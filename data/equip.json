@@ -1,0 +1,10 @@
+{
+  "equips": {
+    "5001": {
+      "name": "天雷印",
+      "icon": "ui_new/skill_05.png",
+      "quality": 4,
+      "cd_total": 6
+    }
+  }
+}

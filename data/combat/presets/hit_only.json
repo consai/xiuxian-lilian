@@ -1,0 +1,6 @@
+{
+  "_comment": "无施法动作，仅受击（治疗/BUFF 等暂用）",
+  "sequence": [
+    { "op": "impact" }
+  ]
+}

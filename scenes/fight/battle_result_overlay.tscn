@@ -1,0 +1,113 @@
+[gd_scene format=3 uid="uid://do06os1xqkp8m"]
+
+[ext_resource type="Script" uid="uid://c8e6pjpfrg8a1" path="res://scripts/fight/battle_result_overlay_view.gd" id="1_view"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_n1hxr"]
+[ext_resource type="Texture2D" uid="uid://byo31enqsiwst" path="res://assets/art/ui_new/img_suc.png" id="5_cdiv8"]
+[ext_resource type="PackedScene" uid="uid://bx04spldnbiyv" path="res://scenes/items/item.tscn" id="5_nhlnp"]
+[ext_resource type="Texture2D" uid="uid://d3mta65yicnke" path="res://assets/art/ui_new/imt_fail.png" id="5_s8ofd"]
+
+[node name="BattleResultOverlay" type="Control" unique_id=444096834]
+z_index = 50
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("1_view")
+
+[node name="Dim" type="ColorRect" parent="." unique_id=1777386079]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0, 0, 0.55)
+
+[node name="Panel" type="Panel" parent="." unique_id=371697160]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -271.0
+offset_right = 320.0
+offset_bottom = 274.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_n1hxr")
+
+[node name="img_suc" type="TextureRect" parent="Panel" unique_id=1727350055]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 53.0
+offset_top = 27.0
+offset_right = 607.0
+offset_bottom = 267.0
+texture = ExtResource("5_cdiv8")
+
+[node name="img_fail" type="TextureRect" parent="Panel" unique_id=2043926123]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 52.0
+offset_top = 69.0
+offset_right = 584.0
+offset_bottom = 250.0
+texture = ExtResource("5_s8ofd")
+
+[node name="BattleResultScroll" type="ScrollContainer" parent="Panel" unique_id=1767267631]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 62.0
+offset_top = 264.0
+offset_right = -59.0
+offset_bottom = -232.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BattleResultBody" type="RichTextLabel" parent="Panel/BattleResultScroll" unique_id=767821391]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "战斗耗时: xxx
+修为+xxx 		灵石+xxx
+"
+fit_content = true
+scroll_active = false
+
+[node name="BattleResultClose" type="Button" parent="Panel" unique_id=1630051711]
+unique_name_in_owner = true
+self_modulate = Color(0.87058824, 0.7372549, 0.5372549, 1)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -361.0
+offset_top = -78.0
+offset_right = -282.0
+offset_bottom = -38.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "确定"
+
+[node name="rewards" type="HBoxContainer" parent="Panel" unique_id=1008248288]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 64.0
+offset_top = 335.0
+offset_right = 581.0
+offset_bottom = 385.0
+
+[node name="Item" parent="Panel/rewards" unique_id=544489580 instance=ExtResource("5_nhlnp")]
+layout_mode = 2

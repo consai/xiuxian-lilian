@@ -1,0 +1,10 @@
+---
+description: UI 布局必须在场景文件中定义，禁止在脚本里动态拼装 Control 结构
+globs: "**/*.gd,**/*.tscn"
+---
+
+# UI 布局规范
+
+- **布局与控件树**：所有界面布局（容器层级、`custom_minimum_size`、锚点、主题、`%` 唯一名）必须在 `.tscn` 场景文件中完成。
+- **脚本职责**：GDScript 仅负责绑定数据、连接信号、更新已有节点的 `text`/`value`/`visible` 等属性；不得在运行时 `new` 容器或 `add_child` 方式拼装整块 UI 结构。
+- **列表与重复项**：每条目、每张卡等重复 UI 须有**独立子场景** `.tscn` 描述完整布局。主菜单优先在父场景中摆放**固定数量**子场景实例以便对齐；若必须运行时 `instantiate()`，只能实例化上述子场景并 `add_child`，**禁止**在脚本里 `new Label` / `new HBoxContainer` 等从零拼布局。

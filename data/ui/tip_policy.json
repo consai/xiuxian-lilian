@@ -1,0 +1,9 @@
+{
+  "default_dedupe_window_ms": 450,
+  "default_throttle_ms": 160,
+  "channels": {
+    "combat_block": {
+      "max_inflight": 2
+    }
+  }
+}

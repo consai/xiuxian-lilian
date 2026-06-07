@@ -1,0 +1,200 @@
+[gd_scene format=3 uid="uid://jcty6ipi0vb2"]
+
+[ext_resource type="Script" uid="uid://ckw3mnn1ldhcn" path="res://scenes/items/oneskill.gd" id="1_tiany"]
+[ext_resource type="Texture2D" uid="uid://dr8mq2yvaep1a" path="res://assets/art/ui_new/sprite_006.png" id="2_p7row"]
+[ext_resource type="Texture2D" uid="uid://ohm5mgw4oqtf" path="res://assets/art/ui_new/skill_01.png" id="2_sg1g1"]
+[ext_resource type="Texture2D" uid="uid://bkn13hdpnhtn4" path="res://assets/art/ui_new/skill_number.png" id="3_tiany"]
+[ext_resource type="StyleBox" uid="uid://gpol4k6gxiec" path="res://ui/panel_skillback.tres" id="3_ypyvn"]
+[ext_resource type="LabelSettings" uid="uid://dknyivqhm6bby" path="res://ui/ziti_new/13.tres" id="5_uukb5"]
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="7_ypyvn"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_beab3"]
+bg_color = Color(0.45882353, 0.28627452, 0.25882354, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g2ogb"]
+bg_color = Color(1, 0.93333334, 0.8784314, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.76862746, 0.5058824, 0.3882353, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+corner_detail = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m6mll"]
+bg_color = Color(0.93333334, 0.8039216, 0.7019608, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.76862746, 0.5058824, 0.3882353, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+corner_detail = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hvaav"]
+bg_color = Color(0.9529412, 0.70980394, 0.6627451, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.654902, 0.34901962, 0.31764707, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nkxry"]
+bg_color = Color(0.90588236, 0.47843137, 0.43529412, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5411765, 0.5411765, 0.5411765, 0)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+anti_aliasing_size = 0.01
+
+[sub_resource type="Theme" id="Theme_rbqh8"]
+HSlider/icons/grabber = ExtResource("2_p7row")
+HSlider/icons/grabber_disabled = ExtResource("2_p7row")
+HSlider/icons/grabber_highlight = ExtResource("2_p7row")
+HSlider/styles/slider = SubResource("StyleBoxFlat_beab3")
+Panel/styles/panel = SubResource("StyleBoxFlat_g2ogb")
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_m6mll")
+ProgressBar/colors/font_outline_color = Color(0.49803922, 0.48235294, 0.4862745, 1)
+ProgressBar/constants/outline_size = 1
+ProgressBar/font_sizes/font_size = 11
+ProgressBar/styles/background = SubResource("StyleBoxFlat_hvaav")
+ProgressBar/styles/fill = SubResource("StyleBoxFlat_nkxry")
+
+[node name="skill_1" type="Control" unique_id=70018307]
+custom_minimum_size = Vector2(94, 114)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 94.0
+offset_bottom = 114.0
+script = ExtResource("1_tiany")
+
+[node name="Back" type="Panel" parent="." unique_id=1939327050]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 94.0
+offset_bottom = 94.0
+mouse_filter = 2
+theme = SubResource("Theme_rbqh8")
+theme_override_styles/panel = ExtResource("3_ypyvn")
+
+[node name="Icon" type="TextureRect" parent="Back" unique_id=69741909]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = -7.0
+offset_bottom = -7.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_sg1g1")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CdOverlay" type="TextureProgressBar" parent="Back/Icon" unique_id=58514758]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -11.0
+offset_top = -10.0
+offset_right = 11.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+fill_mode = 5
+texture_progress = ExtResource("2_sg1g1")
+tint_progress = Color(0, 0, 0, 0.55)
+
+[node name="skill_num" type="TextureRect" parent="." unique_id=436472769]
+layout_mode = 0
+offset_right = 20.0
+offset_bottom = 21.0
+mouse_filter = 2
+texture = ExtResource("3_tiany")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="SlotLabel" type="Label" parent="skill_num" unique_id=730386023]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "1"
+label_settings = ExtResource("5_uukb5")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NameLabel" type="Label" parent="." unique_id=945060692]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "雷霆万军"
+label_settings = ExtResource("5_uukb5")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CountLabel" type="Label" parent="." unique_id=161020504]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 19.0
+offset_top = -35.0
+offset_right = 40.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(1, 0.9647059, 0.74509805, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.78)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+text = "99"
+label_settings = ExtResource("5_uukb5")
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Control" type="Control" parent="." unique_id=1869731696]
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("7_ypyvn")
+target_path = NodePath("..")

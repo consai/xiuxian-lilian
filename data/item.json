@@ -1,0 +1,246 @@
+{
+  "items": [
+    {
+      "id": "items_LingCao",
+      "name": "灵草",
+      "type": "材料",
+      "rarity": "普通",
+      "quality": 1,
+      "ling_shi": 8,
+      "stackable": true,
+      "max_stack": 999,
+      "desc": "常见灵植，可用于炼丹与基础交易。",
+      "icon": "res://assets/art/ui/lingcao.png"
+    },
+    {
+      "id": "items_LingGuo",
+      "name": "灵果",
+      "type": "材料",
+      "rarity": "普通",
+      "quality": 1,
+      "ling_shi": 14,
+      "stackable": true,
+      "max_stack": 999,
+      "desc": "富含灵气的果实，直接食用可略微补益。",
+      "icon": "res://assets/art/ui/lingcao.png",
+      "use_effect": [
+        {"op": "hp", "args": [10]},
+        {"op": "heart_demon", "args": [-2]}
+      ]
+    },
+    {
+      "id": "items_YaoDan",
+      "name": "妖丹",
+      "type": "材料",
+      "rarity": "稀有",
+      "quality": 3,
+      "ling_shi": 62,
+      "stackable": true,
+      "max_stack": 999,
+      "desc": "妖兽内丹，是高阶炼制与交易的常用素材。",
+      "icon": "res://assets/art/ui/lingcao.png"
+    },
+    {
+      "id": "items_HanTie",
+      "name": "寒铁",
+      "type": "矿材",
+      "rarity": "普通",
+      "quality": 1,
+      "ling_shi": 10,
+      "stackable": true,
+      "max_stack": 999,
+      "desc": "可用于锻造低阶法器。",
+      "icon": "res://assets/art/ui/lingshi.png"
+    },
+    {
+      "id": "items_XuanJin",
+      "name": "玄金",
+      "type": "矿材",
+      "rarity": "稀有",
+      "quality": 3,
+      "ling_shi": 58,
+      "stackable": true,
+      "max_stack": 999,
+      "desc": "蕴含特殊灵纹的矿材，价值较高。",
+      "icon": "res://assets/art/ui/lingshi.png"
+    },
+    {
+      "id": "items_HuiQiDan",
+      "name": "回气丹",
+      "type": "丹药",
+      "rarity": "普通",
+      "quality": 1,
+      "ling_shi": 25,
+      "stackable": true,
+      "max_stack": 99,
+      "desc": "用于恢复状态的常见丹药。",
+      "icon": "res://assets/art/ui/danyao_huang.png",
+      "use_effect": [{"op": "hp", "args": [22]}]
+    },
+    {
+      "id": "items_JuQiDan",
+      "name": "聚气丹",
+      "type": "丹药",
+      "rarity": "普通",
+      "quality": 1,
+      "ling_shi": 35,
+      "stackable": true,
+      "max_stack": 99,
+      "desc": "短时聚拢灵气，常作为修炼消耗品。",
+      "icon": "res://assets/art/ui/danyao_huang.png",
+      "use_effect": [{"op": "cultivation", "args": [18]}]
+    },
+    {
+      "id": "items_LiaoShangDan",
+      "name": "疗伤丹",
+      "type": "丹药",
+      "rarity": "普通",
+      "quality": 1,
+      "ling_shi": 40,
+      "stackable": true,
+      "max_stack": 99,
+      "desc": "用于治疗伤势的基础丹药。",
+      "icon": "res://assets/art/ui/danyao_huang.png",
+      "use_effect": [{"op": "hp", "args": [35]}]
+    },
+    {
+      "id": "items_PoJingDan",
+      "name": "破境丹",
+      "type": "丹药",
+      "rarity": "稀有",
+      "quality": 3,
+      "ling_shi": 120,
+      "stackable": true,
+      "max_stack": 99,
+      "desc": "可用于突破阶段辅助。",
+      "icon": "res://assets/art/ui/danyao_huang.png",
+      "use_effect": [
+        {"op": "cultivation", "args": [40]},
+        {"op": "heart_demon", "args": [-6]}
+      ]
+    },
+    {
+      "id": "items_HuiLingDan",
+      "name": "回灵丹",
+      "type": "丹药",
+      "rarity": "普通",
+      "quality": 1,
+      "ling_shi": 30,
+      "stackable": true,
+      "max_stack": 99,
+      "desc": "用于补充灵气与回复状态。",
+      "icon": "res://assets/art/ui/danyao_huang.png",
+      "use_effect": [
+        {"op": "cultivation", "args": [15]},
+        {"op": "hp", "args": [8]}
+      ]
+    },
+    {
+      "id": "items_QingFengJian",
+      "name": "青锋剑",
+      "type": "法宝",
+      "rarity": "普通",
+      "quality": 1,
+      "ling_shi": 85,
+      "stackable": false,
+      "max_stack": 1,
+      "desc": "轻巧锋利，适合初期修士。",
+      "icon": "res://assets/art/ui/daojubeijin.png"
+    },
+    {
+      "id": "items_XuanWuJia",
+      "name": "玄武甲",
+      "type": "法宝",
+      "rarity": "普通",
+      "quality": 1,
+      "ling_shi": 92,
+      "stackable": false,
+      "max_stack": 1,
+      "desc": "防护型护甲法宝。",
+      "icon": "res://assets/art/ui/daojubeijin.png"
+    },
+    {
+      "id": "items_ZhenHunLing",
+      "name": "镇魂铃",
+      "type": "法宝",
+      "rarity": "稀有",
+      "quality": 3,
+      "ling_shi": 210,
+      "stackable": false,
+      "max_stack": 1,
+      "desc": "有助于稳固神魂、压制心魔。",
+      "icon": "res://assets/art/ui/daojubeijin.png"
+    },
+    {
+      "id": "items_QianKunDai",
+      "name": "乾坤袋",
+      "type": "法宝",
+      "rarity": "普通",
+      "quality": 1,
+      "ling_shi": 155,
+      "stackable": false,
+      "max_stack": 1,
+      "desc": "便携储物法宝，适合长期采集与携行。",
+      "icon": "res://assets/art/ui/daojubeijin.png"
+    },
+    {
+      "id": "items_JiuZhuanJinDan",
+      "name": "九转金丹",
+      "type": "丹药",
+      "rarity": "传说",
+      "quality": 6,
+      "ling_shi": 520,
+      "stackable": true,
+      "max_stack": 9,
+      "desc": "极其珍贵的高阶丹药。",
+      "icon": "res://assets/art/ui/danyao_huang.png",
+      "use_effect": [
+        {"op": "cultivation", "args": [120]},
+        {"op": "hp", "args": [50]},
+        {"op": "heart_demon", "args": [-20]}
+      ]
+    },
+    {
+      "id": "items_ZhuXianJian",
+      "name": "诛仙剑",
+      "type": "法宝",
+      "rarity": "传说",
+      "quality": 6,
+      "ling_shi": 880,
+      "stackable": false,
+      "max_stack": 1,
+      "desc": "顶级攻伐法宝，实战与历练价值极高。",
+      "icon": "res://assets/art/ui/daojubeijin.png"
+    },
+    {
+      "id": "items_LunHuiYin",
+      "name": "轮回印",
+      "type": "法宝",
+      "rarity": "传说",
+      "quality": 6,
+      "ling_shi": 620,
+      "stackable": false,
+      "max_stack": 1,
+      "desc": "罕见保命异宝，可在危局中逆转一线生机。",
+      "icon": "res://assets/art/ui/daojubeijin.png"
+    },
+    {
+      "id": "items_FightTestDan",
+      "name": "战斗测试丹",
+      "type": "丹药",
+      "rarity": "普通",
+      "quality": 1,
+      "ling_shi": 1,
+      "stackable": true,
+      "max_stack": 99,
+      "desc": "战斗内测试用消耗品，回复气血并少量回灵。",
+      "icon": "res://assets/art/ui/danyao_huang.png",
+      "fight_id": 9001,
+      "fight_cd": 3,
+      "fight_effect": [
+        {"type": "heal", "value": 30, "target": "self"},
+        {"type": "restore_mp", "value": 15, "target": "self"}
+      ]
+    }
+  ]
+}

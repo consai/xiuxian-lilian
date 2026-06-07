@@ -1,0 +1,54 @@
+{
+  "battle_time_limit": 200,
+  "skills": {
+    "0": {
+      "name": "普攻",
+      "icon": "ui_new/skill_01.png",
+      "quality": 1,
+      "vfx_type": "melee",
+      "vfx": "melee_default",
+      "tags": ["attack", "physical"]
+    },
+    "1": {
+      "name": "火焰弹",
+      "icon": "ui_new/skill_05.png",
+      "quality": 2,
+      "mp_cost": 10,
+      "cd_total": 5,
+      "power": 1000,
+      "vfx_type": "ranged",
+      "vfx": "ranged_default",
+      "tags": ["magic"],
+      "effects": [
+        {"type": "damage", "value": 5, "target": "enemy"}
+      ]
+    },
+    "2": {
+      "name": "火焰盾",
+      "icon": "ui_new/skill_06.png",
+      "quality": 3,
+      "mp_cost": 10,
+      "cd_total": 5,
+      "power": 1000,
+      "vfx_type": "ranged",
+      "vfx": "status_cast",
+      "tags": ["magic"],
+      "effects": [
+        {"type": "shield", "value": 100, "target": "self"}
+      ]
+    },
+    "3": {
+      "name": "毒",
+      "icon": "ui_new/skill_02.png",
+      "quality": 2,
+      "mp_cost": 10,
+      "cd_total": 5,
+      "power": 1000,
+      "vfx_type": "ranged",
+      "vfx": "status_cast",
+      "effects": [
+        {"type": "buff", "modifiers": {"buff_dot": 1}, "target": "enemy"}
+      ]
+    }
+  }
+}

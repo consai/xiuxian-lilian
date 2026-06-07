@@ -1,0 +1,16 @@
+{
+  "combat": {
+    "float": {
+      "basic_attack": "普攻",
+      "damage": "-{value}",
+      "crit": "-{value}！",
+      "heal": "+{value}",
+      "mp_cost": "-{value} MP",
+      "mp_gain": "+{value} MP",
+      "shield": "盾 -{value}",
+      "shield_absorb": "吸收",
+      "buff_prefix": "",
+      "buff_expire": "{name} 消散"
+    }
+  }
+}

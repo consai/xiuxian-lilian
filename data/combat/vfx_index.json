@@ -1,0 +1,7 @@
+{
+  "_comment": "战斗表现索引；技能 vfx 填 presets 目录下文件名（可带或不带 .json）",
+  "version": 1,
+  "default": "melee_default",
+  "impact_preset": "hit_default",
+  "preset_dir": "presets"
+}
