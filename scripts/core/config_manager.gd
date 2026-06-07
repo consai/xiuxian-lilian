@@ -54,6 +54,22 @@ func equip_by_id(equip_id: int) -> Dictionary:
 	return {}
 
 
+func item_by_fight_id(fight_id: int) -> Dictionary:
+	var def := item_def_by_fight_id(fight_id)
+	if def == null:
+		return {}
+	return def.to_fight_runtime_dict()
+
+
+func item_def_by_fight_id(fight_id: int) -> ItemDef:
+	if fight_id <= 0:
+		return null
+	for it in _items:
+		if it is ItemDef and (it as ItemDef).fight_id == fight_id:
+			return it
+	return null
+
+
 func basic_attack_cfg() -> Dictionary:
 	return skill_by_id(0)
 

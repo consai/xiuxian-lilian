@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 DataEvents="*res://scripts/events/data_events.gd"
 ConfigManager="*res://scripts/core/config_manager.gd"
 TipsHost="*res://scripts/ui/tips_host.gd"
+HoverTipHost="*res://scripts/ui/hover/hover_tip_host.gd"
 
 [display]
 

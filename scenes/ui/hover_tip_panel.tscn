@@ -1,0 +1,67 @@
+[gd_scene load_steps=5 format=3 uid="uid://c8hoverpanel001"]
+
+[ext_resource type="Script" path="res://scripts/ui/hover/hover_tip_panel.gd" id="1_panel"]
+[ext_resource type="StyleBox" uid="uid://bdjlyraa36sst" path="res://ui/panel_itemback.tres" id="2_style"]
+[ext_resource type="LabelSettings" uid="uid://dg7uds3ec0xtu" path="res://ui/ziti_new/22.tres" id="3_title"]
+[ext_resource type="LabelSettings" uid="uid://dknyivqhm6bby" path="res://ui/ziti_new/13.tres" id="4_body"]
+
+[node name="HoverTipPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 200.0
+offset_bottom = 120.0
+mouse_filter = 2
+script = ExtResource("1_panel")
+
+[node name="Panel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 120.0
+theme_override_styles/panel = ExtResource("2_style")
+
+[node name="Margin" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Header" type="HBoxContainer" parent="Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Icon" type="TextureRect" parent="Panel/Margin/VBox/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="Panel/Margin/VBox/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "技能名称"
+label_settings = ExtResource("3_title")
+vertical_alignment = 1
+
+[node name="Body" type="Label" parent="Panel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4117647, 0.3019608, 0.27450982, 1)
+text = "描述行"
+label_settings = ExtResource("4_body")
+autowrap_mode = 3
+
+[node name="Footer" type="Label" parent="Panel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5372549, 0.42745098, 0.3882353, 1)
+label_settings = ExtResource("4_body")
+autowrap_mode = 3

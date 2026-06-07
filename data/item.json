@@ -74,7 +74,7 @@
       "stackable": true,
       "max_stack": 99,
       "desc": "用于恢复状态的常见丹药。",
-      "icon": "res://assets/art/ui/danyao_huang.png",
+      "icon": "res://assets/art/ui/hulu.png",
       "use_effect": [{"op": "hp", "args": [22]}]
     },
     {
@@ -87,7 +87,7 @@
       "stackable": true,
       "max_stack": 99,
       "desc": "短时聚拢灵气，常作为修炼消耗品。",
-      "icon": "res://assets/art/ui/danyao_huang.png",
+      "icon": "res://assets/art/ui/hulu.png",
       "use_effect": [{"op": "cultivation", "args": [18]}]
     },
     {
@@ -100,7 +100,7 @@
       "stackable": true,
       "max_stack": 99,
       "desc": "用于治疗伤势的基础丹药。",
-      "icon": "res://assets/art/ui/danyao_huang.png",
+      "icon": "res://assets/art/ui/hulu.png",
       "use_effect": [{"op": "hp", "args": [35]}]
     },
     {
@@ -113,7 +113,7 @@
       "stackable": true,
       "max_stack": 99,
       "desc": "可用于突破阶段辅助。",
-      "icon": "res://assets/art/ui/danyao_huang.png",
+      "icon": "res://assets/art/ui/hulu.png",
       "use_effect": [
         {"op": "cultivation", "args": [40]},
         {"op": "heart_demon", "args": [-6]}
@@ -129,7 +129,7 @@
       "stackable": true,
       "max_stack": 99,
       "desc": "用于补充灵气与回复状态。",
-      "icon": "res://assets/art/ui/danyao_huang.png",
+      "icon": "res://assets/art/ui/hulu.png",
       "use_effect": [
         {"op": "cultivation", "args": [15]},
         {"op": "hp", "args": [8]}
@@ -193,7 +193,7 @@
       "stackable": true,
       "max_stack": 9,
       "desc": "极其珍贵的高阶丹药。",
-      "icon": "res://assets/art/ui/danyao_huang.png",
+      "icon": "res://assets/art/ui/hulu.png",
       "use_effect": [
         {"op": "cultivation", "args": [120]},
         {"op": "hp", "args": [50]},
@@ -210,7 +210,7 @@
       "stackable": false,
       "max_stack": 1,
       "desc": "顶级攻伐法宝，实战与历练价值极高。",
-      "icon": "res://assets/art/ui/daojubeijin.png"
+      "icon": "res://assets/art/ui_new/jian.png"
     },
     {
       "id": "items_LunHuiYin",
@@ -222,7 +222,7 @@
       "stackable": false,
       "max_stack": 1,
       "desc": "罕见保命异宝，可在危局中逆转一线生机。",
-      "icon": "res://assets/art/ui/daojubeijin.png"
+      "icon": "res://assets/art/ui_new/jian.png"
     },
     {
       "id": "items_FightTestDan",
@@ -234,7 +234,7 @@
       "stackable": true,
       "max_stack": 99,
       "desc": "战斗内测试用消耗品，回复气血并少量回灵。",
-      "icon": "res://assets/art/ui/danyao_huang.png",
+      "icon": "res://assets/art/ui_new/hulu.png",
       "fight_id": 9001,
       "fight_cd": 3,
       "fight_effect": [

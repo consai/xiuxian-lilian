@@ -1,4 +1,57 @@
 {
+  "hover": {
+    "target": {
+      "self": "自身",
+      "enemy": "敌人",
+      "ally": "友方",
+      "default": "目标"
+    },
+    "skill": {
+      "mp_cost": "法力消耗：{value}",
+      "cd": "冷却：{value}秒",
+      "power": "威力：{value}",
+      "tags": "标签：{value}",
+      "effect_damage": "对{target}造成伤害 {value}",
+      "effect_heal": "为{target}恢复 {value} 生命",
+      "effect_shield": "为{target}获得护盾 {value}",
+      "effect_buff": "对{target}施加 {name}",
+      "effect_buff_plain": "对{target}施加状态",
+      "tag": {
+        "attack": "攻击",
+        "physical": "物理",
+        "magic": "法术"
+      }
+    },
+    "item": {
+      "count": "数量：{value}",
+      "effect_restore_mp": "为{target}恢复 {value} 法力"
+    },
+    "equip": {
+      "kind": "战斗法宝"
+    },
+    "buff": {
+      "stacks": "层数：{value}",
+      "duration": "持续：{value}秒",
+      "max_stacks": "最大层数：{value}",
+      "ticktime": "周期：{value}秒",
+      "modifier": "{name} {sign}{value}",
+      "tags": "标签：{value}",
+      "tag": {
+        "buff": "增益",
+        "debuff": "减益"
+      },
+      "attr": {
+        "hp_max": "气血上限",
+        "mp_max": "法力上限",
+        "shield": "护盾",
+        "atk": "攻击",
+        "def": "防御",
+        "spd": "速度",
+        "crit": "暴击",
+        "crit_damage": "暴击伤害"
+      }
+    }
+  },
   "combat": {
     "float": {
       "basic_attack": "普攻",
@@ -10,7 +63,8 @@
       "shield": "盾 -{value}",
       "shield_absorb": "吸收",
       "buff_prefix": "",
-      "buff_expire": "{name} 消散"
+      "buff_expire": "{name} 消散",
+      "buff_tick": "状态"
     }
   }
 }

@@ -2,6 +2,7 @@
   "buffs": {
     "buff_slow": {
       "name": "迟缓",
+      "icon": "ui_new/skill_03.png",
       "desc": "出手变慢（示例）",
       "duration": 6,
       "max_stacks": 1,
@@ -12,6 +13,7 @@
     },
     "buff_dot": {
       "name": "灼烧",
+      "icon": "ui_new/huo.png",
       "desc": "周期造成伤害（示例）",
       "duration": 6,
       "max_stacks": 1,
@@ -21,16 +23,6 @@
         {"type": "damage", "value": 10}
       ],
       "tags": ["debuff"]
-    },
-    "buff_shield": {
-      "name": "护盾",
-      "desc": "护盾值增加（示例）",
-      "duration": 6,
-      "max_stacks": 1,
-      "ticktime": 1.0,
-      "modifiers": [{"shield": 100}],
-      "tick_effects": [],
-      "tags": ["buff"]
     }
   }
 }

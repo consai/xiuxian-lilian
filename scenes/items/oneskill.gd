@@ -18,6 +18,7 @@ var _hot_key: String = "1"
 @onready var _slot_label: Label = %SlotLabel
 @onready var _name_label: Label = %NameLabel
 @onready var _count_label: Label = %CountLabel
+@onready var _hover_tip: HoverTipSource = %HoverTipSource
 
 var _cd_total: float = 0.0
 var _blocked_tween: Tween
@@ -71,6 +72,39 @@ func clear_slot() -> void:
 	var press := get_node_or_null("Control")
 	if press is Control:
 		press.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if _hover_tip != null:
+		_hover_tip.clear_payload()
+		_hover_tip.enabled = false
+
+
+## 绑定技能 hover tip；[param skill_id] < 0 时不展示。
+func bind_hover_skill(skill_id: int, icon: Texture2D = null) -> void:
+	_bind_hover_payload(SkillHoverTipBuilder.build(skill_id, icon))
+
+
+## 绑定道具 hover tip；[param fight_item_id] 为战斗槽位 id（fight_id）。
+func bind_hover_item(fight_item_id: int, icon: Texture2D = null, count: int = -1) -> void:
+	_bind_hover_payload(ItemHoverTipBuilder.build(fight_item_id, icon, count))
+
+
+## 绑定法宝 hover tip。
+func bind_hover_equip(
+	equip_id: int,
+	icon: Texture2D = null,
+	slot_effects: Variant = null
+) -> void:
+	_bind_hover_payload(EquipHoverTipBuilder.build(equip_id, icon, slot_effects))
+
+
+func _bind_hover_payload(payload: Dictionary) -> void:
+	if _hover_tip == null:
+		return
+	if HoverTipPayload.is_empty(payload):
+		_hover_tip.clear_payload()
+		_hover_tip.enabled = false
+		return
+	_hover_tip.set_payload(payload)
+	_hover_tip.enabled = true
 
 
 func set_cooldown(remaining: float, total: float = -1.0) -> void:

@@ -639,6 +639,7 @@ static func build_skills_ui(player: FightObj, skill_cfg: Dictionary) -> Array:
 			continue
 		if skill_id == 0:
 			var basic := {
+				"skill_id": 0,
 				"name": "普攻",
 				"cd_remaining": float(slot.get("cd", 0.0)),
 				"cd_total": -1.0,
@@ -663,6 +664,7 @@ static func build_skills_ui(player: FightObj, skill_cfg: Dictionary) -> Array:
 		var cd_total := float(slot.get("cd_total", cfg.get("cd", 0.0)))
 		var icon := _resolve_icon_texture(cfg)
 		var row := {
+			"skill_id": skill_id,
 			"name": str(cfg.get("name", "")),
 			"cd_remaining": float(slot.get("cd", 0.0)),
 			"cd_total": cd_total,
@@ -731,11 +733,15 @@ static func build_equips_ui(slots_v: Variant, equip_cfg: Dictionary) -> Array:
 			rows.append({"empty": true})
 			continue
 		var row := {
+			"equip_id": equip_id,
 			"name": str(cfg.get("name", str(equip_id))),
 			"item_id": equip_id,
 			"cd_remaining": float(slot.get("cd", 0.0)),
 			"cd_total": float(slot.get("cd_total", cfg.get("cd_total", cfg.get("cd", 0.0)))),
 		}
+		var effects_v: Variant = slot.get("effects", cfg.get("effects", []))
+		if effects_v is Array and not (effects_v as Array).is_empty():
+			row["effects"] = (effects_v as Array).duplicate(true)
 		var icon := _resolve_icon_texture(cfg)
 		if icon != null:
 			row["icon"] = icon

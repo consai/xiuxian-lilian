@@ -5,6 +5,7 @@ extends RefCounted
 
 var id: String = ""
 var name: String = ""
+var icon: String = ""
 var desc: String = ""
 var duration: float = 0.0
 var max_stacks: int = 1
@@ -22,6 +23,7 @@ static func from_dict(data: Dictionary) -> BuffDef:
 	var buff := BuffDef.new()
 	buff.id = bid
 	buff.name = str(data.get("name", "")).strip_edges()
+	buff.icon = str(data.get("icon", "")).strip_edges()
 	buff.desc = str(data.get("desc", "")).strip_edges()
 	buff.duration = float(data.get("duration", 0.0))
 	buff.max_stacks = maxi(1, int(data.get("max_stacks", 1)))
@@ -60,6 +62,7 @@ func to_dict() -> Dictionary:
 	return {
 		"id": id,
 		"name": name,
+		"icon": icon,
 		"desc": desc,
 		"duration": duration,
 		"max_stacks": max_stacks,

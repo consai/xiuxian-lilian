@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://dp0ph2rhfe3qy"]
 
 [ext_resource type="Script" uid="uid://3kf84o4xhq3h" path="res://scripts/fight/fight_scene.gd" id="1_6irjl"]
-[ext_resource type="Texture2D" uid="uid://db4t3v2tn0w5v" path="res://assets/art/back/战斗界面.png" id="1_rbqh8"]
 [ext_resource type="Texture2D" uid="uid://k7aplfa6t5bk" path="res://assets/art/fightscene/fight1.png" id="2_co4yi"]
 [ext_resource type="Texture2D" uid="uid://dr8mq2yvaep1a" path="res://assets/art/ui_new/sprite_006.png" id="2_rpgid"]
 [ext_resource type="StyleBox" uid="uid://djo82jeb3from" path="res://ui/progress_blue_back.tres" id="3_eiqso"]
@@ -10,6 +9,8 @@
 [ext_resource type="Texture2D" uid="uid://db4kxr0kfsyt" path="res://assets/art/jueshe/sprite_002.png" id="5_0naaa"]
 [ext_resource type="LabelSettings" uid="uid://dg7uds3ec0xtu" path="res://ui/ziti_new/22.tres" id="6_dlkp7"]
 [ext_resource type="Texture2D" uid="uid://dyt1550r3j3nt" path="res://assets/art/ui_new/shengming.png" id="7_j6srn"]
+[ext_resource type="Texture2D" uid="uid://b2rlinwudsv5b" path="res://assets/art/ui_new/hudun_icon.png" id="7_x82jq"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="8_kbag1"]
 [ext_resource type="Texture2D" uid="uid://di6wqkkk0t4tl" path="res://assets/art/ui_new/fali.png" id="8_mh2b2"]
 [ext_resource type="Texture2D" uid="uid://cb0y0hjmgauls" path="res://assets/art/ui_new/flag.png" id="9_mh2b2"]
 [ext_resource type="Texture2D" uid="uid://drq6walh54ag4" path="res://assets/art/ui_new/btn_back.png" id="10_ropvy"]
@@ -28,6 +29,7 @@
 [ext_resource type="Script" uid="uid://b8ghtxgbdb858" path="res://scripts/fight/combat_float_layer.gd" id="25_float"]
 [ext_resource type="PackedScene" uid="uid://do06os1xqkp8m" path="res://scenes/fight/battle_result_overlay.tscn" id="26_resultoverlay"]
 [ext_resource type="PackedScene" uid="uid://bwekah2swk2g3" path="res://scenes/fight/interval_track_view.tscn" id="27_interval"]
+[ext_resource type="PackedScene" path="res://scenes/fight/buff_status_bar.tscn" id="28_buffbar"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_beab3"]
 bg_color = Color(0.45882353, 0.28627452, 0.25882354, 1)
@@ -102,6 +104,21 @@ ProgressBar/font_sizes/font_size = 11
 ProgressBar/styles/background = SubResource("StyleBoxFlat_hvaav")
 ProgressBar/styles/fill = SubResource("StyleBoxFlat_nkxry")
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shield_back"]
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shield_fill"]
+bg_color = Color(0.2, 0.8666667, 0.8, 0.58431375)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8, 0.8, 0.8, 0)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
 [sub_resource type="Resource" id="Resource_748tr"]
 script = ExtResource("24_l3d53")
 actor_base_scale = 1.0
@@ -117,35 +134,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_6irjl")
-
-[node name="TextureRect" type="TextureRect" parent="." unique_id=299693978]
-visible = false
-self_modulate = Color(1, 1, 1, 0.34509805)
-z_index = 1
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -9.0
-offset_bottom = 3.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("1_rbqh8")
-expand_mode = 1
-
-[node name="TextureRect2" type="TextureRect" parent="." unique_id=96481049]
-visible = false
-z_index = 1
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -9.0
-offset_bottom = 3.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("1_rbqh8")
-expand_mode = 1
 
 [node name="fightback" type="TextureRect" parent="." unique_id=1120030507]
 layout_mode = 1
@@ -163,7 +151,7 @@ self_modulate = Color(1, 1, 1, 0.7411765)
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 170.0
+offset_bottom = 185.0
 grow_horizontal = 2
 
 [node name="left" type="Control" parent="head" unique_id=2027380691]
@@ -225,6 +213,43 @@ label_settings = ExtResource("16_3s5lo")
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="shield_left" type="ProgressBar" parent="head/left" unique_id=1702423945]
+unique_name_in_owner = true
+z_index = 1
+layout_mode = 0
+offset_left = 214.0
+offset_top = 74.0
+offset_right = 379.0
+offset_bottom = 94.0
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_shield_back")
+theme_override_styles/fill = SubResource("StyleBoxFlat_shield_fill")
+value = 13.59
+show_percentage = false
+
+[node name="shield_badge_left" type="HBoxContainer" parent="head/left" unique_id=1299439381]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 382.0
+offset_top = 73.0
+offset_right = 430.0
+offset_bottom = 95.0
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="ShieldIcon" type="TextureRect" parent="head/left/shield_badge_left" unique_id=430340297]
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+texture = ExtResource("7_x82jq")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="shield_val_left" type="Label" parent="head/left/shield_badge_left" unique_id=1911542446]
+unique_name_in_owner = true
+layout_mode = 2
+text = "50"
+label_settings = ExtResource("8_kbag1")
+
 [node name="fali_left" type="ProgressBar" parent="head/left" unique_id=1915843097]
 unique_name_in_owner = true
 layout_mode = 0
@@ -250,6 +275,14 @@ text = "100/100"
 label_settings = ExtResource("16_3s5lo")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="buff_status_left" parent="head/left" unique_id=1543137868 instance=ExtResource("28_buffbar")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 191.0
+offset_top = 128.0
+offset_right = 379.0
+offset_bottom = 174.0
 
 [node name="rolename_left" type="Label" parent="head/left" unique_id=952350243]
 unique_name_in_owner = true
@@ -329,6 +362,7 @@ offset_right = 178.0
 offset_bottom = 95.0
 theme = SubResource("Theme_rbqh8")
 value = 83.11
+show_percentage = false
 
 [node name="hp_val_right" type="Label" parent="head/right/shengming_right" unique_id=2041603034]
 unique_name_in_owner = true
@@ -343,6 +377,44 @@ label_settings = ExtResource("16_3s5lo")
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="shield_right" type="ProgressBar" parent="head/right" unique_id=2090926165]
+unique_name_in_owner = true
+visible = false
+z_index = 1
+layout_mode = 0
+offset_left = 13.0
+offset_top = 75.0
+offset_right = 178.0
+offset_bottom = 95.0
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_shield_back")
+theme_override_styles/fill = SubResource("StyleBoxFlat_shield_fill")
+show_percentage = false
+
+[node name="shield_badge_right" type="HBoxContainer" parent="head/right" unique_id=711162124]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = -36.0
+offset_top = 74.0
+offset_right = 12.0
+offset_bottom = 96.0
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="ShieldIcon" type="TextureRect" parent="head/right/shield_badge_right" unique_id=1033608697]
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+texture = ExtResource("7_x82jq")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="shield_val_right" type="Label" parent="head/right/shield_badge_right" unique_id=952119105]
+unique_name_in_owner = true
+layout_mode = 2
+text = "50"
+label_settings = ExtResource("8_kbag1")
+
 [node name="fali_right" type="ProgressBar" parent="head/right" unique_id=366750543]
 unique_name_in_owner = true
 layout_mode = 0
@@ -354,6 +426,7 @@ theme = SubResource("Theme_rbqh8")
 theme_override_styles/background = ExtResource("3_eiqso")
 theme_override_styles/fill = ExtResource("4_fbi8s")
 value = 96.55
+show_percentage = false
 
 [node name="mp_val_right" type="Label" parent="head/right/fali_right" unique_id=181918380]
 unique_name_in_owner = true
@@ -367,6 +440,15 @@ text = "100/100"
 label_settings = ExtResource("16_3s5lo")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="buff_status_right" parent="head/right" unique_id=1336526454 instance=ExtResource("28_buffbar")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 13.0
+offset_top = 128.0
+offset_right = 178.0
+offset_bottom = 174.0
+row_alignment = "end"
 
 [node name="rolename_right" type="Label" parent="head/right" unique_id=2034249076]
 unique_name_in_owner = true

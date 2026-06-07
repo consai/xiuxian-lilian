@@ -77,17 +77,17 @@ static func build_spawns(
 static func build_buff_tick_spawns(
 		unit_id: String,
 		report: Dictionary,
-		_buff_name: String,
-		names: Dictionary = {}
+		buff_name: String,
+		_names: Dictionary = {}
 ) -> Array:
-	var target_name := _display_name(unit_id, names)
-	if target_name == "":
-		target_name = BattleDebugLog.side_label(unit_id)
+	var line_name := buff_name.strip_edges()
+	if line_name == "":
+		line_name = StringsZh.getp("combat.float.buff_tick", "状态")
 	return build_spawns(
 		unit_id,
 		unit_id,
 		report,
-		{"name": target_name, "is_basic_attack": false}
+		{"name": line_name, "is_basic_attack": false}
 	)
 
 
