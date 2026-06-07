@@ -233,6 +233,11 @@ func return_battle_end(ctx: FightSceneContext, hud: FightSceneHud, reason: Strin
 			ctx.domain.battle_elapsed_advancing,
 			ctx.record_names
 		)
+		summary["player_runtime"] = {
+			"hp": ctx.domain.player.hp,
+			"mp": ctx.domain.player.mp,
+			"items": FightObj._duplicate_slot_array(ctx.domain.player.items),
+		}
 		if ctx.scene.has_signal("battle_finished"):
 			ctx.scene.emit_signal("battle_finished", summary)
 		hud.show_battle_result(ctx, summary)

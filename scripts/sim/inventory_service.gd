@@ -44,7 +44,7 @@ static func cycle_equip_slot(owned_equips: Array, slots: Array, index: int) -> v
 	var choices: Array = [-1]
 	for value in owned_equips:
 		var eid := int(value)
-		if eid > 0 and not choices.has(eid):
+		if eid > 0 and (eid == int(slots[index]) or not slots.has(eid)) and not choices.has(eid):
 			choices.append(eid)
 	var current := int(slots[index])
 	var pos := choices.find(current)
@@ -58,7 +58,12 @@ static func cycle_item_slot(inventory: Dictionary, slots: Array, index: int) -> 
 	for iid_v in inventory.keys():
 		var iid := str(iid_v)
 		var def := _item_def(iid)
-		if def != null and def.has_fight_config() and int(inventory[iid]) > 0:
+		if (
+			def != null
+			and def.has_fight_config()
+			and int(inventory[iid]) > 0
+			and (iid == str(slots[index]) or not slots.has(iid))
+		):
 			choices.append(iid)
 	choices.sort()
 	var current := str(slots[index])
@@ -93,6 +98,19 @@ static func sync_battle_item_counts(inventory: Dictionary, slots: Array, battle_
 
 
 static func _item_def(item_id: String) -> ItemDef:
-	if ConfigManager == null:
+	var cm := _config_manager()
+	if cm != null and cm.has_method("item_def_by_id"):
+		var found: ItemDef = cm.call("item_def_by_id", item_id) as ItemDef
+		if found != null:
+			return found
+	for item_v in JsonLoader.load_items():
+		if item_v is ItemDef and (item_v as ItemDef).id == item_id:
+			return item_v as ItemDef
+	return null
+
+
+static func _config_manager() -> Node:
+	var loop := Engine.get_main_loop()
+	if not loop is SceneTree:
 		return null
-	return ConfigManager.item_def_by_id(item_id)
+	return (loop as SceneTree).root.get_node_or_null("ConfigManager")

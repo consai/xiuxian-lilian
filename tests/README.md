@@ -11,3 +11,15 @@ C:\Godot_v4.6.2-stable_win64_console.exe --headless --path $PWD --script res://t
 The temporary application-data directories keep Godot's `user://` writes inside the workspace. They are ignored by Git through the existing `.godot*` rule.
 
 The test runner exits with code `0` when all tests pass and `1` when any assertion fails.
+
+Run the simulation-loop tests with the same environment:
+
+```powershell
+C:\Godot_v4.6.2-stable_win64_console.exe --headless --path $PWD --script res://tests/run_simulation_tests.gd
+```
+
+The end-to-end encounter smoke test loads the real fight scene with automatic combat:
+
+```powershell
+C:\Godot_v4.6.2-stable_win64_console.exe --headless --path $PWD --script res://tests/run_encounter_smoke.gd
+```

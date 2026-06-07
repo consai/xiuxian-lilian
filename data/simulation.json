@@ -4,6 +4,10 @@
     "cultivate": {"days": 1, "cultivation_gain": 20},
     "rest": {"days": 1, "injury_recovery": 2}
   },
+  "rules": {
+    "battle_loss_injury_days": 3,
+    "battle_loss_hp_floor_ratio": 0.25
+  },
   "realms": [
     {"id": "qi_1", "name": "炼气一层", "breakthrough_at": 100},
     {"id": "qi_2", "name": "炼气二层", "breakthrough_at": 220}

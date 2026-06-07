@@ -2,6 +2,9 @@ extends Node
 
 const SIM_PATH := "res://data/simulation.json"
 const HUB_SCENE := "res://scenes/sim/cave_hub.tscn"
+const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
+const EncounterServiceScript := preload("res://scripts/sim/encounter_service.gd")
+const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
 
 var day := 1
 var realm_index := 0
@@ -61,7 +64,9 @@ func new_game() -> void:
 
 
 func cultivate() -> int:
-	var gain := 10 if injury_days > 0 else 20
+	var cfg := _activity_cfg("cultivate")
+	var base_gain := maxi(0, int(cfg.get("cultivation_gain", 20)))
+	var gain := base_gain / 2 if injury_days > 0 else base_gain
 	cultivation += gain
 	_finish_activity("修炼：修为 +%d" % gain, true)
 	return gain
@@ -70,7 +75,7 @@ func cultivate() -> int:
 func rest() -> void:
 	hp = float(attrs.get(FightAttr.HP_MAX, 100.0))
 	mp = float(attrs.get(FightAttr.MP_MAX, 100.0))
-	injury_days = maxi(0, injury_days - 2)
+	injury_days = maxi(0, injury_days - maxi(0, int(_activity_cfg("rest").get("injury_recovery", 2))))
 	_finish_activity("休息：恢复气血与法力", false)
 
 
@@ -94,7 +99,7 @@ func breakthrough() -> Dictionary:
 
 
 func start_encounter(encounter_id: String, tree: SceneTree) -> bool:
-	var encounter := EncounterService.by_id(encounter_id)
+	var encounter: Dictionary = EncounterServiceScript.by_id(encounter_id)
 	if encounter.is_empty():
 		return false
 	pending_encounter_id = encounter_id
@@ -111,7 +116,13 @@ func build_battle_init(encounter: Dictionary) -> Dictionary:
 		skills.append({"id": -1, "cd": 0.0})
 	var equips: Array = []
 	for eid_v in equip_slots:
-		equips.append({"id": int(eid_v), "cd": 0.0})
+		var eid := int(eid_v)
+		var equip_row := {"id": eid, "cd": 0.0}
+		if eid > 0:
+			var cfg: Dictionary = _equip_cfg(eid)
+			equip_row["effects"] = (cfg.get("effects", []) as Array).duplicate(true)
+			equip_row["cd_total"] = float(cfg.get("cd_total", cfg.get("cd", 0.0)))
+		equips.append(equip_row)
 	var player := {
 		"name": player_name,
 		"icon": player_icon,
@@ -120,7 +131,7 @@ func build_battle_init(encounter: Dictionary) -> Dictionary:
 		"attrs": attrs.duplicate(true),
 		"skills": skills,
 		"equips": equips,
-		"items": InventoryService.build_battle_item_slots(inventory, item_slots),
+		"items": InventoryServiceScript.build_battle_item_slots(inventory, item_slots),
 	}
 	var enemy := (encounter.get("enemy", {}) as Dictionary).duplicate(true)
 	var enemy_skills: Array = []
@@ -149,20 +160,25 @@ func settle_pending_battle() -> Dictionary:
 	var runtime := summary.get("player_runtime", {}) as Dictionary
 	hp = float(runtime.get("hp", hp))
 	mp = float(runtime.get("mp", mp))
-	InventoryService.sync_battle_item_counts(inventory, item_slots, runtime.get("items", []) as Array)
+	InventoryServiceScript.sync_battle_item_counts(inventory, item_slots, runtime.get("items", []) as Array)
 	totals["battles"] = int(totals.get("battles", 0)) + 1
 	var won := str(summary.get("outcome", "")) == "win"
 	if won:
 		totals["wins"] = int(totals.get("wins", 0)) + 1
-		last_rewards = RewardService.apply_rewards(self, RewardService.roll_rewards(EncounterService.by_id(pending_encounter_id)))
+		last_rewards = RewardServiceScript.apply_rewards(
+			self,
+			RewardServiceScript.roll_rewards(EncounterServiceScript.by_id(pending_encounter_id))
+		)
 		for reward in last_rewards:
 			totals["items_gained"] = int(totals.get("items_gained", 0)) + int((reward as Dictionary).get("count", 0))
+		_finish_activity("历练%s：胜利" % EncounterServiceScript.by_id(pending_encounter_id).get("name", ""), true)
 	else:
 		totals["losses"] = int(totals.get("losses", 0)) + 1
-		hp = maxf(hp, float(attrs.get(FightAttr.HP_MAX, 100.0)) * 0.25)
-		injury_days = maxi(injury_days, 3)
+		var rules := _simulation_root().get("rules", {}) as Dictionary
+		hp = maxf(hp, float(attrs.get(FightAttr.HP_MAX, 100.0)) * float(rules.get("battle_loss_hp_floor_ratio", 0.25)))
+		injury_days = maxi(injury_days, int(rules.get("battle_loss_injury_days", 3)))
 		last_rewards = []
-	_finish_activity("历练%s：%s" % [EncounterService.by_id(pending_encounter_id).get("name", ""), "胜利" if won else "战败受伤"], true)
+		_finish_activity("历练%s：战败受伤" % EncounterServiceScript.by_id(pending_encounter_id).get("name", ""), false)
 	pending_encounter_id = ""
 	pending_battle_summary = {}
 	return {"ok": true, "won": won, "rewards": last_rewards.duplicate(true)}
@@ -203,6 +219,12 @@ func apply_dict(data: Dictionary) -> bool:
 	owned_equips = (data.get("owned_equips", []) as Array).duplicate(true)
 	equip_slots = (data.get("equip_slots", [-1, -1]) as Array).duplicate(true)
 	item_slots = (data.get("item_slots", ["", ""]) as Array).duplicate(true)
+	while equip_slots.size() < 2:
+		equip_slots.append(-1)
+	equip_slots = equip_slots.slice(0, 2)
+	while item_slots.size() < 2:
+		item_slots.append("")
+	item_slots = item_slots.slice(0, 2)
 	inventory = (data["inventory"] as Dictionary).duplicate(true)
 	activity_log = (data.get("activity_log", []) as Array).duplicate(true)
 	totals = (data.get("totals", {}) as Dictionary).duplicate(true)
@@ -216,10 +238,14 @@ func apply_dict(data: Dictionary) -> bool:
 func reward_label(reward: Dictionary) -> String:
 	var kind := str(reward.get("kind", "item"))
 	if kind == "equip":
-		return "%s x1" % str(ConfigManager.equip_by_id(int(reward.get("id", -1))).get("name", "法宝"))
+		return "%s x1" % str(_equip_cfg(int(reward.get("id", -1))).get("name", "法宝"))
 	if kind == "currency":
 		return "灵石 x%d" % int(reward.get("count", 0))
-	return "%s x%d" % [ConfigManager.get_item_display_name(str(reward.get("id", ""))), int(reward.get("count", 0))]
+	var cm := _config_manager()
+	var name := str(reward.get("id", ""))
+	if cm != null and cm.has_method("get_item_display_name"):
+		name = str(cm.call("get_item_display_name", name))
+	return "%s x%d" % [name, int(reward.get("count", 0))]
 
 
 func _finish_activity(text: String, reduce_injury: bool) -> void:
@@ -232,9 +258,33 @@ func _finish_activity(text: String, reduce_injury: bool) -> void:
 
 
 func _sync_realm() -> void:
-	var root := JsonLoader._read_json_root_object(SIM_PATH)
+	var root := _simulation_root()
 	var realms := root.get("realms", []) as Array
 	var index := mini(realm_index, maxi(0, realms.size() - 1))
 	var row := realms[index] as Dictionary if not realms.is_empty() else {}
 	realm_name = str(row.get("name", "炼气一层"))
 	breakthrough_at = maxi(cultivation + 100, int(row.get("breakthrough_at", 100))) if realm_index >= realms.size() else int(row.get("breakthrough_at", 100))
+
+
+func _activity_cfg(activity_id: String) -> Dictionary:
+	var activities := _simulation_root().get("activities", {}) as Dictionary
+	var cfg_v: Variant = activities.get(activity_id, {})
+	return cfg_v as Dictionary if cfg_v is Dictionary else {}
+
+
+func _simulation_root() -> Dictionary:
+	return JsonLoader._read_json_root_object(SIM_PATH)
+
+
+func _equip_cfg(equip_id: int) -> Dictionary:
+	var cm := _config_manager()
+	if cm != null and cm.has_method("equip_by_id"):
+		return cm.call("equip_by_id", equip_id) as Dictionary
+	return {}
+
+
+func _config_manager() -> Node:
+	var loop := Engine.get_main_loop()
+	if not loop is SceneTree:
+		return null
+	return (loop as SceneTree).root.get_node_or_null("ConfigManager")

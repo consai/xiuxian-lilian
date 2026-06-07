@@ -7,19 +7,33 @@ const BattleRecordTypesScript := preload("res://scripts/fight/battle_record_type
 
 @onready var _body: RichTextLabel = %BattleResultBody
 @onready var _btn_close: Button = %BattleResultClose
+@onready var _btn_log: Button = %BattleResultLog
+@onready var _log_popup: Control = %BattleLogPopup
+@onready var _log_popup_scroll: ScrollContainer = %BattleLogPopupScroll
+@onready var _log_popup_body: RichTextLabel = %BattleLogPopupBody
+@onready var _btn_log_popup_close: Button = %BattleLogPopupClose
 @onready var _img_suc: TextureRect = %img_suc
 @onready var _img_fail: TextureRect = %img_fail
 @onready var _rewards: HBoxContainer = %rewards
 @onready var _reward_template = _rewards.get_child(0) if _rewards != null and _rewards.get_child_count() > 0 else null
 
+var _log_formatter = null
+var _log_entries: Array = []
+var _log_names: Dictionary = {}
+
 
 func _ready() -> void:
 	_sync_outcome_visual("")
 	_prepare_reward_template()
+	_hide_log_popup()
 	if _btn_close != null:
 		_btn_close.pressed.connect(func() -> void:
 			close_requested.emit()
 		)
+	if _btn_log != null:
+		_btn_log.pressed.connect(_on_log_button_pressed)
+	if _btn_log_popup_close != null:
+		_btn_log_popup_close.pressed.connect(_hide_log_popup)
 
 
 func apply_summary(summary: Dictionary, formatter, entries_tail: Array = [], names: Dictionary = {}) -> void:
@@ -34,19 +48,58 @@ func apply_summary(summary: Dictionary, formatter, entries_tail: Array = [], nam
 	if formatter != null:
 		blocks.append(str(formatter.format_summary(summary)))
 
-	if not entries_tail.is_empty() and formatter != null:
-		blocks.append("")
-		blocks.append("[b]最近战报[/b]")
-		for ev_v in entries_tail:
-			if not ev_v is Dictionary:
-				continue
-			var line := str(formatter.format_entry(ev_v as Dictionary, names)).strip_edges()
-			if line == "":
-				continue
-			blocks.append(line)
+	_log_formatter = formatter
+	_log_entries = entries_tail.duplicate()
+	_log_names = names.duplicate()
+	_hide_log_popup()
+	_sync_log_button()
 
 	_body.text = "\n".join(blocks).strip_edges()
 	_sync_rewards(summary.get("rewards", []))
+
+
+func _sync_log_button() -> void:
+	if _btn_log == null:
+		return
+	_btn_log.visible = _log_formatter != null and not _log_entries.is_empty()
+
+
+func _on_log_button_pressed() -> void:
+	if _log_popup == null or _log_popup_body == null:
+		return
+	var text := _format_log_text()
+	if text == "":
+		return
+	_log_popup_body.bbcode_enabled = true
+	_log_popup_body.text = text
+	_log_popup.visible = true
+	_scroll_log_to_end()
+
+
+func _format_log_text() -> String:
+	if _log_formatter == null or _log_entries.is_empty():
+		return ""
+	var blocks: PackedStringArray = PackedStringArray()
+	for ev_v in _log_entries:
+		if not ev_v is Dictionary:
+			continue
+		var line := str(_log_formatter.format_entry(ev_v as Dictionary, _log_names)).strip_edges()
+		if line == "":
+			continue
+		blocks.append(line)
+	return "\n".join(blocks).strip_edges()
+
+
+func _hide_log_popup() -> void:
+	if _log_popup != null:
+		_log_popup.visible = false
+
+
+func _scroll_log_to_end() -> void:
+	if _log_popup_scroll == null:
+		return
+	await get_tree().process_frame
+	_log_popup_scroll.scroll_vertical = int(_log_popup_scroll.get_v_scroll_bar().max_value)
 
 
 func _sync_outcome_visual(outcome: String) -> void:

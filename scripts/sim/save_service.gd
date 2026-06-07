@@ -22,7 +22,10 @@ func save_slot(slot: int, data: Dictionary) -> Dictionary:
 func load_slot(slot: int) -> Dictionary:
 	if slot < 1 or slot > SLOT_COUNT or not FileAccess.file_exists(_path(slot)):
 		return {"ok": false, "error": "该槽位为空"}
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(_path(slot)))
+	var parser := JSON.new()
+	if parser.parse(FileAccess.get_file_as_string(_path(slot))) != OK:
+		return {"ok": false, "error": "存档损坏"}
+	var parsed: Variant = parser.data
 	if not parsed is Dictionary:
 		return {"ok": false, "error": "存档损坏"}
 	var envelope := parsed as Dictionary

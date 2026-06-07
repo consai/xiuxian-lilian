@@ -426,7 +426,7 @@ func show_battle_result(ctx: FightSceneContext, summary: Dictionary) -> void:
 			"apply_summary",
 			summary,
 			ctx.record_formatter,
-			ctx.recorder.get_entries_tail(10),
+			ctx.recorder.get_entries_tail(80),
 			ctx.record_names
 		)
 		_refs.battle_result_overlay.visible = true

@@ -1,6 +1,8 @@
 class_name RewardService
 extends RefCounted
 
+const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
+
 
 static func roll_rewards(encounter: Dictionary, rng: RandomNumberGenerator = null) -> Array:
 	var random := rng if rng != null else RandomNumberGenerator.new()
@@ -35,15 +37,15 @@ static func apply_rewards(game_state: Node, rewards: Array) -> Array:
 		var count := maxi(1, int(reward.get("count", 1)))
 		if kind == "equip":
 			var eid := int(reward.get("id", -1))
-			if InventoryService.add_equip(game_state.owned_equips, eid):
+			if InventoryServiceScript.add_equip(game_state.owned_equips, eid):
 				applied.append({"kind": kind, "id": eid, "count": 1})
-		else:
+			else:
 				var compensation := count * 30
 				game_state.ling_stones += compensation
 				applied.append({"kind": "currency", "id": "ling_stones", "count": compensation})
 		else:
 			var iid := str(reward.get("id", ""))
-			var added := InventoryService.add_item(game_state.inventory, iid, count)
+			var added := InventoryServiceScript.add_item(game_state.inventory, iid, count)
 			if added > 0:
 				applied.append({"kind": "item", "id": iid, "count": added})
 	return applied

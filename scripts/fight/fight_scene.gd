@@ -76,6 +76,8 @@ func _ready() -> void:
 		item_slot_pressed.connect(_on_item_slot_pressed)
 	if not equip_slot_pressed.is_connected(_on_equip_slot_pressed):
 		equip_slot_pressed.connect(_on_equip_slot_pressed)
+	if not battle_finished.is_connected(_on_battle_finished):
+		battle_finished.connect(_on_battle_finished)
 	var vfx := _hud.get_vfx()
 	if vfx != null:
 		if not vfx.event_finished.is_connected(_on_vfx_event_finished):
@@ -261,4 +263,13 @@ func _on_vfx_queue_finished() -> void:
 
 
 func _on_battle_result_close_requested() -> void:
+	if GameState != null and GameState.pending_battle_summary is Dictionary and not GameState.pending_battle_summary.is_empty():
+		GameState.settle_pending_battle()
+		get_tree().change_scene_to_file(GameState.HUB_SCENE)
+		return
 	_hud.hide_battle_result()
+
+
+func _on_battle_finished(summary: Dictionary) -> void:
+	if GameState != null and str(GameState.pending_encounter_id) != "":
+		GameState.receive_battle_summary(summary)

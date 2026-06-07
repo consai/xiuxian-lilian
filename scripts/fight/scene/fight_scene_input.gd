@@ -112,7 +112,7 @@ func set_auto_battle_player(enabled: bool) -> void:
 		and _ctx.domain.paused_side == BattleDomainService.SIDE_PLAYER
 		and _on_schedule_player_act.is_valid()
 	):
-		_on_schedule_player_act.call(BattleDomainService.SIDE_PLAYER)
+		_on_schedule_player_act.call()
 
 
 func toggle_auto_battle_player() -> void:

@@ -617,11 +617,6 @@ bbcode_enabled = true
 fit_content = true
 scroll_active = false
 
-[node name="BattleResultOverlay" parent="." unique_id=1124815881 instance=ExtResource("26_resultoverlay")]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-
 [node name="center" type="Control" parent="." unique_id=66841021]
 layout_mode = 1
 anchors_preset = 8
@@ -902,6 +897,11 @@ text = "U"
 label_settings = ExtResource("16_3s5lo")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="BattleResultOverlay" parent="." unique_id=1124815881 instance=ExtResource("26_resultoverlay")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
 
 [node name="FightVfxManager" type="Node" parent="." unique_id=1982746501]
 unique_name_in_owner = true

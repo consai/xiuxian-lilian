@@ -103,8 +103,11 @@
       "stackable": true,
       "max_stack": 99,
       "desc": "用于治疗伤势的基础丹药。",
-      "icon": "res://assets/art/ui/hulu.png",
-      "use_effect": [{"op": "hp", "args": [35]}]
+      "icon": "res://assets/art/ui_new/hulu.png",
+      "use_effect": [{"op": "hp", "args": [35]}],
+      "fight_id": 9004,
+      "fight_cd": 6,
+      "fight_effect": [{"type": "heal", "value": 35, "target": "self"}]
     },
     {
       "id": "items_PoJingDan",
