@@ -8,6 +8,7 @@ var name: String = ""
 var icon: String = ""
 var quality: int = 1
 var cd_total: float = 0.0
+var effects: Array = []
 
 
 static func from_dict(data: Dictionary) -> EquipDef:
@@ -24,6 +25,9 @@ static func from_dict(data: Dictionary) -> EquipDef:
 	equip.icon = str(data.get("icon", data.get("icon_path", ""))).strip_edges()
 	equip.quality = maxi(1, int(data.get("quality", 1)))
 	equip.cd_total = maxf(0.0, float(data.get("cd_total", data.get("cd", 0.0))))
+	var effects_v: Variant = data.get("effects", [])
+	if effects_v is Array:
+		equip.effects = (effects_v as Array).duplicate(true)
 	return equip
 
 
@@ -36,6 +40,7 @@ func to_runtime_dict() -> Dictionary:
 		"cd_total": cd_total,
 		"vfx_type": "heal",
 		"vfx": "status_cast",
+		"effects": effects.duplicate(true),
 	}
 	if icon != "":
 		out["icon"] = icon

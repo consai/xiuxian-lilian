@@ -74,8 +74,11 @@
       "stackable": true,
       "max_stack": 99,
       "desc": "用于恢复状态的常见丹药。",
-      "icon": "res://assets/art/ui/hulu.png",
-      "use_effect": [{"op": "hp", "args": [22]}]
+      "icon": "res://assets/art/ui_new/hulu.png",
+      "use_effect": [{"op": "hp", "args": [22]}],
+      "fight_id": 9002,
+      "fight_cd": 4,
+      "fight_effect": [{"type": "heal", "value": 22, "target": "self"}]
     },
     {
       "id": "items_JuQiDan",
@@ -129,7 +132,10 @@
       "stackable": true,
       "max_stack": 99,
       "desc": "用于补充灵气与回复状态。",
-      "icon": "res://assets/art/ui/hulu.png",
+      "icon": "res://assets/art/ui_new/hulu.png",
+      "fight_id": 9003,
+      "fight_cd": 4,
+      "fight_effect": [{"type": "restore_mp", "value": 25, "target": "self"}],
       "use_effect": [
         {"op": "cultivation", "args": [15]},
         {"op": "hp", "args": [8]}

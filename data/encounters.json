@@ -1,0 +1,61 @@
+{
+  "encounters": {
+    "normal": {
+      "name": "山林寻妖",
+      "risk": "普通",
+      "desc": "气息寻常，适合稳妥积累材料。",
+      "reward_rolls": 2,
+      "enemy": {
+        "name": "青牙狼",
+        "icon": "jueshe/sprite_003.png",
+        "hp": 75,
+        "mp": 30,
+        "attrs": {"hp_max": 75, "mp_max": 30, "shield": 0, "atk": 70, "def": 80, "spd": 92, "crit": 5, "crit_damage": 150},
+        "skills": [1, 0]
+      },
+      "rewards": [
+        {"kind": "item", "id": "items_LingCao", "min": 1, "max": 3, "weight": 5},
+        {"kind": "item", "id": "items_HuiQiDan", "min": 1, "max": 1, "weight": 2},
+        {"kind": "item", "id": "items_HuiLingDan", "min": 1, "max": 1, "weight": 2}
+      ]
+    },
+    "elite": {
+      "name": "寒潭除祟",
+      "risk": "精英",
+      "desc": "妖物凶悍，胜后更易获得丹药与法宝。",
+      "reward_rolls": 3,
+      "enemy": {
+        "name": "寒潭妖蟒",
+        "icon": "jueshe/sprite_001.png",
+        "hp": 145,
+        "mp": 70,
+        "attrs": {"hp_max": 145, "mp_max": 70, "shield": 0, "atk": 92, "def": 105, "spd": 96, "crit": 8, "crit_damage": 150},
+        "skills": [3, 1, 0]
+      },
+      "rewards": [
+        {"kind": "item", "id": "items_YaoDan", "min": 1, "max": 2, "weight": 4},
+        {"kind": "item", "id": "items_LiaoShangDan", "min": 1, "max": 2, "weight": 3},
+        {"kind": "equip", "id": 5002, "min": 1, "max": 1, "weight": 1}
+      ]
+    },
+    "boss": {
+      "name": "赤焰妖王",
+      "risk": "首领",
+      "desc": "并非突破必需，但其珍藏足以改变往后的修行。",
+      "reward_rolls": 4,
+      "enemy": {
+        "name": "赤焰妖王",
+        "icon": "jueshe/sprite_000.png",
+        "hp": 240,
+        "mp": 100,
+        "attrs": {"hp_max": 240, "mp_max": 100, "shield": 0, "atk": 112, "def": 120, "spd": 105, "crit": 12, "crit_damage": 165},
+        "skills": [3, 1, 2, 0]
+      },
+      "rewards": [
+        {"kind": "item", "id": "items_YaoDan", "min": 2, "max": 4, "weight": 4},
+        {"kind": "item", "id": "items_PoJingDan", "min": 1, "max": 1, "weight": 2},
+        {"kind": "equip", "id": 5003, "min": 1, "max": 1, "weight": 1}
+      ]
+    }
+  }
+}

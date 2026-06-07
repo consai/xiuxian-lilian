@@ -2,6 +2,9 @@
   "version": 1,
   "jitter_x": 18,
   "max_per_unit_per_frame": 6,
+  "arc_drift_ratio": 1,
+  "arc_apex_min": 0.55,
+  "arc_apex_max": 1.25,
   "styles": {
     "skill": {
       "color": "#F2EDD7",

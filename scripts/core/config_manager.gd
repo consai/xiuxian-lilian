@@ -36,6 +36,14 @@ func items() -> Array:
 	return _items.duplicate()
 
 
+func item_def_by_id(item_id: String) -> ItemDef:
+	var iid := item_id.strip_edges()
+	for it in _items:
+		if it is ItemDef and (it as ItemDef).id == iid:
+			return it as ItemDef
+	return null
+
+
 func skill_by_id(skill_id: int) -> Dictionary:
 	var v: Variant = _skills_by_id.get(skill_id, _skills_by_id.get(str(skill_id), null))
 	if v is SkillDef:

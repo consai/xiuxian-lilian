@@ -74,6 +74,7 @@ func spawn(text: String, screen_pos: Vector2, tone: String, unit_key: String = "
 	var lane_offset := Vector2(0.0, -lane * lane_step_y)
 	inst.position = screen_pos + lane_offset + rand_offset
 	inst.apply_style(style)
+	inst.apply_motion_config(_styles_bundle)
 	inst.set_text(t)
 	add_child(inst)
 	BattleDebugLog.write("飘字", "CombatFloatLayer.spawn", {
