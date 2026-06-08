@@ -3,7 +3,11 @@
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="1_7bdtr"]
 [ext_resource type="Texture2D" uid="uid://chmbwc04bfpnm" path="res://assets/art/ui_new/bagback.png" id="1_bmgy1"]
 [ext_resource type="PackedScene" uid="uid://dvun4oamukfyn" path="res://scenes/items/bag_base.tscn" id="2_k3bim"]
+[ext_resource type="Script" uid="uid://c61br6dowu6tk" path="res://scenes/sim/inventory_overlay.gd" id="2_ow35f"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="2_w4g80"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="2_xfp0u"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="7_6wts8"]
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="8_fcmln"]
 
 [node name="InventoryOverlay" type="TextureRect" unique_id=1891878246]
 anchors_preset = 8
@@ -18,13 +22,32 @@ offset_bottom = 361.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("1_bmgy1")
+script = ExtResource("2_ow35f")
 
-[node name="BagBase" parent="." unique_id=54537540 instance=ExtResource("2_k3bim")]
+[node name="Label" type="Label" parent="." unique_id=918993329]
+layout_mode = 0
+offset_left = 428.5
+offset_top = 15.0
+offset_right = 781.5
+offset_bottom = 69.0
+text = "仓库"
+label_settings = ExtResource("2_xfp0u")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BagLeft" parent="." unique_id=934551352 instance=ExtResource("2_k3bim")]
+layout_mode = 0
+offset_left = 74.5
+offset_top = 107.0
+offset_right = 494.5
+offset_bottom = 687.0
+
+[node name="BagRight" parent="." unique_id=54537540 instance=ExtResource("2_k3bim")]
 layout_mode = 0
 offset_left = 681.5
-offset_top = 75.0
-offset_right = 1129.5
-offset_bottom = 695.0
+offset_top = 105.0
+offset_right = 1101.5
+offset_bottom = 685.0
 
 [node name="Content" type="VBoxContainer" parent="." unique_id=49271856]
 visible = false
@@ -153,3 +176,24 @@ text = "保存"
 [node name="Load3" type="Button" parent="Content/SavePanel/Slot3" unique_id=1401453650]
 layout_mode = 2
 text = "读取"
+
+[node name="SaveAll" type="Button" parent="." unique_id=568285696]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -628.5
+offset_top = -331.0
+offset_right = -543.5
+offset_bottom = -295.0
+grow_horizontal = 0
+grow_vertical = 0
+size_flags_horizontal = 3
+theme = ExtResource("7_6wts8")
+theme_type_variation = &"TabActive"
+text = "全部存入"
+script = ExtResource("8_fcmln")

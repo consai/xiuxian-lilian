@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://pqdvuxfxat2k" path="res://scenes/items/item.gd" id="2_k3e2y"]
 [ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="3_g5kul"]
 [ext_resource type="Texture2D" uid="uid://7ppj3d5hwhen" path="res://assets/art/ui_new/wanzi.png" id="4_ptqfc"]
-[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="5_e2jp5"]
+[ext_resource type="LabelSettings" uid="uid://dknyivqhm6bby" path="res://ui/ziti_new/13.tres" id="5_27fjs"]
 [ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="6_db6vm"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u6xce"]
@@ -25,9 +25,9 @@ corner_radius_bottom_left = 15
 corner_detail = 5
 
 [node name="Item" type="Panel" unique_id=544489580]
-custom_minimum_size = Vector2(88, 88)
-offset_right = 88.0
-offset_bottom = 88.0
+custom_minimum_size = Vector2(70, 80)
+offset_right = 70.0
+offset_bottom = 80.0
 mouse_filter = 2
 theme_override_styles/panel = ExtResource("1_a8f5r")
 script = ExtResource("2_k3e2y")
@@ -48,17 +48,14 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_u6xce")
 
 [node name="GcDetailIcon" type="TextureRect" parent="." unique_id=302395797]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(72, 72)
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.134
-anchor_top = 0.079
-anchor_right = 0.86600006
-anchor_bottom = 0.75600004
-offset_left = -0.008000374
-offset_top = -0.059000015
-offset_right = 0.0079956055
-offset_bottom = 0.023994446
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = 7.0
+offset_right = -7.0
+offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -74,14 +71,14 @@ anchor_left = 0.062000003
 anchor_top = 0.76000005
 anchor_right = 0.93700004
 anchor_bottom = 0.95000005
-offset_left = 0.055999756
-offset_top = -0.9600067
-offset_right = 0.055999756
+offset_left = -0.6939964
+offset_top = -5.7500076
+offset_right = 2.0559998
 offset_bottom = -0.9500046
 grow_horizontal = 0
 grow_vertical = 0
 text = "园子x100"
-label_settings = ExtResource("5_e2jp5")
+label_settings = ExtResource("5_27fjs")
 horizontal_alignment = 1
 vertical_alignment = 1
 

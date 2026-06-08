@@ -10,7 +10,11 @@ const EnumItemTypeScript := preload("res://scripts/enum/enum_itemtype.gd")
 
 enum TabFilter { ALL, MATERIAL, PILL, EQUIP }
 
+const TAB_THEME_ACTIVE := &"TabActive"
+const TAB_THEME_IDLE := &"TabIdle"
+
 signal entry_clicked(entry: Dictionary)
+signal entry_right_clicked(entry: Dictionary)
 signal sort_requested(entries: Array)
 
 @export var max_slots_show: int = 25
@@ -34,15 +38,12 @@ var _selected_index: int = -1
 var _window_start: int = -1
 var _slot_pool: Array[ItemView] = []
 var _row_height: float = 96.0
-var _tab_style_active: StyleBox
-var _tab_style_idle: StyleBox
 var _tabs: Array[Button] = []
 
 
 func _ready() -> void:
 	_grid.columns = maxi(1, grid_columns)
 	_title.text = title_text
-	_cache_tab_styles()
 	_tabs = [_tab_all, _tab_material, _tab_pill, _tab_equip]
 	_tab_all.pressed.connect(_on_tab_pressed.bind(TabFilter.ALL))
 	_tab_material.pressed.connect(_on_tab_pressed.bind(TabFilter.MATERIAL))
@@ -223,6 +224,7 @@ func _bind_entry(view: ItemView, entry: Dictionary, index: int) -> void:
 	view.set_click_enabled(true)
 	_set_selected(view, index == _selected_index, entry)
 	view.clicked.connect(_on_slot_clicked.bind(index))
+	view.right_clicked.connect(_on_slot_right_clicked.bind(index))
 
 
 func _disconnect_slot(view: ItemView) -> void:
@@ -230,6 +232,8 @@ func _disconnect_slot(view: ItemView) -> void:
 		return
 	for conn in view.clicked.get_connections():
 		view.clicked.disconnect(conn["callable"])
+	for conn in view.right_clicked.get_connections():
+		view.right_clicked.disconnect(conn["callable"])
 
 
 func _on_slot_clicked(index: int) -> void:
@@ -242,6 +246,12 @@ func _on_slot_clicked(index: int) -> void:
 			break
 		_set_selected(_slot_pool[i], data_index == _selected_index, _filtered_cache[data_index] as Dictionary)
 	entry_clicked.emit((_filtered_cache[index] as Dictionary).duplicate(true))
+
+
+func _on_slot_right_clicked(index: int) -> void:
+	if index < 0 or index >= _filtered_cache.size():
+		return
+	entry_right_clicked.emit((_filtered_cache[index] as Dictionary).duplicate(true))
 
 
 func _set_selected(view: ItemView, selected: bool, entry: Dictionary = {}) -> void:
@@ -292,18 +302,7 @@ func _set_active_tab(tab: TabFilter) -> void:
 		var btn := pair[0] as Button
 		if btn == null:
 			continue
-		var style := _tab_style_active if pair[1] == tab else _tab_style_idle
-		if style != null:
-			btn.add_theme_stylebox_override("normal", style)
-			btn.add_theme_stylebox_override("hover", style)
-			btn.add_theme_stylebox_override("pressed", style)
-
-
-func _cache_tab_styles() -> void:
-	if _tab_all != null:
-		_tab_style_active = _tab_all.get_theme_stylebox("normal")
-	if _tab_material != null:
-		_tab_style_idle = _tab_material.get_theme_stylebox("normal")
+		btn.theme_type_variation = TAB_THEME_ACTIVE if pair[1] == tab else TAB_THEME_IDLE
 
 
 func _filtered_entries() -> Array:

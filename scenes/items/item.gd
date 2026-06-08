@@ -6,6 +6,7 @@ extends Panel
 ## [code]%GcItemHighlight[/code] 为品质边框，随 [member quality] / [method apply_display] 更新。
 
 signal clicked
+signal right_clicked
 
 @export var click_enabled: bool = false:
 	set(value):
@@ -35,6 +36,7 @@ func _ready() -> void:
 	_refresh_name_count_text()
 	if click_enabled:
 		_press.clicked.connect(_on_press_clicked)
+	gui_input.connect(_on_gui_input)
 
 
 func set_click_enabled(enabled: bool) -> void:
@@ -86,6 +88,16 @@ func apply_row(row: Dictionary, fallback_icon: Texture2D = null) -> void:
 
 func _on_press_clicked() -> void:
 	clicked.emit()
+
+
+func _on_gui_input(event: InputEvent) -> void:
+	if not click_enabled:
+		return
+	if event is InputEventMouseButton:
+		var mb := event as InputEventMouseButton
+		if mb.button_index == MOUSE_BUTTON_RIGHT and mb.pressed:
+			right_clicked.emit()
+			accept_event()
 
 
 func _apply_click_enabled() -> void:

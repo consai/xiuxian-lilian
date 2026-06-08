@@ -23,7 +23,6 @@ TipsHost="*res://scripts/ui/tips_host.gd"
 HoverTipHost="*res://scripts/ui/hover/hover_tip_host.gd"
 SaveService="*res://scripts/sim/save_service.gd"
 GameState="*res://scripts/sim/game_state.gd"
-ViewportScaleProbe="*res://scripts/debug/viewport_scale_probe.gd"
 ExpeditionState="*res://scripts/expedition/expedition_state.gd"
 
 [display]

@@ -31,6 +31,31 @@ static func remove_item(inventory: Dictionary, item_id: String, count: int) -> i
 	return removed
 
 
+static func transfer_item(from_inventory: Dictionary, to_inventory: Dictionary, item_id: String, count: int) -> int:
+	var removed := remove_item(from_inventory, item_id, count)
+	if removed > 0:
+		add_item(to_inventory, item_id, removed)
+	return removed
+
+
+static func transfer_all_items(from_inventory: Dictionary, to_inventory: Dictionary) -> void:
+	for iid_v in (from_inventory.keys() as Array).duplicate():
+		var iid := str(iid_v)
+		transfer_item(from_inventory, to_inventory, iid, int(from_inventory.get(iid, 0)))
+
+
+static func transfer_equip(from_equips: Array, to_equips: Array, equip_id: int) -> bool:
+	if equip_id <= 0 or not from_equips.has(equip_id):
+		return false
+	from_equips.erase(equip_id)
+	return add_equip(to_equips, equip_id)
+
+
+static func transfer_all_equips(from_equips: Array, to_equips: Array) -> void:
+	for eid_v in (from_equips as Array).duplicate():
+		transfer_equip(from_equips, to_equips, int(eid_v))
+
+
 static func add_equip(owned_equips: Array, equip_id: int) -> bool:
 	if equip_id <= 0 or owned_equips.has(equip_id):
 		return false

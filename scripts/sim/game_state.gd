@@ -26,6 +26,8 @@ var owned_equips: Array = []
 var equip_slots: Array = [-1, -1]
 var item_slots: Array = ["", ""]
 var inventory: Dictionary = {}
+var storage: Dictionary = {}
+var storage_equips: Array = []
 var activity_log: Array = []
 var totals := {
 	"battles": 0, "wins": 0, "losses": 0, "items_gained": 0,
@@ -61,6 +63,8 @@ func new_game() -> void:
 	equip_slots = (initial.get("equip_slots", [-1, -1]) as Array).duplicate(true)
 	item_slots = (initial.get("item_slots", ["", ""]) as Array).duplicate(true)
 	inventory = (initial.get("inventory", {}) as Dictionary).duplicate(true)
+	storage = (initial.get("storage", {}) as Dictionary).duplicate(true)
+	storage_equips = (initial.get("storage_equips", []) as Array).duplicate(true)
 	activity_log = []
 	totals = {
 		"battles": 0, "wins": 0, "losses": 0, "items_gained": 0,
@@ -239,7 +243,10 @@ func to_dict() -> Dictionary:
 		"equipped_skills": equipped_skills.duplicate(true),
 		"owned_equips": owned_equips.duplicate(true),
 		"equip_slots": equip_slots.duplicate(true), "item_slots": item_slots.duplicate(true),
-		"inventory": inventory.duplicate(true), "activity_log": activity_log.duplicate(true),
+		"inventory": inventory.duplicate(true),
+		"storage": storage.duplicate(true),
+		"storage_equips": storage_equips.duplicate(true),
+		"activity_log": activity_log.duplicate(true),
 		"totals": totals.duplicate(true)
 	}
 
@@ -270,6 +277,8 @@ func apply_dict(data: Dictionary) -> bool:
 		item_slots.append("")
 	item_slots = item_slots.slice(0, 2)
 	inventory = (data["inventory"] as Dictionary).duplicate(true)
+	storage = (data.get("storage", {}) as Dictionary).duplicate(true)
+	storage_equips = (data.get("storage_equips", []) as Array).duplicate(true)
 	activity_log = (data.get("activity_log", []) as Array).duplicate(true)
 	totals = (data.get("totals", {}) as Dictionary).duplicate(true)
 	last_rewards = []

@@ -6,7 +6,7 @@ const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd"
 @onready var _status_label: Label = %StatusLabel
 @onready var _message_label: Label = %MessageLabel
 @onready var _inventory_label: RichTextLabel = %InventoryLabel
-@onready var _inventory_overlay: Panel = %InventoryOverlay
+@onready var _inventory_overlay: Control = %InventoryOverlay
 @onready var _breakthrough_button: TextureButton = %BreakthroughButton
 @onready var _save_panel: VBoxContainer = %SavePanel
 @onready var _equip_buttons: Array[Button] = [%EquipButton1, %EquipButton2]
@@ -130,6 +130,8 @@ func _on_breakthrough() -> void:
 func _toggle_inventory() -> void:
 	_inventory_overlay.visible = not _inventory_overlay.visible
 	if _inventory_overlay.visible:
+		if _inventory_overlay.has_method("refresh"):
+			_inventory_overlay.refresh()
 		_refresh()
 
 
