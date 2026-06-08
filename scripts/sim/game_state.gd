@@ -8,7 +8,7 @@ const LocationServiceScript := preload("res://scripts/expedition/location_servic
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 func _ds() -> Node:
-	return DataStoreRef.resolve()
+	return DataStore
 
 
 var day: int:
@@ -83,9 +83,9 @@ var last_rewards: Array:
 var last_expedition_summary: Dictionary:
 	get: return _ds().game_runtime().get("last_expedition_summary", {}) as Dictionary
 	set(value): _ds().game_runtime()["last_expedition_summary"] = value
-var _last_expedition_settlement_key: String:
-	get: return str(_ds().game_runtime().get("last_expedition_settlement_key", ""))
-	set(value): _ds().game_runtime()["last_expedition_settlement_key"] = value
+var last_settled_expedition_id: String:
+	get: return str(_ds().game_runtime().get("last_settled_expedition_id", ""))
+	set(value): _ds().game_runtime()["last_settled_expedition_id"] = value
 
 
 func _ready() -> void:
@@ -123,7 +123,7 @@ func new_game() -> void:
 	}
 	last_rewards = []
 	last_expedition_summary = {}
-	_last_expedition_settlement_key = ""
+	last_settled_expedition_id = ""
 	_sync_realm()
 
 
@@ -218,15 +218,15 @@ func build_battle_init(event: Dictionary) -> Dictionary:
 func settle_expedition(result: Dictionary) -> Dictionary:
 	if result.is_empty():
 		return {"ok": false, "error": "缺少历练结算数据"}
-	var settlement_key := "%s:%d:%d:%d" % [
-		str(result.get("exit_reason", "")),
-		int(result.get("elapsed_days", 0)),
-		int((result.get("stats", {}) as Dictionary).get("steps", 0)),
-		int((result.get("loot", []) as Array).size()),
-	]
-	if settlement_key == _last_expedition_settlement_key:
+	var result_errors := ExpeditionResult.collect_errors(result)
+	if not result_errors.is_empty():
+		return {"ok": false, "error": result_errors[0]}
+	var settlement_id := str(result.get("settlement_id", "")).strip_edges()
+	if settlement_id == "":
+		return {"ok": false, "error": "缺少 settlement_id"}
+	if settlement_id == last_settled_expedition_id:
 		return {"ok": false, "error": "duplicate", "duplicate": true}
-	_last_expedition_settlement_key = settlement_key
+	last_settled_expedition_id = settlement_id
 	var elapsed_days := maxi(1, int(result.get("elapsed_days", 1)))
 	injury_days = maxi(0, injury_days - elapsed_days)
 	var exit_reason := str(result.get("exit_reason", "manual"))
@@ -248,7 +248,7 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 			inventory[iid] = remaining
 		else:
 			inventory.erase(iid)
-	last_rewards = RewardServiceScript.apply_rewards(self, result.get("loot", []) as Array)
+	last_rewards = (result.get("loot", []) as Array).duplicate(true)
 	for reward in last_rewards:
 		totals["items_gained"] = int(totals.get("items_gained", 0)) + int((reward as Dictionary).get("count", 0))
 	var stats := result.get("stats", {}) as Dictionary
@@ -278,6 +278,7 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 	activity_log.append({"day": day - elapsed_days, "text": log_text})
 	if activity_log.size() > 30:
 		activity_log = activity_log.slice(activity_log.size() - 30)
+	last_settled_expedition_id = settlement_id
 	last_expedition_summary = result.duplicate(true)
 	return {"ok": true, "rewards": last_rewards.duplicate(true), "elapsed_days": elapsed_days}
 

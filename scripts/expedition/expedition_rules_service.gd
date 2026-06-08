@@ -1,13 +1,14 @@
 class_name ExpeditionRulesService
 extends RefCounted
 
-const PATH := "res://data/expedition_rules.json"
-
 const BATTLE_TYPES := ["battle", "elite", "boss"]
 
 
 static func rules() -> Dictionary:
-	return JsonLoader._read_json_root_object(PATH)
+	var cm := _config_manager()
+	if cm != null and cm.has_method("expedition_rules"):
+		return cm.call("expedition_rules") as Dictionary
+	return {}
 
 
 static func elapsed_days(steps: int) -> int:
@@ -29,3 +30,10 @@ static func reward_depth_multiplier(depth: int) -> float:
 
 static func is_battle_type(event_type: String) -> bool:
 	return event_type in BATTLE_TYPES
+
+
+static func _config_manager() -> Node:
+	var loop := Engine.get_main_loop()
+	if not loop is SceneTree:
+		return null
+	return (loop as SceneTree).root.get_node_or_null("ConfigManager")

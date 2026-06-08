@@ -1,14 +1,23 @@
 extends Control
 
 const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
+const ItemDefScript := preload("res://scripts/core/item_def.gd")
+const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
+
 var _locked := false
 var _feedback_timer := 0.0
+
+@onready var _loot_items: HBoxContainer = %LootItems
+@onready var _loot_item_template: ItemView = (
+	_loot_items.get_child(0) as ItemView if _loot_items != null and _loot_items.get_child_count() > 0 else null
+)
 
 
 func _ready() -> void:
 	if not ExpeditionState.active:
 		call_deferred("_fallback_hub")
 		return
+	_prepare_loot_template()
 	(%ExitButton as Button).pressed.connect(_on_exit_pressed)
 	_refresh_all()
 	if get_tree().root.has_meta("smoke_auto_exit") and bool(get_tree().root.get_meta("smoke_auto_exit")):
@@ -40,10 +49,7 @@ func _refresh_all() -> void:
 		int(ExpeditionState.stats.get("wins", 0)),
 		int(ExpeditionState.stats.get("losses", 0)),
 	]
-	var loot_lines: PackedStringArray = []
-	for reward_v in ExpeditionState.loot:
-		loot_lines.append(GameState.reward_label(reward_v as Dictionary))
-	(%Loot as RichTextLabel).text = "\n".join(loot_lines) if not loot_lines.is_empty() else "暂无战利品"
+	_sync_loot_items()
 	var log_lines: PackedStringArray = []
 	for entry_v in ExpeditionState.event_log.slice(max(0, ExpeditionState.event_log.size() - 5)):
 		var entry := entry_v as Dictionary
@@ -93,6 +99,7 @@ func _on_event_chosen(event_id: String) -> void:
 		var nav: Dictionary = SceneManager.go_fight(battle_data, "expedition")
 		if not bool(nav.get("ok", false)):
 			(%Feedback as Label).text = "无法进入战斗"
+			ExpeditionState.clear_pending_battle()
 			_locked = false
 			_refresh_all()
 		return
@@ -110,6 +117,120 @@ func _on_exit_pressed() -> void:
 
 func _fallback_hub() -> void:
 	SceneManager.go_hub()
+
+
+func _prepare_loot_template() -> void:
+	if _loot_item_template == null:
+		return
+	_loot_item_template.visible = false
+	_loot_item_template.set_click_enabled(false)
+
+
+func _sync_loot_items() -> void:
+	if _loot_items == null:
+		return
+	_clear_generated_loot_items()
+	var rewards: Array = ExpeditionState.loot
+	var empty_label := %LootEmpty as Label
+	if rewards.is_empty():
+		_loot_items.visible = false
+		if empty_label != null:
+			empty_label.visible = true
+		return
+	var shown := 0
+	for reward_v in rewards:
+		if not reward_v is Dictionary:
+			continue
+		var view := _make_loot_item()
+		if view == null:
+			continue
+		_apply_loot_row(view, reward_v as Dictionary)
+		shown += 1
+	_loot_items.visible = shown > 0
+	if empty_label != null:
+		empty_label.visible = shown <= 0
+
+
+func _clear_generated_loot_items() -> void:
+	if _loot_items == null:
+		return
+	var keep: Array[Node] = []
+	if _loot_item_template != null and _loot_item_template.get_parent() == _loot_items:
+		keep.append(_loot_item_template)
+	for child in _loot_items.get_children():
+		if keep.has(child):
+			child.visible = false
+			continue
+		child.queue_free()
+
+
+func _make_loot_item() -> ItemView:
+	if _loot_items == null or _loot_item_template == null:
+		return null
+	var copy_v := _loot_item_template.duplicate()
+	if not copy_v is ItemView:
+		return null
+	var copy := copy_v as ItemView
+	copy.visible = true
+	copy.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	copy.set_click_enabled(false)
+	_loot_items.add_child(copy)
+	return copy
+
+
+func _apply_loot_row(view: ItemView, row: Dictionary) -> void:
+	if view == null:
+		return
+	var kind := str(row.get("kind", "item"))
+	var count := maxi(1, int(row.get("count", row.get("amount", 1))))
+	var item_name := str(row.get("name", row.get("item_name", ""))).strip_edges()
+	var quality := str(row.get("quality", row.get("pin_zhi", ""))).strip_edges()
+	var icon: Texture2D = null
+	var icon_v: Variant = row.get("icon")
+	if icon_v is Texture2D:
+		icon = icon_v
+	elif kind == "currency":
+		if item_name == "":
+			item_name = "灵石" if str(row.get("id", "")) == "ling_stones" else str(row.get("id", "货币"))
+	elif kind == "equip":
+		var equip_cfg := _equip_cfg(int(row.get("id", -1)))
+		if item_name == "":
+			item_name = str(equip_cfg.get("name", "法宝"))
+		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
+		if quality == "":
+			quality = _quality_label_from_int(int(equip_cfg.get("quality", 1)))
+	elif kind == "item":
+		var item_id := str(row.get("id", ""))
+		if item_name == "" and ConfigManager != null:
+			item_name = str(ConfigManager.get_item_display_name(item_id))
+		if ConfigManager != null:
+			var def := ConfigManager.item_def_by_id(item_id)
+			if def != null:
+				icon = ItemDefScript.resolve_icon_texture(def.icon_path, null)
+				if quality == "":
+					quality = def.rarity
+	else:
+		if item_name == "":
+			item_name = str(row.get("id", "奖励"))
+		var path := str(row.get("icon_path", row.get("icon", ""))).strip_edges()
+		if path != "":
+			icon = ItemDefScript.resolve_icon_texture(path, null)
+	view.apply_display(icon, item_name, count, Color.WHITE, quality)
+	view.show_name_label = true
+
+
+func _equip_cfg(equip_id: int) -> Dictionary:
+	if ConfigManager != null and ConfigManager.has_method("equip_by_id"):
+		return ConfigManager.equip_by_id(equip_id) as Dictionary
+	return {}
+
+
+func _quality_label_from_int(quality: int) -> String:
+	if quality >= 5:
+		return "传说"
+	if quality >= 3:
+		return "稀有"
+	return ""
 
 
 func _item_summary() -> String:

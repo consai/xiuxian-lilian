@@ -1059,10 +1059,4 @@ static func _quality_back_color(quality: int) -> Color:
 
 
 static func _data_store() -> Node:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	var ref := (loop as SceneTree).root.get_node_or_null("DataStoreRef")
-	if ref != null and ref.has_method("resolve"):
-		return ref.resolve()
-	return null
+	return DataStore

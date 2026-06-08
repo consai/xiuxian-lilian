@@ -58,10 +58,16 @@ func start_expedition(location_id: String, seed_override: int = -1) -> Dictionar
 	var game_state := _game_state()
 	if expedition == null or game_state == null:
 		return {"ok": false, "error": "缺少 GameState 或 ExpeditionState"}
+	var preflight := _preflight_transition()
+	if not bool(preflight.get("ok", false)):
+		return preflight
 	var started: Dictionary = expedition.start(location_id, game_state, seed_override)
 	if not bool(started.get("ok", false)):
 		return started
-	return go_expedition_loop()
+	var nav := go_expedition_loop()
+	if not bool(nav.get("ok", false)):
+		expedition.reset()
+	return nav
 
 
 func go_expedition_loop() -> Dictionary:
@@ -69,11 +75,17 @@ func go_expedition_loop() -> Dictionary:
 
 
 func go_expedition_result(reason: String = "manual") -> Dictionary:
-	return go_to(EXPEDITION_RESULT, {"reason": reason})
+	var payload := ScenePayload.expedition_result(reason)
+	if payload.is_empty():
+		return {"ok": false, "error": "invalid_expedition_result_payload"}
+	return go_to(EXPEDITION_RESULT, payload)
 
 
 func go_breakthrough_summary(summary: Dictionary) -> Dictionary:
-	return go_to(BREAKTHROUGH_SUMMARY, summary)
+	var payload := ScenePayload.breakthrough_summary(summary)
+	if payload.is_empty():
+		return {"ok": false, "error": "invalid_breakthrough_summary_payload"}
+	return go_to(BREAKTHROUGH_SUMMARY, payload)
 
 
 func go_fight(battle_data: Dictionary, source: String = "scene_manager") -> Dictionary:
@@ -81,8 +93,14 @@ func go_fight(battle_data: Dictionary, source: String = "scene_manager") -> Dict
 	var errors := BattleInitData.collect_errors(merged)
 	if not errors.is_empty():
 		return {"ok": false, "error": errors[0]}
+	var preflight := _preflight_transition()
+	if not bool(preflight.get("ok", false)):
+		return preflight
 	BattleInitData.set_pending(get_tree(), merged, source)
-	return _perform_transition(FIGHT, {})
+	var nav := _perform_transition(FIGHT, {})
+	if not bool(nav.get("ok", false)):
+		_ds().battle_runtime()["pending_init"] = {}
+	return nav
 
 
 func take_payload(scene_id: String) -> Dictionary:
@@ -106,7 +124,9 @@ func _guard_enter(scene_id: String, options: Dictionary) -> Dictionary:
 		EXPEDITION_RESULT:
 			if expedition == null:
 				return {"ok": false, "error": "缺少 ExpeditionState"}
-			if not expedition.active and expedition.last_finish_result.is_empty():
+			var game_state := _game_state()
+			var has_summary := game_state != null and not (game_state.last_expedition_summary as Dictionary).is_empty()
+			if not expedition.active and not has_summary:
 				return {"ok": false, "error": "没有可结算的历练"}
 		LOCATION_SELECT:
 			if expedition != null and expedition.active:
@@ -116,6 +136,13 @@ func _guard_enter(scene_id: String, options: Dictionary) -> Dictionary:
 		HUB:
 			if expedition != null and expedition.active and not bool(options.get("allow_active_expedition", false)):
 				return {"ok": false, "error": _BLOCKED_EXPEDITION_ACTIVE, "blocked": true}
+	return {"ok": true}
+
+
+func _preflight_transition() -> Dictionary:
+	var scene_rt: Dictionary = _ds().scene_runtime()
+	if bool(scene_rt.get("transitioning", false)):
+		return {"ok": false, "error": "transition_in_progress"}
 	return {"ok": true}
 
 

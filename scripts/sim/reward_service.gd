@@ -33,6 +33,10 @@ static func apply_rewards(game_state: Node, rewards: Array) -> Array:
 		if not reward_v is Dictionary:
 			continue
 		var reward := reward_v as Dictionary
+		var reward_errors := RewardEntry.collect_errors(reward)
+		if not reward_errors.is_empty():
+			push_error("RewardEntry: %s" % reward_errors[0])
+			continue
 		var kind := str(reward.get("kind", "item"))
 		var count := maxi(1, int(reward.get("count", 1)))
 		if kind == "equip":
@@ -43,6 +47,11 @@ static func apply_rewards(game_state: Node, rewards: Array) -> Array:
 				var compensation := count * 30
 				game_state.ling_stones += compensation
 				applied.append({"kind": "currency", "id": "ling_stones", "count": compensation})
+		elif kind == "currency":
+			var currency_id := str(reward.get("id", "ling_stones"))
+			if currency_id == "ling_stones":
+				game_state.ling_stones += count
+				applied.append({"kind": kind, "id": currency_id, "count": count})
 		else:
 			var iid := str(reward.get("id", ""))
 			var added := InventoryServiceScript.add_item(game_state.inventory, iid, count)

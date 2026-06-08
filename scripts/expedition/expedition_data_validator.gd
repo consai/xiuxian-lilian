@@ -39,8 +39,10 @@ static func _build_sample_battle_init(event: Dictionary, game_state: Node) -> Di
 	}
 	var player: Dictionary = {}
 	if game_state != null and game_state.has_method("build_player_battle_snapshot"):
-		player = game_state.build_player_battle_snapshot(runtime)
-	else:
+		var built: Dictionary = game_state.build_player_battle_snapshot(runtime)
+		if PlayerBattleSnapshot.collect_errors(built).is_empty():
+			player = built
+	if player.is_empty():
 		player = {
 			"hp": 100.0,
 			"mp": 100.0,
@@ -70,12 +72,15 @@ static func _validate_reward(reward: Dictionary, label: String) -> PackedStringA
 		var cm := _config_manager()
 		if cm != null and cm.has_method("equip_by_id") and (cm.call("equip_by_id", eid) as Dictionary).is_empty():
 			errors.append("%s 引用了未知法宝 %d" % [label, eid])
-	elif kind == "item" or kind == "currency":
-		if kind == "item":
-			var iid := str(reward.get("id", ""))
-			var cm := _config_manager()
-			if cm != null and cm.has_method("item_def_by_id") and cm.call("item_def_by_id", iid) == null:
-				errors.append("%s 引用了未知物品 %s" % [label, iid])
+	elif kind == "item":
+		var iid := str(reward.get("id", ""))
+		var cm := _config_manager()
+		if cm != null and cm.has_method("item_def_by_id") and cm.call("item_def_by_id", iid) == null:
+			errors.append("%s 引用了未知物品 %s" % [label, iid])
+	elif kind == "currency":
+		var currency_id := str(reward.get("id", "ling_stones"))
+		if currency_id != "ling_stones":
+			errors.append("%s 引用了未知货币 %s" % [label, currency_id])
 	return errors
 
 

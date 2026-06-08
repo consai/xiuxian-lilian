@@ -31,11 +31,32 @@ static func remove_item(inventory: Dictionary, item_id: String, count: int) -> i
 	return removed
 
 
+static func transfer_capacity(inventory: Dictionary, item_id: String) -> int:
+	var iid := item_id.strip_edges()
+	if iid == "":
+		return 0
+	var def := _item_def(iid)
+	if def == null:
+		return 0
+	var current := int(inventory.get(iid, 0))
+	var cap := maxi(1, def.max_stack)
+	return maxi(0, cap - current)
+
+
 static func transfer_item(from_inventory: Dictionary, to_inventory: Dictionary, item_id: String, count: int) -> int:
-	var removed := remove_item(from_inventory, item_id, count)
-	if removed > 0:
-		add_item(to_inventory, item_id, removed)
-	return removed
+	var iid := item_id.strip_edges()
+	if iid == "" or count <= 0:
+		return 0
+	var source_count := int(from_inventory.get(iid, 0))
+	if source_count <= 0:
+		return 0
+	var room := transfer_capacity(to_inventory, iid)
+	var movable := mini(count, mini(source_count, room))
+	if movable <= 0:
+		return 0
+	remove_item(from_inventory, iid, movable)
+	add_item(to_inventory, iid, movable)
+	return movable
 
 
 static func transfer_all_items(from_inventory: Dictionary, to_inventory: Dictionary) -> void:

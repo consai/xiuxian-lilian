@@ -9,8 +9,8 @@ func _ready() -> void:
 	if ExpeditionState.active:
 		_result = ExpeditionState.finish(reason)
 		GameState.settle_expedition(_result)
-	elif not ExpeditionState.last_finish_result.is_empty():
-		_result = ExpeditionState.last_finish_result.duplicate(true)
+	elif not GameState.last_expedition_summary.is_empty():
+		_result = GameState.last_expedition_summary.duplicate(true)
 	else:
 		SceneManager.go_hub()
 		return

@@ -1,34 +1,27 @@
 class_name LocationService
 extends RefCounted
 
-const PATH := "res://data/locations.json"
-
 
 static func all_locations() -> Array:
-	var root := JsonLoader._read_json_root_object(PATH)
-	var raw: Variant = root.get("locations", {})
-	if not raw is Dictionary:
-		return []
-	var out: Array = []
-	for key in (raw as Dictionary).keys():
-		var row := ((raw as Dictionary)[key] as Dictionary).duplicate(true)
-		row["id"] = str(key)
-		out.append(row)
-	return out
+	var cm := _config_manager()
+	if cm != null and cm.has_method("all_locations"):
+		return cm.call("all_locations") as Array
+	return []
 
 
 static func by_id(location_id: String) -> Dictionary:
-	var root := JsonLoader._read_json_root_object(PATH)
-	var raw: Variant = root.get("locations", {})
-	if not raw is Dictionary:
-		return {}
-	var row_v: Variant = (raw as Dictionary).get(location_id)
-	if not row_v is Dictionary:
-		return {}
-	var row := (row_v as Dictionary).duplicate(true)
-	row["id"] = location_id
-	return row
+	var cm := _config_manager()
+	if cm != null and cm.has_method("location_by_id"):
+		return cm.call("location_by_id", location_id) as Dictionary
+	return {}
 
 
 static func has_location(location_id: String) -> bool:
 	return not by_id(location_id).is_empty()
+
+
+static func _config_manager() -> Node:
+	var loop := Engine.get_main_loop()
+	if not loop is SceneTree:
+		return null
+	return (loop as SceneTree).root.get_node_or_null("ConfigManager")

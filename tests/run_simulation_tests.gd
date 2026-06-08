@@ -16,6 +16,7 @@ func _init() -> void:
 func _run_all() -> void:
 	_run("new game and daily activities", _test_new_game_and_daily_activities)
 	_run("inventory and battle item slots", _test_inventory_and_battle_item_slots)
+	_run("transfer item respects stack cap", _test_transfer_item_stack_cap)
 	_run("expedition events build valid battle data", _test_expedition_events_build_valid_battle_data)
 	_run("reward pools produce legal rewards", _test_reward_pools)
 	_run("expedition defeat settlement persists runtime state", _test_expedition_defeat_settlement)
@@ -64,6 +65,25 @@ func _test_new_game_and_daily_activities() -> void:
 	_expect_true(state.can_breakthrough(), "breakthrough available")
 	var result: Dictionary = state.breakthrough()
 	_expect_true(bool(result.get("ok", false)), "breakthrough succeeds")
+
+
+func _test_transfer_item_stack_cap() -> void:
+	var from := {"items_HuiQiDan": 10}
+	var dest_full := {"items_HuiQiDan": 99}
+	var dest_partial := {"items_HuiQiDan": 95}
+	var dest_empty := {}
+	var moved_full := InventoryServiceScript.transfer_item(from, dest_full, "items_HuiQiDan", 5)
+	_expect_eq(moved_full, 0, "full destination blocks transfer")
+	_expect_eq(int(from.get("items_HuiQiDan", 0)), 10, "source unchanged when blocked")
+	_expect_eq(int(dest_full.get("items_HuiQiDan", 0)), 99, "destination unchanged when blocked")
+	var moved_partial := InventoryServiceScript.transfer_item(from, dest_partial, "items_HuiQiDan", 8)
+	_expect_eq(moved_partial, 4, "partial capacity transfer")
+	_expect_eq(int(from.get("items_HuiQiDan", 0)), 6, "source reduced by partial transfer")
+	_expect_eq(int(dest_partial.get("items_HuiQiDan", 0)), 99, "destination filled to cap")
+	var moved_all := InventoryServiceScript.transfer_item(from, dest_empty, "items_HuiQiDan", 6)
+	_expect_eq(moved_all, 6, "full transfer when room available")
+	_expect_true(not from.has("items_HuiQiDan"), "source emptied")
+	_expect_eq(int(dest_empty.get("items_HuiQiDan", 0)), 6, "destination received all")
 
 
 func _test_inventory_and_battle_item_slots() -> void:

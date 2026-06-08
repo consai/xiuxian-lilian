@@ -2,6 +2,7 @@ class_name ExpeditionRewardService
 extends RefCounted
 
 const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
+const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 
 
@@ -35,35 +36,43 @@ static func roll_fixed_rewards(rewards: Array) -> Array:
 	return RewardServiceScript.merge_rewards(rewards)
 
 
-static func apply_loot_loss_on_defeat(loot: Array) -> Dictionary:
+static func grant_to_player(game_state: Node, session_loot: Array, rewards: Array) -> Array:
+	if game_state == null or rewards.is_empty():
+		return []
+	var applied := RewardServiceScript.apply_rewards(game_state, rewards)
+	merge_into_loot(session_loot, applied)
+	return applied
+
+
+static func apply_inventory_loss_on_defeat(inventory: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 	var rules := ExpeditionRulesServiceScript.rules()
-	var keep_ratio := float(rules.get("defeat_loot_item_keep_ratio", 0.5))
-	var keep_equips := bool(rules.get("defeat_keep_new_equips", false))
-	var kept: Array = []
+	var min_stacks := maxi(0, int(rules.get("defeat_inventory_drop_min_stacks", 1)))
+	var max_stacks := maxi(min_stacks, int(rules.get("defeat_inventory_drop_max_stacks", 2)))
+	var min_ratio := clampf(float(rules.get("defeat_inventory_drop_min_ratio", 0.25)), 0.0, 1.0)
+	var max_ratio := clampf(float(rules.get("defeat_inventory_drop_max_ratio", 0.75)), min_ratio, 1.0)
+	var candidates: Array = []
+	for iid_v in inventory.keys():
+		var iid := str(iid_v)
+		if int(inventory.get(iid, 0)) > 0:
+			candidates.append(iid)
+	if candidates.is_empty():
+		return {"lost": []}
+	_shuffle_array(candidates, rng)
+	var pick_count := mini(candidates.size(), rng.randi_range(min_stacks, max_stacks))
 	var lost: Array = []
-	for reward_v in loot:
-		if not reward_v is Dictionary:
+	for i in pick_count:
+		var iid := str(candidates[i])
+		var count := int(inventory.get(iid, 0))
+		if count <= 0:
 			continue
-		var reward := reward_v as Dictionary
-		var kind := str(reward.get("kind", "item"))
-		var count := maxi(1, int(reward.get("count", 1)))
-		if kind == "equip":
-			if keep_equips:
-				kept.append(reward.duplicate(true))
-			else:
-				lost.append(reward.duplicate(true))
+		var min_drop := maxi(1, int(floor(float(count) * min_ratio)))
+		var max_drop := maxi(min_drop, int(floor(float(count) * max_ratio)))
+		var drop := mini(count, rng.randi_range(min_drop, max_drop))
+		if drop <= 0:
 			continue
-		var kept_count := maxi(0, int(floor(float(count) * keep_ratio)))
-		var lost_count := count - kept_count
-		if kept_count > 0:
-			var kept_row := reward.duplicate(true)
-			kept_row["count"] = kept_count
-			kept.append(kept_row)
-		if lost_count > 0:
-			var lost_row := reward.duplicate(true)
-			lost_row["count"] = lost_count
-			lost.append(lost_row)
-	return {"kept": kept, "lost": lost}
+		InventoryServiceScript.remove_item(inventory, iid, drop)
+		lost.append({"kind": "item", "id": iid, "count": drop})
+	return {"lost": lost}
 
 
 static func merge_into_loot(loot: Array, rewards: Array) -> void:
@@ -84,6 +93,14 @@ static func merge_into_loot(loot: Array, rewards: Array) -> void:
 				break
 		if not merged:
 			loot.append(reward.duplicate(true))
+
+
+static func _shuffle_array(values: Array, rng: RandomNumberGenerator) -> void:
+	for i in range(values.size() - 1, 0, -1):
+		var j := rng.randi_range(0, i)
+		var tmp: Variant = values[i]
+		values[i] = values[j]
+		values[j] = tmp
 
 
 static func _weighted_pick(pool: Array, rng: RandomNumberGenerator) -> Dictionary:

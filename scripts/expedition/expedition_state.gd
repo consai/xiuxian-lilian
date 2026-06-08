@@ -8,7 +8,7 @@ const ExpeditionEventServiceScript := preload("res://scripts/expedition/expediti
 const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 func _ds() -> Node:
-	return DataStoreRef.resolve()
+	return DataStore
 
 
 var active: bool:
@@ -68,9 +68,9 @@ var player_snapshot: Dictionary:
 var pending_exit_reason: String:
 	get: return str(_ds().expedition_runtime().get("pending_exit_reason", ""))
 	set(value): _ds().expedition_runtime()["pending_exit_reason"] = value
-var last_finish_result: Dictionary:
-	get: return _ds().expedition_runtime().get("last_finish_result", {}) as Dictionary
-	set(value): _ds().expedition_runtime()["last_finish_result"] = value
+var expedition_id: String:
+	get: return str(_ds().expedition_runtime().get("expedition_id", ""))
+	set(value): _ds().expedition_runtime()["expedition_id"] = value
 var _rng := RandomNumberGenerator.new()
 var _game_state: Node = null
 
@@ -83,6 +83,7 @@ func start(location_id_value: String, game_state: Node, seed_override: int = -1)
 		return {"ok": false, "error": "未知地点"}
 	reset()
 	_game_state = game_state
+	expedition_id = _new_expedition_id()
 	location_id = location_id_value
 	seed = seed_override if seed_override >= 0 else int(Time.get_unix_time_from_system()) % 2147483647
 	_rng.seed = seed
@@ -165,18 +166,29 @@ func build_battle_init() -> Dictionary:
 	var player: Dictionary = {}
 	if _game_state != null:
 		player = _game_state.build_player_battle_snapshot(runtime)
+	if not PlayerBattleSnapshot.collect_errors(player).is_empty():
+		return {}
 	var enemy := ExpeditionEventServiceScript.build_battle_enemy(event, depth)
-	return {
+	var init_data := {
 		"player": player,
 		"enemy": enemy,
 		"battle_time_limit": 200.0,
 		"auto_battle": {"player": false, "enemy": true},
 		"spd_jitter_ratio": 0.0,
 	}
+	var init_errors := BattleInitData.collect_errors(init_data)
+	if not init_errors.is_empty():
+		push_error("build_battle_init: %s" % init_errors[0])
+		return {}
+	return init_data
 
 
 func receive_battle_summary(summary: Dictionary) -> void:
-	pending_battle_summary = summary.duplicate(true)
+	var summary_errors := BattleSummary.collect_errors(summary)
+	if not summary_errors.is_empty():
+		push_error("BattleSummary: %s" % summary_errors[0])
+		return
+	pending_battle_summary = BattleSummary.to_dict(summary)
 	pending_battle_rewards = []
 	if str(summary.get("outcome", "")) != "win" or pending_battle_event_id == "":
 		return
@@ -198,7 +210,7 @@ func settle_pending_battle() -> Dictionary:
 	stats["battles"] = int(stats.get("battles", 0)) + 1
 	if won:
 		stats["wins"] = int(stats.get("wins", 0)) + 1
-		ExpeditionRewardServiceScript.merge_into_loot(loot, pending_battle_rewards)
+		_apply_session_rewards(pending_battle_rewards)
 		pending_battle_rewards = []
 		if str(event.get("type", "")) == "boss":
 			stats["boss_defeated"] = true
@@ -224,35 +236,51 @@ func can_exit() -> bool:
 	return active and phase in ["choosing", "resolving"] and pending_exit_reason == ""
 
 
+func clear_pending_battle() -> void:
+	pending_battle_event_id = ""
+	pending_battle_summary = {}
+	pending_battle_rewards = []
+	if phase == "battle":
+		phase = "choosing"
+		generate_choices()
+
+
 func finish(exit_reason: String) -> Dictionary:
-	if not active and last_finish_result.is_empty():
+	if not active:
 		return {"ok": false, "error": "没有可结算的历练"}
 	var reason := exit_reason
 	if reason == "manual" and bool(stats.get("boss_defeated", false)):
 		reason = "boss_complete"
 	var elapsed_days: int = ExpeditionRulesServiceScript.elapsed_days(steps)
-	var loot_for_settlement := loot.duplicate(true)
 	var loot_lost: Array = []
 	if reason == "defeated":
-		var loss := ExpeditionRewardServiceScript.apply_loot_loss_on_defeat(loot)
-		loot_for_settlement = loss.get("kept", []) as Array
-		loot_lost = loss.get("lost", []) as Array
+		if _game_state != null:
+			_restore_rng()
+			var loss := ExpeditionRewardServiceScript.apply_inventory_loss_on_defeat(
+				_game_state.inventory, _rng
+			)
+			_save_rng()
+			loot_lost = loss.get("lost", []) as Array
+			_sync_runtime_inventory_from_game()
 		var rules: Dictionary = ExpeditionRulesServiceScript.rules()
 		var hp_max := float((player_snapshot.get("attrs", {}) as Dictionary).get(FightAttr.HP_MAX, 100.0))
 		runtime["hp"] = maxf(float(runtime.get("hp", 0.0)), hp_max * float(rules.get("defeat_hp_floor_ratio", 0.25)))
-	var result := {
+	var result := ExpeditionResult.to_dict({
 		"ok": true,
+		"settlement_id": expedition_id,
 		"exit_reason": reason,
-		"elapsed_days": elapsed_days,
+		"elapsed_days": maxi(1, elapsed_days),
 		"hp": float(runtime.get("hp", 0.0)),
 		"mp": float(runtime.get("mp", 0.0)),
 		"items": _runtime_items_for_settlement(),
-		"loot": loot_for_settlement,
+		"loot": loot.duplicate(true),
 		"loot_lost": loot_lost,
 		"location_name": str(LocationServiceScript.by_id(location_id).get("name", location_id)),
 		"stats": stats.duplicate(true),
-	}
-	last_finish_result = result.duplicate(true)
+	})
+	var result_errors := ExpeditionResult.collect_errors(result)
+	if not result_errors.is_empty():
+		return {"ok": false, "error": result_errors[0]}
 	reset()
 	return result
 
@@ -271,7 +299,7 @@ func should_go_to_result() -> bool:
 
 
 func _apply_step_after_event(event: Dictionary, extra_rewards: Array, feedback: String) -> void:
-	ExpeditionRewardServiceScript.merge_into_loot(loot, extra_rewards)
+	_apply_session_rewards(extra_rewards)
 	if bool(event.get("once_per_expedition", false)):
 		var event_id := str(event.get("id", ""))
 		if event_id != "" and not visited_once_events.has(event_id):
@@ -295,6 +323,32 @@ func _sync_runtime_from_summary(summary: Dictionary) -> void:
 	var inv := runtime.get("inventory", {}) as Dictionary
 	var slots := runtime.get("item_slots", ["", ""]) as Array
 	InventoryServiceScript.sync_battle_item_counts(inv, slots, runtime_summary.get("items", []) as Array)
+	runtime["inventory"] = inv
+
+
+func _apply_session_rewards(rewards: Array) -> void:
+	if rewards.is_empty():
+		return
+	if _game_state == null:
+		ExpeditionRewardServiceScript.merge_into_loot(loot, rewards)
+		return
+	ExpeditionRewardServiceScript.grant_to_player(_game_state, loot, rewards)
+	_sync_runtime_inventory_from_game()
+
+
+func _sync_runtime_inventory_from_game() -> void:
+	if _game_state == null:
+		return
+	var inv := runtime.get("inventory", {}) as Dictionary
+	for slot_v in runtime.get("item_slots", []) as Array:
+		var iid := str(slot_v)
+		if iid == "":
+			continue
+		var count := int(_game_state.inventory.get(iid, 0))
+		if count > 0:
+			inv[iid] = count
+		else:
+			inv.erase(iid)
 	runtime["inventory"] = inv
 
 
@@ -341,6 +395,10 @@ func _restore_rng() -> void:
 
 func _save_rng() -> void:
 	rng_state = _rng.state
+
+
+func _new_expedition_id() -> String:
+	return "expedition_%d_%d" % [int(Time.get_unix_time_from_system() * 1000.0), randi()]
 
 
 func _rng_from_state() -> RandomNumberGenerator:

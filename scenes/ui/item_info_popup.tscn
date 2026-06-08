@@ -1,25 +1,24 @@
-[gd_scene load_steps=9 format=3 uid="uid://biteminfopopup1"]
+[gd_scene format=3 uid="uid://bv101bwig3jb1"]
 
-[ext_resource type="Script" path="res://scripts/ui/item_info_popup_view.gd" id="1_view"]
+[ext_resource type="Script" uid="uid://dxhpridv24cl" path="res://scripts/ui/item_info_popup_view.gd" id="1_view"]
 [ext_resource type="StyleBox" uid="uid://bdjlyraa36sst" path="res://ui/panel_itemback.tres" id="2_panel"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="3_title"]
-[ext_resource type="LabelSettings" uid="uid://dknyivqhm6bby" path="res://ui/ziti_new/13.tres" id="4_body"]
-[ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="5_meta"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="5_meta"]
 [ext_resource type="PackedScene" uid="uid://bx04spldnbiyv" path="res://scenes/items/item.tscn" id="6_item"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="6_uok5a"]
 [ext_resource type="Texture2D" uid="uid://8mwstvi8kywh" path="res://assets/art/ui_new/btn_close.png" id="7_close"]
 [ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="8_press"]
 
-[node name="ItemInfoPopup" type="Control"]
+[node name="ItemInfoPopup" type="Control" unique_id=427759546]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 script = ExtResource("1_view")
 
-[node name="Backdrop" type="ColorRect" parent="."]
+[node name="Backdrop" type="ColorRect" parent="." unique_id=278255476]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -27,10 +26,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 color = Color(0, 0, 0, 0.45)
 
-[node name="Center" type="Control" parent="."]
+[node name="Center" type="Control" parent="." unique_id=1606122016]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -45,7 +43,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="Panel" type="PanelContainer" parent="Center"]
+[node name="Panel" type="PanelContainer" parent="Center" unique_id=1306025061]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -55,38 +53,38 @@ grow_vertical = 2
 mouse_filter = 1
 theme_override_styles/panel = ExtResource("2_panel")
 
-[node name="Margin" type="MarginContainer" parent="Center/Panel"]
+[node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=131101345]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 16
 
-[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin" unique_id=1382110740]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Header" type="HBoxContainer" parent="Center/Panel/Margin/VBox"]
+[node name="Header" type="HBoxContainer" parent="Center/Panel/Margin/VBox" unique_id=253222805]
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="ItemPreview" parent="Center/Panel/Margin/VBox/Header" instance=ExtResource("6_item")]
+[node name="ItemPreview" parent="Center/Panel/Margin/VBox/Header" unique_id=1364437411 instance=ExtResource("6_item")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Info" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Header"]
+[node name="Info" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Header" unique_id=1532349657]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="NameLabel" type="Label" parent="Center/Panel/Margin/VBox/Header/Info"]
+[node name="NameLabel" type="Label" parent="Center/Panel/Margin/VBox/Header/Info" unique_id=729787613]
 unique_name_in_owner = true
 layout_mode = 2
 text = "道具名称"
 label_settings = ExtResource("3_title")
 autowrap_mode = 3
 
-[node name="MetaLabel" type="Label" parent="Center/Panel/Margin/VBox/Header/Info"]
+[node name="MetaLabel" type="Label" parent="Center/Panel/Margin/VBox/Header/Info" unique_id=247517155]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5372549, 0.42745098, 0.3882353, 1)
@@ -94,40 +92,40 @@ text = "类型：丹药 · 品质：普通"
 label_settings = ExtResource("5_meta")
 autowrap_mode = 3
 
-[node name="DescLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="DescLabel" type="Label" parent="Center/Panel/Margin/VBox" unique_id=1353947500]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4117647, 0.3019608, 0.27450982, 1)
 text = "道具描述"
-label_settings = ExtResource("4_body")
+label_settings = ExtResource("6_uok5a")
 autowrap_mode = 3
 
-[node name="DetailLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="DetailLabel" type="Label" parent="Center/Panel/Margin/VBox" unique_id=1830855413]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4117647, 0.3019608, 0.27450982, 1)
 text = "效果说明"
-label_settings = ExtResource("4_body")
+label_settings = ExtResource("6_uok5a")
 autowrap_mode = 3
 
-[node name="FooterLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="FooterLabel" type="Label" parent="Center/Panel/Margin/VBox" unique_id=570364403]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5372549, 0.42745098, 0.3882353, 1)
 text = "数量：1"
-label_settings = ExtResource("4_body")
+label_settings = ExtResource("6_uok5a")
 autowrap_mode = 3
 
-[node name="CloseButton" type="TextureButton" parent="Center"]
+[node name="CloseButton" type="TextureButton" parent="Center" unique_id=1669625423]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -52.0
-offset_top = 8.0
-offset_right = -8.0
-offset_bottom = 52.0
+offset_left = -54.0
+offset_top = -20.0
+offset_right = 15.0
+offset_bottom = 50.0
 grow_horizontal = 0
 texture_normal = ExtResource("7_close")
 script = ExtResource("8_press")

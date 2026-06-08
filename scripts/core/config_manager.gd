@@ -3,12 +3,17 @@ extends Node
 ## 全局配置中心：启动时预处理战斗配置表，并提供缓存读取接口。
 
 var _items: Array = []
+var _items_by_id: Dictionary = {}
+var _items_by_fight_id: Dictionary = {}
 var _item_name_by_id: Dictionary = {}
 var _skills_by_id: Dictionary = {}
 var _equips_by_id: Dictionary = {}
 var _battle_time_limit_default: float = 200.0
 var _buff_by_id: Dictionary = {}
-const ExpeditionDataValidatorScript := preload("res://scripts/expedition/expedition_data_validator.gd")
+var _locations_by_id: Dictionary = {}
+var _expedition_events_by_id: Dictionary = {}
+var _expedition_rules: Dictionary = {}
+const ConfigValidatorScript := preload("res://scripts/core/config_validator.gd")
 
 
 func _ready() -> void:
@@ -17,27 +22,26 @@ func _ready() -> void:
 
 
 func reload_all() -> void:
-	_items = JsonLoader.load_items()
-	_item_name_by_id.clear()
-	for it in _items:
-		if it == null:
-			continue
-		var iid := JsonLoader.config_id_to_string(str(it.id))
-		if iid == "":
-			continue
-		var nm := str(it.name).strip_edges()
-		if nm == "":
-			nm = iid
-		_item_name_by_id[iid] = nm
+	_load_items_local()
 	_load_skills_local()
 	_load_equips_local()
 	_load_buffs_local()
+	_load_locations_local()
+	_load_expedition_events_local()
+	_load_expedition_rules_local()
+	_validate_all_config()
 
 
 func _validate_expedition_data() -> void:
-	var game_state := get_tree().root.get_node_or_null("GameState")
-	for msg in ExpeditionDataValidatorScript.collect_errors(game_state):
-		push_error("ExpeditionDataValidator: %s" % msg)
+	_validate_all_config()
+
+
+func _validate_all_config() -> void:
+	var game_state: Node = null
+	if is_inside_tree():
+		game_state = get_tree().root.get_node_or_null("GameState")
+	for msg in ConfigValidatorScript.collect_all_errors(self, game_state):
+		push_error("ConfigValidator: %s" % msg)
 
 
 func items() -> Array:
@@ -46,9 +50,9 @@ func items() -> Array:
 
 func item_def_by_id(item_id: String) -> ItemDef:
 	var iid := item_id.strip_edges()
-	for it in _items:
-		if it is ItemDef and (it as ItemDef).id == iid:
-			return it as ItemDef
+	var found: Variant = _items_by_id.get(iid)
+	if found is ItemDef:
+		return found as ItemDef
 	return null
 
 
@@ -80,10 +84,61 @@ func item_by_fight_id(fight_id: int) -> Dictionary:
 func item_def_by_fight_id(fight_id: int) -> ItemDef:
 	if fight_id <= 0:
 		return null
-	for it in _items:
-		if it is ItemDef and (it as ItemDef).fight_id == fight_id:
-			return it
+	var found: Variant = _items_by_fight_id.get(fight_id)
+	if found is ItemDef:
+		return found as ItemDef
 	return null
+
+
+func location_by_id(location_id: String) -> Dictionary:
+	var lid := location_id.strip_edges()
+	var row_v: Variant = _locations_by_id.get(lid)
+	if not row_v is Dictionary:
+		return {}
+	var row := (row_v as Dictionary).duplicate(true)
+	row["id"] = lid
+	return row
+
+
+func all_locations() -> Array:
+	var out: Array = []
+	for key in _locations_by_id.keys():
+		out.append(location_by_id(str(key)))
+	return out
+
+
+func all_location_ids() -> Array:
+	return (_locations_by_id.keys() as Array).duplicate()
+
+
+func expedition_event_by_id(event_id: String) -> Dictionary:
+	var eid := event_id.strip_edges()
+	var row_v: Variant = _expedition_events_by_id.get(eid)
+	if not row_v is Dictionary:
+		return {}
+	var row := (row_v as Dictionary).duplicate(true)
+	row["id"] = eid
+	return row
+
+
+func all_expedition_event_ids() -> Array:
+	return (_expedition_events_by_id.keys() as Array).duplicate()
+
+
+func expedition_rules() -> Dictionary:
+	return _expedition_rules.duplicate(true)
+
+
+func all_skill_ids() -> Array:
+	return (_skills_by_id.keys() as Array).duplicate()
+
+
+func all_equip_ids() -> Array:
+	return (_equips_by_id.keys() as Array).duplicate()
+
+
+func all_buff_ids() -> Array:
+	return (_buff_by_id.keys() as Array).duplicate()
 
 
 func basic_attack_cfg() -> Dictionary:
@@ -205,6 +260,55 @@ func get_item_display_name(item_id: String) -> String:
 	if iid == "":
 		return ""
 	return str(_item_name_by_id.get(iid, iid))
+
+
+func _load_items_local() -> void:
+	_items = JsonLoader.load_items()
+	_item_name_by_id.clear()
+	_items_by_id.clear()
+	_items_by_fight_id.clear()
+	for it in _items:
+		if it == null or not it is ItemDef:
+			continue
+		var def := it as ItemDef
+		var iid := JsonLoader.config_id_to_string(str(def.id))
+		if iid == "":
+			continue
+		_items_by_id[iid] = def
+		if def.fight_id > 0:
+			_items_by_fight_id[def.fight_id] = def
+		var nm := str(def.name).strip_edges()
+		if nm == "":
+			nm = iid
+		_item_name_by_id[iid] = nm
+
+
+func _load_locations_local() -> void:
+	_locations_by_id.clear()
+	var root := JsonLoader._read_json_root_object("res://data/locations.json")
+	var raw_v: Variant = root.get("locations", {})
+	if not raw_v is Dictionary:
+		return
+	for key in (raw_v as Dictionary).keys():
+		var row_v: Variant = (raw_v as Dictionary)[key]
+		if row_v is Dictionary:
+			_locations_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
+
+
+func _load_expedition_events_local() -> void:
+	_expedition_events_by_id.clear()
+	var root := JsonLoader._read_json_root_object("res://data/expedition_events.json")
+	var raw_v: Variant = root.get("events", {})
+	if not raw_v is Dictionary:
+		return
+	for key in (raw_v as Dictionary).keys():
+		var row_v: Variant = (raw_v as Dictionary)[key]
+		if row_v is Dictionary:
+			_expedition_events_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
+
+
+func _load_expedition_rules_local() -> void:
+	_expedition_rules = JsonLoader._read_json_root_object("res://data/expedition_rules.json").duplicate(true)
 
 
 func _load_skills_local() -> void:

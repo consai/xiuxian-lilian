@@ -73,7 +73,7 @@ func peek_payload(scene_id: String) -> Dictionary
 | 目标场景 | 允许条件 | 拒绝时行为 |
 |----------|----------|------------|
 | `EXPEDITION_LOOP` | `ExpeditionState.active == true` 且未进入结算（`should_go_to_result() == false`） | 返回错误，不切场景 |
-| `EXPEDITION_RESULT` | `ExpeditionState.active == true` 或 `last_finish_result` 非空 | 返回错误；结果页 `_ready` 可回退洞府 |
+| `EXPEDITION_RESULT` | `ExpeditionState.active == true` 或 `GameState.last_expedition_summary` 非空 | 返回错误；结果页 `_ready` 可回退洞府 |
 | `LOCATION_SELECT` | `ExpeditionState.active == false` | 返回错误，不破坏历练状态 |
 | `FIGHT` | 仅允许 `go_fight()` | 直接 `go_to(FIGHT)` 拒绝 |
 | `HUB` | 默认允许；若 `ExpeditionState.active == true` 则拒绝 | 返回 `blocked: true`，不清历练状态 |

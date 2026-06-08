@@ -28,6 +28,8 @@ func _run_all() -> void:
 	_run("go_breakthrough_summary payload consumed once", _test_breakthrough_summary_payload)
 	_run("go_expedition_result passes reason", _test_expedition_result_reason)
 	_run("transition lock prevents double go_to", _test_transition_lock)
+	_run("start expedition rolls back when transition locked", _test_start_expedition_rollback_on_lock)
+	_run("go fight leaves no pending init when transition locked", _test_go_fight_blocked_without_pending)
 	if not _failures.is_empty():
 		for failure in _failures:
 			printerr("FAIL: %s" % failure)
@@ -114,6 +116,27 @@ func _test_expedition_result_reason() -> void:
 	_expect_true(bool(nav.get("ok", false)), "result navigation ok")
 	var payload: Dictionary = _scene_manager().peek_payload(SceneManagerScript.EXPEDITION_RESULT)
 	_expect_eq(str(payload.get("reason", "")), "manual", "reason payload")
+
+
+func _test_start_expedition_rollback_on_lock() -> void:
+	_reset_game()
+	_data_store().scene_runtime()["transitioning"] = true
+	var expedition := _expedition()
+	var nav: Dictionary = _scene_manager().start_expedition("qinglan_mountain", 1234)
+	_expect_false(bool(nav.get("ok", true)), "start blocked by lock")
+	_expect_false(expedition.active, "expedition not left active")
+	_data_store().scene_runtime()["transitioning"] = false
+
+
+func _test_go_fight_blocked_without_pending() -> void:
+	_reset_game()
+	_data_store().scene_runtime()["transitioning"] = true
+	var data: Dictionary = BattleInitData.sample_for_editor()
+	var nav: Dictionary = _scene_manager().go_fight(data, "scene_manager_test")
+	_expect_false(bool(nav.get("ok", true)), "go fight blocked by lock")
+	var pending_v: Variant = _data_store().battle_runtime().get("pending_init", {})
+	_expect_true((pending_v as Dictionary).is_empty(), "pending init not written")
+	_data_store().scene_runtime()["transitioning"] = false
 
 
 func _test_transition_lock() -> void:

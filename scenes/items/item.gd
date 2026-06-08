@@ -34,8 +34,6 @@ func _ready() -> void:
 	_apply_click_enabled()
 	_apply_quality_border(_quality)
 	_refresh_name_count_text()
-	if click_enabled:
-		_press.clicked.connect(_on_press_clicked)
 	gui_input.connect(_on_gui_input)
 
 
@@ -101,13 +99,19 @@ func _on_gui_input(event: InputEvent) -> void:
 
 
 func _apply_click_enabled() -> void:
+	if _press == null:
+		return
 	if click_enabled:
 		_press.process_mode = Node.PROCESS_MODE_INHERIT
 		mouse_filter = Control.MOUSE_FILTER_STOP
+		if not _press.clicked.is_connected(_on_press_clicked):
+			_press.clicked.connect(_on_press_clicked)
 	else:
 		_press.process_mode = Node.PROCESS_MODE_DISABLED
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 		scale = Vector2.ONE
+		if _press.clicked.is_connected(_on_press_clicked):
+			_press.clicked.disconnect(_on_press_clicked)
 
 
 func _apply_quality_border(pin_zhi: String) -> void:

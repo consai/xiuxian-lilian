@@ -1,6 +1,7 @@
 extends SceneTree
 
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
+const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
 
@@ -17,12 +18,14 @@ func _run_all() -> void:
 	_run("choices obey depth and battle cap", _test_choices_obey_depth_and_battle_cap)
 	_run("non battle events advance expedition", _test_non_battle_events_advance)
 	_run("manual exit keeps all loot", _test_manual_exit_keeps_all_loot)
-	_run("defeat exit applies loss and injury", _test_defeat_exit_applies_loss_and_injury)
+	_run("defeat exit drops inventory and injury", _test_defeat_exit_drops_inventory_and_injury)
+	_run("defeat inventory drop is deterministic", _test_defeat_inventory_drop_deterministic)
 	_run("elapsed days use step ceiling", _test_elapsed_days_use_step_ceiling)
 	_run("battle win returns to expedition", _test_battle_win_returns_to_expedition)
 	_run("battle loss forces expedition result", _test_battle_loss_forces_expedition_result)
 	_run("boss requires depth and marks completion", _test_boss_requires_depth_and_marks_completion)
 	_run("game settlement occurs once", _test_game_settlement_occurs_once)
+	_run("distinct expeditions do not collide on settlement", _test_distinct_expeditions_settlement_ids)
 	if _failures.is_empty():
 		print("PASS: %d expedition tests" % _tests_run)
 		quit(0)
@@ -100,7 +103,8 @@ func _test_non_battle_events_advance() -> void:
 	_expect_true(bool(result.get("ok", false)), "gather resolves")
 	_expect_eq(expedition.steps, before_steps + 1, "steps increased")
 	_expect_eq(expedition.depth, before_depth + 1, "depth increased")
-	_expect_true(expedition.loot.size() >= before_loot, "loot gained")
+	_expect_true(expedition.loot.size() >= before_loot, "session loot tracked")
+	_expect_true(int(game.inventory.get("items_LingCao", 0)) > 3, "gather reward entered inventory")
 	game.hp = 10.0
 	expedition.runtime["hp"] = 10.0
 	expedition.current_choices = [ExpeditionEventServiceScript.by_id("qinglan_shelter")]
@@ -113,7 +117,9 @@ func _test_manual_exit_keeps_all_loot() -> void:
 	var game := _state()
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 505)
-	expedition.loot = [{"kind": "item", "id": "items_LingCao", "count": 4}]
+	ExpeditionRewardServiceScript.grant_to_player(
+		game, expedition.loot, [{"kind": "item", "id": "items_LingCao", "count": 4}]
+	)
 	var finish: Dictionary = expedition.finish("manual")
 	var settled: Dictionary = game.settle_expedition(finish)
 	_expect_true(bool(settled.get("ok", false)), "settlement ok")
@@ -121,21 +127,35 @@ func _test_manual_exit_keeps_all_loot() -> void:
 	_expect_eq(game.day, 2, "manual exit advances at least one day")
 
 
-func _test_defeat_exit_applies_loss_and_injury() -> void:
+func _test_defeat_exit_drops_inventory_and_injury() -> void:
 	var game := _state()
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 606)
-	expedition.loot = [
-		{"kind": "item", "id": "items_LingCao", "count": 5},
-		{"kind": "equip", "id": 5002, "count": 1},
-	]
+	ExpeditionRewardServiceScript.grant_to_player(
+		game,
+		expedition.loot,
+		[{"kind": "item", "id": "items_LingCao", "count": 5}],
+	)
+	var inv_before := int(game.inventory.get("items_LingCao", 0))
 	expedition.runtime["hp"] = 0.0
 	var finish: Dictionary = expedition.finish("defeated")
-	_expect_eq((finish.get("loot", []) as Array).size(), 1, "equip lost on defeat")
-	_expect_eq(int(((finish.get("loot", []) as Array)[0] as Dictionary).get("count", 0)), 2, "items halved")
+	var inv_after := int(game.inventory.get("items_LingCao", 0))
+	_expect_true(inv_after < inv_before, "defeat removes inventory items")
+	_expect_true(not (finish.get("loot_lost", []) as Array).is_empty(), "loot_lost recorded")
 	game.settle_expedition(finish)
 	_expect_near(game.hp, 25.0, "defeat hp floor")
 	_expect_eq(game.injury_days, 3, "defeat injury applied after elapsed reduction")
+
+
+func _test_defeat_inventory_drop_deterministic() -> void:
+	var inventory_a := {"items_LingCao": 8, "items_HuiQiDan": 4}
+	var inventory_b := {"items_LingCao": 8, "items_HuiQiDan": 4}
+	var loss_a := ExpeditionRewardServiceScript.apply_inventory_loss_on_defeat(inventory_a, _rng(4242))
+	var loss_b := ExpeditionRewardServiceScript.apply_inventory_loss_on_defeat(inventory_b, _rng(4242))
+	_expect_eq(inventory_a, inventory_b, "same seed same inventory result")
+	_expect_eq(loss_a, loss_b, "same seed same loss result")
+	_expect_true(not (loss_a.get("lost", []) as Array).is_empty(), "drops at least one stack")
+	_expect_true(_inventory_total(inventory_a) < 12, "inventory count reduced")
 
 
 func _test_elapsed_days_use_step_ceiling() -> void:
@@ -149,6 +169,7 @@ func _test_elapsed_days_use_step_ceiling() -> void:
 func _test_battle_win_returns_to_expedition() -> void:
 	var game := _state()
 	var day_before: int = int(game.day)
+	var inv_before := _inventory_total(game.inventory)
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 707)
 	expedition.current_choices = [ExpeditionEventServiceScript.by_id("qinglan_wolf")]
@@ -166,7 +187,8 @@ func _test_battle_win_returns_to_expedition() -> void:
 	_expect_true(expedition.active, "expedition still active")
 	_expect_eq(game.day, day_before, "game day unchanged")
 	_expect_near(float(expedition.runtime.get("hp", 0.0)), 55.0, "runtime hp updated")
-	_expect_true(not expedition.loot.is_empty(), "battle loot stored in expedition")
+	_expect_true(not expedition.loot.is_empty(), "battle loot tracked in session")
+	_expect_true(_inventory_total(game.inventory) > inv_before, "battle loot entered inventory")
 
 
 func _test_battle_loss_forces_expedition_result() -> void:
@@ -204,14 +226,47 @@ func _test_game_settlement_occurs_once() -> void:
 	var game := _state()
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 1001)
-	expedition.loot = [{"kind": "item", "id": "items_LingCao", "count": 2}]
+	ExpeditionRewardServiceScript.grant_to_player(
+		game, expedition.loot, [{"kind": "item", "id": "items_LingCao", "count": 2}]
+	)
 	var finish: Dictionary = expedition.finish("manual")
+	_expect_true(str(finish.get("settlement_id", "")) != "", "finish includes settlement_id")
 	var first: Dictionary = game.settle_expedition(finish)
 	var second: Dictionary = game.settle_expedition(finish)
 	_expect_true(bool(first.get("ok", false)), "first settlement ok")
 	_expect_true(bool(second.get("duplicate", false)), "duplicate settlement rejected")
-	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 5, "loot applied once")
+	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 5, "inventory not doubled at settlement")
 	_expect_eq(game.day, 2, "day advanced once")
+
+
+func _test_distinct_expeditions_settlement_ids() -> void:
+	var game := _state()
+	var expedition := _expedition()
+	expedition.start("qinglan_mountain", game, 2001)
+	ExpeditionRewardServiceScript.grant_to_player(
+		game, expedition.loot, [{"kind": "item", "id": "items_LingCao", "count": 1}]
+	)
+	var first_finish: Dictionary = expedition.finish("manual")
+	game.settle_expedition(first_finish)
+	expedition.start("qinglan_mountain", game, 2002)
+	ExpeditionRewardServiceScript.grant_to_player(
+		game, expedition.loot, [{"kind": "item", "id": "items_LingCao", "count": 1}]
+	)
+	var second_finish: Dictionary = expedition.finish("manual")
+	_expect_true(
+		str(second_finish.get("settlement_id", "")) != str(first_finish.get("settlement_id", "")),
+		"distinct expedition ids"
+	)
+	var second: Dictionary = game.settle_expedition(second_finish)
+	_expect_true(bool(second.get("ok", false)), "second distinct settlement ok")
+	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 5, "both loot applied")
+
+
+func _inventory_total(inventory: Dictionary) -> int:
+	var total := 0
+	for count_v in inventory.values():
+		total += int(count_v)
+	return total
 
 
 func _rng(seed_value: int) -> RandomNumberGenerator:

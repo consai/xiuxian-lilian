@@ -55,7 +55,7 @@ func reset_rundata() -> void:
 		"game": {
 			"last_rewards": [],
 			"last_expedition_summary": {},
-			"last_expedition_settlement_key": "",
+			"last_settled_expedition_id": "",
 		},
 		"expedition": _default_expedition(),
 		"battle": {
@@ -292,5 +292,5 @@ func _default_expedition() -> Dictionary:
 		"event_log": [],
 		"player_snapshot": {},
 		"pending_exit_reason": "",
-		"last_finish_result": {},
+		"expedition_id": "",
 	}

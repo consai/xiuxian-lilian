@@ -1,22 +1,15 @@
 class_name ExpeditionEventService
 extends RefCounted
 
-const PATH := "res://data/expedition_events.json"
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
 
 
 static func by_id(event_id: String) -> Dictionary:
-	var root := JsonLoader._read_json_root_object(PATH)
-	var raw: Variant = root.get("events", {})
-	if not raw is Dictionary:
-		return {}
-	var row_v: Variant = (raw as Dictionary).get(event_id)
-	if not row_v is Dictionary:
-		return {}
-	var row := (row_v as Dictionary).duplicate(true)
-	row["id"] = event_id
-	return row
+	var cm := _config_manager()
+	if cm != null and cm.has_method("expedition_event_by_id"):
+		return cm.call("expedition_event_by_id", event_id) as Dictionary
+	return {}
 
 
 static func event_pool_for_location(location: Dictionary) -> Array:
@@ -182,3 +175,10 @@ static func _weighted_pick(pool: Array, rng: RandomNumberGenerator) -> Dictionar
 		if roll <= 0:
 			return row.duplicate(true)
 	return {}
+
+
+static func _config_manager() -> Node:
+	var loop := Engine.get_main_loop()
+	if not loop is SceneTree:
+		return null
+	return (loop as SceneTree).root.get_node_or_null("ConfigManager")

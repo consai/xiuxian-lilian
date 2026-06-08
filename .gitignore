@@ -1,8 +1,8 @@
 # Godot 4+ specific ignores
 /.godot/
 /android/
-/.godot_test_appdata/
-/.godot_test_local/
+# Godot headless/CI test runtime dirs (APPDATA/LOCALAPPDATA overrides)
+/.godot_test_*/
 
 # Editor/user-specific caches (never commit)
 /.godot/editor/

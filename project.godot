@@ -18,7 +18,6 @@ config/icon="res://icon.svg"
 [autoload]
 
 DataStore="*res://scripts/core/data_store.gd"
-DataStoreRef="*res://scripts/core/data_store_ref.gd"
 DataEvents="*res://scripts/events/data_events.gd"
 ConfigManager="*res://scripts/core/config_manager.gd"
 SaveService="*res://scripts/sim/save_service.gd"
