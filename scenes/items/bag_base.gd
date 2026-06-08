@@ -20,6 +20,7 @@ signal sort_requested(entries: Array)
 @export var max_slots_show: int = 25
 @export var grid_columns: int = 5
 @export var title_text: String = "背包"
+@export var show_info_on_click: bool = true
 
 @onready var _title: Label = %Title
 @onready var _content: Control = %BagContent
@@ -245,7 +246,10 @@ func _on_slot_clicked(index: int) -> void:
 		if data_index >= _filtered_cache.size():
 			break
 		_set_selected(_slot_pool[i], data_index == _selected_index, _filtered_cache[data_index] as Dictionary)
-	entry_clicked.emit((_filtered_cache[index] as Dictionary).duplicate(true))
+	var entry := (_filtered_cache[index] as Dictionary).duplicate(true)
+	entry_clicked.emit(entry)
+	if show_info_on_click:
+		ItemInfoPopupHost.show_entry(entry)
 
 
 func _on_slot_right_clicked(index: int) -> void:

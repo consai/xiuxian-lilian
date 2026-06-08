@@ -1,8 +1,7 @@
 extends Control
 
-
 func _ready() -> void:
-	var summary: Dictionary = get_tree().root.get_meta("breakthrough_summary", {})
+	var summary: Dictionary = DataStoreRef.resolve().take_ui_breakthrough_summary()
 	var bg := ColorRect.new()
 	bg.color = Color("#f3dfb8")
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

@@ -6,7 +6,6 @@ const BattleSetupScript = preload("res://scripts/fight/battle_setup.gd")
 const BattleRecordTypesScript = preload("res://scripts/fight/battle_record_types.gd")
 const EnumQualityScript = preload("res://scripts/enum/enum_quality.gd")
 
-const META_KEY := "pending_battle_init"
 const META_SCHEMA_VERSION := 2
 
 const SETUP_KEYS := ["player", "enemy", "battle_time_limit"]
@@ -35,18 +34,14 @@ static func set_pending(
 		"created_unix": int(Time.get_unix_time_from_system()),
 		"payload": payload,
 	}
-	tree.root.set_meta(META_KEY, envelope)
+	_data_store().set_battle_pending_init(envelope)
 	return sid
 
 
-static func take_pending(tree: SceneTree, required_session_id: String = "") -> Dictionary:
-	if not tree.root.has_meta(META_KEY):
+static func take_pending(_tree: SceneTree = null, required_session_id: String = "") -> Dictionary:
+	var envelope: Dictionary = _data_store().take_battle_pending_init()
+	if envelope.is_empty():
 		return {}
-	var data: Variant = tree.root.get_meta(META_KEY)
-	tree.root.remove_meta(META_KEY)
-	if not data is Dictionary:
-		return {}
-	var envelope := data as Dictionary
 	if envelope.has("payload"):
 		var sid := str(envelope.get("battle_session_id", "")).strip_edges()
 		var required := required_session_id.strip_edges()
@@ -1061,3 +1056,13 @@ static func _new_battle_session_id() -> String:
 
 static func _quality_back_color(quality: int) -> Color:
 	return EnumQualityScript.get_color(maxi(1, quality))
+
+
+static func _data_store() -> Node:
+	var loop := Engine.get_main_loop()
+	if not loop is SceneTree:
+		return null
+	var ref := (loop as SceneTree).root.get_node_or_null("DataStoreRef")
+	if ref != null and ref.has_method("resolve"):
+		return ref.resolve()
+	return null

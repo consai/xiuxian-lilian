@@ -1,12 +1,11 @@
 [gd_scene format=3 uid="uid://d4c01tu5e581m"]
 
-[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="1_7bdtr"]
 [ext_resource type="Texture2D" uid="uid://chmbwc04bfpnm" path="res://assets/art/ui_new/bagback.png" id="1_bmgy1"]
 [ext_resource type="PackedScene" uid="uid://dvun4oamukfyn" path="res://scenes/items/bag_base.tscn" id="2_k3bim"]
 [ext_resource type="Script" uid="uid://c61br6dowu6tk" path="res://scenes/sim/inventory_overlay.gd" id="2_ow35f"]
-[ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="2_w4g80"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="2_xfp0u"]
 [ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="7_6wts8"]
+[ext_resource type="Texture2D" uid="uid://8mwstvi8kywh" path="res://assets/art/ui_new/btn_close.png" id="7_ow35f"]
 [ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="8_fcmln"]
 
 [node name="InventoryOverlay" type="TextureRect" unique_id=1891878246]
@@ -49,134 +48,6 @@ offset_top = 105.0
 offset_right = 1101.5
 offset_bottom = 685.0
 
-[node name="Content" type="VBoxContainer" parent="." unique_id=49271856]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 24.0
-offset_top = 18.0
-offset_right = -24.0
-offset_bottom = -18.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/separation = 10
-
-[node name="Header" type="HBoxContainer" parent="Content" unique_id=1083220264]
-layout_mode = 2
-
-[node name="Title" type="Label" parent="Content/Header" unique_id=673957225]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "洞府储物"
-label_settings = ExtResource("1_7bdtr")
-
-[node name="CloseButton" type="Button" parent="Content/Header" unique_id=641352312]
-layout_mode = 2
-text = "关闭"
-
-[node name="InventoryLabel" type="RichTextLabel" parent="Content" unique_id=1594187786]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 170)
-layout_mode = 2
-size_flags_vertical = 3
-bbcode_enabled = true
-fit_content = true
-
-[node name="EquipTitle" type="Label" parent="Content" unique_id=455537263]
-layout_mode = 2
-text = "法宝与丹药整备"
-label_settings = ExtResource("2_w4g80")
-
-[node name="EquipButton1" type="Button" parent="Content" unique_id=405756549]
-unique_name_in_owner = true
-layout_mode = 2
-text = "法宝槽 1：空"
-
-[node name="EquipButton2" type="Button" parent="Content" unique_id=1489264497]
-unique_name_in_owner = true
-layout_mode = 2
-text = "法宝槽 2：空"
-
-[node name="ItemButton1" type="Button" parent="Content" unique_id=2013124857]
-unique_name_in_owner = true
-layout_mode = 2
-text = "丹药槽 1：空"
-
-[node name="ItemButton2" type="Button" parent="Content" unique_id=168729118]
-unique_name_in_owner = true
-layout_mode = 2
-text = "丹药槽 2：空"
-
-[node name="UtilityRow" type="HBoxContainer" parent="Content" unique_id=881928082]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="SavePanelButton" type="Button" parent="Content/UtilityRow" unique_id=428944346]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "存档 / 读档"
-
-[node name="NewGameButton" type="Button" parent="Content/UtilityRow" unique_id=954854518]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "新开修行"
-
-[node name="SavePanel" type="VBoxContainer" parent="Content" unique_id=516381880]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="Slot1" type="HBoxContainer" parent="Content/SavePanel" unique_id=2104997255]
-layout_mode = 2
-
-[node name="SlotLabel1" type="Label" parent="Content/SavePanel/Slot1" unique_id=1815190100]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "槽位 1：空"
-
-[node name="Save1" type="Button" parent="Content/SavePanel/Slot1" unique_id=644006210]
-layout_mode = 2
-text = "保存"
-
-[node name="Load1" type="Button" parent="Content/SavePanel/Slot1" unique_id=1214736717]
-layout_mode = 2
-text = "读取"
-
-[node name="Slot2" type="HBoxContainer" parent="Content/SavePanel" unique_id=1512013077]
-layout_mode = 2
-
-[node name="SlotLabel2" type="Label" parent="Content/SavePanel/Slot2" unique_id=1796045743]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "槽位 2：空"
-
-[node name="Save2" type="Button" parent="Content/SavePanel/Slot2" unique_id=207917787]
-layout_mode = 2
-text = "保存"
-
-[node name="Load2" type="Button" parent="Content/SavePanel/Slot2" unique_id=439144709]
-layout_mode = 2
-text = "读取"
-
-[node name="Slot3" type="HBoxContainer" parent="Content/SavePanel" unique_id=730886726]
-layout_mode = 2
-
-[node name="SlotLabel3" type="Label" parent="Content/SavePanel/Slot3" unique_id=1606072764]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "槽位 3：空"
-
-[node name="Save3" type="Button" parent="Content/SavePanel/Slot3" unique_id=1515089738]
-layout_mode = 2
-text = "保存"
-
-[node name="Load3" type="Button" parent="Content/SavePanel/Slot3" unique_id=1401453650]
-layout_mode = 2
-text = "读取"
-
 [node name="SaveAll" type="Button" parent="." unique_id=568285696]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 36)
@@ -196,4 +67,17 @@ size_flags_horizontal = 3
 theme = ExtResource("7_6wts8")
 theme_type_variation = &"TabActive"
 text = "全部存入"
+script = ExtResource("8_fcmln")
+
+[node name="btn_close" type="TextureButton" parent="." unique_id=1677324943]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -64.0
+offset_right = 5.0
+offset_bottom = 70.0
+grow_horizontal = 0
+texture_normal = ExtResource("7_ow35f")
 script = ExtResource("8_fcmln")

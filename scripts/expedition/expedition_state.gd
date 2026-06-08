@@ -7,27 +7,70 @@ const LocationServiceScript := preload("res://scripts/expedition/location_servic
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
+func _ds() -> Node:
+	return DataStoreRef.resolve()
 
-var active := false
-var phase := "idle"
-var location_id := ""
-var depth := 1
-var steps := 0
-var seed := 0
-var rng_state := 0
-var runtime := {"hp": 0.0, "mp": 0.0, "item_slots": ["", ""], "inventory": {}}
-var loot: Array = []
-var current_choices: Array = []
-var current_event_id := ""
-var pending_battle_event_id := ""
-var pending_battle_summary: Dictionary = {}
-var pending_battle_rewards: Array = []
-var visited_once_events: Array = []
-var stats := {}
-var event_log: Array = []
-var player_snapshot := {}
-var pending_exit_reason := ""
-var last_finish_result: Dictionary = {}
+
+var active: bool:
+	get: return bool(_ds().expedition_runtime().get("active", false))
+	set(value): _ds().expedition_runtime()["active"] = value
+var phase: String:
+	get: return str(_ds().expedition_runtime().get("phase", "idle"))
+	set(value): _ds().expedition_runtime()["phase"] = value
+var location_id: String:
+	get: return str(_ds().expedition_runtime().get("location_id", ""))
+	set(value): _ds().expedition_runtime()["location_id"] = value
+var depth: int:
+	get: return int(_ds().expedition_runtime().get("depth", 1))
+	set(value): _ds().expedition_runtime()["depth"] = value
+var steps: int:
+	get: return int(_ds().expedition_runtime().get("steps", 0))
+	set(value): _ds().expedition_runtime()["steps"] = value
+var seed: int:
+	get: return int(_ds().expedition_runtime().get("seed", 0))
+	set(value): _ds().expedition_runtime()["seed"] = value
+var rng_state: int:
+	get: return int(_ds().expedition_runtime().get("rng_state", 0))
+	set(value): _ds().expedition_runtime()["rng_state"] = value
+var runtime: Dictionary:
+	get: return _ds().expedition_runtime().get("runtime", {}) as Dictionary
+	set(value): _ds().expedition_runtime()["runtime"] = value
+var loot: Array:
+	get: return _ds().expedition_runtime().get("loot", []) as Array
+	set(value): _ds().expedition_runtime()["loot"] = value
+var current_choices: Array:
+	get: return _ds().expedition_runtime().get("current_choices", []) as Array
+	set(value): _ds().expedition_runtime()["current_choices"] = value
+var current_event_id: String:
+	get: return str(_ds().expedition_runtime().get("current_event_id", ""))
+	set(value): _ds().expedition_runtime()["current_event_id"] = value
+var pending_battle_event_id: String:
+	get: return str(_ds().expedition_runtime().get("pending_battle_event_id", ""))
+	set(value): _ds().expedition_runtime()["pending_battle_event_id"] = value
+var pending_battle_summary: Dictionary:
+	get: return _ds().expedition_runtime().get("pending_battle_summary", {}) as Dictionary
+	set(value): _ds().expedition_runtime()["pending_battle_summary"] = value
+var pending_battle_rewards: Array:
+	get: return _ds().expedition_runtime().get("pending_battle_rewards", []) as Array
+	set(value): _ds().expedition_runtime()["pending_battle_rewards"] = value
+var visited_once_events: Array:
+	get: return _ds().expedition_runtime().get("visited_once_events", []) as Array
+	set(value): _ds().expedition_runtime()["visited_once_events"] = value
+var stats: Dictionary:
+	get: return _ds().expedition_runtime().get("stats", {}) as Dictionary
+	set(value): _ds().expedition_runtime()["stats"] = value
+var event_log: Array:
+	get: return _ds().expedition_runtime().get("event_log", []) as Array
+	set(value): _ds().expedition_runtime()["event_log"] = value
+var player_snapshot: Dictionary:
+	get: return _ds().expedition_runtime().get("player_snapshot", {}) as Dictionary
+	set(value): _ds().expedition_runtime()["player_snapshot"] = value
+var pending_exit_reason: String:
+	get: return str(_ds().expedition_runtime().get("pending_exit_reason", ""))
+	set(value): _ds().expedition_runtime()["pending_exit_reason"] = value
+var last_finish_result: Dictionary:
+	get: return _ds().expedition_runtime().get("last_finish_result", {}) as Dictionary
+	set(value): _ds().expedition_runtime()["last_finish_result"] = value
 var _rng := RandomNumberGenerator.new()
 var _game_state: Node = null
 
@@ -215,25 +258,7 @@ func finish(exit_reason: String) -> Dictionary:
 
 
 func reset() -> void:
-	active = false
-	phase = "idle"
-	location_id = ""
-	depth = 1
-	steps = 0
-	seed = 0
-	rng_state = 0
-	runtime = {"hp": 0.0, "mp": 0.0, "item_slots": ["", ""], "inventory": {}}
-	loot = []
-	current_choices = []
-	current_event_id = ""
-	pending_battle_event_id = ""
-	pending_battle_summary = {}
-	pending_battle_rewards = []
-	visited_once_events = []
-	stats = {}
-	event_log = []
-	player_snapshot = {}
-	pending_exit_reason = ""
+	_ds().reset_expedition_runtime()
 	_game_state = null
 
 

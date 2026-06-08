@@ -1,7 +1,5 @@
 extends SceneTree
 
-const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
-
 var _finished := false
 var _frames := 0
 var _stage := "init"
@@ -37,7 +35,7 @@ func _start() -> void:
 		printerr("FAIL: could not start expedition")
 		quit(1)
 		return
-	expedition.current_choices = [ExpeditionEventServiceScript.by_id("qinglan_wolf")]
+	expedition.current_choices = [ExpeditionEventService.by_id("qinglan_wolf")]
 	_stage = "enter battle"
 	var choose: Dictionary = expedition.choose_event("qinglan_wolf")
 	if not bool(choose.get("ok", false)):
@@ -94,7 +92,7 @@ func _on_battle_finished(summary: Dictionary, game_state: Node, expedition: Node
 		return
 	_stage = "exit expedition"
 	root.set_meta("smoke_auto_exit", true)
-	change_scene_to_file(ExpeditionState.RESULT_SCENE)
+	change_scene_to_file("res://scenes/expedition/expedition_result.tscn")
 	for _i in 120:
 		await process_frame
 		if current_scene != null and current_scene.name == "ExpeditionResult":

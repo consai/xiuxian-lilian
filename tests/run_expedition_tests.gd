@@ -1,7 +1,5 @@
 extends SceneTree
 
-const GameStateScript := preload("res://scripts/sim/game_state.gd")
-const ExpeditionStateScript := preload("res://scripts/expedition/expedition_state.gd")
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
@@ -11,6 +9,10 @@ var _tests_run := 0
 
 
 func _init() -> void:
+	call_deferred("_run_all")
+
+
+func _run_all() -> void:
 	_run("start creates isolated runtime", _test_start_creates_isolated_runtime)
 	_run("choices obey depth and battle cap", _test_choices_obey_depth_and_battle_cap)
 	_run("non battle events advance expedition", _test_non_battle_events_advance)
@@ -39,13 +41,13 @@ func _run(name: String, test: Callable) -> void:
 
 
 func _state() -> Node:
-	var state := GameStateScript.new()
+	var state := root.get_node("GameState")
 	state.new_game()
 	return state
 
 
 func _expedition() -> Node:
-	return ExpeditionStateScript.new()
+	return root.get_node("ExpeditionState")
 
 
 func _test_start_creates_isolated_runtime() -> void:
@@ -57,8 +59,6 @@ func _test_start_creates_isolated_runtime() -> void:
 	_expect_near(float(expedition.runtime.get("hp", 0.0)), game.hp, "runtime hp copied")
 	game.hp = 1.0
 	_expect_near(float(expedition.runtime.get("hp", 0.0)), 100.0, "runtime isolated from game")
-	game.free()
-	expedition.free()
 
 
 func _test_choices_obey_depth_and_battle_cap() -> void:
@@ -84,8 +84,6 @@ func _test_choices_obey_depth_and_battle_cap() -> void:
 		var choice := choice_v as Dictionary
 		_expect_true(str(choice.get("id", "")) != "qinglan_boss", "boss hidden at depth 2")
 		_expect_true(str(choice.get("id", "")) != "qinglan_serpent", "elite hidden at depth 2")
-	game.free()
-	expedition.free()
 
 
 func _test_non_battle_events_advance() -> void:
@@ -109,8 +107,6 @@ func _test_non_battle_events_advance() -> void:
 	expedition.phase = "choosing"
 	expedition.choose_event("qinglan_shelter")
 	_expect_true(float(expedition.runtime.get("hp", 0.0)) > 10.0, "recover raises hp")
-	game.free()
-	expedition.free()
 
 
 func _test_manual_exit_keeps_all_loot() -> void:
@@ -123,8 +119,6 @@ func _test_manual_exit_keeps_all_loot() -> void:
 	_expect_true(bool(settled.get("ok", false)), "settlement ok")
 	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 7, "loot merged into inventory")
 	_expect_eq(game.day, 2, "manual exit advances at least one day")
-	game.free()
-	expedition.free()
 
 
 func _test_defeat_exit_applies_loss_and_injury() -> void:
@@ -142,8 +136,6 @@ func _test_defeat_exit_applies_loss_and_injury() -> void:
 	game.settle_expedition(finish)
 	_expect_near(game.hp, 25.0, "defeat hp floor")
 	_expect_eq(game.injury_days, 3, "defeat injury applied after elapsed reduction")
-	game.free()
-	expedition.free()
 
 
 func _test_elapsed_days_use_step_ceiling() -> void:
@@ -175,8 +167,6 @@ func _test_battle_win_returns_to_expedition() -> void:
 	_expect_eq(game.day, day_before, "game day unchanged")
 	_expect_near(float(expedition.runtime.get("hp", 0.0)), 55.0, "runtime hp updated")
 	_expect_true(not expedition.loot.is_empty(), "battle loot stored in expedition")
-	game.free()
-	expedition.free()
 
 
 func _test_battle_loss_forces_expedition_result() -> void:
@@ -193,8 +183,6 @@ func _test_battle_loss_forces_expedition_result() -> void:
 	_expect_true(bool(settled.get("forced_exit", false)), "loss forces exit")
 	_expect_true(expedition.should_go_to_result(), "result scene required")
 	_expect_true(expedition.current_choices.is_empty(), "no more choices after defeat")
-	game.free()
-	expedition.free()
 
 
 func _test_boss_requires_depth_and_marks_completion() -> void:
@@ -210,8 +198,6 @@ func _test_boss_requires_depth_and_marks_completion() -> void:
 	})
 	expedition.settle_pending_battle()
 	_expect_true(bool(expedition.stats.get("boss_defeated", false)), "boss completion marked")
-	game.free()
-	expedition.free()
 
 
 func _test_game_settlement_occurs_once() -> void:
@@ -226,8 +212,6 @@ func _test_game_settlement_occurs_once() -> void:
 	_expect_true(bool(second.get("duplicate", false)), "duplicate settlement rejected")
 	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 5, "loot applied once")
 	_expect_eq(game.day, 2, "day advanced once")
-	game.free()
-	expedition.free()
 
 
 func _rng(seed_value: int) -> RandomNumberGenerator:

@@ -1,7 +1,5 @@
 extends SceneTree
 
-const GameStateScript := preload("res://scripts/sim/game_state.gd")
-const ExpeditionStateScript := preload("res://scripts/expedition/expedition_state.gd")
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
 const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
@@ -12,6 +10,10 @@ var _tests_run := 0
 
 
 func _init() -> void:
+	call_deferred("_run_all")
+
+
+func _run_all() -> void:
 	_run("new game and daily activities", _test_new_game_and_daily_activities)
 	_run("inventory and battle item slots", _test_inventory_and_battle_item_slots)
 	_run("expedition events build valid battle data", _test_expedition_events_build_valid_battle_data)
@@ -37,13 +39,13 @@ func _run(name: String, test: Callable) -> void:
 
 
 func _state() -> Node:
-	var state := GameStateScript.new()
+	var state := root.get_node("GameState")
 	state.new_game()
 	return state
 
 
 func _expedition() -> Node:
-	return ExpeditionStateScript.new()
+	return root.get_node("ExpeditionState")
 
 
 func _test_new_game_and_daily_activities() -> void:
@@ -62,7 +64,6 @@ func _test_new_game_and_daily_activities() -> void:
 	_expect_true(state.can_breakthrough(), "breakthrough available")
 	var result: Dictionary = state.breakthrough()
 	_expect_true(bool(result.get("ok", false)), "breakthrough succeeds")
-	state.free()
 
 
 func _test_inventory_and_battle_item_slots() -> void:
@@ -75,7 +76,6 @@ func _test_inventory_and_battle_item_slots() -> void:
 	(slots[0] as Dictionary)["count"] = 1
 	InventoryServiceScript.sync_battle_item_counts(state.inventory, state.item_slots, slots)
 	_expect_eq(int(state.inventory[state.item_slots[0]]), 1, "sync consumed items")
-	state.free()
 
 
 func _test_expedition_events_build_valid_battle_data() -> void:
@@ -84,7 +84,6 @@ func _test_expedition_events_build_valid_battle_data() -> void:
 		var event := ExpeditionEventServiceScript.by_id(event_id)
 		var errors := BattleInitData.collect_errors(state.build_battle_init(event))
 		_expect_true(errors.is_empty(), "valid battle setup: %s" % str(errors))
-	state.free()
 
 
 func _test_reward_pools() -> void:
@@ -118,8 +117,6 @@ func _test_expedition_defeat_settlement() -> void:
 	_expect_near(state.hp, 25.0, "loss hp floor")
 	_expect_near(state.mp, 12.0, "mp persisted")
 	_expect_eq(state.injury_days, 3, "loss applies three injury days")
-	state.free()
-	expedition.free()
 
 
 func _test_save_round_trip() -> void:
@@ -135,8 +132,6 @@ func _test_save_round_trip() -> void:
 	_expect_true(restored.apply_dict(loaded.get("game", {})), "apply saved state")
 	_expect_eq(restored.day, 9, "restored day")
 	_expect_eq(restored.cultivation, 77, "restored cultivation")
-	state.free()
-	restored.free()
 	service.free()
 
 

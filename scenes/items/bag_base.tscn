@@ -4,7 +4,6 @@
 [ext_resource type="Script" uid="uid://drjuyybf1c53a" path="res://scenes/items/bag_base.gd" id="2_1muc5"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="3_1muc5"]
 [ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="3_xubt2"]
-[ext_resource type="PackedScene" uid="uid://bx04spldnbiyv" path="res://scenes/items/item.tscn" id="6_item"]
 
 [node name="BagBase" type="Control" unique_id=54537540]
 custom_minimum_size = Vector2(420, 580)
@@ -118,21 +117,6 @@ size_flags_horizontal = 3
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 columns = 5
-
-[node name="Item" parent="Scroll/BagContent/BagGrid" unique_id=544489580 instance=ExtResource("6_item")]
-layout_mode = 2
-
-[node name="Item2" parent="Scroll/BagContent/BagGrid" unique_id=730481385 instance=ExtResource("6_item")]
-layout_mode = 2
-
-[node name="Item3" parent="Scroll/BagContent/BagGrid" unique_id=823278561 instance=ExtResource("6_item")]
-layout_mode = 2
-
-[node name="Item4" parent="Scroll/BagContent/BagGrid" unique_id=241814643 instance=ExtResource("6_item")]
-layout_mode = 2
-
-[node name="Item5" parent="Scroll/BagContent/BagGrid" unique_id=1188678498 instance=ExtResource("6_item")]
-layout_mode = 2
 
 [node name="BagSort" type="Button" parent="." unique_id=249945284]
 unique_name_in_owner = true

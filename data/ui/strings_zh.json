@@ -52,6 +52,20 @@
       }
     }
   },
+  "item_info": {
+    "type": "类型：{value}",
+    "type_equip": "法宝",
+    "rarity": "品质：{value}",
+    "count": "数量：{value}",
+    "price": "灵石估价：{value}",
+    "stack": "可堆叠（上限 {value}）",
+    "equip_kind": "战斗法宝",
+    "use_hp": "使用效果：恢复气血 {value}",
+    "use_mp": "使用效果：恢复法力 {value}",
+    "use_heart_demon": "使用效果：心魔 {value}",
+    "fight_mp_cost": "战斗消耗：法力 {value}",
+    "fight_cd": "战斗冷却：{value} 秒"
+  },
   "combat": {
     "float": {
       "basic_attack": "普攻",

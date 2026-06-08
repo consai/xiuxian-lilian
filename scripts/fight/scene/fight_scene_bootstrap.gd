@@ -20,11 +20,11 @@ static func try_initialize(
 		data = BattleInitData.sample_for_editor()
 		push_warning(
 			"FightScene: 编辑器直开，已使用 sample_for_editor()。"
-			+ "正式进战请 BattleInitData.set_pending(tree, data)。"
+			+ "正式进战请 BattleInitData.set_pending(tree, data)（写入 DataStore）。"
 		)
 	if data.is_empty():
 		push_error(
-			"FightScene: 缺少战斗初始化数据。请 BattleInitData.set_pending(tree, data) 后切场景，"
+			"FightScene: 缺少战斗初始化数据。请 BattleInitData.set_pending(tree, data) 写入 DataStore 后切场景，"
 			+ "或在编辑器填写 editor_battle_init（或开启 editor_auto_sample）。"
 		)
 		return false

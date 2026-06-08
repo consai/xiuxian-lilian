@@ -7,36 +7,85 @@ const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
 const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
+func _ds() -> Node:
+	return DataStoreRef.resolve()
 
-var day := 1
-var realm_index := 0
-var realm_name := ""
-var cultivation := 0
-var breakthrough_at := 100
-var injury_days := 0
-var ling_stones := 0
-var player_name := ""
-var player_icon := ""
-var attrs: Dictionary = {}
-var hp := 100.0
-var mp := 100.0
-var unlocked_skills: Array = []
-var equipped_skills: Array = []
-var owned_equips: Array = []
-var equip_slots: Array = [-1, -1]
-var item_slots: Array = ["", ""]
-var inventory: Dictionary = {}
-var storage: Dictionary = {}
-var storage_equips: Array = []
-var activity_log: Array = []
-var totals := {
-	"battles": 0, "wins": 0, "losses": 0, "items_gained": 0,
-	"expeditions": 0, "expedition_steps": 0, "max_depth": 0,
-	"bosses_defeated": 0,
-}
-var last_rewards: Array = []
-var last_expedition_summary: Dictionary = {}
-var _last_expedition_settlement_key := ""
+
+var day: int:
+	get: return int(_ds().savedata.get("day", 1))
+	set(value): _ds().savedata["day"] = value
+var realm_index: int:
+	get: return int(_ds().savedata.get("realm_index", 0))
+	set(value): _ds().savedata["realm_index"] = value
+var realm_name: String:
+	get: return str(_ds().savedata.get("realm_name", ""))
+	set(value): _ds().savedata["realm_name"] = value
+var cultivation: int:
+	get: return int(_ds().savedata.get("cultivation", 0))
+	set(value): _ds().savedata["cultivation"] = value
+var breakthrough_at: int:
+	get: return int(_ds().savedata.get("breakthrough_at", 100))
+	set(value): _ds().savedata["breakthrough_at"] = value
+var injury_days: int:
+	get: return int(_ds().savedata.get("injury_days", 0))
+	set(value): _ds().savedata["injury_days"] = value
+var ling_stones: int:
+	get: return int(_ds().savedata.get("ling_stones", 0))
+	set(value): _ds().savedata["ling_stones"] = value
+var player_name: String:
+	get: return str(_ds().savedata.get("player_name", ""))
+	set(value): _ds().savedata["player_name"] = value
+var player_icon: String:
+	get: return str(_ds().savedata.get("player_icon", ""))
+	set(value): _ds().savedata["player_icon"] = value
+var attrs: Dictionary:
+	get: return _ds().savedata.get("attrs", {}) as Dictionary
+	set(value): _ds().savedata["attrs"] = value
+var hp: float:
+	get: return float(_ds().savedata.get("hp", 100.0))
+	set(value): _ds().savedata["hp"] = value
+var mp: float:
+	get: return float(_ds().savedata.get("mp", 100.0))
+	set(value): _ds().savedata["mp"] = value
+var unlocked_skills: Array:
+	get: return _ds().savedata.get("unlocked_skills", []) as Array
+	set(value): _ds().savedata["unlocked_skills"] = value
+var equipped_skills: Array:
+	get: return _ds().savedata.get("equipped_skills", []) as Array
+	set(value): _ds().savedata["equipped_skills"] = value
+var owned_equips: Array:
+	get: return _ds().savedata.get("owned_equips", []) as Array
+	set(value): _ds().savedata["owned_equips"] = value
+var equip_slots: Array:
+	get: return _ds().savedata.get("equip_slots", [-1, -1]) as Array
+	set(value): _ds().savedata["equip_slots"] = value
+var item_slots: Array:
+	get: return _ds().savedata.get("item_slots", ["", ""]) as Array
+	set(value): _ds().savedata["item_slots"] = value
+var inventory: Dictionary:
+	get: return _ds().savedata.get("inventory", {}) as Dictionary
+	set(value): _ds().savedata["inventory"] = value
+var storage: Dictionary:
+	get: return _ds().savedata.get("storage", {}) as Dictionary
+	set(value): _ds().savedata["storage"] = value
+var storage_equips: Array:
+	get: return _ds().savedata.get("storage_equips", []) as Array
+	set(value): _ds().savedata["storage_equips"] = value
+var activity_log: Array:
+	get: return _ds().savedata.get("activity_log", []) as Array
+	set(value): _ds().savedata["activity_log"] = value
+var totals: Dictionary:
+	get: return _ds().savedata.get("totals", {}) as Dictionary
+	set(value): _ds().savedata["totals"] = value
+var last_rewards: Array:
+	get: return _ds().game_runtime().get("last_rewards", []) as Array
+	set(value): _ds().game_runtime()["last_rewards"] = value
+var last_expedition_summary: Dictionary:
+	get: return _ds().game_runtime().get("last_expedition_summary", {}) as Dictionary
+	set(value): _ds().game_runtime()["last_expedition_summary"] = value
+var _last_expedition_settlement_key: String:
+	get: return str(_ds().game_runtime().get("last_expedition_settlement_key", ""))
+	set(value): _ds().game_runtime()["last_expedition_settlement_key"] = value
 
 
 func _ready() -> void:
@@ -45,6 +94,7 @@ func _ready() -> void:
 
 
 func new_game() -> void:
+	_ds().reset_all()
 	var root := JsonLoader._read_json_root_object(SIM_PATH)
 	var initial := root.get("initial_player", {}) as Dictionary
 	day = 1
@@ -233,57 +283,15 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 
 
 func to_dict() -> Dictionary:
-	return {
-		"day": day, "realm_index": realm_index, "realm_name": realm_name,
-		"cultivation": cultivation, "breakthrough_at": breakthrough_at,
-		"injury_days": injury_days, "ling_stones": ling_stones,
-		"player_name": player_name, "player_icon": player_icon,
-		"attrs": attrs.duplicate(true), "hp": hp, "mp": mp,
-		"unlocked_skills": unlocked_skills.duplicate(true),
-		"equipped_skills": equipped_skills.duplicate(true),
-		"owned_equips": owned_equips.duplicate(true),
-		"equip_slots": equip_slots.duplicate(true), "item_slots": item_slots.duplicate(true),
-		"inventory": inventory.duplicate(true),
-		"storage": storage.duplicate(true),
-		"storage_equips": storage_equips.duplicate(true),
-		"activity_log": activity_log.duplicate(true),
-		"totals": totals.duplicate(true)
-	}
+	return _ds().export_savedata()
 
 
 func apply_dict(data: Dictionary) -> bool:
-	for key in ["day", "realm_index", "cultivation", "attrs", "inventory"]:
-		if not data.has(key):
-			return false
-	day = maxi(1, int(data["day"]))
-	realm_index = maxi(0, int(data["realm_index"]))
-	cultivation = maxi(0, int(data["cultivation"]))
-	injury_days = maxi(0, int(data.get("injury_days", 0)))
-	ling_stones = maxi(0, int(data.get("ling_stones", 0)))
-	player_name = str(data.get("player_name", "修士"))
-	player_icon = str(data.get("player_icon", ""))
-	attrs = (data["attrs"] as Dictionary).duplicate(true)
-	hp = clampf(float(data.get("hp", attrs.get(FightAttr.HP_MAX, 100.0))), 0.0, float(attrs.get(FightAttr.HP_MAX, 100.0)))
-	mp = clampf(float(data.get("mp", attrs.get(FightAttr.MP_MAX, 100.0))), 0.0, float(attrs.get(FightAttr.MP_MAX, 100.0)))
-	unlocked_skills = (data.get("unlocked_skills", []) as Array).duplicate(true)
-	equipped_skills = (data.get("equipped_skills", unlocked_skills) as Array).duplicate(true)
-	owned_equips = (data.get("owned_equips", []) as Array).duplicate(true)
-	equip_slots = (data.get("equip_slots", [-1, -1]) as Array).duplicate(true)
-	item_slots = (data.get("item_slots", ["", ""]) as Array).duplicate(true)
-	while equip_slots.size() < 2:
-		equip_slots.append(-1)
-	equip_slots = equip_slots.slice(0, 2)
-	while item_slots.size() < 2:
-		item_slots.append("")
-	item_slots = item_slots.slice(0, 2)
-	inventory = (data["inventory"] as Dictionary).duplicate(true)
-	storage = (data.get("storage", {}) as Dictionary).duplicate(true)
-	storage_equips = (data.get("storage_equips", []) as Array).duplicate(true)
-	activity_log = (data.get("activity_log", []) as Array).duplicate(true)
-	totals = (data.get("totals", {}) as Dictionary).duplicate(true)
-	last_rewards = []
-	last_expedition_summary = {}
-	_last_expedition_settlement_key = ""
+	if not _ds().import_savedata(data):
+		return false
+	var attrs_dict := attrs
+	hp = clampf(hp, 0.0, float(attrs_dict.get(FightAttr.HP_MAX, 100.0)))
+	mp = clampf(mp, 0.0, float(attrs_dict.get(FightAttr.MP_MAX, 100.0)))
 	if Engine.get_main_loop() is SceneTree:
 		var expedition := (Engine.get_main_loop() as SceneTree).root.get_node_or_null("ExpeditionState")
 		if expedition != null and expedition.has_method("reset"):

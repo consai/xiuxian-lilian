@@ -1,12 +1,101 @@
-[gd_scene load_steps=10 format=3 uid="uid://expedition_loop"]
+[gd_scene load_steps=25 format=3 uid="uid://expedition_loop"]
 
 [ext_resource type="Script" path="res://scripts/expedition/expedition_loop.gd" id="1"]
 [ext_resource type="Theme" path="res://ui/theme_tuhuang.tres" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/expedition/expedition_event_card.tscn" id="3"]
-[ext_resource type="LabelSettings" uid="uid://c8expeditionfont28" path="res://ui/ziti_new/28.tres" id="4_header"]
-[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="5_body"]
-[ext_resource type="LabelSettings" uid="uid://dg7uds3ec0xtu" path="res://ui/ziti_new/22.tres" id="6_section"]
-[ext_resource type="FontFile" uid="uid://btkp4vukwqrul" path="res://assets/art/AlimamaDaoLiTi.ttf" id="8_font"]
+[ext_resource type="Texture2D" path="res://docs/concepts/cave_hub_background_only_v3.png" id="4_bg"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/28.tres" id="5_header"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/22.tres" id="6_section"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/16.tres" id="7_body"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/13.tres" id="8_small"]
+[ext_resource type="FontFile" path="res://assets/art/AlimamaDaoLiTi.ttf" id="9_font"]
+[ext_resource type="Texture2D" path="res://assets/art/ui_new/yaoping.png" id="10_potion"]
+[ext_resource type="Texture2D" path="res://assets/art/ui_new/yaoping1.png" id="11_potion2"]
+[ext_resource type="Texture2D" path="res://assets/art/ui_new/shuye.png" id="12_herb"]
+[ext_resource type="Texture2D" path="res://assets/art/ui_new/shuijing.png" id="13_orb"]
+
+[sub_resource type="StyleBoxFlat" id="TopPanel"]
+bg_color = Color(1, 0.94902, 0.839216, 0.94)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.345098, 0.231373, 0.156863, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0.145098, 0.0862745, 0.0470588, 0.25)
+shadow_size = 8
+
+[sub_resource type="StyleBoxFlat" id="SidePanel"]
+bg_color = Color(1, 0.960784, 0.870588, 0.94)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.427451, 0.301961, 0.203922, 0.95)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="HpBack"]
+bg_color = Color(0.901961, 0.776471, 0.654902, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[sub_resource type="StyleBoxFlat" id="HpFill"]
+bg_color = Color(0.882353, 0.435294, 0.352941, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[sub_resource type="StyleBoxFlat" id="MpFill"]
+bg_color = Color(0.352941, 0.670588, 0.792157, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[sub_resource type="StyleBoxFlat" id="SlotBack"]
+bg_color = Color(0.937255, 0.85098, 0.690196, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.607843, 0.443137, 0.294118, 0.9)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="BottomStrip"]
+bg_color = Color(0.960784, 0.878431, 0.72549, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.482353, 0.329412, 0.211765, 0.9)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="ExitNormal"]
+bg_color = Color(0.678431, 0.756863, 0.501961, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.286275, 0.360784, 0.2, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [node name="ExpeditionLoop" type="Control"]
 layout_mode = 3
@@ -18,128 +107,443 @@ grow_vertical = 2
 theme = ExtResource("2")
 script = ExtResource("1")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.901961, 0.87451, 0.807843, 1)
+mouse_filter = 2
+texture = ExtResource("4_bg")
+expand_mode = 1
+stretch_mode = 6
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="LandscapeTint" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 32
-theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 32
-theme_override_constants/margin_bottom = 24
+mouse_filter = 2
+color = Color(0.470588, 0.647059, 0.552941, 0.13)
 
-[node name="Root" type="VBoxContainer" parent="Margin"]
-layout_mode = 2
-theme_override_constants/separation = 12
+[node name="HeaderPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 295.0
+offset_top = 20.0
+offset_right = -295.0
+offset_bottom = 92.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("TopPanel")
 
-[node name="Header" type="Label" parent="Margin/Root"]
+[node name="Header" type="Label" parent="HeaderPanel"]
 unique_name_in_owner = true
-layout_mode = 2
-text = "历练中"
-label_settings = ExtResource("4_header")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 4.0
+offset_bottom = -23.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "青岚山脉 · 深入 3 层 · 预计 1 日"
+label_settings = ExtResource("5_header")
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="Feedback" type="Label" parent="Margin/Root"]
+[node name="ProgressDots" type="Label" parent="HeaderPanel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -29.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.407843, 0.568627, 0.439216, 1)
+theme_override_fonts/font = ExtResource("9_font")
+theme_override_font_sizes/font_size = 17
+text = "●  ●  ●  ○  ○  ○"
+horizontal_alignment = 1
+
+[node name="Feedback" type="Label" parent="."]
 unique_name_in_owner = true
-layout_mode = 2
-label_settings = ExtResource("5_body")
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 360.0
+offset_top = 98.0
+offset_right = -360.0
+offset_bottom = 128.0
+grow_horizontal = 2
+label_settings = ExtResource("7_body")
+horizontal_alignment = 1
 
-[node name="BossHint" type="Label" parent="Margin/Root"]
+[node name="BossHint" type="Label" parent="."]
 unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.2, 0.1, 1)
-label_settings = ExtResource("5_body")
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 360.0
+offset_top = 98.0
+offset_right = -360.0
+offset_bottom = 128.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.635294, 0.239216, 0.168627, 1)
+label_settings = ExtResource("7_body")
+horizontal_alignment = 1
 
-[node name="Body" type="HBoxContainer" parent="Margin/Root"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 16
+[node name="StatusPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 112.0
+offset_right = 250.0
+offset_bottom = 668.0
+theme_override_styles/panel = SubResource("SidePanel")
 
-[node name="Left" type="VBoxContainer" parent="Margin/Root/Body"]
-layout_mode = 2
-custom_minimum_size = Vector2(220, 0)
-
-[node name="LeftTitle" type="Label" parent="Margin/Root/Body/Left"]
-layout_mode = 2
+[node name="Title" type="Label" parent="StatusPanel"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 14.0
+offset_right = 218.0
+offset_bottom = 46.0
 text = "当前状态"
 label_settings = ExtResource("6_section")
+horizontal_alignment = 1
 
-[node name="Runtime" type="RichTextLabel" parent="Margin/Root/Body/Left"]
+[node name="HpLabel" type="Label" parent="StatusPanel"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 66.0
+offset_right = 214.0
+offset_bottom = 91.0
+text = "气血  76 / 100"
+label_settings = ExtResource("7_body")
+
+[node name="HpBar" type="ProgressBar" parent="StatusPanel"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 96.0
+offset_right = 214.0
+offset_bottom = 116.0
+value = 76.0
+show_percentage = false
+theme_override_styles/background = SubResource("HpBack")
+theme_override_styles/fill = SubResource("HpFill")
+
+[node name="MpLabel" type="Label" parent="StatusPanel"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 137.0
+offset_right = 214.0
+offset_bottom = 162.0
+text = "法力  48 / 100"
+label_settings = ExtResource("7_body")
+
+[node name="MpBar" type="ProgressBar" parent="StatusPanel"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 167.0
+offset_right = 214.0
+offset_bottom = 187.0
+value = 48.0
+show_percentage = false
+theme_override_styles/background = SubResource("HpBack")
+theme_override_styles/fill = SubResource("MpFill")
+
+[node name="SupplyTitle" type="Label" parent="StatusPanel"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 218.0
+offset_right = 214.0
+offset_bottom = 248.0
+text = "携带丹药"
+label_settings = ExtResource("7_body")
+horizontal_alignment = 1
+
+[node name="PotionSlot1" type="Panel" parent="StatusPanel"]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 258.0
+offset_right = 104.0
+offset_bottom = 354.0
+theme_override_styles/panel = SubResource("SlotBack")
+
+[node name="Icon" type="TextureRect" parent="StatusPanel/PotionSlot1"]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 8.0
+offset_right = 68.0
+offset_bottom = 62.0
+texture = ExtResource("10_potion")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Count" type="Label" parent="StatusPanel/PotionSlot1"]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 65.0
+offset_right = 77.0
+offset_bottom = 91.0
+text = "回气丹 ×2"
+label_settings = ExtResource("8_small")
+horizontal_alignment = 1
+
+[node name="PotionSlot2" type="Panel" parent="StatusPanel"]
+layout_mode = 0
+offset_left = 126.0
+offset_top = 258.0
+offset_right = 208.0
+offset_bottom = 354.0
+theme_override_styles/panel = SubResource("SlotBack")
+
+[node name="Icon" type="TextureRect" parent="StatusPanel/PotionSlot2"]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 8.0
+offset_right = 68.0
+offset_bottom = 62.0
+texture = ExtResource("11_potion2")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Count" type="Label" parent="StatusPanel/PotionSlot2"]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 65.0
+offset_right = 77.0
+offset_bottom = 91.0
+text = "疗伤丹 ×1"
+label_settings = ExtResource("8_small")
+horizontal_alignment = 1
+
+[node name="RuntimeTitle" type="Label" parent="StatusPanel"]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 385.0
+offset_right = 214.0
+offset_bottom = 415.0
+text = "历练统计"
+label_settings = ExtResource("7_body")
+horizontal_alignment = 1
+
+[node name="Runtime" type="RichTextLabel" parent="StatusPanel"]
 unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/default_color = Color(0.33333334, 0.19607843, 0.18431373, 1)
-theme_override_constants/outline_size = 2
-theme_override_fonts/normal_font = ExtResource("8_font")
-theme_override_font_sizes/normal_font_size = 14
-size_flags_vertical = 3
+layout_mode = 0
+offset_left = 18.0
+offset_top = 422.0
+offset_right = 212.0
+offset_bottom = 535.0
+theme_override_colors/default_color = Color(0.333333, 0.196078, 0.184314, 1)
+theme_override_fonts/normal_font = ExtResource("9_font")
+theme_override_font_sizes/normal_font_size = 15
+bbcode_enabled = true
+text = "气血 76/100\n法力 48/100\n回气丹 x2  疗伤丹 x1\n\n战斗 1  胜 1  负 0"
 fit_content = true
 
-[node name="Center" type="VBoxContainer" parent="Margin/Root/Body"]
-layout_mode = 2
-size_flags_horizontal = 3
+[node name="LootPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -250.0
+offset_top = 112.0
+offset_right = -20.0
+offset_bottom = 668.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("SidePanel")
 
-[node name="CenterTitle" type="Label" parent="Margin/Root/Body/Center"]
-layout_mode = 2
-text = "选择一项事件"
-label_settings = ExtResource("6_section")
-
-[node name="EventCards" type="HBoxContainer" parent="Margin/Root/Body/Center"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 12
-
-[node name="Right" type="VBoxContainer" parent="Margin/Root/Body"]
-layout_mode = 2
-custom_minimum_size = Vector2(240, 0)
-
-[node name="LootTitle" type="Label" parent="Margin/Root/Body/Right"]
-layout_mode = 2
+[node name="LootTitle" type="Label" parent="LootPanel"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 14.0
+offset_right = 218.0
+offset_bottom = 46.0
 text = "本次战利品"
 label_settings = ExtResource("6_section")
+horizontal_alignment = 1
 
-[node name="Loot" type="RichTextLabel" parent="Margin/Root/Body/Right"]
+[node name="LootSlot1" type="Panel" parent="LootPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 63.0
+offset_right = 210.0
+offset_bottom = 127.0
+theme_override_styles/panel = SubResource("SlotBack")
+
+[node name="Icon" type="TextureRect" parent="LootPanel/LootSlot1"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 7.0
+offset_right = 58.0
+offset_bottom = 57.0
+texture = ExtResource("12_herb")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="LootPanel/LootSlot1"]
+layout_mode = 0
+offset_left = 68.0
+offset_top = 17.0
+offset_right = 180.0
+offset_bottom = 47.0
+text = "灵草 ×4"
+label_settings = ExtResource("7_body")
+
+[node name="LootSlot2" type="Panel" parent="LootPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 139.0
+offset_right = 210.0
+offset_bottom = 203.0
+theme_override_styles/panel = SubResource("SlotBack")
+
+[node name="Icon" type="TextureRect" parent="LootPanel/LootSlot2"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 7.0
+offset_right = 58.0
+offset_bottom = 57.0
+texture = ExtResource("13_orb")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="LootPanel/LootSlot2"]
+layout_mode = 0
+offset_left = 68.0
+offset_top = 17.0
+offset_right = 180.0
+offset_bottom = 47.0
+text = "寒铁 ×2"
+label_settings = ExtResource("7_body")
+
+[node name="Loot" type="RichTextLabel" parent="LootPanel"]
 unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/default_color = Color(0.33333334, 0.19607843, 0.18431373, 1)
-theme_override_constants/outline_size = 2
-theme_override_fonts/normal_font = ExtResource("8_font")
+layout_mode = 0
+offset_left = 20.0
+offset_top = 218.0
+offset_right = 210.0
+offset_bottom = 288.0
+theme_override_colors/default_color = Color(0.333333, 0.196078, 0.184314, 1)
+theme_override_fonts/normal_font = ExtResource("9_font")
 theme_override_font_sizes/normal_font_size = 14
-custom_minimum_size = Vector2(0, 120)
+text = "灵草 x4\n寒铁 x2\n灵石 x8"
 fit_content = true
 
-[node name="LogTitle" type="Label" parent="Margin/Root/Body/Right"]
-layout_mode = 2
-text = "最近事件"
+[node name="LogTitle" type="Label" parent="LootPanel"]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 310.0
+offset_right = 216.0
+offset_bottom = 342.0
+text = "最近经历"
+label_settings = ExtResource("7_body")
+horizontal_alignment = 1
+
+[node name="Log" type="RichTextLabel" parent="LootPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 20.0
+offset_top = 350.0
+offset_right = 210.0
+offset_bottom = 530.0
+theme_override_colors/default_color = Color(0.333333, 0.196078, 0.184314, 1)
+theme_override_fonts/normal_font = ExtResource("9_font")
+theme_override_font_sizes/normal_font_size = 14
+text = "林间灵草：获得灵草 x4\n灵泉小憩：恢复法力"
+fit_content = true
+
+[node name="ChoiceTitle" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 270.0
+offset_top = 130.0
+offset_right = -270.0
+offset_bottom = 165.0
+grow_horizontal = 2
+text = "选择前路"
 label_settings = ExtResource("6_section")
+horizontal_alignment = 1
 
-[node name="Log" type="RichTextLabel" parent="Margin/Root/Body/Right"]
+[node name="EventCards" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -382.0
+offset_top = -210.0
+offset_right = 382.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="EventCard1" parent="EventCards" instance=ExtResource("3")]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/default_color = Color(0.33333334, 0.19607843, 0.18431373, 1)
-theme_override_constants/outline_size = 2
-theme_override_fonts/normal_font = ExtResource("8_font")
-theme_override_font_sizes/normal_font_size = 14
-size_flags_vertical = 3
-fit_content = true
 
-[node name="Footer" type="HBoxContainer" parent="Margin/Root"]
-layout_mode = 2
-
-[node name="ExitButton" type="Button" parent="Margin/Root/Footer"]
+[node name="EventCard2" parent="EventCards" instance=ExtResource("3")]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.33333334, 0.19607843, 0.18431373, 1)
-theme_override_fonts/font = ExtResource("8_font")
-theme_override_font_sizes/font_size = 22
-text = "退出历练"
+
+[node name="EventCard3" parent="EventCards" instance=ExtResource("3")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="FooterStrip" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 260.0
+offset_top = -106.0
+offset_right = -260.0
+offset_bottom = -22.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("BottomStrip")
+
+[node name="Rule" type="Label" parent="FooterStrip"]
+layout_mode = 0
+offset_left = 170.0
+offset_top = 13.0
+offset_right = 590.0
+offset_bottom = 39.0
+text = "每三步消耗一天 · 战败损失部分战利品"
+label_settings = ExtResource("8_small")
+horizontal_alignment = 1
+
+[node name="Step" type="Label" parent="FooterStrip"]
+layout_mode = 0
+offset_left = 590.0
+offset_top = 13.0
+offset_right = 750.0
+offset_bottom = 39.0
+text = "当前第 4 步"
+label_settings = ExtResource("8_small")
+horizontal_alignment = 1
+
+[node name="ExitButton" type="Button" parent="FooterStrip"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 14.0
+offset_top = 10.0
+offset_right = 158.0
+offset_bottom = 72.0
+theme_override_colors/font_color = Color(0.333333, 0.196078, 0.184314, 1)
+theme_override_fonts/font = ExtResource("9_font")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("ExitNormal")
+theme_override_styles/hover = SubResource("ExitNormal")
+theme_override_styles/pressed = SubResource("ExitNormal")
+text = "主动返程"

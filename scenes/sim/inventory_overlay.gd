@@ -5,6 +5,7 @@ const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd"
 @onready var _bag_left: BagBaseView = $BagLeft
 @onready var _bag_right: BagBaseView = $BagRight
 @onready var _save_all_button: Button = %SaveAll
+@onready var _close_button: TextureButton = %btn_close
 
 
 func _ready() -> void:
@@ -13,7 +14,20 @@ func _ready() -> void:
 	_bag_left.entry_right_clicked.connect(_on_storage_entry_right_clicked)
 	_bag_right.entry_right_clicked.connect(_on_backpack_entry_right_clicked)
 	_save_all_button.pressed.connect(_deposit_all)
+	_close_button.pressed.connect(_close)
 	refresh()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not visible:
+		return
+	if event.is_action_pressed("ui_cancel"):
+		_close()
+		get_viewport().set_input_as_handled()
+
+
+func _close() -> void:
+	visible = false
 
 
 func refresh() -> void:

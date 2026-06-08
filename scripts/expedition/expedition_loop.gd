@@ -1,15 +1,13 @@
 extends Control
 
-const EventCardScene := preload("res://scenes/expedition/expedition_event_card.tscn")
 const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
-
 var _locked := false
 var _feedback_timer := 0.0
 
 
 func _ready() -> void:
 	if not ExpeditionState.active:
-		get_tree().change_scene_to_file(GameState.HUB_SCENE)
+		get_tree().call_deferred("change_scene_to_file", GameState.HUB_SCENE)
 		return
 	(%ExitButton as Button).pressed.connect(_on_exit_pressed)
 	_refresh_all()
@@ -57,13 +55,16 @@ func _refresh_all() -> void:
 
 func _refresh_cards() -> void:
 	var cards := %EventCards as HBoxContainer
-	for child in cards.get_children():
-		child.queue_free()
-	for choice_v in ExpeditionState.current_choices:
-		var card := EventCardScene.instantiate()
-		cards.add_child(card)
-		card.setup(choice_v as Dictionary)
-		card.chosen.connect(_on_event_chosen)
+	var card_nodes := cards.get_children()
+	for index in card_nodes.size():
+		var card = card_nodes[index]
+		if index >= ExpeditionState.current_choices.size():
+			card.visible = false
+			continue
+		card.visible = true
+		card.setup(ExpeditionState.current_choices[index] as Dictionary)
+		if not card.chosen.is_connected(_on_event_chosen):
+			card.chosen.connect(_on_event_chosen)
 		card.disabled = _locked
 
 
@@ -103,7 +104,7 @@ func _on_event_chosen(event_id: String) -> void:
 func _on_exit_pressed() -> void:
 	if not ExpeditionState.can_exit():
 		return
-	get_tree().root.set_meta("expedition_exit_reason", "manual")
+	DataStoreRef.resolve().set_ui_expedition_exit_reason("manual")
 	get_tree().change_scene_to_file(ExpeditionState.RESULT_SCENE)
 
 

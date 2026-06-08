@@ -4,7 +4,7 @@ var _result: Dictionary = {}
 
 
 func _ready() -> void:
-	var reason := str(get_tree().root.get_meta("expedition_exit_reason", "manual"))
+	var reason: String = DataStoreRef.resolve().peek_ui_expedition_exit_reason("manual")
 	if ExpeditionState.active:
 		_result = ExpeditionState.finish(reason)
 		GameState.settle_expedition(_result)
@@ -58,5 +58,5 @@ func _render() -> void:
 
 
 func _on_return_pressed() -> void:
-	get_tree().root.remove_meta("expedition_exit_reason")
+	DataStoreRef.resolve().clear_ui_expedition_exit_reason()
 	get_tree().change_scene_to_file(GameState.HUB_SCENE)
