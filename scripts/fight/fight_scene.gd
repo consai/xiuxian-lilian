@@ -266,12 +266,10 @@ func _on_battle_result_close_requested() -> void:
 	if ExpeditionState != null and ExpeditionState.active and ExpeditionState.phase == "battle":
 		ExpeditionState.settle_pending_battle()
 		if ExpeditionState.should_go_to_result():
-			DataStoreRef.resolve().set_ui_expedition_exit_reason(
-				ExpeditionState.pending_exit_reason if ExpeditionState.pending_exit_reason != "" else "defeated"
-			)
-			get_tree().change_scene_to_file(ExpeditionState.RESULT_SCENE)
+			var reason := ExpeditionState.pending_exit_reason if ExpeditionState.pending_exit_reason != "" else "defeated"
+			SceneManager.go_expedition_result(reason)
 		else:
-			get_tree().change_scene_to_file(ExpeditionState.LOOP_SCENE)
+			SceneManager.go_expedition_loop()
 		return
 	_hud.hide_battle_result()
 

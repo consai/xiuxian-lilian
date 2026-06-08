@@ -1,7 +1,7 @@
 extends Control
 
 func _ready() -> void:
-	var summary: Dictionary = DataStoreRef.resolve().take_ui_breakthrough_summary()
+	var summary: Dictionary = SceneManager.take_payload(SceneManager.BREAKTHROUGH_SUMMARY)
 	var bg := ColorRect.new()
 	bg.color = Color("#f3dfb8")
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -28,5 +28,5 @@ func _ready() -> void:
 	root.add_child(body)
 	var button := Button.new()
 	button.text = "继续修行"
-	button.pressed.connect(func() -> void: get_tree().change_scene_to_file(GameState.HUB_SCENE))
+	button.pressed.connect(func() -> void: SceneManager.go_hub())
 	root.add_child(button)

@@ -61,6 +61,7 @@ func reset_rundata() -> void:
 		"battle": {
 			"pending_init": {},
 		},
+		"scene": _default_scene(),
 		"ui": {
 			"breakthrough_summary": {},
 			"expedition_exit_reason": "manual",
@@ -113,6 +114,56 @@ func ui_runtime() -> Dictionary:
 	return rundata["ui"] as Dictionary
 
 
+func scene_runtime() -> Dictionary:
+	ensure_initialized()
+	if not rundata.has("scene"):
+		rundata["scene"] = _default_scene()
+	return rundata["scene"] as Dictionary
+
+
+func reset_scene_runtime() -> void:
+	ensure_initialized()
+	rundata["scene"] = _default_scene()
+
+
+func set_scene_payload(scene_id: String, payload: Dictionary) -> void:
+	ensure_initialized()
+	var payloads_v: Variant = scene_runtime().get("payloads", {})
+	var payloads: Dictionary = payloads_v as Dictionary if payloads_v is Dictionary else {}
+	payloads[scene_id] = payload.duplicate(true)
+	scene_runtime()["payloads"] = payloads
+
+
+func take_scene_payload(scene_id: String) -> Dictionary:
+	ensure_initialized()
+	var payloads_v: Variant = scene_runtime().get("payloads", {})
+	var payloads: Dictionary = payloads_v as Dictionary if payloads_v is Dictionary else {}
+	var payload_v: Variant = payloads.get(scene_id, {})
+	payloads.erase(scene_id)
+	scene_runtime()["payloads"] = payloads
+	if payload_v is Dictionary:
+		return (payload_v as Dictionary).duplicate(true)
+	return {}
+
+
+func peek_scene_payload(scene_id: String) -> Dictionary:
+	ensure_initialized()
+	var payloads_v: Variant = scene_runtime().get("payloads", {})
+	var payloads: Dictionary = payloads_v as Dictionary if payloads_v is Dictionary else {}
+	var payload_v: Variant = payloads.get(scene_id, {})
+	if payload_v is Dictionary:
+		return (payload_v as Dictionary).duplicate(true)
+	return {}
+
+
+func clear_scene_payload(scene_id: String) -> void:
+	ensure_initialized()
+	var payloads_v: Variant = scene_runtime().get("payloads", {})
+	var payloads: Dictionary = payloads_v as Dictionary if payloads_v is Dictionary else {}
+	payloads.erase(scene_id)
+	scene_runtime()["payloads"] = payloads
+
+
 func reset_expedition_runtime() -> void:
 	ensure_initialized()
 	rundata["expedition"] = _default_expedition()
@@ -134,28 +185,37 @@ func take_battle_pending_init() -> Dictionary:
 
 func set_ui_expedition_exit_reason(reason: String) -> void:
 	ensure_initialized()
+	set_scene_payload("expedition_result", {"reason": reason})
 	ui_runtime()["expedition_exit_reason"] = reason
 
 
 func peek_ui_expedition_exit_reason(default_reason: String = "manual") -> String:
 	ensure_initialized()
+	var payload := peek_scene_payload("expedition_result")
+	if not payload.is_empty():
+		return str(payload.get("reason", default_reason))
 	return str(ui_runtime().get("expedition_exit_reason", default_reason))
 
 
 func clear_ui_expedition_exit_reason() -> void:
 	ensure_initialized()
+	clear_scene_payload("expedition_result")
 	ui_runtime()["expedition_exit_reason"] = "manual"
 
 
 func set_ui_breakthrough_summary(summary: Dictionary) -> void:
 	ensure_initialized()
+	set_scene_payload("breakthrough_summary", summary)
 	ui_runtime()["breakthrough_summary"] = summary.duplicate(true)
 
 
 func take_ui_breakthrough_summary() -> Dictionary:
 	ensure_initialized()
-	var summary_v: Variant = ui_runtime().get("breakthrough_summary", {})
+	var summary := take_scene_payload("breakthrough_summary")
 	ui_runtime()["breakthrough_summary"] = {}
+	if not summary.is_empty():
+		return summary
+	var summary_v: Variant = ui_runtime().get("breakthrough_summary", {})
 	if summary_v is Dictionary:
 		return summary_v as Dictionary
 	return {}
@@ -198,6 +258,16 @@ func _default_totals() -> Dictionary:
 		"expedition_steps": 0,
 		"max_depth": 0,
 		"bosses_defeated": 0,
+	}
+
+
+func _default_scene() -> Dictionary:
+	return {
+		"current_id": "",
+		"previous_id": "",
+		"transitioning": false,
+		"payloads": {},
+		"history": [],
 	}
 
 

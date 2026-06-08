@@ -7,7 +7,7 @@ var _feedback_timer := 0.0
 
 func _ready() -> void:
 	if not ExpeditionState.active:
-		get_tree().call_deferred("change_scene_to_file", GameState.HUB_SCENE)
+		call_deferred("_fallback_hub")
 		return
 	(%ExitButton as Button).pressed.connect(_on_exit_pressed)
 	_refresh_all()
@@ -90,7 +90,8 @@ func _on_event_chosen(event_id: String) -> void:
 		return
 	if str(result.get("type", "")) == "battle":
 		var battle_data := ExpeditionState.build_battle_init()
-		if not BattleInitData.goto_fight_scene(get_tree(), battle_data, "res://scenes/fightScene.tscn"):
+		var nav: Dictionary = SceneManager.go_fight(battle_data, "expedition")
+		if not bool(nav.get("ok", false)):
 			(%Feedback as Label).text = "无法进入战斗"
 			_locked = false
 			_refresh_all()
@@ -104,8 +105,11 @@ func _on_event_chosen(event_id: String) -> void:
 func _on_exit_pressed() -> void:
 	if not ExpeditionState.can_exit():
 		return
-	DataStoreRef.resolve().set_ui_expedition_exit_reason("manual")
-	get_tree().change_scene_to_file(ExpeditionState.RESULT_SCENE)
+	SceneManager.go_expedition_result("manual")
+
+
+func _fallback_hub() -> void:
+	SceneManager.go_hub()
 
 
 func _item_summary() -> String:

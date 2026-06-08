@@ -4,14 +4,15 @@ var _result: Dictionary = {}
 
 
 func _ready() -> void:
-	var reason: String = DataStoreRef.resolve().peek_ui_expedition_exit_reason("manual")
+	var payload: Dictionary = SceneManager.peek_payload(SceneManager.EXPEDITION_RESULT)
+	var reason: String = str(payload.get("reason", "manual"))
 	if ExpeditionState.active:
 		_result = ExpeditionState.finish(reason)
 		GameState.settle_expedition(_result)
 	elif not ExpeditionState.last_finish_result.is_empty():
 		_result = ExpeditionState.last_finish_result.duplicate(true)
 	else:
-		get_tree().change_scene_to_file(GameState.HUB_SCENE)
+		SceneManager.go_hub()
 		return
 	(%ReturnButton as Button).pressed.connect(_on_return_pressed)
 	_render()
@@ -58,5 +59,5 @@ func _render() -> void:
 
 
 func _on_return_pressed() -> void:
-	DataStoreRef.resolve().clear_ui_expedition_exit_reason()
-	get_tree().change_scene_to_file(GameState.HUB_SCENE)
+	SceneManager.take_payload(SceneManager.EXPEDITION_RESULT)
+	SceneManager.go_hub()

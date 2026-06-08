@@ -8,6 +8,8 @@ const DEFAULT_RULE_TEXT := "每三步消耗一天，可随时返程，战败损�
 
 var _location: Dictionary = {}
 var _blocked := false
+var _preview_entries: Array = [{}, {}, {}, {}]
+var _supply_entries: Array = [{}, {}]
 
 @onready var _preview_rewards: Array[ItemView] = [
 	%PreviewReward1, %PreviewReward2, %PreviewReward3, %PreviewReward4,
@@ -28,16 +30,18 @@ func _ready() -> void:
 
 
 func _configure_item_views() -> void:
-	for view in _preview_rewards:
+	for i in _preview_rewards.size():
+		var view := _preview_rewards[i]
 		if view == null:
 			continue
-		view.click_enabled = false
 		view.show_name_label = true
-	for view in _supply_items:
+		view.clicked.connect(_on_preview_item_clicked.bind(i))
+	for i in _supply_items.size():
+		var view := _supply_items[i]
 		if view == null:
 			continue
-		view.click_enabled = false
 		view.show_name_label = true
+		view.clicked.connect(_on_supply_item_clicked.bind(i))
 
 
 func _refresh() -> void:
@@ -83,9 +87,12 @@ func _refresh_preview_rewards() -> void:
 		if view == null:
 			continue
 		if i >= rewards.size():
+			_preview_entries[i] = {}
 			_bind_item_view(view, {})
 			continue
-		_bind_item_view(view, _resolve_reward_display(rewards[i]))
+		var entry := _entry_from_reward(rewards[i])
+		_preview_entries[i] = entry
+		_bind_item_view(view, _resolve_reward_display(rewards[i]), not entry.is_empty())
 
 
 func _refresh_supplies() -> void:
@@ -94,10 +101,13 @@ func _refresh_supplies() -> void:
 		if view == null:
 			continue
 		var item_id := str(GameState.item_slots[i]) if i < GameState.item_slots.size() else ""
-		_bind_item_view(view, _resolve_item_display(item_id))
+		var entry := _entry_from_supply_slot(item_id)
+		_supply_entries[i] = entry
+		_bind_item_view(view, _resolve_item_display(item_id), not entry.is_empty())
 
 
-func _bind_item_view(view: ItemView, display: Dictionary) -> void:
+func _bind_item_view(view: ItemView, display: Dictionary, clickable: bool = false) -> void:
+	view.set_click_enabled(clickable)
 	if display.is_empty():
 		view.apply_empty(null, Color(1, 1, 1, 0))
 		view.visible = true
@@ -110,6 +120,48 @@ func _bind_item_view(view: ItemView, display: Dictionary) -> void:
 		Color.WHITE,
 		str(display.get("quality", ""))
 	)
+
+
+func _on_preview_item_clicked(index: int) -> void:
+	_show_item_entry(_preview_entries[index] if index < _preview_entries.size() else {})
+
+
+func _on_supply_item_clicked(index: int) -> void:
+	_show_item_entry(_supply_entries[index] if index < _supply_entries.size() else {})
+
+
+func _show_item_entry(entry: Variant) -> void:
+	if not entry is Dictionary:
+		return
+	var row := entry as Dictionary
+	if row.is_empty():
+		return
+	ItemInfoPopupHost.show_entry(row)
+
+
+func _entry_from_reward(reward_v: Variant) -> Dictionary:
+	if reward_v is String:
+		var iid := str(reward_v).strip_edges()
+		if iid == "":
+			return {}
+		return {"kind": "item", "id": iid, "count": 1}
+	if reward_v is int or reward_v is float:
+		var equip_id := int(reward_v)
+		if equip_id <= 0:
+			return {}
+		return {"kind": "equip", "id": equip_id, "count": 1}
+	return {}
+
+
+func _entry_from_supply_slot(item_id: String) -> Dictionary:
+	var iid := item_id.strip_edges()
+	if iid == "":
+		return {}
+	return {
+		"kind": "item",
+		"id": iid,
+		"count": maxi(0, int(GameState.inventory.get(iid, 0))),
+	}
 
 
 func _apply_preview_image(path: String) -> void:
@@ -187,15 +239,15 @@ func _danger_stars(danger: int) -> String:
 func _on_start_pressed() -> void:
 	if _blocked or _location.is_empty():
 		return
-	var started: Dictionary = ExpeditionState.start(str(_location.get("id", "")), GameState)
-	if not bool(started.get("ok", false)):
-		_show_blocked(str(started.get("error", "无法开始历练")))
-		return
-	get_tree().change_scene_to_file(ExpeditionState.LOOP_SCENE)
+	var nav: Dictionary = SceneManager.start_expedition(str(_location.get("id", "")))
+	if not bool(nav.get("ok", false)):
+		_show_blocked(str(nav.get("error", "无法进入历练")))
 
 
 func _on_back_pressed() -> void:
-	get_tree().change_scene_to_file(GameState.HUB_SCENE)
+	var nav: Dictionary = SceneManager.go_hub()
+	if not bool(nav.get("ok", false)):
+		_show_blocked(str(nav.get("error", "无法返回洞府")))
 
 
 func _show_blocked(message: String) -> void:

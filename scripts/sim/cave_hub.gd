@@ -77,14 +77,17 @@ func _on_encounter() -> void:
 	if ExpeditionState.active:
 		_refresh("当前仍在历练中，请先完成或结算后再操作。")
 		return
-	get_tree().change_scene_to_file("res://scenes/expedition/location_select.tscn")
+	var nav: Dictionary = SceneManager.go_location_select()
+	if not bool(nav.get("ok", false)):
+		_refresh(str(nav.get("error", "无法前往地点选择")))
 
 
 func _on_breakthrough() -> void:
 	var result: Dictionary = GameState.breakthrough()
 	if bool(result.get("ok", false)):
-		DataStoreRef.resolve().set_ui_breakthrough_summary(result)
-		get_tree().change_scene_to_file("res://scenes/sim/breakthrough_summary.tscn")
+		var nav: Dictionary = SceneManager.go_breakthrough_summary(result)
+		if not bool(nav.get("ok", false)):
+			_refresh(str(nav.get("error", "无法打开突破摘要")))
 	else:
 		_refresh(str(result.get("error", "无法突破")))
 
