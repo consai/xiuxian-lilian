@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "locations": {
+    "qinglan_mountain": {
+      "name": "青岚山脉",
+      "subtitle": "林深雾重，灵草与妖兽并存",
+      "desc": "适合炼气期修士历练的山脉。",
+      "danger": 1,
+      "recommended_realm": "炼气一层",
+      "event_pool": [
+        "qinglan_herbs",
+        "qinglan_ore",
+        "qinglan_spring",
+        "qinglan_shelter",
+        "qinglan_fog",
+        "qinglan_cliff",
+        "qinglan_wolf",
+        "qinglan_serpent",
+        "qinglan_boss"
+      ],
+      "preview_rewards": [
+        "items_LingCao",
+        "items_YaoDan",
+        5002
+      ]
+    }
+  }
+}

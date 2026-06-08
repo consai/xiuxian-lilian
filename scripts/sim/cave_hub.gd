@@ -2,168 +2,103 @@ extends Control
 
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
 
-var _status: Label
-var _message: RichTextLabel
-var _inventory_label: RichTextLabel
-var _equip_buttons: Array[Button] = []
-var _item_buttons: Array[Button] = []
-var _save_panel: VBoxContainer
+@onready var _realm_label: Label = %RealmLabel
+@onready var _status_label: Label = %StatusLabel
+@onready var _message_label: Label = %MessageLabel
+@onready var _inventory_label: RichTextLabel = %InventoryLabel
+@onready var _inventory_overlay: Panel = %InventoryOverlay
+@onready var _breakthrough_button: TextureButton = %BreakthroughButton
+@onready var _save_panel: VBoxContainer = %SavePanel
+@onready var _equip_buttons: Array[Button] = [%EquipButton1, %EquipButton2]
+@onready var _item_buttons: Array[Button] = [%ItemButton1, %ItemButton2]
 
 
 func _ready() -> void:
-	_build_ui()
+	_connect_actions()
 	_refresh()
 
 
-func _build_ui() -> void:
-	var bg := ColorRect.new()
-	bg.color = Color("#f1dfc2")
-	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(bg)
-
-	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 48)
-	margin.add_theme_constant_override("margin_right", 48)
-	margin.add_theme_constant_override("margin_top", 30)
-	margin.add_theme_constant_override("margin_bottom", 30)
-	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(margin)
-
-	var root := VBoxContainer.new()
-	root.add_theme_constant_override("separation", 14)
-	margin.add_child(root)
-
-	var title := Label.new()
-	title.text = "清风洞府 · 修行日程"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_font_size_override("font_size", 34)
-	root.add_child(title)
-
-	_status = Label.new()
-	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_status.add_theme_font_size_override("font_size", 20)
-	root.add_child(_status)
-
-	var columns := HBoxContainer.new()
-	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	columns.add_theme_constant_override("separation", 18)
-	root.add_child(columns)
-
-	var actions := _panel("今日安排")
-	actions.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	columns.add_child(actions)
-	_add_button(actions, "修炼一日", _on_cultivate)
-	_add_button(actions, "外出历练", _on_encounter)
-	_add_button(actions, "静养休息", _on_rest)
-	_add_button(actions, "主动突破", _on_breakthrough, "BreakthroughButton")
-
-	var prep := _panel("洞府整备")
-	prep.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	columns.add_child(prep)
-	var skill_label := Label.new()
-	skill_label.text = "技能：火焰弹 / 火焰盾 / 毒 / 普攻"
-	skill_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	prep.add_child(skill_label)
-	for i in 2:
-		var button := Button.new()
-		button.pressed.connect(_cycle_equip.bind(i))
-		prep.add_child(button)
-		_equip_buttons.append(button)
-	for i in 2:
-		var button := Button.new()
-		button.pressed.connect(_cycle_item.bind(i))
-		prep.add_child(button)
-		_item_buttons.append(button)
-
-	var records := _panel("背包与记录")
-	records.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	columns.add_child(records)
-	_inventory_label = RichTextLabel.new()
-	_inventory_label.fit_content = true
-	_inventory_label.bbcode_enabled = true
-	_inventory_label.custom_minimum_size = Vector2(250, 260)
-	records.add_child(_inventory_label)
-
-	var footer := HBoxContainer.new()
-	footer.add_theme_constant_override("separation", 12)
-	root.add_child(footer)
-	_message = RichTextLabel.new()
-	_message.bbcode_enabled = true
-	_message.fit_content = true
-	_message.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	footer.add_child(_message)
-	_add_button(footer, "存档 / 读档", _toggle_save_panel)
-	_add_button(footer, "新开修行", _new_game)
-
-	_save_panel = _panel("三槽手动存档")
-	_save_panel.visible = false
-	root.add_child(_save_panel)
+func _connect_actions() -> void:
+	$FurnaceButton.pressed.connect(_on_alchemy)
+	$StorageButton.pressed.connect(_toggle_inventory)
+	$CultivateObjectButton.pressed.connect(_on_cultivate)
+	$RestButton.pressed.connect(_on_rest)
+	$ExpeditionObjectButton.pressed.connect(_on_encounter)
+	$BackpackButton.pressed.connect(_toggle_inventory)
+	$BottomActions/CultivateButton.pressed.connect(_on_cultivate)
+	$BottomActions/BreakthroughButton.pressed.connect(_on_breakthrough)
+	$BottomActions/ExpeditionButton.pressed.connect(_on_encounter)
+	$InventoryOverlay/Content/Header/CloseButton.pressed.connect(_toggle_inventory)
+	$InventoryOverlay/Content/UtilityRow/SavePanelButton.pressed.connect(_toggle_save_panel)
+	$InventoryOverlay/Content/UtilityRow/NewGameButton.pressed.connect(_new_game)
+	for i in _equip_buttons.size():
+		_equip_buttons[i].pressed.connect(_cycle_equip.bind(i))
+	for i in _item_buttons.size():
+		_item_buttons[i].pressed.connect(_cycle_item.bind(i))
 	for slot in range(1, 4):
-		var row := HBoxContainer.new()
-		var label := Label.new()
-		label.name = "SlotLabel%d" % slot
-		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_child(label)
-		_add_button(row, "保存", _save.bind(slot))
-		_add_button(row, "读取", _load.bind(slot))
-		_save_panel.add_child(row)
-
-
-func _panel(title_text: String) -> VBoxContainer:
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 10)
-	var title := Label.new()
-	title.text = title_text
-	title.add_theme_font_size_override("font_size", 23)
-	box.add_child(title)
-	return box
-
-
-func _add_button(parent: Node, text: String, action: Callable, node_name: String = "") -> Button:
-	var button := Button.new()
-	if node_name != "":
-		button.name = node_name
-	button.text = text
-	button.custom_minimum_size = Vector2(150, 42)
-	button.pressed.connect(action)
-	parent.add_child(button)
-	return button
+		_save_panel.get_node("Slot%d/Save%d" % [slot, slot]).pressed.connect(_save.bind(slot))
+		_save_panel.get_node("Slot%d/Load%d" % [slot, slot]).pressed.connect(_load.bind(slot))
 
 
 func _refresh(message: String = "") -> void:
-	_status.text = "第 %d 日   %s   修为 %d/%d   气血 %.0f/%.0f   法力 %.0f/%.0f   伤势 %d 日" % [
-		GameState.day, GameState.realm_name, GameState.cultivation, GameState.breakthrough_at,
-		GameState.hp, float(GameState.attrs.get(FightAttr.HP_MAX, 100.0)),
-		GameState.mp, float(GameState.attrs.get(FightAttr.MP_MAX, 100.0)), GameState.injury_days
+	var hp_max := float(GameState.attrs.get(FightAttr.HP_MAX, 100.0))
+	var mp_max := float(GameState.attrs.get(FightAttr.MP_MAX, 100.0))
+	_realm_label.text = "%s · 修为 %d/%d" % [
+		GameState.realm_name, GameState.cultivation, GameState.breakthrough_at
 	]
-	var breakthrough := find_child("BreakthroughButton", true, false) as Button
-	if breakthrough != null:
-		breakthrough.disabled = not GameState.can_breakthrough()
+	_status_label.text = "第 %d 日  |  灵石 %d  |  气血 %.0f/%.0f  |  法力 %.0f/%.0f  |  伤势 %d 日" % [
+		GameState.day, GameState.ling_stones, GameState.hp, hp_max,
+		GameState.mp, mp_max, GameState.injury_days
+	]
+	_breakthrough_button.disabled = not GameState.can_breakthrough()
+	_breakthrough_button.modulate = Color.WHITE if not _breakthrough_button.disabled else Color(0.65, 0.65, 0.65, 0.8)
 	for i in _equip_buttons.size():
-		var eid := int(GameState.equip_slots[i])
-		_equip_buttons[i].text = "法宝槽 %d：%s（点击切换）" % [i + 1, _equip_name(eid)]
+		_equip_buttons[i].text = "法宝槽 %d：%s（点击切换）" % [i + 1, _equip_name(int(GameState.equip_slots[i]))]
 	for i in _item_buttons.size():
-		var iid := str(GameState.item_slots[i])
-		_item_buttons[i].text = "丹药槽 %d：%s（点击切换）" % [i + 1, _item_name(iid)]
+		_item_buttons[i].text = "丹药槽 %d：%s（点击切换）" % [i + 1, _item_name(str(GameState.item_slots[i]))]
+	_refresh_inventory()
+	_message_label.text = _resolve_message(message)
+	_refresh_save_slots()
+
+
+func _refresh_inventory() -> void:
 	var lines: PackedStringArray = ["[b]灵石：%d[/b]" % GameState.ling_stones]
-	for iid_v in GameState.inventory.keys():
-		var iid := str(iid_v)
-		lines.append("%s x%d" % [_item_name(iid), int(GameState.inventory[iid])])
+	if GameState.inventory.is_empty():
+		lines.append("背包中暂无丹药与道具。")
+	else:
+		for iid_v in GameState.inventory.keys():
+			var iid := str(iid_v)
+			lines.append("%s x%d" % [_item_name(iid), int(GameState.inventory[iid])])
 	lines.append("")
 	lines.append("[b]历练：%d  胜：%d  负：%d[/b]" % [
-		int(GameState.totals.get("battles", 0)), int(GameState.totals.get("wins", 0)), int(GameState.totals.get("losses", 0))
+		int(GameState.totals.get("battles", 0)),
+		int(GameState.totals.get("wins", 0)),
+		int(GameState.totals.get("losses", 0)),
 	])
 	_inventory_label.text = "\n".join(lines)
-	var display := message
-	if display == "" and not GameState.last_rewards.is_empty():
+
+
+func _resolve_message(message: String) -> String:
+	if message != "":
+		return message
+	if not GameState.last_expedition_summary.is_empty():
+		var summary := GameState.last_expedition_summary
+		var stats := summary.get("stats", {}) as Dictionary
+		return "上次历练：深入 %d 层，消耗 %d 日" % [
+			int(stats.get("max_depth", 0)), int(summary.get("elapsed_days", 1))
+		]
+	if not GameState.last_rewards.is_empty():
 		var rewards: PackedStringArray = []
 		for reward in GameState.last_rewards:
 			rewards.append(GameState.reward_label(reward))
-		display = "上次历练所得：" + "、".join(rewards)
-	if display == "" and not GameState.activity_log.is_empty():
-		display = str((GameState.activity_log.back() as Dictionary).get("text", ""))
-	_message.text = display
-	_refresh_save_slots()
+		return "上次所得：" + "、".join(rewards)
+	if not GameState.activity_log.is_empty():
+		return str((GameState.activity_log.back() as Dictionary).get("text", ""))
+	return "洞府清幽，宜静心修行。"
+
+
+func _on_alchemy() -> void:
+	_refresh("炼丹炉火候正好，炼丹功能尚待开启。")
 
 
 func _on_cultivate() -> void:
@@ -177,7 +112,10 @@ func _on_rest() -> void:
 
 
 func _on_encounter() -> void:
-	get_tree().change_scene_to_file("res://scenes/sim/encounter_select.tscn")
+	if ExpeditionState.active:
+		_refresh("当前仍在历练中，请先完成或结算后再操作。")
+		return
+	get_tree().change_scene_to_file("res://scenes/expedition/location_select.tscn")
 
 
 func _on_breakthrough() -> void:
@@ -187,6 +125,12 @@ func _on_breakthrough() -> void:
 		get_tree().change_scene_to_file("res://scenes/sim/breakthrough_summary.tscn")
 	else:
 		_refresh(str(result.get("error", "无法突破")))
+
+
+func _toggle_inventory() -> void:
+	_inventory_overlay.visible = not _inventory_overlay.visible
+	if _inventory_overlay.visible:
+		_refresh()
 
 
 func _cycle_equip(index: int) -> void:
@@ -200,16 +144,25 @@ func _cycle_item(index: int) -> void:
 
 
 func _toggle_save_panel() -> void:
+	if ExpeditionState.active:
+		_refresh("历练中无法存档或读档。")
+		return
 	_save_panel.visible = not _save_panel.visible
 	_refresh_save_slots()
 
 
 func _save(slot: int) -> void:
+	if ExpeditionState.active:
+		_refresh("历练中无法存档。")
+		return
 	var result: Dictionary = SaveService.save_slot(slot, GameState.to_dict())
 	_refresh("槽位 %d：%s" % [slot, "保存成功" if result.get("ok", false) else result.get("error", "保存失败")])
 
 
 func _load(slot: int) -> void:
+	if ExpeditionState.active:
+		_refresh("历练中无法读档。")
+		return
 	var result: Dictionary = SaveService.load_slot(slot)
 	if bool(result.get("ok", false)) and GameState.apply_dict(result["game"]):
 		_refresh("已读取槽位 %d。" % slot)
@@ -223,12 +176,13 @@ func _new_game() -> void:
 
 
 func _refresh_save_slots() -> void:
-	if _save_panel == null:
-		return
 	for slot in range(1, 4):
-		var label := _save_panel.find_child("SlotLabel%d" % slot, true, false) as Label
+		var label := _save_panel.get_node("Slot%d/SlotLabel%d" % [slot, slot]) as Label
 		var info: Dictionary = SaveService.slot_info(slot)
-		label.text = "槽位 %d：%s" % [slot, "第%d日 %s 修为%d" % [info.day, info.realm_name, info.cultivation] if info.get("ok", false) else "空"]
+		label.text = "槽位 %d：%s" % [
+			slot,
+			"第%d日 %s 修为%d" % [info.day, info.realm_name, info.cultivation] if info.get("ok", false) else "空",
+		]
 
 
 func _equip_name(eid: int) -> String:

@@ -1,0 +1,69 @@
+[gd_scene load_steps=7 format=3 uid="uid://expedition_result"]
+
+[ext_resource type="Script" path="res://scripts/expedition/expedition_result.gd" id="1"]
+[ext_resource type="Theme" path="res://ui/theme_tuhuang.tres" id="2"]
+[ext_resource type="LabelSettings" uid="uid://c8expeditionfont30" path="res://ui/ziti_new/30.tres" id="3_title"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="4_body"]
+[ext_resource type="FontFile" uid="uid://btkp4vukwqrul" path="res://assets/art/AlimamaDaoLiTi.ttf" id="5_font"]
+
+[node name="ExpeditionResult" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2")
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.917647, 0.839216, 0.709804, 1)
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -220.0
+offset_right = 320.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Box" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Panel/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "历练结算"
+label_settings = ExtResource("3_title")
+horizontal_alignment = 1
+
+[node name="Body" type="RichTextLabel" parent="Panel/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/default_color = Color(0.33333334, 0.19607843, 0.18431373, 1)
+theme_override_constants/outline_size = 1
+theme_override_fonts/normal_font = ExtResource("5_font")
+theme_override_font_sizes/normal_font_size = 16
+custom_minimum_size = Vector2(560, 220)
+fit_content = true
+
+[node name="ReturnButton" type="Button" parent="Panel/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.33333334, 0.19607843, 0.18431373, 1)
+theme_override_fonts/font = ExtResource("5_font")
+theme_override_font_sizes/font_size = 22
+text = "返回洞府"

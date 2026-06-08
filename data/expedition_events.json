@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "events": {
+    "qinglan_herbs": {
+      "id": "qinglan_herbs",
+      "location_id": "qinglan_mountain",
+      "type": "gather",
+      "name": "林间灵草",
+      "desc": "雾气中露出一片泛着微光的灵草。",
+      "risk_text": "安全",
+      "weight": 30,
+      "min_depth": 1,
+      "max_depth": 0,
+      "once_per_expedition": false,
+      "effects": [],
+      "rewards": [
+        {"kind": "item", "id": "items_LingCao", "min": 2, "max": 4, "weight": 1}
+      ]
+    },
+    "qinglan_ore": {
+      "id": "qinglan_ore",
+      "location_id": "qinglan_mountain",
+      "type": "gather",
+      "name": "山壁矿脉",
+      "desc": "岩缝中闪烁着寒铁微光。",
+      "risk_text": "安全",
+      "weight": 18,
+      "min_depth": 2,
+      "max_depth": 0,
+      "once_per_expedition": false,
+      "effects": [],
+      "rewards": [
+        {"kind": "item", "id": "items_HanTie", "min": 1, "max": 2, "weight": 3},
+        {"kind": "currency", "id": "ling_stones", "min": 5, "max": 15, "weight": 2}
+      ]
+    },
+    "qinglan_spring": {
+      "id": "qinglan_spring",
+      "location_id": "qinglan_mountain",
+      "type": "recover",
+      "name": "灵泉小憩",
+      "desc": "清冽灵泉可恢复法力。",
+      "risk_text": "安全",
+      "weight": 22,
+      "min_depth": 1,
+      "max_depth": 0,
+      "once_per_expedition": false,
+      "effects": [
+        {"type": "restore_mp_percent", "value": 0.35}
+      ],
+      "rewards": []
+    },
+    "qinglan_shelter": {
+      "id": "qinglan_shelter",
+      "location_id": "qinglan_mountain",
+      "type": "recover",
+      "name": "岩洞歇脚",
+      "desc": "暂避风雨，调息气血。",
+      "risk_text": "安全",
+      "weight": 16,
+      "min_depth": 2,
+      "max_depth": 0,
+      "once_per_expedition": false,
+      "effects": [
+        {"type": "heal_hp_percent", "value": 0.25}
+      ],
+      "rewards": []
+    },
+    "qinglan_fog": {
+      "id": "qinglan_fog",
+      "location_id": "qinglan_mountain",
+      "type": "hazard",
+      "name": "迷障浓雾",
+      "desc": "雾气耗散法力，需小心前行。",
+      "risk_text": "轻微",
+      "weight": 20,
+      "min_depth": 1,
+      "max_depth": 0,
+      "once_per_expedition": false,
+      "effects": [
+        {"type": "drain_mp_percent", "value": 0.15}
+      ],
+      "rewards": []
+    },
+    "qinglan_cliff": {
+      "id": "qinglan_cliff",
+      "location_id": "qinglan_mountain",
+      "type": "hazard",
+      "name": "断崖滑坠",
+      "desc": "碎石滚落，擦伤难免。",
+      "risk_text": "危险",
+      "weight": 14,
+      "min_depth": 3,
+      "max_depth": 0,
+      "once_per_expedition": false,
+      "effects": [
+        {"type": "damage_hp_percent", "value": 0.12}
+      ],
+      "rewards": []
+    },
+    "qinglan_wolf": {
+      "id": "qinglan_wolf",
+      "location_id": "qinglan_mountain",
+      "type": "battle",
+      "name": "青牙狼袭",
+      "desc": "狼群自林间扑出。",
+      "risk_text": "普通",
+      "weight": 24,
+      "min_depth": 1,
+      "max_depth": 0,
+      "once_per_expedition": false,
+      "effects": [],
+      "reward_rolls": 2,
+      "rewards": [
+        {"kind": "item", "id": "items_LingCao", "min": 1, "max": 3, "weight": 5},
+        {"kind": "item", "id": "items_HuiQiDan", "min": 1, "max": 1, "weight": 2},
+        {"kind": "item", "id": "items_HuiLingDan", "min": 1, "max": 1, "weight": 2}
+      ],
+      "enemy": {
+        "name": "青牙狼",
+        "icon": "jueshe/sprite_003.png",
+        "hp": 75,
+        "mp": 30,
+        "attrs": {"hp_max": 75, "mp_max": 30, "shield": 0, "atk": 70, "def": 80, "spd": 92, "crit": 5, "crit_damage": 150},
+        "skills": [1, 0]
+      }
+    },
+    "qinglan_serpent": {
+      "id": "qinglan_serpent",
+      "location_id": "qinglan_mountain",
+      "type": "elite",
+      "name": "寒潭妖蟒",
+      "desc": "潭底巨蟒破水而出。",
+      "risk_text": "精英",
+      "weight": 12,
+      "min_depth": 3,
+      "max_depth": 0,
+      "once_per_expedition": false,
+      "effects": [],
+      "reward_rolls": 3,
+      "rewards": [
+        {"kind": "item", "id": "items_YaoDan", "min": 1, "max": 2, "weight": 4},
+        {"kind": "item", "id": "items_LiaoShangDan", "min": 1, "max": 2, "weight": 3},
+        {"kind": "equip", "id": 5002, "min": 1, "max": 1, "weight": 1}
+      ],
+      "enemy": {
+        "name": "寒潭妖蟒",
+        "icon": "jueshe/sprite_001.png",
+        "hp": 145,
+        "mp": 70,
+        "attrs": {"hp_max": 145, "mp_max": 70, "shield": 0, "atk": 92, "def": 105, "spd": 96, "crit": 8, "crit_damage": 150},
+        "skills": [3, 1, 0]
+      }
+    },
+    "qinglan_boss": {
+      "id": "qinglan_boss",
+      "location_id": "qinglan_mountain",
+      "type": "boss",
+      "name": "赤焰妖王",
+      "desc": "山巅妖王威压如山。",
+      "risk_text": "首领",
+      "weight": 6,
+      "min_depth": 6,
+      "max_depth": 0,
+      "once_per_expedition": true,
+      "effects": [],
+      "reward_rolls": 4,
+      "rewards": [
+        {"kind": "item", "id": "items_YaoDan", "min": 2, "max": 4, "weight": 4},
+        {"kind": "item", "id": "items_PoJingDan", "min": 1, "max": 1, "weight": 2},
+        {"kind": "equip", "id": 5003, "min": 1, "max": 1, "weight": 1}
+      ],
+      "enemy": {
+        "name": "赤焰妖王",
+        "icon": "jueshe/sprite_000.png",
+        "hp": 240,
+        "mp": 100,
+        "attrs": {"hp_max": 240, "mp_max": 100, "shield": 0, "atk": 112, "def": 120, "spd": 105, "crit": 12, "crit_damage": 165},
+        "skills": [3, 1, 2, 0]
+      }
+    }
+  }
+}

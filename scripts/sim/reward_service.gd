@@ -24,7 +24,7 @@ static func roll_rewards(encounter: Dictionary, rng: RandomNumberGenerator = nul
 		reward.erase("min")
 		reward.erase("max")
 		out.append(reward)
-	return _merge_rewards(out)
+	return merge_rewards(out)
 
 
 static func apply_rewards(game_state: Node, rewards: Array) -> Array:
@@ -69,7 +69,7 @@ static func _weighted_pick(pool: Array, rng: RandomNumberGenerator) -> Dictionar
 	return {}
 
 
-static func _merge_rewards(rows: Array) -> Array:
+static func merge_rewards(rows: Array) -> Array:
 	var merged: Dictionary = {}
 	for row_v in rows:
 		var row := row_v as Dictionary

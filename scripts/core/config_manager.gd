@@ -8,10 +8,12 @@ var _skills_by_id: Dictionary = {}
 var _equips_by_id: Dictionary = {}
 var _battle_time_limit_default: float = 200.0
 var _buff_by_id: Dictionary = {}
+const ExpeditionDataValidatorScript := preload("res://scripts/expedition/expedition_data_validator.gd")
 
 
 func _ready() -> void:
 	reload_all()
+	call_deferred("_validate_expedition_data")
 
 
 func reload_all() -> void:
@@ -30,6 +32,12 @@ func reload_all() -> void:
 	_load_skills_local()
 	_load_equips_local()
 	_load_buffs_local()
+
+
+func _validate_expedition_data() -> void:
+	var game_state := get_tree().root.get_node_or_null("GameState")
+	for msg in ExpeditionDataValidatorScript.collect_errors(game_state):
+		push_error("ExpeditionDataValidator: %s" % msg)
 
 
 func items() -> Array:

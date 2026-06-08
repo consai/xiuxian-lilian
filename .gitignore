@@ -6,6 +6,7 @@
 
 # Editor/user-specific caches (never commit)
 /.godot/editor/
+!/.godot/editor/project_metadata.cfg
 /.godot/imported/
 /.godot/mono/
 /.godot/uid_cache.bin

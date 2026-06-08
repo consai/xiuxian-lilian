@@ -1,0 +1,36 @@
+[gd_scene load_steps=5 format=3 uid="uid://expedition_event_card"]
+
+[ext_resource type="Script" path="res://scripts/expedition/expedition_event_card.gd" id="1"]
+[ext_resource type="Theme" path="res://ui/theme_tuhuang.tres" id="2"]
+[ext_resource type="LabelSettings" uid="uid://c8expeditionfont20" path="res://ui/ziti_new/20.tres" id="3_title"]
+[ext_resource type="LabelSettings" uid="uid://dknyivqhm6bby" path="res://ui/ziti_new/13.tres" id="4_detail"]
+
+[node name="EventCard" type="Button"]
+custom_minimum_size = Vector2(240, 180)
+theme = ExtResource("2")
+script = ExtResource("1")
+
+[node name="Box" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+text = "事件"
+label_settings = ExtResource("3_title")
+
+[node name="Detail" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+size_flags_vertical = 3
+autowrap_mode = 3
+text = "详情"
+label_settings = ExtResource("4_detail")

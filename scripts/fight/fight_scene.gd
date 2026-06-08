@@ -263,13 +263,17 @@ func _on_vfx_queue_finished() -> void:
 
 
 func _on_battle_result_close_requested() -> void:
-	if GameState != null and GameState.pending_battle_summary is Dictionary and not GameState.pending_battle_summary.is_empty():
-		GameState.settle_pending_battle()
-		get_tree().change_scene_to_file(GameState.HUB_SCENE)
+	if ExpeditionState != null and ExpeditionState.active and ExpeditionState.phase == "battle":
+		ExpeditionState.settle_pending_battle()
+		if ExpeditionState.should_go_to_result():
+			get_tree().root.set_meta("expedition_exit_reason", ExpeditionState.pending_exit_reason if ExpeditionState.pending_exit_reason != "" else "defeated")
+			get_tree().change_scene_to_file(ExpeditionState.RESULT_SCENE)
+		else:
+			get_tree().change_scene_to_file(ExpeditionState.LOOP_SCENE)
 		return
 	_hud.hide_battle_result()
 
 
 func _on_battle_finished(summary: Dictionary) -> void:
-	if GameState != null and str(GameState.pending_encounter_id) != "":
-		GameState.receive_battle_summary(summary)
+	if ExpeditionState != null and ExpeditionState.active and ExpeditionState.phase == "battle":
+		ExpeditionState.receive_battle_summary(summary)

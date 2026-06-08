@@ -3,8 +3,10 @@ extends Node
 const SIM_PATH := "res://data/simulation.json"
 const HUB_SCENE := "res://scenes/sim/cave_hub.tscn"
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
-const EncounterServiceScript := preload("res://scripts/sim/encounter_service.gd")
 const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
+const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
+const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
+const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 
 var day := 1
 var realm_index := 0
@@ -25,10 +27,14 @@ var equip_slots: Array = [-1, -1]
 var item_slots: Array = ["", ""]
 var inventory: Dictionary = {}
 var activity_log: Array = []
-var totals := {"battles": 0, "wins": 0, "losses": 0, "items_gained": 0}
-var pending_encounter_id := ""
-var pending_battle_summary: Dictionary = {}
+var totals := {
+	"battles": 0, "wins": 0, "losses": 0, "items_gained": 0,
+	"expeditions": 0, "expedition_steps": 0, "max_depth": 0,
+	"bosses_defeated": 0,
+}
 var last_rewards: Array = []
+var last_expedition_summary: Dictionary = {}
+var _last_expedition_settlement_key := ""
 
 
 func _ready() -> void:
@@ -56,10 +62,14 @@ func new_game() -> void:
 	item_slots = (initial.get("item_slots", ["", ""]) as Array).duplicate(true)
 	inventory = (initial.get("inventory", {}) as Dictionary).duplicate(true)
 	activity_log = []
-	totals = {"battles": 0, "wins": 0, "losses": 0, "items_gained": 0}
-	pending_encounter_id = ""
-	pending_battle_summary = {}
+	totals = {
+		"battles": 0, "wins": 0, "losses": 0, "items_gained": 0,
+		"expeditions": 0, "expedition_steps": 0, "max_depth": 0,
+		"bosses_defeated": 0,
+	}
 	last_rewards = []
+	last_expedition_summary = {}
+	_last_expedition_settlement_key = ""
 	_sync_realm()
 
 
@@ -98,17 +108,16 @@ func breakthrough() -> Dictionary:
 	}
 
 
-func start_encounter(encounter_id: String, tree: SceneTree) -> bool:
-	var encounter: Dictionary = EncounterServiceScript.by_id(encounter_id)
-	if encounter.is_empty():
-		return false
-	pending_encounter_id = encounter_id
-	pending_battle_summary = {}
-	last_rewards = []
-	return BattleInitData.goto_fight_scene(tree, build_battle_init(encounter), "res://scenes/fightScene.tscn")
+func begin_expedition(location_id: String) -> Dictionary:
+	var location := LocationServiceScript.by_id(location_id)
+	if location.is_empty():
+		return {"ok": false, "error": "未知地点"}
+	return {"ok": true, "location": location}
 
 
-func build_battle_init(encounter: Dictionary) -> Dictionary:
+func build_player_battle_snapshot(runtime: Dictionary) -> Dictionary:
+	var runtime_inv := (runtime.get("inventory", {}) as Dictionary).duplicate(true)
+	var runtime_slots := (runtime.get("item_slots", item_slots) as Array).duplicate(true)
 	var skills: Array = []
 	for sid_v in equipped_skills:
 		skills.append({"id": int(sid_v), "cd": 0.0})
@@ -123,23 +132,26 @@ func build_battle_init(encounter: Dictionary) -> Dictionary:
 			equip_row["effects"] = (cfg.get("effects", []) as Array).duplicate(true)
 			equip_row["cd_total"] = float(cfg.get("cd_total", cfg.get("cd", 0.0)))
 		equips.append(equip_row)
-	var player := {
+	return {
 		"name": player_name,
 		"icon": player_icon,
-		"hp": hp,
-		"mp": mp,
+		"hp": float(runtime.get("hp", hp)),
+		"mp": float(runtime.get("mp", mp)),
 		"attrs": attrs.duplicate(true),
 		"skills": skills,
 		"equips": equips,
-		"items": InventoryServiceScript.build_battle_item_slots(inventory, item_slots),
+		"items": InventoryServiceScript.build_battle_item_slots(runtime_inv, runtime_slots),
 	}
-	var enemy := (encounter.get("enemy", {}) as Dictionary).duplicate(true)
-	var enemy_skills: Array = []
-	for sid_v in enemy.get("skills", [0]) as Array:
-		enemy_skills.append({"id": int(sid_v), "cd": 0.0})
-	enemy["skills"] = enemy_skills
-	enemy["items"] = []
-	enemy["equips"] = []
+
+
+func build_battle_init(event: Dictionary) -> Dictionary:
+	var player := build_player_battle_snapshot({
+		"hp": hp,
+		"mp": mp,
+		"inventory": inventory,
+		"item_slots": item_slots,
+	})
+	var enemy := ExpeditionEventServiceScript.build_battle_enemy(event, int(event.get("depth", 1)))
 	return {
 		"player": player,
 		"enemy": enemy,
@@ -149,39 +161,71 @@ func build_battle_init(encounter: Dictionary) -> Dictionary:
 	}
 
 
-func receive_battle_summary(summary: Dictionary) -> void:
-	pending_battle_summary = summary.duplicate(true)
-
-
-func settle_pending_battle() -> Dictionary:
-	if pending_battle_summary.is_empty() or pending_encounter_id == "":
-		return {"ok": false}
-	var summary := pending_battle_summary
-	var runtime := summary.get("player_runtime", {}) as Dictionary
-	hp = float(runtime.get("hp", hp))
-	mp = float(runtime.get("mp", mp))
-	InventoryServiceScript.sync_battle_item_counts(inventory, item_slots, runtime.get("items", []) as Array)
-	totals["battles"] = int(totals.get("battles", 0)) + 1
-	var won := str(summary.get("outcome", "")) == "win"
-	if won:
-		totals["wins"] = int(totals.get("wins", 0)) + 1
-		last_rewards = RewardServiceScript.apply_rewards(
-			self,
-			RewardServiceScript.roll_rewards(EncounterServiceScript.by_id(pending_encounter_id))
-		)
-		for reward in last_rewards:
-			totals["items_gained"] = int(totals.get("items_gained", 0)) + int((reward as Dictionary).get("count", 0))
-		_finish_activity("历练%s：胜利" % EncounterServiceScript.by_id(pending_encounter_id).get("name", ""), true)
-	else:
-		totals["losses"] = int(totals.get("losses", 0)) + 1
-		var rules := _simulation_root().get("rules", {}) as Dictionary
-		hp = maxf(hp, float(attrs.get(FightAttr.HP_MAX, 100.0)) * float(rules.get("battle_loss_hp_floor_ratio", 0.25)))
-		injury_days = maxi(injury_days, int(rules.get("battle_loss_injury_days", 3)))
-		last_rewards = []
-		_finish_activity("历练%s：战败受伤" % EncounterServiceScript.by_id(pending_encounter_id).get("name", ""), false)
-	pending_encounter_id = ""
-	pending_battle_summary = {}
-	return {"ok": true, "won": won, "rewards": last_rewards.duplicate(true)}
+func settle_expedition(result: Dictionary) -> Dictionary:
+	if result.is_empty():
+		return {"ok": false, "error": "缺少历练结算数据"}
+	var settlement_key := "%s:%d:%d:%d" % [
+		str(result.get("exit_reason", "")),
+		int(result.get("elapsed_days", 0)),
+		int((result.get("stats", {}) as Dictionary).get("steps", 0)),
+		int((result.get("loot", []) as Array).size()),
+	]
+	if settlement_key == _last_expedition_settlement_key:
+		return {"ok": false, "error": "duplicate", "duplicate": true}
+	_last_expedition_settlement_key = settlement_key
+	var elapsed_days := maxi(1, int(result.get("elapsed_days", 1)))
+	injury_days = maxi(0, injury_days - elapsed_days)
+	var exit_reason := str(result.get("exit_reason", "manual"))
+	hp = float(result.get("hp", hp))
+	mp = float(result.get("mp", mp))
+	if exit_reason == "defeated":
+		var rules := ExpeditionRulesServiceScript.rules()
+		hp = maxf(hp, float(attrs.get(FightAttr.HP_MAX, 100.0)) * float(rules.get("defeat_hp_floor_ratio", 0.25)))
+		injury_days = maxi(injury_days, int(rules.get("defeat_injury_days", 3)))
+	for item_row_v in result.get("items", []) as Array:
+		if not item_row_v is Dictionary:
+			continue
+		var item_row := item_row_v as Dictionary
+		var iid := str(item_row.get("inventory_id", ""))
+		if iid == "":
+			continue
+		var remaining := maxi(0, int(item_row.get("count", 0)))
+		if remaining > 0:
+			inventory[iid] = remaining
+		else:
+			inventory.erase(iid)
+	last_rewards = RewardServiceScript.apply_rewards(self, result.get("loot", []) as Array)
+	for reward in last_rewards:
+		totals["items_gained"] = int(totals.get("items_gained", 0)) + int((reward as Dictionary).get("count", 0))
+	var stats := result.get("stats", {}) as Dictionary
+	totals["expeditions"] = int(totals.get("expeditions", 0)) + 1
+	totals["expedition_steps"] = int(totals.get("expedition_steps", 0)) + int(stats.get("steps", 0))
+	totals["max_depth"] = maxi(int(totals.get("max_depth", 0)), int(stats.get("max_depth", 0)))
+	if bool(stats.get("boss_defeated", false)):
+		totals["bosses_defeated"] = int(totals.get("bosses_defeated", 0)) + 1
+	totals["battles"] = int(totals.get("battles", 0)) + int(stats.get("battles", 0))
+	totals["wins"] = int(totals.get("wins", 0)) + int(stats.get("wins", 0))
+	totals["losses"] = int(totals.get("losses", 0)) + int(stats.get("losses", 0))
+	day += elapsed_days
+	var location_name := str(result.get("location_name", "未知地点"))
+	var reward_labels: PackedStringArray = []
+	for reward in last_rewards:
+		reward_labels.append(reward_label(reward))
+	var log_text := "第 %d 日：%s历练，深入 %d 层，胜 %d 场" % [
+		day - elapsed_days,
+		location_name,
+		int(stats.get("max_depth", 0)),
+		int(stats.get("wins", 0)),
+	]
+	if not reward_labels.is_empty():
+		log_text += "，带回 %s" % "、".join(reward_labels)
+	if exit_reason == "defeated":
+		log_text += "（战败撤退）"
+	activity_log.append({"day": day - elapsed_days, "text": log_text})
+	if activity_log.size() > 30:
+		activity_log = activity_log.slice(activity_log.size() - 30)
+	last_expedition_summary = result.duplicate(true)
+	return {"ok": true, "rewards": last_rewards.duplicate(true), "elapsed_days": elapsed_days}
 
 
 func to_dict() -> Dictionary:
@@ -228,9 +272,13 @@ func apply_dict(data: Dictionary) -> bool:
 	inventory = (data["inventory"] as Dictionary).duplicate(true)
 	activity_log = (data.get("activity_log", []) as Array).duplicate(true)
 	totals = (data.get("totals", {}) as Dictionary).duplicate(true)
-	pending_encounter_id = ""
-	pending_battle_summary = {}
 	last_rewards = []
+	last_expedition_summary = {}
+	_last_expedition_settlement_key = ""
+	if Engine.get_main_loop() is SceneTree:
+		var expedition := (Engine.get_main_loop() as SceneTree).root.get_node_or_null("ExpeditionState")
+		if expedition != null and expedition.has_method("reset"):
+			expedition.reset()
 	_sync_realm()
 	return true
 

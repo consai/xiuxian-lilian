@@ -1,8 +1,9 @@
 extends SceneTree
 
 const GameStateScript := preload("res://scripts/sim/game_state.gd")
+const ExpeditionStateScript := preload("res://scripts/expedition/expedition_state.gd")
+const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
-const EncounterServiceScript := preload("res://scripts/sim/encounter_service.gd")
 const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
 const SaveServiceScript := preload("res://scripts/sim/save_service.gd")
 
@@ -13,9 +14,9 @@ var _tests_run := 0
 func _init() -> void:
 	_run("new game and daily activities", _test_new_game_and_daily_activities)
 	_run("inventory and battle item slots", _test_inventory_and_battle_item_slots)
-	_run("encounters build valid battle data", _test_encounters_build_valid_battle_data)
+	_run("expedition events build valid battle data", _test_expedition_events_build_valid_battle_data)
 	_run("reward pools produce legal rewards", _test_reward_pools)
-	_run("battle settlement persists runtime state", _test_battle_settlement)
+	_run("expedition defeat settlement persists runtime state", _test_expedition_defeat_settlement)
 	_run("three save slots round trip", _test_save_round_trip)
 	_run("save service rejects corrupt data", _test_corrupt_save)
 	if _failures.is_empty():
@@ -39,6 +40,10 @@ func _state() -> Node:
 	var state := GameStateScript.new()
 	state.new_game()
 	return state
+
+
+func _expedition() -> Node:
+	return ExpeditionStateScript.new()
 
 
 func _test_new_game_and_daily_activities() -> void:
@@ -73,10 +78,11 @@ func _test_inventory_and_battle_item_slots() -> void:
 	state.free()
 
 
-func _test_encounters_build_valid_battle_data() -> void:
+func _test_expedition_events_build_valid_battle_data() -> void:
 	var state := _state()
-	for encounter_v in EncounterServiceScript.all_encounters():
-		var errors := BattleInitData.collect_errors(state.build_battle_init(encounter_v as Dictionary))
+	for event_id in ["qinglan_wolf", "qinglan_serpent", "qinglan_boss"]:
+		var event := ExpeditionEventServiceScript.by_id(event_id)
+		var errors := BattleInitData.collect_errors(state.build_battle_init(event))
 		_expect_true(errors.is_empty(), "valid battle setup: %s" % str(errors))
 	state.free()
 
@@ -84,9 +90,9 @@ func _test_encounters_build_valid_battle_data() -> void:
 func _test_reward_pools() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 42
-	for encounter_v in EncounterServiceScript.all_encounters():
-		var encounter := encounter_v as Dictionary
-		var rewards := RewardServiceScript.roll_rewards(encounter, rng)
+	for event_id in ["qinglan_wolf", "qinglan_serpent", "qinglan_boss"]:
+		var event := ExpeditionEventServiceScript.by_id(event_id)
+		var rewards := RewardServiceScript.roll_rewards(event, rng)
 		_expect_true(not rewards.is_empty(), "rewards should not be empty")
 		for reward_v in rewards:
 			var reward := reward_v as Dictionary
@@ -94,20 +100,26 @@ func _test_reward_pools() -> void:
 			_expect_true(int(reward.get("count", 0)) > 0, "positive reward count")
 
 
-func _test_battle_settlement() -> void:
+func _test_expedition_defeat_settlement() -> void:
 	var state := _state()
-	state.pending_encounter_id = "normal"
-	state.receive_battle_summary({
+	var expedition := _expedition()
+	expedition.start("qinglan_mountain", state, 9091)
+	expedition.current_choices = [ExpeditionEventServiceScript.by_id("qinglan_wolf")]
+	expedition.choose_event("qinglan_wolf")
+	expedition.receive_battle_summary({
 		"outcome": "loss",
 		"player_runtime": {"hp": 0.0, "mp": 12.0, "items": [{"id": 9001, "count": 1}, {"id": 9003, "count": 0}]},
 	})
-	var result: Dictionary = state.settle_pending_battle()
+	expedition.settle_pending_battle()
+	var finish: Dictionary = expedition.finish("defeated")
+	var result: Dictionary = state.settle_expedition(finish)
 	_expect_true(bool(result.get("ok", false)), "settlement ok")
-	_expect_eq(state.day, 2, "battle consumes day")
+	_expect_eq(state.day, 2, "expedition consumes day")
 	_expect_near(state.hp, 25.0, "loss hp floor")
 	_expect_near(state.mp, 12.0, "mp persisted")
 	_expect_eq(state.injury_days, 3, "loss applies three injury days")
 	state.free()
+	expedition.free()
 
 
 func _test_save_round_trip() -> void:

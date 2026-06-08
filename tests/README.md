@@ -18,8 +18,14 @@ Run the simulation-loop tests with the same environment:
 C:\Godot_v4.6.2-stable_win64_console.exe --headless --path $PWD --script res://tests/run_simulation_tests.gd
 ```
 
-The end-to-end encounter smoke test loads the real fight scene with automatic combat:
+Run expedition domain tests:
 
 ```powershell
-C:\Godot_v4.6.2-stable_win64_console.exe --headless --path $PWD --script res://tests/run_encounter_smoke.gd
+C:\Godot_v4.6.2-stable_win64_console.exe --headless --path $PWD --script res://tests/run_expedition_tests.gd
+```
+
+The end-to-end expedition smoke test loads the real fight scene with automatic combat:
+
+```powershell
+C:\Godot_v4.6.2-stable_win64_console.exe --headless --path $PWD --script res://tests/run_expedition_smoke.gd
 ```

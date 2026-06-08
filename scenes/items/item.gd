@@ -112,7 +112,7 @@ func _apply_quality_border(pin_zhi: String) -> void:
 
 func _refresh_name_count_text() -> void:
 	if not show_name_label:
-		if _display_count > 1:
+		if _display_count > 0:
 			_name_count.text = str(_display_count)
 			_name_count.visible = true
 		else:

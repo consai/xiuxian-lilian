@@ -1,9 +1,40 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://o7pt8kaue6ba"]
 
-[ext_resource type="Script" path="res://scripts/sim/cave_hub.gd" id="1"]
-[ext_resource type="Theme" path="res://ui/theme_tuhuang.tres" id="2_theme"]
+[ext_resource type="Script" uid="uid://bx25wapjm1qf6" path="res://scripts/sim/cave_hub.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_theme"]
+[ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="3_bg"]
+[ext_resource type="Texture2D" uid="uid://dnrmhlg66g75h" path="res://assets/art/ui_new/liandanlu.png" id="4_furnace"]
+[ext_resource type="Texture2D" uid="uid://drd2jhm2t3gw4" path="res://assets/art/ui_new/chuwuxiang.png" id="5_chest"]
+[ext_resource type="Texture2D" uid="uid://dhw6jh6dgsxnt" path="res://assets/art/ui_new/deng.png" id="6_lamp"]
+[ext_resource type="Texture2D" uid="uid://dvjjp7ysrp4v8" path="res://assets/art/ui_new/dazuo.png" id="7_mat"]
+[ext_resource type="Texture2D" uid="uid://cgisif14cejwm" path="res://assets/art/ui_new/xiuxi.png" id="8_bed"]
+[ext_resource type="Texture2D" uid="uid://p7i7o8jqh8xt" path="res://assets/art/ui_new/beibao.png" id="9_bag"]
+[ext_resource type="Texture2D" uid="uid://dq4k3ybmxqrut" path="res://assets/art/ui_new/btn_mihuang.png" id="11_small_button"]
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="12_av2rb"]
+[ext_resource type="Texture2D" uid="uid://c3f3nny73kvhg" path="res://assets/art/ui_new/btn_lv.png" id="12_green_button"]
+[ext_resource type="Texture2D" uid="uid://hwomn6aon70a" path="res://assets/art/ui_new/btn_huang.png" id="13_yellow_button"]
+[ext_resource type="Texture2D" uid="uid://gyhsfoix048v" path="res://assets/art/ui_new/btn_lan.png" id="14_blue_button"]
+[ext_resource type="Texture2D" uid="uid://bm2vyd4mxlsaj" path="res://assets/art/ui_new/btn_mihuang_da.png" id="15_message_back"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="16_label20"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="17_label24"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="18_label28"]
+[ext_resource type="PackedScene" uid="uid://d4c01tu5e581m" path="res://scenes/sim/inventory_overlay.tscn" id="19_breup"]
 
-[node name="CaveHub" type="Control"]
+[sub_resource type="StyleBoxFlat" id="Style_panel"]
+bg_color = Color(1, 0.933333, 0.823529, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.333333, 0.196078, 0.184314, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0.258824, 0.145098, 0.105882, 0.3)
+shadow_size = 8
+
+[node name="CaveHub" type="Control" unique_id=1187446055]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,4 +42,408 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("2_theme")
-script = ExtResource("1")
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=962241750]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ProfilePanel" type="Panel" parent="." unique_id=240799206]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 16.0
+offset_right = 270.0
+offset_bottom = 112.0
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="Title" type="Label" parent="ProfilePanel" unique_id=2141488932]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 12.0
+offset_right = 232.0
+offset_bottom = 45.0
+text = "清风洞府"
+label_settings = ExtResource("18_label28")
+horizontal_alignment = 1
+
+[node name="RealmLabel" type="Label" parent="ProfilePanel" unique_id=1463564457]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 53.0
+offset_right = 236.0
+offset_bottom = 82.0
+text = "炼气一层 · 修为 0/100"
+label_settings = ExtResource("16_label20")
+horizontal_alignment = 1
+
+[node name="StatusPanel" type="Panel" parent="." unique_id=144307130]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 402.0
+offset_top = 16.0
+offset_right = -402.0
+offset_bottom = 83.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="StatusLabel" type="Label" parent="StatusPanel" unique_id=193195899]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_right = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "第 1 日  |  灵石 0  |  气血 100/100  |  法力 100/100"
+label_settings = ExtResource("16_label20")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Furnace" type="TextureRect" parent="." unique_id=2146814888]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 424.0
+offset_right = 269.0
+offset_bottom = 599.0
+mouse_filter = 2
+texture = ExtResource("4_furnace")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Chest" type="TextureRect" parent="." unique_id=931958143]
+layout_mode = 0
+offset_left = 359.0
+offset_top = 404.0
+offset_right = 488.0
+offset_bottom = 532.0
+mouse_filter = 2
+texture = ExtResource("5_chest")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Lamp" type="TextureRect" parent="." unique_id=88140575]
+layout_mode = 0
+offset_left = 515.0
+offset_top = 408.0
+offset_right = 582.0
+offset_bottom = 494.0
+mouse_filter = 2
+texture = ExtResource("6_lamp")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Mat" type="TextureRect" parent="." unique_id=129589927]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -13.0
+offset_top = -299.0
+offset_right = 148.0
+offset_bottom = -204.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+texture = ExtResource("7_mat")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Bed" type="TextureRect" parent="." unique_id=1845389963]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -281.0
+offset_top = -345.0
+offset_right = -96.0
+offset_bottom = -206.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+texture = ExtResource("8_bed")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="FurnaceButton" type="TextureButton" parent="." unique_id=781328250]
+layout_mode = 0
+offset_left = 116.0
+offset_top = 350.0
+offset_right = 242.0
+offset_bottom = 416.0
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="FurnaceButton" unique_id=974668784]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "炼丹"
+label_settings = ExtResource("17_label24")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StorageButton" type="TextureButton" parent="." unique_id=2024447570]
+layout_mode = 0
+offset_left = 369.0
+offset_top = 335.0
+offset_right = 495.0
+offset_bottom = 401.0
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="StorageButton" unique_id=531631224]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "储物"
+label_settings = ExtResource("17_label24")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CultivateObjectButton" type="TextureButton" parent="." unique_id=1442375708]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_top = -382.0
+offset_right = 126.0
+offset_bottom = -316.0
+grow_horizontal = 2
+grow_vertical = 0
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="CultivateObjectButton" unique_id=927340752]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "修炼"
+label_settings = ExtResource("17_label24")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RestButton" type="TextureButton" parent="." unique_id=1299526767]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -248.0
+offset_top = -417.0
+offset_right = -122.0
+offset_bottom = -351.0
+grow_horizontal = 0
+grow_vertical = 0
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="RestButton" unique_id=386144629]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "休息"
+label_settings = ExtResource("17_label24")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ExpeditionObjectButton" type="TextureButton" parent="." unique_id=416321749]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -350.0
+offset_top = -596.0
+offset_right = -224.0
+offset_bottom = -530.0
+grow_horizontal = 0
+grow_vertical = 0
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="ExpeditionObjectButton" unique_id=330289364]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "历练"
+label_settings = ExtResource("17_label24")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BackpackButton" type="TextureButton" parent="." unique_id=1155588514]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -116.0
+offset_top = -130.0
+offset_right = -21.0
+offset_bottom = -39.0
+grow_horizontal = 0
+grow_vertical = 0
+texture_normal = ExtResource("9_bag")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("12_av2rb")
+
+[node name="BottomActions" type="HBoxContainer" parent="." unique_id=720273206]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 326.0
+offset_top = -132.0
+offset_right = -304.0
+offset_bottom = -34.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 25
+alignment = 1
+
+[node name="CultivateButton" type="TextureButton" parent="BottomActions" unique_id=1149458252]
+custom_minimum_size = Vector2(200, 98)
+layout_mode = 2
+texture_normal = ExtResource("12_green_button")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="BottomActions/CultivateButton" unique_id=246962866]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "修炼"
+label_settings = ExtResource("18_label28")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BreakthroughButton" type="TextureButton" parent="BottomActions" unique_id=154044267]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 98)
+layout_mode = 2
+texture_normal = ExtResource("13_yellow_button")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="BottomActions/BreakthroughButton" unique_id=323072190]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "突破"
+label_settings = ExtResource("18_label28")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ExpeditionButton" type="TextureButton" parent="BottomActions" unique_id=897574208]
+custom_minimum_size = Vector2(200, 98)
+layout_mode = 2
+texture_normal = ExtResource("14_blue_button")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="BottomActions/ExpeditionButton" unique_id=548210536]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "历练"
+label_settings = ExtResource("18_label28")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MessageBack" type="NinePatchRect" parent="." unique_id=452448490]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = -102.0
+offset_right = -987.0
+offset_bottom = -9.0
+grow_horizontal = 2
+grow_vertical = 0
+texture = ExtResource("15_message_back")
+patch_margin_left = 134
+patch_margin_top = 17
+patch_margin_right = 52
+patch_margin_bottom = 20
+
+[node name="MessageLabel" type="Label" parent="MessageBack" unique_id=1365221689]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_right = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "洞府清幽，宜静心修行。"
+label_settings = ExtResource("16_label20")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="InventoryOverlay" parent="." unique_id=484445740 instance=ExtResource("19_breup")]
+unique_name_in_owner = true
+layout_mode = 0
+anchors_preset = 0

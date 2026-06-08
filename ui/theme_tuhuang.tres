@@ -1,6 +1,5 @@
 [gd_resource type="Theme" format=3 uid="uid://cqcxyqjqsly8l"]
 
-[ext_resource type="FontFile" uid="uid://bkguhrgvgbi3w" path="res://assets/art/AlimamaDongFangDaKai-Regular.ttf" id="1_beab3"]
 [ext_resource type="StyleBox" uid="uid://cukkt0r66d47a" path="res://ui/btn.tres" id="2_tsa77"]
 [ext_resource type="FontFile" uid="uid://btkp4vukwqrul" path="res://assets/art/AlimamaDaoLiTi.ttf" id="3_tsa77"]
 
@@ -117,8 +116,8 @@ _source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"8\"><
 
 [resource]
 Button/colors/font_color = Color(0.54901963, 0.42745098, 0.3019608, 1)
-Button/font_sizes/font_size = 22
-Button/fonts/font = ExtResource("1_beab3")
+Button/font_sizes/font_size = 16
+Button/fonts/font = ExtResource("3_tsa77")
 Button/styles/hover = ExtResource("2_tsa77")
 Button/styles/hover_pressed = ExtResource("2_tsa77")
 Button/styles/normal = ExtResource("2_tsa77")

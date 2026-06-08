@@ -23,15 +23,15 @@ TipsHost="*res://scripts/ui/tips_host.gd"
 HoverTipHost="*res://scripts/ui/hover/hover_tip_host.gd"
 SaveService="*res://scripts/sim/save_service.gd"
 GameState="*res://scripts/sim/game_state.gd"
+ViewportScaleProbe="*res://scripts/debug/viewport_scale_probe.gd"
+ExpeditionState="*res://scripts/expedition/expedition_state.gd"
 
 [display]
 
 window/size/viewport_width=1280
 window/size/viewport_height=800
-window/size/resizable=true
-window/stretch/mode="viewport"
-window/stretch/aspect="keep"
-window/stretch/scale_mode="fractional"
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 
 [physics]
 

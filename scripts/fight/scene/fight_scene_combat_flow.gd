@@ -240,7 +240,10 @@ func return_battle_end(ctx: FightSceneContext, hud: FightSceneHud, reason: Strin
 		}
 		if ctx.scene.has_signal("battle_finished"):
 			ctx.scene.emit_signal("battle_finished", summary)
-		hud.show_battle_result(ctx, summary)
+		var display_summary := summary.duplicate(true)
+		if ExpeditionState != null and ExpeditionState.active and ExpeditionState.phase == "battle":
+			display_summary["rewards"] = ExpeditionState.pending_battle_rewards.duplicate(true)
+		hud.show_battle_result(ctx, display_summary)
 	BattleDebugLog.write("结束", "战斗结束", {
 		"原因": BattleDebugLog.end_reason_label(reason),
 		"玩家生命": ctx.domain.player.hp,

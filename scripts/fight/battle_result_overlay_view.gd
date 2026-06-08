@@ -4,6 +4,8 @@ extends Control
 signal close_requested
 
 const BattleRecordTypesScript := preload("res://scripts/fight/battle_record_types.gd")
+const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
+const ItemDefScript := preload("res://scripts/core/item_def.gd")
 
 @onready var _body: RichTextLabel = %BattleResultBody
 @onready var _btn_close: Button = %BattleResultClose
@@ -40,13 +42,8 @@ func apply_summary(summary: Dictionary, formatter, entries_tail: Array = [], nam
 	_sync_outcome_visual(str(summary.get("outcome", "")).strip_edges())
 
 	if _body == null:
-		_sync_rewards(summary.get("rewards", []))
+		_sync_rewards(_loot_rewards(summary.get("rewards", [])))
 		return
-
-	_body.bbcode_enabled = true
-	var blocks: PackedStringArray = PackedStringArray()
-	if formatter != null:
-		blocks.append(str(formatter.format_summary(summary)))
 
 	_log_formatter = formatter
 	_log_entries = entries_tail.duplicate()
@@ -54,8 +51,9 @@ func apply_summary(summary: Dictionary, formatter, entries_tail: Array = [], nam
 	_hide_log_popup()
 	_sync_log_button()
 
-	_body.text = "\n".join(blocks).strip_edges()
-	_sync_rewards(summary.get("rewards", []))
+	_body.bbcode_enabled = false
+	_body.text = _format_gain_body(summary.get("rewards", []))
+	_sync_rewards(_loot_rewards(summary.get("rewards", [])))
 
 
 func _sync_log_button() -> void:
@@ -121,6 +119,35 @@ func _prepare_reward_template() -> void:
 		_reward_template.call("set_click_enabled", false)
 
 
+func _format_gain_body(rewards_v: Variant) -> String:
+	var cultivation_gain := 0
+	var ling_stones_gain := 0
+	var rewards: Array = rewards_v as Array if rewards_v is Array else []
+	for row_v in rewards:
+		if not row_v is Dictionary:
+			continue
+		var row := row_v as Dictionary
+		var kind := str(row.get("kind", "item"))
+		var count := maxi(0, int(row.get("count", 0)))
+		if kind == "currency" and str(row.get("id", "")) == "ling_stones":
+			ling_stones_gain += count
+		elif kind == "cultivation":
+			cultivation_gain += count
+	return "修为 +%d\t\t灵石 +%d" % [cultivation_gain, ling_stones_gain]
+
+
+func _loot_rewards(rewards_v: Variant) -> Array:
+	var rewards: Array = rewards_v as Array if rewards_v is Array else []
+	var out: Array = []
+	for row_v in rewards:
+		if not row_v is Dictionary:
+			continue
+		var kind := str((row_v as Dictionary).get("kind", "item"))
+		if kind == "item" or kind == "equip":
+			out.append(row_v)
+	return out
+
+
 func _sync_rewards(rewards_v: Variant) -> void:
 	if _rewards == null:
 		return
@@ -172,19 +199,50 @@ func _make_reward_item() -> ItemView:
 func _apply_reward_row(view: ItemView, row: Dictionary) -> void:
 	if view == null:
 		return
-	var item_name := str(row.get("name", row.get("item_name", row.get("id", "奖励")))).strip_edges()
-	var count := int(row.get("count", row.get("amount", 1)))
+	var kind := str(row.get("kind", "item"))
+	var count := maxi(1, int(row.get("count", row.get("amount", 1))))
+	var item_name := str(row.get("name", row.get("item_name", ""))).strip_edges()
+	var quality := str(row.get("quality", row.get("pin_zhi", ""))).strip_edges()
 	var icon: Texture2D = null
 	var icon_v: Variant = row.get("icon")
 	if icon_v is Texture2D:
 		icon = icon_v
+	elif kind == "equip":
+		var equip_cfg := _equip_cfg(int(row.get("id", -1)))
+		if item_name == "":
+			item_name = str(equip_cfg.get("name", "法宝"))
+		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
+		if quality == "":
+			quality = _quality_label_from_int(int(equip_cfg.get("quality", 1)))
+	elif kind == "item":
+		var item_id := str(row.get("id", ""))
+		if item_name == "" and ConfigManager != null:
+			item_name = str(ConfigManager.get_item_display_name(item_id))
+		if ConfigManager != null:
+			var def := ConfigManager.item_def_by_id(item_id)
+			if def != null:
+				icon = ItemDefScript.resolve_icon_texture(def.icon_path, null)
+				if quality == "":
+					quality = def.rarity
 	else:
+		if item_name == "":
+			item_name = str(row.get("id", "奖励"))
 		var path := str(row.get("icon_path", row.get("icon", ""))).strip_edges()
 		if path != "":
-			var loaded := load(path)
-			if loaded is Texture2D:
-				icon = loaded as Texture2D
-	var quality := str(row.get("quality", row.get("pin_zhi", ""))).strip_edges()
-	view.apply_display(icon, item_name, maxi(1, count), Color.WHITE, quality)
+			icon = ItemDefScript.resolve_icon_texture(path, null)
+	view.apply_display(icon, item_name, count, Color.WHITE, quality)
 	view.show_name_label = true
 
+
+func _equip_cfg(equip_id: int) -> Dictionary:
+	if ConfigManager != null and ConfigManager.has_method("equip_by_id"):
+		return ConfigManager.equip_by_id(equip_id) as Dictionary
+	return {}
+
+
+func _quality_label_from_int(quality: int) -> String:
+	if quality >= 5:
+		return "传说"
+	if quality >= 3:
+		return "稀有"
+	return ""
