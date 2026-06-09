@@ -1,13 +1,15 @@
 extends CanvasLayer
 
-## 全局提示入口：接收 DataEvents 的 tip_intent 并交给 TipBus 策略化处理（战斗 combat_block 通道）。
+## 全局提示入口：接收 DataEvents 的 tip_intent 并交给 TipBus 策略化处理（bar / combat_block 通道）。
 
 const TipIntentScript := preload("res://scripts/ui/tips/core/tip_intent.gd")
 const TipMetricsScript := preload("res://scripts/ui/tips/core/tip_metrics.gd")
 const TipPolicyEngineScript := preload("res://scripts/ui/tips/core/tip_policy_engine.gd")
 const TipRouterScript := preload("res://scripts/ui/tips/core/tip_router.gd")
 const TipBusScript := preload("res://scripts/ui/tips/core/tip_bus.gd")
+const BarTipPresenterScript := preload("res://scripts/ui/tips/presenter/bar_tip_presenter.gd")
 const CombatBlockPresenterScript := preload("res://scripts/ui/tips/presenter/combat_block_presenter.gd")
+const TipBarScene := preload("res://scenes/ui/tip_bar.tscn")
 
 const POLICY_CFG_PATH := "res://data/ui/tip_policy.json"
 
@@ -51,6 +53,11 @@ func _setup_tip_runtime() -> void:
 	_router = TipRouterScript.new()
 	_bus = TipBusScript.new()
 	_policy.setup(_load_policy_config())
+	var bar_root := TipBarScene.instantiate() as Control
+	add_child(bar_root)
+	var bar_presenter := BarTipPresenterScript.new()
+	bar_presenter.setup(bar_root)
+	_router.register_presenter(TipIntentScript.CHANNEL_BAR, bar_presenter)
 	_router.register_presenter(TipIntentScript.CHANNEL_COMBAT_BLOCK, CombatBlockPresenterScript.new())
 	_bus.setup(_policy, _router, _metrics)
 

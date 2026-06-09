@@ -78,7 +78,13 @@ func _on_mouse_entered() -> void:
 
 
 func _on_mouse_exited() -> void:
-	if _target == null:
+	call_deferred("_request_hide")
+
+
+func _request_hide() -> void:
+	if _target == null or not is_instance_valid(_target):
+		return
+	if _target.get_global_rect().has_point(_target.get_global_mouse_position()):
 		return
 	_hover_depth = maxi(_hover_depth - 1, 0)
 	if _hover_depth > 0:

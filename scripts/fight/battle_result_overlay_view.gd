@@ -115,8 +115,9 @@ func _prepare_reward_template() -> void:
 	if _reward_template == null:
 		return
 	_reward_template.visible = false
-	if _reward_template.has_method("set_click_enabled"):
-		_reward_template.call("set_click_enabled", false)
+	if _reward_template is ItemView:
+		(_reward_template as ItemView).set_click_enabled(false)
+		(_reward_template as ItemView).show_info_on_click = false
 
 
 func _format_gain_body(rewards_v: Variant) -> String:
@@ -190,8 +191,8 @@ func _make_reward_item() -> ItemView:
 		return null
 	var copy := copy_v as ItemView
 	copy.visible = true
-	copy.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	copy.set_click_enabled(false)
+	copy.set_click_enabled(true)
+	copy.show_info_on_click = true
 	_rewards.add_child(copy)
 	return copy
 
@@ -208,7 +209,7 @@ func _apply_reward_row(view: ItemView, row: Dictionary) -> void:
 	if icon_v is Texture2D:
 		icon = icon_v
 	elif kind == "equip":
-		var equip_cfg := _equip_cfg(int(row.get("id", -1)))
+		var equip_cfg := ConfigManager.equip_by_id(int(row.get("id", -1)))
 		if item_name == "":
 			item_name = str(equip_cfg.get("name", "法宝"))
 		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
@@ -232,12 +233,7 @@ func _apply_reward_row(view: ItemView, row: Dictionary) -> void:
 			icon = ItemDefScript.resolve_icon_texture(path, null)
 	view.apply_display(icon, item_name, count, Color.WHITE, quality)
 	view.show_name_label = true
-
-
-func _equip_cfg(equip_id: int) -> Dictionary:
-	if ConfigManager != null and ConfigManager.has_method("equip_by_id"):
-		return ConfigManager.equip_by_id(equip_id) as Dictionary
-	return {}
+	view.set_info_entry(ItemView.entry_from_reward_row(row))
 
 
 func _quality_label_from_int(quality: int) -> String:

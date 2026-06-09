@@ -1,5 +1,7 @@
 extends Control
 
+const ExpeditionBattleFlow := preload("res://scripts/expedition/expedition_battle_flow.gd")
+
 ## 战斗场景编排层：布局在 [code]fightScene.tscn[/code]，逻辑按职责拆至 [code]scripts/fight/scene/[/code]。
 ## 域层 [BattleDomainService]、表现 [FightScenePresentation]、HUD [FightSceneHud] 各司其职。
 
@@ -173,7 +175,7 @@ func _exit_tree() -> void:
 	BattleDebugLog.clear_domain()
 
 
-## 由 [BattleInitData.resolve] 消费进战数据；外部请 [BattleInitData.set_pending] / [method goto_fight_scene]。
+## 由 [BattleInitData.resolve] 消费进战数据；外部请 [SceneManager.go_fight] 写入 pending 并切场景。
 func initialize_battle(data: Dictionary) -> bool:
 	return FightSceneBootstrap.initialize_battle(_ctx, _hud, data)
 
@@ -263,17 +265,14 @@ func _on_vfx_queue_finished() -> void:
 
 
 func _on_battle_result_close_requested() -> void:
-	if ExpeditionState != null and ExpeditionState.active and ExpeditionState.phase == "battle":
-		ExpeditionState.settle_pending_battle()
-		if ExpeditionState.should_go_to_result():
-			var reason := ExpeditionState.pending_exit_reason if ExpeditionState.pending_exit_reason != "" else "defeated"
-			SceneManager.go_expedition_result(reason)
-		else:
-			SceneManager.go_expedition_loop()
+	if ExpeditionBattleFlow.is_expedition_source(_ctx.battle_source):
+		ExpeditionBattleFlow.handle_result_close()
 		return
 	_hud.hide_battle_result()
 
 
 func _on_battle_finished(summary: Dictionary) -> void:
-	if ExpeditionState != null and ExpeditionState.active and ExpeditionState.phase == "battle":
-		ExpeditionState.receive_battle_summary(summary)
+	if ExpeditionBattleFlow.is_expedition_source(_ctx.battle_source):
+		ExpeditionBattleFlow.handle_battle_finished(summary)
+		return
+	GameState.apply_battle_player_runtime(summary)

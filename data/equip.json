@@ -5,7 +5,7 @@
       "icon": "ui_new/jian.png",
       "quality": 4,
       "cd_total": 6,
-      "effects": [{"type": "damage", "value": 18, "target": "enemy"}]
+      "effects": [{"type": "damage", "value": 518, "target": "enemy"}]
     },
     "5002": {
       "name": "寒潭珠",

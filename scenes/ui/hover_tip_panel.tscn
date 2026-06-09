@@ -8,16 +8,14 @@
 [node name="HoverTipPanel" type="Control"]
 layout_mode = 3
 anchors_preset = 0
-offset_right = 200.0
-offset_bottom = 120.0
 mouse_filter = 2
 script = ExtResource("1_panel")
 
 [node name="Panel" type="PanelContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 0
-offset_right = 200.0
-offset_bottom = 120.0
+offset_right = 1.0
+offset_bottom = 1.0
 theme_override_styles/panel = ExtResource("2_style")
 
 [node name="Margin" type="MarginContainer" parent="Panel"]
@@ -54,6 +52,7 @@ vertical_alignment = 1
 [node name="Body" type="Label" parent="Panel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.4117647, 0.3019608, 0.27450982, 1)
 text = "描述行"
 label_settings = ExtResource("4_body")
@@ -62,6 +61,7 @@ autowrap_mode = 3
 [node name="Footer" type="Label" parent="Panel/Margin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.5372549, 0.42745098, 0.3882353, 1)
 label_settings = ExtResource("4_body")
 autowrap_mode = 3

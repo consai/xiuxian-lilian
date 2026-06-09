@@ -35,7 +35,6 @@ signal sort_requested(entries: Array)
 var _entries: Array = []
 var _filtered_cache: Array = []
 var _active_tab: TabFilter = TabFilter.ALL
-var _selected_index: int = -1
 var _window_start: int = -1
 var _slot_pool: Array[ItemView] = []
 var _row_height: float = 96.0
@@ -66,7 +65,6 @@ func set_title(text: String) -> void:
 
 func set_entries(entries: Array) -> void:
 	_entries = _normalize_entries(entries)
-	_selected_index = -1
 	if is_node_ready():
 		_scroll.scroll_vertical = 0
 		_refresh()
@@ -181,7 +179,7 @@ func _create_slot_view() -> ItemView:
 		node.queue_free()
 		return null
 	var view := node as ItemView
-	view.show_name_label = false
+	view.show_name_label = true
 	view.click_enabled = true
 	_grid.add_child(view)
 	return view
@@ -192,6 +190,7 @@ func _bind_empty(view: ItemView) -> void:
 		return
 	_disconnect_slot(view)
 	view.apply_empty(null, Color(1, 1, 1, 0))
+	view.show_info_on_click = false
 	view.set_click_enabled(false)
 
 
@@ -205,7 +204,7 @@ func _bind_entry(view: ItemView, entry: Dictionary, index: int) -> void:
 	var count := maxi(1, int(entry.get("count", 1)))
 	var kind := str(entry.get("kind", "item"))
 	if kind == "equip":
-		var equip_cfg := _equip_cfg(int(entry.get("id", -1)))
+		var equip_cfg := ConfigManager.equip_by_id(int(entry.get("id", -1)))
 		if item_name == "":
 			item_name = str(equip_cfg.get("name", "法宝"))
 		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
@@ -222,8 +221,9 @@ func _bind_entry(view: ItemView, entry: Dictionary, index: int) -> void:
 				if quality == "":
 					quality = def.rarity
 	view.apply_display(icon, item_name, count, Color.WHITE, quality)
+	view.show_info_on_click = show_info_on_click
+	view.set_info_entry(entry)
 	view.set_click_enabled(true)
-	_set_selected(view, index == _selected_index, entry)
 	view.clicked.connect(_on_slot_clicked.bind(index))
 	view.right_clicked.connect(_on_slot_right_clicked.bind(index))
 
@@ -240,16 +240,7 @@ func _disconnect_slot(view: ItemView) -> void:
 func _on_slot_clicked(index: int) -> void:
 	if index < 0 or index >= _filtered_cache.size():
 		return
-	_selected_index = index
-	for i in _slot_pool.size():
-		var data_index := _window_start + i
-		if data_index >= _filtered_cache.size():
-			break
-		_set_selected(_slot_pool[i], data_index == _selected_index, _filtered_cache[data_index] as Dictionary)
-	var entry := (_filtered_cache[index] as Dictionary).duplicate(true)
-	entry_clicked.emit(entry)
-	if show_info_on_click:
-		ItemInfoPopupHost.show_entry(entry)
+	entry_clicked.emit((_filtered_cache[index] as Dictionary).duplicate(true))
 
 
 func _on_slot_right_clicked(index: int) -> void:
@@ -258,37 +249,14 @@ func _on_slot_right_clicked(index: int) -> void:
 	entry_right_clicked.emit((_filtered_cache[index] as Dictionary).duplicate(true))
 
 
-func _set_selected(view: ItemView, selected: bool, entry: Dictionary = {}) -> void:
-	if view == null:
-		return
-	var highlight := view.get_node_or_null("%GcItemHighlight") as Panel
-	if highlight == null:
-		return
-	if selected:
-		highlight.visible = true
-		highlight.self_modulate = Color(0.109804, 0.596078, 1.0)
-		return
-	match str(entry.get("quality", "")).strip_edges():
-		"稀有":
-			highlight.visible = true
-			highlight.self_modulate = Color(0.45, 0.72, 1.0)
-		"传说":
-			highlight.visible = true
-			highlight.self_modulate = Color(1.0, 0.82, 0.35)
-		_:
-			highlight.visible = false
-
-
 func _on_tab_pressed(tab: TabFilter) -> void:
 	_set_active_tab(tab)
-	_selected_index = -1
 	_scroll.scroll_vertical = 0
 	_refresh()
 
 
 func _on_sort_pressed() -> void:
 	_entries.sort_custom(_compare_entries)
-	_selected_index = -1
 	_scroll.scroll_vertical = 0
 	_refresh()
 	sort_requested.emit(_entries.duplicate(true))
@@ -345,7 +313,7 @@ static func _normalize_entries(entries: Array) -> Array:
 			row["kind"] = "equip"
 			row["count"] = 1
 			if not row.has("sort_name"):
-				row["sort_name"] = str(_equip_cfg(int(row.get("id", -1))).get("name", "法宝"))
+				row["sort_name"] = str(ConfigManager.equip_by_id(int(row.get("id", -1))).get("name", "法宝"))
 			if not row.has("item_type"):
 				row["item_type"] = EnumItemTypeScript.LABEL_EQUIP
 		else:
@@ -388,7 +356,7 @@ static func _entry_from_item(item_id: String, count: int) -> Dictionary:
 static func _entry_from_equip(equip_id: int) -> Dictionary:
 	if equip_id <= 0:
 		return {}
-	var cfg := _equip_cfg(equip_id)
+	var cfg := ConfigManager.equip_by_id(equip_id)
 	var equip_name := str(cfg.get("name", "法宝"))
 	return {
 		"kind": "equip",
@@ -420,12 +388,6 @@ static func _item_def(item_id: String) -> ItemDef:
 	if ConfigManager != null:
 		return ConfigManager.item_def_by_id(item_id)
 	return null
-
-
-static func _equip_cfg(equip_id: int) -> Dictionary:
-	if ConfigManager != null and ConfigManager.has_method("equip_by_id"):
-		return ConfigManager.equip_by_id(equip_id) as Dictionary
-	return {}
 
 
 static func _quality_label_from_int(quality: int) -> String:

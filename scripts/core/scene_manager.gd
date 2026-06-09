@@ -6,6 +6,7 @@ const EXPEDITION_LOOP := "expedition_loop"
 const EXPEDITION_RESULT := "expedition_result"
 const FIGHT := "fight"
 const BREAKTHROUGH_SUMMARY := "breakthrough_summary"
+const CHARACTER_ATTRIBUTES_PANEL := "character_attributes_panel"
 
 const SCENE_PATHS := {
 	HUB: "res://scenes/sim/cave_hub.tscn",
@@ -14,13 +15,10 @@ const SCENE_PATHS := {
 	EXPEDITION_RESULT: "res://scenes/expedition/expedition_result.tscn",
 	FIGHT: "res://scenes/fightScene.tscn",
 	BREAKTHROUGH_SUMMARY: "res://scenes/sim/breakthrough_summary.tscn",
+	CHARACTER_ATTRIBUTES_PANEL: "res://scenes/ui/character_attributes_panel.tscn",
 }
 
 const _BLOCKED_EXPEDITION_ACTIVE := "当前仍在历练中，请先完成或结算后再操作。"
-
-
-func _ds() -> Node:
-	return _autoload("DataStore")
 
 
 func _game_state() -> Node:
@@ -29,6 +27,10 @@ func _game_state() -> Node:
 
 func _expedition_state() -> Node:
 	return _autoload("ExpeditionState")
+
+
+func _data_store() -> Node:
+	return _autoload("DataStore")
 
 
 func _autoload(node_name: String) -> Node:
@@ -88,6 +90,17 @@ func go_breakthrough_summary(summary: Dictionary) -> Dictionary:
 	return go_to(BREAKTHROUGH_SUMMARY, payload)
 
 
+func go_character_attributes_panel() -> Dictionary:
+	return go_to(CHARACTER_ATTRIBUTES_PANEL)
+
+
+func go_back(fallback_scene_id: String = HUB, options: Dictionary = {}) -> Dictionary:
+	var previous_id := str(_data_store().scene_runtime().get("previous_id", ""))
+	if previous_id != "" and SCENE_PATHS.has(previous_id):
+		return go_to(previous_id, {}, options)
+	return go_to(fallback_scene_id, {}, options)
+
+
 func go_fight(battle_data: Dictionary, source: String = "scene_manager") -> Dictionary:
 	var merged := BattleInitData.merge_skill_cfg_from_tables(battle_data)
 	var errors := BattleInitData.collect_errors(merged)
@@ -99,16 +112,16 @@ func go_fight(battle_data: Dictionary, source: String = "scene_manager") -> Dict
 	BattleInitData.set_pending(get_tree(), merged, source)
 	var nav := _perform_transition(FIGHT, {})
 	if not bool(nav.get("ok", false)):
-		_ds().battle_runtime()["pending_init"] = {}
+		_data_store().battle_runtime()["pending_init"] = {}
 	return nav
 
 
 func take_payload(scene_id: String) -> Dictionary:
-	return _ds().take_scene_payload(scene_id)
+	return _data_store().take_scene_payload(scene_id)
 
 
 func peek_payload(scene_id: String) -> Dictionary:
-	return _ds().peek_scene_payload(scene_id)
+	return _data_store().peek_scene_payload(scene_id)
 
 
 func _guard_enter(scene_id: String, options: Dictionary) -> Dictionary:
@@ -140,14 +153,14 @@ func _guard_enter(scene_id: String, options: Dictionary) -> Dictionary:
 
 
 func _preflight_transition() -> Dictionary:
-	var scene_rt: Dictionary = _ds().scene_runtime()
+	var scene_rt: Dictionary = _data_store().scene_runtime()
 	if bool(scene_rt.get("transitioning", false)):
 		return {"ok": false, "error": "transition_in_progress"}
 	return {"ok": true}
 
 
 func _perform_transition(scene_id: String, payload: Dictionary) -> Dictionary:
-	var scene_rt: Dictionary = _ds().scene_runtime()
+	var scene_rt: Dictionary = _data_store().scene_runtime()
 	if bool(scene_rt.get("transitioning", false)):
 		return {"ok": false, "error": "transition_in_progress"}
 	var path := str(SCENE_PATHS.get(scene_id, ""))
@@ -155,7 +168,7 @@ func _perform_transition(scene_id: String, payload: Dictionary) -> Dictionary:
 		return {"ok": false, "error": "unknown_scene_id:%s" % scene_id}
 	scene_rt["transitioning"] = true
 	if not payload.is_empty():
-		_ds().set_scene_payload(scene_id, payload)
+		_data_store().set_scene_payload(scene_id, payload)
 	scene_rt["previous_id"] = str(scene_rt.get("current_id", ""))
 	scene_rt["current_id"] = scene_id
 	var history_v: Variant = scene_rt.get("history", [])
@@ -169,4 +182,4 @@ func _perform_transition(scene_id: String, payload: Dictionary) -> Dictionary:
 
 func _release_transition_lock() -> void:
 	await get_tree().process_frame
-	_ds().scene_runtime()["transitioning"] = false
+	_data_store().scene_runtime()["transitioning"] = false

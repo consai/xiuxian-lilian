@@ -1,76 +1,93 @@
 extends Node
 
-const LOOP_SCENE := "res://scenes/expedition/expedition_loop.tscn"
-const RESULT_SCENE := "res://scenes/expedition/expedition_result.tscn"
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
 const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
-func _ds() -> Node:
-	return DataStore
+const ExpeditionDirectorServiceScript := preload("res://scripts/expedition/expedition_director_service.gd")
+const ExpeditionLogServiceScript := preload("res://scripts/expedition/expedition_log_service.gd")
 
+signal log_updated
+
+var _pending_log_index := -1
+var _pending_step_event: Dictionary = {}
 
 var active: bool:
-	get: return bool(_ds().expedition_runtime().get("active", false))
-	set(value): _ds().expedition_runtime()["active"] = value
+	get: return bool(DataStore.expedition_runtime().get("active", false))
+	set(value): DataStore.expedition_runtime()["active"] = value
 var phase: String:
-	get: return str(_ds().expedition_runtime().get("phase", "idle"))
-	set(value): _ds().expedition_runtime()["phase"] = value
+	get: return str(DataStore.expedition_runtime().get("phase", "idle"))
+	set(value): DataStore.expedition_runtime()["phase"] = value
 var location_id: String:
-	get: return str(_ds().expedition_runtime().get("location_id", ""))
-	set(value): _ds().expedition_runtime()["location_id"] = value
+	get: return str(DataStore.expedition_runtime().get("location_id", ""))
+	set(value): DataStore.expedition_runtime()["location_id"] = value
+var journey_step: int:
+	get: return int(DataStore.expedition_runtime().get("journey_step", 0))
+	set(value): DataStore.expedition_runtime()["journey_step"] = value
+var active_chain_id: String:
+	get: return str(DataStore.expedition_runtime().get("active_chain_id", ""))
+	set(value): DataStore.expedition_runtime()["active_chain_id"] = value
+var completed_events: Array:
+	get: return DataStore.expedition_runtime().get("completed_events", []) as Array
+	set(value): DataStore.expedition_runtime()["completed_events"] = value
 var depth: int:
-	get: return int(_ds().expedition_runtime().get("depth", 1))
-	set(value): _ds().expedition_runtime()["depth"] = value
+	get: return int(DataStore.expedition_runtime().get("depth", 1))
+	set(value): DataStore.expedition_runtime()["depth"] = value
 var steps: int:
-	get: return int(_ds().expedition_runtime().get("steps", 0))
-	set(value): _ds().expedition_runtime()["steps"] = value
+	get: return int(DataStore.expedition_runtime().get("steps", 0))
+	set(value): DataStore.expedition_runtime()["steps"] = value
 var seed: int:
-	get: return int(_ds().expedition_runtime().get("seed", 0))
-	set(value): _ds().expedition_runtime()["seed"] = value
+	get: return int(DataStore.expedition_runtime().get("seed", 0))
+	set(value): DataStore.expedition_runtime()["seed"] = value
 var rng_state: int:
-	get: return int(_ds().expedition_runtime().get("rng_state", 0))
-	set(value): _ds().expedition_runtime()["rng_state"] = value
+	get: return int(DataStore.expedition_runtime().get("rng_state", 0))
+	set(value): DataStore.expedition_runtime()["rng_state"] = value
 var runtime: Dictionary:
-	get: return _ds().expedition_runtime().get("runtime", {}) as Dictionary
-	set(value): _ds().expedition_runtime()["runtime"] = value
+	get: return DataStore.expedition_runtime().get("runtime", {}) as Dictionary
+	set(value): DataStore.expedition_runtime()["runtime"] = value
 var loot: Array:
-	get: return _ds().expedition_runtime().get("loot", []) as Array
-	set(value): _ds().expedition_runtime()["loot"] = value
+	get: return DataStore.expedition_runtime().get("loot", []) as Array
+	set(value): DataStore.expedition_runtime()["loot"] = value
 var current_choices: Array:
-	get: return _ds().expedition_runtime().get("current_choices", []) as Array
-	set(value): _ds().expedition_runtime()["current_choices"] = value
+	get: return DataStore.expedition_runtime().get("current_choices", []) as Array
+	set(value): DataStore.expedition_runtime()["current_choices"] = value
+var pending_decision_event: Dictionary:
+	get: return DataStore.expedition_runtime().get("pending_decision_event", {}) as Dictionary
+	set(value): DataStore.expedition_runtime()["pending_decision_event"] = value
 var current_event_id: String:
-	get: return str(_ds().expedition_runtime().get("current_event_id", ""))
-	set(value): _ds().expedition_runtime()["current_event_id"] = value
+	get: return str(DataStore.expedition_runtime().get("current_event_id", ""))
+	set(value): DataStore.expedition_runtime()["current_event_id"] = value
 var pending_battle_event_id: String:
-	get: return str(_ds().expedition_runtime().get("pending_battle_event_id", ""))
-	set(value): _ds().expedition_runtime()["pending_battle_event_id"] = value
+	get: return str(DataStore.expedition_runtime().get("pending_battle_event_id", ""))
+	set(value): DataStore.expedition_runtime()["pending_battle_event_id"] = value
 var pending_battle_summary: Dictionary:
-	get: return _ds().expedition_runtime().get("pending_battle_summary", {}) as Dictionary
-	set(value): _ds().expedition_runtime()["pending_battle_summary"] = value
+	get: return DataStore.expedition_runtime().get("pending_battle_summary", {}) as Dictionary
+	set(value): DataStore.expedition_runtime()["pending_battle_summary"] = value
 var pending_battle_rewards: Array:
-	get: return _ds().expedition_runtime().get("pending_battle_rewards", []) as Array
-	set(value): _ds().expedition_runtime()["pending_battle_rewards"] = value
+	get: return DataStore.expedition_runtime().get("pending_battle_rewards", []) as Array
+	set(value): DataStore.expedition_runtime()["pending_battle_rewards"] = value
 var visited_once_events: Array:
-	get: return _ds().expedition_runtime().get("visited_once_events", []) as Array
-	set(value): _ds().expedition_runtime()["visited_once_events"] = value
+	get: return DataStore.expedition_runtime().get("visited_once_events", []) as Array
+	set(value): DataStore.expedition_runtime()["visited_once_events"] = value
 var stats: Dictionary:
-	get: return _ds().expedition_runtime().get("stats", {}) as Dictionary
-	set(value): _ds().expedition_runtime()["stats"] = value
+	get: return DataStore.expedition_runtime().get("stats", {}) as Dictionary
+	set(value): DataStore.expedition_runtime()["stats"] = value
 var event_log: Array:
-	get: return _ds().expedition_runtime().get("event_log", []) as Array
-	set(value): _ds().expedition_runtime()["event_log"] = value
+	get: return DataStore.expedition_runtime().get("event_log", []) as Array
+	set(value): DataStore.expedition_runtime()["event_log"] = value
 var player_snapshot: Dictionary:
-	get: return _ds().expedition_runtime().get("player_snapshot", {}) as Dictionary
-	set(value): _ds().expedition_runtime()["player_snapshot"] = value
+	get: return DataStore.expedition_runtime().get("player_snapshot", {}) as Dictionary
+	set(value): DataStore.expedition_runtime()["player_snapshot"] = value
 var pending_exit_reason: String:
-	get: return str(_ds().expedition_runtime().get("pending_exit_reason", ""))
-	set(value): _ds().expedition_runtime()["pending_exit_reason"] = value
+	get: return str(DataStore.expedition_runtime().get("pending_exit_reason", ""))
+	set(value): DataStore.expedition_runtime()["pending_exit_reason"] = value
 var expedition_id: String:
-	get: return str(_ds().expedition_runtime().get("expedition_id", ""))
-	set(value): _ds().expedition_runtime()["expedition_id"] = value
+	get: return str(DataStore.expedition_runtime().get("expedition_id", ""))
+	set(value): DataStore.expedition_runtime()["expedition_id"] = value
+var start_day: int:
+	get: return int(DataStore.expedition_runtime().get("start_day", 0))
+	set(value): DataStore.expedition_runtime()["start_day"] = value
 var _rng := RandomNumberGenerator.new()
 var _game_state: Node = null
 
@@ -83,17 +100,22 @@ func start(location_id_value: String, game_state: Node, seed_override: int = -1)
 		return {"ok": false, "error": "未知地点"}
 	reset()
 	_game_state = game_state
+	start_day = int(game_state.day) if game_state != null else 0
 	expedition_id = _new_expedition_id()
 	location_id = location_id_value
+	journey_step = 0
+	active_chain_id = ""
+	completed_events = []
 	seed = seed_override if seed_override >= 0 else int(Time.get_unix_time_from_system()) % 2147483647
 	_rng.seed = seed
 	rng_state = _rng.state
 	active = true
-	phase = "choosing"
+	phase = "resolving"
 	depth = 1
 	steps = 0
 	loot = []
 	current_choices = []
+	pending_decision_event = {}
 	visited_once_events = []
 	event_log = []
 	stats = {
@@ -106,27 +128,179 @@ func start(location_id_value: String, game_state: Node, seed_override: int = -1)
 	}
 	player_snapshot = _copy_player_snapshot(game_state)
 	runtime = _copy_runtime_from_game(game_state)
-	current_choices = generate_choices()
-	return {"ok": true, "location": location, "choices": current_choices.duplicate(true)}
+	event_log.append(ExpeditionLogServiceScript.build_departure_entry(location))
+	return {"ok": true, "location": location}
 
 
-func generate_choices() -> Array:
+func advance_step() -> Dictionary:
+	var began := begin_next_step()
+	if not bool(began.get("ok", false)):
+		return began
+	if str(began.get("mode", "")) == "resolving":
+		return complete_current_step()
+	return began
+
+
+func begin_next_step() -> Dictionary:
 	if not active:
-		return []
+		return {"ok": false, "error": "历练未进行"}
+	if phase == "battle":
+		return {"ok": false, "error": "战斗进行中"}
+	if not _pending_step_event.is_empty():
+		return {"ok": false, "error": "上一步事件尚未结算"}
 	_restore_rng()
-	var location := LocationServiceScript.by_id(location_id)
-	current_choices = ExpeditionEventServiceScript.generate_choices(
-		location, depth, visited_once_events, _rng
+	var event := ExpeditionDirectorServiceScript.select_next_event(_director_context(), _rng)
+	_save_rng()
+	if event.is_empty():
+		pending_exit_reason = "journey_complete"
+		phase = "result"
+		return {"ok": true, "mode": "complete", "feedback": "本次历练已经结束"}
+	if ExpeditionEventServiceScript.is_decision_event(event):
+		_begin_log_event(event)
+		pending_decision_event = event.duplicate(true)
+		current_choices = ExpeditionEventServiceScript.decision_options_as_choices(event)
+		current_event_id = ""
+		phase = "choosing"
+		return {
+			"ok": true,
+			"mode": "decision",
+			"event": event,
+			"scene": ExpeditionLogServiceScript.event_scene(event),
+			"choices": current_choices.duplicate(true),
+		}
+	_pending_step_event = event.duplicate(true)
+	return _begin_auto_event(event)
+
+
+func complete_current_step() -> Dictionary:
+	if _pending_step_event.is_empty():
+		return {"ok": false, "error": "没有待结算的事件"}
+	var event := _pending_step_event.duplicate(true)
+	_pending_step_event = {}
+	return _resolve_auto_event_finish(event)
+
+
+func _begin_auto_event(event: Dictionary) -> Dictionary:
+	var chosen := event.duplicate(true)
+	current_event_id = str(chosen.get("id", ""))
+	current_choices = []
+	pending_decision_event = {}
+	phase = "resolving"
+	_begin_log_event(chosen)
+	var scene := ExpeditionLogServiceScript.event_scene(chosen)
+	var event_type := str(chosen.get("type", ""))
+	if ExpeditionRulesServiceScript.is_battle_type(event_type):
+		pending_battle_event_id = current_event_id
+		phase = "battle"
+		_pending_step_event = {}
+		var enemy_name := str((chosen.get("enemy", {}) as Dictionary).get("name", chosen.get("name", "强敌")))
+		var encounter := "%s拦住了去路，杀气扑面！" % enemy_name
+		return {
+			"ok": true,
+			"mode": "battle",
+			"type": "battle",
+			"event": chosen,
+			"scene": scene,
+			"outcome": encounter,
+			"feedback": encounter,
+		}
+	return {
+		"ok": true,
+		"mode": "resolving",
+		"event": chosen,
+		"scene": scene,
+	}
+
+
+func _resolve_auto_event_finish(event: Dictionary) -> Dictionary:
+	var chosen := event.duplicate(true)
+	current_event_id = str(chosen.get("id", ""))
+	_restore_rng()
+	var result := ExpeditionEventServiceScript.resolve_non_battle_event(
+		chosen, runtime, player_snapshot.get("attrs", {}) as Dictionary, depth, _rng
 	)
 	_save_rng()
-	phase = "choosing"
-	current_event_id = ""
-	return current_choices.duplicate(true)
+	if not bool(result.get("ok", false)):
+		_cancel_pending_log_entry()
+		phase = "choosing"
+		return result
+	var resolved_event := result.get("event", chosen) as Dictionary
+	_apply_step_after_event(
+		resolved_event,
+		result.get("rewards", []) as Array,
+		str(result.get("outcome", result.get("feedback", "")))
+	)
+	result["mode"] = "auto_done"
+	result["event"] = resolved_event
+	if pending_exit_reason == "":
+		phase = "resolving"
+	return result
 
 
-func choose_event(event_id: String) -> Dictionary:
-	if not active or phase != "choosing":
+func choose_event(choice_id: String) -> Dictionary:
+	if not active:
 		return {"ok": false, "error": "当前无法选择事件"}
+	if phase == "resolving" and pending_decision_event.is_empty():
+		return _resolve_manual_event_choice(choice_id)
+	if phase != "choosing":
+		return {"ok": false, "error": "当前无法选择事件"}
+	if not pending_decision_event.is_empty():
+		return _resolve_decision_choice(choice_id)
+	return _resolve_manual_event_choice(choice_id)
+
+
+func _resolve_decision_choice(choice_id: String) -> Dictionary:
+	var parent := pending_decision_event.duplicate(true)
+	var parsed := ExpeditionEventServiceScript.parse_decision_choice_id(choice_id)
+	var option_id := str(parsed.get("option_id", ""))
+	if option_id == "":
+		return {"ok": false, "error": "无效的抉择"}
+	var option := ExpeditionEventServiceScript.find_decision_option(parent, option_id)
+	if option.is_empty():
+		return {"ok": false, "error": "无效的抉择选项"}
+	pending_decision_event = {}
+	current_choices = []
+	current_event_id = str(parent.get("id", ""))
+	if pending_exit_reason == "":
+		phase = "resolving"
+	_restore_rng()
+	var result := ExpeditionEventServiceScript.resolve_decision_option(
+		parent,
+		option,
+		runtime,
+		player_snapshot.get("attrs", {}) as Dictionary,
+		depth,
+		_rng
+	)
+	_save_rng()
+	if not bool(result.get("ok", false)):
+		phase = "choosing"
+		pending_decision_event = parent
+		current_choices = ExpeditionEventServiceScript.decision_options_as_choices(parent)
+		return result
+	if str(result.get("type", "")) == "battle":
+		var battle_event := result.get("event", {}) as Dictionary
+		pending_battle_event_id = str(battle_event.get("id", ""))
+		phase = "battle"
+		result["mode"] = "battle"
+		_mark_once_per_expedition(parent)
+		return result
+	_mark_once_per_expedition(parent)
+	var log_event := result.get("event", parent) as Dictionary
+	_apply_step_after_event(
+		log_event,
+		result.get("rewards", []) as Array,
+		str(result.get("outcome", result.get("feedback", ""))),
+		str(result.get("log_name", log_event.get("name", "")))
+	)
+	result["mode"] = "auto_done"
+	result["event"] = log_event
+	if pending_exit_reason == "":
+		phase = "resolving"
+	return result
+
+
+func _resolve_manual_event_choice(event_id: String) -> Dictionary:
 	var chosen: Dictionary = {}
 	for choice_v in current_choices:
 		var choice := choice_v as Dictionary
@@ -134,27 +308,29 @@ func choose_event(event_id: String) -> Dictionary:
 			chosen = choice
 			break
 	if chosen.is_empty():
+		chosen = ExpeditionEventServiceScript.by_id(event_id)
+	if chosen.is_empty():
 		return {"ok": false, "error": "无效的事件选择"}
-	current_event_id = event_id
-	current_choices = [chosen]
+	current_choices = []
+	_begin_log_event(chosen)
 	var event_type := str(chosen.get("type", ""))
 	if ExpeditionRulesServiceScript.is_battle_type(event_type):
-		pending_battle_event_id = event_id
+		current_event_id = str(chosen.get("id", ""))
+		pending_battle_event_id = current_event_id
 		phase = "battle"
-		return {"ok": true, "type": "battle", "event": chosen}
-	phase = "resolving"
-	_restore_rng()
-	var result := ExpeditionEventServiceScript.resolve_non_battle_event(
-		chosen, runtime, player_snapshot.get("attrs", {}) as Dictionary, depth, _rng
-	)
-	_save_rng()
-	if not bool(result.get("ok", false)):
-		return result
-	_apply_step_after_event(chosen, result.get("rewards", []) as Array, str(result.get("feedback", "")))
-	phase = "choosing"
-	generate_choices()
-	result["choices"] = current_choices.duplicate(true)
-	return result
+		var enemy_name := str((chosen.get("enemy", {}) as Dictionary).get("name", chosen.get("name", "强敌")))
+		var encounter := "%s拦住了去路，杀气扑面！" % enemy_name
+		return {
+			"ok": true,
+			"mode": "battle",
+			"type": "battle",
+			"event": chosen,
+			"scene": ExpeditionLogServiceScript.event_scene(chosen),
+			"outcome": encounter,
+			"feedback": encounter,
+		}
+	_pending_step_event = chosen.duplicate(true)
+	return complete_current_step()
 
 
 func build_battle_init() -> Dictionary:
@@ -206,23 +382,45 @@ func settle_pending_battle() -> Dictionary:
 	var summary := pending_battle_summary
 	var event := ExpeditionEventServiceScript.by_id(pending_battle_event_id)
 	_sync_runtime_from_summary(summary)
+	_sync_battle_consumption_to_game(summary)
 	var won := str(summary.get("outcome", "")) == "win"
 	stats["battles"] = int(stats.get("battles", 0)) + 1
 	if won:
 		stats["wins"] = int(stats.get("wins", 0)) + 1
-		_apply_session_rewards(pending_battle_rewards)
+		var battle_rewards := pending_battle_rewards.duplicate(true)
+		_apply_session_rewards(battle_rewards)
 		pending_battle_rewards = []
 		if str(event.get("type", "")) == "boss":
 			stats["boss_defeated"] = true
 			if bool(event.get("once_per_expedition", false)):
 				visited_once_events.append(pending_battle_event_id)
-		_apply_step_after_event(event, [], "战斗胜利")
+		_apply_step_after_event(
+			event,
+			[],
+			ExpeditionLogServiceScript.build_battle_victory_outcome(event, battle_rewards)
+		)
 		pending_battle_event_id = ""
 		pending_battle_summary = {}
-		phase = "choosing"
-		generate_choices()
-		return {"ok": true, "won": true, "choices": current_choices.duplicate(true)}
+		if pending_exit_reason == "":
+			phase = "resolving"
+		current_choices = []
+		pending_decision_event = {}
+		return {"ok": true, "won": true, "mode": "auto_done", "event": event}
 	stats["losses"] = int(stats.get("losses", 0)) + 1
+	if not event.is_empty():
+		var defeat_outcome := ExpeditionLogServiceScript.build_battle_defeat_outcome(event)
+		if _pending_log_index >= 0:
+			_finish_pending_log_outcome(defeat_outcome)
+		else:
+			event_log.append(
+				ExpeditionLogServiceScript.build_battle_defeat_entry(
+					event,
+					journey_step + 1,
+					current_beat_name(),
+					depth
+				)
+			)
+			log_updated.emit()
 	pending_exit_reason = "defeated"
 	pending_battle_event_id = ""
 	pending_battle_summary = {}
@@ -233,7 +431,15 @@ func settle_pending_battle() -> Dictionary:
 
 
 func can_exit() -> bool:
-	return active and phase in ["choosing", "resolving"] and pending_exit_reason == ""
+	if not active or pending_exit_reason != "":
+		return false
+	if phase == "battle":
+		return false
+	if phase == "choosing":
+		return true
+	if phase == "resolving":
+		return pending_decision_event.is_empty() and pending_battle_event_id == ""
+	return false
 
 
 func clear_pending_battle() -> void:
@@ -241,8 +447,22 @@ func clear_pending_battle() -> void:
 	pending_battle_summary = {}
 	pending_battle_rewards = []
 	if phase == "battle":
-		phase = "choosing"
-		generate_choices()
+		phase = "resolving"
+		current_choices = []
+		pending_decision_event = {}
+
+
+func retreat_from_pending_battle() -> Dictionary:
+	if pending_battle_event_id == "" or phase != "battle":
+		return {"ok": false, "error": "没有待处理的战斗"}
+	var event := ExpeditionEventServiceScript.by_id(pending_battle_event_id)
+	clear_pending_battle()
+	if not event.is_empty():
+		var enemy_name := str((event.get("enemy", {}) as Dictionary).get("name", event.get("name", "强敌")))
+		_finish_pending_log_outcome(
+			"见%s来势凶猛，你当机立断，抽身撤退，结束本次历练。" % enemy_name
+		)
+	return {"ok": true, "event": event}
 
 
 func finish(exit_reason: String) -> Dictionary:
@@ -261,7 +481,6 @@ func finish(exit_reason: String) -> Dictionary:
 			)
 			_save_rng()
 			loot_lost = loss.get("lost", []) as Array
-			_sync_runtime_inventory_from_game()
 		var rules: Dictionary = ExpeditionRulesServiceScript.rules()
 		var hp_max := float((player_snapshot.get("attrs", {}) as Dictionary).get(FightAttr.HP_MAX, 100.0))
 		runtime["hp"] = maxf(float(runtime.get("hp", 0.0)), hp_max * float(rules.get("defeat_hp_floor_ratio", 0.25)))
@@ -269,6 +488,7 @@ func finish(exit_reason: String) -> Dictionary:
 		"ok": true,
 		"settlement_id": expedition_id,
 		"exit_reason": reason,
+		"start_day": start_day,
 		"elapsed_days": maxi(1, elapsed_days),
 		"hp": float(runtime.get("hp", 0.0)),
 		"mp": float(runtime.get("mp", 0.0)),
@@ -277,6 +497,8 @@ func finish(exit_reason: String) -> Dictionary:
 		"loot_lost": loot_lost,
 		"location_name": str(LocationServiceScript.by_id(location_id).get("name", location_id)),
 		"stats": stats.duplicate(true),
+		"chronicle": _build_chronicle(),
+		"world_changes": _world_changes(),
 	})
 	var result_errors := ExpeditionResult.collect_errors(result)
 	if not result_errors.is_empty():
@@ -286,7 +508,9 @@ func finish(exit_reason: String) -> Dictionary:
 
 
 func reset() -> void:
-	_ds().reset_expedition_runtime()
+	_pending_log_index = -1
+	_pending_step_event = {}
+	DataStore.reset_expedition_runtime()
 	_game_state = null
 
 
@@ -298,22 +522,96 @@ func should_go_to_result() -> bool:
 	return pending_exit_reason != "" or phase == "result"
 
 
-func _apply_step_after_event(event: Dictionary, extra_rewards: Array, feedback: String) -> void:
+func _mark_once_per_expedition(event: Dictionary) -> void:
+	if not bool(event.get("once_per_expedition", false)):
+		return
+	var event_id := str(event.get("id", ""))
+	if event_id != "" and not visited_once_events.has(event_id):
+		visited_once_events.append(event_id)
+
+
+func _begin_log_event(event: Dictionary, log_name: String = "") -> void:
+	var title := log_name.strip_edges()
+	if title == "":
+		title = str(event.get("name", ""))
+	var entry := ExpeditionLogServiceScript.build_event_entry(
+		event,
+		journey_step + 1,
+		current_beat_name(),
+		depth,
+		ExpeditionLogServiceScript.event_scene(event),
+		"",
+		title
+	)
+	event_log.append(entry)
+	_pending_log_index = event_log.size() - 1
+	log_updated.emit()
+
+
+func _finish_pending_log_outcome(outcome: String) -> void:
+	if _pending_log_index < 0 or _pending_log_index >= event_log.size():
+		return
+	var entry := event_log[_pending_log_index] as Dictionary
+	ExpeditionLogServiceScript.apply_outcome(entry, outcome)
+	_pending_log_index = -1
+	log_updated.emit()
+
+
+func _cancel_pending_log_entry() -> void:
+	if _pending_log_index >= 0 and _pending_log_index < event_log.size():
+		event_log.remove_at(_pending_log_index)
+	_pending_log_index = -1
+	log_updated.emit()
+
+
+func _apply_step_after_event(
+		event: Dictionary,
+		extra_rewards: Array,
+		outcome: String,
+		log_name: String = ""
+) -> void:
 	_apply_session_rewards(extra_rewards)
-	if bool(event.get("once_per_expedition", false)):
-		var event_id := str(event.get("id", ""))
-		if event_id != "" and not visited_once_events.has(event_id):
-			visited_once_events.append(event_id)
+	_mark_once_per_expedition(event)
 	steps += 1
+	var event_depth := depth
 	depth += 1
 	stats["steps"] = steps
 	stats["max_depth"] = maxi(int(stats.get("max_depth", 1)), depth - 1)
-	event_log.append({
-		"depth": depth - 1,
-		"event_id": str(event.get("id", "")),
-		"name": str(event.get("name", "")),
-		"feedback": feedback,
-	})
+	var beat := current_beat_name()
+	var next_step := journey_step + 1
+	if _pending_log_index >= 0 and _pending_log_index < event_log.size():
+		var entry := event_log[_pending_log_index] as Dictionary
+		entry["depth"] = event_depth
+		entry["journey_step"] = next_step
+		entry["beat"] = beat
+		if log_name.strip_edges() != "":
+			entry["name"] = log_name
+		ExpeditionLogServiceScript.apply_outcome(entry, outcome)
+		_pending_log_index = -1
+	else:
+		var title := log_name if log_name.strip_edges() != "" else str(event.get("name", ""))
+		event_log.append(
+			ExpeditionLogServiceScript.build_event_entry(
+				event,
+				next_step,
+				beat,
+				event_depth,
+				ExpeditionLogServiceScript.event_scene(event),
+				outcome,
+				title
+			)
+		)
+	log_updated.emit()
+	var event_id := str(event.get("id", ""))
+	if event_id != "" and not completed_events.has(event_id):
+		completed_events.append(event_id)
+	var chain_id := str(event.get("chain_id", ""))
+	if active_chain_id == "" and chain_id != "":
+		active_chain_id = chain_id
+	journey_step += 1
+	if journey_step >= 8:
+		pending_exit_reason = "journey_complete"
+		phase = "result"
 
 
 func _sync_runtime_from_summary(summary: Dictionary) -> void:
@@ -333,23 +631,12 @@ func _apply_session_rewards(rewards: Array) -> void:
 		ExpeditionRewardServiceScript.merge_into_loot(loot, rewards)
 		return
 	ExpeditionRewardServiceScript.grant_to_player(_game_state, loot, rewards)
-	_sync_runtime_inventory_from_game()
 
 
-func _sync_runtime_inventory_from_game() -> void:
-	if _game_state == null:
+func _sync_battle_consumption_to_game(summary: Dictionary) -> void:
+	if _game_state == null or not _game_state.has_method("apply_battle_player_runtime"):
 		return
-	var inv := runtime.get("inventory", {}) as Dictionary
-	for slot_v in runtime.get("item_slots", []) as Array:
-		var iid := str(slot_v)
-		if iid == "":
-			continue
-		var count := int(_game_state.inventory.get(iid, 0))
-		if count > 0:
-			inv[iid] = count
-		else:
-			inv.erase(iid)
-	runtime["inventory"] = inv
+	_game_state.apply_battle_player_runtime(summary)
 
 
 func _runtime_items_for_settlement() -> Array:
@@ -399,6 +686,44 @@ func _save_rng() -> void:
 
 func _new_expedition_id() -> String:
 	return "expedition_%d_%d" % [int(Time.get_unix_time_from_system() * 1000.0), randi()]
+
+
+func current_beat_name() -> String:
+	var beats := LocationServiceScript.by_id(location_id).get("journey_beats", []) as Array
+	if journey_step >= 0 and journey_step < beats.size():
+		return str((beats[journey_step] as Dictionary).get("beat", ""))
+	return "ending"
+
+
+func _director_context() -> Dictionary:
+	return {
+		"location": LocationServiceScript.by_id(location_id),
+		"journey_step": journey_step,
+		"active_chain_id": active_chain_id,
+		"completed_events": completed_events,
+		"runtime": runtime,
+		"player_attrs": player_snapshot.get("attrs", {}) as Dictionary,
+		"world_state": _game_state.world_state if _game_state != null else {},
+		"stats": stats,
+	}
+
+
+func _world_changes() -> Array:
+	var changes: Array = []
+	for event_id_v in completed_events:
+		var event := ExpeditionEventServiceScript.by_id(str(event_id_v))
+		for change_v in event.get("world_effects", []) as Array:
+			if change_v is Dictionary:
+				changes.append((change_v as Dictionary).duplicate(true))
+	return changes
+
+
+func _build_chronicle() -> Array:
+	var lines: Array = []
+	for entry_v in event_log:
+		var entry := entry_v as Dictionary
+		lines.append(ExpeditionLogServiceScript.format_plain(entry))
+	return lines
 
 
 func _rng_from_state() -> RandomNumberGenerator:

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "steps_per_day": 3,
+  "steps_per_day": 1,
   "minimum_elapsed_days": 1,
   "defeat_inventory_drop_min_stacks": 1,
   "defeat_inventory_drop_max_stacks": 2,
@@ -11,5 +11,6 @@
   "enemy_depth_growth": 0.08,
   "reward_depth_growth": 0.05,
   "choice_count": 3,
-  "max_battle_choices": 1
+  "max_battle_choices": 1,
+  "auto_event_advance_seconds": 1.0
 }

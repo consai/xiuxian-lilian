@@ -1,0 +1,724 @@
+[gd_scene format=3 uid="uid://do3okd17ottms"]
+
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://8mwstvi8kywh" path="res://assets/art/ui_new/btn_close.png" id="3_close"]
+[ext_resource type="Texture2D" uid="uid://cf8g208mj4li2" path="res://assets/art/jueshe/sprite_000.png" id="4_portrait"]
+[ext_resource type="Texture2D" uid="uid://cjfih161xnbaq" path="res://assets/art/character_panel_icons/attr_attack.png" id="5_attack"]
+[ext_resource type="Texture2D" uid="uid://dy6ggx1qxjufr" path="res://assets/art/character_panel_icons/attr_defense.png" id="6_defense"]
+[ext_resource type="Texture2D" uid="uid://cbg6ja2ub58dk" path="res://assets/art/character_panel_icons/attr_speed.png" id="7_speed"]
+[ext_resource type="Texture2D" uid="uid://cojrouwtu26e8" path="res://assets/art/character_panel_icons/attr_crit.png" id="8_crit"]
+[ext_resource type="Texture2D" uid="uid://bwjmrnski8b3" path="res://assets/art/character_panel_icons/attr_crit_damage.png" id="9_crit_damage"]
+[ext_resource type="Texture2D" uid="uid://b0eogowyswdu7" path="res://assets/art/character_panel_icons/attr_shield.png" id="10_shield"]
+[ext_resource type="StyleBox" path="res://ui/hp_bar_back.tres" id="12_na8bq"]
+[ext_resource type="StyleBox" path="res://ui/hp_bar_fill.tres" id="13_o1ncj"]
+[ext_resource type="StyleBox" path="res://ui/mp_bar_fill.tres" id="14_qoeon"]
+[ext_resource type="Texture2D" uid="uid://crgpho4s0jn0h" path="res://assets/art/character_panel_icons/status_day.png" id="16_day"]
+[ext_resource type="Texture2D" uid="uid://cm2wk2gqtr70t" path="res://assets/art/character_panel_icons/status_injury.png" id="17_injury"]
+[ext_resource type="Texture2D" uid="uid://ctasihqhw3mlx" path="res://assets/art/character_panel_icons/status_spirit_stone.png" id="18_stone"]
+[ext_resource type="Texture2D" uid="uid://c3f3nny73kvhg" path="res://assets/art/ui_new/btn_lv.png" id="19_green"]
+[ext_resource type="Texture2D" uid="uid://dq4k3ybmxqrut" path="res://assets/art/ui_new/btn_mihuang.png" id="20_button"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="21_title"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="22_h2"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="23_body"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="24_small"]
+[ext_resource type="Script" uid="uid://bnplqcaqy5rg8" path="res://scripts/ui/character_attributes_panel.gd" id="25_script"]
+
+[sub_resource type="StyleBoxFlat" id="MainPanel"]
+bg_color = Color(1, 0.945, 0.835, 0.985)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.31, 0.19, 0.12, 1)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+shadow_color = Color(0.12, 0.07, 0.03, 0.45)
+shadow_size = 16
+
+[sub_resource type="StyleBoxFlat" id="TitlePanel"]
+bg_color = Color(0.91, 0.72, 0.48, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.4, 0.25, 0.14, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="InsetPanel"]
+bg_color = Color(1, 0.965, 0.89, 0.76)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.57, 0.38, 0.22, 0.85)
+corner_radius_top_left = 17
+corner_radius_top_right = 17
+corner_radius_bottom_right = 17
+corner_radius_bottom_left = 17
+
+[sub_resource type="StyleBoxFlat" id="SlotPanel"]
+bg_color = Color(0.96, 0.86, 0.7, 0.42)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.65, 0.47, 0.29, 0.78)
+corner_radius_top_left = 13
+corner_radius_top_right = 13
+corner_radius_bottom_right = 13
+corner_radius_bottom_left = 13
+
+[sub_resource type="StyleBoxFlat" id="BarBack"]
+bg_color = Color(0.78, 0.68, 0.52, 0.7)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.38, 0.27, 0.17, 0.9)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="CultivationFill"]
+bg_color = Color(0.48, 0.64, 0.3, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="CharacterAttributesPanel" type="Control" unique_id=698250103]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_theme")
+script = ExtResource("25_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=542301095]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Dimmer" type="ColorRect" parent="." unique_id=232179820]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.12, 0.08, 0.04, 0.42)
+
+[node name="Panel" type="Panel" parent="." unique_id=79412613]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -490.0
+offset_top = -340.0
+offset_right = 490.0
+offset_bottom = 340.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("MainPanel")
+
+[node name="TitleBack" type="Panel" parent="Panel" unique_id=285288583]
+layout_mode = 0
+offset_left = 300.0
+offset_top = -16.0
+offset_right = 680.0
+offset_bottom = 58.0
+theme_override_styles/panel = SubResource("TitlePanel")
+
+[node name="Title" type="Label" parent="Panel/TitleBack" unique_id=1528525467]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "人物属性"
+label_settings = ExtResource("21_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="TextureButton" parent="Panel" unique_id=1118663398]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 920.0
+offset_top = -15.0
+offset_right = 994.0
+offset_bottom = 59.0
+texture_normal = ExtResource("3_close")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="IdentityCard" type="Panel" parent="Panel" unique_id=643209460]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 68.0
+offset_right = 304.0
+offset_bottom = 562.0
+theme_override_styles/panel = SubResource("InsetPanel")
+
+[node name="PortraitBack" type="Panel" parent="Panel/IdentityCard" unique_id=1194882614]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 268.0
+offset_bottom = 245.0
+theme_override_styles/panel = SubResource("SlotPanel")
+
+[node name="Portrait" type="TextureRect" parent="Panel/IdentityCard/PortraitBack" unique_id=300933074]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 17.0
+offset_top = 12.0
+offset_right = -21.0
+offset_bottom = -19.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_portrait")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CharacterName" type="Label" parent="Panel/IdentityCard" unique_id=1231109706]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 260.0
+offset_right = 264.0
+offset_bottom = 293.0
+text = "清风剑仙"
+label_settings = ExtResource("22_h2")
+horizontal_alignment = 1
+
+[node name="Realm" type="Label" parent="Panel/IdentityCard" unique_id=437805136]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 295.0
+offset_right = 264.0
+offset_bottom = 323.0
+text = "炼气一层"
+label_settings = ExtResource("23_body")
+horizontal_alignment = 1
+
+[node name="CultivationLabel" type="Label" parent="Panel/IdentityCard" unique_id=1814673347]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 332.0
+offset_right = 68.0
+offset_bottom = 358.0
+text = "修为"
+label_settings = ExtResource("24_small")
+
+[node name="CultivationBar" type="ProgressBar" parent="Panel/IdentityCard" unique_id=1829575580]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 66.0
+offset_top = 337.0
+offset_right = 188.0
+offset_bottom = 354.0
+theme_override_styles/background = SubResource("BarBack")
+theme_override_styles/fill = SubResource("CultivationFill")
+value = 60.0
+show_percentage = false
+
+[node name="CultivationValue" type="Label" parent="Panel/IdentityCard" unique_id=318905844]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 194.0
+offset_top = 331.0
+offset_right = 264.0
+offset_bottom = 359.0
+text = "60 / 100"
+label_settings = ExtResource("24_small")
+
+[node name="Divider" type="HSeparator" parent="Panel/IdentityCard" unique_id=781381188]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 366.0
+offset_right = 265.0
+offset_bottom = 370.0
+
+[node name="DayIcon" type="TextureRect" parent="Panel/IdentityCard" unique_id=1147770079]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 382.0
+offset_right = 44.0
+offset_bottom = 410.0
+texture = ExtResource("16_day")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DayLabel" type="Label" parent="Panel/IdentityCard" unique_id=339811831]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 52.0
+offset_top = 382.0
+offset_right = 255.0
+offset_bottom = 410.0
+text = "第十二日"
+label_settings = ExtResource("23_body")
+
+[node name="InjuryIcon" type="TextureRect" parent="Panel/IdentityCard" unique_id=381725642]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 414.0
+offset_right = 44.0
+offset_bottom = 442.0
+texture = ExtResource("17_injury")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="InjuryLabel" type="Label" parent="Panel/IdentityCard" unique_id=1156274178]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 52.0
+offset_top = 414.0
+offset_right = 255.0
+offset_bottom = 442.0
+text = "伤势：无"
+label_settings = ExtResource("23_body")
+
+[node name="StoneIcon" type="TextureRect" parent="Panel/IdentityCard" unique_id=614073533]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 446.0
+offset_right = 44.0
+offset_bottom = 474.0
+texture = ExtResource("18_stone")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StoneLabel" type="Label" parent="Panel/IdentityCard" unique_id=1651044167]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 52.0
+offset_top = 446.0
+offset_right = 255.0
+offset_bottom = 474.0
+text = "灵石 128"
+label_settings = ExtResource("23_body")
+
+[node name="AttributesCard" type="Panel" parent="Panel" unique_id=1877405290]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 318.0
+offset_top = 68.0
+offset_right = 638.0
+offset_bottom = 564.0
+theme_override_styles/panel = SubResource("InsetPanel")
+
+[node name="Heading" type="Label" parent="Panel/AttributesCard" unique_id=1352032944]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 12.0
+offset_right = 310.0
+offset_bottom = 44.0
+text = "基础属性"
+label_settings = ExtResource("22_h2")
+horizontal_alignment = 1
+
+[node name="HpLabel" type="Label" parent="Panel/AttributesCard" unique_id=406349497]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 58.0
+offset_right = 72.0
+offset_bottom = 88.0
+text = "气血"
+label_settings = ExtResource("23_body")
+
+[node name="HpBar" type="ProgressBar" parent="Panel/AttributesCard" unique_id=444611424]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 72.0
+offset_top = 64.0
+offset_right = 230.0
+offset_bottom = 82.0
+theme_override_styles/background = ExtResource("12_na8bq")
+theme_override_styles/fill = ExtResource("13_o1ncj")
+value = 100.0
+show_percentage = false
+
+[node name="HpValue" type="Label" parent="Panel/AttributesCard" unique_id=1931456821]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 238.0
+offset_top = 58.0
+offset_right = 305.0
+offset_bottom = 88.0
+text = "100/100"
+label_settings = ExtResource("24_small")
+
+[node name="MpLabel" type="Label" parent="Panel/AttributesCard" unique_id=105969279]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 102.0
+offset_right = 72.0
+offset_bottom = 132.0
+text = "法力"
+label_settings = ExtResource("23_body")
+
+[node name="MpBar" type="ProgressBar" parent="Panel/AttributesCard" unique_id=864360765]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 72.0
+offset_top = 108.0
+offset_right = 230.0
+offset_bottom = 126.0
+theme_override_styles/background = ExtResource("12_na8bq")
+theme_override_styles/fill = ExtResource("14_qoeon")
+value = 80.0
+show_percentage = false
+
+[node name="MpValue" type="Label" parent="Panel/AttributesCard" unique_id=1769333240]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 238.0
+offset_top = 102.0
+offset_right = 305.0
+offset_bottom = 132.0
+text = "80/100"
+label_settings = ExtResource("24_small")
+
+[node name="Attack" type="Panel" parent="Panel/AttributesCard" unique_id=1308859223]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 15.0
+offset_top = 180.0
+offset_right = 155.0
+offset_bottom = 270.0
+theme_override_styles/panel = SubResource("SlotPanel")
+
+[node name="Icon" type="TextureRect" parent="Panel/AttributesCard/Attack" unique_id=137771734]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 19.0
+offset_right = 60.0
+offset_bottom = 69.0
+texture = ExtResource("5_attack")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Panel/AttributesCard/Attack" unique_id=1235215117]
+layout_mode = 0
+offset_left = 65.0
+offset_top = 13.0
+offset_right = 132.0
+offset_bottom = 77.0
+text = "攻击
+100"
+label_settings = ExtResource("23_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Defense" type="Panel" parent="Panel/AttributesCard" unique_id=1783771581]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 165.0
+offset_top = 180.0
+offset_right = 305.0
+offset_bottom = 270.0
+theme_override_styles/panel = SubResource("SlotPanel")
+
+[node name="Icon" type="TextureRect" parent="Panel/AttributesCard/Defense" unique_id=2144503704]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 19.0
+offset_right = 60.0
+offset_bottom = 69.0
+texture = ExtResource("6_defense")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Panel/AttributesCard/Defense" unique_id=753659100]
+layout_mode = 0
+offset_left = 65.0
+offset_top = 13.0
+offset_right = 132.0
+offset_bottom = 77.0
+text = "防御
+100"
+label_settings = ExtResource("23_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Speed" type="Panel" parent="Panel/AttributesCard" unique_id=1145308024]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 15.0
+offset_top = 280.0
+offset_right = 155.0
+offset_bottom = 370.0
+theme_override_styles/panel = SubResource("SlotPanel")
+
+[node name="Icon" type="TextureRect" parent="Panel/AttributesCard/Speed" unique_id=367050984]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 19.0
+offset_right = 60.0
+offset_bottom = 69.0
+texture = ExtResource("7_speed")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Panel/AttributesCard/Speed" unique_id=679176535]
+layout_mode = 0
+offset_left = 65.0
+offset_top = 13.0
+offset_right = 132.0
+offset_bottom = 77.0
+text = "速度
+100"
+label_settings = ExtResource("23_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Crit" type="Panel" parent="Panel/AttributesCard" unique_id=1926747794]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 165.0
+offset_top = 280.0
+offset_right = 305.0
+offset_bottom = 370.0
+theme_override_styles/panel = SubResource("SlotPanel")
+
+[node name="Icon" type="TextureRect" parent="Panel/AttributesCard/Crit" unique_id=874961126]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 19.0
+offset_right = 60.0
+offset_bottom = 69.0
+texture = ExtResource("8_crit")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Panel/AttributesCard/Crit" unique_id=593107476]
+layout_mode = 0
+offset_left = 65.0
+offset_top = 13.0
+offset_right = 132.0
+offset_bottom = 77.0
+text = "暴击
+10%"
+label_settings = ExtResource("23_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CritDamage" type="Panel" parent="Panel/AttributesCard" unique_id=1340533017]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 15.0
+offset_top = 380.0
+offset_right = 155.0
+offset_bottom = 470.0
+theme_override_styles/panel = SubResource("SlotPanel")
+
+[node name="Icon" type="TextureRect" parent="Panel/AttributesCard/CritDamage" unique_id=2059693763]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 19.0
+offset_right = 60.0
+offset_bottom = 69.0
+texture = ExtResource("9_crit_damage")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Panel/AttributesCard/CritDamage" unique_id=1071310151]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 13.0
+offset_right = 137.0
+offset_bottom = 77.0
+text = "暴伤
+150%"
+label_settings = ExtResource("23_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Shield" type="Panel" parent="Panel/AttributesCard" unique_id=494099088]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 165.0
+offset_top = 380.0
+offset_right = 305.0
+offset_bottom = 470.0
+theme_override_styles/panel = SubResource("SlotPanel")
+
+[node name="Icon" type="TextureRect" parent="Panel/AttributesCard/Shield" unique_id=1302771247]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 19.0
+offset_right = 60.0
+offset_bottom = 69.0
+texture = ExtResource("10_shield")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Panel/AttributesCard/Shield" unique_id=266794948]
+layout_mode = 0
+offset_left = 65.0
+offset_top = 13.0
+offset_right = 132.0
+offset_bottom = 77.0
+text = "护盾
+0"
+label_settings = ExtResource("23_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="OtherAttr" type="Panel" parent="Panel" unique_id=139421829]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 652.0
+offset_top = 71.0
+offset_right = 956.0
+offset_bottom = 559.0
+theme_override_styles/panel = SubResource("InsetPanel")
+
+[node name="OtherAttrHeading" type="Label" parent="Panel/OtherAttr" unique_id=919827525]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 10.0
+offset_top = 12.0
+offset_right = 294.0
+offset_bottom = 44.0
+text = "其他属性"
+label_settings = ExtResource("22_h2")
+horizontal_alignment = 1
+
+[node name="BiographyLabel" type="Label" parent="Panel/OtherAttr" unique_id=1092181205]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 23.0
+offset_top = 55.0
+offset_right = -16.0
+offset_bottom = -19.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "清风入道，初踏仙途。"
+label_settings = ExtResource("23_body")
+autowrap_mode = 1
+
+[node name="BottomDivider" type="HSeparator" parent="Panel" unique_id=89333529]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 568.0
+offset_right = 952.0
+offset_bottom = 572.0
+
+[node name="AttributesTab" type="TextureButton" parent="Panel" unique_id=2127763751]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 38.0
+offset_top = 588.0
+offset_right = 168.0
+offset_bottom = 648.0
+texture_normal = ExtResource("19_green")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Panel/AttributesTab" unique_id=674680492]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "属性"
+label_settings = ExtResource("22_h2")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ExperienceTab" type="TextureButton" parent="Panel" unique_id=1695047519]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 180.0
+offset_top = 588.0
+offset_right = 310.0
+offset_bottom = 648.0
+texture_normal = ExtResource("20_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Panel/ExperienceTab" unique_id=767244718]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "经历"
+label_settings = ExtResource("22_h2")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StatisticsTab" type="TextureButton" parent="Panel" unique_id=360336285]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 322.0
+offset_top = 588.0
+offset_right = 452.0
+offset_bottom = 648.0
+texture_normal = ExtResource("20_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Panel/StatisticsTab" unique_id=755677016]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "统计"
+label_settings = ExtResource("22_h2")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Biography" type="Panel" parent="Panel" unique_id=1938137326]
+layout_mode = 0
+offset_left = 475.0
+offset_top = 588.0
+offset_right = 944.0
+offset_bottom = 648.0
+theme_override_styles/panel = SubResource("InsetPanel")
+
+[node name="BiographyLabel2" type="Label" parent="Panel/Biography" unique_id=689067156]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "清风入道，初踏仙途。"
+label_settings = ExtResource("23_body")
+vertical_alignment = 1

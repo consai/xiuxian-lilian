@@ -33,10 +33,14 @@ func _glyph_for_type(event_type: String) -> String:
 	match event_type:
 		"gather":
 			return "♧"
+		"travel":
+			return "→"
 		"recover":
 			return "◉"
 		"hazard":
 			return "!"
+		"decision_option":
+			return "？"
 		"battle", "elite", "boss":
 			return "⚔"
 		_:

@@ -50,7 +50,7 @@ static func from_item_id(item_id: String, count: int = 1) -> Dictionary:
 static func from_equip_id(equip_id: int) -> Dictionary:
 	if equip_id <= 0:
 		return {}
-	var cfg := _equip_cfg(equip_id)
+	var cfg := ConfigManager.equip_by_id(equip_id)
 	if cfg.is_empty():
 		return {}
 	var title := str(cfg.get("name", "法宝")).strip_edges()
@@ -199,8 +199,3 @@ static func _item_def(item_id: String) -> ItemDef:
 		return ConfigManager.item_def_by_id(item_id)
 	return null
 
-
-static func _equip_cfg(equip_id: int) -> Dictionary:
-	if ConfigManager != null and ConfigManager.has_method("equip_by_id"):
-		return ConfigManager.equip_by_id(equip_id) as Dictionary
-	return {}

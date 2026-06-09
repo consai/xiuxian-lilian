@@ -2,6 +2,7 @@ extends Node
 
 const SCHEMA_VERSION := 1
 const SLOT_COUNT := 3
+const AUTO_SAVE_SLOT := 1
 
 
 func save_slot(slot: int, data: Dictionary) -> Dictionary:
@@ -35,6 +36,10 @@ func load_slot(slot: int) -> Dictionary:
 	if not game_v is Dictionary:
 		return {"ok": false, "error": "存档缺少游戏状态"}
 	return {"ok": true, "game": (game_v as Dictionary).duplicate(true)}
+
+
+func slot_exists(slot: int) -> bool:
+	return slot >= 1 and slot <= SLOT_COUNT and FileAccess.file_exists(_path(slot))
 
 
 func slot_info(slot: int) -> Dictionary:

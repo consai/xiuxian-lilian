@@ -13,6 +13,8 @@
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="16_body"]
 [ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="17_small"]
 [ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="19_press"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hp_bar.tscn" id="20_hp_bar"]
+[ext_resource type="PackedScene" path="res://scenes/ui/mp_bar.tscn" id="21_mp_bar"]
 
 [sub_resource type="StyleBoxFlat" id="PanelMain"]
 bg_color = Color(1, 0.945, 0.835, 0.98)
@@ -51,20 +53,6 @@ corner_radius_top_left = 17
 corner_radius_top_right = 17
 corner_radius_bottom_right = 17
 corner_radius_bottom_left = 17
-
-[sub_resource type="StyleBoxFlat" id="HpFill"]
-bg_color = Color(0.88, 0.39, 0.31, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-
-[sub_resource type="StyleBoxFlat" id="MpFill"]
-bg_color = Color(0.29, 0.62, 0.78, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
 
 [node name="LocationSelect" type="Control" unique_id=441293247]
 layout_mode = 3
@@ -174,9 +162,9 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 18.0
-offset_top = 58.0
-offset_right = 354.0
-offset_bottom = 285.0
+offset_top = 54.0
+offset_right = 337.0
+offset_bottom = 219.0
 texture = ExtResource("3_bg")
 expand_mode = 1
 stretch_mode = 6
@@ -185,9 +173,9 @@ stretch_mode = 6
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 22.0
-offset_top = 302.0
+offset_top = 234.0
 offset_right = 350.0
-offset_bottom = 354.0
+offset_bottom = 286.0
 text = "林深雾重，灵草与妖兽并存。"
 label_settings = ExtResource("16_body")
 autowrap_mode = 2
@@ -212,55 +200,28 @@ offset_bottom = 430.0
 text = "建议境界：炼气一层"
 label_settings = ExtResource("16_body")
 
-[node name="Rewards" type="Panel" parent="Dialog" unique_id=63193064]
+[node name="RewardsScroll" type="ScrollContainer" parent="Dialog/LeftCard" unique_id=1846102942]
+unique_name_in_owner = true
 layout_mode = 0
-offset_left = 418.0
-offset_top = 78.0
-offset_right = 942.0
-offset_bottom = 216.0
-theme_override_styles/panel = SubResource("PanelInset")
+offset_left = 17.0
+offset_top = 268.0
+offset_right = 336.0
+offset_bottom = 354.0
+horizontal_scroll_mode = 1
+vertical_scroll_mode = 0
 
-[node name="Heading" type="Label" parent="Dialog/Rewards" unique_id=543619810]
-layout_mode = 0
-offset_left = 12.0
-offset_top = 7.0
-offset_right = 512.0
-offset_bottom = 38.0
-text = "可能收获"
-label_settings = ExtResource("15_h3")
-horizontal_alignment = 1
-
-[node name="RewardRow" type="HBoxContainer" parent="Dialog/Rewards" unique_id=1846102942]
-layout_mode = 0
-offset_left = 50.0
-offset_top = 42.0
-offset_right = 480.0
-offset_bottom = 128.0
-theme_override_constants/separation = 50
-
-[node name="PreviewReward1" type="Panel" parent="Dialog/Rewards/RewardRow" unique_id=544489580 instance=ExtResource("10_p3lih")]
+[node name="Rewards" type="HBoxContainer" parent="Dialog/LeftCard/RewardsScroll" unique_id=544489580]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="PreviewReward2" type="Panel" parent="Dialog/Rewards/RewardRow" unique_id=4352591 instance=ExtResource("10_p3lih")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="PreviewReward3" type="Panel" parent="Dialog/Rewards/RewardRow" unique_id=1975007908 instance=ExtResource("10_p3lih")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="PreviewReward4" type="Panel" parent="Dialog/Rewards/RewardRow" unique_id=1220484167 instance=ExtResource("10_p3lih")]
-unique_name_in_owner = true
-layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 16
 
 [node name="Status" type="Panel" parent="Dialog" unique_id=1876891030]
 layout_mode = 0
 offset_left = 418.0
-offset_top = 230.0
+offset_top = 81.0
 offset_right = 942.0
-offset_bottom = 360.0
+offset_bottom = 211.0
 theme_override_styles/panel = SubResource("PanelInset")
 
 [node name="Heading" type="Label" parent="Dialog/Status" unique_id=1320398435]
@@ -282,15 +243,13 @@ offset_bottom = 76.0
 text = "气血"
 label_settings = ExtResource("17_small")
 
-[node name="HpBar" type="ProgressBar" parent="Dialog/Status" unique_id=1613269466]
+[node name="HpBar" parent="Dialog/Status" unique_id=1613269466 instance=ExtResource("20_hp_bar")]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 92.0
 offset_top = 50.0
 offset_right = 380.0
 offset_bottom = 72.0
-theme_override_styles/fill = SubResource("HpFill")
-show_percentage = false
 
 [node name="HpValue" type="Label" parent="Dialog/Status" unique_id=244430580]
 unique_name_in_owner = true
@@ -311,15 +270,13 @@ offset_bottom = 107.0
 text = "法力"
 label_settings = ExtResource("17_small")
 
-[node name="MpBar" type="ProgressBar" parent="Dialog/Status" unique_id=1238852338]
+[node name="MpBar" parent="Dialog/Status" unique_id=1238852338 instance=ExtResource("21_mp_bar")]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 92.0
 offset_top = 81.0
 offset_right = 380.0
 offset_bottom = 103.0
-theme_override_styles/fill = SubResource("MpFill")
-show_percentage = false
 
 [node name="MpValue" type="Label" parent="Dialog/Status" unique_id=1835272940]
 unique_name_in_owner = true
@@ -334,48 +291,36 @@ label_settings = ExtResource("17_small")
 [node name="Supplies" type="Panel" parent="Dialog" unique_id=1383815363]
 layout_mode = 0
 offset_left = 418.0
-offset_top = 374.0
+offset_top = 218.0
 offset_right = 942.0
 offset_bottom = 520.0
 theme_override_styles/panel = SubResource("PanelInset")
 
 [node name="Heading" type="Label" parent="Dialog/Supplies" unique_id=1429137210]
 layout_mode = 0
-offset_left = 12.0
+offset_left = 19.0
 offset_top = 7.0
-offset_right = 512.0
+offset_right = 170.0
 offset_bottom = 38.0
-text = "携带丹药"
+text = "道具"
 label_settings = ExtResource("15_h3")
 horizontal_alignment = 1
 
-[node name="SupplyItem1" type="Panel" parent="Dialog/Supplies" unique_id=451532234 instance=ExtResource("10_p3lih")]
+[node name="SupplyItem1" parent="Dialog/Supplies" unique_id=451532234 instance=ExtResource("10_p3lih")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 38.0
-offset_top = 35.0
-offset_right = 108.0
-offset_bottom = 121.0
+offset_left = 20.0
+offset_top = 36.0
+offset_right = 90.0
+offset_bottom = 122.0
 
-[node name="SupplyItem2" type="Panel" parent="Dialog/Supplies" unique_id=628834142 instance=ExtResource("10_p3lih")]
+[node name="SupplyItem2" parent="Dialog/Supplies" unique_id=628834142 instance=ExtResource("10_p3lih")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 119.0
+offset_left = 101.0
 offset_top = 37.0
-offset_right = 189.0
+offset_right = 171.0
 offset_bottom = 123.0
-
-[node name="LockedHint" type="Label" parent="Dialog/Supplies" unique_id=1367960335]
-layout_mode = 0
-offset_left = 248.0
-offset_top = 58.0
-offset_right = 485.0
-offset_bottom = 112.0
-text = "整备将随你进入历练
-历练中无法更换"
-label_settings = ExtResource("17_small")
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="RulePanel" type="Panel" parent="Dialog" unique_id=111594932]
 layout_mode = 0
@@ -395,7 +340,7 @@ offset_left = 12.0
 offset_right = -12.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "每三步消耗一天，可随时返程，战败损失部分战利品。"
+text = "每个事件消耗一天，可随时返程，战败损失部分战利品。"
 label_settings = ExtResource("16_body")
 horizontal_alignment = 1
 vertical_alignment = 1

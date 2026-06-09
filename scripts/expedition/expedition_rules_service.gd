@@ -13,7 +13,7 @@ static func rules() -> Dictionary:
 
 static func elapsed_days(steps: int) -> int:
 	var cfg := rules()
-	var per_day := maxi(1, int(cfg.get("steps_per_day", 3)))
+	var per_day := maxi(1, int(cfg.get("steps_per_day", 1)))
 	var minimum := maxi(1, int(cfg.get("minimum_elapsed_days", 1)))
 	return maxi(minimum, int(ceil(float(maxi(0, steps)) / float(per_day))))
 

@@ -50,10 +50,6 @@ func _scene_manager() -> Node:
 	return root.get_node("SceneManager")
 
 
-func _data_store() -> Node:
-	return root.get_node("DataStore")
-
-
 func _expedition() -> Node:
 	return root.get_node("ExpeditionState")
 
@@ -61,12 +57,12 @@ func _expedition() -> Node:
 func _reset_game() -> void:
 	root.get_node("GameState").new_game()
 	_expedition().reset()
-	_data_store().reset_scene_runtime()
+	root.get_node("DataStore").reset_scene_runtime()
 
 
 func _test_import_savedata_resets_scene_runtime() -> void:
 	_reset_game()
-	var ds := _data_store()
+	var ds := root.get_node("DataStore")
 	ds.set_scene_payload(SceneManagerScript.HUB, {"probe": 1})
 	ds.scene_runtime()["current_id"] = SceneManagerScript.HUB
 	var saved: Dictionary = root.get_node("GameState").to_dict()
@@ -120,28 +116,28 @@ func _test_expedition_result_reason() -> void:
 
 func _test_start_expedition_rollback_on_lock() -> void:
 	_reset_game()
-	_data_store().scene_runtime()["transitioning"] = true
+	root.get_node("DataStore").scene_runtime()["transitioning"] = true
 	var expedition := _expedition()
 	var nav: Dictionary = _scene_manager().start_expedition("qinglan_mountain", 1234)
 	_expect_false(bool(nav.get("ok", true)), "start blocked by lock")
 	_expect_false(expedition.active, "expedition not left active")
-	_data_store().scene_runtime()["transitioning"] = false
+	root.get_node("DataStore").scene_runtime()["transitioning"] = false
 
 
 func _test_go_fight_blocked_without_pending() -> void:
 	_reset_game()
-	_data_store().scene_runtime()["transitioning"] = true
+	root.get_node("DataStore").scene_runtime()["transitioning"] = true
 	var data: Dictionary = BattleInitData.sample_for_editor()
 	var nav: Dictionary = _scene_manager().go_fight(data, "scene_manager_test")
 	_expect_false(bool(nav.get("ok", true)), "go fight blocked by lock")
-	var pending_v: Variant = _data_store().battle_runtime().get("pending_init", {})
+	var pending_v: Variant = root.get_node("DataStore").battle_runtime().get("pending_init", {})
 	_expect_true((pending_v as Dictionary).is_empty(), "pending init not written")
-	_data_store().scene_runtime()["transitioning"] = false
+	root.get_node("DataStore").scene_runtime()["transitioning"] = false
 
 
 func _test_transition_lock() -> void:
 	_reset_game()
-	_data_store().scene_runtime()["transitioning"] = false
+	root.get_node("DataStore").scene_runtime()["transitioning"] = false
 	var sm := _scene_manager()
 	var first: Dictionary = sm.go_hub()
 	var second: Dictionary = sm.go_hub()
@@ -172,7 +168,7 @@ func _run_async(name: String, stage: String) -> void:
 			var data: Dictionary = BattleInitData.sample_for_editor()
 			var nav: Dictionary = _scene_manager().go_fight(data, "scene_manager_test")
 			_expect_true(bool(nav.get("ok", false)), "go fight ok")
-			var pending_v: Variant = _data_store().battle_runtime().get("pending_init", {})
+			var pending_v: Variant = root.get_node("DataStore").battle_runtime().get("pending_init", {})
 			_expect_false((pending_v as Dictionary).is_empty(), "pending init written")
 	if not _failures.is_empty():
 		for failure in _failures:

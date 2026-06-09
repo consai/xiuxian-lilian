@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://bqxmpbarui001"]
+
+[ext_resource type="StyleBoxFlat" path="res://ui/hp_bar_back.tres" id="1_back"]
+[ext_resource type="StyleBoxFlat" path="res://ui/mp_bar_fill.tres" id="2_fill"]
+
+[node name="MpBar" type="ProgressBar"]
+custom_minimum_size = Vector2(0, 20)
+size_flags_horizontal = 3
+theme_override_styles/background = ExtResource("1_back")
+theme_override_styles/fill = ExtResource("2_fill")
+show_percentage = false

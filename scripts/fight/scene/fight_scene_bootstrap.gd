@@ -13,7 +13,12 @@ static func try_initialize(
 		editor_auto_sample: bool,
 		tree: SceneTree
 ) -> bool:
-	var data := BattleInitData.take_pending(tree)
+	var envelope := BattleInitData.take_pending_envelope(tree)
+	var data: Dictionary = {}
+	if envelope.has("payload"):
+		var payload_v: Variant = envelope.get("payload", {})
+		data = payload_v as Dictionary if payload_v is Dictionary else {}
+	ctx.battle_source = str(envelope.get("source", ""))
 	if data.is_empty() and not editor_battle_init.is_empty():
 		data = editor_battle_init.duplicate(true)
 	if data.is_empty() and editor_auto_sample and OS.has_feature("editor"):

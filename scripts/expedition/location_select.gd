@@ -3,17 +3,17 @@ extends Control
 const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
 const ItemDefScript := preload("res://scripts/core/item_def.gd")
 const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
+const ItemScene := preload("res://scenes/items/item.tscn")
 
-const DEFAULT_RULE_TEXT := "每三步消耗一天，可随时返程，战败损失部分战利品。"
+const DEFAULT_RULE_TEXT := "每个事件消耗一天，可随时返程，战败损失部分战利品。"
 
 var _location: Dictionary = {}
 var _blocked := false
-var _preview_entries: Array = [{}, {}, {}, {}]
 var _supply_entries: Array = [{}, {}]
+var _reward_views: Array[ItemView] = []
 
-@onready var _preview_rewards: Array[ItemView] = [
-	%PreviewReward1, %PreviewReward2, %PreviewReward3, %PreviewReward4,
-]
+@onready var _rewards_scroll: ScrollContainer = %RewardsScroll
+@onready var _rewards_row: HBoxContainer = %Rewards
 @onready var _supply_items: Array[ItemView] = [%SupplyItem1, %SupplyItem2]
 
 
@@ -30,18 +30,10 @@ func _ready() -> void:
 
 
 func _configure_item_views() -> void:
-	for i in _preview_rewards.size():
-		var view := _preview_rewards[i]
+	for view in _supply_items:
 		if view == null:
 			continue
 		view.show_name_label = true
-		view.clicked.connect(_on_preview_item_clicked.bind(i))
-	for i in _supply_items.size():
-		var view := _supply_items[i]
-		if view == null:
-			continue
-		view.show_name_label = true
-		view.clicked.connect(_on_supply_item_clicked.bind(i))
 
 
 func _refresh() -> void:
@@ -82,17 +74,53 @@ func _refresh_status() -> void:
 
 func _refresh_preview_rewards() -> void:
 	var rewards := _location.get("preview_rewards", []) as Array
-	for i in _preview_rewards.size():
-		var view := _preview_rewards[i]
+	_sync_reward_views(rewards.size())
+	for i in rewards.size():
+		var reward_v: Variant = rewards[i]
+		var entry := _entry_from_reward(reward_v)
+		_bind_item_view(
+			_reward_views[i],
+			_resolve_reward_display(reward_v),
+			entry,
+			not entry.is_empty()
+		)
+	call_deferred("_update_rewards_scroll")
+
+
+func _sync_reward_views(count: int) -> void:
+	while _reward_views.size() < count:
+		var view := _create_reward_view()
 		if view == null:
-			continue
-		if i >= rewards.size():
-			_preview_entries[i] = {}
-			_bind_item_view(view, {})
-			continue
-		var entry := _entry_from_reward(rewards[i])
-		_preview_entries[i] = entry
-		_bind_item_view(view, _resolve_reward_display(rewards[i]), not entry.is_empty())
+			break
+		_reward_views.append(view)
+	while _reward_views.size() > count:
+		var extra: ItemView = _reward_views.pop_back()
+		if is_instance_valid(extra):
+			extra.queue_free()
+
+
+func _create_reward_view() -> ItemView:
+	var node := ItemScene.instantiate()
+	if not node is ItemView:
+		node.queue_free()
+		return null
+	var view := node as ItemView
+	view.show_name_label = true
+	_rewards_row.add_child(view)
+	return view
+
+
+func _update_rewards_scroll() -> void:
+	if _rewards_scroll == null or _rewards_row == null:
+		return
+	var content_w := _rewards_row.get_combined_minimum_size().x
+	var viewport_w := float(_rewards_scroll.size.x)
+	_rewards_scroll.horizontal_scroll_mode = (
+		ScrollContainer.SCROLL_MODE_AUTO if content_w > viewport_w + 1.0
+		else ScrollContainer.SCROLL_MODE_DISABLED
+	)
+	if _rewards_scroll.horizontal_scroll_mode == ScrollContainer.SCROLL_MODE_DISABLED:
+		_rewards_scroll.scroll_horizontal = 0
 
 
 func _refresh_supplies() -> void:
@@ -103,11 +131,12 @@ func _refresh_supplies() -> void:
 		var item_id := str(GameState.item_slots[i]) if i < GameState.item_slots.size() else ""
 		var entry := _entry_from_supply_slot(item_id)
 		_supply_entries[i] = entry
-		_bind_item_view(view, _resolve_item_display(item_id), not entry.is_empty())
+		_bind_item_view(view, _resolve_item_display(item_id), entry, not entry.is_empty())
 
 
-func _bind_item_view(view: ItemView, display: Dictionary, clickable: bool = false) -> void:
+func _bind_item_view(view: ItemView, display: Dictionary, entry: Dictionary, clickable: bool = false) -> void:
 	view.set_click_enabled(clickable)
+	view.show_info_on_click = clickable
 	if display.is_empty():
 		view.apply_empty(null, Color(1, 1, 1, 0))
 		view.visible = true
@@ -120,23 +149,7 @@ func _bind_item_view(view: ItemView, display: Dictionary, clickable: bool = fals
 		Color.WHITE,
 		str(display.get("quality", ""))
 	)
-
-
-func _on_preview_item_clicked(index: int) -> void:
-	_show_item_entry(_preview_entries[index] if index < _preview_entries.size() else {})
-
-
-func _on_supply_item_clicked(index: int) -> void:
-	_show_item_entry(_supply_entries[index] if index < _supply_entries.size() else {})
-
-
-func _show_item_entry(entry: Variant) -> void:
-	if not entry is Dictionary:
-		return
-	var row := entry as Dictionary
-	if row.is_empty():
-		return
-	ItemInfoPopupHost.show_entry(row)
+	view.set_info_entry(entry)
 
 
 func _entry_from_reward(reward_v: Variant) -> Dictionary:

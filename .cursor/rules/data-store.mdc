@@ -1,0 +1,63 @@
+---
+description: 游戏运行时与存档数据统一经 DataStore 单例存取
+globs: "**/*.gd"
+alwaysApply: true
+---
+
+# 游戏数据存取规范
+
+所有**运行时状态**与**存档数据**必须通过 Autoload 单例 `DataStore`（`res://scripts/core/data_store.gd`）读写，禁止在其他脚本中维护平行的全局字典、静态变量或临时单例来保存游戏进度。
+
+## 数据分区
+
+| 分区 | 用途 | 访问方式 |
+|------|------|----------|
+| `savedata` | 持久化存档（角色、背包、统计等） | `DataStore.savedata` 或 `GameState` 属性代理 |
+| `rundata` | 当前局内临时状态（探险、战斗、场景传参等） | `DataStore.*_runtime()` 访问器 |
+
+优先使用 `DataStore` 提供的访问器，而非直接深钻 `rundata` 嵌套键：
+
+- `game_runtime()` — 最近奖励、探险结算摘要等
+- `expedition_runtime()` — 探险进行中状态
+- `battle_runtime()` / `set_battle_pending_init()` / `take_battle_pending_init()` — 战斗初始化信封
+- `ui_runtime()` 及 `set_ui_*` / `take_ui_*` — UI 跨场景摘要
+- `scene_runtime()` / `set_scene_payload()` / `take_scene_payload()` — 场景切换传参
+
+## 推荐写法
+
+```gdscript
+# ✅ 存档字段：经 GameState 属性（底层仍写 DataStore.savedata）
+GameState.day += 1
+GameState.inventory["herb"] = 3
+
+# ✅ 或直接读写 DataStore.savedata
+DataStore.savedata["ling_stones"] += 10
+
+# ✅ 局内状态：经 runtime 访问器
+DataStore.expedition_runtime()["depth"] = 2
+DataStore.set_scene_payload("battle_result", {"won": true})
+
+# ✅ 存档导入导出
+var snap := DataStore.export_savedata()
+DataStore.import_savedata(snap)
+```
+
+## 禁止写法
+
+```gdscript
+# ❌ 模块级或类静态游戏状态
+static var player_hp := 100
+var _cached_inventory := {}
+
+# ❌ 新建平行数据单例
+# MyGameData.player = ...
+
+# ❌ 场景间用成员变量长期携带应持久化的进度（应写入 DataStore）
+```
+
+## 例外
+
+- `res://data/*.json` 等**静态配置表**由 `JsonLoader` 等工具读取，不属于运行时存档。
+- 纯局部、帧内临时变量（如 UI 动画中间值）可留在节点脚本中，但不得替代 `DataStore` 保存跨场景/跨存档的数据。
+
+新增字段时：在 `DataStore._default_savedata()` 或对应 `_default_*()` 中补充默认值，并通过 `coalesce_savedata()` 等合并逻辑保证读档兼容。

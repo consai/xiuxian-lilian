@@ -1,7 +1,7 @@
 class_name BattleInitData
 extends RefCounted
 ## 进战唯一入口：外部只提交 combatant 字典，由 [method resolve] 生成 [BattleSetup]（[FightObj] + UI 快照）。
-## 进战前可 [method set_pending] / [method goto_fight_scene]，由 [FightScene] 在 _ready 消费。
+## 进战前经 [method set_pending] 写入 DataStore，由 [FightScene] 在 _ready 消费；切场景请用 [SceneManager.go_fight]。
 const BattleSetupScript = preload("res://scripts/fight/battle_setup.gd")
 const BattleRecordTypesScript = preload("res://scripts/fight/battle_record_types.gd")
 const EnumQualityScript = preload("res://scripts/enum/enum_quality.gd")
@@ -34,12 +34,25 @@ static func set_pending(
 		"created_unix": int(Time.get_unix_time_from_system()),
 		"payload": payload,
 	}
-	_data_store().set_battle_pending_init(envelope)
+	var store := tree.root.get_node_or_null("DataStore")
+	if store != null:
+		store.set_battle_pending_init(envelope)
 	return sid
 
 
-static func take_pending(_tree: SceneTree = null, required_session_id: String = "") -> Dictionary:
-	var envelope: Dictionary = _data_store().take_battle_pending_init()
+static func take_pending_envelope(tree: SceneTree = null) -> Dictionary:
+	var active_tree := tree if tree != null else Engine.get_main_loop() as SceneTree
+	var store := active_tree.root.get_node_or_null("DataStore") if active_tree != null else null
+	if store == null:
+		return {}
+	var envelope: Dictionary = store.take_battle_pending_init()
+	if envelope.is_empty():
+		return {}
+	return envelope
+
+
+static func take_pending(tree: SceneTree = null, required_session_id: String = "") -> Dictionary:
+	var envelope := take_pending_envelope(tree)
 	if envelope.is_empty():
 		return {}
 	if envelope.has("payload"):
@@ -55,16 +68,14 @@ static func take_pending(_tree: SceneTree = null, required_session_id: String = 
 	return envelope
 
 
-static func goto_fight_scene(tree: SceneTree, data: Dictionary, scene_path: String = "res://scenes/fightScene.tscn") -> bool:
-	var errors := collect_errors(data)
-	if not errors.is_empty():
-		for msg in errors:
-			push_error("BattleInitData: %s" % msg)
+static func goto_fight_scene(tree: SceneTree, data: Dictionary, _scene_path: String = "") -> bool:
+	push_warning("BattleInitData.goto_fight_scene 已废弃，请改用 SceneManager.go_fight()")
+	var scene_manager := tree.root.get_node_or_null("SceneManager")
+	if scene_manager == null or not scene_manager.has_method("go_fight"):
+		push_error("BattleInitData.goto_fight_scene: 缺少 SceneManager")
 		return false
-	var merged := merge_skill_cfg_from_tables(data)
-	set_pending(tree, merged, "goto_fight_scene")
-	tree.change_scene_to_file(scene_path)
-	return true
+	var nav: Dictionary = scene_manager.go_fight(data, "deprecated_goto_fight_scene")
+	return bool(nav.get("ok", false))
 
 
 ## 合并表、校验并构建 [BattleSetup]；失败返回 [code]null[/code]（默认 [method push_error]）。
@@ -1056,7 +1067,3 @@ static func _new_battle_session_id() -> String:
 
 static func _quality_back_color(quality: int) -> Color:
 	return EnumQualityScript.get_color(maxi(1, quality))
-
-
-static func _data_store() -> Node:
-	return DataStore

@@ -1,6 +1,21 @@
 {
   "schema_version": 1,
   "events": {
+    "qinglan_travel": {
+      "id": "qinglan_travel",
+      "location_id": "qinglan_mountain",
+      "type": "travel",
+      "mode": "auto",
+      "name": "山路赶路",
+      "desc": "沿山道继续前行，风声掠过林梢。",
+      "risk_text": "平安",
+      "weight": 26,
+      "min_depth": 1,
+      "max_depth": 0,
+      "once_per_expedition": false,
+      "effects": [],
+      "rewards": []
+    },
     "qinglan_herbs": {
       "id": "qinglan_herbs",
       "location_id": "qinglan_mountain",
@@ -69,6 +84,7 @@
     "qinglan_fog": {
       "id": "qinglan_fog",
       "location_id": "qinglan_mountain",
+      "chain_id": "demonic_ritual",
       "type": "hazard",
       "name": "迷障浓雾",
       "desc": "雾气耗散法力，需小心前行。",
@@ -85,6 +101,7 @@
     "qinglan_cliff": {
       "id": "qinglan_cliff",
       "location_id": "qinglan_mountain",
+      "chain_id": "sword_tomb",
       "type": "hazard",
       "name": "断崖滑坠",
       "desc": "碎石滚落，擦伤难免。",
@@ -98,10 +115,79 @@
       ],
       "rewards": []
     },
+    "qinglan_wolf_tracks": {
+      "id": "qinglan_wolf_tracks",
+      "location_id": "qinglan_mountain",
+      "chain_id": "wolf_king",
+      "type": "decision",
+      "mode": "decision",
+      "name": "狼踪再现",
+      "desc": "泥地上留着新鲜爪印，是否要追踪狼踪？",
+      "risk_text": "抉择",
+      "weight": 14,
+      "min_depth": 2,
+      "max_depth": 0,
+      "once_per_expedition": false,
+      "options": [
+        {
+          "id": "track",
+          "label": "追踪狼踪",
+          "desc": "深入林间，可能遭遇狼群伏击。",
+          "risk_text": "危险",
+          "trigger_event": "qinglan_wolf"
+        },
+        {
+          "id": "pass",
+          "label": "绕行而过",
+          "desc": "稳妥前行，避免无谓厮杀。",
+          "risk_text": "稳妥",
+          "effects": [],
+          "rewards": []
+        }
+      ]
+    },
+    "qinglan_injured_cultivator": {
+      "id": "qinglan_injured_cultivator",
+      "location_id": "qinglan_mountain",
+      "type": "decision",
+      "mode": "decision",
+      "name": "遇伤修士",
+      "desc": "一名散修靠在岩边喘息，向你求助。",
+      "risk_text": "抉择",
+      "weight": 12,
+      "min_depth": 1,
+      "max_depth": 0,
+      "once_per_expedition": false,
+      "options": [
+        {
+          "id": "help",
+          "label": "出手相助",
+          "desc": "匀出丹药与法力，换取对方谢礼。",
+          "risk_text": "消耗",
+          "effects": [
+            {"type": "drain_mp_percent", "value": 0.12}
+          ],
+          "rewards": [
+            {"kind": "item", "id": "items_HuiQiDan", "min": 1, "max": 1, "weight": 3},
+            {"kind": "currency", "id": "ling_stones", "min": 8, "max": 18, "weight": 2}
+          ]
+        },
+        {
+          "id": "ignore",
+          "label": "径直离开",
+          "desc": "历练凶险，不宜节外生枝。",
+          "risk_text": "冷淡",
+          "effects": [],
+          "rewards": []
+        }
+      ]
+    },
     "qinglan_wolf": {
       "id": "qinglan_wolf",
       "location_id": "qinglan_mountain",
+      "chain_id": "wolf_king",
       "type": "battle",
+      "mode": "auto",
       "name": "青牙狼袭",
       "desc": "狼群自林间扑出。",
       "risk_text": "普通",
@@ -178,6 +264,92 @@
         "attrs": {"hp_max": 240, "mp_max": 100, "shield": 0, "atk": 112, "def": 120, "spd": 105, "crit": 12, "crit_damage": 165},
         "skills": [3, 1, 2, 0]
       }
+    },
+    "wolf_den_choice": {
+      "id": "wolf_den_choice", "location_id": "qinglan_mountain", "chain_id": "wolf_king",
+      "type": "decision", "mode": "decision", "name": "狼巢入口", "desc": "腥风从洞中涌出，狼王就在深处。", "risk_text": "抉择",
+      "options": [
+        {"id": "enter", "label": "潜入狼巢", "desc": "冒险确认狼王踪迹。", "risk_text": "危险", "effects": [{"type": "drain_mp_percent", "value": 0.08}]},
+        {"id": "observe", "label": "外围观察", "desc": "稳妥记录狼群动向。", "risk_text": "稳妥", "effects": []}
+      ]
+    },
+    "wolf_pack_ambush": {
+      "id": "wolf_pack_ambush", "location_id": "qinglan_mountain", "chain_id": "wolf_king",
+      "type": "hazard", "name": "狼群围猎", "desc": "狼群从四面逼近，你负伤突围。", "risk_text": "危险",
+      "effects": [{"type": "damage_hp_percent", "value": 0.12}], "rewards": []
+    },
+    "wolf_king_boss": {
+      "id": "wolf_king_boss", "location_id": "qinglan_mountain", "chain_id": "wolf_king",
+      "type": "boss", "name": "青岚狼王", "desc": "狼王踏出巢穴，群狼随之低伏。", "risk_text": "首领",
+      "reward_rolls": 3, "rewards": [{"kind": "item", "id": "items_YaoDan", "min": 1, "max": 2, "weight": 1}],
+      "world_effects": [{"state": "wolf_threat", "value": -20}],
+      "enemy": {"name": "青岚狼王", "icon": "jueshe/sprite_003.png", "hp": 190, "mp": 60, "attrs": {"hp_max": 190, "mp_max": 60, "shield": 0, "atk": 105, "def": 105, "spd": 112, "crit": 10, "crit_damage": 160}, "skills": [3, 1, 0]}
+    },
+    "wolf_hunt_ending": {
+      "id": "wolf_hunt_ending", "location_id": "qinglan_mountain", "chain_id": "wolf_king",
+      "type": "travel", "name": "狼患暂息", "desc": "山林恢复寂静，你带着调查结果返程。", "risk_text": "结局", "effects": [], "rewards": []
+    },
+    "sword_broken_blade": {
+      "id": "sword_broken_blade", "location_id": "qinglan_mountain", "chain_id": "sword_tomb",
+      "type": "gather", "name": "林中残剑", "desc": "一截古剑在泥土中轻鸣。", "risk_text": "线索",
+      "reward_rolls": 1, "rewards": [{"kind": "item", "id": "items_HanTie", "min": 1, "max": 1, "weight": 1}]
+    },
+    "sword_stele_choice": {
+      "id": "sword_stele_choice", "location_id": "qinglan_mountain", "chain_id": "sword_tomb",
+      "type": "decision", "mode": "decision", "name": "无字古碑", "desc": "残剑靠近古碑时，碑上浮现剑痕。", "risk_text": "抉择",
+      "options": [
+        {"id": "comprehend", "label": "以神识参悟", "desc": "消耗法力破解剑痕。", "risk_text": "消耗", "effects": [{"type": "drain_mp_percent", "value": 0.18}]},
+        {"id": "trace", "label": "拓印剑痕", "desc": "保守记录线索。", "risk_text": "稳妥", "effects": []}
+      ]
+    },
+    "sword_array": {
+      "id": "sword_array", "location_id": "qinglan_mountain", "chain_id": "sword_tomb",
+      "type": "hazard", "name": "残缺剑阵", "desc": "沉寂剑气突然复苏。", "risk_text": "危险",
+      "effects": [{"type": "damage_hp_percent", "value": 0.15}], "rewards": []
+    },
+    "sword_guardian": {
+      "id": "sword_guardian", "location_id": "qinglan_mountain", "chain_id": "sword_tomb",
+      "type": "elite", "name": "守冢剑傀", "desc": "古老剑傀挡在石门之前。", "risk_text": "精英",
+      "reward_rolls": 2, "rewards": [{"kind": "item", "id": "items_HanTie", "min": 2, "max": 3, "weight": 1}],
+      "enemy": {"name": "守冢剑傀", "icon": "jueshe/sprite_001.png", "hp": 175, "mp": 80, "attrs": {"hp_max": 175, "mp_max": 80, "shield": 20, "atk": 108, "def": 120, "spd": 92, "crit": 8, "crit_damage": 155}, "skills": [3, 2, 0]}
+    },
+    "sword_tomb_ending": {
+      "id": "sword_tomb_ending", "location_id": "qinglan_mountain", "chain_id": "sword_tomb",
+      "type": "travel", "name": "剑冢石门", "desc": "石门开启一线，古剑之气冲天而起。", "risk_text": "结局", "effects": [], "rewards": [],
+      "world_effects": [{"state": "sword_tomb_opening", "value": 25}]
+    },
+    "demonic_missing_cultivator": {
+      "id": "demonic_missing_cultivator", "location_id": "qinglan_mountain", "chain_id": "demonic_ritual",
+      "type": "decision", "mode": "decision", "name": "失踪修士", "desc": "你发现一名奄奄一息的外门弟子。", "risk_text": "线索",
+      "options": [
+        {"id": "rescue", "label": "救下弟子", "desc": "耗费法力稳定伤势。", "risk_text": "消耗", "effects": [{"type": "drain_mp_percent", "value": 0.12}]},
+        {"id": "question", "label": "先问清线索", "desc": "抓紧时间追查魔修。", "risk_text": "冷静", "effects": []}
+      ]
+    },
+    "demonic_blood_trail": {
+      "id": "demonic_blood_trail", "location_id": "qinglan_mountain", "chain_id": "demonic_ritual",
+      "type": "decision", "mode": "decision", "name": "血祭痕迹", "desc": "血色符纹一路延伸至山腹。", "risk_text": "抉择",
+      "options": [
+        {"id": "destroy", "label": "破坏符纹", "desc": "削弱仪式但会惊动敌人。", "risk_text": "危险", "effects": [{"type": "damage_hp_percent", "value": 0.08}]},
+        {"id": "follow", "label": "隐匿追踪", "desc": "保留体力继续调查。", "risk_text": "谨慎", "effects": []}
+      ]
+    },
+    "demonic_ambush": {
+      "id": "demonic_ambush", "location_id": "qinglan_mountain", "chain_id": "demonic_ritual",
+      "type": "battle", "name": "魔修伏击", "desc": "黑衣魔修从血雾中现身。", "risk_text": "战斗",
+      "reward_rolls": 2, "rewards": [{"kind": "item", "id": "items_HuiLingDan", "min": 1, "max": 1, "weight": 1}],
+      "enemy": {"name": "黑衣魔修", "icon": "jueshe/sprite_002.png", "hp": 145, "mp": 100, "attrs": {"hp_max": 145, "mp_max": 100, "shield": 0, "atk": 102, "def": 95, "spd": 108, "crit": 10, "crit_damage": 160}, "skills": [3, 1, 0]}
+    },
+    "demonic_ritual_boss": {
+      "id": "demonic_ritual_boss", "location_id": "qinglan_mountain", "chain_id": "demonic_ritual",
+      "type": "boss", "name": "血祭主持者", "desc": "魔修催动血阵，山腹震颤。", "risk_text": "首领",
+      "reward_rolls": 3, "rewards": [{"kind": "item", "id": "items_PoJingDan", "min": 1, "max": 1, "weight": 1}],
+      "world_effects": [{"state": "sect_unrest", "value": -25}],
+      "enemy": {"name": "血祭主持者", "icon": "jueshe/sprite_000.png", "hp": 220, "mp": 130, "attrs": {"hp_max": 220, "mp_max": 130, "shield": 15, "atk": 118, "def": 108, "spd": 106, "crit": 12, "crit_damage": 165}, "skills": [3, 2, 1, 0]}
+    },
+    "demonic_ritual_ending": {
+      "id": "demonic_ritual_ending", "location_id": "qinglan_mountain", "chain_id": "demonic_ritual",
+      "type": "travel", "name": "血阵熄灭", "desc": "血光散去，失踪弟子的线索终于明朗。", "risk_text": "结局", "effects": [], "rewards": []
     }
   }
 }

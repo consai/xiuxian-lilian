@@ -66,9 +66,12 @@ static func transfer_all_items(from_inventory: Dictionary, to_inventory: Diction
 
 
 static func transfer_equip(from_equips: Array, to_equips: Array, equip_id: int) -> bool:
-	if equip_id <= 0 or not from_equips.has(equip_id):
+	if equip_id <= 0:
 		return false
-	from_equips.erase(equip_id)
+	var from_idx := _find_equip_index(from_equips, equip_id)
+	if from_idx < 0:
+		return false
+	from_equips.remove_at(from_idx)
 	return add_equip(to_equips, equip_id)
 
 
@@ -78,10 +81,17 @@ static func transfer_all_equips(from_equips: Array, to_equips: Array) -> void:
 
 
 static func add_equip(owned_equips: Array, equip_id: int) -> bool:
-	if equip_id <= 0 or owned_equips.has(equip_id):
+	if equip_id <= 0 or _find_equip_index(owned_equips, equip_id) >= 0:
 		return false
 	owned_equips.append(equip_id)
 	return true
+
+
+static func _find_equip_index(equips: Array, equip_id: int) -> int:
+	for i in equips.size():
+		if int(equips[i]) == equip_id:
+			return i
+	return -1
 
 
 static func cycle_equip_slot(owned_equips: Array, slots: Array, index: int) -> void:
@@ -141,6 +151,7 @@ static func sync_battle_item_counts(inventory: Dictionary, slots: Array, battle_
 			inventory[iid] = remaining
 		else:
 			inventory.erase(iid)
+			slots[i] = ""
 
 
 static func _item_def(item_id: String) -> ItemDef:

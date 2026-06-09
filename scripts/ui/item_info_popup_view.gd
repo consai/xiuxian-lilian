@@ -21,6 +21,7 @@ func _ready() -> void:
 	visible = false
 	_item_preview.show_name_label = false
 	_item_preview.set_click_enabled(false)
+	_item_preview.show_info_on_click = false
 	_close_button.pressed.connect(_request_close)
 	_backdrop.gui_input.connect(_on_backdrop_gui_input)
 

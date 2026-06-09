@@ -1,13 +1,15 @@
 class_name ItemView
-extends Panel
+extends Control
 
 ## 道具展示块，场景 [code]item.tscn[/code]。
 ## [member click_enabled] 为 [code]false[/code] 时仅展示（如详情弹窗）；为 [code]true[/code] 时可点击并带缩放反馈（如背包）。
+## [member show_info_on_click] 为 [code]true[/code] 且已 [method set_info_entry] 时，左键打开全局道具详情。
 ## [code]%GcItemHighlight[/code] 为品质边框，随 [member quality] / [method apply_display] 更新。
 
 signal clicked
 signal right_clicked
 
+@export var show_info_on_click: bool = true
 @export var click_enabled: bool = false:
 	set(value):
 		click_enabled = value
@@ -28,9 +30,12 @@ signal right_clicked
 var _display_name: String = ""
 var _display_count: int = 0
 var _quality: String = ""
+var _info_entry: Dictionary = {}
 
 
 func _ready() -> void:
+	if _name_count != null:
+		_name_count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_apply_click_enabled()
 	_apply_quality_border(_quality)
 	_refresh_name_count_text()
@@ -41,10 +46,40 @@ func set_click_enabled(enabled: bool) -> void:
 	click_enabled = enabled
 
 
+func set_info_entry(entry: Dictionary) -> void:
+	_info_entry = entry.duplicate(true) if entry is Dictionary else {}
+
+
+func clear_info_entry() -> void:
+	_info_entry = {}
+
+
+static func entry_from_reward_row(row: Dictionary) -> Dictionary:
+	var kind := str(row.get("kind", "item"))
+	match kind:
+		"equip":
+			var equip_id := int(row.get("id", -1))
+			if equip_id <= 0:
+				return {}
+			return {"kind": "equip", "id": equip_id, "count": 1}
+		"item":
+			var item_id := str(row.get("id", "")).strip_edges()
+			if item_id == "":
+				return {}
+			return {
+				"kind": "item",
+				"id": item_id,
+				"count": maxi(1, int(row.get("count", row.get("amount", 1)))),
+			}
+		_:
+			return {}
+
+
 func apply_empty(placeholder: Texture2D, icon_modulate: Color = Color(1, 1, 1, 0.28)) -> void:
 	_display_name = ""
 	_display_count = 0
 	_quality = ""
+	clear_info_entry()
 	if placeholder != null:
 		_icon.texture = placeholder
 	_icon.self_modulate = icon_modulate
@@ -86,6 +121,8 @@ func apply_row(row: Dictionary, fallback_icon: Texture2D = null) -> void:
 
 func _on_press_clicked() -> void:
 	clicked.emit()
+	if show_info_on_click and not _info_entry.is_empty():
+		ItemInfoPopupHost.show_entry(_info_entry)
 
 
 func _on_gui_input(event: InputEvent) -> void:

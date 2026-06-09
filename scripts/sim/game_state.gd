@@ -7,85 +7,89 @@ const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
 const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
-func _ds() -> Node:
-	return DataStore
 
 
 var day: int:
-	get: return int(_ds().savedata.get("day", 1))
-	set(value): _ds().savedata["day"] = value
+	get: return int(DataStore.savedata.get("day", 1))
+	set(value): DataStore.savedata["day"] = value
 var realm_index: int:
-	get: return int(_ds().savedata.get("realm_index", 0))
-	set(value): _ds().savedata["realm_index"] = value
+	get: return int(DataStore.savedata.get("realm_index", 0))
+	set(value): DataStore.savedata["realm_index"] = value
 var realm_name: String:
-	get: return str(_ds().savedata.get("realm_name", ""))
-	set(value): _ds().savedata["realm_name"] = value
+	get: return str(DataStore.savedata.get("realm_name", ""))
+	set(value): DataStore.savedata["realm_name"] = value
 var cultivation: int:
-	get: return int(_ds().savedata.get("cultivation", 0))
-	set(value): _ds().savedata["cultivation"] = value
+	get: return int(DataStore.savedata.get("cultivation", 0))
+	set(value): DataStore.savedata["cultivation"] = value
 var breakthrough_at: int:
-	get: return int(_ds().savedata.get("breakthrough_at", 100))
-	set(value): _ds().savedata["breakthrough_at"] = value
+	get: return int(DataStore.savedata.get("breakthrough_at", 100))
+	set(value): DataStore.savedata["breakthrough_at"] = value
 var injury_days: int:
-	get: return int(_ds().savedata.get("injury_days", 0))
-	set(value): _ds().savedata["injury_days"] = value
+	get: return int(DataStore.savedata.get("injury_days", 0))
+	set(value): DataStore.savedata["injury_days"] = value
 var ling_stones: int:
-	get: return int(_ds().savedata.get("ling_stones", 0))
-	set(value): _ds().savedata["ling_stones"] = value
+	get: return int(DataStore.savedata.get("ling_stones", 0))
+	set(value): DataStore.savedata["ling_stones"] = value
 var player_name: String:
-	get: return str(_ds().savedata.get("player_name", ""))
-	set(value): _ds().savedata["player_name"] = value
+	get: return str(DataStore.savedata.get("player_name", ""))
+	set(value): DataStore.savedata["player_name"] = value
 var player_icon: String:
-	get: return str(_ds().savedata.get("player_icon", ""))
-	set(value): _ds().savedata["player_icon"] = value
+	get: return str(DataStore.savedata.get("player_icon", ""))
+	set(value): DataStore.savedata["player_icon"] = value
 var attrs: Dictionary:
-	get: return _ds().savedata.get("attrs", {}) as Dictionary
-	set(value): _ds().savedata["attrs"] = value
+	get: return DataStore.savedata.get("attrs", {}) as Dictionary
+	set(value): DataStore.savedata["attrs"] = value
 var hp: float:
-	get: return float(_ds().savedata.get("hp", 100.0))
-	set(value): _ds().savedata["hp"] = value
+	get: return float(DataStore.savedata.get("hp", 100.0))
+	set(value): DataStore.savedata["hp"] = value
 var mp: float:
-	get: return float(_ds().savedata.get("mp", 100.0))
-	set(value): _ds().savedata["mp"] = value
+	get: return float(DataStore.savedata.get("mp", 100.0))
+	set(value): DataStore.savedata["mp"] = value
 var unlocked_skills: Array:
-	get: return _ds().savedata.get("unlocked_skills", []) as Array
-	set(value): _ds().savedata["unlocked_skills"] = value
+	get: return DataStore.savedata.get("unlocked_skills", []) as Array
+	set(value): DataStore.savedata["unlocked_skills"] = value
 var equipped_skills: Array:
-	get: return _ds().savedata.get("equipped_skills", []) as Array
-	set(value): _ds().savedata["equipped_skills"] = value
+	get: return DataStore.savedata.get("equipped_skills", []) as Array
+	set(value): DataStore.savedata["equipped_skills"] = value
 var owned_equips: Array:
-	get: return _ds().savedata.get("owned_equips", []) as Array
-	set(value): _ds().savedata["owned_equips"] = value
+	get: return DataStore.savedata.get("owned_equips", []) as Array
+	set(value): DataStore.savedata["owned_equips"] = value
 var equip_slots: Array:
-	get: return _ds().savedata.get("equip_slots", [-1, -1]) as Array
-	set(value): _ds().savedata["equip_slots"] = value
+	get: return DataStore.savedata.get("equip_slots", [-1, -1]) as Array
+	set(value): DataStore.savedata["equip_slots"] = value
 var item_slots: Array:
-	get: return _ds().savedata.get("item_slots", ["", ""]) as Array
-	set(value): _ds().savedata["item_slots"] = value
+	get: return DataStore.savedata.get("item_slots", ["", ""]) as Array
+	set(value): DataStore.savedata["item_slots"] = value
 var inventory: Dictionary:
-	get: return _ds().savedata.get("inventory", {}) as Dictionary
-	set(value): _ds().savedata["inventory"] = value
+	get: return DataStore.savedata.get("inventory", {}) as Dictionary
+	set(value): DataStore.savedata["inventory"] = value
+var world_state: Dictionary:
+	get: return DataStore.savedata.get("world_state", {}) as Dictionary
+	set(value): DataStore.savedata["world_state"] = value
 var storage: Dictionary:
-	get: return _ds().savedata.get("storage", {}) as Dictionary
-	set(value): _ds().savedata["storage"] = value
+	get: return DataStore.savedata.get("storage", {}) as Dictionary
+	set(value): DataStore.savedata["storage"] = value
 var storage_equips: Array:
-	get: return _ds().savedata.get("storage_equips", []) as Array
-	set(value): _ds().savedata["storage_equips"] = value
+	get: return DataStore.savedata.get("storage_equips", []) as Array
+	set(value): DataStore.savedata["storage_equips"] = value
 var activity_log: Array:
-	get: return _ds().savedata.get("activity_log", []) as Array
-	set(value): _ds().savedata["activity_log"] = value
+	get: return DataStore.savedata.get("activity_log", []) as Array
+	set(value): DataStore.savedata["activity_log"] = value
 var totals: Dictionary:
-	get: return _ds().savedata.get("totals", {}) as Dictionary
-	set(value): _ds().savedata["totals"] = value
+	get: return DataStore.savedata.get("totals", {}) as Dictionary
+	set(value): DataStore.savedata["totals"] = value
 var last_rewards: Array:
-	get: return _ds().game_runtime().get("last_rewards", []) as Array
-	set(value): _ds().game_runtime()["last_rewards"] = value
+	get: return DataStore.game_runtime().get("last_rewards", []) as Array
+	set(value): DataStore.game_runtime()["last_rewards"] = value
 var last_expedition_summary: Dictionary:
-	get: return _ds().game_runtime().get("last_expedition_summary", {}) as Dictionary
-	set(value): _ds().game_runtime()["last_expedition_summary"] = value
+	get: return DataStore.game_runtime().get("last_expedition_summary", {}) as Dictionary
+	set(value): DataStore.game_runtime()["last_expedition_summary"] = value
 var last_settled_expedition_id: String:
-	get: return str(_ds().game_runtime().get("last_settled_expedition_id", ""))
-	set(value): _ds().game_runtime()["last_settled_expedition_id"] = value
+	get: return str(DataStore.game_runtime().get("last_settled_expedition_id", ""))
+	set(value): DataStore.game_runtime()["last_settled_expedition_id"] = value
+var active_save_slot: int:
+	get: return int(DataStore.game_runtime().get("active_save_slot", 0))
+	set(value): DataStore.game_runtime()["active_save_slot"] = value
 
 
 func _ready() -> void:
@@ -94,7 +98,7 @@ func _ready() -> void:
 
 
 func new_game() -> void:
-	_ds().reset_all()
+	DataStore.reset_all()
 	var root := JsonLoader._read_json_root_object(SIM_PATH)
 	var initial := root.get("initial_player", {}) as Dictionary
 	day = 1
@@ -116,6 +120,7 @@ func new_game() -> void:
 	storage = (initial.get("storage", {}) as Dictionary).duplicate(true)
 	storage_equips = (initial.get("storage_equips", []) as Array).duplicate(true)
 	activity_log = []
+	world_state = {"wolf_threat": 35, "sword_tomb_opening": 0, "sect_unrest": 30}
 	totals = {
 		"battles": 0, "wins": 0, "losses": 0, "items_gained": 0,
 		"expeditions": 0, "expedition_steps": 0, "max_depth": 0,
@@ -124,7 +129,55 @@ func new_game() -> void:
 	last_rewards = []
 	last_expedition_summary = {}
 	last_settled_expedition_id = ""
+	active_save_slot = 0
 	_sync_realm()
+
+
+func can_persist() -> bool:
+	return ExpeditionState == null or not ExpeditionState.active
+
+
+func save_game(slot: int) -> Dictionary:
+	if slot == SaveService.AUTO_SAVE_SLOT:
+		return {"ok": false, "error": "槽位 1 为自动存档，无法手动存入"}
+	return _persist_slot(slot)
+
+
+func auto_save() -> Dictionary:
+	var result := _persist_slot(SaveService.AUTO_SAVE_SLOT)
+	if bool(result.get("ok", false)):
+		DataEvents.emit_tip_intent({
+			"type": "toast",
+			"text": "自动存档成功",
+			"tone": "gain",
+			"channel": "bar",
+			"source": "auto_save",
+			"ttl_ms": 2200,
+			"dedupe_key": "auto_save_success",
+			"dedupe_window_ms": 800,
+		})
+	return result
+
+
+func _persist_slot(slot: int) -> Dictionary:
+	if not can_persist():
+		return {"ok": false, "error": "历练中无法存档，请先完成或结算"}
+	var result: Dictionary = SaveService.save_slot(slot, to_dict())
+	if bool(result.get("ok", false)):
+		active_save_slot = slot
+	return result
+
+
+func load_game(slot: int) -> Dictionary:
+	if not can_persist():
+		return {"ok": false, "error": "历练中无法读档，请先完成或结算"}
+	var loaded: Dictionary = SaveService.load_slot(slot)
+	if not bool(loaded.get("ok", false)):
+		return loaded
+	if not apply_dict(loaded.get("game", {}) as Dictionary):
+		return {"ok": false, "error": "存档数据无效"}
+	active_save_slot = slot
+	return {"ok": true, "slot": slot}
 
 
 func cultivate() -> int:
@@ -169,6 +222,21 @@ func begin_expedition(location_id: String) -> Dictionary:
 	return {"ok": true, "location": location}
 
 
+func apply_battle_player_runtime(summary: Dictionary) -> void:
+	var runtime_summary := summary.get("player_runtime", {}) as Dictionary
+	if runtime_summary.is_empty():
+		return
+	if runtime_summary.has("hp"):
+		hp = float(runtime_summary.get("hp", hp))
+	if runtime_summary.has("mp"):
+		mp = float(runtime_summary.get("mp", mp))
+	var battle_items_v: Variant = runtime_summary.get("items", [])
+	if battle_items_v is Array:
+		InventoryServiceScript.sync_battle_item_counts(
+			inventory, item_slots, battle_items_v as Array
+		)
+
+
 func build_player_battle_snapshot(runtime: Dictionary) -> Dictionary:
 	var runtime_inv := (runtime.get("inventory", {}) as Dictionary).duplicate(true)
 	var runtime_slots := (runtime.get("item_slots", item_slots) as Array).duplicate(true)
@@ -182,7 +250,7 @@ func build_player_battle_snapshot(runtime: Dictionary) -> Dictionary:
 		var eid := int(eid_v)
 		var equip_row := {"id": eid, "cd": 0.0}
 		if eid > 0:
-			var cfg: Dictionary = _equip_cfg(eid)
+			var cfg: Dictionary = ConfigManager.equip_by_id(eid)
 			equip_row["effects"] = (cfg.get("effects", []) as Array).duplicate(true)
 			equip_row["cd_total"] = float(cfg.get("cd_total", cfg.get("cd", 0.0)))
 		equips.append(equip_row)
@@ -228,6 +296,7 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 		return {"ok": false, "error": "duplicate", "duplicate": true}
 	last_settled_expedition_id = settlement_id
 	var elapsed_days := maxi(1, int(result.get("elapsed_days", 1)))
+	var start_day := int(result.get("start_day", 0))
 	injury_days = maxi(0, injury_days - elapsed_days)
 	var exit_reason := str(result.get("exit_reason", "manual"))
 	hp = float(result.get("hp", hp))
@@ -260,7 +329,10 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 	totals["battles"] = int(totals.get("battles", 0)) + int(stats.get("battles", 0))
 	totals["wins"] = int(totals.get("wins", 0)) + int(stats.get("wins", 0))
 	totals["losses"] = int(totals.get("losses", 0)) + int(stats.get("losses", 0))
-	day += elapsed_days
+	if start_day > 0:
+		day = start_day + elapsed_days
+	else:
+		day += elapsed_days
 	var location_name := str(result.get("location_name", "未知地点"))
 	var reward_labels: PackedStringArray = []
 	for reward in last_rewards:
@@ -275,20 +347,22 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 		log_text += "，带回 %s" % "、".join(reward_labels)
 	if exit_reason == "defeated":
 		log_text += "（战败撤退）"
-	activity_log.append({"day": day - elapsed_days, "text": log_text})
+	activity_log.append({"day": day, "text": log_text})
 	if activity_log.size() > 30:
 		activity_log = activity_log.slice(activity_log.size() - 30)
 	last_settled_expedition_id = settlement_id
 	last_expedition_summary = result.duplicate(true)
+	_apply_world_changes(result.get("world_changes", []) as Array)
+	auto_save()
 	return {"ok": true, "rewards": last_rewards.duplicate(true), "elapsed_days": elapsed_days}
 
 
 func to_dict() -> Dictionary:
-	return _ds().export_savedata()
+	return DataStore.export_savedata()
 
 
 func apply_dict(data: Dictionary) -> bool:
-	if not _ds().import_savedata(data):
+	if not DataStore.import_savedata(data):
 		return false
 	var attrs_dict := attrs
 	hp = clampf(hp, 0.0, float(attrs_dict.get(FightAttr.HP_MAX, 100.0)))
@@ -304,7 +378,7 @@ func apply_dict(data: Dictionary) -> bool:
 func reward_label(reward: Dictionary) -> String:
 	var kind := str(reward.get("kind", "item"))
 	if kind == "equip":
-		return "%s x1" % str(_equip_cfg(int(reward.get("id", -1))).get("name", "法宝"))
+		return "%s x1" % str(ConfigManager.equip_by_id(int(reward.get("id", -1))).get("name", "法宝"))
 	if kind == "currency":
 		return "灵石 x%d" % int(reward.get("count", 0))
 	var cm := _config_manager()
@@ -342,15 +416,19 @@ func _simulation_root() -> Dictionary:
 	return JsonLoader._read_json_root_object(SIM_PATH)
 
 
-func _equip_cfg(equip_id: int) -> Dictionary:
-	var cm := _config_manager()
-	if cm != null and cm.has_method("equip_by_id"):
-		return cm.call("equip_by_id", equip_id) as Dictionary
-	return {}
-
-
 func _config_manager() -> Node:
 	var loop := Engine.get_main_loop()
 	if not loop is SceneTree:
 		return null
 	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
+
+
+func _apply_world_changes(changes: Array) -> void:
+	for change_v in changes:
+		if not change_v is Dictionary:
+			continue
+		var change := change_v as Dictionary
+		var key := str(change.get("state", ""))
+		if not world_state.has(key):
+			continue
+		world_state[key] = clampi(int(world_state.get(key, 0)) + int(change.get("value", 0)), 0, 100)

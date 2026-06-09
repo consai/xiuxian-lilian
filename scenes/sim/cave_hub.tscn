@@ -19,6 +19,7 @@
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="17_label24"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="18_label28"]
 [ext_resource type="PackedScene" uid="uid://d4c01tu5e581m" path="res://scenes/sim/inventory_overlay.tscn" id="19_breup"]
+[ext_resource type="PackedScene" path="res://scenes/sim/save_slots_overlay.tscn" id="20_save"]
 
 [sub_resource type="StyleBoxFlat" id="Style_panel"]
 bg_color = Color(1, 0.933333, 0.823529, 0.96)
@@ -84,6 +85,15 @@ offset_bottom = 82.0
 text = "炼气一层 · 修为 0/100"
 label_settings = ExtResource("16_label20")
 horizontal_alignment = 1
+
+[node name="SaveButton" type="Button" parent="ProfilePanel" unique_id=1418512808]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 72.0
+offset_top = 84.0
+offset_right = 180.0
+offset_bottom = 108.0
+text = "存档"
 
 [node name="StatusPanel" type="Panel" parent="." unique_id=144307130]
 layout_mode = 1
@@ -340,7 +350,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 326.0
-offset_top = -132.0
+offset_top = -112.0
 offset_right = -304.0
 offset_bottom = -34.0
 grow_horizontal = 2
@@ -349,7 +359,7 @@ theme_override_constants/separation = 25
 alignment = 1
 
 [node name="CultivateButton" type="TextureButton" parent="BottomActions" unique_id=1149458252]
-custom_minimum_size = Vector2(200, 98)
+custom_minimum_size = Vector2(128.315, 76.08)
 layout_mode = 2
 texture_normal = ExtResource("12_green_button")
 ignore_texture_size = true
@@ -370,7 +380,7 @@ vertical_alignment = 1
 
 [node name="BreakthroughButton" type="TextureButton" parent="BottomActions" unique_id=154044267]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 98)
+custom_minimum_size = Vector2(128.315, 76.08)
 layout_mode = 2
 texture_normal = ExtResource("13_yellow_button")
 ignore_texture_size = true
@@ -390,7 +400,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="ExpeditionButton" type="TextureButton" parent="BottomActions" unique_id=897574208]
-custom_minimum_size = Vector2(200, 98)
+custom_minimum_size = Vector2(128.315, 76.08)
 layout_mode = 2
 texture_normal = ExtResource("14_blue_button")
 ignore_texture_size = true
@@ -405,6 +415,26 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "历练"
+label_settings = ExtResource("18_label28")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="btnattrs" type="TextureButton" parent="BottomActions" unique_id=229591886]
+custom_minimum_size = Vector2(128.315, 76.08)
+layout_mode = 2
+texture_normal = ExtResource("14_blue_button")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="BottomActions/btnattrs" unique_id=461312723]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "属性"
 label_settings = ExtResource("18_label28")
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -444,6 +474,11 @@ vertical_alignment = 1
 autowrap_mode = 2
 
 [node name="InventoryOverlay" parent="." unique_id=484445740 instance=ExtResource("19_breup")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="SaveSlotsOverlay" parent="." unique_id=1076859842 instance=ExtResource("20_save")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1

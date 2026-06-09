@@ -47,6 +47,11 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 	out["item_slots"] = item_slots.slice(0, 2)
 	if not out.get("totals") is Dictionary:
 		out["totals"] = _default_totals()
+	var world_state_v: Variant = out.get("world_state", {})
+	var world_state := world_state_v as Dictionary if world_state_v is Dictionary else {}
+	for key in ["wolf_threat", "sword_tomb_opening", "sect_unrest"]:
+		world_state[key] = clampi(int(world_state.get(key, 0)), 0, 100)
+	out["world_state"] = world_state
 	return out
 
 
@@ -56,6 +61,7 @@ func reset_rundata() -> void:
 			"last_rewards": [],
 			"last_expedition_summary": {},
 			"last_settled_expedition_id": "",
+			"active_save_slot": 0,
 		},
 		"expedition": _default_expedition(),
 		"battle": {
@@ -233,8 +239,8 @@ func _default_savedata() -> Dictionary:
 		"player_name": "",
 		"player_icon": "",
 		"attrs": {},
-		"hp": 100.0,
-		"mp": 100.0,
+		"hp": 1000.0,
+		"mp": 1000.0,
 		"unlocked_skills": [],
 		"equipped_skills": [],
 		"owned_equips": [],
@@ -244,6 +250,7 @@ func _default_savedata() -> Dictionary:
 		"storage": {},
 		"storage_equips": [],
 		"activity_log": [],
+		"world_state": {"wolf_threat": 35, "sword_tomb_opening": 0, "sect_unrest": 30},
 		"totals": _default_totals(),
 	}
 
@@ -276,6 +283,9 @@ func _default_expedition() -> Dictionary:
 		"active": false,
 		"phase": "idle",
 		"location_id": "",
+		"journey_step": 0,
+		"active_chain_id": "",
+		"completed_events": [],
 		"depth": 1,
 		"steps": 0,
 		"seed": 0,
@@ -283,6 +293,7 @@ func _default_expedition() -> Dictionary:
 		"runtime": {"hp": 0.0, "mp": 0.0, "item_slots": ["", ""], "inventory": {}},
 		"loot": [],
 		"current_choices": [],
+		"pending_decision_event": {},
 		"current_event_id": "",
 		"pending_battle_event_id": "",
 		"pending_battle_summary": {},
@@ -293,4 +304,5 @@ func _default_expedition() -> Dictionary:
 		"player_snapshot": {},
 		"pending_exit_reason": "",
 		"expedition_id": "",
+		"start_day": 0,
 	}

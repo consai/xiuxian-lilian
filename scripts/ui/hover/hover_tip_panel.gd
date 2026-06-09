@@ -2,16 +2,18 @@ extends Control
 class_name HoverTipPanel
 
 const _TITLE_COLOR_DEFAULT := Color(0.33333334, 0.19607843, 0.18431373, 1.0)
-const _BODY_COLOR := Color(0.4117647, 0.3019608, 0.27450982, 1.0)
-const _FOOTER_COLOR := Color(0.5372549, 0.42745098, 0.3882353, 1.0)
 const _MIN_WIDTH := 168.0
 const _MAX_WIDTH := 280.0
+const _H_MARGIN := 20.0
+const _ICON_ROW_EXTRA := 34.0
 
 @onready var _icon: TextureRect = %Icon
 @onready var _title: Label = %Title
 @onready var _body: Label = %Body
 @onready var _footer: Label = %Footer
 @onready var _panel: PanelContainer = %Panel
+
+var _present_generation := 0
 
 
 func _ready() -> void:
@@ -21,6 +23,8 @@ func _ready() -> void:
 
 
 func apply_payload(payload: Dictionary) -> void:
+	_reset_layout_sizes()
+
 	var title := str(payload.get("title", "")).strip_edges()
 	var title_color_v: Variant = payload.get("title_color", null)
 	var title_color := title_color_v as Color if title_color_v is Color else _TITLE_COLOR_DEFAULT
@@ -50,34 +54,116 @@ func apply_payload(payload: Dictionary) -> void:
 	_footer.text = footer
 	_footer.visible = footer != ""
 
-	_panel.custom_minimum_size.x = clampf(
-		maxf(_MIN_WIDTH, _measure_content_width()),
-		_MIN_WIDTH,
-		_MAX_WIDTH
-	)
-	_panel.reset_size()
-	size = _panel.size
 
-
-func show_at_anchor(anchor: Control) -> void:
+func show_at_anchor(anchor: Control, show_token: int, token_check: Callable) -> void:
 	if anchor == null or not is_instance_valid(anchor):
 		return
-	visible = true
+	_present_generation += 1
+	var generation := _present_generation
+	hide_immediate()
+
+	_apply_panel_width(_MAX_WIDTH)
 	await get_tree().process_frame
+	if not _can_present(anchor, show_token, generation, token_check):
+		return
+
+	var panel_width := _compute_panel_width()
+	_apply_panel_width(panel_width)
+	await get_tree().process_frame
+	if not _can_present(anchor, show_token, generation, token_check):
+		return
+
+	_finalize_layout()
 	_place_near_pointer(anchor)
+	visible = true
 	modulate.a = 1.0
 
 
 func hide_immediate() -> void:
+	_present_generation += 1
 	visible = false
 	modulate.a = 0.0
 
 
-func _resolve_panel_size() -> Vector2:
-	var panel_size := size
+func _can_present(
+		anchor: Control,
+		show_token: int,
+		generation: int,
+		token_check: Callable
+) -> bool:
+	if generation != _present_generation:
+		return false
+	if token_check.is_valid() and not bool(token_check.call(show_token)):
+		return false
+	return _is_anchor_hovered(anchor)
+
+
+func _is_anchor_hovered(anchor: Control) -> bool:
+	if anchor == null or not is_instance_valid(anchor):
+		return false
+	return anchor.get_global_rect().has_point(anchor.get_global_mouse_position())
+
+
+func _reset_layout_sizes() -> void:
+	_panel.custom_minimum_size = Vector2.ZERO
+	_body.custom_minimum_size = Vector2.ZERO
+	_footer.custom_minimum_size = Vector2.ZERO
+	size = Vector2.ZERO
+	_panel.position = Vector2.ZERO
+
+
+func _apply_panel_width(panel_width: float) -> void:
+	var width := clampf(panel_width, _MIN_WIDTH, _MAX_WIDTH)
+	var inner_width := maxf(1.0, width - _H_MARGIN)
+	if _body.visible:
+		_body.custom_minimum_size.x = inner_width
+	if _footer.visible:
+		_footer.custom_minimum_size.x = inner_width
+	_panel.custom_minimum_size.x = width
+	_panel.reset_size()
+
+
+func _compute_panel_width() -> float:
+	var width := _MIN_WIDTH
+
+	if _title.visible:
+		var header_width := _title.get_minimum_size().x
+		if _icon.visible:
+			header_width += _ICON_ROW_EXTRA
+		width = maxf(width, header_width + _H_MARGIN)
+
+	if _body.visible:
+		width = maxf(width, minf(_body.get_minimum_size().x + _H_MARGIN, _MAX_WIDTH))
+	if _footer.visible:
+		width = maxf(width, minf(_footer.get_minimum_size().x + _H_MARGIN, _MAX_WIDTH))
+
+	width = clampf(width, _MIN_WIDTH, _MAX_WIDTH)
+	var inner_width := maxf(1.0, width - _H_MARGIN)
+
+	if _body.visible:
+		_body.custom_minimum_size.x = inner_width
+	if _footer.visible:
+		_footer.custom_minimum_size.x = inner_width
+
+	return width
+
+
+func _finalize_layout() -> void:
+	_panel.reset_size()
+	var panel_size := _panel.get_combined_minimum_size()
 	if panel_size.x <= 1.0 or panel_size.y <= 1.0:
 		panel_size = _panel.size
-	return panel_size
+	size = panel_size
+	_panel.position = Vector2.ZERO
+
+
+func _resolve_panel_size() -> Vector2:
+	if size.x > 1.0 and size.y > 1.0:
+		return size
+	var panel_size := _panel.get_combined_minimum_size()
+	if panel_size.x > 1.0 and panel_size.y > 1.0:
+		return panel_size
+	return _panel.size
 
 
 func _place_near_pointer(anchor: Control) -> void:
@@ -149,16 +235,3 @@ func _avoid_anchor_overlap(
 		pos.y = below_anchor_y
 
 	return pos
-
-
-func _measure_content_width() -> float:
-	var width := _MIN_WIDTH
-	if _title.visible:
-		width = maxf(width, _title.get_minimum_size().x + 16.0)
-	if _body.visible:
-		width = maxf(width, _body.get_minimum_size().x + 16.0)
-	if _footer.visible:
-		width = maxf(width, _footer.get_minimum_size().x + 16.0)
-	if _icon.visible:
-		width += _icon.custom_minimum_size.x + 8.0
-	return width

@@ -56,6 +56,10 @@ func hide_for(source: Control, delay_ms: int = 80) -> void:
 		return
 	if _active_source != source:
 		return
+	if not is_instance_valid(source):
+		return
+	if source.get_global_rect().has_point(source.get_global_mouse_position()):
+		return
 	_hide_now(token)
 
 
@@ -73,7 +77,11 @@ func _present_now(token: int) -> void:
 	if not is_instance_valid(_active_source):
 		return
 	_panel.apply_payload(_pending_payload)
-	_panel.show_at_anchor(_active_source)
+	_panel.show_at_anchor(_active_source, token, Callable(self, "_is_show_token_active"))
+
+
+func _is_show_token_active(token: int) -> bool:
+	return token == _show_token and _active_source != null and is_instance_valid(_active_source)
 
 
 func _hide_now(token: int) -> void:

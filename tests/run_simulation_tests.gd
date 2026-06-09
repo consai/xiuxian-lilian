@@ -3,8 +3,6 @@ extends SceneTree
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
 const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
-const SaveServiceScript := preload("res://scripts/sim/save_service.gd")
-
 var _failures: Array[String] = []
 var _tests_run := 0
 
@@ -16,11 +14,16 @@ func _init() -> void:
 func _run_all() -> void:
 	_run("new game and daily activities", _test_new_game_and_daily_activities)
 	_run("inventory and battle item slots", _test_inventory_and_battle_item_slots)
+	_run("battle runtime deducts inventory", _test_battle_runtime_deducts_inventory)
 	_run("transfer item respects stack cap", _test_transfer_item_stack_cap)
 	_run("expedition events build valid battle data", _test_expedition_events_build_valid_battle_data)
 	_run("reward pools produce legal rewards", _test_reward_pools)
 	_run("expedition defeat settlement persists runtime state", _test_expedition_defeat_settlement)
 	_run("three save slots round trip", _test_save_round_trip)
+	_run("game state save and load via autoload", _test_game_state_save_load)
+	_run("auto save slot restrictions", _test_auto_save_slot_restrictions)
+	_run("expedition settlement auto saves", _test_expedition_settlement_auto_saves)
+	_run("save blocked during expedition", _test_save_blocked_during_expedition)
 	_run("save service rejects corrupt data", _test_corrupt_save)
 	if _failures.is_empty():
 		print("PASS: %d simulation tests" % _tests_run)
@@ -47,6 +50,10 @@ func _state() -> Node:
 
 func _expedition() -> Node:
 	return root.get_node("ExpeditionState")
+
+
+func _save_service() -> Node:
+	return root.get_node("SaveService")
 
 
 func _test_new_game_and_daily_activities() -> void:
@@ -88,14 +95,34 @@ func _test_transfer_item_stack_cap() -> void:
 
 func _test_inventory_and_battle_item_slots() -> void:
 	var state := _state()
-	var before := int(state.inventory.get("items_HuiQiDan", 0))
-	_expect_eq(InventoryServiceScript.add_item(state.inventory, "items_HuiQiDan", 2), 2, "add stack")
-	_expect_eq(int(state.inventory["items_HuiQiDan"]), before + 2, "stack result")
+	var slot_id := str(state.item_slots[0])
+	var before := int(state.inventory.get(slot_id, 0))
 	var slots := InventoryServiceScript.build_battle_item_slots(state.inventory, state.item_slots)
 	_expect_eq(slots.size(), 2, "battle item slot count")
-	(slots[0] as Dictionary)["count"] = 1
+	(slots[0] as Dictionary)["count"] = maxi(0, before - 1)
 	InventoryServiceScript.sync_battle_item_counts(state.inventory, state.item_slots, slots)
-	_expect_eq(int(state.inventory[state.item_slots[0]]), 1, "sync consumed items")
+	_expect_eq(int(state.inventory.get(slot_id, 0)), before - 1, "sync consumed items")
+	(slots[0] as Dictionary)["count"] = 0
+	InventoryServiceScript.sync_battle_item_counts(state.inventory, state.item_slots, slots)
+	_expect_true(not state.inventory.has(slot_id), "depleted item removed")
+	_expect_eq(str(state.item_slots[0]), "", "depleted slot cleared")
+
+
+func _test_battle_runtime_deducts_inventory() -> void:
+	var state := _state()
+	var slot_id := str(state.item_slots[0])
+	_expect_true(slot_id != "", "battle slot configured")
+	var before := int(state.inventory.get(slot_id, 0))
+	var battle_items := InventoryServiceScript.build_battle_item_slots(state.inventory, state.item_slots)
+	(battle_items[0] as Dictionary)["count"] = maxi(0, before - 1)
+	state.apply_battle_player_runtime({
+		"player_runtime": {
+			"hp": 80.0,
+			"mp": 60.0,
+			"items": battle_items,
+		},
+	})
+	_expect_eq(int(state.inventory.get(slot_id, 0)), before - 1, "battle consumption persisted")
 
 
 func _test_expedition_events_build_valid_battle_data() -> void:
@@ -143,26 +170,84 @@ func _test_save_round_trip() -> void:
 	var state := _state()
 	state.day = 9
 	state.cultivation = 77
-	var service := SaveServiceScript.new()
-	var saved: Dictionary = service.save_slot(3, state.to_dict())
+	var saved: Dictionary = _save_service().save_slot(3, state.to_dict())
 	_expect_true(bool(saved.get("ok", false)), "save slot")
-	var loaded: Dictionary = service.load_slot(3)
+	var loaded: Dictionary = _save_service().load_slot(3)
 	_expect_true(bool(loaded.get("ok", false)), "load slot")
 	var restored := _state()
 	_expect_true(restored.apply_dict(loaded.get("game", {})), "apply saved state")
 	_expect_eq(restored.day, 9, "restored day")
 	_expect_eq(restored.cultivation, 77, "restored cultivation")
-	service.free()
+
+
+func _test_game_state_save_load() -> void:
+	var state := _state()
+	state.new_game()
+	state.day = 5
+	state.cultivation = 42
+	var saved: Dictionary = state.save_game(2)
+	_expect_true(bool(saved.get("ok", false)), "game save ok")
+	_expect_eq(state.active_save_slot, 2, "active slot tracked")
+	state.day = 1
+	state.cultivation = 0
+	var loaded: Dictionary = state.load_game(2)
+	_expect_true(bool(loaded.get("ok", false)), "game load ok")
+	_expect_eq(state.day, 5, "loaded day")
+	_expect_eq(state.cultivation, 42, "loaded cultivation")
+	_expect_eq(state.active_save_slot, 2, "active slot restored")
+
+
+func _test_auto_save_slot_restrictions() -> void:
+	var state := _state()
+	state.new_game()
+	state.day = 3
+	var blocked: Dictionary = state.save_game(SaveService.AUTO_SAVE_SLOT)
+	_expect_true(not bool(blocked.get("ok", false)), "manual save blocked on auto slot")
+	var auto_saved: Dictionary = state.auto_save()
+	_expect_true(bool(auto_saved.get("ok", false)), "auto save ok")
+	_expect_eq(state.active_save_slot, SaveService.AUTO_SAVE_SLOT, "auto slot tracked")
+	var info: Dictionary = _save_service().slot_info(SaveService.AUTO_SAVE_SLOT)
+	_expect_true(bool(info.get("ok", false)), "auto slot has data")
+	_expect_eq(int(info.get("day", 0)), 3, "auto slot day")
+
+
+func _test_expedition_settlement_auto_saves() -> void:
+	var state := _state()
+	var expedition := _expedition()
+	state.new_game()
+	expedition.start("qinglan_mountain", state, 9092)
+	expedition.current_choices = [ExpeditionEventServiceScript.by_id("qinglan_wolf")]
+	expedition.choose_event("qinglan_wolf")
+	expedition.receive_battle_summary({
+		"outcome": "loss",
+		"player_runtime": {"hp": 0.0, "mp": 12.0, "items": [{"id": 9001, "count": 1}, {"id": 9003, "count": 0}]},
+	})
+	expedition.settle_pending_battle()
+	var finish: Dictionary = expedition.finish("defeated")
+	state.settle_expedition(finish)
+	var info: Dictionary = _save_service().slot_info(SaveService.AUTO_SAVE_SLOT)
+	_expect_true(bool(info.get("ok", false)), "expedition settlement auto-saves")
+	_expect_eq(int(info.get("day", 0)), 2, "auto save reflects settled day")
+	_expect_eq(state.active_save_slot, SaveService.AUTO_SAVE_SLOT, "active slot is auto save")
+
+
+func _test_save_blocked_during_expedition() -> void:
+	var state := _state()
+	var expedition := _expedition()
+	state.new_game()
+	var started: Dictionary = expedition.start("qinglan_mountain", state, 99)
+	_expect_true(bool(started.get("ok", false)), "expedition started")
+	var blocked: Dictionary = state.save_game(2)
+	_expect_true(not bool(blocked.get("ok", false)), "save blocked")
+	expedition.reset()
 
 
 func _test_corrupt_save() -> void:
 	var file := FileAccess.open("user://save_slot_2.json", FileAccess.WRITE)
 	file.store_string("{broken")
 	file.close()
-	var service := SaveServiceScript.new()
-	var loaded: Dictionary = service.load_slot(2)
+	var loaded: Dictionary = _save_service().load_slot(2)
 	_expect_true(not bool(loaded.get("ok", false)), "corrupt save rejected")
-	service.free()
 
 
 func _expect_true(actual: bool, message: String) -> void:

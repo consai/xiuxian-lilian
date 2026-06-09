@@ -45,8 +45,16 @@ func _start() -> void:
 	var data: Dictionary = expedition.build_battle_init()
 	(data["player"] as Dictionary)["attrs"]["atk"] = 500.0
 	data["auto_battle"] = {"player": true, "enemy": true}
-	BattleInitData.set_pending(self, data, "expedition_smoke")
-	change_scene_to_file("res://scenes/fightScene.tscn")
+	var scene_manager := root.get_node_or_null("SceneManager")
+	if scene_manager == null:
+		printerr("FAIL: SceneManager autoload missing")
+		quit(1)
+		return
+	var nav: Dictionary = scene_manager.go_fight(data, "expedition_smoke")
+	if not bool(nav.get("ok", false)):
+		printerr("FAIL: go_fight failed: %s" % str(nav.get("error", "unknown")))
+		quit(1)
+		return
 	await process_frame
 	await process_frame
 	if current_scene == null or not current_scene.has_signal("battle_finished"):
