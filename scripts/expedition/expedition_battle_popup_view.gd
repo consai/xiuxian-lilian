@@ -29,8 +29,8 @@ func _ready() -> void:
 	_backdrop.gui_input.connect(_on_backdrop_gui_input)
 
 
-func apply_event(event: Dictionary, depth: int) -> void:
-	var enemy := ExpeditionEventServiceScript.build_battle_enemy(event, depth)
+func apply_event(event: Dictionary, _depth: int = 0) -> void:
+	var enemy := ExpeditionEventServiceScript.build_battle_enemy(event)
 	var attrs := enemy.get("attrs", {}) as Dictionary
 	var enemy_title := str(enemy.get("name", "")).strip_edges()
 	var event_title := str(event.get("name", "")).strip_edges()

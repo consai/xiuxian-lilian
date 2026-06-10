@@ -11,6 +11,11 @@ var _equips_by_id: Dictionary = {}
 var _battle_time_limit_default: float = 200.0
 var _buff_by_id: Dictionary = {}
 var _locations_by_id: Dictionary = {}
+var _world_map_meta: Dictionary = {}
+var _cities_by_id: Dictionary = {}
+var _world_routes: Array = []
+var _wilderness_regions_by_id: Dictionary = {}
+var _wilderness_locations_by_id: Dictionary = {}
 var _expedition_events_by_id: Dictionary = {}
 var _expedition_rules: Dictionary = {}
 const ConfigValidatorScript := preload("res://scripts/core/config_validator.gd")
@@ -27,6 +32,7 @@ func reload_all() -> void:
 	_load_equips_local()
 	_load_buffs_local()
 	_load_locations_local()
+	_load_world_map_local()
 	_load_expedition_events_local()
 	_load_expedition_rules_local()
 	_validate_all_config()
@@ -109,6 +115,60 @@ func all_locations() -> Array:
 
 func all_location_ids() -> Array:
 	return (_locations_by_id.keys() as Array).duplicate()
+
+
+func world_map_meta() -> Dictionary:
+	return _world_map_meta.duplicate(true)
+
+
+func city_by_id(city_id: String) -> Dictionary:
+	var cid := city_id.strip_edges()
+	var row_v: Variant = _cities_by_id.get(cid)
+	if not row_v is Dictionary:
+		return {}
+	var row := (row_v as Dictionary).duplicate(true)
+	row["id"] = cid
+	return row
+
+
+func all_city_ids() -> Array:
+	return (_cities_by_id.keys() as Array).duplicate()
+
+
+func all_routes() -> Array:
+	var out: Array = []
+	for route_v in _world_routes:
+		if route_v is Dictionary:
+			out.append((route_v as Dictionary).duplicate(true))
+	return out
+
+
+func wilderness_region_by_id(region_id: String) -> Dictionary:
+	var rid := region_id.strip_edges()
+	var row_v: Variant = _wilderness_regions_by_id.get(rid)
+	if not row_v is Dictionary:
+		return {}
+	var row := (row_v as Dictionary).duplicate(true)
+	row["id"] = rid
+	return row
+
+
+func all_wilderness_region_ids() -> Array:
+	return (_wilderness_regions_by_id.keys() as Array).duplicate()
+
+
+func wilderness_location_by_id(location_id: String) -> Dictionary:
+	var lid := location_id.strip_edges()
+	var row_v: Variant = _wilderness_locations_by_id.get(lid)
+	if not row_v is Dictionary:
+		return {}
+	var row := (row_v as Dictionary).duplicate(true)
+	row["id"] = lid
+	return row
+
+
+func all_wilderness_location_ids() -> Array:
+	return (_wilderness_locations_by_id.keys() as Array).duplicate()
 
 
 func expedition_event_by_id(event_id: String) -> Dictionary:
@@ -296,6 +356,42 @@ func _load_locations_local() -> void:
 		var row_v: Variant = (raw_v as Dictionary)[key]
 		if row_v is Dictionary:
 			_locations_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
+
+
+func _load_world_map_local() -> void:
+	_world_map_meta.clear()
+	_cities_by_id.clear()
+	_world_routes.clear()
+	_wilderness_regions_by_id.clear()
+	_wilderness_locations_by_id.clear()
+	var root := JsonLoader._read_json_root_object("res://data/world_map.json")
+	_world_map_meta = {
+		"schema_version": int(root.get("schema_version", 1)),
+		"starter_city_id": str(root.get("starter_city_id", "qingshi_market")),
+	}
+	var cities_v: Variant = root.get("cities", {})
+	if cities_v is Dictionary:
+		for key in (cities_v as Dictionary).keys():
+			var row_v: Variant = (cities_v as Dictionary)[key]
+			if row_v is Dictionary:
+				_cities_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
+	var routes_v: Variant = root.get("routes", [])
+	if routes_v is Array:
+		for route_v in routes_v as Array:
+			if route_v is Dictionary:
+				_world_routes.append((route_v as Dictionary).duplicate(true))
+	var regions_v: Variant = root.get("wilderness_regions", {})
+	if regions_v is Dictionary:
+		for key in (regions_v as Dictionary).keys():
+			var row_v: Variant = (regions_v as Dictionary)[key]
+			if row_v is Dictionary:
+				_wilderness_regions_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
+	var locations_v: Variant = root.get("wilderness_locations", {})
+	if locations_v is Dictionary:
+		for key in (locations_v as Dictionary).keys():
+			var row_v: Variant = (locations_v as Dictionary)[key]
+			if row_v is Dictionary:
+				_wilderness_locations_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
 
 
 func _load_expedition_events_local() -> void:

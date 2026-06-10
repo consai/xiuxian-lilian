@@ -52,6 +52,7 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 	for key in ["wolf_threat", "sword_tomb_opening", "sect_unrest"]:
 		world_state[key] = clampi(int(world_state.get(key, 0)), 0, 100)
 	out["world_state"] = world_state
+	out["map"] = _coalesce_map_savedata(out.get("map", {}))
 	return out
 
 
@@ -72,6 +73,7 @@ func reset_rundata() -> void:
 			"breakthrough_summary": {},
 			"expedition_exit_reason": "manual",
 		},
+		"map": _default_map_runtime(),
 	}
 
 
@@ -118,6 +120,18 @@ func battle_runtime() -> Dictionary:
 func ui_runtime() -> Dictionary:
 	ensure_initialized()
 	return rundata["ui"] as Dictionary
+
+
+func map_savedata() -> Dictionary:
+	ensure_initialized()
+	return _coalesce_map_savedata(savedata.get("map", {}))
+
+
+func map_runtime() -> Dictionary:
+	ensure_initialized()
+	if not rundata.has("map"):
+		rundata["map"] = _default_map_runtime()
+	return rundata["map"] as Dictionary
 
 
 func scene_runtime() -> Dictionary:
@@ -251,7 +265,48 @@ func _default_savedata() -> Dictionary:
 		"storage_equips": [],
 		"activity_log": [],
 		"world_state": {"wolf_threat": 35, "sword_tomb_opening": 0, "sect_unrest": 30},
+		"map": _default_map_savedata(),
 		"totals": _default_totals(),
+	}
+
+
+func _default_map_savedata() -> Dictionary:
+	return {
+		"current_city_id": "qingshi_market",
+		"discovered_cities": ["qingshi_market"],
+		"discovered_regions": [],
+		"discovered_locations": [],
+		"vanished_nodes": [],
+		"route_states": {},
+		"region_exploration": {},
+	}
+
+
+func _coalesce_map_savedata(data: Variant) -> Dictionary:
+	var out := _default_map_savedata()
+	if not data is Dictionary:
+		return out
+	var src := data as Dictionary
+	for key in ["current_city_id"]:
+		if src.has(key):
+			out[key] = str(src.get(key, out[key]))
+	for key in ["discovered_cities", "discovered_regions", "discovered_locations", "vanished_nodes"]:
+		if src.get(key) is Array:
+			out[key] = (src.get(key) as Array).duplicate()
+	if src.get("route_states") is Dictionary:
+		out["route_states"] = (src.get("route_states") as Dictionary).duplicate(true)
+	if src.get("region_exploration") is Dictionary:
+		out["region_exploration"] = (src.get("region_exploration") as Dictionary).duplicate(true)
+	return out
+
+
+func _default_map_runtime() -> Dictionary:
+	return {
+		"selected_city_id": "",
+		"selected_region_id": "",
+		"selected_location_id": "",
+		"pending_travel": {},
+		"wilderness_options": {},
 	}
 
 
@@ -263,8 +318,7 @@ func _default_totals() -> Dictionary:
 		"items_gained": 0,
 		"expeditions": 0,
 		"expedition_steps": 0,
-		"max_depth": 0,
-		"bosses_defeated": 0,
+		"max_difficulty": 0,
 	}
 
 
@@ -286,8 +340,10 @@ func _default_expedition() -> Dictionary:
 		"journey_step": 0,
 		"active_chain_id": "",
 		"completed_events": [],
-		"depth": 1,
+		"auto_advance": true,
 		"steps": 0,
+		"days": 0,
+		"days_without_event": 0,
 		"seed": 0,
 		"rng_state": 0,
 		"runtime": {"hp": 0.0, "mp": 0.0, "item_slots": ["", ""], "inventory": {}},

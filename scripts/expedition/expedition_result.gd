@@ -26,15 +26,11 @@ func _render() -> void:
 	var reason_text := "主动返程"
 	if reason == "defeated":
 		reason_text = "战败撤退"
-	elif reason == "boss_complete":
-		reason_text = "首领告捷"
-	elif reason == "journey_complete":
-		reason_text = "历练完成"
 	title.text = "历练结算 · %s" % reason_text
 	var stats := _result.get("stats", {}) as Dictionary
 	var lines: PackedStringArray = [
-		"深入 %d 层，事件 %d 个，消耗 %d 日" % [
-			int(stats.get("max_depth", 0)),
+		"最高难度 %d，事件 %d 个，消耗 %d 日" % [
+			maxi(int(stats.get("max_difficulty", 0)), int(stats.get("max_depth", 0))),
 			int(stats.get("steps", 0)),
 			int(_result.get("elapsed_days", 1)),
 		],

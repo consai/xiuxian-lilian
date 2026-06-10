@@ -1,7 +1,7 @@
 extends Node
 
 const HUB := "hub"
-const LOCATION_SELECT := "location_select"
+const WORLD_MAP := "world_map"
 const EXPEDITION_LOOP := "expedition_loop"
 const EXPEDITION_RESULT := "expedition_result"
 const FIGHT := "fight"
@@ -10,7 +10,7 @@ const CHARACTER_ATTRIBUTES_PANEL := "character_attributes_panel"
 
 const SCENE_PATHS := {
 	HUB: "res://scenes/sim/cave_hub.tscn",
-	LOCATION_SELECT: "res://scenes/expedition/location_select.tscn",
+	WORLD_MAP: "res://scenes/map/map.tscn",
 	EXPEDITION_LOOP: "res://scenes/expedition/expedition_loop.tscn",
 	EXPEDITION_RESULT: "res://scenes/expedition/expedition_result.tscn",
 	FIGHT: "res://scenes/fightScene.tscn",
@@ -51,8 +51,8 @@ func go_hub(payload: Dictionary = {}) -> Dictionary:
 	return go_to(HUB, payload)
 
 
-func go_location_select() -> Dictionary:
-	return go_to(LOCATION_SELECT)
+func go_world_map() -> Dictionary:
+	return go_to(WORLD_MAP)
 
 
 func start_expedition(location_id: String, seed_override: int = -1) -> Dictionary:
@@ -141,7 +141,7 @@ func _guard_enter(scene_id: String, options: Dictionary) -> Dictionary:
 			var has_summary := game_state != null and not (game_state.last_expedition_summary as Dictionary).is_empty()
 			if not expedition.active and not has_summary:
 				return {"ok": false, "error": "没有可结算的历练"}
-		LOCATION_SELECT:
+		WORLD_MAP:
 			if expedition != null and expedition.active:
 				return {"ok": false, "error": _BLOCKED_EXPEDITION_ACTIVE}
 		FIGHT:

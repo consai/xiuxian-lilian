@@ -15,16 +15,17 @@ func _init() -> void:
 
 func _run_all() -> void:
 	_run("start creates isolated runtime", _test_start_creates_isolated_runtime)
-	_run("roll next event obeys depth", _test_roll_next_event_obey_depth)
+	_run("roll next event obeys difficulty", _test_roll_next_event_obey_difficulty)
 	_run("decision event exposes options", _test_decision_event_exposes_options)
 	_run("non battle events advance expedition", _test_non_battle_events_advance)
 	_run("manual exit keeps all loot", _test_manual_exit_keeps_all_loot)
 	_run("defeat exit drops inventory and injury", _test_defeat_exit_drops_inventory_and_injury)
 	_run("defeat inventory drop is deterministic", _test_defeat_inventory_drop_deterministic)
-	_run("elapsed days use step ceiling", _test_elapsed_days_use_step_ceiling)
+	_run("elapsed days track expedition days", _test_elapsed_days_track_expedition_days)
+	_run("quiet days advance time without logs", _test_quiet_days_advance_without_logs)
 	_run("battle win returns to expedition", _test_battle_win_returns_to_expedition)
 	_run("battle loss forces expedition result", _test_battle_loss_forces_expedition_result)
-	_run("boss requires depth and marks completion", _test_boss_requires_depth_and_marks_completion)
+	_run("boss battle resolves at high difficulty", _test_boss_battle_resolves_at_high_difficulty)
 	_run("game settlement occurs once", _test_game_settlement_occurs_once)
 	_run("distinct expeditions do not collide on settlement", _test_distinct_expeditions_settlement_ids)
 	_run("director is deterministic from event pool", _test_director_deterministic)
@@ -67,15 +68,17 @@ func _test_start_creates_isolated_runtime() -> void:
 	_expect_near(float(expedition.runtime.get("hp", 0.0)), 100.0, "runtime isolated from game")
 
 
-func _test_roll_next_event_obey_depth() -> void:
+func _test_roll_next_event_obey_difficulty() -> void:
 	var location := LocationServiceScript.by_id("qinglan_mountain")
+	var capped := location.duplicate(true)
+	capped["max_difficulty"] = 2
 	for _i in 20:
-		var event := ExpeditionEventServiceScript.roll_next_event(location, 1, [], _rng(202 + _i))
-		_expect_true(not event.is_empty(), "one rolled event at depth 1")
+		var event := ExpeditionEventServiceScript.roll_next_event(capped, [], _rng(202 + _i))
+		_expect_true(not event.is_empty(), "one rolled event within difficulty cap")
 		_expect_true(str(event.get("id", "")) != "", "rolled event has id")
-	var shallow := ExpeditionEventServiceScript.roll_next_event(location, 2, [], _rng(303))
-	_expect_true(str(shallow.get("id", "")) != "qinglan_boss", "boss hidden at depth 2")
-	_expect_true(str(shallow.get("id", "")) != "qinglan_serpent", "elite hidden at depth 2")
+	var shallow := ExpeditionEventServiceScript.roll_next_event(capped, [], _rng(303))
+	_expect_true(str(shallow.get("id", "")) != "qinglan_boss", "boss hidden when max difficulty is 2")
+	_expect_true(str(shallow.get("id", "")) != "qinglan_serpent", "elite hidden when max difficulty is 2")
 
 
 func _test_decision_event_exposes_options() -> void:
@@ -92,16 +95,23 @@ func _test_non_battle_events_advance() -> void:
 	expedition.start("qinglan_mountain", game, 404)
 	var herbs := ExpeditionEventServiceScript.by_id("qinglan_herbs")
 	var before_steps: int = int(expedition.steps)
-	var before_depth: int = int(expedition.depth)
+	var before_max_diff: int = int((expedition.stats as Dictionary).get("max_difficulty", 0))
 	var before_loot: int = (expedition.loot as Array).size()
 	expedition.current_choices = [herbs]
 	expedition.phase = "choosing"
 	var result: Dictionary = expedition.choose_event("qinglan_herbs")
 	_expect_true(bool(result.get("ok", false)), "gather resolves")
 	_expect_eq(expedition.steps, before_steps + 1, "steps increased")
-	_expect_eq(expedition.depth, before_depth + 1, "depth increased")
+	_expect_true(int((expedition.stats as Dictionary).get("max_difficulty", 0)) >= before_max_diff, "max difficulty tracked")
 	_expect_true(expedition.loot.size() >= before_loot, "session loot tracked")
-	_expect_true(int(game.inventory.get("items_LingCao", 0)) > 3, "gather reward entered inventory")
+	var inv_before: int = int(game.inventory.get("items_LingCao", 0))
+	var loot_lingcao := 0
+	for reward_v in expedition.loot:
+		var reward := reward_v as Dictionary
+		if str(reward.get("id", "")) == "items_LingCao":
+			loot_lingcao += int(reward.get("count", 0))
+	_expect_true(loot_lingcao > 0, "gather reward in session loot")
+	_expect_eq(int(game.inventory.get("items_LingCao", 0)), inv_before, "game inventory unchanged during expedition")
 	game.hp = 10.0
 	expedition.runtime["hp"] = 10.0
 	expedition.current_choices = [ExpeditionEventServiceScript.by_id("qinglan_shelter")]
@@ -114,8 +124,8 @@ func _test_manual_exit_keeps_all_loot() -> void:
 	var game := _state()
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 505)
-	ExpeditionRewardServiceScript.grant_to_player(
-		game, expedition.loot, [{"kind": "item", "id": "items_LingCao", "count": 4}]
+	ExpeditionRewardServiceScript.merge_into_loot(
+		expedition.loot, [{"kind": "item", "id": "items_LingCao", "count": 4}]
 	)
 	var finish: Dictionary = expedition.finish("manual")
 	var settled: Dictionary = game.settle_expedition(finish)
@@ -128,16 +138,14 @@ func _test_defeat_exit_drops_inventory_and_injury() -> void:
 	var game := _state()
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 606)
-	ExpeditionRewardServiceScript.grant_to_player(
-		game,
+	ExpeditionRewardServiceScript.merge_into_loot(
 		expedition.loot,
 		[{"kind": "item", "id": "items_LingCao", "count": 5}],
 	)
 	var inv_before := _inventory_total(game.inventory)
 	expedition.runtime["hp"] = 0.0
 	var finish: Dictionary = expedition.finish("defeated")
-	var inv_after := _inventory_total(game.inventory)
-	_expect_true(inv_after < inv_before, "defeat removes inventory items")
+	_expect_eq(_inventory_total(game.inventory), inv_before, "game inventory unchanged before settle")
 	_expect_true(not (finish.get("loot_lost", []) as Array).is_empty(), "loot_lost recorded")
 	game.settle_expedition(finish)
 	_expect_near(game.hp, 25.0, "defeat hp floor")
@@ -155,12 +163,26 @@ func _test_defeat_inventory_drop_deterministic() -> void:
 	_expect_true(_inventory_total(inventory_a) < 12, "inventory count reduced")
 
 
-func _test_elapsed_days_use_step_ceiling() -> void:
-	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(0), 1, "0 steps -> 1 day")
-	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(1), 1, "1 step -> 1 day")
-	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(3), 3, "3 steps -> 3 days")
-	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(4), 4, "4 steps -> 4 days")
-	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(6), 6, "6 steps -> 6 days")
+func _test_elapsed_days_track_expedition_days() -> void:
+	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(0), 1, "0 days -> minimum 1")
+	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(1), 1, "1 day -> 1 day")
+	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(3), 3, "3 days -> 3 days")
+	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(6), 6, "6 days -> 6 days")
+
+
+func _test_quiet_days_advance_without_logs() -> void:
+	var game := _state()
+	var expedition := _expedition()
+	expedition.start("qinglan_mountain", game, 5151)
+	var departure_logs: int = expedition.event_log.size()
+	var days_before: int = int(expedition.days)
+	var result: Dictionary = expedition.advance_day()
+	_expect_true(bool(result.get("ok", false)), "advance day ok")
+	_expect_true(int(expedition.days) > days_before, "days advanced")
+	if str(result.get("mode", "")) == "pass_day":
+		_expect_eq(expedition.event_log.size(), departure_logs, "quiet day keeps log size")
+	else:
+		_expect_true(int(expedition.days) > int(expedition.steps), "batched quiet days before event")
 
 
 func _test_battle_win_returns_to_expedition() -> void:
@@ -185,10 +207,11 @@ func _test_battle_win_returns_to_expedition() -> void:
 	_expect_eq(game.day, day_before, "game day unchanged")
 	_expect_near(float(expedition.runtime.get("hp", 0.0)), 55.0, "runtime hp updated")
 	_expect_true(not expedition.loot.is_empty(), "battle loot tracked in session")
-	_expect_true(_inventory_total(game.inventory) >= inv_before - 2, "battle rewards offset consumed supplies")
+	_expect_eq(_inventory_total(game.inventory), inv_before, "game inventory unchanged during active expedition")
 	var slot_id := str(expedition.runtime.get("item_slots", [])[0])
 	if slot_id != "":
-		_expect_eq(int(game.inventory.get(slot_id, 0)), 2, "battle pill consumption synced to backpack")
+		var runtime_inv := expedition.runtime.get("inventory", {}) as Dictionary
+		_expect_eq(int(runtime_inv.get(slot_id, 0)), 2, "runtime pill consumption updated")
 
 
 func _test_battle_loss_forces_expedition_result() -> void:
@@ -207,27 +230,27 @@ func _test_battle_loss_forces_expedition_result() -> void:
 	_expect_true(expedition.current_choices.is_empty(), "no more choices after defeat")
 
 
-func _test_boss_requires_depth_and_marks_completion() -> void:
+func _test_boss_battle_resolves_at_high_difficulty() -> void:
 	var game := _state()
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 909)
-	expedition.depth = 6
 	expedition.current_choices = [ExpeditionEventServiceScript.by_id("qinglan_boss")]
 	expedition.choose_event("qinglan_boss")
 	expedition.receive_battle_summary({
 		"outcome": "win",
 		"player_runtime": {"hp": 40.0, "mp": 10.0, "items": []},
 	})
-	expedition.settle_pending_battle()
-	_expect_true(bool(expedition.stats.get("boss_defeated", false)), "boss completion marked")
+	var settled: Dictionary = expedition.settle_pending_battle()
+	_expect_true(bool(settled.get("ok", false)), "boss battle settled")
+	_expect_true(expedition.active, "expedition continues after boss win")
 
 
 func _test_game_settlement_occurs_once() -> void:
 	var game := _state()
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 1001)
-	ExpeditionRewardServiceScript.grant_to_player(
-		game, expedition.loot, [{"kind": "item", "id": "items_LingCao", "count": 2}]
+	ExpeditionRewardServiceScript.merge_into_loot(
+		expedition.loot, [{"kind": "item", "id": "items_LingCao", "count": 2}]
 	)
 	var finish: Dictionary = expedition.finish("manual")
 	_expect_true(str(finish.get("settlement_id", "")) != "", "finish includes settlement_id")
@@ -241,16 +264,17 @@ func _test_game_settlement_occurs_once() -> void:
 
 func _test_distinct_expeditions_settlement_ids() -> void:
 	var game := _state()
+	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 3, "fresh inventory before expeditions")
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 2001)
-	ExpeditionRewardServiceScript.grant_to_player(
-		game, expedition.loot, [{"kind": "item", "id": "items_LingCao", "count": 1}]
+	ExpeditionRewardServiceScript.merge_into_loot(
+		expedition.loot, [{"kind": "item", "id": "items_LingCao", "count": 1}]
 	)
 	var first_finish: Dictionary = expedition.finish("manual")
 	game.settle_expedition(first_finish)
 	expedition.start("qinglan_mountain", game, 2002)
-	ExpeditionRewardServiceScript.grant_to_player(
-		game, expedition.loot, [{"kind": "item", "id": "items_LingCao", "count": 1}]
+	ExpeditionRewardServiceScript.merge_into_loot(
+		expedition.loot, [{"kind": "item", "id": "items_LingCao", "count": 1}]
 	)
 	var second_finish: Dictionary = expedition.finish("manual")
 	_expect_true(
@@ -266,13 +290,12 @@ func _test_director_deterministic() -> void:
 	var game := _state()
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 3333)
-	var first: Dictionary = expedition.advance_step()
-	_expect_true(bool(first.get("ok", false)), "first pool event resolves")
-	_expect_true(not (first.get("event", {}) as Dictionary).is_empty(), "first pool event selected")
+	var first := _first_event_from_advance_steps(expedition)
+	_expect_true(not first.is_empty(), "first pool event selected")
 	expedition.reset()
 	expedition.start("qinglan_mountain", game, 3333)
-	var repeated: Dictionary = expedition.advance_step()
-	_expect_eq(first.get("event", {}), repeated.get("event", {}), "same seed same director event")
+	var repeated := _first_event_from_advance_steps(expedition)
+	_expect_eq(first, repeated, "same seed same director event")
 
 
 func _test_completed_events_world_change() -> void:
@@ -281,7 +304,7 @@ func _test_completed_events_world_change() -> void:
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 4444)
 	expedition.completed_events = ["wolf_king_boss"]
-	var finish: Dictionary = expedition.finish("journey_complete")
+	var finish: Dictionary = expedition.finish("manual")
 	game.settle_expedition(finish)
 	_expect_eq(int(game.world_state.get("wolf_threat", 0)), maxi(0, before - 20), "perfect wolf hunt lowers threat")
 
@@ -291,6 +314,16 @@ func _inventory_total(inventory: Dictionary) -> int:
 	for count_v in inventory.values():
 		total += int(count_v)
 	return total
+
+
+func _first_event_from_advance_steps(expedition: Node) -> Dictionary:
+	for _i in 30:
+		var result: Dictionary = expedition.advance_step()
+		_expect_true(bool(result.get("ok", false)), "advance step ok")
+		if str(result.get("mode", "")) == "pass_day":
+			continue
+		return result.get("event", {}) as Dictionary
+	return {}
 
 
 func _rng(seed_value: int) -> RandomNumberGenerator:

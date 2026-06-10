@@ -1,0 +1,137 @@
+[gd_scene format=3 uid="uid://5mdt77ri6tkq"]
+
+[ext_resource type="Script" path="res://scripts/map/wilderness_detail_popup_view.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="Texture2D" uid="uid://8mwstvi8kywh" path="res://assets/art/ui_new/btn_close.png" id="2_close"]
+[ext_resource type="Texture2D" uid="uid://gyhsfoix048v" path="res://assets/art/ui_new/btn_lan.png" id="3_button"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="4_title"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="5_body"]
+
+[sub_resource type="StyleBoxFlat" id="PopupStyle"]
+bg_color = Color(1, 0.945, 0.835, 0.99)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.31, 0.19, 0.12, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0.12, 0.07, 0.03, 0.4)
+shadow_size = 12
+
+[node name="WildernessDetailPopup" type="Control" unique_id=973719982]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_theme")
+script = ExtResource("1_script")
+
+[node name="Dimmer" type="ColorRect" parent="." unique_id=1246997008]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.06, 0.03, 0.48)
+
+[node name="Panel" type="Panel" parent="." unique_id=1981686589]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -245.0
+offset_right = 260.0
+offset_bottom = 245.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("PopupStyle")
+
+[node name="Title" type="Label" parent="Panel" unique_id=697642321]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 28.0
+offset_top = 24.0
+offset_right = 492.0
+offset_bottom = 62.0
+text = "青岚山脉"
+label_settings = ExtResource("4_title")
+horizontal_alignment = 1
+
+[node name="CloseButton" type="TextureButton" parent="Panel" unique_id=856712108]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 466.0
+offset_top = -12.0
+offset_right = 532.0
+offset_bottom = 54.0
+texture_normal = ExtResource("2_close")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Body" type="Label" parent="Panel" unique_id=407388609]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 38.0
+offset_top = 82.0
+offset_right = 482.0
+offset_bottom = 330.0
+text = "危险：一星
+推荐境界：炼气一层
+环境：山林、灵泉、妖兽巢穴
+
+可能收获：灵草、妖丹、寒潭珠
+探索度：35%
+
+野外区域没有固定路线，进入后可自由探索。"
+label_settings = ExtResource("5_body")
+autowrap_mode = 2
+
+[node name="MinDifficultyOption" type="OptionButton" parent="Panel" unique_id=1760446736]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 38.0
+offset_top = 340.0
+offset_right = 238.0
+offset_bottom = 376.0
+
+[node name="MaxDifficultyOption" type="OptionButton" parent="Panel" unique_id=1760446738]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 282.0
+offset_top = 340.0
+offset_right = 482.0
+offset_bottom = 376.0
+
+[node name="EnterButton" type="TextureButton" parent="Panel" unique_id=1760446737]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 160.0
+offset_top = 390.0
+offset_right = 360.0
+offset_bottom = 450.0
+texture_normal = ExtResource("3_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Panel/EnterButton" unique_id=597557922]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "进入探索"
+label_settings = ExtResource("5_body")
+horizontal_alignment = 1
+vertical_alignment = 1

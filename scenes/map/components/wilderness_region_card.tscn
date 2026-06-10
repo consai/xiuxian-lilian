@@ -1,0 +1,62 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/map/wilderness_region_card.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_theme"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="3_label"]
+
+[sub_resource type="StyleBoxFlat" id="RegionStyle"]
+bg_color = Color(0.45, 0.66, 0.45, 0.38)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25, 0.39, 0.22, 0.9)
+corner_radius_top_left = 40
+corner_radius_top_right = 58
+corner_radius_bottom_right = 42
+corner_radius_bottom_left = 65
+
+[node name="WildernessRegionCard" type="Control"]
+custom_minimum_size = Vector2(250, 150)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 250.0
+offset_bottom = 150.0
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/normal = SubResource("RegionStyle")
+theme_override_styles/hover = SubResource("RegionStyle")
+theme_override_styles/pressed = SubResource("RegionStyle")
+
+[node name="NameLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 24.0
+offset_top = 48.0
+offset_right = 226.0
+offset_bottom = 82.0
+mouse_filter = 2
+text = "野外区域"
+label_settings = ExtResource("3_label")
+horizontal_alignment = 1
+
+[node name="MetaLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 24.0
+offset_top = 86.0
+offset_right = 226.0
+offset_bottom = 116.0
+mouse_filter = 2
+text = "危险一星 · 探索 35%"
+horizontal_alignment = 1
+
+[connection signal="pressed" from="Button" to="." method="_on_pressed"]

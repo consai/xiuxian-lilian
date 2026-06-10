@@ -28,12 +28,18 @@ var active_chain_id: String:
 var completed_events: Array:
 	get: return DataStore.expedition_runtime().get("completed_events", []) as Array
 	set(value): DataStore.expedition_runtime()["completed_events"] = value
-var depth: int:
-	get: return int(DataStore.expedition_runtime().get("depth", 1))
-	set(value): DataStore.expedition_runtime()["depth"] = value
+var auto_advance: bool:
+	get: return bool(DataStore.expedition_runtime().get("auto_advance", true))
+	set(value): DataStore.expedition_runtime()["auto_advance"] = value
 var steps: int:
 	get: return int(DataStore.expedition_runtime().get("steps", 0))
 	set(value): DataStore.expedition_runtime()["steps"] = value
+var days: int:
+	get: return int(DataStore.expedition_runtime().get("days", 0))
+	set(value): DataStore.expedition_runtime()["days"] = value
+var days_without_event: int:
+	get: return int(DataStore.expedition_runtime().get("days_without_event", 0))
+	set(value): DataStore.expedition_runtime()["days_without_event"] = value
 var seed: int:
 	get: return int(DataStore.expedition_runtime().get("seed", 0))
 	set(value): DataStore.expedition_runtime()["seed"] = value
@@ -85,6 +91,8 @@ var expedition_id: String:
 var start_day: int:
 	get: return int(DataStore.expedition_runtime().get("start_day", 0))
 	set(value): DataStore.expedition_runtime()["start_day"] = value
+const _MAX_QUIET_DAY_CHAIN := 32
+
 var _rng := RandomNumberGenerator.new()
 var _game_state: Node = null
 
@@ -95,6 +103,21 @@ func start(location_id_value: String, game_state: Node, seed_override: int = -1)
 	var location := LocationServiceScript.by_id(location_id_value)
 	if location.is_empty():
 		return {"ok": false, "error": "未知地点"}
+	var effective_location := location.duplicate(true)
+	var override_v: Variant = DataStore.expedition_runtime().get("difficulty_override", {})
+	if override_v is Dictionary:
+		var override := override_v as Dictionary
+		if not override.is_empty():
+			var loc_min := maxi(1, int(location.get("min_difficulty", 1)))
+			var loc_max := int(location.get("max_difficulty", 0))
+			if loc_max <= 0:
+				loc_max = loc_min
+			var chosen_min := clampi(int(override.get("min_difficulty", loc_min)), loc_min, loc_max)
+			var chosen_max := clampi(int(override.get("max_difficulty", loc_max)), loc_min, loc_max)
+			if chosen_max < chosen_min:
+				chosen_max = chosen_min
+			effective_location["min_difficulty"] = chosen_min
+			effective_location["max_difficulty"] = chosen_max
 	reset()
 	_game_state = game_state
 	start_day = int(game_state.day) if game_state != null else 0
@@ -107,8 +130,10 @@ func start(location_id_value: String, game_state: Node, seed_override: int = -1)
 	rng_state = _rng.state
 	active = true
 	phase = "resolving"
-	depth = 1
+	auto_advance = true
 	steps = 0
+	days = 0
+	days_without_event = 0
 	loot = []
 	current_choices = []
 	pending_decision_event = {}
@@ -116,40 +141,80 @@ func start(location_id_value: String, game_state: Node, seed_override: int = -1)
 	event_log = []
 	stats = {
 		"steps": 0,
+		"days": 0,
 		"battles": 0,
 		"wins": 0,
 		"losses": 0,
-		"max_depth": 1,
-		"boss_defeated": false,
+		"max_difficulty": 0,
 	}
 	player_snapshot = _copy_player_snapshot(game_state)
 	runtime = _copy_runtime_from_game(game_state)
-	event_log.append(ExpeditionLogServiceScript.build_departure_entry(location))
-	return {"ok": true, "location": location}
+	DataStore.expedition_runtime()["effective_location"] = effective_location
+	DataStore.expedition_runtime().erase("difficulty_override")
+	event_log.append(ExpeditionLogServiceScript.build_departure_entry(effective_location))
+	return {"ok": true, "location": effective_location}
 
 
 func advance_step() -> Dictionary:
-	var began := begin_next_step()
+	var began := advance_day()
 	if not bool(began.get("ok", false)):
+		return began
+	if str(began.get("mode", "")) == "pass_day":
 		return began
 	if str(began.get("mode", "")) == "resolving":
 		return complete_current_step()
 	return began
 
 
-func begin_next_step() -> Dictionary:
+func advance_day() -> Dictionary:
+	var result: Dictionary = {}
+	for _i in _MAX_QUIET_DAY_CHAIN:
+		result = _advance_single_day()
+		if not bool(result.get("ok", false)):
+			return result
+		if str(result.get("mode", "")) != "pass_day":
+			return result
+	return result
+
+
+func _advance_single_day() -> Dictionary:
 	if not active:
 		return {"ok": false, "error": "历练未进行"}
 	if phase == "battle":
 		return {"ok": false, "error": "战斗进行中"}
 	if not _pending_step_event.is_empty():
 		return {"ok": false, "error": "上一步事件尚未结算"}
+	days += 1
+	stats["days"] = days
 	_restore_rng()
+	if not ExpeditionRulesServiceScript.should_trigger_event_today(days_without_event, _rng):
+		days_without_event += 1
+		_save_rng()
+		return {"ok": true, "mode": "pass_day"}
 	var event := ExpeditionDirectorServiceScript.select_next_event(_director_context(), _rng)
-	_save_rng()
 	if event.is_empty():
-		phase = "resolving"
-		return {"ok": false, "error": "暂无可用事件", "feedback": "此地暂且无事，可择日返程。"}
+		days_without_event += 1
+		_save_rng()
+		return {"ok": true, "mode": "pass_day"}
+	days_without_event = 0
+	var began := _start_event(event)
+	_save_rng()
+	return began
+
+
+func begin_next_step() -> Dictionary:
+	return advance_day()
+
+
+func complete_current_step() -> Dictionary:
+	if _pending_step_event.is_empty():
+		return {"ok": false, "error": "没有待结算的事件"}
+	var event := _pending_step_event.duplicate(true)
+	_pending_step_event = {}
+	return _resolve_auto_event_finish(event)
+
+
+func _start_event(event: Dictionary) -> Dictionary:
 	if ExpeditionEventServiceScript.is_decision_event(event):
 		_begin_log_event(event)
 		pending_decision_event = event.duplicate(true)
@@ -165,14 +230,6 @@ func begin_next_step() -> Dictionary:
 		}
 	_pending_step_event = event.duplicate(true)
 	return _begin_auto_event(event)
-
-
-func complete_current_step() -> Dictionary:
-	if _pending_step_event.is_empty():
-		return {"ok": false, "error": "没有待结算的事件"}
-	var event := _pending_step_event.duplicate(true)
-	_pending_step_event = {}
-	return _resolve_auto_event_finish(event)
 
 
 func _begin_auto_event(event: Dictionary) -> Dictionary:
@@ -212,7 +269,7 @@ func _resolve_auto_event_finish(event: Dictionary) -> Dictionary:
 	current_event_id = str(chosen.get("id", ""))
 	_restore_rng()
 	var result := ExpeditionEventServiceScript.resolve_non_battle_event(
-		chosen, runtime, player_snapshot.get("attrs", {}) as Dictionary, depth, _rng
+		chosen, runtime, player_snapshot.get("attrs", {}) as Dictionary, _rng
 	)
 	_save_rng()
 	if not bool(result.get("ok", false)):
@@ -264,7 +321,6 @@ func _resolve_decision_choice(choice_id: String) -> Dictionary:
 		option,
 		runtime,
 		player_snapshot.get("attrs", {}) as Dictionary,
-		depth,
 		_rng
 	)
 	_save_rng()
@@ -339,7 +395,7 @@ func build_battle_init() -> Dictionary:
 		player = _game_state.build_player_battle_snapshot(runtime)
 	if not PlayerBattleSnapshot.collect_errors(player).is_empty():
 		return {}
-	var enemy := ExpeditionEventServiceScript.build_battle_enemy(event, depth)
+	var enemy := ExpeditionEventServiceScript.build_battle_enemy(event)
 	var init_data := {
 		"player": player,
 		"enemy": enemy,
@@ -367,7 +423,7 @@ func receive_battle_summary(summary: Dictionary) -> void:
 	if event.is_empty():
 		return
 	_restore_rng()
-	pending_battle_rewards = ExpeditionRewardServiceScript.roll_event_rewards(event, depth, _rng)
+	pending_battle_rewards = ExpeditionRewardServiceScript.roll_event_rewards(event, _rng)
 	_save_rng()
 
 
@@ -377,7 +433,6 @@ func settle_pending_battle() -> Dictionary:
 	var summary := pending_battle_summary
 	var event := ExpeditionEventServiceScript.by_id(pending_battle_event_id)
 	_sync_runtime_from_summary(summary)
-	_sync_battle_consumption_to_game(summary)
 	var won := str(summary.get("outcome", "")) == "win"
 	stats["battles"] = int(stats.get("battles", 0)) + 1
 	if won:
@@ -385,10 +440,6 @@ func settle_pending_battle() -> Dictionary:
 		var battle_rewards := pending_battle_rewards.duplicate(true)
 		_apply_session_rewards(battle_rewards)
 		pending_battle_rewards = []
-		if str(event.get("type", "")) == "boss":
-			stats["boss_defeated"] = true
-			if bool(event.get("once_per_expedition", false)):
-				visited_once_events.append(pending_battle_event_id)
 		_apply_step_after_event(
 			event,
 			[],
@@ -410,8 +461,8 @@ func settle_pending_battle() -> Dictionary:
 			event_log.append(
 				ExpeditionLogServiceScript.build_battle_defeat_entry(
 					event,
-					steps + 1,
-					depth
+					days,
+					_event_difficulty(event)
 				)
 			)
 			log_updated.emit()
@@ -463,18 +514,15 @@ func finish(exit_reason: String) -> Dictionary:
 	if not active:
 		return {"ok": false, "error": "没有可结算的历练"}
 	var reason := exit_reason
-	if reason == "manual" and bool(stats.get("boss_defeated", false)):
-		reason = "boss_complete"
-	var elapsed_days: int = ExpeditionRulesServiceScript.elapsed_days(steps)
+	var elapsed_days: int = ExpeditionRulesServiceScript.elapsed_days(days)
 	var loot_lost: Array = []
 	if reason == "defeated":
-		if _game_state != null:
-			_restore_rng()
-			var loss := ExpeditionRewardServiceScript.apply_inventory_loss_on_defeat(
-				_game_state.inventory, _rng
-			)
-			_save_rng()
-			loot_lost = loss.get("lost", []) as Array
+		_restore_rng()
+		var loss := ExpeditionRewardServiceScript.apply_inventory_loss_on_defeat(
+			_project_inventory_for_settlement(), _rng
+		)
+		_save_rng()
+		loot_lost = loss.get("lost", []) as Array
 		var rules: Dictionary = ExpeditionRulesServiceScript.rules()
 		var hp_max := float((player_snapshot.get("attrs", {}) as Dictionary).get(FightAttr.HP_MAX, 100.0))
 		runtime["hp"] = maxf(float(runtime.get("hp", 0.0)), hp_max * float(rules.get("defeat_hp_floor_ratio", 0.25)))
@@ -509,7 +557,7 @@ func reset() -> void:
 
 
 func estimated_elapsed_days() -> int:
-	return ExpeditionRulesServiceScript.elapsed_days(steps)
+	return ExpeditionRulesServiceScript.elapsed_days(days)
 
 
 func should_go_to_result() -> bool:
@@ -530,8 +578,8 @@ func _begin_log_event(event: Dictionary, log_name: String = "") -> void:
 		title = str(event.get("name", ""))
 	var entry := ExpeditionLogServiceScript.build_event_entry(
 		event,
-		steps + 1,
-		depth,
+		days,
+		_event_difficulty(event),
 		ExpeditionLogServiceScript.event_scene(event),
 		"",
 		title
@@ -566,15 +614,13 @@ func _apply_step_after_event(
 	_apply_session_rewards(extra_rewards)
 	_mark_once_per_expedition(event)
 	steps += 1
-	var event_depth := depth
-	depth += 1
+	var event_difficulty := _event_difficulty(event)
 	stats["steps"] = steps
-	stats["max_depth"] = maxi(int(stats.get("max_depth", 1)), depth - 1)
-	var step_day := steps
+	stats["max_difficulty"] = maxi(int(stats.get("max_difficulty", 0)), event_difficulty)
 	if _pending_log_index >= 0 and _pending_log_index < event_log.size():
 		var entry := event_log[_pending_log_index] as Dictionary
-		entry["depth"] = event_depth
-		entry["journey_step"] = step_day
+		entry["difficulty"] = event_difficulty
+		entry["journey_step"] = days
 		if log_name.strip_edges() != "":
 			entry["name"] = log_name
 		ExpeditionLogServiceScript.apply_outcome(entry, outcome)
@@ -584,8 +630,8 @@ func _apply_step_after_event(
 		event_log.append(
 			ExpeditionLogServiceScript.build_event_entry(
 				event,
-				step_day,
-				event_depth,
+				days,
+				event_difficulty,
 				ExpeditionLogServiceScript.event_scene(event),
 				outcome,
 				title
@@ -613,16 +659,24 @@ func _sync_runtime_from_summary(summary: Dictionary) -> void:
 func _apply_session_rewards(rewards: Array) -> void:
 	if rewards.is_empty():
 		return
+	ExpeditionRewardServiceScript.merge_into_loot(loot, rewards)
+
+
+func _project_inventory_for_settlement() -> Dictionary:
 	if _game_state == null:
-		ExpeditionRewardServiceScript.merge_into_loot(loot, rewards)
-		return
-	ExpeditionRewardServiceScript.grant_to_player(_game_state, loot, rewards)
-
-
-func _sync_battle_consumption_to_game(summary: Dictionary) -> void:
-	if _game_state == null or not _game_state.has_method("apply_battle_player_runtime"):
-		return
-	_game_state.apply_battle_player_runtime(summary)
+		return (runtime.get("inventory", {}) as Dictionary).duplicate(true)
+	var inv := (_game_state.inventory as Dictionary).duplicate(true)
+	var runtime_inv := runtime.get("inventory", {}) as Dictionary
+	for slot_v in runtime.get("item_slots", []) as Array:
+		var iid := str(slot_v)
+		if iid == "":
+			continue
+		var remaining := int(runtime_inv.get(iid, 0))
+		if remaining > 0:
+			inv[iid] = remaining
+		else:
+			inv.erase(iid)
+	return inv
 
 
 func _runtime_items_for_settlement() -> Array:
@@ -674,10 +728,20 @@ func _new_expedition_id() -> String:
 	return "expedition_%d_%d" % [int(Time.get_unix_time_from_system() * 1000.0), randi()]
 
 
+func _event_difficulty(event: Dictionary) -> int:
+	return maxi(1, int(event.get("difficulty", 1)))
+
+
+func effective_location() -> Dictionary:
+	var stored_v: Variant = DataStore.expedition_runtime().get("effective_location", {})
+	if stored_v is Dictionary and not (stored_v as Dictionary).is_empty():
+		return (stored_v as Dictionary).duplicate(true)
+	return LocationServiceScript.by_id(location_id)
+
+
 func _director_context() -> Dictionary:
 	return {
-		"location": LocationServiceScript.by_id(location_id),
-		"depth": depth,
+		"location": effective_location(),
 		"active_chain_id": active_chain_id,
 		"completed_events": completed_events,
 		"runtime": runtime,

@@ -1,0 +1,96 @@
+[gd_scene format=3 uid="uid://cgfmi0l7bivvn"]
+
+[ext_resource type="Script" path="res://scripts/map/wilderness_location_node.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="2_press"]
+[ext_resource type="Texture2D" uid="uid://1impvpgc21e8" path="res://assets/art/ui_new/shuye.png" id="3_icon"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="4_label"]
+
+[sub_resource type="StyleBoxFlat" id="NodeNormal"]
+bg_color = Color(0.68, 0.79, 0.53, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.24, 0.36, 0.18, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_color = Color(0.12, 0.07, 0.03, 0.35)
+shadow_size = 5
+
+[sub_resource type="StyleBoxFlat" id="NodeHover"]
+bg_color = Color(0.8, 0.88, 0.61, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.2, 0.31, 0.14, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_color = Color(0.12, 0.07, 0.03, 0.4)
+shadow_size = 7
+
+[node name="WildernessLocationNode" type="Control" unique_id=650815690]
+custom_minimum_size = Vector2(126, 92)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 126.0
+offset_bottom = 92.0
+theme = ExtResource("1_theme")
+script = ExtResource("1_script")
+
+[node name="Button" type="Button" parent="." unique_id=542579578]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 35.0
+offset_top = 2.0
+offset_right = 72.0
+offset_bottom = 39.0
+theme_override_styles/normal = SubResource("NodeNormal")
+theme_override_styles/pressed = SubResource("NodeHover")
+theme_override_styles/hover = SubResource("NodeHover")
+script = ExtResource("2_press")
+
+[node name="Icon" type="TextureRect" parent="Button" unique_id=111971255]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 9.0
+offset_top = 8.0
+offset_right = -9.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="." unique_id=499250831]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = -10.0
+offset_top = 40.0
+offset_right = 116.0
+offset_bottom = 60.0
+text = "灵泉谷"
+label_settings = ExtResource("4_label")
+horizontal_alignment = 1
+
+[node name="DangerBadge" type="Label" parent="." unique_id=2023186404]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 56.0
+offset_top = 1.0
+offset_right = 96.0
+offset_bottom = 21.0
+text = "野外"
+label_settings = ExtResource("4_label")
+horizontal_alignment = 1
+
+[connection signal="pressed" from="Button" to="." method="_on_pressed"]

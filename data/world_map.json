@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "starter_city_id": "qingshi_market",
+  "cities": {
+    "qingshi_market": {
+      "name": "青石坊市",
+      "type": "market",
+      "position": [146, 181],
+      "desc": "小型修士聚集地，适合交易基础材料与补给。",
+      "services": ["坊市", "委托", "补给"]
+    },
+    "yunlan_city": {
+      "name": "云岚仙城",
+      "type": "cultivation_city",
+      "position": [350, 106],
+      "desc": "云雾环绕的繁华仙城，宗门与商会在此设有驻地。",
+      "services": ["坊市", "传送阵", "宗门驻地"]
+    },
+    "tianhe_ferry": {
+      "name": "天河渡口",
+      "type": "market",
+      "position": [565, 196],
+      "desc": "天河航运枢纽，可由此转赴各处。",
+      "services": ["摆渡", "补给", "情报"]
+    },
+    "luoxia_town": {
+      "name": "落霞镇",
+      "type": "market",
+      "position": [650, 371],
+      "desc": "落霞映照的小镇，商旅往来频繁。",
+      "services": ["坊市", "客栈", "委托"]
+    }
+  },
+  "routes": [
+    {"from": "qingshi_market", "to": "yunlan_city", "days": 2, "default_state": "open"},
+    {"from": "qingshi_market", "to": "tianhe_ferry", "days": 2, "default_state": "open"},
+    {"from": "qingshi_market", "to": "luoxia_town", "days": 3, "default_state": "open"},
+    {"from": "yunlan_city", "to": "tianhe_ferry", "days": 2, "default_state": "open"},
+    {"from": "tianhe_ferry", "to": "luoxia_town", "days": 2, "default_state": "open"},
+    {"from": "yunlan_city", "to": "luoxia_town", "days": 4, "default_state": "open"}
+  ],
+  "wilderness_regions": {
+    "qinglan_mountain": {
+      "name": "青岚山脉",
+      "danger": 1,
+      "recommended_realm": "炼气一层",
+      "environment_tags": ["山林", "灵泉", "妖兽巢穴"],
+      "preview_rewards": ["灵草", "妖丹", "寒潭珠"],
+      "polygon": [[30, 350], [280, 350], [280, 500], [30, 500]],
+      "near_city": ["qingshi_market"],
+      "sub_locations": ["spirit_spring_valley", "ancient_sword_tomb"],
+      "expedition_location_id": "qinglan_mountain"
+    },
+    "blackwater_marsh": {
+      "name": "黑水沼泽",
+      "danger": 2,
+      "recommended_realm": "炼气三层",
+      "environment_tags": ["沼泽", "毒雾", "妖兽"],
+      "preview_rewards": ["毒囊", "沼泽灵草"],
+      "polygon": [[500, 20], [750, 20], [750, 170], [500, 170]],
+      "near_city": ["yunlan_city", "tianhe_ferry"],
+      "sub_locations": [],
+      "expedition_location_id": ""
+    }
+  },
+  "wilderness_locations": {
+    "spirit_spring_valley": {
+      "name": "灵泉谷",
+      "danger": 1,
+      "recommended_realm": "炼气一层",
+      "environment_tags": ["灵泉", "竹林", "药圃"],
+      "preview_rewards": ["灵草", "泉水精华"],
+      "position": [75, 406],
+      "parent_region": "qinglan_mountain",
+      "reveal_radius": 120,
+      "services": ["采集", "恢复"],
+      "expedition_location_id": "qinglan_mountain"
+    },
+    "ancient_sword_tomb": {
+      "name": "古剑冢",
+      "danger": 3,
+      "recommended_realm": "炼气二层",
+      "environment_tags": ["剑意", "遗迹", "禁制"],
+      "preview_rewards": ["断剑", "剑诀残页"],
+      "position": [270, 371],
+      "parent_region": "qinglan_mountain",
+      "reveal_radius": 100,
+      "services": ["秘境入口", "剑冢试炼"],
+      "expedition_location_id": "qinglan_mountain"
+    }
+  }
+}

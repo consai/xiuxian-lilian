@@ -31,29 +31,34 @@ func _ready() -> void:
 	if not ExpeditionState.log_updated.is_connected(_refresh_log_display):
 		ExpeditionState.log_updated.connect(_refresh_log_display)
 	(%ExitButton as Button).pressed.connect(_on_exit_pressed)
+	(%AdvanceButton as Button).pressed.connect(_on_advance_pressed)
+	(%AutoAdvanceButton as Button).toggled.connect(_on_auto_advance_toggled)
 	_refresh_all()
 	if ExpeditionState.phase == "battle" and ExpeditionState.pending_battle_event_id != "":
 		var pending_event := ExpeditionEventServiceScript.by_id(ExpeditionState.pending_battle_event_id)
 		if not pending_event.is_empty():
 			_show_pending_battle_popup(pending_event)
-		else:
+		elif ExpeditionState.auto_advance:
 			_schedule_auto_advance()
-	else:
+	elif ExpeditionState.auto_advance:
 		_schedule_auto_advance()
 	if get_tree().root.has_meta("smoke_auto_exit") and bool(get_tree().root.get_meta("smoke_auto_exit")):
 		call_deferred("_on_exit_pressed")
 
 
 func _refresh_all() -> void:
-	var location: Dictionary = LocationServiceScript.by_id(ExpeditionState.location_id)
-	(%Header as Label).text = "%s · 深入 %d 层 · 已消耗 %d 日" % [
+	var location: Dictionary = ExpeditionState.effective_location()
+	var min_diff := maxi(1, int(location.get("min_difficulty", 1)))
+	var max_diff := int(location.get("max_difficulty", 0))
+	var diff_text := "难度 %d" % min_diff if max_diff <= 0 or max_diff == min_diff else "难度 %d-%d" % [min_diff, max_diff]
+	(%Header as Label).text = "%s · %s · 已消耗 %d 日" % [
 		str(location.get("name", "")),
-		ExpeditionState.depth,
+		diff_text,
 		ExpeditionState.estimated_elapsed_days(),
 	]
 	_refresh_progress_dots()
 	_refresh_status_panel()
-	(%Step as Label).text = "第 %d 步" % ExpeditionState.steps
+	(%Step as Label).text = "第 %d 日 · %d 件事" % [ExpeditionState.days, ExpeditionState.steps]
 	_sync_loot_items()
 	_refresh_log_display()
 	_refresh_event_presentation()
@@ -148,9 +153,20 @@ func _refresh_progress_dots() -> void:
 func _refresh_controls() -> void:
 	var exit_button := %ExitButton as Button
 	exit_button.disabled = _locked or not ExpeditionState.can_exit()
-	var boss_hint := %BossHint as Label
-	boss_hint.visible = bool(ExpeditionState.stats.get("boss_defeated", false))
-	boss_hint.text = "已击败首领，建议功成返程。"
+	var advance_button := %AdvanceButton as Button
+	var awaiting_manual := (
+		not ExpeditionState.auto_advance
+		and ExpeditionState.phase == "resolving"
+		and ExpeditionState.pending_decision_event.is_empty()
+		and ExpeditionState.pending_battle_event_id == ""
+		and not ExpeditionState.should_go_to_result()
+	)
+	advance_button.visible = awaiting_manual
+	advance_button.disabled = _locked or not awaiting_manual
+	var auto_button := %AutoAdvanceButton as Button
+	if auto_button.button_pressed != ExpeditionState.auto_advance:
+		auto_button.set_pressed_no_signal(ExpeditionState.auto_advance)
+	auto_button.disabled = _locked
 
 
 func _continue_expedition() -> void:
@@ -170,7 +186,7 @@ func _advance_auto_step() -> void:
 	_stop_auto_advance()
 	_locked = true
 	_refresh_controls()
-	var began: Dictionary = ExpeditionState.begin_next_step()
+	var began: Dictionary = ExpeditionState.advance_day()
 	_locked = false
 	if not bool(began.get("ok", false)):
 		var feedback := str(began.get("feedback", began.get("error", ""))).strip_edges()
@@ -182,8 +198,10 @@ func _advance_auto_step() -> void:
 
 
 func _handle_step_begin(began: Dictionary) -> void:
-	if str(began.get("mode", "")) == "complete":
-		SceneManager.go_expedition_result("journey_complete")
+	if str(began.get("mode", "")) == "pass_day":
+		_refresh_all()
+		if ExpeditionState.auto_advance:
+			call_deferred("_continue_expedition")
 		return
 	if str(began.get("mode", "")) == "decision":
 		_stop_auto_advance()
@@ -213,9 +231,6 @@ func _complete_current_step() -> void:
 
 
 func _handle_step_result(result: Dictionary) -> void:
-	if str(result.get("mode", "")) == "complete":
-		SceneManager.go_expedition_result("journey_complete")
-		return
 	if str(result.get("mode", "")) == "decision":
 		_stop_auto_advance()
 		_refresh_all()
@@ -229,10 +244,6 @@ func _handle_step_result(result: Dictionary) -> void:
 	_refresh_all()
 
 
-func _go_completed_result() -> void:
-	SceneManager.go_expedition_result("journey_complete")
-
-
 func _auto_advance_seconds() -> float:
 	return maxf(0.1, float(
 		ExpeditionRulesServiceScript.rules().get("auto_event_advance_seconds", 1.0)
@@ -240,6 +251,9 @@ func _auto_advance_seconds() -> float:
 
 
 func _schedule_auto_advance(continue_after: bool = true) -> void:
+	if not ExpeditionState.auto_advance:
+		_refresh_controls()
+		return
 	if _auto_advance_timer == null:
 		return
 	_auto_chain_after_timer = continue_after
@@ -294,6 +308,21 @@ func _on_exit_pressed() -> void:
 	SceneManager.go_expedition_result("manual")
 
 
+func _on_advance_pressed() -> void:
+	if _locked or ExpeditionState.auto_advance:
+		return
+	_continue_expedition()
+
+
+func _on_auto_advance_toggled(enabled: bool) -> void:
+	ExpeditionState.auto_advance = enabled
+	if enabled:
+		_schedule_auto_advance()
+	else:
+		_stop_auto_advance()
+	_refresh_controls()
+
+
 func _fallback_hub() -> void:
 	SceneManager.go_hub()
 
@@ -313,7 +342,7 @@ func _show_pending_battle_popup(event: Dictionary) -> void:
 	if popup == null:
 		return
 	_locked = true
-	popup.apply_event(event, ExpeditionState.depth)
+	popup.apply_event(event, maxi(1, int(event.get("difficulty", 1))))
 	popup.visible = true
 	_refresh_controls()
 

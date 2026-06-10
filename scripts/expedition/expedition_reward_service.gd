@@ -6,8 +6,7 @@ const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd"
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 
 
-static func roll_event_rewards(event: Dictionary, depth: int, rng: RandomNumberGenerator) -> Array:
-	var multiplier := ExpeditionRulesServiceScript.reward_depth_multiplier(depth)
+static func roll_event_rewards(event: Dictionary, rng: RandomNumberGenerator) -> Array:
 	var pool: Array = event.get("rewards", []) as Array
 	if pool.is_empty():
 		return []
@@ -22,9 +21,7 @@ static func roll_event_rewards(event: Dictionary, depth: int, rng: RandomNumberG
 		var reward := row.duplicate(true)
 		var min_count := maxi(1, int(row.get("min", 1)))
 		var max_count := maxi(min_count, int(row.get("max", min_count)))
-		var base_count := rng.randi_range(min_count, max_count)
-		var scaled := maxi(1, int(floor(float(base_count) * multiplier)))
-		reward["count"] = scaled
+		reward["count"] = rng.randi_range(min_count, max_count)
 		reward.erase("weight")
 		reward.erase("min")
 		reward.erase("max")

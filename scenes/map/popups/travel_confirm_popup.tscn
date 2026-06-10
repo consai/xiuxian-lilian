@@ -1,0 +1,124 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/map/travel_confirm_popup_view.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="Texture2D" uid="uid://hwomn6aon70a" path="res://assets/art/ui_new/btn_huang.png" id="2_cancel"]
+[ext_resource type="Texture2D" uid="uid://c3f3nny73kvhg" path="res://assets/art/ui_new/btn_lv.png" id="3_confirm"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/28.tres" id="4_title"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="5_body"]
+
+[sub_resource type="StyleBoxFlat" id="PopupStyle"]
+bg_color = Color(1, 0.945, 0.835, 0.99)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.31, 0.19, 0.12, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0.12, 0.07, 0.03, 0.4)
+shadow_size = 12
+
+[node name="TravelConfirmPopup" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_theme")
+script = ExtResource("1_script")
+
+[node name="Dimmer" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.06, 0.03, 0.48)
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -200.0
+offset_right = 260.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("PopupStyle")
+
+[node name="Title" type="Label" parent="Panel"]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 24.0
+offset_right = 492.0
+offset_bottom = 62.0
+text = "确认启程"
+label_settings = ExtResource("4_title")
+horizontal_alignment = 1
+
+[node name="RouteSummary" type="Label" parent="Panel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 42.0
+offset_top = 90.0
+offset_right = 478.0
+offset_bottom = 270.0
+text = "青石坊市 → 天河渡口 → 云岚仙城\n\n预计耗时：3 日\n可能遭遇：商队、路匪、随机事件\n\n启程后将立即离开当前城市。"
+label_settings = ExtResource("5_body")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="CancelButton" type="TextureButton" parent="Panel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 52.0
+offset_top = 310.0
+offset_right = 232.0
+offset_bottom = 366.0
+texture_normal = ExtResource("2_cancel")
+ignore_texture_size = true
+stretch_mode = 5
+[node name="Label" type="Label" parent="Panel/CancelButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "取消"
+label_settings = ExtResource("5_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ConfirmButton" type="TextureButton" parent="Panel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 288.0
+offset_top = 310.0
+offset_right = 468.0
+offset_bottom = 366.0
+texture_normal = ExtResource("3_confirm")
+ignore_texture_size = true
+stretch_mode = 5
+[node name="Label" type="Label" parent="Panel/ConfirmButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "确认启程"
+label_settings = ExtResource("5_body")
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -11,21 +11,22 @@ static func rules() -> Dictionary:
 	return {}
 
 
-static func elapsed_days(steps: int) -> int:
+static func elapsed_days(days_elapsed: int) -> int:
+	var minimum := maxi(1, int(rules().get("minimum_elapsed_days", 1)))
+	return maxi(minimum, maxi(0, days_elapsed))
+
+
+static func should_trigger_event_today(idle_days: int, rng: RandomNumberGenerator) -> bool:
 	var cfg := rules()
-	var per_day := maxi(1, int(cfg.get("steps_per_day", 1)))
-	var minimum := maxi(1, int(cfg.get("minimum_elapsed_days", 1)))
-	return maxi(minimum, int(ceil(float(maxi(0, steps)) / float(per_day))))
-
-
-static func enemy_depth_multiplier(depth: int) -> float:
-	var growth := float(rules().get("enemy_depth_growth", 0.08))
-	return 1.0 + float(maxi(1, depth) - 1) * growth
-
-
-static func reward_depth_multiplier(depth: int) -> float:
-	var growth := float(rules().get("reward_depth_growth", 0.05))
-	return 1.0 + float(maxi(1, depth) - 1) * growth
+	var max_idle := maxi(1, int(cfg.get("max_idle_days", 4)))
+	if idle_days >= max_idle:
+		return true
+	var chance := clampf(float(cfg.get("event_day_chance", 0.55)), 0.0, 1.0)
+	if chance >= 1.0:
+		return true
+	if chance <= 0.0:
+		return false
+	return rng.randf() < chance
 
 
 static func is_battle_type(event_type: String) -> bool:

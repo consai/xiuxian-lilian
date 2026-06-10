@@ -2,6 +2,7 @@ class_name ConfigValidator
 extends RefCounted
 
 const ExpeditionDataValidatorScript := preload("res://scripts/expedition/expedition_data_validator.gd")
+const WorldMapDataValidatorScript := preload("res://scripts/map/world_map_data_validator.gd")
 const SceneManagerScript := preload("res://scripts/core/scene_manager.gd")
 
 
@@ -15,6 +16,7 @@ static func collect_all_errors(config_manager: Node, game_state: Node = null) ->
 	errors.append_array(_validate_expedition_rules(config_manager))
 	errors.append_array(_validate_location_preview_rewards(config_manager))
 	errors.append_array(ExpeditionDataValidatorScript.collect_errors(game_state))
+	errors.append_array(WorldMapDataValidatorScript.collect_errors())
 	return errors
 
 
@@ -72,14 +74,17 @@ static func _validate_expedition_rules(config_manager: Node) -> PackedStringArra
 		errors.append("远征规则为空")
 		return errors
 	var required := [
-		"steps_per_day", "minimum_elapsed_days", "choice_count",
-		"max_battle_choices", "defeat_hp_floor_ratio", "defeat_injury_days",
+		"minimum_elapsed_days", "event_day_chance", "max_idle_days", "choice_count",
+		"defeat_hp_floor_ratio", "defeat_injury_days",
 	]
 	for key in required:
 		if not rules.has(key):
 			errors.append("远征规则缺少字段: %s" % key)
-	if int(rules.get("steps_per_day", 0)) < 1:
-		errors.append("steps_per_day 必须 >= 1")
+	var event_chance := float(rules.get("event_day_chance", -1.0))
+	if event_chance < 0.0 or event_chance > 1.0:
+		errors.append("event_day_chance 必须在 0~1 之间")
+	if int(rules.get("max_idle_days", 0)) < 1:
+		errors.append("max_idle_days 必须 >= 1")
 	if int(rules.get("choice_count", 0)) < 1:
 		errors.append("choice_count 必须 >= 1")
 	var floor_ratio := float(rules.get("defeat_hp_floor_ratio", -1.0))

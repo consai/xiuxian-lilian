@@ -5,7 +5,7 @@ const ItemDefScript := preload("res://scripts/core/item_def.gd")
 const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
 const ItemScene := preload("res://scenes/items/item.tscn")
 
-const DEFAULT_RULE_TEXT := "每个事件消耗一天，可随时返程，战败损失部分战利品。"
+const DEFAULT_RULE_TEXT := "历练按日推进，并非每日都有遭遇；无事件之日不会产生日志。可随时返程，战败损失部分战利品。"
 
 var _location: Dictionary = {}
 var _blocked := false

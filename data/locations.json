@@ -6,6 +6,8 @@
       "subtitle": "林深雾重，灵草与妖兽并存",
       "desc": "适合炼气期修士历练的山脉。",
       "danger": 1,
+      "min_difficulty": 1,
+      "max_difficulty": 6,
       "recommended_realm": "炼气一层",
       "event_pool": [
         "qinglan_travel",

@@ -15,7 +15,8 @@ $scripts = @(
 	"res://tests/run_expedition_smoke.gd",
 	"res://tests/run_scene_manager_tests.gd",
 	"res://tests/run_contract_tests.gd",
-	"res://tests/run_config_validation_tests.gd"
+	"res://tests/run_config_validation_tests.gd",
+	"res://tests/run_world_map_tests.gd"
 )
 
 foreach ($script in $scripts) {

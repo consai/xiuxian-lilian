@@ -6,8 +6,8 @@ extends RefCounted
 ## 例：spd=100 → 约 3.0s/刀；spd=150 → 约 2.0s；spd=50 → 约 6.0s。
 
 const SPD_REF := 100.0
-const INTERVAL_BASE_SEC := 3.0
-const INTERVAL_MIN_SEC := 0.8
+const INTERVAL_BASE_SEC := 1.2
+const INTERVAL_MIN_SEC := 0.3
 const INTERVAL_MAX_SEC := 12.0
 const SPD_FLOOR := 1.0
 

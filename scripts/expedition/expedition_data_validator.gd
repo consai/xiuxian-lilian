@@ -11,6 +11,10 @@ static func collect_errors(game_state: Node = null) -> PackedStringArray:
 	for location_v in LocationServiceScript.all_locations():
 		var location := location_v as Dictionary
 		var location_id := str(location.get("id", ""))
+		var min_difficulty := maxi(1, int(location.get("min_difficulty", 1)))
+		var max_difficulty := int(location.get("max_difficulty", 0))
+		if max_difficulty > 0 and max_difficulty < min_difficulty:
+			errors.append("地点 %s 的 max_difficulty 小于 min_difficulty" % location_id)
 		for event_id_v in location.get("event_pool", []) as Array:
 			var event_id := str(event_id_v)
 			var event := ExpeditionEventServiceScript.by_id(event_id)
@@ -19,6 +23,13 @@ static func collect_errors(game_state: Node = null) -> PackedStringArray:
 				continue
 			if str(event.get("location_id", "")) != location_id:
 				errors.append("事件 %s 的 location_id 与地点 %s 不一致" % [event_id, location_id])
+			var event_difficulty := maxi(1, int(event.get("difficulty", 0)))
+			if int(event.get("difficulty", 0)) < 1:
+				errors.append("事件 %s 缺少有效 difficulty" % event_id)
+			elif max_difficulty > 0 and event_difficulty > max_difficulty:
+				errors.append("事件 %s 难度 %d 超出地点 %s 上限 %d" % [event_id, event_difficulty, location_id, max_difficulty])
+			elif event_difficulty < min_difficulty:
+				errors.append("事件 %s 难度 %d 低于地点 %s 下限 %d" % [event_id, event_difficulty, location_id, min_difficulty])
 			if ExpeditionEventServiceScript.is_decision_event(event):
 				errors.append_array(_validate_decision_event(event, event_id))
 			elif ExpeditionRulesServiceScript.is_battle_type(str(event.get("type", ""))):
@@ -61,7 +72,7 @@ static func _build_sample_battle_init(event: Dictionary, game_state: Node) -> Di
 		}
 	return {
 		"player": player,
-		"enemy": ExpeditionEventServiceScript.build_battle_enemy(event, 1),
+		"enemy": ExpeditionEventServiceScript.build_battle_enemy(event),
 		"battle_time_limit": 200.0,
 	}
 

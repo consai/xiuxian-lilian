@@ -26,17 +26,17 @@ static func select_next_event(context: Dictionary, rng: RandomNumberGenerator) -
 
 
 static func _pool_candidates(location: Dictionary, context: Dictionary) -> Array:
-	var depth := int(context.get("depth", 1))
+	var min_difficulty := maxi(1, int(location.get("min_difficulty", 1)))
+	var max_difficulty := int(location.get("max_difficulty", 0))
 	var out: Array = []
 	for event_id_v in location.get("event_pool", []) as Array:
 		var event := EventService.by_id(str(event_id_v))
 		if event.is_empty():
 			continue
-		var min_depth := maxi(1, int(event.get("min_depth", 1)))
-		if depth < min_depth:
+		var event_difficulty := maxi(1, int(event.get("difficulty", 1)))
+		if event_difficulty < min_difficulty:
 			continue
-		var max_depth := int(event.get("max_depth", 0))
-		if max_depth > 0 and depth > max_depth:
+		if max_difficulty > 0 and event_difficulty > max_difficulty:
 			continue
 		if _is_available(event, context):
 			out.append(event)
@@ -71,11 +71,6 @@ static func _is_available(event: Dictionary, context: Dictionary) -> bool:
 		return false
 	var completed := context.get("completed_events", []) as Array
 	if bool(event.get("once_per_expedition", false)) and completed.has(str(event.get("id", ""))):
-		return false
-	var stats := context.get("stats", {}) as Dictionary
-	var rules := ExpeditionRulesService.rules()
-	var max_battles := maxi(1, int(rules.get("max_battle_choices", 1)))
-	if ExpeditionRulesService.is_battle_type(str(event.get("type", ""))) and int(stats.get("battles", 0)) >= max_battles:
 		return false
 	var chain_id := str(event.get("chain_id", ""))
 	var active_chain_id := str(context.get("active_chain_id", ""))

@@ -29,11 +29,10 @@ static func is_decision_event(event: Dictionary) -> bool:
 
 static func roll_next_event(
 		location: Dictionary,
-		depth: int,
 		visited_once: Array,
 		rng: RandomNumberGenerator
 ) -> Dictionary:
-	var candidates := _filter_candidates(location, depth, visited_once)
+	var candidates := _filter_candidates(location, visited_once)
 	var pick := _weighted_pick(candidates, rng)
 	return pick.duplicate(true) if not pick.is_empty() else {}
 
@@ -89,7 +88,6 @@ static func resolve_decision_option(
 		option: Dictionary,
 		runtime: Dictionary,
 		player_attrs: Dictionary,
-		depth: int,
 		rng: RandomNumberGenerator
 ) -> Dictionary:
 	var trigger_id := str(option.get("trigger_event", "")).strip_edges()
@@ -111,9 +109,7 @@ static func resolve_decision_option(
 				"feedback": encounter,
 				"log_name": str(parent_event.get("name", "")),
 			}
-		var chained := resolve_non_battle_event(
-			triggered, runtime, player_attrs, depth, rng
-		)
+		var chained := resolve_non_battle_event(triggered, runtime, player_attrs, rng)
 		if not bool(chained.get("ok", false)):
 			return chained
 		chained["event"] = triggered
@@ -135,7 +131,6 @@ static func resolve_decision_option(
 			"rewards": option.get("rewards", []),
 			"reward_rolls": maxi(1, int(option.get("reward_rolls", 1))),
 		},
-		depth,
 		rng
 	)
 	var effect_lines := _apply_effects(option.get("effects", []) as Array, runtime, player_attrs)
@@ -164,14 +159,13 @@ static func resolve_non_battle_event(
 		event: Dictionary,
 		runtime: Dictionary,
 		player_attrs: Dictionary,
-		depth: int,
 		rng: RandomNumberGenerator
 ) -> Dictionary:
 	var event_type := str(event.get("type", ""))
 	var scene := str(event.get("desc", "")).strip_edges()
 	match event_type:
 		"gather":
-			var rewards := ExpeditionRewardServiceScript.roll_event_rewards(event, depth, rng)
+			var rewards := ExpeditionRewardServiceScript.roll_event_rewards(event, rng)
 			var gather_result := ExpeditionLogServiceScript.gather_outcome(rewards)
 			return {
 				"ok": true,
@@ -208,18 +202,14 @@ static func resolve_non_battle_event(
 			return {"ok": false, "error": "unsupported event type"}
 
 
-static func build_battle_enemy(event: Dictionary, depth: int) -> Dictionary:
+static func build_battle_enemy(event: Dictionary) -> Dictionary:
 	var enemy := (event.get("enemy", {}) as Dictionary).duplicate(true)
-	var multiplier := ExpeditionRulesServiceScript.enemy_depth_multiplier(depth)
 	var attrs := (enemy.get("attrs", {}) as Dictionary).duplicate(true)
-	for key in [FightAttr.HP_MAX, FightAttr.ATK, FightAttr.DEF]:
-		if attrs.has(key):
-			attrs[key] = float(attrs[key]) * multiplier
 	enemy["attrs"] = attrs
-	if enemy.has("hp"):
-		enemy["hp"] = float(enemy["hp"]) * multiplier
 	if attrs.has(FightAttr.HP_MAX):
 		enemy["hp"] = float(attrs[FightAttr.HP_MAX])
+	elif enemy.has("hp"):
+		enemy["hp"] = float(enemy["hp"])
 	var enemy_skills: Array = []
 	for sid_v in enemy.get("skills", [0]) as Array:
 		enemy_skills.append({"id": int(sid_v), "cd": 0.0})
@@ -291,18 +281,19 @@ static func _join_feedback(prefix: String, body: String) -> String:
 	return "%s：%s" % [lead, tail]
 
 
-static func _filter_candidates(location: Dictionary, depth: int, visited_once: Array) -> Array:
+static func _filter_candidates(location: Dictionary, visited_once: Array) -> Array:
+	var min_difficulty := maxi(1, int(location.get("min_difficulty", 1)))
+	var max_difficulty := int(location.get("max_difficulty", 0))
 	var out: Array = []
 	for event_v in event_pool_for_location(location):
 		var event := event_v as Dictionary
 		var event_id := str(event.get("id", ""))
 		if bool(event.get("once_per_expedition", false)) and visited_once.has(event_id):
 			continue
-		var min_depth := maxi(1, int(event.get("min_depth", 1)))
-		if depth < min_depth:
+		var event_difficulty := maxi(1, int(event.get("difficulty", 1)))
+		if event_difficulty < min_difficulty:
 			continue
-		var max_depth := int(event.get("max_depth", 0))
-		if max_depth > 0 and depth > max_depth:
+		if max_difficulty > 0 and event_difficulty > max_difficulty:
 			continue
 		out.append(event)
 	return out

@@ -9,7 +9,7 @@ static func build_departure_entry(location: Dictionary) -> Dictionary:
 		scene = "%s，%s" % [scene, subtitle]
 	var narrative := join_scene_outcome(scene, "你整理行装，握紧法器，正式踏上历练之路。")
 	return {
-		"depth": 0,
+		"difficulty": 0,
 		"journey_step": 0,
 		"event_id": "",
 		"name": "启程",
@@ -35,7 +35,7 @@ static func apply_outcome(entry: Dictionary, outcome: String) -> void:
 static func build_event_entry(
 		event: Dictionary,
 		step_day: int,
-		depth: int,
+		difficulty: int,
 		scene: String,
 		outcome: String,
 		log_name: String = ""
@@ -44,7 +44,7 @@ static func build_event_entry(
 	if title == "":
 		title = str(event.get("name", ""))
 	var entry := {
-		"depth": depth,
+		"difficulty": difficulty,
 		"journey_step": step_day,
 		"event_id": str(event.get("id", "")),
 		"name": title,
@@ -60,7 +60,7 @@ static func build_event_entry(
 static func build_battle_victory_entry(
 		event: Dictionary,
 		step_day: int,
-		depth: int,
+		difficulty: int,
 		rewards: Array
 ) -> Dictionary:
 	var scene := str(event.get("desc", "")).strip_edges()
@@ -73,7 +73,7 @@ static func build_battle_victory_entry(
 		clash = "恶战良久，你险胜%s。" % enemy_name
 	var loot := format_rewards(rewards)
 	var outcome := clash if loot == "" else "%s %s" % [clash, loot]
-	return build_event_entry(event, step_day, depth, scene, outcome)
+	return build_event_entry(event, step_day, difficulty, scene, outcome)
 
 
 static func build_battle_victory_outcome(event: Dictionary, rewards: Array) -> String:
@@ -89,19 +89,19 @@ static func build_battle_defeat_outcome(event: Dictionary) -> String:
 static func build_battle_defeat_entry(
 		event: Dictionary,
 		step_day: int,
-		depth: int
+		difficulty: int
 ) -> Dictionary:
 	var scene := str(event.get("desc", "")).strip_edges()
 	var enemy_name := str((event.get("enemy", {}) as Dictionary).get("name", event.get("name", "强敌")))
 	var outcome := "力竭不敌，你被%s击退，只得撤出战局。" % enemy_name
-	return build_event_entry(event, step_day, depth, scene, outcome)
+	return build_event_entry(event, step_day, difficulty, scene, outcome)
 
 
-static func build_retreat_entry(event: Dictionary, depth: int) -> Dictionary:
+static func build_retreat_entry(event: Dictionary, difficulty: int) -> Dictionary:
 	var scene := str(event.get("desc", "")).strip_edges()
 	var enemy_name := str((event.get("enemy", {}) as Dictionary).get("name", event.get("name", "强敌")))
 	var outcome := "见%s来势凶猛，你当机立断，抽身撤退，结束本次历练。" % enemy_name
-	return build_event_entry(event, 0, depth, scene, outcome)
+	return build_event_entry(event, 0, difficulty, scene, outcome)
 
 
 static func join_scene_outcome(scene: String, outcome: String) -> String:
@@ -189,7 +189,7 @@ static func format_plain(entry: Dictionary) -> String:
 
 
 static func _format_header(entry: Dictionary) -> String:
-	var step := int(entry.get("journey_step", entry.get("depth", 0)))
+	var step := int(entry.get("journey_step", 0))
 	if step <= 0:
 		return "启程"
 	return "第%d天" % step

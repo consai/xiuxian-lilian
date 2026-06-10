@@ -5,6 +5,7 @@ const HUB_SCENE := "res://scenes/sim/cave_hub.tscn"
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
 const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
 const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
+const WorldMapServiceScript := preload("res://scripts/map/world_map_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 
@@ -90,6 +91,18 @@ var last_settled_expedition_id: String:
 var active_save_slot: int:
 	get: return int(DataStore.game_runtime().get("active_save_slot", 0))
 	set(value): DataStore.game_runtime()["active_save_slot"] = value
+var current_city_id: String:
+	get: return str(DataStore.map_savedata().get("current_city_id", ""))
+	set(value): _map_savedata()["current_city_id"] = value
+var map_discovered_cities: Array:
+	get: return DataStore.map_savedata().get("discovered_cities", []) as Array
+	set(value): _map_savedata()["discovered_cities"] = value
+var map_discovered_regions: Array:
+	get: return DataStore.map_savedata().get("discovered_regions", []) as Array
+	set(value): _map_savedata()["discovered_regions"] = value
+var map_discovered_locations: Array:
+	get: return DataStore.map_savedata().get("discovered_locations", []) as Array
+	set(value): _map_savedata()["discovered_locations"] = value
 
 
 func _ready() -> void:
@@ -123,13 +136,15 @@ func new_game() -> void:
 	world_state = {"wolf_threat": 35, "sword_tomb_opening": 0, "sect_unrest": 30}
 	totals = {
 		"battles": 0, "wins": 0, "losses": 0, "items_gained": 0,
-		"expeditions": 0, "expedition_steps": 0, "max_depth": 0,
-		"bosses_defeated": 0,
+		"expeditions": 0, "expedition_steps": 0, "max_difficulty": 0,
 	}
 	last_rewards = []
 	last_expedition_summary = {}
 	last_settled_expedition_id = ""
 	active_save_slot = 0
+	if ExpeditionState != null and ExpeditionState.has_method("reset"):
+		ExpeditionState.reset()
+	_initialize_map_state()
 	_sync_realm()
 
 
@@ -222,6 +237,51 @@ func begin_expedition(location_id: String) -> Dictionary:
 	return {"ok": true, "location": location}
 
 
+func map_data() -> Dictionary:
+	return DataStore.map_savedata()
+
+
+func set_map_data(data: Dictionary) -> void:
+	DataStore.savedata["map"] = data.duplicate(true)
+
+
+func discover_map_node(node_id: String, category: String) -> void:
+	set_map_data(WorldMapServiceScript.discover_map_node(map_data(), node_id, category))
+
+
+func travel_to_city(target_city_id: String, path: Array, total_days: int) -> Dictionary:
+	if target_city_id == "":
+		return {"ok": false, "error": "缺少目标城市"}
+	var preview := WorldMapServiceScript.build_travel_preview(current_city_id, target_city_id, map_data())
+	if not bool(preview.get("ok", false)):
+		return preview
+	var expected_path: Array = preview.get("path", []) as Array
+	if expected_path.size() != path.size():
+		return {"ok": false, "error": "旅行路径已变化，请重新确认"}
+	for i in range(path.size()):
+		if str(path[i]) != str(expected_path[i]):
+			return {"ok": false, "error": "旅行路径已变化，请重新确认"}
+	var elapsed := maxi(0, total_days)
+	if elapsed != int(preview.get("total_days", -1)):
+		return {"ok": false, "error": "旅行耗时已变化，请重新确认"}
+	var next_map := WorldMapServiceScript.discover_along_path(map_data(), path)
+	next_map["current_city_id"] = target_city_id
+	set_map_data(next_map)
+	if elapsed > 0:
+		day += elapsed
+		injury_days = maxi(0, injury_days - elapsed)
+	activity_log.append({
+		"day": day,
+		"text": "旅行至%s，耗时 %d 日" % [
+			str(WorldMapServiceScript.city_by_id(target_city_id).get("name", target_city_id)),
+			elapsed,
+		],
+	})
+	if activity_log.size() > 30:
+		activity_log = activity_log.slice(activity_log.size() - 30)
+	return {"ok": true, "city_id": target_city_id, "elapsed_days": elapsed}
+
+
 func apply_battle_player_runtime(summary: Dictionary) -> void:
 	var runtime_summary := summary.get("player_runtime", {}) as Dictionary
 	if runtime_summary.is_empty():
@@ -273,7 +333,7 @@ func build_battle_init(event: Dictionary) -> Dictionary:
 		"inventory": inventory,
 		"item_slots": item_slots,
 	})
-	var enemy := ExpeditionEventServiceScript.build_battle_enemy(event, int(event.get("depth", 1)))
+	var enemy := ExpeditionEventServiceScript.build_battle_enemy(event)
 	return {
 		"player": player,
 		"enemy": enemy,
@@ -317,15 +377,24 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 			inventory[iid] = remaining
 		else:
 			inventory.erase(iid)
-	last_rewards = (result.get("loot", []) as Array).duplicate(true)
+	var applied_loot := RewardServiceScript.apply_rewards(self, result.get("loot", []) as Array)
+	last_rewards = applied_loot if not applied_loot.is_empty() else (result.get("loot", []) as Array).duplicate(true)
+	for lost_v in result.get("loot_lost", []) as Array:
+		if not lost_v is Dictionary:
+			continue
+		var lost := lost_v as Dictionary
+		InventoryServiceScript.remove_item(
+			inventory,
+			str(lost.get("id", "")),
+			int(lost.get("count", 0))
+		)
 	for reward in last_rewards:
 		totals["items_gained"] = int(totals.get("items_gained", 0)) + int((reward as Dictionary).get("count", 0))
 	var stats := result.get("stats", {}) as Dictionary
 	totals["expeditions"] = int(totals.get("expeditions", 0)) + 1
 	totals["expedition_steps"] = int(totals.get("expedition_steps", 0)) + int(stats.get("steps", 0))
-	totals["max_depth"] = maxi(int(totals.get("max_depth", 0)), int(stats.get("max_depth", 0)))
-	if bool(stats.get("boss_defeated", false)):
-		totals["bosses_defeated"] = int(totals.get("bosses_defeated", 0)) + 1
+	var max_diff := maxi(int(stats.get("max_difficulty", 0)), int(stats.get("max_depth", 0)))
+	totals["max_difficulty"] = maxi(int(totals.get("max_difficulty", totals.get("max_depth", 0))), max_diff)
 	totals["battles"] = int(totals.get("battles", 0)) + int(stats.get("battles", 0))
 	totals["wins"] = int(totals.get("wins", 0)) + int(stats.get("wins", 0))
 	totals["losses"] = int(totals.get("losses", 0)) + int(stats.get("losses", 0))
@@ -337,10 +406,11 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 	var reward_labels: PackedStringArray = []
 	for reward in last_rewards:
 		reward_labels.append(reward_label(reward))
-	var log_text := "第 %d 日：%s历练，深入 %d 层，胜 %d 场" % [
+	var peak_diff := maxi(int(stats.get("max_difficulty", 0)), int(stats.get("max_depth", 0)))
+	var log_text := "第 %d 日：%s历练，最高难度 %d，胜 %d 场" % [
 		day - elapsed_days,
 		location_name,
-		int(stats.get("max_depth", 0)),
+		peak_diff,
 		int(stats.get("wins", 0)),
 	]
 	if not reward_labels.is_empty():
@@ -371,6 +441,7 @@ func apply_dict(data: Dictionary) -> bool:
 		var expedition := (Engine.get_main_loop() as SceneTree).root.get_node_or_null("ExpeditionState")
 		if expedition != null and expedition.has_method("reset"):
 			expedition.reset()
+	_initialize_map_state()
 	_sync_realm()
 	return true
 
@@ -421,6 +492,17 @@ func _config_manager() -> Node:
 	if not loop is SceneTree:
 		return null
 	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
+
+
+func _map_savedata() -> Dictionary:
+	return DataStore.map_savedata()
+
+
+func _initialize_map_state() -> void:
+	var map_state := map_data()
+	if str(map_state.get("current_city_id", "")) == "":
+		map_state["current_city_id"] = WorldMapServiceScript.starter_city_id()
+	set_map_data(WorldMapServiceScript.apply_starter_discovery(map_data()))
 
 
 func _apply_world_changes(changes: Array) -> void:

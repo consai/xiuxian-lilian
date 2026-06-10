@@ -22,8 +22,8 @@ func _process(_delta: float) -> bool:
 
 func _run_all() -> void:
 	_run("import_savedata resets scene runtime", _test_import_savedata_resets_scene_runtime)
-	_run("go_location_select allowed when idle", _test_location_select_allowed_when_idle)
-	_run("go_location_select blocked when expedition active", _test_location_select_blocked_when_active)
+	_run("go_world_map allowed when idle", _test_world_map_allowed_when_idle)
+	_run("go_world_map blocked when expedition active", _test_world_map_blocked_when_active)
 	_run("go_expedition_loop rejected without active", _test_go_expedition_loop_rejected_without_active)
 	_run("go_breakthrough_summary payload consumed once", _test_breakthrough_summary_payload)
 	_run("go_expedition_result passes reason", _test_expedition_result_reason)
@@ -71,19 +71,19 @@ func _test_import_savedata_resets_scene_runtime() -> void:
 	_expect_true(ds.peek_scene_payload(SceneManagerScript.HUB).is_empty(), "payload cleared")
 
 
-func _test_location_select_allowed_when_idle() -> void:
+func _test_world_map_allowed_when_idle() -> void:
 	_reset_game()
-	var nav: Dictionary = _scene_manager().go_location_select()
-	_expect_true(bool(nav.get("ok", false)), "location select allowed")
+	var nav: Dictionary = _scene_manager().go_world_map()
+	_expect_true(bool(nav.get("ok", false)), "world map allowed")
 
 
-func _test_location_select_blocked_when_active() -> void:
+func _test_world_map_blocked_when_active() -> void:
 	_reset_game()
 	var expedition := _expedition()
 	var started: Dictionary = expedition.start("qinglan_mountain", root.get_node("GameState"), 77)
 	_expect_true(bool(started.get("ok", false)), "expedition started")
-	var nav: Dictionary = _scene_manager().go_location_select()
-	_expect_false(bool(nav.get("ok", true)), "location select blocked")
+	var nav: Dictionary = _scene_manager().go_world_map()
+	_expect_false(bool(nav.get("ok", true)), "world map blocked")
 	_expect_true(expedition.active, "expedition still active")
 
 

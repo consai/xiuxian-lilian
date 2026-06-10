@@ -157,14 +157,11 @@ func _statistics_text() -> String:
 			int(totals.get("wins", 0)),
 			int(totals.get("losses", 0)),
 		],
-		"历练 %d 次，最深 %d 层" % [
+		"历练 %d 次，最高难度 %d" % [
 			int(totals.get("expeditions", 0)),
-			int(totals.get("max_depth", 0)),
+			maxi(int(totals.get("max_difficulty", 0)), int(totals.get("max_depth", 0))),
 		],
-		"获得物品 %d 件，击败首领 %d" % [
-			int(totals.get("items_gained", 0)),
-			int(totals.get("bosses_defeated", 0)),
-		],
+		"获得物品 %d 件" % int(totals.get("items_gained", 0)),
 	])
 
 

@@ -3,9 +3,7 @@ extends RefCounted
 
 const EXIT_MANUAL := "manual"
 const EXIT_DEFEATED := "defeated"
-const EXIT_BOSS_COMPLETE := "boss_complete"
-const EXIT_JOURNEY_COMPLETE := "journey_complete"
-const VALID_EXIT_REASONS := [EXIT_MANUAL, EXIT_DEFEATED, EXIT_BOSS_COMPLETE, EXIT_JOURNEY_COMPLETE]
+const VALID_EXIT_REASONS := [EXIT_MANUAL, EXIT_DEFEATED]
 
 
 static func from_dict(data: Dictionary) -> Dictionary:

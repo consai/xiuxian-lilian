@@ -54,8 +54,9 @@ func _resolve_message(message: String) -> String:
 	if not GameState.last_expedition_summary.is_empty():
 		var summary := GameState.last_expedition_summary
 		var stats := summary.get("stats", {}) as Dictionary
-		return "上次历练：深入 %d 层，消耗 %d 日" % [
-			int(stats.get("max_depth", 0)), int(summary.get("elapsed_days", 1))
+		return "上次历练：最高难度 %d，消耗 %d 日" % [
+			maxi(int(stats.get("max_difficulty", 0)), int(stats.get("max_depth", 0))),
+			int(summary.get("elapsed_days", 1)),
 		]
 	if not GameState.last_rewards.is_empty():
 		var rewards: PackedStringArray = []
@@ -90,9 +91,9 @@ func _on_encounter() -> void:
 	if ExpeditionState.active:
 		_refresh("当前仍在历练中，请先完成或结算后再操作。")
 		return
-	var nav: Dictionary = SceneManager.go_location_select()
+	var nav: Dictionary = SceneManager.go_world_map()
 	if not bool(nav.get("ok", false)):
-		_refresh(str(nav.get("error", "无法前往地点选择")))
+		_refresh(str(nav.get("error", "无法打开世界地图")))
 
 
 func _on_breakthrough() -> void:
