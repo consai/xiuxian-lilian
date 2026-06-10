@@ -29,25 +29,6 @@ static func collect_errors(game_state: Node = null) -> PackedStringArray:
 				if not reward_v is Dictionary:
 					continue
 				errors.append_array(_validate_reward(reward_v as Dictionary, "事件 %s" % event_id))
-	for location_v in LocationServiceScript.all_locations():
-		var location := location_v as Dictionary
-		var location_id := str(location.get("id", ""))
-		var beats := location.get("journey_beats", []) as Array
-		if beats.size() != 8:
-			errors.append("地点 %s 必须包含 8 个历练节奏章节" % location_id)
-		for beat_v in beats:
-			var beat := beat_v as Dictionary
-			for event_id_v in beat.get("event_ids", []) as Array:
-				var event_id := str(event_id_v)
-				var event := ExpeditionEventServiceScript.by_id(event_id)
-				if event.is_empty():
-					errors.append("地点 %s 的历练节奏引用了未知事件 %s" % [location_id, event_id])
-					continue
-				if ExpeditionEventServiceScript.is_decision_event(event):
-					errors.append_array(_validate_decision_event(event, event_id))
-				elif ExpeditionRulesServiceScript.is_battle_type(str(event.get("type", ""))):
-					for msg in BattleInitData.collect_errors(_build_sample_battle_init(event, game_state)):
-						errors.append("事件 %s: %s" % [event_id, msg])
 	return errors
 
 

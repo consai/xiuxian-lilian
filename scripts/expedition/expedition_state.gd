@@ -22,9 +22,6 @@ var phase: String:
 var location_id: String:
 	get: return str(DataStore.expedition_runtime().get("location_id", ""))
 	set(value): DataStore.expedition_runtime()["location_id"] = value
-var journey_step: int:
-	get: return int(DataStore.expedition_runtime().get("journey_step", 0))
-	set(value): DataStore.expedition_runtime()["journey_step"] = value
 var active_chain_id: String:
 	get: return str(DataStore.expedition_runtime().get("active_chain_id", ""))
 	set(value): DataStore.expedition_runtime()["active_chain_id"] = value
@@ -103,7 +100,6 @@ func start(location_id_value: String, game_state: Node, seed_override: int = -1)
 	start_day = int(game_state.day) if game_state != null else 0
 	expedition_id = _new_expedition_id()
 	location_id = location_id_value
-	journey_step = 0
 	active_chain_id = ""
 	completed_events = []
 	seed = seed_override if seed_override >= 0 else int(Time.get_unix_time_from_system()) % 2147483647
@@ -152,9 +148,8 @@ func begin_next_step() -> Dictionary:
 	var event := ExpeditionDirectorServiceScript.select_next_event(_director_context(), _rng)
 	_save_rng()
 	if event.is_empty():
-		pending_exit_reason = "journey_complete"
-		phase = "result"
-		return {"ok": true, "mode": "complete", "feedback": "本次历练已经结束"}
+		phase = "resolving"
+		return {"ok": false, "error": "暂无可用事件", "feedback": "此地暂且无事，可择日返程。"}
 	if ExpeditionEventServiceScript.is_decision_event(event):
 		_begin_log_event(event)
 		pending_decision_event = event.duplicate(true)
@@ -415,8 +410,7 @@ func settle_pending_battle() -> Dictionary:
 			event_log.append(
 				ExpeditionLogServiceScript.build_battle_defeat_entry(
 					event,
-					journey_step + 1,
-					current_beat_name(),
+					steps + 1,
 					depth
 				)
 			)
@@ -536,8 +530,7 @@ func _begin_log_event(event: Dictionary, log_name: String = "") -> void:
 		title = str(event.get("name", ""))
 	var entry := ExpeditionLogServiceScript.build_event_entry(
 		event,
-		journey_step + 1,
-		current_beat_name(),
+		steps + 1,
 		depth,
 		ExpeditionLogServiceScript.event_scene(event),
 		"",
@@ -577,13 +570,11 @@ func _apply_step_after_event(
 	depth += 1
 	stats["steps"] = steps
 	stats["max_depth"] = maxi(int(stats.get("max_depth", 1)), depth - 1)
-	var beat := current_beat_name()
-	var next_step := journey_step + 1
+	var step_day := steps
 	if _pending_log_index >= 0 and _pending_log_index < event_log.size():
 		var entry := event_log[_pending_log_index] as Dictionary
 		entry["depth"] = event_depth
-		entry["journey_step"] = next_step
-		entry["beat"] = beat
+		entry["journey_step"] = step_day
 		if log_name.strip_edges() != "":
 			entry["name"] = log_name
 		ExpeditionLogServiceScript.apply_outcome(entry, outcome)
@@ -593,8 +584,7 @@ func _apply_step_after_event(
 		event_log.append(
 			ExpeditionLogServiceScript.build_event_entry(
 				event,
-				next_step,
-				beat,
+				step_day,
 				event_depth,
 				ExpeditionLogServiceScript.event_scene(event),
 				outcome,
@@ -608,10 +598,6 @@ func _apply_step_after_event(
 	var chain_id := str(event.get("chain_id", ""))
 	if active_chain_id == "" and chain_id != "":
 		active_chain_id = chain_id
-	journey_step += 1
-	if journey_step >= 8:
-		pending_exit_reason = "journey_complete"
-		phase = "result"
 
 
 func _sync_runtime_from_summary(summary: Dictionary) -> void:
@@ -688,17 +674,10 @@ func _new_expedition_id() -> String:
 	return "expedition_%d_%d" % [int(Time.get_unix_time_from_system() * 1000.0), randi()]
 
 
-func current_beat_name() -> String:
-	var beats := LocationServiceScript.by_id(location_id).get("journey_beats", []) as Array
-	if journey_step >= 0 and journey_step < beats.size():
-		return str((beats[journey_step] as Dictionary).get("beat", ""))
-	return "ending"
-
-
 func _director_context() -> Dictionary:
 	return {
 		"location": LocationServiceScript.by_id(location_id),
-		"journey_step": journey_step,
+		"depth": depth,
 		"active_chain_id": active_chain_id,
 		"completed_events": completed_events,
 		"runtime": runtime,

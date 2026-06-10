@@ -4,7 +4,6 @@
 [ext_resource type="Texture2D" uid="uid://k7aplfa6t5bk" path="res://assets/art/fightscene/fight1.png" id="2_co4yi"]
 [ext_resource type="Texture2D" uid="uid://dr8mq2yvaep1a" path="res://assets/art/ui_new/sprite_006.png" id="2_rpgid"]
 [ext_resource type="StyleBox" uid="uid://djo82jeb3from" path="res://ui/progress_blue_back.tres" id="3_eiqso"]
-[ext_resource type="StyleBox" uid="uid://c1d6175ufxi1g" path="res://ui/panel_headback.tres" id="3_xw0dw"]
 [ext_resource type="StyleBox" uid="uid://bf4cmu4wbkhii" path="res://ui/progress_blue_fill.tres" id="4_fbi8s"]
 [ext_resource type="Texture2D" uid="uid://db4kxr0kfsyt" path="res://assets/art/jueshe/sprite_002.png" id="5_0naaa"]
 [ext_resource type="LabelSettings" uid="uid://dg7uds3ec0xtu" path="res://ui/ziti_new/22.tres" id="6_dlkp7"]
@@ -43,12 +42,12 @@ expand_margin_right = 2.0
 expand_margin_bottom = 2.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g2ogb"]
-bg_color = Color(1, 0.93333334, 0.8784314, 1)
+bg_color = Color(1, 0.945, 0.835, 0.96)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.76862746, 0.5058824, 0.3882353, 1)
+border_color = Color(0.31, 0.19, 0.12, 0.95)
 corner_radius_top_left = 20
 corner_radius_top_right = 20
 corner_radius_bottom_right = 20
@@ -56,12 +55,12 @@ corner_radius_bottom_left = 20
 corner_detail = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m6mll"]
-bg_color = Color(0.93333334, 0.8039216, 0.7019608, 1)
+bg_color = Color(1, 0.965, 0.89, 0.92)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.76862746, 0.5058824, 0.3882353, 1)
+border_color = Color(0.57, 0.38, 0.22, 0.9)
 corner_radius_top_left = 20
 corner_radius_top_right = 20
 corner_radius_bottom_right = 20
@@ -104,6 +103,20 @@ ProgressBar/font_sizes/font_size = 11
 ProgressBar/styles/background = SubResource("StyleBoxFlat_hvaav")
 ProgressBar/styles/fill = SubResource("StyleBoxFlat_nkxry")
 
+[sub_resource type="StyleBoxFlat" id="StyleHudCard"]
+bg_color = Color(1, 0.945, 0.835, 0.94)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.31, 0.19, 0.12, 0.95)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0.12, 0.07, 0.03, 0.3)
+shadow_size = 8
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shield_back"]
 bg_color = Color(0, 0, 0, 0)
 
@@ -119,6 +132,46 @@ corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
+[sub_resource type="StyleBoxFlat" id="StyleInnerCard"]
+bg_color = Color(1, 0.965, 0.89, 0.72)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.57, 0.38, 0.22, 0.82)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleLogCard"]
+bg_color = Color(1, 0.965, 0.89, 0.84)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.3, 0.18, 0.88)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0.12, 0.07, 0.03, 0.22)
+shadow_size = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleActionBar"]
+bg_color = Color(1, 0.945, 0.835, 0.97)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.31, 0.19, 0.12, 0.95)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0.12, 0.07, 0.03, 0.38)
+shadow_size = 12
+
 [sub_resource type="Resource" id="Resource_748tr"]
 script = ExtResource("24_l3d53")
 actor_base_scale = 1.0
@@ -133,6 +186,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("23_748tr")
 script = ExtResource("1_6irjl")
 
 [node name="fightback" type="TextureRect" parent="." unique_id=1120030507]
@@ -147,11 +201,10 @@ expand_mode = 1
 stretch_mode = 4
 
 [node name="head" type="Control" parent="." unique_id=1146742854]
-self_modulate = Color(1, 1, 1, 0.7411765)
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 185.0
+offset_bottom = 194.0
 grow_horizontal = 2
 
 [node name="left" type="Control" parent="head" unique_id=2027380691]
@@ -160,19 +213,19 @@ anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
 offset_top = -87.5
-offset_right = 396.0
+offset_right = 450.0
 offset_bottom = 87.5
 grow_horizontal = 0
 grow_vertical = 2
 
 [node name="headback_left" type="Panel" parent="head/left" unique_id=923783505]
 layout_mode = 0
-offset_left = 36.0
-offset_top = 14.0
-offset_right = 171.0
-offset_bottom = 148.0
+offset_left = 24.0
+offset_top = 18.0
+offset_right = 169.0
+offset_bottom = 163.0
 theme = SubResource("Theme_rbqh8")
-theme_override_styles/panel = ExtResource("3_xw0dw")
+theme_override_styles/panel = SubResource("StyleHudCard")
 
 [node name="head_left" type="TextureRect" parent="head/left/headback_left" unique_id=1261462591]
 unique_name_in_owner = true
@@ -192,9 +245,9 @@ expand_mode = 1
 [node name="shengming_left" type="ProgressBar" parent="head/left" unique_id=982261285]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 214.0
+offset_left = 202.0
 offset_top = 74.0
-offset_right = 379.0
+offset_right = 402.0
 offset_bottom = 94.0
 theme = SubResource("Theme_rbqh8")
 value = 83.11
@@ -217,9 +270,9 @@ vertical_alignment = 1
 unique_name_in_owner = true
 z_index = 1
 layout_mode = 0
-offset_left = 214.0
+offset_left = 202.0
 offset_top = 74.0
-offset_right = 379.0
+offset_right = 402.0
 offset_bottom = 94.0
 mouse_filter = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_shield_back")
@@ -230,9 +283,9 @@ show_percentage = false
 [node name="shield_badge_left" type="HBoxContainer" parent="head/left" unique_id=1299439381]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 382.0
+offset_left = 405.0
 offset_top = 73.0
-offset_right = 430.0
+offset_right = 449.0
 offset_bottom = 95.0
 theme_override_constants/separation = 2
 alignment = 1
@@ -253,9 +306,9 @@ label_settings = ExtResource("8_kbag1")
 [node name="fali_left" type="ProgressBar" parent="head/left" unique_id=1915843097]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 215.0
+offset_left = 202.0
 offset_top = 102.0
-offset_right = 380.0
+offset_right = 402.0
 offset_bottom = 122.0
 theme = SubResource("Theme_rbqh8")
 theme_override_styles/background = ExtResource("3_eiqso")
@@ -279,17 +332,17 @@ vertical_alignment = 1
 [node name="buff_status_left" parent="head/left" unique_id=1543137868 instance=ExtResource("28_buffbar")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 191.0
+offset_left = 180.0
 offset_top = 128.0
-offset_right = 379.0
+offset_right = 402.0
 offset_bottom = 174.0
 
 [node name="rolename_left" type="Label" parent="head/left" unique_id=952350243]
 unique_name_in_owner = true
 layout_mode = 1
-offset_left = 222.0
+offset_left = 202.0
 offset_top = 32.0
-offset_right = 374.0
+offset_right = 402.0
 offset_bottom = 61.0
 text = "清风剑仙"
 label_settings = ExtResource("6_dlkp7")
@@ -297,9 +350,9 @@ vertical_alignment = 1
 
 [node name="TextureRect" type="TextureRect" parent="head/left" unique_id=1513271315]
 layout_mode = 0
-offset_left = 191.0
+offset_left = 178.0
 offset_top = 74.0
-offset_right = 211.0
+offset_right = 198.0
 offset_bottom = 93.0
 texture = ExtResource("7_j6srn")
 expand_mode = 1
@@ -307,9 +360,9 @@ stretch_mode = 4
 
 [node name="TextureRect2" type="TextureRect" parent="head/left" unique_id=1875096306]
 layout_mode = 0
-offset_left = 192.0
+offset_left = 179.0
 offset_top = 102.0
-offset_right = 209.0
+offset_right = 196.0
 offset_bottom = 123.0
 texture = ExtResource("8_mh2b2")
 expand_mode = 1
@@ -322,7 +375,7 @@ anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -396.0
+offset_left = -450.0
 offset_top = -88.5
 offset_bottom = 86.5
 grow_horizontal = 0
@@ -331,12 +384,12 @@ grow_vertical = 2
 [node name="headback_right" type="Panel" parent="head/right" unique_id=2003611961]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 229.0
-offset_top = 14.0
-offset_right = 364.0
-offset_bottom = 148.0
+offset_left = 281.0
+offset_top = 18.0
+offset_right = 426.0
+offset_bottom = 163.0
 theme = SubResource("Theme_rbqh8")
-theme_override_styles/panel = ExtResource("3_xw0dw")
+theme_override_styles/panel = SubResource("StyleHudCard")
 
 [node name="head_right" type="TextureRect" parent="head/right/headback_right" unique_id=692086647]
 unique_name_in_owner = true
@@ -356,9 +409,9 @@ expand_mode = 1
 [node name="shengming_right" type="ProgressBar" parent="head/right" unique_id=1769926884]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 13.0
+offset_left = 48.0
 offset_top = 75.0
-offset_right = 178.0
+offset_right = 248.0
 offset_bottom = 95.0
 theme = SubResource("Theme_rbqh8")
 value = 83.11
@@ -382,9 +435,9 @@ unique_name_in_owner = true
 visible = false
 z_index = 1
 layout_mode = 0
-offset_left = 13.0
+offset_left = 48.0
 offset_top = 75.0
-offset_right = 178.0
+offset_right = 248.0
 offset_bottom = 95.0
 mouse_filter = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_shield_back")
@@ -395,9 +448,9 @@ show_percentage = false
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
-offset_left = -36.0
+offset_left = 1.0
 offset_top = 74.0
-offset_right = 12.0
+offset_right = 45.0
 offset_bottom = 96.0
 theme_override_constants/separation = 2
 alignment = 1
@@ -418,9 +471,9 @@ label_settings = ExtResource("8_kbag1")
 [node name="fali_right" type="ProgressBar" parent="head/right" unique_id=366750543]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 14.0
+offset_left = 48.0
 offset_top = 103.0
-offset_right = 179.0
+offset_right = 248.0
 offset_bottom = 123.0
 theme = SubResource("Theme_rbqh8")
 theme_override_styles/background = ExtResource("3_eiqso")
@@ -444,18 +497,18 @@ vertical_alignment = 1
 [node name="buff_status_right" parent="head/right" unique_id=1336526454 instance=ExtResource("28_buffbar")]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 13.0
+offset_left = 48.0
 offset_top = 128.0
-offset_right = 178.0
+offset_right = 270.0
 offset_bottom = 174.0
 row_alignment = "end"
 
 [node name="rolename_right" type="Label" parent="head/right" unique_id=2034249076]
 unique_name_in_owner = true
 layout_mode = 1
-offset_left = 21.0
+offset_left = 48.0
 offset_top = 33.0
-offset_right = 173.0
+offset_right = 248.0
 offset_bottom = 64.0
 text = "清风剑仙"
 label_settings = ExtResource("6_dlkp7")
@@ -464,9 +517,9 @@ vertical_alignment = 1
 
 [node name="TextureRect" type="TextureRect" parent="head/right" unique_id=1316536438]
 layout_mode = 0
-offset_left = 185.0
+offset_left = 252.0
 offset_top = 75.0
-offset_right = 205.0
+offset_right = 272.0
 offset_bottom = 94.0
 texture = ExtResource("7_j6srn")
 expand_mode = 1
@@ -474,9 +527,9 @@ stretch_mode = 4
 
 [node name="TextureRect2" type="TextureRect" parent="head/right" unique_id=2016635884]
 layout_mode = 0
-offset_left = 186.0
+offset_left = 253.0
 offset_top = 103.0
-offset_right = 203.0
+offset_right = 270.0
 offset_bottom = 124.0
 texture = ExtResource("8_mh2b2")
 expand_mode = 1
@@ -499,13 +552,14 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 12.0
-offset_top = -68.0
-offset_right = -46.0
-offset_bottom = -38.0
+offset_left = 20.0
+offset_top = -72.0
+offset_right = -20.0
+offset_bottom = -36.0
 grow_horizontal = 2
 grow_vertical = 0
 theme = SubResource("Theme_rbqh8")
+theme_override_styles/panel = SubResource("StyleInnerCard")
 
 [node name="interval_left" parent="head/center/Panel" unique_id=1063104566 instance=ExtResource("27_interval")]
 unique_name_in_owner = true
@@ -586,13 +640,13 @@ vertical_alignment = 1
 
 [node name="BattleLogPanel" type="Panel" parent="." unique_id=1331554018]
 unique_name_in_owner = true
-self_modulate = Color(1, 1, 1, 0.5137255)
 layout_mode = 1
-offset_left = 476.0
-offset_top = 482.0
-offset_right = 794.0
-offset_bottom = 598.0
+offset_left = 472.0
+offset_top = 462.0
+offset_right = 808.0
+offset_bottom = 594.0
 theme = SubResource("Theme_rbqh8")
+theme_override_styles/panel = SubResource("StyleLogCard")
 script = ExtResource("18_battlelog")
 
 [node name="BattleLogScroll" type="ScrollContainer" parent="BattleLogPanel" unique_id=2022441602]
@@ -643,13 +697,14 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 11.0
-offset_top = -191.0
-offset_right = -9.0
-offset_bottom = -11.0
+offset_left = 18.0
+offset_top = -188.0
+offset_right = -18.0
+offset_bottom = -14.0
 grow_horizontal = 2
 grow_vertical = 0
 theme = SubResource("Theme_rbqh8")
+theme_override_styles/panel = SubResource("StyleActionBar")
 
 [node name="lefttip" type="TextureRect" parent="botton" unique_id=12645586]
 layout_mode = 1
@@ -689,6 +744,7 @@ offset_right = -645.0
 offset_bottom = -26.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleInnerCard")
 
 [node name="skill_1" parent="botton/Panel" unique_id=70018307 instance=ExtResource("12_s4dxh")]
 unique_name_in_owner = true
@@ -773,6 +829,7 @@ offset_top = 14.0
 offset_right = -334.0
 offset_bottom = 159.0
 grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleInnerCard")
 
 [node name="equip_1" parent="botton/Panel2" unique_id=280868377 instance=ExtResource("12_s4dxh")]
 unique_name_in_owner = true
@@ -831,6 +888,7 @@ offset_top = 14.0
 offset_right = -26.0
 offset_bottom = 159.0
 grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleInnerCard")
 
 [node name="item_1" parent="botton/Panel4" unique_id=2139362364 instance=ExtResource("12_s4dxh")]
 unique_name_in_owner = true
@@ -852,9 +910,8 @@ hot_key = "R"
 
 [node name="auto" type="CheckButton" parent="botton" unique_id=693059749]
 unique_name_in_owner = true
-self_modulate = Color(0.8235294, 0.5176471, 0.36862746, 1)
 layout_mode = 0
-offset_left = 21.0
+offset_left = 34.0
 offset_top = -49.0
 offset_right = 130.0
 offset_bottom = -4.0

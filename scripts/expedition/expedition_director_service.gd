@@ -6,17 +6,7 @@ const EventService := preload("res://scripts/expedition/expedition_event_service
 
 static func select_next_event(context: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 	var location := context.get("location", {}) as Dictionary
-	var beats := location.get("journey_beats", []) as Array
-	var journey_step := int(context.get("journey_step", 0))
-	if journey_step < 0 or journey_step >= beats.size():
-		return {}
-	var beat := beats[journey_step] as Dictionary
-	var candidates: Array = []
-	for event_id_v in beat.get("event_ids", []) as Array:
-		var event := EventService.by_id(str(event_id_v))
-		if _is_available(event, context):
-			event["director_beat"] = str(beat.get("beat", ""))
-			candidates.append(event)
+	var candidates := _pool_candidates(location, context)
 	if candidates.is_empty():
 		return {}
 	var active_chain_id := str(context.get("active_chain_id", ""))
@@ -27,7 +17,7 @@ static func select_next_event(context: Dictionary, rng: RandomNumberGenerator) -
 		)
 		if not chain_candidates.is_empty():
 			candidates = chain_candidates
-	if _resource_ratio(context) < 0.35 and str(beat.get("beat", "")) == "respite":
+	if _resource_ratio(context) < 0.35:
 		for event_v in candidates:
 			var event := event_v as Dictionary
 			if str(event.get("type", "")) == "recover":
@@ -35,12 +25,31 @@ static func select_next_event(context: Dictionary, rng: RandomNumberGenerator) -
 	return _weighted_pick(candidates, context.get("world_state", {}) as Dictionary, rng)
 
 
+static func _pool_candidates(location: Dictionary, context: Dictionary) -> Array:
+	var depth := int(context.get("depth", 1))
+	var out: Array = []
+	for event_id_v in location.get("event_pool", []) as Array:
+		var event := EventService.by_id(str(event_id_v))
+		if event.is_empty():
+			continue
+		var min_depth := maxi(1, int(event.get("min_depth", 1)))
+		if depth < min_depth:
+			continue
+		var max_depth := int(event.get("max_depth", 0))
+		if max_depth > 0 and depth > max_depth:
+			continue
+		if _is_available(event, context):
+			out.append(event)
+	return out
+
+
 static func _weighted_pick(candidates: Array, world_state: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 	var weights: Array[int] = []
 	var total := 0
 	for event_v in candidates:
-		var chain_id := str((event_v as Dictionary).get("chain_id", ""))
-		var weight := 10
+		var event := event_v as Dictionary
+		var chain_id := str(event.get("chain_id", ""))
+		var weight := maxi(1, int(event.get("weight", 10)))
 		if chain_id == "wolf_king":
 			weight += int(world_state.get("wolf_threat", 0))
 		elif chain_id == "sword_tomb":
@@ -64,8 +73,17 @@ static func _is_available(event: Dictionary, context: Dictionary) -> bool:
 	if bool(event.get("once_per_expedition", false)) and completed.has(str(event.get("id", ""))):
 		return false
 	var stats := context.get("stats", {}) as Dictionary
-	if ExpeditionRulesService.is_battle_type(str(event.get("type", ""))) and int(stats.get("battles", 0)) >= 2:
+	var rules := ExpeditionRulesService.rules()
+	var max_battles := maxi(1, int(rules.get("max_battle_choices", 1)))
+	if ExpeditionRulesService.is_battle_type(str(event.get("type", ""))) and int(stats.get("battles", 0)) >= max_battles:
 		return false
+	var chain_id := str(event.get("chain_id", ""))
+	var active_chain_id := str(context.get("active_chain_id", ""))
+	if chain_id != "" and active_chain_id != "" and chain_id != active_chain_id:
+		return false
+	if str(event.get("risk_text", "")) == "结局":
+		if active_chain_id == "" or chain_id != active_chain_id:
+			return false
 	return true
 
 

@@ -27,7 +27,7 @@ func _run_all() -> void:
 	_run("boss requires depth and marks completion", _test_boss_requires_depth_and_marks_completion)
 	_run("game settlement occurs once", _test_game_settlement_occurs_once)
 	_run("distinct expeditions do not collide on settlement", _test_distinct_expeditions_settlement_ids)
-	_run("director is deterministic and follows beats", _test_director_deterministic)
+	_run("director is deterministic from event pool", _test_director_deterministic)
 	_run("completed events change world state", _test_completed_events_world_change)
 	if _failures.is_empty():
 		print("PASS: %d expedition tests" % _tests_run)
@@ -267,7 +267,8 @@ func _test_director_deterministic() -> void:
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 3333)
 	var first: Dictionary = expedition.advance_step()
-	_expect_eq(str((first.get("event", {}) as Dictionary).get("id", "")), "qinglan_travel", "departure beat")
+	_expect_true(bool(first.get("ok", false)), "first pool event resolves")
+	_expect_true(not (first.get("event", {}) as Dictionary).is_empty(), "first pool event selected")
 	expedition.reset()
 	expedition.start("qinglan_mountain", game, 3333)
 	var repeated: Dictionary = expedition.advance_step()

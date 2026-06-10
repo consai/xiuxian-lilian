@@ -1,18 +1,6 @@
 class_name ExpeditionLogService
 extends RefCounted
 
-const BEAT_LABELS := {
-	"departure": "启程",
-	"clue": "线索",
-	"danger": "危险",
-	"choice": "抉择",
-	"respite": "喘息",
-	"escalation": "升级",
-	"climax": "高潮",
-	"ending": "结局",
-}
-
-
 static func build_departure_entry(location: Dictionary) -> Dictionary:
 	var loc_name := str(location.get("name", "未知之地"))
 	var subtitle := str(location.get("subtitle", "")).strip_edges()
@@ -23,7 +11,6 @@ static func build_departure_entry(location: Dictionary) -> Dictionary:
 	return {
 		"depth": 0,
 		"journey_step": 0,
-		"beat": "departure",
 		"event_id": "",
 		"name": "启程",
 		"scene": scene,
@@ -47,8 +34,7 @@ static func apply_outcome(entry: Dictionary, outcome: String) -> void:
 
 static func build_event_entry(
 		event: Dictionary,
-		journey_step: int,
-		beat: String,
+		step_day: int,
 		depth: int,
 		scene: String,
 		outcome: String,
@@ -59,8 +45,7 @@ static func build_event_entry(
 		title = str(event.get("name", ""))
 	var entry := {
 		"depth": depth,
-		"journey_step": journey_step,
-		"beat": beat,
+		"journey_step": step_day,
 		"event_id": str(event.get("id", "")),
 		"name": title,
 		"scene": scene.strip_edges(),
@@ -74,8 +59,7 @@ static func build_event_entry(
 
 static func build_battle_victory_entry(
 		event: Dictionary,
-		journey_step: int,
-		beat: String,
+		step_day: int,
 		depth: int,
 		rewards: Array
 ) -> Dictionary:
@@ -89,36 +73,35 @@ static func build_battle_victory_entry(
 		clash = "恶战良久，你险胜%s。" % enemy_name
 	var loot := format_rewards(rewards)
 	var outcome := clash if loot == "" else "%s %s" % [clash, loot]
-	return build_event_entry(event, journey_step, beat, depth, scene, outcome)
+	return build_event_entry(event, step_day, depth, scene, outcome)
 
 
 static func build_battle_victory_outcome(event: Dictionary, rewards: Array) -> String:
-	var entry := build_battle_victory_entry(event, 0, "", 0, rewards)
+	var entry := build_battle_victory_entry(event, 0, 0, rewards)
 	return str(entry.get("outcome", ""))
 
 
 static func build_battle_defeat_outcome(event: Dictionary) -> String:
-	var entry := build_battle_defeat_entry(event, 0, "", 0)
+	var entry := build_battle_defeat_entry(event, 0, 0)
 	return str(entry.get("outcome", ""))
 
 
 static func build_battle_defeat_entry(
 		event: Dictionary,
-		journey_step: int,
-		beat: String,
+		step_day: int,
 		depth: int
 ) -> Dictionary:
 	var scene := str(event.get("desc", "")).strip_edges()
 	var enemy_name := str((event.get("enemy", {}) as Dictionary).get("name", event.get("name", "强敌")))
 	var outcome := "力竭不敌，你被%s击退，只得撤出战局。" % enemy_name
-	return build_event_entry(event, journey_step, beat, depth, scene, outcome)
+	return build_event_entry(event, step_day, depth, scene, outcome)
 
 
 static func build_retreat_entry(event: Dictionary, depth: int) -> Dictionary:
 	var scene := str(event.get("desc", "")).strip_edges()
 	var enemy_name := str((event.get("enemy", {}) as Dictionary).get("name", event.get("name", "强敌")))
 	var outcome := "见%s来势凶猛，你当机立断，抽身撤退，结束本次历练。" % enemy_name
-	return build_event_entry(event, 0, "danger", depth, scene, outcome)
+	return build_event_entry(event, 0, depth, scene, outcome)
 
 
 static func join_scene_outcome(scene: String, outcome: String) -> String:
@@ -207,12 +190,8 @@ static func format_plain(entry: Dictionary) -> String:
 
 static func _format_header(entry: Dictionary) -> String:
 	var step := int(entry.get("journey_step", entry.get("depth", 0)))
-	var beat := str(entry.get("beat", ""))
-	var beat_label: String = str(BEAT_LABELS.get(beat, beat))
 	if step <= 0:
 		return "启程"
-	if beat_label != "":
-		return "第%d天·%s" % [step, beat_label]
 	return "第%d天" % step
 
 

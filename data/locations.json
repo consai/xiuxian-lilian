@@ -19,17 +19,21 @@
         "qinglan_wolf_tracks",
         "qinglan_injured_cultivator",
         "qinglan_serpent",
-        "qinglan_boss"
-      ],
-      "journey_beats": [
-        {"beat": "departure", "event_ids": ["qinglan_travel"]},
-        {"beat": "clue", "event_ids": ["qinglan_wolf_tracks", "sword_broken_blade", "demonic_missing_cultivator"]},
-        {"beat": "danger", "event_ids": ["qinglan_wolf", "qinglan_cliff", "qinglan_fog"]},
-        {"beat": "choice", "event_ids": ["wolf_den_choice", "sword_stele_choice", "demonic_blood_trail"]},
-        {"beat": "respite", "event_ids": ["qinglan_shelter", "qinglan_spring"]},
-        {"beat": "escalation", "event_ids": ["wolf_pack_ambush", "sword_array", "demonic_ambush"]},
-        {"beat": "climax", "event_ids": ["wolf_king_boss", "sword_guardian", "demonic_ritual_boss"]},
-        {"beat": "ending", "event_ids": ["wolf_hunt_ending", "sword_tomb_ending", "demonic_ritual_ending"]}
+        "qinglan_boss",
+        "wolf_den_choice",
+        "wolf_pack_ambush",
+        "wolf_king_boss",
+        "wolf_hunt_ending",
+        "sword_broken_blade",
+        "sword_stele_choice",
+        "sword_array",
+        "sword_guardian",
+        "sword_tomb_ending",
+        "demonic_missing_cultivator",
+        "demonic_blood_trail",
+        "demonic_ambush",
+        "demonic_ritual_boss",
+        "demonic_ritual_ending"
       ],
       "preview_rewards": [
         "items_LingCao",

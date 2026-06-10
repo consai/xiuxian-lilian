@@ -1,18 +1,16 @@
-[gd_scene load_steps=15 format=3 uid="uid://bs8uku854l12v"]
+[gd_scene format=3 uid="uid://bs8uku854l12v"]
 
 [ext_resource type="Script" uid="uid://epg2tggtwtr2" path="res://scripts/expedition/expedition_result.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_theme"]
 [ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="3_bg"]
-[ext_resource type="Texture2D" path="res://assets/art/ui_new/img_suc.png" id="4_success"]
-[ext_resource type="Texture2D" path="res://assets/art/ui_new/shuye.png" id="5_herb"]
-[ext_resource type="Texture2D" path="res://assets/art/ui_new/wanzi.png" id="6_core"]
-[ext_resource type="Texture2D" path="res://assets/art/ui_new/shuijing.png" id="7_orb"]
-[ext_resource type="Texture2D" uid="uid://c3f3nny73kvhg" path="res://assets/art/ui_new/btn_lv.png" id="8_green"]
+[ext_resource type="Texture2D" uid="uid://byo31enqsiwst" path="res://assets/art/ui_new/img_suc.png" id="4_success"]
+[ext_resource type="Texture2D" uid="uid://1impvpgc21e8" path="res://assets/art/ui_new/shuye.png" id="5_herb"]
+[ext_resource type="Texture2D" uid="uid://7ppj3d5hwhen" path="res://assets/art/ui_new/wanzi.png" id="6_core"]
+[ext_resource type="Texture2D" uid="uid://c76pqy6eaf2sc" path="res://assets/art/ui_new/shuijing.png" id="7_orb"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="9_title"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="10_h2"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="11_h3"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="12_body"]
-[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="13_small"]
 [ext_resource type="FontFile" uid="uid://btkp4vukwqrul" path="res://assets/art/AlimamaDaoLiTi.ttf" id="14_font"]
 
 [sub_resource type="StyleBoxFlat" id="PanelMain"]
@@ -93,7 +91,7 @@ corner_radius_bottom_left = 18
 shadow_color = Color(0.2, 0.12, 0.06, 0.34)
 shadow_size = 6
 
-[node name="ExpeditionResult" type="Control"]
+[node name="ExpeditionResult" type="Control" unique_id=628558094]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -103,7 +101,7 @@ grow_vertical = 2
 theme = ExtResource("2_theme")
 script = ExtResource("1_script")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=2020712540]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -115,7 +113,7 @@ texture = ExtResource("3_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Dimmer" type="ColorRect" parent="."]
+[node name="Dimmer" type="ColorRect" parent="." unique_id=911093068]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -125,7 +123,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.12, 0.08, 0.04, 0.42)
 
-[node name="Dialog" type="Panel" parent="."]
+[node name="Dialog" type="Panel" parent="." unique_id=7758297]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -140,7 +138,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("PanelMain")
 
-[node name="TitleBack" type="Panel" parent="Dialog"]
+[node name="TitleBack" type="Panel" parent="Dialog" unique_id=1676747872]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -151,7 +149,7 @@ offset_bottom = 60.0
 grow_horizontal = 2
 theme_override_styles/panel = SubResource("TitleBack")
 
-[node name="Title" type="Label" parent="Dialog/TitleBack"]
+[node name="Title" type="Label" parent="Dialog/TitleBack" unique_id=1544955969]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -164,7 +162,7 @@ label_settings = ExtResource("9_title")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="OutcomeCard" type="Panel" parent="Dialog"]
+[node name="OutcomeCard" type="Panel" parent="Dialog" unique_id=605795194]
 layout_mode = 0
 offset_left = 28.0
 offset_top = 80.0
@@ -172,7 +170,7 @@ offset_right = 344.0
 offset_bottom = 520.0
 theme_override_styles/panel = SubResource("PanelInset")
 
-[node name="Heading" type="Label" parent="Dialog/OutcomeCard"]
+[node name="Heading" type="Label" parent="Dialog/OutcomeCard" unique_id=1708560408]
 layout_mode = 0
 offset_left = 12.0
 offset_top = 12.0
@@ -182,7 +180,7 @@ text = "满载而归"
 label_settings = ExtResource("10_h2")
 horizontal_alignment = 1
 
-[node name="SuccessIcon" type="TextureRect" parent="Dialog/OutcomeCard"]
+[node name="SuccessIcon" type="TextureRect" parent="Dialog/OutcomeCard" unique_id=2055560051]
 layout_mode = 0
 offset_left = 62.0
 offset_top = 58.0
@@ -192,7 +190,7 @@ texture = ExtResource("4_success")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ResultMessage" type="Label" parent="Dialog/OutcomeCard"]
+[node name="ResultMessage" type="Label" parent="Dialog/OutcomeCard" unique_id=1254079714]
 layout_mode = 0
 offset_left = 20.0
 offset_top = 250.0
@@ -204,14 +202,14 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="Divider" type="HSeparator" parent="Dialog/OutcomeCard"]
+[node name="Divider" type="HSeparator" parent="Dialog/OutcomeCard" unique_id=172503100]
 layout_mode = 0
 offset_left = 22.0
 offset_top = 318.0
 offset_right = 294.0
 offset_bottom = 322.0
 
-[node name="LootHeading" type="Label" parent="Dialog/OutcomeCard"]
+[node name="LootHeading" type="Label" parent="Dialog/OutcomeCard" unique_id=1542292744]
 layout_mode = 0
 offset_left = 20.0
 offset_top = 330.0
@@ -221,14 +219,15 @@ text = "代表性收获"
 label_settings = ExtResource("11_h3")
 horizontal_alignment = 1
 
-[node name="HerbSlot" type="Panel" parent="Dialog/OutcomeCard"]
+[node name="HerbSlot" type="Panel" parent="Dialog/OutcomeCard" unique_id=3233903]
 layout_mode = 0
 offset_left = 24.0
 offset_top = 368.0
 offset_right = 104.0
 offset_bottom = 424.0
 theme_override_styles/panel = SubResource("RewardSlot")
-[node name="Icon" type="TextureRect" parent="Dialog/OutcomeCard/HerbSlot"]
+
+[node name="Icon" type="TextureRect" parent="Dialog/OutcomeCard/HerbSlot" unique_id=2068477713]
 layout_mode = 0
 offset_left = 15.0
 offset_top = 3.0
@@ -238,14 +237,15 @@ texture = ExtResource("5_herb")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CoreSlot" type="Panel" parent="Dialog/OutcomeCard"]
+[node name="CoreSlot" type="Panel" parent="Dialog/OutcomeCard" unique_id=1328351560]
 layout_mode = 0
 offset_left = 118.0
 offset_top = 368.0
 offset_right = 198.0
 offset_bottom = 424.0
 theme_override_styles/panel = SubResource("RewardSlot")
-[node name="Icon" type="TextureRect" parent="Dialog/OutcomeCard/CoreSlot"]
+
+[node name="Icon" type="TextureRect" parent="Dialog/OutcomeCard/CoreSlot" unique_id=1518960043]
 layout_mode = 0
 offset_left = 15.0
 offset_top = 3.0
@@ -255,14 +255,15 @@ texture = ExtResource("6_core")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="OrbSlot" type="Panel" parent="Dialog/OutcomeCard"]
+[node name="OrbSlot" type="Panel" parent="Dialog/OutcomeCard" unique_id=1457481867]
 layout_mode = 0
 offset_left = 212.0
 offset_top = 368.0
 offset_right = 292.0
 offset_bottom = 424.0
 theme_override_styles/panel = SubResource("RewardSlot")
-[node name="Icon" type="TextureRect" parent="Dialog/OutcomeCard/OrbSlot"]
+
+[node name="Icon" type="TextureRect" parent="Dialog/OutcomeCard/OrbSlot" unique_id=1949782926]
 layout_mode = 0
 offset_left = 15.0
 offset_top = 3.0
@@ -272,7 +273,7 @@ texture = ExtResource("7_orb")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="DetailCard" type="Panel" parent="Dialog"]
+[node name="DetailCard" type="Panel" parent="Dialog" unique_id=331816958]
 layout_mode = 0
 offset_left = 360.0
 offset_top = 80.0
@@ -280,7 +281,7 @@ offset_right = 942.0
 offset_bottom = 520.0
 theme_override_styles/panel = SubResource("PanelInset")
 
-[node name="Heading" type="Label" parent="Dialog/DetailCard"]
+[node name="Heading" type="Label" parent="Dialog/DetailCard" unique_id=1668617340]
 layout_mode = 0
 offset_left = 16.0
 offset_top = 12.0
@@ -290,14 +291,14 @@ text = "本次历练记录"
 label_settings = ExtResource("10_h2")
 horizontal_alignment = 1
 
-[node name="TopDivider" type="HSeparator" parent="Dialog/DetailCard"]
+[node name="TopDivider" type="HSeparator" parent="Dialog/DetailCard" unique_id=1851778595]
 layout_mode = 0
 offset_left = 24.0
 offset_top = 52.0
 offset_right = 558.0
 offset_bottom = 56.0
 
-[node name="Scroll" type="ScrollContainer" parent="Dialog/DetailCard"]
+[node name="Scroll" type="ScrollContainer" parent="Dialog/DetailCard" unique_id=1935539412]
 layout_mode = 0
 offset_left = 28.0
 offset_top = 68.0
@@ -305,7 +306,7 @@ offset_right = 554.0
 offset_bottom = 416.0
 horizontal_scroll_mode = 0
 
-[node name="Body" type="RichTextLabel" parent="Dialog/DetailCard/Scroll"]
+[node name="Body" type="RichTextLabel" parent="Dialog/DetailCard/Scroll" unique_id=1776452034]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(500, 340)
 layout_mode = 2
@@ -317,10 +318,13 @@ theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
 theme_override_fonts/normal_font = ExtResource("14_font")
 theme_override_font_sizes/normal_font_size = 20
-text = "深入 6 层，事件 8 个，消耗 3 日\n战斗 3 场，胜 3，负 0\n最终气血 82，法力 46\n获得：灵草 x4、妖丹 x1、寒潭珠 x1"
+text = "深入 6 层，事件 8 个，消耗 3 日
+战斗 3 场，胜 3，负 0
+最终气血 82，法力 46
+获得：灵草 x4、妖丹 x1、寒潭珠 x1"
 fit_content = true
 
-[node name="RulePanel" type="Panel" parent="Dialog"]
+[node name="RulePanel" type="Panel" parent="Dialog" unique_id=407967364]
 layout_mode = 0
 offset_left = 28.0
 offset_top = 536.0
@@ -328,7 +332,7 @@ offset_right = 942.0
 offset_bottom = 584.0
 theme_override_styles/panel = SubResource("PanelInset")
 
-[node name="RuleLabel" type="Label" parent="Dialog/RulePanel"]
+[node name="RuleLabel" type="Label" parent="Dialog/RulePanel" unique_id=545564445]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -342,7 +346,7 @@ label_settings = ExtResource("12_body")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ReturnButton" type="Button" parent="Dialog"]
+[node name="ReturnButton" type="Button" parent="Dialog" unique_id=1053941849]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 365.0
@@ -355,6 +359,6 @@ theme_override_colors/font_hover_color = Color(0.2, 0.14, 0.08, 1)
 theme_override_fonts/font = ExtResource("14_font")
 theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("ReturnNormal")
-theme_override_styles/hover = SubResource("ReturnHover")
 theme_override_styles/pressed = SubResource("ReturnHover")
+theme_override_styles/hover = SubResource("ReturnHover")
 text = "返回洞府"

@@ -46,14 +46,14 @@ func _ready() -> void:
 
 func _refresh_all() -> void:
 	var location: Dictionary = LocationServiceScript.by_id(ExpeditionState.location_id)
-	(%Header as Label).text = "%s · 历练 %d/8 · 已消耗 %d 日" % [
+	(%Header as Label).text = "%s · 深入 %d 层 · 已消耗 %d 日" % [
 		str(location.get("name", "")),
-		mini(8, ExpeditionState.journey_step + 1),
+		ExpeditionState.depth,
 		ExpeditionState.estimated_elapsed_days(),
 	]
 	_refresh_progress_dots()
 	_refresh_status_panel()
-	(%Step as Label).text = _beat_label(ExpeditionState.current_beat_name())
+	(%Step as Label).text = "第 %d 步" % ExpeditionState.steps
 	_sync_loot_items()
 	_refresh_log_display()
 	_refresh_event_presentation()
@@ -142,12 +142,7 @@ func _refresh_potion_slot(slot: Panel, item_id: String, inv: Dictionary) -> void
 
 
 func _refresh_progress_dots() -> void:
-	var per_day := 8
-	var done := clampi(ExpeditionState.journey_step, 0, per_day)
-	var parts: PackedStringArray = []
-	for i in per_day:
-		parts.append("●" if i < done else "○")
-	(%ProgressDots as Label).text = "  ".join(parts)
+	(%ProgressDots as Label).visible = false
 
 
 func _refresh_controls() -> void:
@@ -178,6 +173,9 @@ func _advance_auto_step() -> void:
 	var began: Dictionary = ExpeditionState.begin_next_step()
 	_locked = false
 	if not bool(began.get("ok", false)):
+		var feedback := str(began.get("feedback", began.get("error", ""))).strip_edges()
+		if feedback != "":
+			(%Feedback as Label).text = feedback
 		_refresh_all()
 		return
 	_handle_step_begin(began)
@@ -274,13 +272,6 @@ func _finish_log_scroll() -> void:
 		return
 	var last_line := maxi(0, log_label.get_line_count() - 1)
 	log_label.scroll_to_line(last_line)
-
-
-func _beat_label(beat: String) -> String:
-	return {
-		"departure": "启程", "clue": "线索", "danger": "危险", "choice": "选择",
-		"respite": "喘息", "escalation": "升级", "climax": "高潮", "ending": "结局",
-	}.get(beat, beat)
 
 
 func _on_event_chosen(event_id: String) -> void:
