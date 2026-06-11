@@ -9,6 +9,7 @@
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="7_body"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/16.tres" id="8_small"]
 [ext_resource type="Script" path="res://scripts/ui/combat_loadout_panel.gd" id="9_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/loadout_selection_popup.tscn" id="10_popup"]
 
 [sub_resource type="StyleBoxFlat" id="MainPanel"]
 bg_color = Color(1, 0.945, 0.835, 0.985)
@@ -122,7 +123,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "功法与战斗配置"
+text = "战斗配置"
 label_settings = ExtResource("5_title")
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -143,7 +144,7 @@ layout_mode = 0
 offset_left = 24.0
 offset_top = 68.0
 offset_right = 348.0
-offset_bottom = 574.0
+offset_bottom = 488.0
 theme_override_styles/panel = SubResource("InsetPanel")
 
 [node name="Heading" type="Label" parent="Panel/MethodsCard"]
@@ -172,15 +173,15 @@ layout_mode = 0
 offset_left = 16.0
 offset_top = 84.0
 offset_right = 308.0
-offset_bottom = 356.0
+offset_bottom = 326.0
 theme_override_constants/separation = 10
 
 [node name="MethodSummary" type="Panel" parent="Panel/MethodsCard"]
 layout_mode = 0
 offset_left = 16.0
-offset_top = 372.0
+offset_top = 336.0
 offset_right = 308.0
-offset_bottom = 486.0
+offset_bottom = 402.0
 theme_override_styles/panel = SubResource("NotePanel")
 
 [node name="MethodSummaryLabel" type="Label" parent="Panel/MethodsCard/MethodSummary"]
@@ -206,7 +207,7 @@ layout_mode = 0
 offset_left = 362.0
 offset_top = 68.0
 offset_right = 718.0
-offset_bottom = 574.0
+offset_bottom = 488.0
 theme_override_styles/panel = SubResource("InsetPanel")
 
 [node name="Heading" type="Label" parent="Panel/SkillsCard"]
@@ -215,7 +216,7 @@ offset_left = 12.0
 offset_top = 10.0
 offset_right = 344.0
 offset_bottom = 44.0
-text = "已装备技能"
+text = "技能顺序"
 label_settings = ExtResource("6_heading")
 horizontal_alignment = 1
 
@@ -225,7 +226,7 @@ offset_left = 16.0
 offset_top = 46.0
 offset_right = 340.0
 offset_bottom = 72.0
-text = "槽位顺序会影响自动战斗优先级"
+text = "点击槽位选择技能，顺序决定施法优先级"
 label_settings = ExtResource("8_small")
 horizontal_alignment = 1
 
@@ -235,7 +236,7 @@ layout_mode = 0
 offset_left = 16.0
 offset_top = 84.0
 offset_right = 340.0
-offset_bottom = 470.0
+offset_bottom = 402.0
 theme_override_constants/separation = 12
 
 [node name="EquipmentCard" type="Panel" parent="Panel"]
@@ -243,7 +244,7 @@ layout_mode = 0
 offset_left = 732.0
 offset_top = 68.0
 offset_right = 1076.0
-offset_bottom = 314.0
+offset_bottom = 270.0
 theme_override_styles/panel = SubResource("InsetPanel")
 
 [node name="Heading" type="Label" parent="Panel/EquipmentCard"]
@@ -262,7 +263,7 @@ layout_mode = 0
 offset_left = 16.0
 offset_top = 58.0
 offset_right = 328.0
-offset_bottom = 226.0
+offset_bottom = 184.0
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 10
 columns = 2
@@ -270,9 +271,9 @@ columns = 2
 [node name="StrategyCard" type="Panel" parent="Panel"]
 layout_mode = 0
 offset_left = 732.0
-offset_top = 328.0
+offset_top = 282.0
 offset_right = 1076.0
-offset_bottom = 574.0
+offset_bottom = 488.0
 theme_override_styles/panel = SubResource("InsetPanel")
 
 [node name="Heading" type="Label" parent="Panel/StrategyCard"]
@@ -291,27 +292,37 @@ layout_mode = 0
 offset_left = 16.0
 offset_top = 54.0
 offset_right = 328.0
-offset_bottom = 136.0
+offset_bottom = 184.0
 theme_override_constants/separation = 7
 
-[node name="BooksHeading" type="Label" parent="Panel/StrategyCard"]
+[node name="BooksCard" type="Panel" parent="Panel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 500.0
+offset_right = 1076.0
+offset_bottom = 588.0
+theme_override_styles/panel = SubResource("InsetPanel")
+
+[node name="BooksHeading" type="Label" parent="Panel/BooksCard"]
 layout_mode = 0
 offset_left = 16.0
-offset_top = 142.0
-offset_right = 328.0
-offset_bottom = 170.0
+offset_top = 12.0
+offset_right = 130.0
+offset_bottom = 74.0
 text = "可学习典籍"
 label_settings = ExtResource("7_body")
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="BooksScroll" type="ScrollContainer" parent="Panel/StrategyCard"]
+[node name="BooksScroll" type="ScrollContainer" parent="Panel/BooksCard"]
 layout_mode = 0
-offset_left = 16.0
-offset_top = 174.0
-offset_right = 328.0
-offset_bottom = 226.0
+offset_left = 142.0
+offset_top = 10.0
+offset_right = 1036.0
+offset_bottom = 78.0
 horizontal_scroll_mode = 0
 
-[node name="BooksContainer" type="HBoxContainer" parent="Panel/StrategyCard/BooksScroll"]
+[node name="BooksContainer" type="HBoxContainer" parent="Panel/BooksCard/BooksScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
@@ -319,17 +330,17 @@ theme_override_constants/separation = 8
 [node name="BottomDivider" type="HSeparator" parent="Panel"]
 layout_mode = 0
 offset_left = 28.0
-offset_top = 586.0
+offset_top = 596.0
 offset_right = 1072.0
-offset_bottom = 590.0
+offset_bottom = 600.0
 
 [node name="BackButton" type="TextureButton" parent="Panel"]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 36.0
-offset_top = 606.0
+offset_top = 612.0
 offset_right = 108.0
-offset_bottom = 674.0
+offset_bottom = 680.0
 texture_normal = ExtResource("4_back")
 ignore_texture_size = true
 stretch_mode = 5
@@ -337,9 +348,9 @@ stretch_mode = 5
 [node name="StatusPanel" type="Panel" parent="Panel"]
 layout_mode = 0
 offset_left = 130.0
-offset_top = 606.0
+offset_top = 612.0
 offset_right = 1064.0
-offset_bottom = 670.0
+offset_bottom = 676.0
 theme_override_styles/panel = SubResource("NotePanel")
 
 [node name="StatusLabel" type="Label" parent="Panel/StatusPanel"]
@@ -356,3 +367,6 @@ text = "点击槽位即可调整配置。"
 label_settings = ExtResource("7_body")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="SelectionPopup" parent="." instance=ExtResource("10_popup")]
+unique_name_in_owner = true

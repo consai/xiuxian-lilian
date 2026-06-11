@@ -2,6 +2,7 @@ extends Control
 
 const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
+const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
 
 @onready var _close_button: TextureButton = %CloseButton
 @onready var _back_button: TextureButton = %BackButton
@@ -12,11 +13,16 @@ const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd"
 @onready var _auto: VBoxContainer = %AutoContainer
 @onready var _books: HBoxContainer = %BooksContainer
 @onready var _status: Label = %StatusLabel
+@onready var _selection_popup: LoadoutSelectionPopup = %SelectionPopup
+
+var _selection_mode := ""
+var _selection_target: Variant = -1
 
 
 func _ready() -> void:
 	_close_button.pressed.connect(_go_back)
 	_back_button.pressed.connect(_go_back)
+	_selection_popup.selected.connect(_on_popup_selected)
 	_refresh()
 
 
@@ -49,27 +55,21 @@ func _build_methods() -> void:
 	]
 	for spec in specs:
 		var slot_key := str(spec["key"])
-		var row := HBoxContainer.new()
-		row.custom_minimum_size.y = 55
-		var label := Label.new()
-		label.text = str(spec["label"])
-		label.custom_minimum_size.x = 76
-		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		row.add_child(label)
-		var option := OptionButton.new()
-		option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		for method_id_v in GameState.unlocked_methods:
-			var method_id := str(method_id_v)
-			var method := CultivationMethodServiceScript.by_id(method_id)
-			if not CultivationMethodServiceScript.can_equip(method, slot_key):
-				continue
-			option.add_item(str(method.get("name", method_id)))
-			option.set_item_metadata(option.item_count - 1, method_id)
-			if str(GameState.cultivation_method_slots.get(slot_key, "")) == method_id:
-				option.select(option.item_count - 1)
-		option.item_selected.connect(_on_method_selected.bind(option, slot_key))
-		row.add_child(option)
-		_methods.add_child(row)
+		var method_id := str(GameState.cultivation_method_slots.get(slot_key, ""))
+		var method := CultivationMethodServiceScript.by_id(method_id)
+		var button := Button.new()
+		button.custom_minimum_size = Vector2(0, 54)
+		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.text = "%s  |  %s\n%s" % [
+			str(spec["label"]),
+			str(method.get("name", "空槽位")),
+			_method_effect(method),
+		]
+		button.tooltip_text = str(method.get("desc", "点击选择功法"))
+		button.icon = BattleInitDataScript._resolve_icon_texture(method)
+		button.expand_icon = true
+		button.pressed.connect(_open_selection.bind("method", slot_key))
+		_methods.add_child(button)
 	var main := CultivationMethodServiceScript.by_id(str(GameState.cultivation_method_slots.get("main", "")))
 	_method_summary.text = "当前主修：%s\n修炼速度 ×%.2f\n战斗每 2 秒恢复 %.0f 法力" % [
 		str(main.get("name", "未配置")),
@@ -80,30 +80,21 @@ func _build_methods() -> void:
 
 func _build_skills() -> void:
 	for i in 5:
-		var row := HBoxContainer.new()
-		row.custom_minimum_size.y = 62
-		var badge := Label.new()
-		badge.text = str(i + 1)
-		badge.custom_minimum_size = Vector2(36, 36)
-		badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		row.add_child(badge)
-		var option := OptionButton.new()
-		option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		option.add_item("空槽位")
-		option.set_item_metadata(0, -1)
-		for sid_v in GameState.unlocked_skills:
-			var sid := int(sid_v)
-			var skill := ConfigManager.skill_by_id(sid)
-			if skill.is_empty():
-				continue
-			option.add_item(str(skill.get("name", "技能 %d" % sid)))
-			option.set_item_metadata(option.item_count - 1, sid)
-			if i < GameState.equipped_skills.size() and int(GameState.equipped_skills[i]) == sid:
-				option.select(option.item_count - 1)
-		option.item_selected.connect(_on_skill_selected.bind(option, i))
-		row.add_child(option)
-		_skills.add_child(row)
+		var sid := int(GameState.equipped_skills[i]) if i < GameState.equipped_skills.size() else -1
+		var skill := ConfigManager.skill_by_id(sid)
+		var button := Button.new()
+		button.custom_minimum_size = Vector2(0, 54)
+		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.text = "%d    %s\n%s" % [
+			i + 1,
+			str(skill.get("name", "空槽位")),
+			_skill_effect(skill),
+		]
+		button.tooltip_text = "点击选择第 %d 顺位技能" % (i + 1)
+		button.icon = BattleInitDataScript._resolve_icon_texture(skill)
+		button.expand_icon = true
+		button.pressed.connect(_open_selection.bind("skill", i))
+		_skills.add_child(button)
 
 
 func _build_equipment() -> void:
@@ -170,22 +161,27 @@ func _add_equipment_button(text: String, action: Callable) -> void:
 	_equipment.add_child(button)
 
 
-func _on_method_selected(index: int, option: OptionButton, slot_key: String) -> void:
-	var result: Dictionary = GameState.equip_method(slot_key, str(option.get_item_metadata(index)))
-	_refresh(str(result.get("error", "功法配置已更新。")))
+func _open_selection(mode: String, target: Variant) -> void:
+	_selection_mode = mode
+	_selection_target = target
+	_selection_popup.open_for(mode, target)
 
 
-func _on_skill_selected(index: int, option: OptionButton, slot_index: int) -> void:
-	var sid := int(option.get_item_metadata(index))
+func _on_popup_selected(entry_id: Variant) -> void:
+	if _selection_mode == "method":
+		var result: Dictionary = GameState.equip_method(str(_selection_target), str(entry_id))
+		_refresh(str(result.get("error", "功法配置已更新。")))
+		return
+	var sid := int(entry_id)
 	if sid < 0:
 		var slots := GameState.equipped_skills.duplicate(true)
 		while slots.size() < 5:
 			slots.append(-1)
-		slots[slot_index] = -1
+		slots[int(_selection_target)] = -1
 		GameState.equipped_skills = slots
 		_refresh("技能槽已清空。")
 		return
-	var result: Dictionary = GameState.equip_skill(slot_index, sid)
+	var result: Dictionary = GameState.equip_skill(int(_selection_target), sid)
 	_refresh(str(result.get("error", "技能配置已更新。")))
 
 
@@ -212,6 +208,28 @@ func _equip_name(index: int) -> String:
 func _item_name(index: int) -> String:
 	var iid := str(GameState.item_slots[index]) if index < GameState.item_slots.size() else ""
 	return ConfigManager.get_item_display_name(iid) if iid != "" else "空"
+
+
+func _method_effect(method: Dictionary) -> String:
+	if method.is_empty():
+		return "点击选择功法"
+	if float(method.get("combat_mp_restore_2s", 0.0)) > 0.0:
+		return "每 2 秒恢复 %.0f 法力" % float(method.get("combat_mp_restore_2s", 0.0))
+	return str(method.get("desc", "提供修炼与战斗加成"))
+
+
+func _skill_effect(skill: Dictionary) -> String:
+	if skill.is_empty():
+		return "未配置技能"
+	var effects := skill.get("effects", []) as Array
+	if effects.is_empty():
+		return "基础战斗行动"
+	match str((effects[0] as Dictionary).get("type", "")):
+		"damage": return "对敌人造成伤害"
+		"shield": return "为自身提供护盾"
+		"heal": return "恢复自身气血"
+		"restore_mp": return "恢复自身法力"
+		_: return "提供战斗辅助效果"
 
 
 func _clear(container: Node) -> void:

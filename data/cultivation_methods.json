@@ -13,6 +13,7 @@
       },
       "percent_attrs": {},
       "damage_bonus_percent": 0.0,
+      "icon": "res://assets/art/ui_new/fulu.png",
       "desc": "最基础的吐纳法门，可引天地灵气入体。"
     },
     "blazing_sun_art": {
@@ -27,6 +28,7 @@
       },
       "percent_attrs": {},
       "damage_bonus_percent": 0.08,
+      "icon": "res://assets/art/ui_new/fulu1.png",
       "desc": "运转如烈日，兼顾修炼速度与术法威力。"
     },
     "iron_body_art": {
@@ -41,6 +43,7 @@
       },
       "percent_attrs": {},
       "damage_bonus_percent": 0.0,
+      "icon": "res://assets/art/ui_new/shuye.png",
       "desc": "以灵力淬炼筋骨，增强气血与物防。"
     },
     "spirit_focus_art": {
@@ -55,6 +58,7 @@
       },
       "percent_attrs": {},
       "damage_bonus_percent": 0.04,
+      "icon": "res://assets/art/ui_new/shuijing.png",
       "desc": "凝练神识，增强术法与控制能力。"
     },
     "cloud_step": {
@@ -69,6 +73,7 @@
       },
       "percent_attrs": {},
       "damage_bonus_percent": 0.0,
+      "icon": "res://assets/art/ui_new/sudu.png",
       "desc": "身随云动，提升出手速度与闪避。"
     }
   }
