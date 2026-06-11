@@ -138,7 +138,8 @@ static func log_unit(unit: FightObj, role: String) -> Dictionary:
 		"攻击": unit.get_attr(FightObj.ATTR_ATK),
 		"防御": unit.get_attr(FightObj.ATTR_DEF),
 		"速度": unit.get_attr(FightObj.ATTR_SPD),
-		"走条周期": CombatBalance.interval_cap_for(unit),
+		"行动进度速率": CombatBalance.action_progress_rate_for(unit),
+		"预计出手间隔": CombatBalance.interval_cap_for(unit),
 	}
 
 

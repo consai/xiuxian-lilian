@@ -95,6 +95,15 @@ func side_act_and_present(
 		hud.sync_from_domain(ctx)
 		await presentation.run_presentation(ctx, hud, enemy_payload, on_battle_ended)
 		return
+	if side == BattleDomainService.SIDE_PLAYER and not ctx.player_ai_cfg.is_empty():
+		var player_resolved := FightSceneActions.resolve_player_action_with_ai(ctx)
+		var player_payload: Dictionary = player_resolved.get("payload", {}) as Dictionary
+		var player_desc: Dictionary = player_resolved.get("descriptor", {}) as Dictionary
+		if not player_payload.is_empty():
+			commit_combat_resolution(ctx, hud, player_payload, player_desc)
+			hud.sync_from_domain(ctx)
+			await presentation.run_presentation(ctx, hud, player_payload, on_battle_ended)
+			return
 	var actor := ctx.battle_player if side == BattleDomainService.SIDE_PLAYER else ctx.battle_enemy
 	var check_interactive := side == BattleDomainService.SIDE_PLAYER
 	var slot_index := FightSceneActions.find_auto_skill_slot(ctx, actor, check_interactive)

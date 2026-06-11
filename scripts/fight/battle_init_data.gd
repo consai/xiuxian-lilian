@@ -621,8 +621,8 @@ static func build_apply_battle_payload(
 		"player": _combatant_ui_row(player, player_row),
 		"enemy": _combatant_ui_row(enemy, enemy_row),
 		"intervals": {
-			"left": {"elapsed": 0.0, "cap": _interval_cap(player)},
-			"right": {"elapsed": 0.0, "cap": _interval_cap(enemy)},
+			"left": {"elapsed": 0.0, "cap": CombatBalance.ACTION_PROGRESS_MAX},
+			"right": {"elapsed": 0.0, "cap": CombatBalance.ACTION_PROGRESS_MAX},
 		},
 		"skills": build_skills_ui(player, skill_cfg),
 		"equips": build_equips_ui(player_row.get("equips", []), equip_cfg),

@@ -302,6 +302,42 @@ static func resolve_enemy_action_with_ai(ctx: FightSceneContext) -> Dictionary:
 	return {"payload": payload, "descriptor": desc}
 
 
+static func resolve_player_action_with_ai(ctx: FightSceneContext) -> Dictionary:
+	if ctx.domain == null or ctx.battle_player == null or ctx.battle_enemy == null:
+		return {}
+	var decision := EnemyAiServiceScript.decide_enemy_action(
+		ctx.battle_player,
+		ctx.battle_enemy,
+		ctx.skill_cfg,
+		ctx.player_ai_cfg,
+		ctx.player_ai_runtime,
+		{"battle_elapsed": ctx.domain.battle_elapsed_advancing},
+		ctx.item_cfg,
+		ctx.equip_cfg
+	)
+	if not bool(decision.get("ok", false)):
+		return {}
+	var payload: Dictionary
+	var desc: Dictionary
+	match str(decision.get("action_type", "")):
+		EnemyAiTypesScript.ACTION_BASIC:
+			payload = ctx.domain.resolve_player_basic()
+			desc = {"action_kind": BattleRecordTypes.ACTION_BASIC, "action_id": 0}
+		EnemyAiTypesScript.ACTION_SKILL:
+			var sid := int(decision.get("skill_id", -1))
+			payload = ctx.domain.resolve_player_skill(sid)
+			desc = {"action_kind": BattleRecordTypes.ACTION_SKILL, "action_id": sid}
+		EnemyAiTypesScript.ACTION_ITEM:
+			payload = ctx.domain.resolve_player_item(int(decision.get("slot_index", -1)))
+			desc = descriptor_for_item(payload)
+		EnemyAiTypesScript.ACTION_EQUIP:
+			payload = ctx.domain.resolve_player_equip(int(decision.get("slot_index", -1)))
+			desc = descriptor_for_equip(payload)
+		_:
+			return {}
+	return {"payload": payload, "descriptor": desc} if bool(payload.get("ok", false)) else {}
+
+
 static func descriptor_for_skill_or_basic(skill_id: int) -> Dictionary:
 	if skill_id <= 0:
 		return {"action_kind": BattleRecordTypes.ACTION_BASIC, "action_id": 0}

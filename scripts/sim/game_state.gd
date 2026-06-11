@@ -1,5 +1,7 @@
 extends Node
 
+const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
+const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
 const SIM_PATH := "res://data/simulation.json"
 const HUB_SCENE := "res://scenes/sim/cave_hub.tscn"
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
@@ -37,6 +39,12 @@ var player_name: String:
 var player_icon: String:
 	get: return str(DataStore.savedata.get("player_icon", ""))
 	set(value): DataStore.savedata["player_icon"] = value
+var foundations: Dictionary:
+	get: return DataStore.savedata.get("foundations", CharacterStatsScript.default_foundations()) as Dictionary
+	set(value): DataStore.savedata["foundations"] = CharacterStatsScript.normalize_foundations(value)
+var aptitudes: Dictionary:
+	get: return DataStore.savedata.get("aptitudes", CharacterStatsScript.default_aptitudes()) as Dictionary
+	set(value): DataStore.savedata["aptitudes"] = CharacterStatsScript.normalize_aptitudes(value)
 var attrs: Dictionary:
 	get: return DataStore.savedata.get("attrs", {}) as Dictionary
 	set(value): DataStore.savedata["attrs"] = value
@@ -52,6 +60,21 @@ var unlocked_skills: Array:
 var equipped_skills: Array:
 	get: return DataStore.savedata.get("equipped_skills", []) as Array
 	set(value): DataStore.savedata["equipped_skills"] = value
+var unlocked_methods: Array:
+	get: return DataStore.savedata.get("unlocked_methods", ["basic_qi_art"]) as Array
+	set(value): DataStore.savedata["unlocked_methods"] = value
+var cultivation_method_slots: Dictionary:
+	get: return DataStore.savedata.get("cultivation_method_slots", {}) as Dictionary
+	set(value): DataStore.savedata["cultivation_method_slots"] = value
+var auto_battle_enabled: bool:
+	get: return bool(DataStore.savedata.get("auto_battle_enabled", true))
+	set(value): DataStore.savedata["auto_battle_enabled"] = value
+var auto_battle_preset: String:
+	get: return str(DataStore.savedata.get("auto_battle_preset", "balanced"))
+	set(value): DataStore.savedata["auto_battle_preset"] = value
+var auto_battle_rules: Dictionary:
+	get: return DataStore.savedata.get("auto_battle_rules", {}) as Dictionary
+	set(value): DataStore.savedata["auto_battle_rules"] = value
 var owned_equips: Array:
 	get: return DataStore.savedata.get("owned_equips", []) as Array
 	set(value): DataStore.savedata["owned_equips"] = value
@@ -121,11 +144,20 @@ func new_game() -> void:
 	ling_stones = 0
 	player_name = str(initial.get("name", "修士"))
 	player_icon = str(initial.get("icon", ""))
-	attrs = (initial.get("attrs", {}) as Dictionary).duplicate(true)
+	foundations = initial.get("foundations", CharacterStatsScript.default_foundations()) as Dictionary
+	aptitudes = initial.get("aptitudes", CharacterStatsScript.default_aptitudes()) as Dictionary
+	refresh_derived_attrs(false)
 	hp = float(attrs.get(FightAttr.HP_MAX, 100.0))
 	mp = float(attrs.get(FightAttr.MP_MAX, 100.0))
 	unlocked_skills = (initial.get("skills", []) as Array).duplicate(true)
 	equipped_skills = unlocked_skills.duplicate(true)
+	unlocked_methods = (initial.get("methods", ["basic_qi_art"]) as Array).duplicate(true)
+	cultivation_method_slots = (initial.get("method_slots", {
+		"main": "basic_qi_art", "support_1": "", "support_2": "", "movement": "",
+	}) as Dictionary).duplicate(true)
+	auto_battle_enabled = true
+	auto_battle_preset = "balanced"
+	auto_battle_rules = {}
 	owned_equips = (initial.get("equips", []) as Array).duplicate(true)
 	equip_slots = (initial.get("equip_slots", [-1, -1]) as Array).duplicate(true)
 	item_slots = (initial.get("item_slots", ["", ""]) as Array).duplicate(true)
@@ -198,6 +230,10 @@ func load_game(slot: int) -> Dictionary:
 func cultivate() -> int:
 	var cfg := _activity_cfg("cultivate")
 	var base_gain := maxi(0, int(cfg.get("cultivation_gain", 20)))
+	var speed := CultivationMethodServiceScript.cultivation_speed(cultivation_method_slots)
+	if speed <= 0.0:
+		return 0
+	base_gain = maxi(1, int(round(float(base_gain) * speed)))
 	var gain := base_gain / 2 if injury_days > 0 else base_gain
 	cultivation += gain
 	_finish_activity("修炼：修为 +%d" % gain, true)
@@ -220,6 +256,11 @@ func breakthrough() -> Dictionary:
 		return {"ok": false, "error": "修为尚未达到突破门槛"}
 	var old_name := realm_name
 	realm_index += 1
+	var grown: Dictionary = CharacterStatsScript.normalize_foundations(foundations)
+	for key in grown.keys():
+		grown[key] = float(grown[key]) + 1.0
+	foundations = grown
+	refresh_derived_attrs(true)
 	_sync_realm()
 	return {
 		"ok": true,
@@ -323,6 +364,7 @@ func build_player_battle_snapshot(runtime: Dictionary) -> Dictionary:
 		"skills": skills,
 		"equips": equips,
 		"items": InventoryServiceScript.build_battle_item_slots(runtime_inv, runtime_slots),
+		"ai": resolved_auto_battle_rules(),
 	}
 
 
@@ -338,7 +380,7 @@ func build_battle_init(event: Dictionary) -> Dictionary:
 		"player": player,
 		"enemy": enemy,
 		"battle_time_limit": 200.0,
-		"auto_battle": {"player": false, "enemy": true},
+		"auto_battle": {"player": auto_battle_enabled, "enemy": true},
 		"spd_jitter_ratio": 0.0,
 	}
 
@@ -434,6 +476,7 @@ func to_dict() -> Dictionary:
 func apply_dict(data: Dictionary) -> bool:
 	if not DataStore.import_savedata(data):
 		return false
+	refresh_derived_attrs(true)
 	var attrs_dict := attrs
 	hp = clampf(hp, 0.0, float(attrs_dict.get(FightAttr.HP_MAX, 100.0)))
 	mp = clampf(mp, 0.0, float(attrs_dict.get(FightAttr.MP_MAX, 100.0)))
@@ -444,6 +487,118 @@ func apply_dict(data: Dictionary) -> bool:
 	_initialize_map_state()
 	_sync_realm()
 	return true
+
+
+func refresh_derived_attrs(preserve_vital_ratio: bool = true) -> void:
+	var old_hp_max := maxf(1.0, float(attrs.get(FightAttr.HP_MAX, 100.0)))
+	var old_mp_max := maxf(1.0, float(attrs.get(FightAttr.MP_MAX, 100.0)))
+	var hp_ratio := clampf(hp / old_hp_max, 0.0, 1.0)
+	var mp_ratio := clampf(mp / old_mp_max, 0.0, 1.0)
+	var method_mods := CultivationMethodServiceScript.build_modifiers(cultivation_method_slots)
+	attrs = CharacterStatsScript.build_combat_attrs(
+		foundations,
+		method_mods.get("flat", {}) as Dictionary,
+		method_mods.get("percent", {}) as Dictionary
+	)
+	if preserve_vital_ratio:
+		hp = float(attrs.get(FightAttr.HP_MAX, 100.0)) * hp_ratio
+		mp = float(attrs.get(FightAttr.MP_MAX, 100.0)) * mp_ratio
+
+
+func learn_skill(skill_id: int) -> Dictionary:
+	if ConfigManager.skill_by_id(skill_id).is_empty():
+		return {"ok": false, "error": "未知技能"}
+	if unlocked_skills.has(skill_id):
+		return {"ok": false, "error": "已经掌握该技能"}
+	unlocked_skills.append(skill_id)
+	for i in equipped_skills.size():
+		if int(equipped_skills[i]) < 0:
+			equipped_skills[i] = skill_id
+			return {"ok": true, "skill_id": skill_id}
+	for i in 5:
+		if i >= equipped_skills.size():
+			equipped_skills.append(skill_id)
+			break
+	return {"ok": true, "skill_id": skill_id}
+
+
+func learn_method(method_id: String) -> Dictionary:
+	var row := CultivationMethodServiceScript.by_id(method_id)
+	if row.is_empty():
+		return {"ok": false, "error": "未知功法"}
+	if unlocked_methods.has(method_id):
+		return {"ok": false, "error": "已经掌握该功法"}
+	unlocked_methods.append(method_id)
+	return {"ok": true, "method_id": method_id}
+
+
+func use_learning_book(item_id: String) -> Dictionary:
+	var def := ConfigManager.item_def_by_id(item_id)
+	if def == null or int(inventory.get(item_id, 0)) <= 0:
+		return {"ok": false, "error": "背包中没有该典籍"}
+	var result: Dictionary
+	if def.learn_skill_id >= 0:
+		result = learn_skill(def.learn_skill_id)
+	elif def.learn_method_id != "":
+		result = learn_method(def.learn_method_id)
+	else:
+		return {"ok": false, "error": "该物品不是可学习典籍"}
+	if bool(result.get("ok", false)):
+		InventoryServiceScript.remove_item(inventory, item_id, 1)
+	return result
+
+
+func equip_method(slot_key: String, method_id: String) -> Dictionary:
+	var row := CultivationMethodServiceScript.by_id(method_id)
+	if not unlocked_methods.has(method_id) or not CultivationMethodServiceScript.can_equip(row, slot_key):
+		return {"ok": false, "error": "该功法无法装备到此位置"}
+	var slots := cultivation_method_slots.duplicate(true)
+	for key in slots.keys():
+		if str(slots[key]) == method_id:
+			slots[key] = ""
+	slots[slot_key] = method_id
+	cultivation_method_slots = slots
+	refresh_derived_attrs(true)
+	return {"ok": true}
+
+
+func equip_skill(slot_index: int, skill_id: int) -> Dictionary:
+	if slot_index < 0 or slot_index >= 5 or not unlocked_skills.has(skill_id):
+		return {"ok": false, "error": "无法配置该技能"}
+	var slots := equipped_skills.duplicate(true)
+	while slots.size() < 5:
+		slots.append(-1)
+	var previous := slots.find(skill_id)
+	if previous >= 0:
+		slots[previous] = -1
+	slots[slot_index] = skill_id
+	equipped_skills = slots.slice(0, 5)
+	return {"ok": true}
+
+
+func resolved_auto_battle_rules() -> Dictionary:
+	if not auto_battle_rules.is_empty():
+		return auto_battle_rules.duplicate(true)
+	var rules: Array = []
+	match auto_battle_preset:
+		"aggressive":
+			for sid_v in equipped_skills:
+				var sid := int(sid_v)
+				if sid > 0:
+					rules.append({"when": {"skill_ready": sid}, "action": {"type": "skill", "skill_id": sid}})
+		"conservative":
+			rules.append({"when": {"self_hp_ratio_lte": 0.45, "item_count_gte": {"slot": 0, "count": 1}}, "action": {"type": "item", "slot_index": 0}})
+			for sid_v in equipped_skills:
+				var sid := int(sid_v)
+				if sid > 0:
+					rules.append({"when": {"self_mp_gte": 40, "skill_ready": sid}, "action": {"type": "skill", "skill_id": sid}})
+		_:
+			for sid_v in equipped_skills:
+				var sid := int(sid_v)
+				if sid > 0:
+					rules.append({"when": {"skill_ready": sid}, "action": {"type": "skill", "skill_id": sid}})
+	rules.append({"when": {}, "action": {"type": "basic"}})
+	return {"version": 1, "policy": "rule_list", "rules": rules}
 
 
 func reward_label(reward: Dictionary) -> String:

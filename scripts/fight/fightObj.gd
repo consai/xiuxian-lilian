@@ -11,6 +11,10 @@ const ATTR_DEF := FightAttr.DEF
 const ATTR_SPD := FightAttr.SPD
 const ATTR_CRIT := FightAttr.CRIT
 const ATTR_CRIT_DAMAGE := FightAttr.CRIT_DAMAGE
+const ATTR_PHYSICAL_ATK := FightAttr.PHYSICAL_ATK
+const ATTR_MAGIC_ATK := FightAttr.MAGIC_ATK
+const ATTR_PHYSICAL_DEF := FightAttr.PHYSICAL_DEF
+const ATTR_MAGIC_DEF := FightAttr.MAGIC_DEF
 const CombatEventScript = preload("res://scripts/fight/combat_event.gd")
 const CombatReportScript = preload("res://scripts/fight/combat_report.gd")
 
@@ -383,6 +387,10 @@ func is_crit(crit: float) -> bool:
 
 ## 普攻数据结算（无前后摇）。
 static func resolve_basic_attack(attacker: FightObj, defender: FightObj) -> Dictionary:
+	if not FightAttr.roll_hit(attacker.attrs, defender.attrs):
+		var missed := CombatReportScript.empty_fx_report()
+		missed[CombatReportScript.KEY_MISSED] = true
+		return missed
 	var report := FightAttr.calc_basic_damage(attacker.attrs, defender.attrs)
 	var raw_damage := float(report.get(CombatReportScript.KEY_DAMAGE, 0.0))
 	var shield_abs := defender.be_attacked(raw_damage)
@@ -413,9 +421,7 @@ func use_skill(skill_id: int, skill_cfg: Dictionary = {}, target: FightObj = nul
 	change_mp(-mp_cost)
 	var cd_total := float(slot.get("cd_total", cfg.get("cd", 0.0)))
 	slot["cd"] = cd_total
-	var fx_report := _empty_fx_report()
-	if target != null:
-		fx_report = _apply_skill_effects(cfg, target)
+	var fx_report := _apply_skill_effects(cfg, target)
 	return _merge_use_success(fx_report)
 
 
@@ -652,6 +658,10 @@ static func _merge_use_success(fx_report: Dictionary) -> Dictionary:
 		CombatReportScript.KEY_BUFF_NAMES: _duplicate_buff_names(
 			normalized.get(CombatReportScript.KEY_BUFF_NAMES, [])
 		),
+		CombatReportScript.KEY_MISSED: bool(normalized.get(CombatReportScript.KEY_MISSED, false)),
+		CombatReportScript.KEY_CONTROL_RESISTED: bool(
+			normalized.get(CombatReportScript.KEY_CONTROL_RESISTED, false)
+		),
 	}
 
 
@@ -671,6 +681,7 @@ func _apply_skill_effects(cfg: Dictionary, target: FightObj) -> Dictionary:
 
 func _apply_effects_with_routing(cfg: Dictionary, default_target: FightObj = null) -> Dictionary:
 	var power_scale := float(cfg.get("power", 1000.0)) / 1000.0
+	var damage_type := _damage_type_from_cfg(cfg)
 	var report := _empty_fx_report()
 	var buff_names: Array = report["buff_names"] as Array
 	var effects: Variant = cfg.get("effects", cfg.get("fight_effect", []))
@@ -686,8 +697,16 @@ func _apply_effects_with_routing(cfg: Dictionary, default_target: FightObj = nul
 			"damage":
 				if target == null:
 					continue
+				var can_miss := bool(eff.get("can_miss", cfg.get("can_miss", true)))
+				var accuracy_bonus := float(eff.get(
+					"accuracy_bonus", cfg.get("accuracy_bonus", 0.0)
+				))
+				if can_miss and not FightAttr.roll_hit(attrs, target.attrs, accuracy_bonus):
+					report[CombatReportScript.KEY_MISSED] = true
+					continue
 				var hit := FightAttr.calc_skill_damage(
-					attrs, target.attrs, power_scale, float(eff.get("value", 0.0))
+					attrs, target.attrs, power_scale, _scaled_effect_value(eff),
+					str(eff.get("damage_type", damage_type))
 				)
 				var dmg := float(hit.get("damage", 0.0))
 				if bool(hit.get("is_crit", false)):
@@ -707,24 +726,48 @@ func _apply_effects_with_routing(cfg: Dictionary, default_target: FightObj = nul
 					report[CombatReportScript.KEY_RAW_DAMAGE]
 				)
 			"heal":
-				var heal_val := float(eff.get("value", 0.0))
+				var heal_val := _scaled_effect_value(eff)
 				var heal_target := target if target != null else self
 				heal_target.change_hp(heal_val)
 				report[CombatReportScript.KEY_HEAL] = float(report[CombatReportScript.KEY_HEAL]) + heal_val
 			"shield":
 				var shield_target := target if target != null else self
-				shield_target.change_shield(float(eff.get("value", 0.0)))
+				shield_target.change_shield(_scaled_effect_value(eff))
 			"restore_mp":
-				var mp_val := float(eff.get("value", 0.0))
+				var mp_val := _scaled_effect_value(eff)
 				var mp_target := target if target != null else self
 				mp_target.change_mp(mp_val)
 				report[CombatReportScript.KEY_MP_GAIN] = float(
 					report[CombatReportScript.KEY_MP_GAIN]
 				) + mp_val
 			"buff", "apply_buff", "buff_add":
-				_collect_buff_names_from_effect(eff, target, buff_names)
+				var buff_result := _collect_buff_names_from_effect(eff, target, buff_names)
+				if bool(buff_result.get("resisted", false)):
+					report[CombatReportScript.KEY_CONTROL_RESISTED] = true
 	report["buff_names"] = buff_names
 	return report
+
+
+func _scaled_effect_value(effect: Dictionary) -> float:
+	var value := float(effect.get("value", 0.0))
+	var scaling_v: Variant = effect.get("scaling", {})
+	if not scaling_v is Dictionary:
+		return value
+	for key in (scaling_v as Dictionary).keys():
+		value += get_attr(str(key), 0.0) * float((scaling_v as Dictionary)[key])
+	return value
+
+
+static func _damage_type_from_cfg(cfg: Dictionary) -> String:
+	var explicit := str(cfg.get("damage_type", "")).strip_edges().to_lower()
+	if explicit in [FightAttr.DAMAGE_PHYSICAL, FightAttr.DAMAGE_MAGIC]:
+		return explicit
+	var tags_v: Variant = cfg.get("tags", [])
+	if tags_v is Array:
+		for tag_v in tags_v as Array:
+			if str(tag_v).strip_edges().to_lower() == FightAttr.DAMAGE_PHYSICAL:
+				return FightAttr.DAMAGE_PHYSICAL
+	return FightAttr.DAMAGE_MAGIC
 
 
 func pop_runtime_events(unit_id: String) -> Array:
@@ -741,9 +784,13 @@ func pop_runtime_events(unit_id: String) -> Array:
 	return out
 
 
-func _collect_buff_names_from_effect(eff: Dictionary, target: FightObj, buff_names: Array) -> void:
+func _collect_buff_names_from_effect(eff: Dictionary, target: FightObj, buff_names: Array) -> Dictionary:
 	if target == null:
-		return
+		return {}
+	var base_chance := float(eff.get("control_chance", 1.0))
+	var uses_control := bool(eff.get("control", target != self))
+	if uses_control and target != self and not FightAttr.roll_control(attrs, target.attrs, base_chance):
+		return {"resisted": true}
 	var duration_override := float(eff.get("duration", -1.0))
 	var mods_v: Variant = eff.get("modifiers", null)
 	if mods_v is Dictionary and not (mods_v as Dictionary).is_empty():
@@ -757,12 +804,14 @@ func _collect_buff_names_from_effect(eff: Dictionary, target: FightObj, buff_nam
 					buff_names.append(target._buff_display_name(bid))
 			elif delta < 0:
 				target.remove_buff(bid, absi(delta))
-		return
+		return {"applied": true}
 	var legacy_id := str(eff.get("id", eff.get("buff_id", ""))).strip_edges()
 	if legacy_id != "":
 		var stacks := maxi(1, int(eff.get("stacks", 1)))
 		if target.add_buff(legacy_id, stacks, duration_override) > 0:
 			buff_names.append(target._buff_display_name(legacy_id))
+			return {"applied": true}
+	return {}
 
 
 func _buff_display_name(buff_id: String) -> String:

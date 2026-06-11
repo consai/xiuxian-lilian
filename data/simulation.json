@@ -15,23 +15,37 @@
   "initial_player": {
     "name": "清风剑仙",
     "icon": "jueshe/sprite_002.png",
-    "attrs": {
-      "hp_max": 100,
-      "mp_max": 100,
-      "shield": 0,
-      "atk": 100,
-      "def": 100,
-      "spd": 100,
-      "crit": 10,
-      "crit_damage": 150
+    "foundations": {
+      "body": 10,
+      "spirit": 10,
+      "sense": 10,
+      "agility": 10
     },
-    "skills": [1, 2, 3, 0],
+    "aptitudes": {
+      "comprehension": 12,
+      "fortune": 10,
+      "roots": {
+        "fire": 80,
+        "wood": 35
+      }
+    },
+    "skills": [0],
+    "methods": ["basic_qi_art"],
+    "method_slots": {
+      "main": "basic_qi_art",
+      "support_1": "",
+      "support_2": "",
+      "movement": ""
+    },
     "equips": [5001],
     "inventory": {
       "items_LingCao": 3,
       "items_FightTestDan": 3,
       "items_HuiQiDan": 2,
-      "items_HuiLingDan": 2
+      "items_HuiLingDan": 2,
+      "book_skill_fireball": 1,
+      "book_method_blazing_sun": 1,
+      "book_method_iron_body": 1
     },
     "item_slots": ["items_FightTestDan", "items_HuiLingDan"],
     "equip_slots": [5001, -1]

@@ -1,6 +1,7 @@
 extends Control
 
 const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
+const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const BTN_ACTIVE := preload("res://assets/art/ui_new/btn_lv.png")
 const BTN_INACTIVE := preload("res://assets/art/ui_new/btn_mihuang.png")
 
@@ -25,6 +26,7 @@ enum Tab { ATTRIBUTES, EXPERIENCE, STATISTICS }
 @onready var _crit: Panel = %Crit
 @onready var _crit_damage: Panel = %CritDamage
 @onready var _shield: Panel = %Shield
+@onready var _attributes_heading: Label = $Panel/AttributesCard/Heading
 @onready var _attributes_card: Panel = %AttributesCard
 @onready var _other_attr: Panel = %OtherAttr
 @onready var _other_attr_heading: Label = %OtherAttrHeading
@@ -32,6 +34,7 @@ enum Tab { ATTRIBUTES, EXPERIENCE, STATISTICS }
 @onready var _attributes_tab: TextureButton = %AttributesTab
 @onready var _experience_tab: TextureButton = %ExperienceTab
 @onready var _statistics_tab: TextureButton = %StatisticsTab
+@onready var _loadout_tab: TextureButton = %LoadoutTab
 
 var _active_tab: Tab = Tab.ATTRIBUTES
 
@@ -41,6 +44,7 @@ func _ready() -> void:
 	_attributes_tab.pressed.connect(func() -> void: _select_tab(Tab.ATTRIBUTES))
 	_experience_tab.pressed.connect(func() -> void: _select_tab(Tab.EXPERIENCE))
 	_statistics_tab.pressed.connect(func() -> void: _select_tab(Tab.STATISTICS))
+	_loadout_tab.pressed.connect(func() -> void: SceneManager.go_combat_loadout_panel())
 	_select_tab(Tab.ATTRIBUTES)
 	refresh()
 
@@ -87,16 +91,14 @@ func _bind_vitals() -> void:
 
 func _bind_combat_stats() -> void:
 	var attrs := GameState.attrs
-	_set_stat_slot(_attack, "攻击", "%.0f" % FightAttr.get_attr(attrs, FightAttr.ATK, 0.0))
-	_set_stat_slot(_defense, "防御", "%.0f" % FightAttr.get_attr(attrs, FightAttr.DEF, 0.0))
-	_set_stat_slot(_speed, "速度", "%.0f" % FightAttr.get_attr(attrs, FightAttr.SPD, 0.0))
-	_set_stat_slot(_crit, "暴击", "%.0f%%" % FightAttr.get_attr(attrs, FightAttr.CRIT, 0.0))
-	_set_stat_slot(
-		_crit_damage,
-		"暴伤",
-		"%.0f%%" % FightAttr.get_attr(attrs, FightAttr.CRIT_DAMAGE, 100.0)
-	)
-	_set_stat_slot(_shield, "护盾", "%.0f" % FightAttr.get_attr(attrs, FightAttr.SHIELD, 0.0))
+	_attributes_heading.text = "战斗面板"
+	_set_stat_slot(_attack, "物攻", "%.0f" % FightAttr.get_attr(attrs, FightAttr.PHYSICAL_ATK))
+	_set_stat_slot(_defense, "法攻", "%.0f" % FightAttr.get_attr(attrs, FightAttr.MAGIC_ATK))
+	_set_stat_slot(_speed, "物防", "%.0f" % FightAttr.get_attr(attrs, FightAttr.PHYSICAL_DEF))
+	_set_stat_slot(_crit, "法防", "%.0f" % FightAttr.get_attr(attrs, FightAttr.MAGIC_DEF))
+	_set_stat_slot(_crit_damage, "出手", "%.0f" % FightAttr.get_attr(attrs, FightAttr.SPD))
+	_shield.visible = true
+	_set_stat_slot(_shield, "暴击", "%.0f%%" % FightAttr.get_attr(attrs, FightAttr.CRIT))
 
 
 func _set_stat_slot(panel: Panel, title: String, value_text: String) -> void:
@@ -126,8 +128,8 @@ func _refresh_tab_content() -> void:
 	match _active_tab:
 		Tab.ATTRIBUTES:
 			_other_attr.visible = true
-			_other_attr_heading.text = "其他属性"
-			_biography.text = _biography_text()
+			_other_attr_heading.text = "根基与资质"
+			_biography.text = _foundation_text()
 		Tab.EXPERIENCE:
 			_other_attr.visible = true
 			_other_attr_heading.text = "经历"
@@ -136,6 +138,35 @@ func _refresh_tab_content() -> void:
 			_other_attr.visible = true
 			_other_attr_heading.text = "统计"
 			_biography.text = _statistics_text()
+
+
+func _foundation_text() -> String:
+	var base := CharacterStatsScript.normalize_foundations(GameState.foundations)
+	var aptitude := CharacterStatsScript.normalize_aptitudes(GameState.aptitudes)
+	var attrs := GameState.attrs
+	return "\n".join([
+		"根基",
+		"肉身  %.0f    灵力  %.0f" % [float(base[CharacterStatsScript.BODY]), float(base[CharacterStatsScript.SPIRIT])],
+		"神识  %.0f    身法  %.0f" % [float(base[CharacterStatsScript.SENSE]), float(base[CharacterStatsScript.AGILITY])],
+		"",
+		"资质",
+		"灵根  %s" % CharacterStatsScript.root_label(aptitude),
+		"悟性  %.0f    福缘  %.0f" % [
+			float(aptitude[CharacterStatsScript.COMPREHENSION]),
+			float(aptitude[CharacterStatsScript.FORTUNE]),
+		],
+		"",
+		"辅助",
+		"命中 %.0f    闪避 %.0f" % [
+			FightAttr.get_attr(attrs, FightAttr.ACCURACY),
+			FightAttr.get_attr(attrs, FightAttr.EVASION),
+		],
+		"气血恢复 %.1f    法力恢复 %.1f" % [
+			FightAttr.get_attr(attrs, FightAttr.HP_REGEN),
+			FightAttr.get_attr(attrs, FightAttr.MP_REGEN),
+		],
+		"负重 %.0f" % FightAttr.get_attr(attrs, FightAttr.CARRY),
+	])
 
 
 func _experience_text() -> String:

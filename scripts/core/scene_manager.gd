@@ -7,6 +7,7 @@ const EXPEDITION_RESULT := "expedition_result"
 const FIGHT := "fight"
 const BREAKTHROUGH_SUMMARY := "breakthrough_summary"
 const CHARACTER_ATTRIBUTES_PANEL := "character_attributes_panel"
+const COMBAT_LOADOUT_PANEL := "combat_loadout_panel"
 
 const SCENE_PATHS := {
 	HUB: "res://scenes/sim/cave_hub.tscn",
@@ -16,6 +17,7 @@ const SCENE_PATHS := {
 	FIGHT: "res://scenes/fightScene.tscn",
 	BREAKTHROUGH_SUMMARY: "res://scenes/sim/breakthrough_summary.tscn",
 	CHARACTER_ATTRIBUTES_PANEL: "res://scenes/ui/character_attributes_panel.tscn",
+	COMBAT_LOADOUT_PANEL: "res://scenes/ui/combat_loadout_panel.tscn",
 }
 
 const _BLOCKED_EXPEDITION_ACTIVE := "当前仍在历练中，请先完成或结算后再操作。"
@@ -44,7 +46,7 @@ func go_to(scene_id: String, payload: Dictionary = {}, options: Dictionary = {})
 	var guard := _guard_enter(scene_id, options)
 	if not bool(guard.get("ok", false)):
 		return guard
-	return _perform_transition(scene_id, payload)
+	return _perform_transition(scene_id, payload, true)
 
 
 func go_hub(payload: Dictionary = {}) -> Dictionary:
@@ -94,11 +96,29 @@ func go_character_attributes_panel() -> Dictionary:
 	return go_to(CHARACTER_ATTRIBUTES_PANEL)
 
 
+func go_combat_loadout_panel() -> Dictionary:
+	return go_to(COMBAT_LOADOUT_PANEL)
+
+
 func go_back(fallback_scene_id: String = HUB, options: Dictionary = {}) -> Dictionary:
-	var previous_id := str(_data_store().scene_runtime().get("previous_id", ""))
-	if previous_id != "" and SCENE_PATHS.has(previous_id):
-		return go_to(previous_id, {}, options)
-	return go_to(fallback_scene_id, {}, options)
+	var scene_rt: Dictionary = _data_store().scene_runtime()
+	if bool(scene_rt.get("transitioning", false)):
+		return {"ok": false, "error": "transition_in_progress"}
+	var history_v: Variant = scene_rt.get("history", [])
+	var history: Array = history_v as Array if history_v is Array else []
+	var current_id := str(scene_rt.get("current_id", ""))
+	if not history.is_empty() and str(history.back()) == current_id:
+		history.pop_back()
+	var target_id := fallback_scene_id
+	if not history.is_empty():
+		target_id = str(history.back())
+	scene_rt["history"] = history
+	if not SCENE_PATHS.has(target_id):
+		return {"ok": false, "error": "unknown_scene_id:%s" % target_id}
+	var guard := _guard_enter(target_id, options)
+	if not bool(guard.get("ok", false)):
+		return guard
+	return _perform_transition(target_id, {}, false)
 
 
 func go_fight(battle_data: Dictionary, source: String = "scene_manager") -> Dictionary:
@@ -110,7 +130,7 @@ func go_fight(battle_data: Dictionary, source: String = "scene_manager") -> Dict
 	if not bool(preflight.get("ok", false)):
 		return preflight
 	BattleInitData.set_pending(get_tree(), merged, source)
-	var nav := _perform_transition(FIGHT, {})
+	var nav := _perform_transition(FIGHT, {}, true)
 	if not bool(nav.get("ok", false)):
 		_data_store().battle_runtime()["pending_init"] = {}
 	return nav
@@ -159,7 +179,7 @@ func _preflight_transition() -> Dictionary:
 	return {"ok": true}
 
 
-func _perform_transition(scene_id: String, payload: Dictionary) -> Dictionary:
+func _perform_transition(scene_id: String, payload: Dictionary, record_history: bool) -> Dictionary:
 	var scene_rt: Dictionary = _data_store().scene_runtime()
 	if bool(scene_rt.get("transitioning", false)):
 		return {"ok": false, "error": "transition_in_progress"}
@@ -171,10 +191,11 @@ func _perform_transition(scene_id: String, payload: Dictionary) -> Dictionary:
 		_data_store().set_scene_payload(scene_id, payload)
 	scene_rt["previous_id"] = str(scene_rt.get("current_id", ""))
 	scene_rt["current_id"] = scene_id
-	var history_v: Variant = scene_rt.get("history", [])
-	var history: Array = history_v as Array if history_v is Array else []
-	history.append(scene_id)
-	scene_rt["history"] = history
+	if record_history:
+		var history_v: Variant = scene_rt.get("history", [])
+		var history: Array = history_v as Array if history_v is Array else []
+		history.append(scene_id)
+		scene_rt["history"] = history
 	get_tree().call_deferred("change_scene_to_file", path)
 	call_deferred("_release_transition_lock")
 	return {"ok": true, "scene_id": scene_id, "path": path}

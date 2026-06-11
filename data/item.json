@@ -250,6 +250,42 @@
         {"type": "heal", "value": 30, "target": "self"},
         {"type": "restore_mp", "value": 15, "target": "self"}
       ]
+    },
+    {
+      "id": "book_skill_fireball",
+      "name": "术法玉简·火焰弹",
+      "type": "技能书",
+      "rarity": "普通",
+      "quality": 1,
+      "stackable": true,
+      "max_stack": 9,
+      "desc": "使用后学习战斗技能火焰弹。",
+      "icon": "res://assets/art/ui_new/fulu.png",
+      "learn_skill_id": 1
+    },
+    {
+      "id": "book_method_blazing_sun",
+      "name": "功法玉简·赤阳功",
+      "type": "功法书",
+      "rarity": "稀有",
+      "quality": 3,
+      "stackable": true,
+      "max_stack": 9,
+      "desc": "使用后学习主修功法赤阳功。",
+      "icon": "res://assets/art/ui_new/fulu1.png",
+      "learn_method_id": "blazing_sun_art"
+    },
+    {
+      "id": "book_method_iron_body",
+      "name": "功法玉简·锻体篇",
+      "type": "功法书",
+      "rarity": "普通",
+      "quality": 1,
+      "stackable": true,
+      "max_stack": 9,
+      "desc": "使用后学习辅助功法锻体篇。",
+      "icon": "res://assets/art/ui_new/fulu1.png",
+      "learn_method_id": "iron_body_art"
     }
   ]
 }

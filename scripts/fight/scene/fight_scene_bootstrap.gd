@@ -55,6 +55,8 @@ static func apply_battle_setup(ctx: FightSceneContext, hud: FightSceneHud, setup
 	ctx.equip_cfg = setup.equip_cfg.duplicate(true)
 	ctx.enemy_ai_cfg = setup.get_enemy_ai_cfg()
 	ctx.enemy_ai_runtime = EnemyAiRuntimeStateScript.new()
+	ctx.player_ai_cfg = setup.get_player_ai_cfg()
+	ctx.player_ai_runtime = EnemyAiRuntimeStateScript.new()
 	hud.apply_battle(ctx, setup.ui_payload)
 	hud.register_battle_actors(ctx)
 	start_battle(ctx, hud)

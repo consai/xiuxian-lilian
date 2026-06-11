@@ -400,7 +400,7 @@ func build_battle_init() -> Dictionary:
 		"player": player,
 		"enemy": enemy,
 		"battle_time_limit": 200.0,
-		"auto_battle": {"player": false, "enemy": true},
+		"auto_battle": {"player": bool(_game_state.auto_battle_enabled), "enemy": true},
 		"spd_jitter_ratio": 0.0,
 	}
 	var init_errors := BattleInitData.collect_errors(init_data)

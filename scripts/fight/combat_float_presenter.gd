@@ -25,6 +25,10 @@ static func build_spawns(
 		is_basic_attack = true
 	if not suppress_skill_line and not is_basic_attack:
 		_append_spawn(out, skill_name, source_id, "skill", 2)
+	if bool(report.get(CombatReportScript.KEY_MISSED, false)):
+		_append_spawn(out, "闪避", target_id, "buff_expire", 8)
+	if bool(report.get(CombatReportScript.KEY_CONTROL_RESISTED, false)):
+		_append_spawn(out, "抵抗", target_id, "buff_expire", 8)
 	_append_shield_spawn(out, target_id, float(report.get("shield_absorbed", 0.0)))
 	_append_damage_spawn(
 		out,

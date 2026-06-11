@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "methods": {
+    "basic_qi_art": {
+      "name": "引气诀",
+      "slot_type": "main",
+      "quality": 1,
+      "cultivation_speed": 1.0,
+      "combat_mp_restore_2s": 3,
+      "flat_attrs": {
+        "mp_max": 10,
+        "magic_atk": 3
+      },
+      "percent_attrs": {},
+      "damage_bonus_percent": 0.0,
+      "desc": "最基础的吐纳法门，可引天地灵气入体。"
+    },
+    "blazing_sun_art": {
+      "name": "赤阳功",
+      "slot_type": "main",
+      "quality": 3,
+      "cultivation_speed": 1.35,
+      "combat_mp_restore_2s": 6,
+      "flat_attrs": {
+        "magic_atk": 8,
+        "mp_max": 20
+      },
+      "percent_attrs": {},
+      "damage_bonus_percent": 0.08,
+      "desc": "运转如烈日，兼顾修炼速度与术法威力。"
+    },
+    "iron_body_art": {
+      "name": "锻体篇",
+      "slot_type": "support",
+      "quality": 2,
+      "cultivation_speed": 0.0,
+      "combat_mp_restore_2s": 0,
+      "flat_attrs": {
+        "hp_max": 25,
+        "physical_def": 5
+      },
+      "percent_attrs": {},
+      "damage_bonus_percent": 0.0,
+      "desc": "以灵力淬炼筋骨，增强气血与物防。"
+    },
+    "spirit_focus_art": {
+      "name": "凝神篇",
+      "slot_type": "support",
+      "quality": 2,
+      "cultivation_speed": 0.0,
+      "combat_mp_restore_2s": 0,
+      "flat_attrs": {
+        "mp_max": 15,
+        "control_power": 8
+      },
+      "percent_attrs": {},
+      "damage_bonus_percent": 0.04,
+      "desc": "凝练神识，增强术法与控制能力。"
+    },
+    "cloud_step": {
+      "name": "流云步",
+      "slot_type": "movement",
+      "quality": 2,
+      "cultivation_speed": 0.0,
+      "combat_mp_restore_2s": 0,
+      "flat_attrs": {
+        "spd": 8,
+        "evasion": 10
+      },
+      "percent_attrs": {},
+      "damage_bonus_percent": 0.0,
+      "desc": "身随云动，提升出手速度与闪避。"
+    }
+  }
+}

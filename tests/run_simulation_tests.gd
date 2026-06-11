@@ -3,6 +3,7 @@ extends SceneTree
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
 const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
+const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 var _failures: Array[String] = []
 var _tests_run := 0
 
@@ -13,10 +14,15 @@ func _init() -> void:
 
 func _run_all() -> void:
 	_run("new game and daily activities", _test_new_game_and_daily_activities)
+	_run("foundations derive combat attributes", _test_foundations_derive_combat_attributes)
+	_run("cultivation methods gate growth and apply effects", _test_cultivation_methods)
+	_run("learning books unlock skills and methods", _test_learning_books)
+	_run("player auto battle rules use configured preset", _test_player_auto_battle_rules)
 	_run("inventory and battle item slots", _test_inventory_and_battle_item_slots)
 	_run("battle runtime deducts inventory", _test_battle_runtime_deducts_inventory)
 	_run("transfer item respects stack cap", _test_transfer_item_stack_cap)
 	_run("expedition events build valid battle data", _test_expedition_events_build_valid_battle_data)
+	_run("legacy enemies migrate to foundation scale", _test_legacy_enemies_migrate_to_foundation_scale)
 	_run("reward pools produce legal rewards", _test_reward_pools)
 	_run("expedition defeat settlement persists runtime state", _test_expedition_defeat_settlement)
 	_run("three save slots round trip", _test_save_round_trip)
@@ -72,6 +78,62 @@ func _test_new_game_and_daily_activities() -> void:
 	_expect_true(state.can_breakthrough(), "breakthrough available")
 	var result: Dictionary = state.breakthrough()
 	_expect_true(bool(result.get("ok", false)), "breakthrough succeeds")
+	_expect_near(float(state.foundations.get(CharacterStatsScript.BODY, 0.0)), 11.0, "breakthrough grows body")
+
+
+func _test_foundations_derive_combat_attributes() -> void:
+	var attrs: Dictionary = CharacterStatsScript.build_combat_attrs({
+		CharacterStatsScript.BODY: 10,
+		CharacterStatsScript.SPIRIT: 10,
+		CharacterStatsScript.SENSE: 10,
+		CharacterStatsScript.AGILITY: 10,
+	})
+	_expect_near(FightAttr.get_attr(attrs, FightAttr.HP_MAX), 100.0, "derived hp")
+	_expect_near(FightAttr.get_attr(attrs, FightAttr.MP_MAX), 100.0, "derived mp")
+	_expect_near(FightAttr.get_attr(attrs, FightAttr.PHYSICAL_ATK), 30.0, "derived physical attack")
+	_expect_near(FightAttr.get_attr(attrs, FightAttr.MAGIC_ATK), 32.0, "derived magic attack")
+	_expect_near(FightAttr.get_attr(attrs, FightAttr.PHYSICAL_DEF), 20.0, "derived physical defense")
+	_expect_near(FightAttr.get_attr(attrs, FightAttr.MAGIC_DEF), 24.0, "derived magic defense")
+	_expect_near(FightAttr.get_attr(attrs, FightAttr.SPD), 100.0, "derived action speed")
+
+
+func _test_cultivation_methods() -> void:
+	var state := _state()
+	_expect_eq(state.cultivate(), 20, "starter main method enables cultivation")
+	state.unlocked_methods.append("blazing_sun_art")
+	var equipped: Dictionary = state.equip_method("main", "blazing_sun_art")
+	_expect_true(bool(equipped.get("ok", false)), "advanced main method equips")
+	_expect_eq(state.cultivate(), 27, "advanced main method speeds cultivation")
+	_expect_near(
+		FightAttr.get_attr(state.attrs, FightAttr.COMBAT_MP_RESTORE_2S),
+		6.0,
+		"main method grants combat mp recovery"
+	)
+
+
+func _test_learning_books() -> void:
+	var state := _state()
+	_expect_true(not state.unlocked_skills.has(1), "fireball starts locked")
+	var learned: Dictionary = state.use_learning_book("book_skill_fireball")
+	_expect_true(bool(learned.get("ok", false)), "skill book learns skill")
+	_expect_true(state.unlocked_skills.has(1), "fireball unlocked")
+	_expect_eq(int(state.inventory.get("book_skill_fireball", 0)), 0, "skill book consumed")
+	var method: Dictionary = state.use_learning_book("book_method_iron_body")
+	_expect_true(bool(method.get("ok", false)), "method book learns method")
+	_expect_true(state.unlocked_methods.has("iron_body_art"), "method unlocked")
+
+
+func _test_player_auto_battle_rules() -> void:
+	var state := _state()
+	state.use_learning_book("book_skill_fireball")
+	state.auto_battle_preset = "aggressive"
+	var rules: Dictionary = state.resolved_auto_battle_rules()
+	_expect_eq(str(rules.get("policy", "")), "rule_list", "player auto rules use rule list")
+	_expect_true(not (rules.get("rules", []) as Array).is_empty(), "player auto rules are populated")
+	var snapshot: Dictionary = state.build_player_battle_snapshot({
+		"hp": state.hp, "mp": state.mp, "inventory": state.inventory, "item_slots": state.item_slots,
+	})
+	_expect_true(not (snapshot.get("ai", {}) as Dictionary).is_empty(), "battle snapshot carries player ai")
 
 
 func _test_transfer_item_stack_cap() -> void:
@@ -131,6 +193,16 @@ func _test_expedition_events_build_valid_battle_data() -> void:
 		var event := ExpeditionEventServiceScript.by_id(event_id)
 		var errors := BattleInitData.collect_errors(state.build_battle_init(event))
 		_expect_true(errors.is_empty(), "valid battle setup: %s" % str(errors))
+
+
+func _test_legacy_enemies_migrate_to_foundation_scale() -> void:
+	var enemy := ExpeditionEventServiceScript.build_battle_enemy(
+		ExpeditionEventServiceScript.by_id("qinglan_wolf")
+	)
+	var attrs := enemy.get("attrs", {}) as Dictionary
+	_expect_near(FightAttr.get_attr(attrs, FightAttr.PHYSICAL_ATK), 21.0, "wolf physical attack")
+	_expect_near(FightAttr.get_attr(attrs, FightAttr.MAGIC_ATK), 22.4, "wolf magic attack")
+	_expect_near(FightAttr.get_attr(attrs, FightAttr.PHYSICAL_DEF), 16.0, "wolf physical defense")
 
 
 func _test_reward_pools() -> void:

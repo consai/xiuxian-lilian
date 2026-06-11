@@ -4,6 +4,7 @@ extends RefCounted
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
 const ExpeditionLogServiceScript := preload("res://scripts/expedition/expedition_log_service.gd")
+const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const COMMON_ID_PREFIX := "common::"
 
 
@@ -251,6 +252,10 @@ static func resolve_non_battle_event(
 static func build_battle_enemy(event: Dictionary) -> Dictionary:
 	var enemy := (event.get("enemy", {}) as Dictionary).duplicate(true)
 	var attrs := (enemy.get("attrs", {}) as Dictionary).duplicate(true)
+	if enemy.has("foundations"):
+		attrs = CharacterStatsScript.build_combat_attrs(enemy.get("foundations", {}))
+	else:
+		attrs = CharacterStatsScript.migrate_legacy_enemy_attrs(attrs)
 	enemy["attrs"] = attrs
 	if attrs.has(FightAttr.HP_MAX):
 		enemy["hp"] = float(attrs[FightAttr.HP_MAX])

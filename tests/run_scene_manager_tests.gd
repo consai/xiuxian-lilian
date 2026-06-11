@@ -27,6 +27,7 @@ func _run_all() -> void:
 	_run("go_expedition_loop rejected without active", _test_go_expedition_loop_rejected_without_active)
 	_run("go_breakthrough_summary payload consumed once", _test_breakthrough_summary_payload)
 	_run("go_expedition_result passes reason", _test_expedition_result_reason)
+	_run("go_back pops panel stack instead of previous_id", _test_go_back_panel_stack)
 	_run("transition lock prevents double go_to", _test_transition_lock)
 	_run("start expedition rolls back when transition locked", _test_start_expedition_rollback_on_lock)
 	_run("go fight leaves no pending init when transition locked", _test_go_fight_blocked_without_pending)
@@ -135,6 +136,37 @@ func _test_go_fight_blocked_without_pending() -> void:
 	root.get_node("DataStore").scene_runtime()["transitioning"] = false
 
 
+func _test_go_back_panel_stack() -> void:
+	_reset_game()
+	var ds := root.get_node("DataStore")
+	var sm := _scene_manager()
+	var hub_nav: Dictionary = sm.go_hub()
+	_expect_true(bool(hub_nav.get("ok", false)), "hub navigation ok")
+	ds.scene_runtime()["transitioning"] = false
+	var attrs_nav: Dictionary = sm.go_character_attributes_panel()
+	_expect_true(bool(attrs_nav.get("ok", false)), "attributes navigation ok")
+	ds.scene_runtime()["transitioning"] = false
+	var loadout_nav: Dictionary = sm.go_combat_loadout_panel()
+	_expect_true(bool(loadout_nav.get("ok", false)), "loadout navigation ok")
+	ds.scene_runtime()["transitioning"] = false
+	var back_to_attrs: Dictionary = sm.go_back()
+	_expect_true(bool(back_to_attrs.get("ok", false)), "back to attributes ok")
+	_expect_eq(
+		str(ds.scene_runtime().get("current_id", "")),
+		SceneManagerScript.CHARACTER_ATTRIBUTES_PANEL,
+		"current is attributes after first back"
+	)
+	ds.scene_runtime()["transitioning"] = false
+	var back_to_hub: Dictionary = sm.go_back()
+	_expect_true(bool(back_to_hub.get("ok", false)), "back to hub ok")
+	_expect_eq(str(ds.scene_runtime().get("current_id", "")), SceneManagerScript.HUB, "current is hub after second back")
+	_expect_neq(
+		str(ds.scene_runtime().get("current_id", "")),
+		SceneManagerScript.COMBAT_LOADOUT_PANEL,
+		"closing attributes does not reopen loadout"
+	)
+
+
 func _test_transition_lock() -> void:
 	_reset_game()
 	root.get_node("DataStore").scene_runtime()["transitioning"] = false
@@ -238,3 +270,8 @@ func _expect_false(value: bool, label: String) -> void:
 func _expect_eq(actual: Variant, expected: Variant, label: String) -> void:
 	if actual != expected:
 		_failures.append("%s (expected %s got %s)" % [label, str(expected), str(actual)])
+
+
+func _expect_neq(actual: Variant, expected: Variant, label: String) -> void:
+	if actual == expected:
+		_failures.append("%s (expected not %s)" % [label, str(expected)])

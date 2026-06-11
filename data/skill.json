@@ -18,9 +18,9 @@
       "power": 1000,
       "vfx_type": "ranged",
       "vfx": "ranged_default",
-      "tags": ["magic"],
+      "tags": ["attack", "magic", "fire"],
       "effects": [
-        {"type": "damage", "value": 5, "target": "enemy"}
+        {"type": "damage", "damage_type": "magic", "value": 5, "accuracy_bonus": 0.08, "target": "enemy"}
       ]
     },
     "2": {
@@ -32,13 +32,13 @@
       "power": 1000,
       "vfx_type": "ranged",
       "vfx": "status_cast",
-      "tags": ["magic"],
+      "tags": ["magic", "shield", "fire"],
       "effects": [
-        {"type": "shield", "value": 100, "target": "self"}
+        {"type": "shield", "value": 15, "scaling": {"magic_atk": 1.2}, "target": "self"}
       ]
     },
     "3": {
-      "name": "毒",
+      "name": "蚀神毒",
       "icon": "ui_new/skill_02.png",
       "quality": 2,
       "mp_cost": 10,
@@ -46,8 +46,10 @@
       "power": 1000,
       "vfx_type": "ranged",
       "vfx": "status_cast",
+      "tags": ["magic", "control", "poison"],
       "effects": [
-        {"type": "buff", "modifiers": {"buff_dot": 1}, "target": "enemy"}
+        {"type": "buff", "modifiers": {"buff_dot": 1}, "control": true, "control_chance": 0.8, "target": "enemy"},
+        {"type": "buff", "modifiers": {"buff_slow": 1}, "control": true, "control_chance": 0.65, "target": "enemy"}
       ]
     }
   }

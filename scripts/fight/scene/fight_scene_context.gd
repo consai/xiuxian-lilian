@@ -18,6 +18,8 @@ var item_cfg: Dictionary = {}
 var equip_cfg: Dictionary = {}
 var enemy_ai_cfg: Dictionary = {}
 var enemy_ai_runtime: EnemyAiRuntimeState
+var player_ai_cfg: Dictionary = {}
+var player_ai_runtime: EnemyAiRuntimeState
 
 var battle_time_limit: float = 0.0
 var battle_session_id: String = ""

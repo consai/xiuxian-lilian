@@ -50,9 +50,13 @@ func apply_event(event: Dictionary, _depth: int = 0) -> void:
 
 	var stat_lines: PackedStringArray = PackedStringArray([
 		"气血  %.0f" % float(enemy.get("hp", attrs.get(FightAttr.HP_MAX, 0.0))),
-		"攻击  %.0f    防御  %.0f" % [
-			float(attrs.get(FightAttr.ATK, 0.0)),
-			float(attrs.get(FightAttr.DEF, 0.0)),
+		"物攻  %.0f    法攻  %.0f" % [
+			float(attrs.get(FightAttr.PHYSICAL_ATK, 0.0)),
+			float(attrs.get(FightAttr.MAGIC_ATK, 0.0)),
+		],
+		"物防  %.0f    法防  %.0f" % [
+			float(attrs.get(FightAttr.PHYSICAL_DEF, 0.0)),
+			float(attrs.get(FightAttr.MAGIC_DEF, 0.0)),
 		],
 		"速度  %.0f    暴击  %.0f%%" % [
 			float(attrs.get(FightAttr.SPD, 0.0)),

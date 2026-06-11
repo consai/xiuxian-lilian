@@ -1,6 +1,6 @@
 class_name BattleDomainService
 extends RefCounted
-## 战斗域：四态状态机、走条、CD（仅 ADVANCING）、整场时限、出手结算。
+## 战斗域：四态状态机、实时速度行动进度、CD、整场时限与出手结算。
 const CombatEventScript = preload("res://scripts/fight/combat_event.gd")
 
 enum BattleState { ADVANCING, PAUSED, PRESENTATION, END }
@@ -28,14 +28,16 @@ var equip_cfg: Dictionary = {}
 
 var interval_elapsed_player: float = 0.0
 var interval_elapsed_enemy: float = 0.0
-var interval_T_player: float = 1.0
-var interval_T_enemy: float = 1.0
+## 兼容旧字段名：现在表示固定行动进度上限，而非下一次出手所需秒数。
+var interval_T_player: float = CombatBalance.ACTION_PROGRESS_MAX
+var interval_T_enemy: float = CombatBalance.ACTION_PROGRESS_MAX
 var _overflow_player: float = 0.0
 var _overflow_enemy: float = 0.0
 
 var battle_elapsed_advancing: float = 0.0
 var battle_time_limit: float = 200.0
 var _runtime_events: Array = []
+var _passive_tick_accum: float = 0.0
 
 
 func start_battle(
@@ -55,21 +57,22 @@ func start_battle(
 	battle_elapsed_advancing = 0.0
 	interval_elapsed_player = 0.0
 	interval_elapsed_enemy = 0.0
-	interval_T_player = CombatBalance.interval_cap_for(player)
-	interval_T_enemy = CombatBalance.interval_cap_for(enemy)
+	interval_T_player = CombatBalance.ACTION_PROGRESS_MAX
+	interval_T_enemy = CombatBalance.ACTION_PROGRESS_MAX
 	_overflow_player = 0.0
 	_overflow_enemy = 0.0
 	paused_side = ""
 	presentation_side = ""
 	end_reason = ""
 	_runtime_events.clear()
+	_passive_tick_accum = 0.0
 	BattleDebugLog.reset_tick_throttle()
 	_set_state(BattleState.ADVANCING, "开战")
 	BattleDebugLog.log_domain(self, "开战")
 	BattleDebugLog.write("流程", "战斗开始", {
 		"时限": battle_time_limit,
-		"玩家走条周期": interval_T_player,
-		"敌方走条周期": interval_T_enemy,
+		"玩家走条速率": CombatBalance.action_progress_rate_for(player),
+		"敌方走条速率": CombatBalance.action_progress_rate_for(enemy),
 	})
 
 
@@ -80,19 +83,18 @@ func tick_advancing(delta: float) -> String:
 		return ""
 	player.tick_cooldowns(delta)
 	enemy.tick_cooldowns(delta)
+	_tick_passive_recovery(delta)
 	_drain_runtime_events()
 	var dot_end := check_end_after_resolve()
 	if dot_end != "":
 		return dot_end
-	interval_T_player = CombatBalance.interval_cap_for(player)
-	interval_T_enemy = CombatBalance.interval_cap_for(enemy)
 	battle_elapsed_advancing += delta
 	if battle_elapsed_advancing >= battle_time_limit:
 		_set_end(SIGNAL_TIME_LIMIT, "走条推进超时")
 		BattleDebugLog.write("走条", "达到战斗时限", get_debug_snapshot())
 		return SIGNAL_TIME_LIMIT
-	interval_elapsed_player += delta
-	interval_elapsed_enemy += delta
+	interval_elapsed_player += delta * CombatBalance.action_progress_rate_for(player)
+	interval_elapsed_enemy += delta * CombatBalance.action_progress_rate_for(enemy)
 	BattleDebugLog.tick_progress(self, delta)
 	if interval_elapsed_player >= interval_T_player:
 		BattleDebugLog.write("走条", "玩家走条已满", {
@@ -107,6 +109,18 @@ func tick_advancing(delta: float) -> String:
 		})
 		return SIGNAL_ENEMY_READY
 	return ""
+
+
+func _tick_passive_recovery(delta: float) -> void:
+	_passive_tick_accum += delta
+	while _passive_tick_accum >= 2.0:
+		_passive_tick_accum -= 2.0
+		for unit in [player, enemy]:
+			if unit == null or unit.is_dead():
+				continue
+			var mp_gain: float = unit.get_attr(FightAttr.COMBAT_MP_RESTORE_2S, 0.0)
+			if mp_gain > 0.0:
+				unit.change_mp(mp_gain)
 
 
 func enter_paused(side: String) -> void:
@@ -342,7 +356,7 @@ func consume_runtime_events() -> Array:
 
 
 func _apply_interval_after_action(side: String) -> void:
-	# 文档 §2.3：重置为 0，再加回暂停期间保留的溢出（封顶 T）。
+	# 出手后重置行动进度，再加回越过 100 的溢出进度。
 	if side == SIDE_PLAYER:
 		interval_elapsed_player = minf(_overflow_player, interval_T_player)
 		_overflow_player = 0.0
@@ -421,12 +435,14 @@ func _merge_equip_runtime_cfg(slot: Dictionary, equip_id: int) -> Dictionary:
 
 func format_interval(side: String) -> String:
 	if side == SIDE_PLAYER:
-		return "%.2f/%.2f（溢出 %.2f）" % [
-			interval_elapsed_player, interval_T_player, _overflow_player,
+		return "%.1f/%.0f（速率 %.1f/s，溢出 %.1f）" % [
+			interval_elapsed_player, interval_T_player,
+			CombatBalance.action_progress_rate_for(player), _overflow_player,
 		]
 	if side == SIDE_ENEMY:
-		return "%.2f/%.2f（溢出 %.2f）" % [
-			interval_elapsed_enemy, interval_T_enemy, _overflow_enemy,
+		return "%.1f/%.0f（速率 %.1f/s，溢出 %.1f）" % [
+			interval_elapsed_enemy, interval_T_enemy,
+			CombatBalance.action_progress_rate_for(enemy), _overflow_enemy,
 		]
 	return ""
 

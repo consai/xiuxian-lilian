@@ -1,5 +1,7 @@
 extends Node
 
+const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
+
 const SAVEDATA_SCHEMA_VERSION := 1
 const RUNDATA_SCHEMA_VERSION := 1
 
@@ -45,6 +47,16 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 	while item_slots.size() < 2:
 		item_slots.append("")
 	out["item_slots"] = item_slots.slice(0, 2)
+	var method_slots_v: Variant = out.get("cultivation_method_slots", {})
+	var method_slots := method_slots_v as Dictionary if method_slots_v is Dictionary else {}
+	out["cultivation_method_slots"] = {
+		"main": str(method_slots.get("main", "basic_qi_art")),
+		"support_1": str(method_slots.get("support_1", "")),
+		"support_2": str(method_slots.get("support_2", "")),
+		"movement": str(method_slots.get("movement", "")),
+	}
+	var rules_v: Variant = out.get("auto_battle_rules", {})
+	out["auto_battle_rules"] = (rules_v as Dictionary).duplicate(true) if rules_v is Dictionary else {}
 	if not out.get("totals") is Dictionary:
 		out["totals"] = _default_totals()
 	var world_state_v: Variant = out.get("world_state", {})
@@ -53,6 +65,8 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 		world_state[key] = clampi(int(world_state.get(key, 0)), 0, 100)
 	out["world_state"] = world_state
 	out["map"] = _coalesce_map_savedata(out.get("map", {}))
+	out["foundations"] = CharacterStatsScript.normalize_foundations(out.get("foundations", {}))
+	out["aptitudes"] = CharacterStatsScript.normalize_aptitudes(out.get("aptitudes", {}))
 	return out
 
 
@@ -252,11 +266,20 @@ func _default_savedata() -> Dictionary:
 		"ling_stones": 0,
 		"player_name": "",
 		"player_icon": "",
+		"foundations": CharacterStatsScript.default_foundations(),
+		"aptitudes": CharacterStatsScript.default_aptitudes(),
 		"attrs": {},
 		"hp": 1000.0,
 		"mp": 1000.0,
 		"unlocked_skills": [],
 		"equipped_skills": [],
+		"unlocked_methods": ["basic_qi_art"],
+		"cultivation_method_slots": {
+			"main": "basic_qi_art", "support_1": "", "support_2": "", "movement": ""
+		},
+		"auto_battle_enabled": true,
+		"auto_battle_preset": "balanced",
+		"auto_battle_rules": {},
 		"owned_equips": [],
 		"equip_slots": [-1, -1],
 		"item_slots": ["", ""],

@@ -26,6 +26,8 @@ func format_entry(entry: Dictionary, names: Dictionary = {}) -> String:
 	var heal := float(report.get(CombatReportScript.KEY_HEAL, 0.0))
 	var shield_abs := float(report.get(CombatReportScript.KEY_SHIELD_ABSORBED, 0.0))
 	var is_crit := bool(report.get(CombatReportScript.KEY_IS_CRIT, false))
+	var missed := bool(report.get(CombatReportScript.KEY_MISSED, false))
+	var resisted := bool(report.get(CombatReportScript.KEY_CONTROL_RESISTED, false))
 
 	var parts: PackedStringArray = PackedStringArray()
 	if kind == BattleRecordTypesScript.ACTION_BUFF_TICK:
@@ -70,6 +72,10 @@ func format_entry(entry: Dictionary, names: Dictionary = {}) -> String:
 	_append_buff_names(parts, report)
 
 	var tail: PackedStringArray = PackedStringArray()
+	if missed:
+		tail.append("闪避")
+	if resisted:
+		tail.append("抵抗")
 	if hp_damage > 0.0:
 		var dmg_txt := "-%d" % int(round(hp_damage))
 		if is_crit:
@@ -183,4 +189,3 @@ static func _colored(text: String, color_hex: String) -> String:
 	if t == "":
 		return ""
 	return "[color=%s]%s[/color]" % [color_hex, t]
-

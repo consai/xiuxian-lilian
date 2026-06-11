@@ -19,3 +19,8 @@ var record_names: Dictionary = {}
 func get_enemy_ai_cfg() -> Dictionary:
 	var ai_v: Variant = enemy_row.get("ai")
 	return (ai_v as Dictionary).duplicate(true) if ai_v is Dictionary else {}
+
+
+func get_player_ai_cfg() -> Dictionary:
+	var ai_v: Variant = player_row.get("ai")
+	return (ai_v as Dictionary).duplicate(true) if ai_v is Dictionary else {}

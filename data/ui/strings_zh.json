@@ -19,7 +19,13 @@
       "tag": {
         "attack": "攻击",
         "physical": "物理",
-        "magic": "法术"
+        "magic": "法术",
+        "fire": "火系",
+        "lightning": "雷系",
+        "ice": "冰系",
+        "shield": "护盾",
+        "control": "控制",
+        "poison": "毒"
       }
     },
     "item": {

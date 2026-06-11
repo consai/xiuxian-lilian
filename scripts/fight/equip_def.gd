@@ -9,6 +9,7 @@ var icon: String = ""
 var quality: int = 1
 var cd_total: float = 0.0
 var effects: Array = []
+var tags: Array = []
 
 
 static func from_dict(data: Dictionary) -> EquipDef:
@@ -28,6 +29,9 @@ static func from_dict(data: Dictionary) -> EquipDef:
 	var effects_v: Variant = data.get("effects", [])
 	if effects_v is Array:
 		equip.effects = (effects_v as Array).duplicate(true)
+	var tags_v: Variant = data.get("tags", [])
+	if tags_v is Array:
+		equip.tags = (tags_v as Array).duplicate(true)
 	return equip
 
 
@@ -44,4 +48,6 @@ func to_runtime_dict() -> Dictionary:
 	}
 	if icon != "":
 		out["icon"] = icon
+	if not tags.is_empty():
+		out["tags"] = tags.duplicate(true)
 	return out
