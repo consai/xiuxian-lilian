@@ -11,7 +11,6 @@ const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
 @onready var _skills: VBoxContainer = %SkillsContainer
 @onready var _equipment: GridContainer = %EquipmentContainer
 @onready var _auto: VBoxContainer = %AutoContainer
-@onready var _books: HBoxContainer = %BooksContainer
 @onready var _status: Label = %StatusLabel
 @onready var _selection_popup: LoadoutSelectionPopup = %SelectionPopup
 
@@ -37,12 +36,10 @@ func _refresh(message: String = "") -> void:
 	_clear(_skills)
 	_clear(_equipment)
 	_clear(_auto)
-	_clear(_books)
 	_build_methods()
 	_build_skills()
 	_build_equipment()
 	_build_auto_strategy()
-	_build_books()
 	_status.text = message if message != "" else "点击功法、技能、法宝或道具槽位即可调整配置。"
 
 
@@ -66,7 +63,7 @@ func _build_methods() -> void:
 			_method_effect(method),
 		]
 		button.tooltip_text = str(method.get("desc", "点击选择功法"))
-		button.icon = BattleInitDataScript._resolve_icon_texture(method)
+		button.icon = _entry_icon(method)
 		button.expand_icon = true
 		button.pressed.connect(_open_selection.bind("method", slot_key))
 		_methods.add_child(button)
@@ -91,7 +88,7 @@ func _build_skills() -> void:
 			_skill_effect(skill),
 		]
 		button.tooltip_text = "点击选择第 %d 顺位技能" % (i + 1)
-		button.icon = BattleInitDataScript._resolve_icon_texture(skill)
+		button.icon = _entry_icon(skill)
 		button.expand_icon = true
 		button.pressed.connect(_open_selection.bind("skill", i))
 		_skills.add_child(button)
@@ -132,25 +129,6 @@ func _build_auto_strategy() -> void:
 	note.text = "均衡按槽位施法；进攻优先输出；保守低血先用道具。"
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_auto.add_child(note)
-
-
-func _build_books() -> void:
-	var found := false
-	for item_id_v in GameState.inventory.keys():
-		var item_id := str(item_id_v)
-		var def := ConfigManager.item_def_by_id(item_id)
-		if def == null or (def.learn_skill_id < 0 and def.learn_method_id == ""):
-			continue
-		found = true
-		var button := Button.new()
-		button.text = "%s ×%d" % [def.name, int(GameState.inventory.get(item_id, 0))]
-		button.custom_minimum_size = Vector2(150, 42)
-		button.pressed.connect(_learn_book.bind(item_id))
-		_books.add_child(button)
-	if not found:
-		var empty := Label.new()
-		empty.text = "暂无可学习典籍"
-		_books.add_child(empty)
 
 
 func _add_equipment_button(text: String, action: Callable) -> void:
@@ -195,11 +173,6 @@ func _cycle_item(index: int) -> void:
 	_refresh("道具配置已更新。")
 
 
-func _learn_book(item_id: String) -> void:
-	var result: Dictionary = GameState.use_learning_book(item_id)
-	_refresh(str(result.get("error", "典籍学习成功。")))
-
-
 func _equip_name(index: int) -> String:
 	var eid := int(GameState.equip_slots[index]) if index < GameState.equip_slots.size() else -1
 	return str(ConfigManager.equip_by_id(eid).get("name", "空"))
@@ -230,6 +203,12 @@ func _skill_effect(skill: Dictionary) -> String:
 		"heal": return "恢复自身气血"
 		"restore_mp": return "恢复自身法力"
 		_: return "提供战斗辅助效果"
+
+
+func _entry_icon(entry: Dictionary) -> Texture2D:
+	if entry.is_empty() or not entry.has("icon") or entry.get("icon") == null:
+		return null
+	return BattleInitDataScript._resolve_icon_texture(entry)
 
 
 func _clear(container: Node) -> void:

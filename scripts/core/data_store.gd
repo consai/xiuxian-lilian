@@ -50,7 +50,7 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 	var method_slots_v: Variant = out.get("cultivation_method_slots", {})
 	var method_slots := method_slots_v as Dictionary if method_slots_v is Dictionary else {}
 	out["cultivation_method_slots"] = {
-		"main": str(method_slots.get("main", "basic_qi_art")),
+		"main": str(method_slots.get("main", "five_elements_art")),
 		"support_1": str(method_slots.get("support_1", "")),
 		"support_2": str(method_slots.get("support_2", "")),
 		"movement": str(method_slots.get("movement", "")),
@@ -273,9 +273,9 @@ func _default_savedata() -> Dictionary:
 		"mp": 1000.0,
 		"unlocked_skills": [],
 		"equipped_skills": [],
-		"unlocked_methods": ["basic_qi_art"],
+		"unlocked_methods": ["five_elements_art"],
 		"cultivation_method_slots": {
-			"main": "basic_qi_art", "support_1": "", "support_2": "", "movement": ""
+			"main": "five_elements_art", "support_1": "", "support_2": "", "movement": ""
 		},
 		"auto_battle_enabled": true,
 		"auto_battle_preset": "balanced",

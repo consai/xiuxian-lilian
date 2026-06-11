@@ -259,7 +259,7 @@
       "quality": 1,
       "stackable": true,
       "max_stack": 9,
-      "desc": "使用后学习战斗技能火焰弹。",
+      "desc": "使用后学习战斗技能火球术。",
       "icon": "res://assets/art/ui_new/fulu.png",
       "learn_skill_id": 1
     },

@@ -135,6 +135,8 @@ func _is_equipped_at_target(entry_id: Variant) -> bool:
 
 
 func _entry_icon(row: Dictionary) -> Texture2D:
+	if row.is_empty() or not row.has("icon") or row.get("icon") == null:
+		return null
 	return BattleInitDataScript._resolve_icon_texture(row)
 
 

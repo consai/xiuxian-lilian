@@ -61,7 +61,7 @@ var equipped_skills: Array:
 	get: return DataStore.savedata.get("equipped_skills", []) as Array
 	set(value): DataStore.savedata["equipped_skills"] = value
 var unlocked_methods: Array:
-	get: return DataStore.savedata.get("unlocked_methods", ["basic_qi_art"]) as Array
+	get: return DataStore.savedata.get("unlocked_methods", ["five_elements_art"]) as Array
 	set(value): DataStore.savedata["unlocked_methods"] = value
 var cultivation_method_slots: Dictionary:
 	get: return DataStore.savedata.get("cultivation_method_slots", {}) as Dictionary
@@ -149,11 +149,11 @@ func new_game() -> void:
 	refresh_derived_attrs(false)
 	hp = float(attrs.get(FightAttr.HP_MAX, 100.0))
 	mp = float(attrs.get(FightAttr.MP_MAX, 100.0))
-	unlocked_skills = (initial.get("skills", []) as Array).duplicate(true)
-	equipped_skills = unlocked_skills.duplicate(true)
-	unlocked_methods = (initial.get("methods", ["basic_qi_art"]) as Array).duplicate(true)
+	unlocked_skills = _initial_skill_ids(initial)
+	equipped_skills = _initial_equipped_skills(initial, unlocked_skills)
+	unlocked_methods = _initial_method_ids(initial)
 	cultivation_method_slots = (initial.get("method_slots", {
-		"main": "basic_qi_art", "support_1": "", "support_2": "", "movement": "",
+		"main": "five_elements_art", "support_1": "", "support_2": "", "movement": "",
 	}) as Dictionary).duplicate(true)
 	auto_battle_enabled = true
 	auto_battle_preset = "balanced"
@@ -178,6 +178,43 @@ func new_game() -> void:
 		ExpeditionState.reset()
 	_initialize_map_state()
 	_sync_realm()
+
+
+func _initial_skill_ids(initial: Dictionary) -> Array:
+	var out: Array = []
+	for sid_v in initial.get("skills", []) as Array:
+		out.append(int(sid_v))
+	return out
+
+
+func _initial_method_ids(initial: Dictionary) -> Array:
+	var out: Array = []
+	for method_id_v in initial.get("methods", ["five_elements_art"]) as Array:
+		var method_id := str(method_id_v).strip_edges()
+		if method_id != "":
+			out.append(method_id)
+	return out
+
+
+func _initial_equipped_skills(initial: Dictionary, unlocked: Array) -> Array:
+	var raw_v: Variant = initial.get("equipped_skills", [])
+	if raw_v is Array and not (raw_v as Array).is_empty():
+		return _normalize_skill_slots(raw_v as Array)
+	var slots: Array = [-1, -1, -1, -1, -1]
+	for i in unlocked.size():
+		if i >= 5:
+			break
+		slots[i] = int(unlocked[i])
+	return slots
+
+
+func _normalize_skill_slots(raw: Array) -> Array:
+	var slots: Array = []
+	for sid_v in raw:
+		slots.append(int(sid_v))
+	while slots.size() < 5:
+		slots.append(-1)
+	return slots.slice(0, 5)
 
 
 func can_persist() -> bool:

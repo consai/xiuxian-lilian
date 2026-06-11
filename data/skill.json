@@ -10,7 +10,7 @@
       "tags": ["attack", "physical"]
     },
     "1": {
-      "name": "火焰弹",
+      "name": "火球术",
       "icon": "ui_new/skill_05.png",
       "quality": 2,
       "mp_cost": 10,

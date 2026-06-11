@@ -29,25 +29,18 @@
         "wood": 35
       }
     },
-    "skills": [0],
-    "methods": ["basic_qi_art"],
+    "skills": [1],
+    "equipped_skills": [1, -1, -1, -1, -1],
+    "methods": ["five_elements_art"],
     "method_slots": {
-      "main": "basic_qi_art",
+      "main": "five_elements_art",
       "support_1": "",
       "support_2": "",
       "movement": ""
     },
-    "equips": [5001],
-    "inventory": {
-      "items_LingCao": 3,
-      "items_FightTestDan": 3,
-      "items_HuiQiDan": 2,
-      "items_HuiLingDan": 2,
-      "book_skill_fireball": 1,
-      "book_method_blazing_sun": 1,
-      "book_method_iron_body": 1
-    },
-    "item_slots": ["items_FightTestDan", "items_HuiLingDan"],
-    "equip_slots": [5001, -1]
+    "equips": [],
+    "inventory": {},
+    "item_slots": ["", ""],
+    "equip_slots": [-1, -1]
   }
 }

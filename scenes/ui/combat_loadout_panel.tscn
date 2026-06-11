@@ -1,14 +1,14 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://t6yr8cyln370"]
 
-[ext_resource type="Theme" path="res://ui/theme_tuhuang.tres" id="1_theme"]
-[ext_resource type="Texture2D" path="res://docs/concepts/cave_hub_background_only_v3.png" id="2_bg"]
-[ext_resource type="Texture2D" path="res://assets/art/ui_new/btn_close.png" id="3_close"]
-[ext_resource type="Texture2D" path="res://assets/art/ui_new/btn_back.png" id="4_back"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://8mwstvi8kywh" path="res://assets/art/ui_new/btn_close.png" id="3_close"]
+[ext_resource type="Texture2D" uid="uid://drq6walh54ag4" path="res://assets/art/ui_new/btn_back.png" id="4_back"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="5_title"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="6_heading"]
-[ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="7_body"]
-[ext_resource type="LabelSettings" path="res://ui/ziti_new/16.tres" id="8_small"]
-[ext_resource type="Script" path="res://scripts/ui/combat_loadout_panel.gd" id="9_script"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="7_body"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="8_small"]
+[ext_resource type="Script" uid="uid://b5nab451bsnru" path="res://scripts/ui/combat_loadout_panel.gd" id="9_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/loadout_selection_popup.tscn" id="10_popup"]
 
 [sub_resource type="StyleBoxFlat" id="MainPanel"]
@@ -61,7 +61,7 @@ corner_radius_top_right = 13
 corner_radius_bottom_right = 13
 corner_radius_bottom_left = 13
 
-[node name="CombatLoadoutPanel" type="Control"]
+[node name="CombatLoadoutPanel" type="Control" unique_id=1974076444]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -71,7 +71,7 @@ grow_vertical = 2
 theme = ExtResource("1_theme")
 script = ExtResource("9_script")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=851426002]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -83,7 +83,7 @@ texture = ExtResource("2_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Dimmer" type="ColorRect" parent="."]
+[node name="Dimmer" type="ColorRect" parent="." unique_id=1873338279]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -93,7 +93,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.12, 0.08, 0.04, 0.48)
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Panel" type="Panel" parent="." unique_id=627397096]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -108,7 +108,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("MainPanel")
 
-[node name="TitleBack" type="Panel" parent="Panel"]
+[node name="TitleBack" type="Panel" parent="Panel" unique_id=213944929]
 layout_mode = 0
 offset_left = 350.0
 offset_top = -16.0
@@ -116,7 +116,7 @@ offset_right = 750.0
 offset_bottom = 58.0
 theme_override_styles/panel = SubResource("TitlePanel")
 
-[node name="Title" type="Label" parent="Panel/TitleBack"]
+[node name="Title" type="Label" parent="Panel/TitleBack" unique_id=1642710694]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -128,7 +128,7 @@ label_settings = ExtResource("5_title")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CloseButton" type="TextureButton" parent="Panel"]
+[node name="CloseButton" type="TextureButton" parent="Panel" unique_id=475109533]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 1040.0
@@ -139,15 +139,15 @@ texture_normal = ExtResource("3_close")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="MethodsCard" type="Panel" parent="Panel"]
+[node name="MethodsCard" type="Panel" parent="Panel" unique_id=1022685328]
 layout_mode = 0
 offset_left = 24.0
 offset_top = 68.0
 offset_right = 348.0
-offset_bottom = 488.0
+offset_bottom = 585.0
 theme_override_styles/panel = SubResource("InsetPanel")
 
-[node name="Heading" type="Label" parent="Panel/MethodsCard"]
+[node name="Heading" type="Label" parent="Panel/MethodsCard" unique_id=742247980]
 layout_mode = 0
 offset_left = 12.0
 offset_top = 10.0
@@ -157,7 +157,7 @@ text = "功法配置"
 label_settings = ExtResource("6_heading")
 horizontal_alignment = 1
 
-[node name="Subtitle" type="Label" parent="Panel/MethodsCard"]
+[node name="Subtitle" type="Label" parent="Panel/MethodsCard" unique_id=1364567694]
 layout_mode = 0
 offset_left = 16.0
 offset_top = 46.0
@@ -167,24 +167,24 @@ text = "一主修 · 两辅助 · 一身法"
 label_settings = ExtResource("8_small")
 horizontal_alignment = 1
 
-[node name="MethodsContainer" type="VBoxContainer" parent="Panel/MethodsCard"]
+[node name="MethodsContainer" type="VBoxContainer" parent="Panel/MethodsCard" unique_id=1300575228]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 16.0
 offset_top = 84.0
 offset_right = 308.0
-offset_bottom = 326.0
+offset_bottom = 417.0
 theme_override_constants/separation = 10
 
-[node name="MethodSummary" type="Panel" parent="Panel/MethodsCard"]
+[node name="MethodSummary" type="Panel" parent="Panel/MethodsCard" unique_id=1897258535]
 layout_mode = 0
 offset_left = 16.0
-offset_top = 336.0
+offset_top = 435.0
 offset_right = 308.0
-offset_bottom = 402.0
+offset_bottom = 501.0
 theme_override_styles/panel = SubResource("NotePanel")
 
-[node name="MethodSummaryLabel" type="Label" parent="Panel/MethodsCard/MethodSummary"]
+[node name="MethodSummaryLabel" type="Label" parent="Panel/MethodsCard/MethodSummary" unique_id=133745929]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -202,15 +202,15 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="SkillsCard" type="Panel" parent="Panel"]
+[node name="SkillsCard" type="Panel" parent="Panel" unique_id=578303427]
 layout_mode = 0
 offset_left = 362.0
 offset_top = 68.0
 offset_right = 718.0
-offset_bottom = 488.0
+offset_bottom = 585.0
 theme_override_styles/panel = SubResource("InsetPanel")
 
-[node name="Heading" type="Label" parent="Panel/SkillsCard"]
+[node name="Heading" type="Label" parent="Panel/SkillsCard" unique_id=515925091]
 layout_mode = 0
 offset_left = 12.0
 offset_top = 10.0
@@ -220,7 +220,7 @@ text = "技能顺序"
 label_settings = ExtResource("6_heading")
 horizontal_alignment = 1
 
-[node name="Subtitle" type="Label" parent="Panel/SkillsCard"]
+[node name="Subtitle" type="Label" parent="Panel/SkillsCard" unique_id=632975615]
 layout_mode = 0
 offset_left = 16.0
 offset_top = 46.0
@@ -230,24 +230,24 @@ text = "点击槽位选择技能，顺序决定施法优先级"
 label_settings = ExtResource("8_small")
 horizontal_alignment = 1
 
-[node name="SkillsContainer" type="VBoxContainer" parent="Panel/SkillsCard"]
+[node name="SkillsContainer" type="VBoxContainer" parent="Panel/SkillsCard" unique_id=1819239813]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 16.0
 offset_top = 84.0
 offset_right = 340.0
-offset_bottom = 402.0
+offset_bottom = 505.0
 theme_override_constants/separation = 12
 
-[node name="EquipmentCard" type="Panel" parent="Panel"]
+[node name="EquipmentCard" type="Panel" parent="Panel" unique_id=540063842]
 layout_mode = 0
 offset_left = 732.0
 offset_top = 68.0
 offset_right = 1076.0
-offset_bottom = 270.0
+offset_bottom = 350.0
 theme_override_styles/panel = SubResource("InsetPanel")
 
-[node name="Heading" type="Label" parent="Panel/EquipmentCard"]
+[node name="Heading" type="Label" parent="Panel/EquipmentCard" unique_id=682898837]
 layout_mode = 0
 offset_left = 12.0
 offset_top = 10.0
@@ -257,26 +257,26 @@ text = "法宝与道具"
 label_settings = ExtResource("6_heading")
 horizontal_alignment = 1
 
-[node name="EquipmentContainer" type="GridContainer" parent="Panel/EquipmentCard"]
+[node name="EquipmentContainer" type="GridContainer" parent="Panel/EquipmentCard" unique_id=14305266]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 16.0
 offset_top = 58.0
 offset_right = 328.0
-offset_bottom = 184.0
+offset_bottom = 261.0
 theme_override_constants/h_separation = 10
 theme_override_constants/v_separation = 10
 columns = 2
 
-[node name="StrategyCard" type="Panel" parent="Panel"]
+[node name="StrategyCard" type="Panel" parent="Panel" unique_id=2308979]
 layout_mode = 0
 offset_left = 732.0
-offset_top = 282.0
+offset_top = 368.0
 offset_right = 1076.0
-offset_bottom = 488.0
+offset_bottom = 574.0
 theme_override_styles/panel = SubResource("InsetPanel")
 
-[node name="Heading" type="Label" parent="Panel/StrategyCard"]
+[node name="Heading" type="Label" parent="Panel/StrategyCard" unique_id=2014967378]
 layout_mode = 0
 offset_left = 12.0
 offset_top = 10.0
@@ -286,7 +286,7 @@ text = "历练策略"
 label_settings = ExtResource("6_heading")
 horizontal_alignment = 1
 
-[node name="AutoContainer" type="VBoxContainer" parent="Panel/StrategyCard"]
+[node name="AutoContainer" type="VBoxContainer" parent="Panel/StrategyCard" unique_id=1178464994]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 16.0
@@ -295,46 +295,14 @@ offset_right = 328.0
 offset_bottom = 184.0
 theme_override_constants/separation = 7
 
-[node name="BooksCard" type="Panel" parent="Panel"]
-layout_mode = 0
-offset_left = 24.0
-offset_top = 500.0
-offset_right = 1076.0
-offset_bottom = 588.0
-theme_override_styles/panel = SubResource("InsetPanel")
-
-[node name="BooksHeading" type="Label" parent="Panel/BooksCard"]
-layout_mode = 0
-offset_left = 16.0
-offset_top = 12.0
-offset_right = 130.0
-offset_bottom = 74.0
-text = "可学习典籍"
-label_settings = ExtResource("7_body")
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="BooksScroll" type="ScrollContainer" parent="Panel/BooksCard"]
-layout_mode = 0
-offset_left = 142.0
-offset_top = 10.0
-offset_right = 1036.0
-offset_bottom = 78.0
-horizontal_scroll_mode = 0
-
-[node name="BooksContainer" type="HBoxContainer" parent="Panel/BooksCard/BooksScroll"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="BottomDivider" type="HSeparator" parent="Panel"]
+[node name="BottomDivider" type="HSeparator" parent="Panel" unique_id=1509872063]
 layout_mode = 0
 offset_left = 28.0
 offset_top = 596.0
 offset_right = 1072.0
 offset_bottom = 600.0
 
-[node name="BackButton" type="TextureButton" parent="Panel"]
+[node name="BackButton" type="TextureButton" parent="Panel" unique_id=2057259101]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 36.0
@@ -345,7 +313,7 @@ texture_normal = ExtResource("4_back")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="StatusPanel" type="Panel" parent="Panel"]
+[node name="StatusPanel" type="Panel" parent="Panel" unique_id=1290858738]
 layout_mode = 0
 offset_left = 130.0
 offset_top = 612.0
@@ -353,7 +321,7 @@ offset_right = 1064.0
 offset_bottom = 676.0
 theme_override_styles/panel = SubResource("NotePanel")
 
-[node name="StatusLabel" type="Label" parent="Panel/StatusPanel"]
+[node name="StatusLabel" type="Label" parent="Panel/StatusPanel" unique_id=1984325247]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -368,5 +336,7 @@ label_settings = ExtResource("7_body")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SelectionPopup" parent="." instance=ExtResource("10_popup")]
+[node name="SelectionPopup" parent="." unique_id=1460156315 instance=ExtResource("10_popup")]
 unique_name_in_owner = true
+visible = false
+layout_mode = 1

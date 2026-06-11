@@ -113,11 +113,13 @@ func _test_cultivation_methods() -> void:
 
 func _test_learning_books() -> void:
 	var state := _state()
-	_expect_true(not state.unlocked_skills.has(1), "fireball starts locked")
-	var learned: Dictionary = state.use_learning_book("book_skill_fireball")
-	_expect_true(bool(learned.get("ok", false)), "skill book learns skill")
-	_expect_true(state.unlocked_skills.has(1), "fireball unlocked")
-	_expect_eq(int(state.inventory.get("book_skill_fireball", 0)), 0, "skill book consumed")
+	_expect_true(state.unlocked_skills.has(1), "fireball starts unlocked")
+	_expect_eq(int(state.equipped_skills[0]), 1, "fireball auto equipped")
+	state.inventory["book_skill_fireball"] = 1
+	var duplicate: Dictionary = state.use_learning_book("book_skill_fireball")
+	_expect_true(not bool(duplicate.get("ok", false)), "duplicate skill book rejected")
+	_expect_eq(int(state.inventory.get("book_skill_fireball", 0)), 1, "duplicate skill book not consumed")
+	state.inventory["book_method_iron_body"] = 1
 	var method: Dictionary = state.use_learning_book("book_method_iron_body")
 	_expect_true(bool(method.get("ok", false)), "method book learns method")
 	_expect_true(state.unlocked_methods.has("iron_body_art"), "method unlocked")
@@ -125,7 +127,6 @@ func _test_learning_books() -> void:
 
 func _test_player_auto_battle_rules() -> void:
 	var state := _state()
-	state.use_learning_book("book_skill_fireball")
 	state.auto_battle_preset = "aggressive"
 	var rules: Dictionary = state.resolved_auto_battle_rules()
 	_expect_eq(str(rules.get("policy", "")), "rule_list", "player auto rules use rule list")
@@ -157,6 +158,8 @@ func _test_transfer_item_stack_cap() -> void:
 
 func _test_inventory_and_battle_item_slots() -> void:
 	var state := _state()
+	state.inventory["items_FightTestDan"] = 3
+	state.item_slots = ["items_FightTestDan", ""]
 	var slot_id := str(state.item_slots[0])
 	var before := int(state.inventory.get(slot_id, 0))
 	var slots := InventoryServiceScript.build_battle_item_slots(state.inventory, state.item_slots)
@@ -172,6 +175,8 @@ func _test_inventory_and_battle_item_slots() -> void:
 
 func _test_battle_runtime_deducts_inventory() -> void:
 	var state := _state()
+	state.inventory["items_FightTestDan"] = 3
+	state.item_slots = ["items_FightTestDan", ""]
 	var slot_id := str(state.item_slots[0])
 	_expect_true(slot_id != "", "battle slot configured")
 	var before := int(state.inventory.get(slot_id, 0))

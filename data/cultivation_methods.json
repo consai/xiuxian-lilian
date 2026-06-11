@@ -1,6 +1,21 @@
 {
   "schema_version": 1,
   "methods": {
+    "five_elements_art": {
+      "name": "五行功法",
+      "slot_type": "main",
+      "quality": 1,
+      "cultivation_speed": 1.0,
+      "combat_mp_restore_2s": 3,
+      "flat_attrs": {
+        "mp_max": 10,
+        "magic_atk": 3
+      },
+      "percent_attrs": {},
+      "damage_bonus_percent": 0.0,
+      "icon": "res://assets/art/ui_new/fulu.png",
+      "desc": "调和五行灵气的基础法门，适合炼气期修士入门修炼。"
+    },
     "basic_qi_art": {
       "name": "引气诀",
       "slot_type": "main",

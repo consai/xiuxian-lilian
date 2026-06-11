@@ -160,12 +160,13 @@ func _test_manual_exit_keeps_all_loot() -> void:
 	var finish: Dictionary = expedition.finish("manual")
 	var settled: Dictionary = game.settle_expedition(finish)
 	_expect_true(bool(settled.get("ok", false)), "settlement ok")
-	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 7, "loot merged into inventory")
+	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 4, "loot merged into inventory")
 	_expect_eq(game.day, 2, "manual exit advances at least one day")
 
 
 func _test_defeat_exit_drops_inventory_and_injury() -> void:
 	var game := _state()
+	game.inventory["items_LingCao"] = 3
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 606)
 	ExpeditionRewardServiceScript.merge_into_loot(
@@ -288,13 +289,13 @@ func _test_game_settlement_occurs_once() -> void:
 	var second: Dictionary = game.settle_expedition(finish)
 	_expect_true(bool(first.get("ok", false)), "first settlement ok")
 	_expect_true(bool(second.get("duplicate", false)), "duplicate settlement rejected")
-	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 5, "inventory not doubled at settlement")
+	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 2, "inventory not doubled at settlement")
 	_expect_eq(game.day, 2, "day advanced once")
 
 
 func _test_distinct_expeditions_settlement_ids() -> void:
 	var game := _state()
-	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 3, "fresh inventory before expeditions")
+	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 0, "fresh inventory before expeditions")
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 2001)
 	ExpeditionRewardServiceScript.merge_into_loot(
@@ -313,7 +314,7 @@ func _test_distinct_expeditions_settlement_ids() -> void:
 	)
 	var second: Dictionary = game.settle_expedition(second_finish)
 	_expect_true(bool(second.get("ok", false)), "second distinct settlement ok")
-	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 5, "both loot applied")
+	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 2, "both loot applied")
 
 
 func _test_director_deterministic() -> void:
