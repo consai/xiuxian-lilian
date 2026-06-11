@@ -9,12 +9,15 @@
       "min_difficulty": 1,
       "max_difficulty": 6,
       "recommended_realm": "炼气一层",
-      "event_pool": [
-        "qinglan_travel",
-        "qinglan_herbs",
-        "qinglan_ore",
-        "qinglan_spring",
-        "qinglan_shelter",
+      "common_event_pool": [
+        "travel",
+        "gather_herbs",
+        "gather_ore",
+        "recover_mp",
+        "recover_hp",
+        "local_beast"
+      ],
+      "map_event_pool": [
         "qinglan_fog",
         "qinglan_cliff",
         "qinglan_wolf",
@@ -37,6 +40,46 @@
         "demonic_ritual_boss",
         "demonic_ritual_ending"
       ],
+      "common_event_generation": {
+        "duration_days": {
+          "travel": 1,
+          "gather": 1,
+          "recover": 1,
+          "battle": 2
+        },
+        "reward_pools": {
+          "herbs": [
+            {"kind": "item", "id": "items_LingCao", "min": 2, "max": 4, "weight": 1}
+          ],
+          "ore": [
+            {"kind": "item", "id": "items_HanTie", "min": 1, "max": 2, "weight": 3},
+            {"kind": "currency", "id": "ling_stones", "min": 5, "max": 15, "weight": 2}
+          ],
+          "beast": [
+            {"kind": "item", "id": "items_LingCao", "min": 1, "max": 3, "weight": 5},
+            {"kind": "item", "id": "items_HuiQiDan", "min": 1, "max": 1, "weight": 2},
+            {"kind": "item", "id": "items_HuiLingDan", "min": 1, "max": 1, "weight": 2}
+          ]
+        },
+        "enemy_pools": {
+          "beast": {
+            "name": "青牙狼",
+            "icon": "jueshe/sprite_003.png",
+            "hp": 75,
+            "mp": 30,
+            "attrs": {"hp_max": 75, "mp_max": 30, "shield": 0, "atk": 70, "def": 80, "spd": 92, "crit": 5, "crit_damage": 150},
+            "skills": [1, 0]
+          }
+        },
+        "overrides": {
+          "travel": {"name": "山路赶路", "desc": "沿山道继续前行，风声掠过林梢。"},
+          "gather_herbs": {"name": "林间灵草", "desc": "雾气中露出一片泛着微光的灵草。"},
+          "gather_ore": {"name": "山壁矿脉", "desc": "岩缝中闪烁着寒铁微光。"},
+          "recover_mp": {"name": "灵泉小憩", "desc": "清冽灵泉可恢复法力。"},
+          "recover_hp": {"name": "岩洞歇脚", "desc": "暂避风雨，调息气血。"},
+          "local_beast": {"name": "山林妖兽", "desc": "林间妖兽循着气息扑来。"}
+        }
+      },
       "preview_rewards": [
         "items_LingCao",
         "items_YaoDan",

@@ -73,7 +73,7 @@ func select_wilderness(region_id: String) -> void:
 	if region.is_empty():
 		return
 	var can_enter := WorldMapServiceScript.can_enter_wilderness(region_id, map_data)
-	var bounds := _location_difficulty_bounds(str(can_enter.get("location_id", "")))
+	var bounds := WorldMapServiceScript.region_difficulty_bounds(region)
 	DataStore.map_runtime()["selected_region_id"] = region_id
 	_update_selection_for_region(region, map_data)
 	if _wilderness_popup.has_method("show_region"):
@@ -394,12 +394,3 @@ func _polygon_center(points: Array) -> Vector2:
 	return total / float(points.size())
 
 
-func _location_difficulty_bounds(location_id: String) -> Dictionary:
-	var location := LocationServiceScript.by_id(location_id)
-	if location.is_empty():
-		return {"min": 1, "max": 1}
-	var loc_min := maxi(1, int(location.get("min_difficulty", 1)))
-	var loc_max := int(location.get("max_difficulty", 0))
-	if loc_max <= 0:
-		loc_max = loc_min
-	return {"min": loc_min, "max": loc_max}

@@ -6,14 +6,14 @@
 
 ## 1. 系统概述
 
-历练是洞府主循环中的**外出探索玩法**：玩家选地点 → 进入事件循环（日推进 + 抉择 + 战斗）→ 可随时返程或战败结算 → 回写存档（天数、气血法力、背包、世界状态、统计）。
+历练是洞府主循环中的**外出探索玩法**：玩家经世界地图选野外区域或地点 → 进入事件循环（日推进 + 抉择 + 战斗）→ 可随时返程或战败结算 → 回写存档（天数、气血法力、背包、世界状态、统计）。
 
 核心设计：**局内状态走 `DataStore.expedition_runtime()`**，结算结果经 `ExpeditionResult` 契约交给 `GameState.settle_expedition()` 持久化。
 
 ```mermaid
 flowchart LR
-  Hub[洞府 cave_hub] --> Loc[地点选择 location_select]
-  Loc --> Start[SceneManager.start_expedition]
+  Hub[洞府 cave_hub] --> Map[世界地图 world_map]
+  Map --> Start[SceneManager.start_expedition]
   Start --> Loop[历练主循环 expedition_loop]
   Loop -->|战斗| Fight[战斗 fight_scene]
   Fight --> Loop
@@ -27,8 +27,8 @@ flowchart LR
 
 | # | 功能 | 简述 | 实现要点 |
 |---|------|------|----------|
-| F01 | 入口与互斥 | 洞府「外出历练」进地点选择；历练进行中禁止重复出发 | `cave_hub` → `SceneManager.go_location_select()`；`SceneManager` 拦截活跃历练 |
-| F02 | 地点选择 | 展示地点名、危险度、建议境界、预览奖励、当前气血法力与补给槽 | `location_select.gd` + `data/locations.json` |
+| F01 | 入口与互斥 | 洞府「外出历练」进世界地图；历练进行中禁止重复出发 | `cave_hub` → `SceneManager.go_world_map()`；`SceneManager` 拦截活跃历练 |
+| F02 | 地点选择与启程 | 地图弹窗展示危险度、推荐境界、预览奖励、探索深度档；确认后启程 | `world_map_controller.gd` 野外/地点弹窗 + `data/locations.json` |
 | F03 | 启程 | 校验地点、快照玩家、初始化 RNG/统计/日志 | `ExpeditionState.start()` |
 | F04 | 日推进 | 遭遇日间隔 timer；无遭遇日由 `advance_day()` 连续过天、不写日志、不等待 | `_advance_single_day()` 链式至遭遇或上限 |
 | F05 | 事件导演 | 从地点事件池按权重抽事件，考虑难度范围/链/世界/资源 | `ExpeditionDirectorService.select_next_event()` |
@@ -63,7 +63,7 @@ flowchart LR
 
 | 场景 ID | 路径 | 脚本 |
 |---------|------|------|
-| `location_select` | `scenes/expedition/location_select.tscn` | `location_select.gd` |
+| `world_map` | `scenes/map/map.tscn` | `world_map_controller.gd`（历练入口） |
 | `expedition_loop` | `scenes/expedition/expedition_loop.tscn` | `expedition_loop.gd` |
 | `expedition_result` | `scenes/expedition/expedition_result.tscn` | `expedition_result.gd` |
 | `expedition_battle_popup` | `scenes/expedition/expedition_battle_popup.tscn` | `expedition_battle_popup_view.gd` |
@@ -89,8 +89,9 @@ flowchart LR
 
 | 文件 | 内容 |
 |------|------|
-| `data/locations.json` | 地点元数据、`min_difficulty`/`max_difficulty`、`event_pool`、`preview_rewards` |
-| `data/expedition_events.json` | 事件定义（类型、权重、`difficulty`、敌人、奖励、选项、世界效果） |
+| `data/locations.json` | 地点元数据、难度、公共/地图事件池，以及公共事件的地图级奖励、敌人、耗时生成参数 |
+| `data/expedition_common_events.json` | 可跨地图复用的公共事件模板（赶路、采集、恢复、普通战斗等） |
+| `data/expedition_events.json` | 与地图绑定的大多数唯一事件（抉择、事件链、精英、首领、世界效果等） |
 | `data/expedition_rules.json` | 全局规则（遭遇概率、战败惩罚、自动推进间隔等） |
 
 ---
@@ -152,6 +153,9 @@ advance_day()
 ```
 
 非战斗结算：`resolve_non_battle_event` → 应用 effects / roll rewards → `_apply_step_after_event`（`steps++`、更新 `max_difficulty`、日志、链标记）。
+
+公共事件由 `common_event_pool` 引用模板，并在抽取时使用地点的 `common_event_generation` 物化。生成实例 ID 为
+`common::<location_id>::<template_id>`，因此奖励、敌人和 `duration_days` 可随当前地图变化，同时战斗跨场景后仍可按 ID 恢复。
 
 ### 5.3 战斗
 
@@ -295,3 +299,4 @@ advance_day()
 | 2026-06-10 | 移除 `journey_complete` 退出原因（系统从未产出） |
 | 2026-06-10 | 深度改为难度：事件 `difficulty`、地点难度范围，取消 `depth` 自动递增 |
 | 2026-06-10 | 新增自动/手动推进切换与「前进」按钮 |
+| 2026-06-11 | 移除独立地点选择场景；历练入口改经世界地图弹窗与 `start_expedition` |

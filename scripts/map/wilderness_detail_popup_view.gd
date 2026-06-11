@@ -3,12 +3,18 @@ extends Control
 signal enter_requested(region_id: String, options: Dictionary)
 signal closed
 
+const WorldMapServiceScript := preload("res://scripts/map/world_map_service.gd")
+
+const TIER_OUTER := 0
+const TIER_DEEP := 1
+const TIER_CORE := 2
+const TIER_LABELS := ["外围探索", "深入探索", "进入核心"]
+
 @onready var _title: Label = %Title
 @onready var _body: Label = %Body
 @onready var _enter_button: TextureButton = %EnterButton
 @onready var _close_button: TextureButton = %CloseButton
-@onready var _min_option: OptionButton = %MinDifficultyOption
-@onready var _max_option: OptionButton = %MaxDifficultyOption
+@onready var _difficulty_option: OptionButton = %DifficultyOption
 
 var _region_id := ""
 var _location_bounds := {"min": 1, "max": 1}
@@ -18,8 +24,6 @@ func _ready() -> void:
 	_close_button.pressed.connect(_on_close_pressed)
 	_enter_button.pressed.connect(_on_enter_pressed)
 	%Dimmer.gui_input.connect(_on_dimmer_input)
-	_min_option.item_selected.connect(_on_min_changed)
-	_max_option.item_selected.connect(_on_max_changed)
 
 
 func show_region(
@@ -57,35 +61,32 @@ func hide_popup() -> void:
 func _populate_difficulty_options(bounds: Dictionary) -> void:
 	var loc_min := maxi(1, int(bounds.get("min", 1)))
 	var loc_max := maxi(loc_min, int(bounds.get("max", loc_min)))
-	_min_option.clear()
-	_max_option.clear()
-	for value in range(loc_min, loc_max + 1):
-		_min_option.add_item("难度 %d" % value, value)
-		_max_option.add_item("难度 %d" % value, value)
-	_min_option.select(0)
-	_max_option.select(_max_option.item_count - 1)
+	_difficulty_option.clear()
+	for tier in [TIER_OUTER, TIER_DEEP, TIER_CORE]:
+		var tier_bounds := WorldMapServiceScript.difficulty_tier_bounds(loc_min, loc_max, tier)
+		var label := "%s (难度 %d-%d)" % [
+			TIER_LABELS[tier],
+			int(tier_bounds.get("min", loc_min)),
+			int(tier_bounds.get("max", loc_max)),
+		]
+		_difficulty_option.add_item(label, tier)
+	_difficulty_option.select(TIER_DEEP)
 
 
-func _on_min_changed(_index: int) -> void:
-	var min_id := _min_option.get_selected_id()
-	var max_id := _max_option.get_selected_id()
-	if max_id < min_id:
-		_max_option.select(_min_option.selected)
-
-
-func _on_max_changed(_index: int) -> void:
-	var min_id := _min_option.get_selected_id()
-	var max_id := _max_option.get_selected_id()
-	if max_id < min_id:
-		_min_option.select(_max_option.selected)
+func _selected_difficulty_bounds() -> Dictionary:
+	var loc_min := maxi(1, int(_location_bounds.get("min", 1)))
+	var loc_max := maxi(loc_min, int(_location_bounds.get("max", loc_min)))
+	var tier := _difficulty_option.get_selected_id()
+	return WorldMapServiceScript.difficulty_tier_bounds(loc_min, loc_max, tier)
 
 
 func _on_enter_pressed() -> void:
 	if _region_id == "":
 		return
+	var bounds := _selected_difficulty_bounds()
 	enter_requested.emit(_region_id, {
-		"min_difficulty": _min_option.get_selected_id(),
-		"max_difficulty": _max_option.get_selected_id(),
+		"min_difficulty": int(bounds.get("min", 1)),
+		"max_difficulty": int(bounds.get("max", 1)),
 	})
 
 

@@ -264,6 +264,45 @@ static func region_exploration(map_data: Dictionary, region_id: String) -> int:
 	return clampi(int(exploration.get(region_id, 0)), 0, 100)
 
 
+static func region_difficulty_bounds(region_data: Dictionary) -> Dictionary:
+	var loc_min := maxi(1, int(region_data.get("min_difficulty", 1)))
+	var loc_max := int(region_data.get("max_difficulty", 0))
+	if loc_max <= 0:
+		loc_max = loc_min
+	return {"min": loc_min, "max": loc_max}
+
+
+static func difficulty_tier_bounds(loc_min: int, loc_max: int, tier: int) -> Dictionary:
+	loc_min = maxi(1, loc_min)
+	loc_max = maxi(loc_min, loc_max)
+	if loc_max <= loc_min:
+		return {"min": loc_min, "max": loc_max}
+	var span := float(loc_max - loc_min)
+	var t_low := 0.0
+	var t_high := 1.0
+	match clampi(tier, 0, 2):
+		0:
+			t_low = 0.0
+			t_high = 0.2
+		1:
+			t_low = 0.2
+			t_high = 0.8
+		2:
+			t_low = 0.8
+			t_high = 1.0
+	var out_min := loc_min + int(floor(span * t_low))
+	var out_max := loc_min + int(ceil(span * t_high))
+	if tier <= 0:
+		out_min = loc_min
+	if tier >= 2:
+		out_max = loc_max
+	out_min = clampi(out_min, loc_min, loc_max)
+	out_max = clampi(out_max, loc_min, loc_max)
+	if out_max < out_min:
+		out_max = out_min
+	return {"min": out_min, "max": out_max}
+
+
 static func clamp_difficulty_options(
 	location_id: String,
 	min_difficulty: int,

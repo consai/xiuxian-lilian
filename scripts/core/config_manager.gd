@@ -16,6 +16,7 @@ var _cities_by_id: Dictionary = {}
 var _world_routes: Array = []
 var _wilderness_regions_by_id: Dictionary = {}
 var _wilderness_locations_by_id: Dictionary = {}
+var _common_expedition_events_by_id: Dictionary = {}
 var _expedition_events_by_id: Dictionary = {}
 var _expedition_rules: Dictionary = {}
 const ConfigValidatorScript := preload("res://scripts/core/config_validator.gd")
@@ -182,6 +183,20 @@ func expedition_event_by_id(event_id: String) -> Dictionary:
 		if not row.has(key):
 			row[key] = [] if key in ["beat_tags", "chain_effects", "world_effects"] else ({} if key == "requires" else "")
 	return row
+
+
+func common_expedition_event_by_id(event_id: String) -> Dictionary:
+	var eid := event_id.strip_edges()
+	var row_v: Variant = _common_expedition_events_by_id.get(eid)
+	if not row_v is Dictionary:
+		return {}
+	var row := (row_v as Dictionary).duplicate(true)
+	row["id"] = eid
+	return row
+
+
+func all_common_expedition_event_ids() -> Array:
+	return (_common_expedition_events_by_id.keys() as Array).duplicate()
 
 
 func all_expedition_event_ids() -> Array:
@@ -395,9 +410,17 @@ func _load_world_map_local() -> void:
 
 
 func _load_expedition_events_local() -> void:
+	_common_expedition_events_by_id.clear()
 	_expedition_events_by_id.clear()
+	var common_root := JsonLoader._read_json_root_object("res://data/expedition_common_events.json")
+	var common_v: Variant = common_root.get("events", {})
+	if common_v is Dictionary:
+		for key in (common_v as Dictionary).keys():
+			var row_v: Variant = (common_v as Dictionary)[key]
+			if row_v is Dictionary:
+				_common_expedition_events_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
 	var root := JsonLoader._read_json_root_object("res://data/expedition_events.json")
-	var raw_v: Variant = root.get("events", {})
+	var raw_v: Variant = root.get("map_events", root.get("events", {}))
 	if not raw_v is Dictionary:
 		return
 	for key in (raw_v as Dictionary).keys():

@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://cu1kqwmidfo8o"]
+[gd_scene format=3 uid="uid://cvbfkokxnjv4d"]
 
-[ext_resource type="Script" uid="uid://c8fpox3gsdctw" path="res://scripts/expedition/location_select.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/expedition/location_select.gd" id="1"]
 [ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2"]
 [ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="3_bg"]
 [ext_resource type="Texture2D" uid="uid://8mwstvi8kywh" path="res://assets/art/ui_new/btn_close.png" id="4_close"]
@@ -207,7 +207,6 @@ offset_left = 17.0
 offset_top = 268.0
 offset_right = 336.0
 offset_bottom = 354.0
-horizontal_scroll_mode = 1
 vertical_scroll_mode = 0
 
 [node name="Rewards" type="HBoxContainer" parent="Dialog/LeftCard/RewardsScroll" unique_id=544489580]

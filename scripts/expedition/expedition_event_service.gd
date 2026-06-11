@@ -4,9 +4,15 @@ extends RefCounted
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
 const ExpeditionLogServiceScript := preload("res://scripts/expedition/expedition_log_service.gd")
+const COMMON_ID_PREFIX := "common::"
 
 
 static func by_id(event_id: String) -> Dictionary:
+	if event_id.begins_with(COMMON_ID_PREFIX):
+		var parts := event_id.split("::", false)
+		if parts.size() == 3:
+			var location := _location_by_id(str(parts[1]))
+			return _build_common_event(location, str(parts[2]))
 	var cm := _config_manager()
 	if cm != null and cm.has_method("expedition_event_by_id"):
 		return cm.call("expedition_event_by_id", event_id) as Dictionary
@@ -15,12 +21,52 @@ static func by_id(event_id: String) -> Dictionary:
 
 static func event_pool_for_location(location: Dictionary) -> Array:
 	var pool: Array = []
-	for event_id_v in location.get("event_pool", []) as Array:
+	for template_id_v in location.get("common_event_pool", []) as Array:
+		var common_event := _build_common_event(location, str(template_id_v))
+		if not common_event.is_empty():
+			pool.append(common_event)
+	for event_id_v in location.get("map_event_pool", location.get("event_pool", [])) as Array:
 		var event_id := str(event_id_v)
 		var event := by_id(event_id)
 		if not event.is_empty():
 			pool.append(event)
 	return pool
+
+
+static func _build_common_event(location: Dictionary, template_id: String) -> Dictionary:
+	var location_id := str(location.get("id", "")).strip_edges()
+	if location_id == "" or template_id.strip_edges() == "":
+		return {}
+	var cm := _config_manager()
+	if cm == null or not cm.has_method("common_expedition_event_by_id"):
+		return {}
+	var event := cm.call("common_expedition_event_by_id", template_id) as Dictionary
+	if event.is_empty():
+		return {}
+	var generation := location.get("common_event_generation", {}) as Dictionary
+	var overrides := generation.get("overrides", {}) as Dictionary
+	var override_v: Variant = overrides.get(template_id, {})
+	if override_v is Dictionary:
+		for key in (override_v as Dictionary).keys():
+			event[key] = (override_v as Dictionary)[key]
+	var reward_pool_id := str(event.get("reward_pool", "")).strip_edges()
+	if reward_pool_id != "":
+		var reward_pools := generation.get("reward_pools", {}) as Dictionary
+		event["rewards"] = (reward_pools.get(reward_pool_id, []) as Array).duplicate(true)
+	var enemy_pool_id := str(event.get("enemy_pool", "")).strip_edges()
+	if enemy_pool_id != "":
+		var enemy_pools := generation.get("enemy_pools", {}) as Dictionary
+		var enemy_v: Variant = enemy_pools.get(enemy_pool_id, {})
+		if enemy_v is Dictionary:
+			event["enemy"] = (enemy_v as Dictionary).duplicate(true)
+	var duration_key := str(event.get("duration_key", event.get("type", ""))).strip_edges()
+	var durations := generation.get("duration_days", {}) as Dictionary
+	event["duration_days"] = maxi(1, int(durations.get(duration_key, event.get("duration_days", 1))))
+	event["id"] = "%s%s::%s" % [COMMON_ID_PREFIX, location_id, template_id]
+	event["template_id"] = template_id
+	event["location_id"] = location_id
+	event["scope"] = "common"
+	return event
 
 
 static func is_decision_event(event: Dictionary) -> bool:
@@ -322,3 +368,10 @@ static func _config_manager() -> Node:
 	if not loop is SceneTree:
 		return null
 	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
+
+
+static func _location_by_id(location_id: String) -> Dictionary:
+	var cm := _config_manager()
+	if cm != null and cm.has_method("location_by_id"):
+		return cm.call("location_by_id", location_id) as Dictionary
+	return {}

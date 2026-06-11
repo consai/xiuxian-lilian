@@ -27,6 +27,7 @@ static func _validate_unique_ids(config_manager: Node) -> PackedStringArray:
 	errors.append_array(_validate_no_duplicate_dict_keys(config_manager.all_equip_ids(), "法宝"))
 	errors.append_array(_validate_no_duplicate_dict_keys(config_manager.all_buff_ids(), "Buff"))
 	errors.append_array(_validate_no_duplicate_dict_keys(config_manager.all_location_ids(), "地点"))
+	errors.append_array(_validate_no_duplicate_dict_keys(config_manager.all_common_expedition_event_ids(), "公共历练事件"))
 	errors.append_array(_validate_no_duplicate_dict_keys(config_manager.all_expedition_event_ids(), "远征事件"))
 	return errors
 

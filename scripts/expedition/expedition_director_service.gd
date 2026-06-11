@@ -29,8 +29,8 @@ static func _pool_candidates(location: Dictionary, context: Dictionary) -> Array
 	var min_difficulty := maxi(1, int(location.get("min_difficulty", 1)))
 	var max_difficulty := int(location.get("max_difficulty", 0))
 	var out: Array = []
-	for event_id_v in location.get("event_pool", []) as Array:
-		var event := EventService.by_id(str(event_id_v))
+	for event_v in EventService.event_pool_for_location(location):
+		var event := event_v as Dictionary
 		if event.is_empty():
 			continue
 		var event_difficulty := maxi(1, int(event.get("difficulty", 1)))

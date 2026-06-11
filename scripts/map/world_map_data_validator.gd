@@ -47,6 +47,10 @@ static func collect_errors() -> PackedStringArray:
 		var expedition_id := str(region.get("expedition_location_id", "")).strip_edges()
 		if expedition_id != "" and not LocationServiceScript.has_location(expedition_id):
 			errors.append("野外区域 %s 的 expedition_location_id 不存在: %s" % [region_id, expedition_id])
+		var min_difficulty := maxi(1, int(region.get("min_difficulty", 1)))
+		var max_difficulty := int(region.get("max_difficulty", 0))
+		if max_difficulty > 0 and max_difficulty < min_difficulty:
+			errors.append("野外区域 %s 的 max_difficulty 小于 min_difficulty" % region_id)
 		for sub_id_v in region.get("sub_locations", []) as Array:
 			var sub_id := str(sub_id_v)
 			if sub_id not in location_ids:

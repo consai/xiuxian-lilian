@@ -15,7 +15,17 @@ static func collect_errors(game_state: Node = null) -> PackedStringArray:
 		var max_difficulty := int(location.get("max_difficulty", 0))
 		if max_difficulty > 0 and max_difficulty < min_difficulty:
 			errors.append("地点 %s 的 max_difficulty 小于 min_difficulty" % location_id)
-		for event_id_v in location.get("event_pool", []) as Array:
+		var common_ids := location.get("common_event_pool", []) as Array
+		var map_ids := location.get("map_event_pool", location.get("event_pool", [])) as Array
+		for template_id_v in common_ids:
+			var template_id := str(template_id_v)
+			var common_event := ExpeditionEventServiceScript.event_pool_for_location(location).filter(
+				func(event_v: Variant) -> bool:
+					return str((event_v as Dictionary).get("template_id", "")) == template_id
+			)
+			if common_event.is_empty():
+				errors.append("地点 %s 引用了不存在或无法生成的公共事件 %s" % [location_id, template_id])
+		for event_id_v in map_ids:
 			var event_id := str(event_id_v)
 			var event := ExpeditionEventServiceScript.by_id(event_id)
 			if event.is_empty():
@@ -40,6 +50,29 @@ static func collect_errors(game_state: Node = null) -> PackedStringArray:
 				if not reward_v is Dictionary:
 					continue
 				errors.append_array(_validate_reward(reward_v as Dictionary, "事件 %s" % event_id))
+		for generated_v in ExpeditionEventServiceScript.event_pool_for_location(location):
+			var generated := generated_v as Dictionary
+			if str(generated.get("scope", "")) != "common":
+				continue
+			errors.append_array(_validate_generated_common_event(generated, location_id, game_state))
+	return errors
+
+
+static func _validate_generated_common_event(event: Dictionary, location_id: String, game_state: Node) -> PackedStringArray:
+	var errors: PackedStringArray = []
+	var event_id := str(event.get("id", ""))
+	if int(event.get("duration_days", 0)) < 1:
+		errors.append("地点 %s 的公共事件 %s 缺少有效 duration_days" % [location_id, event_id])
+	if str(event.get("reward_pool", "")).strip_edges() != "" and (event.get("rewards", []) as Array).is_empty():
+		errors.append("地点 %s 的公共事件 %s 未生成奖励池" % [location_id, event_id])
+	if str(event.get("enemy_pool", "")).strip_edges() != "" and (event.get("enemy", {}) as Dictionary).is_empty():
+		errors.append("地点 %s 的公共事件 %s 未生成敌人池" % [location_id, event_id])
+	if ExpeditionRulesServiceScript.is_battle_type(str(event.get("type", ""))):
+		for msg in BattleInitData.collect_errors(_build_sample_battle_init(event, game_state)):
+			errors.append("公共事件 %s: %s" % [event_id, msg])
+	for reward_v in event.get("rewards", []) as Array:
+		if reward_v is Dictionary:
+			errors.append_array(_validate_reward(reward_v as Dictionary, "公共事件 %s" % event_id))
 	return errors
 
 

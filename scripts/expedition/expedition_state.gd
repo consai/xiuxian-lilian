@@ -454,6 +454,7 @@ func settle_pending_battle() -> Dictionary:
 		return {"ok": true, "won": true, "mode": "auto_done", "event": event}
 	stats["losses"] = int(stats.get("losses", 0)) + 1
 	if not event.is_empty():
+		_apply_event_duration(event)
 		var defeat_outcome := ExpeditionLogServiceScript.build_battle_defeat_outcome(event)
 		if _pending_log_index >= 0:
 			_finish_pending_log_outcome(defeat_outcome)
@@ -614,6 +615,7 @@ func _apply_step_after_event(
 	_apply_session_rewards(extra_rewards)
 	_mark_once_per_expedition(event)
 	steps += 1
+	_apply_event_duration(event)
 	var event_difficulty := _event_difficulty(event)
 	stats["steps"] = steps
 	stats["max_difficulty"] = maxi(int(stats.get("max_difficulty", 0)), event_difficulty)
@@ -644,6 +646,13 @@ func _apply_step_after_event(
 	var chain_id := str(event.get("chain_id", ""))
 	if active_chain_id == "" and chain_id != "":
 		active_chain_id = chain_id
+
+
+func _apply_event_duration(event: Dictionary) -> void:
+	var duration_days := maxi(1, int(event.get("duration_days", 1)))
+	if duration_days > 1:
+		days += duration_days - 1
+	stats["days"] = days
 
 
 func _sync_runtime_from_summary(summary: Dictionary) -> void:

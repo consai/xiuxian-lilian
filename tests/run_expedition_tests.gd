@@ -16,6 +16,8 @@ func _init() -> void:
 func _run_all() -> void:
 	_run("start creates isolated runtime", _test_start_creates_isolated_runtime)
 	_run("roll next event obeys difficulty", _test_roll_next_event_obey_difficulty)
+	_run("common events use location generation", _test_common_events_use_location_generation)
+	_run("common event duration advances days", _test_common_event_duration_advances_days)
 	_run("decision event exposes options", _test_decision_event_exposes_options)
 	_run("non battle events advance expedition", _test_non_battle_events_advance)
 	_run("manual exit keeps all loot", _test_manual_exit_keeps_all_loot)
@@ -81,6 +83,33 @@ func _test_roll_next_event_obey_difficulty() -> void:
 	_expect_true(str(shallow.get("id", "")) != "qinglan_serpent", "elite hidden when max difficulty is 2")
 
 
+func _test_common_events_use_location_generation() -> void:
+	var location := LocationServiceScript.by_id("qinglan_mountain")
+	var pool := ExpeditionEventServiceScript.event_pool_for_location(location)
+	var herbs := _find_event_by_template(pool, "gather_herbs")
+	var beast := _find_event_by_template(pool, "local_beast")
+	_expect_eq(str(herbs.get("id", "")), "common::qinglan_mountain::gather_herbs", "common event gets stable generated id")
+	_expect_eq(str(herbs.get("location_id", "")), "qinglan_mountain", "common event binds current location")
+	_expect_true(not (herbs.get("rewards", []) as Array).is_empty(), "common gather uses location reward pool")
+	_expect_eq(int(beast.get("duration_days", 0)), 2, "common battle uses location duration")
+	_expect_eq(str((beast.get("enemy", {}) as Dictionary).get("name", "")), "青牙狼", "common battle uses location enemy")
+	_expect_eq(ExpeditionEventServiceScript.by_id(str(beast.get("id", ""))), beast, "generated event can be restored by id")
+
+
+func _test_common_event_duration_advances_days() -> void:
+	var game := _state()
+	var expedition := _expedition()
+	expedition.start("qinglan_mountain", game, 3030)
+	var event := ExpeditionEventServiceScript.by_id("common::qinglan_mountain::recover_hp")
+	event["duration_days"] = 3
+	expedition.runtime["hp"] = 10.0
+	expedition.current_choices = [event]
+	expedition.phase = "choosing"
+	var result: Dictionary = expedition.choose_event(str(event.get("id", "")))
+	_expect_true(bool(result.get("ok", false)), "generated duration event resolves")
+	_expect_eq(expedition.days, 2, "event duration adds extra elapsed days")
+
+
 func _test_decision_event_exposes_options() -> void:
 	var tracks := ExpeditionEventServiceScript.by_id("qinglan_wolf_tracks")
 	_expect_true(ExpeditionEventServiceScript.is_decision_event(tracks), "wolf tracks is decision")
@@ -93,13 +122,13 @@ func _test_non_battle_events_advance() -> void:
 	var game := _state()
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 404)
-	var herbs := ExpeditionEventServiceScript.by_id("qinglan_herbs")
+	var herbs := ExpeditionEventServiceScript.by_id("common::qinglan_mountain::gather_herbs")
 	var before_steps: int = int(expedition.steps)
 	var before_max_diff: int = int((expedition.stats as Dictionary).get("max_difficulty", 0))
 	var before_loot: int = (expedition.loot as Array).size()
 	expedition.current_choices = [herbs]
 	expedition.phase = "choosing"
-	var result: Dictionary = expedition.choose_event("qinglan_herbs")
+	var result: Dictionary = expedition.choose_event(str(herbs.get("id", "")))
 	_expect_true(bool(result.get("ok", false)), "gather resolves")
 	_expect_eq(expedition.steps, before_steps + 1, "steps increased")
 	_expect_true(int((expedition.stats as Dictionary).get("max_difficulty", 0)) >= before_max_diff, "max difficulty tracked")
@@ -114,9 +143,10 @@ func _test_non_battle_events_advance() -> void:
 	_expect_eq(int(game.inventory.get("items_LingCao", 0)), inv_before, "game inventory unchanged during expedition")
 	game.hp = 10.0
 	expedition.runtime["hp"] = 10.0
-	expedition.current_choices = [ExpeditionEventServiceScript.by_id("qinglan_shelter")]
+	var shelter := ExpeditionEventServiceScript.by_id("common::qinglan_mountain::recover_hp")
+	expedition.current_choices = [shelter]
 	expedition.phase = "choosing"
-	expedition.choose_event("qinglan_shelter")
+	expedition.choose_event(str(shelter.get("id", "")))
 	_expect_true(float(expedition.runtime.get("hp", 0.0)) > 10.0, "recover raises hp")
 
 
@@ -314,6 +344,14 @@ func _inventory_total(inventory: Dictionary) -> int:
 	for count_v in inventory.values():
 		total += int(count_v)
 	return total
+
+
+func _find_event_by_template(pool: Array, template_id: String) -> Dictionary:
+	for event_v in pool:
+		var event := event_v as Dictionary
+		if str(event.get("template_id", "")) == template_id:
+			return event
+	return {}
 
 
 func _first_event_from_advance_steps(expedition: Node) -> Dictionary:

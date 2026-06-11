@@ -5,7 +5,11 @@ const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd"
 @onready var _bag_left: BagBaseView = $BagLeft
 @onready var _bag_right: BagBaseView = $BagRight
 @onready var _save_all_button: Button = %SaveAll
+@onready var _withdraw_all_button: Button = %WithdrawAll
 @onready var _close_button: TextureButton = %btn_close
+@onready var _storage_count: Label = %StorageCount
+@onready var _backpack_count: Label = %BackpackCount
+@onready var _status: Label = %Status
 
 
 func _ready() -> void:
@@ -14,6 +18,7 @@ func _ready() -> void:
 	_bag_left.entry_right_clicked.connect(_on_storage_entry_right_clicked)
 	_bag_right.entry_right_clicked.connect(_on_backpack_entry_right_clicked)
 	_save_all_button.pressed.connect(_deposit_all)
+	_withdraw_all_button.pressed.connect(_withdraw_all)
 	_close_button.pressed.connect(_close)
 	refresh()
 
@@ -33,6 +38,10 @@ func _close() -> void:
 func refresh() -> void:
 	_bag_left.bind_inventory(GameState.storage, GameState.storage_equips)
 	_bag_right.bind_inventory(GameState.inventory, GameState.owned_equips)
+	_storage_count.text = _inventory_summary(GameState.storage, GameState.storage_equips)
+	_backpack_count.text = _inventory_summary(GameState.inventory, GameState.owned_equips)
+	_withdraw_all_button.disabled = GameState.storage.is_empty() and GameState.storage_equips.is_empty()
+	_save_all_button.disabled = GameState.inventory.is_empty() and GameState.owned_equips.is_empty()
 
 
 func _on_backpack_entry_right_clicked(entry: Dictionary) -> void:
@@ -54,6 +63,7 @@ func _deposit_entry(entry: Dictionary) -> void:
 		var moved := InventoryServiceScript.transfer_item(GameState.inventory, GameState.storage, item_id, count)
 		if moved > 0:
 			_clear_item_slots_if_empty(item_id)
+			_show_status("已存入 %s × %d" % [_entry_name(entry), moved])
 	refresh()
 
 
@@ -65,7 +75,9 @@ func _withdraw_entry(entry: Dictionary) -> void:
 		var count := maxi(1, int(entry.get("count", 1)))
 		if item_id == "":
 			return
-		InventoryServiceScript.transfer_item(GameState.storage, GameState.inventory, item_id, count)
+		var moved := InventoryServiceScript.transfer_item(GameState.storage, GameState.inventory, item_id, count)
+		if moved > 0:
+			_show_status("已取出 %s × %d" % [_entry_name(entry), moved])
 	refresh()
 
 
@@ -75,13 +87,15 @@ func _deposit_equip(equip_id: int) -> void:
 	if not InventoryServiceScript.transfer_equip(GameState.owned_equips, GameState.storage_equips, equip_id):
 		return
 	_clear_equip_slots(equip_id)
+	_show_status("已将法宝存入仓库")
 	refresh()
 
 
 func _withdraw_equip(equip_id: int) -> void:
 	if equip_id <= 0:
 		return
-	InventoryServiceScript.transfer_equip(GameState.storage_equips, GameState.owned_equips, equip_id)
+	if InventoryServiceScript.transfer_equip(GameState.storage_equips, GameState.owned_equips, equip_id):
+		_show_status("已从仓库取出法宝")
 	refresh()
 
 
@@ -95,7 +109,33 @@ func _deposit_all() -> void:
 			continue
 		if InventoryServiceScript.transfer_equip(GameState.owned_equips, GameState.storage_equips, equip_id):
 			_clear_equip_slots(equip_id)
+	_show_status("背包物品已全部存入仓库")
 	refresh()
+
+
+func _withdraw_all() -> void:
+	InventoryServiceScript.transfer_all_items(GameState.storage, GameState.inventory)
+	InventoryServiceScript.transfer_all_equips(GameState.storage_equips, GameState.owned_equips)
+	_show_status("仓库物品已全部取出")
+	refresh()
+
+
+func _inventory_summary(inventory: Dictionary, equips: Array) -> String:
+	var stack_count := 0
+	for count_v in inventory.values():
+		stack_count += maxi(0, int(count_v))
+	return "%d 类物品 · %d 件物品 · %d 件法宝" % [inventory.size(), stack_count, equips.size()]
+
+
+func _entry_name(entry: Dictionary) -> String:
+	var display_name := str(entry.get("name", "")).strip_edges()
+	if display_name != "":
+		return display_name
+	return str(entry.get("id", "物品"))
+
+
+func _show_status(message: String) -> void:
+	_status.text = message
 
 
 func _clear_item_slots_if_empty(item_id: String) -> void:
