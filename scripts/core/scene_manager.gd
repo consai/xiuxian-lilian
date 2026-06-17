@@ -1,23 +1,41 @@
 extends Node
 
+const MAIN_MENU := "main_menu"
 const HUB := "hub"
 const WORLD_MAP := "world_map"
 const EXPEDITION_LOOP := "expedition_loop"
 const EXPEDITION_RESULT := "expedition_result"
 const FIGHT := "fight"
 const BREAKTHROUGH_SUMMARY := "breakthrough_summary"
+const CULTIVATION_PANEL := "cultivation_panel"
+const CULTIVATION_PROGRESS := "cultivation_progress"
+const ALCHEMY_PANEL := "alchemy_panel"
+const ALCHEMY_PROGRESS := "alchemy_progress"
+const ALCHEMY_RESULT := "alchemy_result"
 const CHARACTER_ATTRIBUTES_PANEL := "character_attributes_panel"
 const COMBAT_LOADOUT_PANEL := "combat_loadout_panel"
+const SKILL_RELEASE_STRATEGY_PANEL := "skill_release_strategy_panel"
+const BACKPACK_PANEL := "backpack_panel"
+const DAO_TREE_PANEL := "dao_tree_panel"
 
 const SCENE_PATHS := {
+	MAIN_MENU: "res://scenes/ui/main_menu.tscn",
 	HUB: "res://scenes/sim/cave_hub.tscn",
 	WORLD_MAP: "res://scenes/map/map.tscn",
 	EXPEDITION_LOOP: "res://scenes/expedition/expedition_loop.tscn",
 	EXPEDITION_RESULT: "res://scenes/expedition/expedition_result.tscn",
 	FIGHT: "res://scenes/fightScene.tscn",
 	BREAKTHROUGH_SUMMARY: "res://scenes/sim/breakthrough_summary.tscn",
+	CULTIVATION_PANEL: "res://scenes/sim/cultivation_panel.tscn",
+	CULTIVATION_PROGRESS: "res://scenes/sim/cultivation_progress_fullscreen.tscn",
+	ALCHEMY_PANEL: "res://scenes/sim/alchemy_panel.tscn",
+	ALCHEMY_PROGRESS: "res://scenes/sim/alchemy_progress_fullscreen.tscn",
+	ALCHEMY_RESULT: "res://scenes/sim/alchemy_result_popup.tscn",
 	CHARACTER_ATTRIBUTES_PANEL: "res://scenes/ui/character_attributes_panel.tscn",
 	COMBAT_LOADOUT_PANEL: "res://scenes/ui/combat_loadout_panel.tscn",
+	SKILL_RELEASE_STRATEGY_PANEL: "res://scenes/ui/skill_release_strategy_panel.tscn",
+	BACKPACK_PANEL: "res://scenes/ui/backpack_panel.tscn",
+	DAO_TREE_PANEL: "res://scenes/ui/dao_tree_panel.tscn",
 }
 
 const _BLOCKED_EXPEDITION_ACTIVE := "当前仍在历练中，请先完成或结算后再操作。"
@@ -43,14 +61,16 @@ func _autoload(node_name: String) -> Node:
 
 
 func go_to(scene_id: String, payload: Dictionary = {}, options: Dictionary = {}) -> Dictionary:
+	if bool(options.get("reset_history", false)):
+		_data_store().reset_scene_runtime()
 	var guard := _guard_enter(scene_id, options)
 	if not bool(guard.get("ok", false)):
 		return guard
 	return _perform_transition(scene_id, payload, true)
 
 
-func go_hub(payload: Dictionary = {}) -> Dictionary:
-	return go_to(HUB, payload)
+func go_hub(payload: Dictionary = {}, options: Dictionary = {}) -> Dictionary:
+	return go_to(HUB, payload, options)
 
 
 func go_world_map() -> Dictionary:
@@ -68,6 +88,9 @@ func start_expedition(location_id: String, seed_override: int = -1) -> Dictionar
 	var started: Dictionary = expedition.start(location_id, game_state, seed_override)
 	if not bool(started.get("ok", false)):
 		return started
+	var tutorial := _autoload("TutorialService")
+	if tutorial != null and tutorial.has_method("game_event"):
+		tutorial.call("game_event", "tutorial.expedition_started")
 	var nav := go_expedition_loop()
 	if not bool(nav.get("ok", false)):
 		expedition.reset()
@@ -85,11 +108,51 @@ func go_expedition_result(reason: String = "manual") -> Dictionary:
 	return go_to(EXPEDITION_RESULT, payload)
 
 
+func go_breakthrough_panel() -> Dictionary:
+	return go_to(BREAKTHROUGH_SUMMARY, {"mode": "panel"})
+
+
+func go_cultivation_panel() -> Dictionary:
+	return go_to(CULTIVATION_PANEL)
+
+
+func go_alchemy_panel() -> Dictionary:
+	return go_to(ALCHEMY_PANEL)
+
+
+func go_alchemy_progress(session: Dictionary) -> Dictionary:
+	var payload := session.duplicate(true)
+	if str(payload.get("recipe_id", "")).strip_edges() == "":
+		return {"ok": false, "error": "缺少丹方"}
+	if str(payload.get("strategy_id", "")).strip_edges() == "":
+		return {"ok": false, "error": "缺少炼制策略"}
+	if int(payload.get("days", 0)) <= 0:
+		return {"ok": false, "error": "炼制天数无效"}
+	return go_to(ALCHEMY_PROGRESS, payload)
+
+
+func go_alchemy_result(result: Dictionary) -> Dictionary:
+	if not bool(result.get("ok", false)):
+		return {"ok": false, "error": str(result.get("error", "炼丹结果无效"))}
+	return go_to(ALCHEMY_RESULT, result.duplicate(true))
+
+
+func go_cultivation_progress(session: Dictionary) -> Dictionary:
+	var payload := session.duplicate(true)
+	if str(payload.get("mode_id", "")).strip_edges() == "":
+		return {"ok": false, "error": "缺少修炼方式"}
+	if int(payload.get("days", 0)) <= 0:
+		return {"ok": false, "error": "闭关天数无效"}
+	return go_to(CULTIVATION_PROGRESS, payload)
+
+
 func go_breakthrough_summary(summary: Dictionary) -> Dictionary:
-	var payload := ScenePayload.breakthrough_summary(summary)
-	if payload.is_empty():
+	var payload := summary.duplicate(true)
+	payload["mode"] = "result"
+	var validated := ScenePayload.breakthrough_summary(payload)
+	if validated.is_empty():
 		return {"ok": false, "error": "invalid_breakthrough_summary_payload"}
-	return go_to(BREAKTHROUGH_SUMMARY, payload)
+	return go_to(BREAKTHROUGH_SUMMARY, validated)
 
 
 func go_character_attributes_panel() -> Dictionary:
@@ -98,6 +161,22 @@ func go_character_attributes_panel() -> Dictionary:
 
 func go_combat_loadout_panel() -> Dictionary:
 	return go_to(COMBAT_LOADOUT_PANEL)
+
+
+func go_skill_release_strategy_panel() -> Dictionary:
+	return go_to(SKILL_RELEASE_STRATEGY_PANEL)
+
+
+func go_backpack_panel() -> Dictionary:
+	return go_to(BACKPACK_PANEL)
+
+
+func go_dao_tree_panel() -> Dictionary:
+	var guard := _guard_enter(DAO_TREE_PANEL, {})
+	if not bool(guard.get("ok", false)):
+		return guard
+	# 大道树是人物配置中的同级视图，不额外占用返回栈层级。
+	return _perform_transition(DAO_TREE_PANEL, {}, false)
 
 
 func go_back(fallback_scene_id: String = HUB, options: Dictionary = {}) -> Dictionary:

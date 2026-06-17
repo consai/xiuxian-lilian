@@ -45,6 +45,7 @@ func _ready() -> void:
 	_experience_tab.pressed.connect(func() -> void: _select_tab(Tab.EXPERIENCE))
 	_statistics_tab.pressed.connect(func() -> void: _select_tab(Tab.STATISTICS))
 	_loadout_tab.pressed.connect(func() -> void: SceneManager.go_combat_loadout_panel())
+	_experience_tab.pressed.connect(func() -> void: SceneManager.go_dao_tree_panel())
 	_select_tab(Tab.ATTRIBUTES)
 	refresh()
 
@@ -56,6 +57,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func refresh() -> void:
+	GameState.refresh_derived_attrs(true)
 	_bind_identity()
 	_bind_vitals()
 	_bind_combat_stats()
@@ -197,4 +199,5 @@ func _statistics_text() -> String:
 
 
 func _on_close_pressed() -> void:
+	TutorialService.game_event("tutorial.attributes_closed")
 	SceneManager.go_back()

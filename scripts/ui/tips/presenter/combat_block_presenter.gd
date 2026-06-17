@@ -70,7 +70,7 @@ func _resolve_block_label() -> Label:
 	var scene := tree.current_scene
 	if scene == null:
 		return null
-	return scene.find_child("block_reason_tip", true, false) as Label
+	return scene.get_node_or_null("%block_reason_tip") as Label
 
 
 func _ensure_base_position(label: Label) -> Vector2:

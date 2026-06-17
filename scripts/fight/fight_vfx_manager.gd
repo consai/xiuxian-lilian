@@ -87,8 +87,6 @@ func ensure_actor_registered(unit_id: String, sprite: Node2D, vfx_settings: Comb
 	if existing != null and is_instance_valid(existing):
 		existing.bind_actor(sprite)
 		_actors[id] = existing
-		if BattleDebugLog.enabled:
-			BattleDebugLog.write("特效", "确认战斗角色", _actor_debug_row(id, sprite, existing, "已存在"))
 		return existing
 	return register_actor(id, sprite, vfx_settings)
 

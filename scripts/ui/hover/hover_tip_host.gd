@@ -36,8 +36,6 @@ func show_for(source: Control, payload: Dictionary, delay_ms: int = 280) -> void
 		return
 	if not is_instance_valid(source):
 		return
-	if not source.get_global_rect().has_point(source.get_global_mouse_position()):
-		return
 	_present_now(token)
 
 
@@ -58,7 +56,7 @@ func hide_for(source: Control, delay_ms: int = 80) -> void:
 		return
 	if not is_instance_valid(source):
 		return
-	if source.get_global_rect().has_point(source.get_global_mouse_position()):
+	if _source_still_hovered(source):
 		return
 	_hide_now(token)
 
@@ -91,3 +89,15 @@ func _hide_now(token: int) -> void:
 	_pending_payload = {}
 	if _panel != null:
 		_panel.hide_immediate()
+
+
+func _source_still_hovered(source: Control) -> bool:
+	if source == null or not is_instance_valid(source):
+		return false
+	var vp := source.get_viewport()
+	if vp == null:
+		return false
+	var hovered: Control = vp.gui_get_hovered_control()
+	if hovered == null:
+		return source.get_global_rect().has_point(source.get_global_mouse_position())
+	return hovered == source or source.is_ancestor_of(hovered)

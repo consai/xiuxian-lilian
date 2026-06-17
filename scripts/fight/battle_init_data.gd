@@ -8,7 +8,7 @@ const EnumQualityScript = preload("res://scripts/enum/enum_quality.gd")
 
 const META_SCHEMA_VERSION := 2
 
-const SETUP_KEYS := ["player", "enemy", "battle_time_limit"]
+const SETUP_KEYS := ["player", "battle_time_limit"]
 const COMBATANT_KEYS := ["hp", "mp", "attrs", "skills"]
 const ATTR_KEYS := FightAttr.CORE_KEYS
 
@@ -162,8 +162,7 @@ static func merge_skill_cfg_from_tables(data: Dictionary) -> Dictionary:
 		if cm != null and cm.has_method("battle_time_limit_default"):
 			out["battle_time_limit"] = cm.call("battle_time_limit_default")
 		else:
-			var bundle: Dictionary = JsonLoader.load_skills_bundle()
-			out["battle_time_limit"] = maxf(1.0, float(bundle.get("battle_time_limit", 200.0)))
+			out["battle_time_limit"] = 200.0
 	return out
 
 
@@ -180,11 +179,11 @@ static func validate_setup(data: Dictionary) -> PackedStringArray:
 		_append_combatant_errors(errors, "player", player_v as Dictionary)
 	else:
 		errors.append("player 必须为 Dictionary")
-	var enemy_v: Variant = data.get("enemy")
-	if enemy_v is Dictionary:
-		_append_combatant_errors(errors, "enemy", enemy_v as Dictionary)
-	else:
-		errors.append("enemy 必须为 Dictionary")
+	var enemy_rows := _extract_enemy_rows(data)
+	if enemy_rows.is_empty():
+		errors.append("缺少 enemy 或 enemies")
+	for i in enemy_rows.size():
+		_append_combatant_errors(errors, "enemies[%d]" % i, enemy_rows[i] as Dictionary)
 	if not data.has("skill_cfg"):
 		errors.append("缺少 skill_cfg（请先调用 merge_skill_cfg_from_tables）")
 	var skill_cfg_v: Variant = data.get("skill_cfg")
@@ -192,9 +191,11 @@ static func validate_setup(data: Dictionary) -> PackedStringArray:
 		errors.append("skill_cfg 必须为 Dictionary")
 	elif skill_cfg_v is Dictionary and player_v is Dictionary:
 		_validate_slot_ids(errors, "player.skills", (player_v as Dictionary).get("skills"), skill_cfg_v as Dictionary)
-		if enemy_v is Dictionary:
-			_validate_slot_ids(errors, "enemy.skills", (enemy_v as Dictionary).get("skills"), skill_cfg_v as Dictionary)
-			_validate_enemy_ai_cfg(errors, enemy_v as Dictionary, skill_cfg_v as Dictionary)
+		for i in enemy_rows.size():
+			var label := "enemies[%d]" % i
+			var enemy_row := enemy_rows[i] as Dictionary
+			_validate_slot_ids(errors, "%s.skills" % label, enemy_row.get("skills"), skill_cfg_v as Dictionary)
+			_validate_enemy_ai_cfg(errors, enemy_row, skill_cfg_v as Dictionary)
 	var limit_v: Variant = data.get("battle_time_limit")
 	if limit_v != null and not (limit_v is int or limit_v is float):
 		errors.append("battle_time_limit 必须为数值")
@@ -217,6 +218,8 @@ static func validate_setup(data: Dictionary) -> PackedStringArray:
 		var p_equips: Variant = (player_v as Dictionary).get("equips", [])
 		if p_equips is Array:
 			_validate_equip_slot_ids(errors, "player.equips", p_equips, equip_cfg_v)
+	if data.has("enemy_formation") and not data.get("enemy_formation") is Dictionary:
+		errors.append("enemy_formation 必须为 Dictionary")
 	return errors
 
 
@@ -523,6 +526,45 @@ static func _enemy_equip_slot_has_id(enemy_row: Dictionary, slot_index: int) -> 
 	return int((slot_v as Dictionary).get("id", -1)) >= 0
 
 
+static func _extract_enemy_rows(data: Dictionary) -> Array:
+	var rows: Array = []
+	var enemies_v: Variant = data.get("enemies", null)
+	if enemies_v is Array:
+		for enemy_v in enemies_v as Array:
+			if enemy_v is Dictionary:
+				rows.append((enemy_v as Dictionary).duplicate(true))
+	if rows.is_empty():
+		var enemy_v: Variant = data.get("enemy", null)
+		if enemy_v is Dictionary:
+			rows.append((enemy_v as Dictionary).duplicate(true))
+	return rows
+
+
+static func _duplicate_enemy_rows(rows: Array) -> Array:
+	var out: Array = []
+	for row_v in rows:
+		if row_v is Dictionary:
+			out.append((row_v as Dictionary).duplicate(true))
+	return out
+
+
+static func _enemy_group_record_name(rows: Array) -> String:
+	if rows.is_empty():
+		return ""
+	var names: Array[String] = []
+	for row_v in rows:
+		if not row_v is Dictionary:
+			continue
+		var n := str((row_v as Dictionary).get("name", "")).strip_edges()
+		if n != "":
+			names.append(n)
+	if names.size() == 1:
+		return names[0]
+	if names.is_empty():
+		return "敌群 x%d" % rows.size()
+	return "%s 等 x%d" % [names[0], rows.size()]
+
+
 static func _collect_enemy_skill_ids(slots_v: Variant) -> Dictionary:
 	var out := {}
 	if not slots_v is Array:
@@ -539,12 +581,22 @@ static func _collect_enemy_skill_ids(slots_v: Variant) -> Dictionary:
 static func _build_setup(merged: Dictionary) -> BattleSetupScript:
 	var setup := BattleSetupScript.new()
 	var player_row: Dictionary = (merged["player"] as Dictionary).duplicate(true)
-	var enemy_row: Dictionary = (merged["enemy"] as Dictionary).duplicate(true)
-	_apply_spd_jitter_from_setup(player_row, enemy_row, merged)
+	var enemy_rows := _extract_enemy_rows(merged)
+	if enemy_rows.is_empty():
+		return null
+	_apply_spd_jitter_from_setup(player_row, enemy_rows, merged)
 	setup.player_row = player_row
-	setup.enemy_row = enemy_row
+	setup.enemy_rows = _duplicate_enemy_rows(enemy_rows)
+	setup.enemy_row = (setup.enemy_rows[0] as Dictionary).duplicate(true)
 	setup.player = create_fight_obj("player", player_row)
-	setup.enemy = create_fight_obj("enemy", enemy_row)
+	setup.enemies = []
+	for i in enemy_rows.size():
+		var enemy_obj := create_fight_obj("enemy%d" % i, enemy_rows[i] as Dictionary)
+		if enemy_obj == null:
+			push_error("BattleInitData._build_setup: 无法创建第 %d 个敌方 FightObj" % (i + 1))
+			return null
+		setup.enemies.append(enemy_obj)
+	setup.enemy = setup.enemies[0] as FightObj
 	if setup.player == null or setup.enemy == null:
 		push_error("BattleInitData._build_setup: 无法创建 FightObj")
 		return null
@@ -560,25 +612,31 @@ static func _build_setup(merged: Dictionary) -> BattleSetupScript:
 	var auto_v: Variant = merged.get("auto_battle")
 	if auto_v is Dictionary:
 		setup.auto_battle = (auto_v as Dictionary).duplicate(true)
+	var formation_v: Variant = merged.get("enemy_formation", {})
+	if formation_v is Dictionary:
+		setup.enemy_formation = (formation_v as Dictionary).duplicate(true)
 	setup.record_names = {
 		BattleRecordTypesScript.UNIT_PLAYER: str(player_row.get("name", "")).strip_edges(),
-		BattleRecordTypesScript.UNIT_ENEMY: str(enemy_row.get("name", "")).strip_edges(),
+		BattleRecordTypesScript.UNIT_ENEMY: _enemy_group_record_name(setup.enemy_rows),
 	}
 	setup.ui_payload = build_apply_battle_payload(
 		setup.player,
 		setup.enemy,
 		player_row,
-		enemy_row,
+		setup.enemy_row,
 		setup.skill_cfg,
 		setup.item_cfg,
 		setup.equip_cfg
 	)
+	setup.ui_payload["enemy_count"] = setup.enemies.size()
+	setup.ui_payload["enemy_index"] = 0
+	setup.ui_payload["enemy_formation"] = setup.enemy_formation.duplicate(true)
 	return setup
 
 
 static func _apply_spd_jitter_from_setup(
 		player_row: Dictionary,
-		enemy_row: Dictionary,
+		enemy_rows: Array,
 		data: Dictionary
 ) -> void:
 	if not data.has("spd_jitter_ratio"):
@@ -589,8 +647,9 @@ static func _apply_spd_jitter_from_setup(
 	var ratio := float(ratio_v)
 	if not player_row.has("spd_jitter_ratio"):
 		player_row["spd_jitter_ratio"] = ratio
-	if not enemy_row.has("spd_jitter_ratio"):
-		enemy_row["spd_jitter_ratio"] = ratio
+	for row_v in enemy_rows:
+		if row_v is Dictionary and not (row_v as Dictionary).has("spd_jitter_ratio"):
+			(row_v as Dictionary)["spd_jitter_ratio"] = ratio
 
 
 static func create_fight_obj(side: String, row: Dictionary) -> FightObj:
@@ -901,7 +960,8 @@ static func sample_for_editor() -> Dictionary:
 			},
 			"attrs": FightAttr.from_stat_block({
 				FightAttr.MP_MAX: 50.0,
-				FightAttr.ATK: 80.0,
+				FightAttr.PHYSICAL_ATK: 80.0,
+				FightAttr.MAGIC_ATK: 80.0,
 				FightAttr.CRIT: 5.0,
 				FightAttr.CRIT_DAMAGE: 150.0,
 			}),
@@ -933,17 +993,17 @@ static func _get_config_manager() -> Node:
 
 
 static func _build_skill_cfg_fallback(partial: Dictionary) -> Dictionary:
-	var bundle: Dictionary = JsonLoader.load_skills_bundle()
+	const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
+	var bundle: Dictionary = AbilityServiceScript.build_skill_cfg({})
 	var out: Dictionary = {}
-	var skills_v: Variant = bundle.get("skills", [])
-	if skills_v is Array:
-		for sv in skills_v as Array:
-			if not sv is SkillDef:
+	var skills_v: Variant = bundle.get("skills", {})
+	if skills_v is Dictionary:
+		for key in (skills_v as Dictionary).keys():
+			var row_v: Variant = (skills_v as Dictionary)[key]
+			if not row_v is Dictionary:
 				continue
-			var row := (sv as SkillDef).to_runtime_dict()
-			var sid := int(row.get("id", -1))
-			if sid < 0:
-				continue
+			var row := (row_v as Dictionary).duplicate(true)
+			var sid := int(key)
 			out[sid] = row
 			out[str(sid)] = row
 	if partial.is_empty():
@@ -1037,6 +1097,8 @@ static func _resolve_icon_texture(cfg: Dictionary) -> Texture2D:
 	var icon_v: Variant = cfg.get("icon")
 	if icon_v is Texture2D:
 		return icon_v
+	if icon_v == null:
+		return null
 	var path := str(icon_v).strip_edges()
 	if path == "":
 		return null

@@ -13,12 +13,16 @@ static func build(skill_id: int, icon: Texture2D = null) -> Dictionary:
 		title = "技能 %d" % skill_id
 	var quality := maxi(1, int(cfg.get("quality", 1)))
 	var lines: Array[String] = []
-	var mp_cost := float(cfg.get("mp_cost", 0.0))
-	if mp_cost > 0.0:
-		lines.append(StringsZh.format_template(
-			StringsZh.getp("hover.skill.mp_cost", "法力消耗：{value}"),
-			{"value": _fmt_num(mp_cost)}
-		))
+	var cost_text := str(cfg.get("cost_text", "")).strip_edges()
+	if cost_text != "":
+		lines.append("消耗：%s" % cost_text)
+	else:
+		var mp_cost := float(cfg.get("mp_cost", 0.0))
+		if mp_cost > 0.0:
+			lines.append(StringsZh.format_template(
+				StringsZh.getp("hover.skill.mp_cost", "法力消耗：{value}"),
+				{"value": _fmt_num(mp_cost)}
+			))
 	var cd := float(cfg.get("cd", cfg.get("cd_total", 0.0)))
 	if cd > 0.0:
 		lines.append(StringsZh.format_template(

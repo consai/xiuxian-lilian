@@ -13,6 +13,7 @@
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="16_body"]
 [ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="17_small"]
 [ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="19_press"]
+[ext_resource type="Script" path="res://scripts/ui/components/long_press_scroll_container.gd" id="20_lpsc"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hp_bar.tscn" id="20_hp_bar"]
 [ext_resource type="PackedScene" path="res://scenes/ui/mp_bar.tscn" id="21_mp_bar"]
 
@@ -202,6 +203,7 @@ label_settings = ExtResource("16_body")
 
 [node name="RewardsScroll" type="ScrollContainer" parent="Dialog/LeftCard" unique_id=1846102942]
 unique_name_in_owner = true
+script = ExtResource("20_lpsc")
 layout_mode = 0
 offset_left = 17.0
 offset_top = 268.0

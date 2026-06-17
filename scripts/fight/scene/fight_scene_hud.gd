@@ -6,6 +6,8 @@ extends RefCounted
 const SKILL_BACK := Color(0.933, 0.804, 0.702)
 
 var _refs: FightSceneHudRefs
+var _enemy_slot_nodes: Dictionary = {}
+var _enemy_actor_nodes: Dictionary = {}
 
 
 func bind(refs: FightSceneHudRefs) -> void:
@@ -27,10 +29,10 @@ func get_chk_auto_player() -> CheckButton:
 func apply_battle(ctx: FightSceneContext, data: Dictionary) -> void:
 	var player_v: Variant = data.get("player", {})
 	if player_v is Dictionary:
-		apply_combatant("left", player_v as Dictionary)
+		apply_combatant(ctx, "left", player_v as Dictionary)
 	var enemy_v: Variant = data.get("enemy", {})
 	if enemy_v is Dictionary:
-		apply_combatant("right", enemy_v as Dictionary)
+		apply_combatant(ctx, "right", enemy_v as Dictionary)
 	var intervals_v: Variant = data.get("intervals", {})
 	if intervals_v is Dictionary:
 		var id := intervals_v as Dictionary
@@ -39,9 +41,10 @@ func apply_battle(ctx: FightSceneContext, data: Dictionary) -> void:
 	apply_skill_row(ctx.skill_slots, data.get("skills", []), ctx.skill_slot_interactive, "skill")
 	apply_skill_row(ctx.equip_slots, data.get("equips", []), ctx.equip_slot_interactive, "equip")
 	apply_skill_row(ctx.item_slots, data.get("items", []), ctx.item_slot_interactive, "item")
+	collect_enemy_formation_slots()
 
 
-func apply_combatant(side: String, row: Dictionary) -> void:
+func apply_combatant(ctx: FightSceneContext, side: String, row: Dictionary) -> void:
 	if not row.has("hp") or not row.has("hp_max") or not row.has("mp") or not row.has("mp_max"):
 		push_error("FightSceneHud.apply_combatant(%s): 缺少 hp/hp_max/mp/mp_max" % side)
 		return
@@ -59,23 +62,21 @@ func apply_combatant(side: String, row: Dictionary) -> void:
 			_refs.head_left.texture = avatar_v
 			if _refs.interval_left != null:
 				_refs.interval_left.set_avatar_texture(avatar_v)
-		if sprite_tex_v is Texture2D:
-			_refs.sprite_left.texture = sprite_tex_v
 	else:
-		if name_text != "":
-			_refs.rolename_right.text = name_text
 		if avatar_v is Texture2D:
-			_refs.head_right.texture = avatar_v
 			if _refs.interval_right != null:
 				_refs.interval_right.set_avatar_texture(avatar_v)
 		if sprite_tex_v is Texture2D:
 			_refs.sprite_right.texture = sprite_tex_v
+		return
 	set_combatant_vitals(side, hp, hp_max, mp, mp_max)
 	var shield := 0.0
 	var attrs_v: Variant = row.get("attrs", null)
 	if attrs_v is Dictionary:
 		shield = float((attrs_v as Dictionary).get(FightAttr.SHIELD, 0.0))
 	set_combatant_shield(side, shield, hp_max)
+	if side == "left":
+		_apply_player_slot(ctx, row)
 
 
 func set_interval(side: String, elapsed: float, cap: float) -> void:
@@ -136,6 +137,7 @@ func set_combatant_shield(side: String, shield: float, hp_max: float) -> void:
 func sync_from_domain(ctx: FightSceneContext) -> void:
 	if ctx.domain == null:
 		return
+	collect_enemy_formation_slots()
 	sync_fight_time_label(ctx)
 	set_combatant_vitals(
 		"left",
@@ -149,18 +151,9 @@ func sync_from_domain(ctx: FightSceneContext) -> void:
 		ctx.domain.player.get_attr(FightAttr.SHIELD),
 		ctx.domain.player.get_hp_max()
 	)
-	set_combatant_vitals(
-		"right",
-		ctx.domain.enemy.hp,
-		ctx.domain.enemy.get_hp_max(),
-		ctx.domain.enemy.mp,
-		ctx.domain.enemy.get_mp_max()
-	)
-	set_combatant_shield(
-		"right",
-		ctx.domain.enemy.get_attr(FightAttr.SHIELD),
-		ctx.domain.enemy.get_hp_max()
-	)
+	sync_enemy_header(ctx)
+	sync_player_slot(ctx)
+	sync_enemy_formation(ctx)
 	var intervals_v: Variant = ctx.domain.get_ui_snapshot().get("intervals", {})
 	if intervals_v is Dictionary:
 		var id := intervals_v as Dictionary
@@ -168,16 +161,185 @@ func sync_from_domain(ctx: FightSceneContext) -> void:
 		_set_interval_bar(_refs.interval_right, id.get("right", {}))
 	sync_skill_cooldowns(ctx)
 	sync_item_and_equip_runtime_ui(ctx)
-	sync_buff_status_bars(ctx)
 
 
-func sync_buff_status_bars(ctx: FightSceneContext) -> void:
-	if ctx.domain == null:
+func sync_player_slot(ctx: FightSceneContext) -> void:
+	var unit := ctx.domain.player if ctx.domain != null else ctx.battle_player
+	if unit == null:
+		if _refs.sprite_left != null:
+			_refs.sprite_left.visible = false
 		return
-	if _refs.buff_status_left != null:
-		_refs.buff_status_left.sync_buffs(ctx.domain.player.buffs)
-	if _refs.buff_status_right != null:
-		_refs.buff_status_right.sync_buffs(ctx.domain.enemy.buffs)
+	var row: Dictionary = ctx.battle_player_row.duplicate(true)
+	if row.is_empty():
+		row = {
+			"name": str(ctx.record_names.get(FightSceneContext.UNIT_PLAYER, "玩家")),
+		}
+	row["hp"] = unit.hp
+	row["hp_max"] = unit.get_hp_max()
+	_apply_player_slot(ctx, row)
+
+
+func _apply_player_slot(ctx: FightSceneContext, row: Dictionary) -> void:
+	var slot := _refs.sprite_left
+	if slot == null:
+		return
+	var unit := ctx.domain.player if ctx.domain != null else ctx.battle_player
+	if unit == null:
+		slot.visible = false
+		return
+	var dead := unit.hp <= 0.0
+	slot.apply_slot(row, unit, {}, true, dead)
+	if _refs.vfx != null:
+		_refs.vfx.ensure_actor_registered(FightSceneContext.UNIT_PLAYER, slot)
+
+
+func collect_enemy_formation_slots() -> void:
+	if _refs == null or _refs.center == null:
+		return
+	if not _enemy_slot_nodes.is_empty():
+		return
+	for child in _refs.center.get_children():
+		if child is Node2D and str(child.name).begins_with("EnemySlot_"):
+			var slot_index := int(str(child.name).trim_prefix("EnemySlot_"))
+			_enemy_slot_nodes[slot_index] = child
+
+
+func sync_enemy_formation(ctx: FightSceneContext) -> void:
+	if ctx.domain == null or _refs.center == null:
+		return
+	var formation := ctx.domain.get_formation_snapshot()
+	var slots_v: Variant = formation.get("slots", [])
+	if not slots_v is Array:
+		return
+	var seen := {}
+	_enemy_actor_nodes.clear()
+	for slot_v in slots_v as Array:
+		if not slot_v is Dictionary:
+			continue
+		var slot := slot_v as Dictionary
+		var slot_index := int(slot.get("slot", -1))
+		if slot_index < 0:
+			continue
+		seen[slot_index] = true
+		var node := _enemy_slot_nodes.get(slot_index, null) as Node2D
+		if node != null:
+			_apply_enemy_slot_node(ctx, node, slot)
+	for key in _enemy_slot_nodes.keys():
+		if not seen.has(int(key)):
+			var old := _enemy_slot_nodes[key] as Node2D
+			if old != null:
+				old.visible = false
+
+
+func _apply_enemy_slot_node(ctx: FightSceneContext, node: Node2D, slot: Dictionary) -> void:
+	var empty := bool(slot.get("empty", false))
+	node.visible = not empty
+	if empty:
+		return
+	var active := bool(slot.get("active", false))
+	var dead := bool(slot.get("dead", false))
+	var enemy_index := int(slot.get("enemy_index", -1))
+	var unit := ctx.domain._enemy_at(enemy_index)
+	var row_data: Dictionary = {}
+	if enemy_index >= 0 and enemy_index < ctx.battle_enemy_rows.size() and ctx.battle_enemy_rows[enemy_index] is Dictionary:
+		row_data = ctx.battle_enemy_rows[enemy_index] as Dictionary
+	var intent_row := _resolve_enemy_intent_row(ctx, enemy_index) if active and not dead else {}
+	if node.has_method("apply_slot"):
+		node.call("apply_slot", row_data, unit, intent_row, active, dead)
+	var actor_id := str(slot.get("actor_id", ""))
+	if actor_id != "":
+		_enemy_actor_nodes[actor_id] = node
+		if _refs.vfx != null:
+			_refs.vfx.ensure_actor_registered(actor_id, node)
+	if bool(slot.get("current", false)):
+		_enemy_actor_nodes[FightSceneContext.UNIT_ENEMY] = node
+		if _refs.vfx != null:
+			_refs.vfx.ensure_actor_registered(FightSceneContext.UNIT_ENEMY, node)
+
+
+func _resolve_enemy_intent_row(ctx: FightSceneContext, enemy_index: int) -> Dictionary:
+	var decision := FightSceneActions.preview_enemy_action(ctx, enemy_index)
+	match str(decision.get("action_type", "")):
+		"skill":
+			return _build_skill_intent_row(
+				ctx,
+				enemy_index,
+				int(decision.get("skill_id", -1)),
+				"skill"
+			)
+		"basic":
+			return _build_skill_intent_row(ctx, enemy_index, 0, "basic")
+		"item":
+			var unit := ctx.domain._enemy_at(enemy_index)
+			var slot := unit.get_item_slot_at(int(decision.get("slot_index", -1))) if unit != null else {}
+			var item_id := int(slot.get("id", -1))
+			var item_cfg := FightObj._lookup_cfg(ctx.item_cfg, item_id)
+			return {
+				"action_type": "item",
+				"item_id": item_id,
+				"icon": BattleInitData._resolve_icon_texture(item_cfg),
+				"count": int(slot.get("count", 0)),
+				"back_color": BattleInitData._quality_back_color(int(item_cfg.get("quality", 1))),
+			}
+		"equip":
+			var unit2 := ctx.domain._enemy_at(enemy_index)
+			var slot2 := unit2.get_equip_slot_at(int(decision.get("slot_index", -1))) if unit2 != null else {}
+			var equip_id := int(slot2.get("id", -1))
+			var equip_cfg := FightObj._lookup_cfg(ctx.equip_cfg, equip_id)
+			return {
+				"action_type": "equip",
+				"equip_id": equip_id,
+				"icon": BattleInitData._resolve_icon_texture(equip_cfg),
+				"effects": (slot2.get("effects", equip_cfg.get("effects", [])) as Array).duplicate(true),
+				"back_color": BattleInitData._quality_back_color(int(equip_cfg.get("quality", 1))),
+			}
+		_:
+			return _build_skill_intent_row(ctx, enemy_index, 0, "basic")
+
+
+func _build_skill_intent_row(
+		ctx: FightSceneContext,
+		enemy_index: int,
+		skill_id: int,
+		action_type: String,
+) -> Dictionary:
+	var cfg := FightObj._lookup_cfg(ctx.skill_cfg, skill_id)
+	var row := {
+		"action_type": action_type,
+		"skill_id": skill_id,
+		"icon": _resolve_skill_cfg_icon(ctx, skill_id),
+		"back_color": BattleInitData._quality_back_color(int(cfg.get("quality", 1))),
+	}
+	if ctx.battle_player == null or ctx.domain == null:
+		return row
+	var unit := ctx.domain._enemy_at(enemy_index)
+	if unit == null:
+		return row
+	var preview_unit := FightSceneActions._enemy_unit_for_intent_preview(ctx, enemy_index, unit)
+	return EnemyIntentPreview.enrich_skill_row(row, preview_unit, ctx.battle_player, cfg, skill_id)
+
+
+func _resolve_skill_cfg_icon(ctx: FightSceneContext, skill_id: int) -> Texture2D:
+	var tex := BattleInitData._resolve_icon_texture(FightObj._lookup_cfg(ctx.skill_cfg, skill_id))
+	if tex != null:
+		return tex
+	return BattleInitData._resolve_icon_texture({"icon": "ui_new/skill_03.png"})
+
+
+func sync_enemy_header(ctx: FightSceneContext) -> void:
+	if ctx.domain == null or ctx.domain.enemy == null:
+		return
+	ctx.battle_enemy = ctx.domain.enemy
+	var idx := ctx.domain.active_enemy_index
+	var row: Dictionary = {}
+	if idx >= 0 and idx < ctx.battle_enemy_rows.size() and ctx.battle_enemy_rows[idx] is Dictionary:
+		row = (ctx.battle_enemy_rows[idx] as Dictionary)
+	var avatar := BattleInitData._resolve_avatar_texture(row)
+	if avatar != null and _refs.interval_right != null:
+		_refs.interval_right.set_avatar_texture(avatar)
+	var sprite_v: Variant = row.get("sprite")
+	if sprite_v is Texture2D and _refs.sprite_right != null:
+		_refs.sprite_right.texture = sprite_v
 
 
 func sync_fight_time_label(ctx: FightSceneContext) -> void:
@@ -301,32 +463,9 @@ func apply_skill_row(
 			interactive_out.append(false)
 			continue
 		var row := row_arr[i] as Dictionary
-		var icon_v: Variant = row.get("icon")
-		var back_v: Variant = row.get("back_color")
-		var back: Color = back_v as Color if back_v is Color else SKILL_BACK
-		var tex: Texture2D = icon_v as Texture2D if icon_v is Texture2D else null
-		slot.setup(str(row.get("name", "")), tex, back)
-		var count_v = row.get("count", null)
-		if count_v is int:
-			slot.set_stack_count(int(count_v))
-		else:
-			slot.set_stack_count(-1)
-		var cd_rem := float(row.get("cd_remaining", 0.0))
-		var cd_total := float(row.get("cd_total", -1.0))
-		slot.set_cooldown(cd_rem, cd_total)
+		slot.apply_battle_row(row, slot_kind)
 		var usable := bool(row.get("usable", true))
 		interactive_out.append(usable)
-		match slot_kind:
-			"item":
-				slot.bind_hover_item(int(row.get("item_id", -1)), tex, int(row.get("count", -1)))
-			"equip":
-				slot.bind_hover_equip(
-					int(row.get("equip_id", row.get("item_id", -1))),
-					tex,
-					row.get("effects", [])
-				)
-			_:
-				slot.bind_hover_skill(int(row.get("skill_id", -1)), tex)
 
 
 func setup_battle_vfx(ctx: FightSceneContext) -> void:
@@ -341,12 +480,16 @@ func setup_battle_vfx(ctx: FightSceneContext) -> void:
 func register_battle_actors(ctx: FightSceneContext) -> void:
 	if _refs.vfx == null or ctx.scene == null:
 		return
-	if not is_instance_valid(_refs.sprite_left) or not is_instance_valid(_refs.sprite_right):
-		push_warning("FightScene: 战斗精灵未就绪，延后注册 VFX 角色")
+	if not is_instance_valid(_refs.sprite_left):
+		push_warning("FightScene: 玩家战斗精灵未就绪，延后注册 VFX 角色")
 		ctx.scene.call_deferred("_deferred_register_vfx_actors")
 		return
 	_refs.vfx.register_actor(FightSceneContext.UNIT_PLAYER, _refs.sprite_left)
-	_refs.vfx.register_actor(FightSceneContext.UNIT_ENEMY, _refs.sprite_right)
+	var enemy_node := _actor_node_for_unit(FightSceneContext.UNIT_ENEMY)
+	if is_instance_valid(enemy_node):
+		_refs.vfx.register_actor(FightSceneContext.UNIT_ENEMY, enemy_node)
+	elif is_instance_valid(_refs.sprite_right):
+		_refs.vfx.register_actor(FightSceneContext.UNIT_ENEMY, _refs.sprite_right)
 	_refs.vfx.refresh_all_actors()
 	BattleDebugLog.write("场景", "VFX 角色注册完成", {
 		"玩家": sprite_vfx_snapshot(FightSceneContext.UNIT_PLAYER),
@@ -359,7 +502,14 @@ func ensure_vfx_actors_for_combat() -> void:
 		return
 	if is_instance_valid(_refs.sprite_left):
 		_refs.vfx.ensure_actor_registered(FightSceneContext.UNIT_PLAYER, _refs.sprite_left)
-	if is_instance_valid(_refs.sprite_right):
+	for actor_id in _enemy_actor_nodes.keys():
+		var actor_node := _enemy_actor_nodes[actor_id] as Node2D
+		if is_instance_valid(actor_node):
+			_refs.vfx.ensure_actor_registered(str(actor_id), actor_node)
+	var enemy_node := _actor_node_for_unit(FightSceneContext.UNIT_ENEMY)
+	if is_instance_valid(enemy_node):
+		_refs.vfx.ensure_actor_registered(FightSceneContext.UNIT_ENEMY, enemy_node)
+	elif is_instance_valid(_refs.sprite_right):
 		_refs.vfx.ensure_actor_registered(FightSceneContext.UNIT_ENEMY, _refs.sprite_right)
 
 
@@ -380,12 +530,24 @@ func sprite_vfx_snapshot(unit_id: String) -> Dictionary:
 
 
 func unit_screen_pos(ctx: FightSceneContext, unit_id: String) -> Vector2:
-	var sprite: Node2D = (
-		_refs.sprite_left if unit_id == FightSceneContext.UNIT_PLAYER else _refs.sprite_right
-	)
+	var sprite := _actor_node_for_unit(unit_id)
 	if not is_instance_valid(sprite) or ctx.scene == null:
 		return ctx.scene.size * Vector2(0.5, 0.35) if ctx.scene != null else Vector2.ZERO
 	return sprite.get_global_transform_with_canvas().origin + Vector2(0.0, -90.0)
+
+
+func _actor_node_for_unit(unit_id: String) -> Node2D:
+	if unit_id == FightSceneContext.UNIT_PLAYER:
+		return _refs.sprite_left
+	if _enemy_actor_nodes.has(unit_id):
+		var node := _enemy_actor_nodes[unit_id] as Node2D
+		if is_instance_valid(node):
+			return node
+	if unit_id == FightSceneContext.UNIT_ENEMY and _enemy_actor_nodes.has(FightSceneContext.UNIT_ENEMY):
+		var enemy_node := _enemy_actor_nodes[FightSceneContext.UNIT_ENEMY] as Node2D
+		if is_instance_valid(enemy_node):
+			return enemy_node
+	return _refs.sprite_right
 
 
 func sync_auto_battle_ui(ctx: FightSceneContext) -> void:

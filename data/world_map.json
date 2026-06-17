@@ -50,7 +50,7 @@
       "preview_rewards": ["灵草", "妖丹", "寒潭珠"],
       "polygon": [[30, 350], [280, 350], [280, 500], [30, 500]],
       "near_city": ["qingshi_market"],
-      "sub_locations": ["spirit_spring_valley", "ancient_sword_tomb"],
+      "sub_locations": ["wild_wolf_valley", "spirit_spring_valley", "ancient_sword_tomb"],
       "expedition_location_id": "qinglan_mountain"
     },
     "blackwater_marsh": {
@@ -64,10 +64,23 @@
       "polygon": [[500, 20], [750, 20], [750, 170], [500, 170]],
       "near_city": ["yunlan_city", "tianhe_ferry"],
       "sub_locations": [],
-      "expedition_location_id": ""
+      "expedition_location_id": "blackwater_marsh"
     }
   },
   "wilderness_locations": {
+    "wild_wolf_valley": {
+      "name": "野狼谷",
+      "danger": 1,
+      "recommended_realm": "炼气一层",
+      "environment_tags": ["山谷", "狼群", "迷雾"],
+      "preview_rewards": ["妖丹", "狼皮", "灵草"],
+      "position": [160, 430],
+      "parent_region": "qinglan_mountain",
+      "default_discovered": true,
+      "reveal_radius": 120,
+      "services": ["剧情", "狼患调查"],
+      "expedition_location_id": "wild_wolf_valley"
+    },
     "spirit_spring_valley": {
       "name": "灵泉谷",
       "danger": 1,

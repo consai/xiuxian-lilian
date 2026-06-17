@@ -20,6 +20,7 @@ func _ready() -> void:
 	_save_all_button.pressed.connect(_deposit_all)
 	_withdraw_all_button.pressed.connect(_withdraw_all)
 	_close_button.pressed.connect(_close)
+	DataEvents.inventory_changed.connect(refresh)
 	refresh()
 
 
@@ -144,6 +145,9 @@ func _clear_item_slots_if_empty(item_id: String) -> void:
 	for i in GameState.item_slots.size():
 		if str(GameState.item_slots[i]) == item_id:
 			GameState.item_slots[i] = ""
+	for i in GameState.treasure_item_slots.size():
+		if str(GameState.treasure_item_slots[i]) == item_id:
+			GameState.treasure_item_slots[i] = ""
 
 
 func _clear_equip_slots(equip_id: int) -> void:

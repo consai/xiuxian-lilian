@@ -8,6 +8,8 @@
 [ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="6_uok5a"]
 [ext_resource type="Texture2D" uid="uid://8mwstvi8kywh" path="res://assets/art/ui_new/btn_close.png" id="7_close"]
 [ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="8_press"]
+[ext_resource type="Texture2D" uid="uid://hwomn6aon70a" path="res://assets/art/ui_new/btn_huang.png" id="9_btwk4"]
+[ext_resource type="LabelSettings" uid="uid://dg7uds3ec0xtu" path="res://ui/ziti_new/22.tres" id="10_ntt3x"]
 
 [node name="ItemInfoPopup" type="Control" unique_id=427759546]
 layout_mode = 3
@@ -68,9 +70,13 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="ItemPreview" parent="Center/Panel/Margin/VBox/Header" unique_id=1364437411 instance=ExtResource("6_item")]
-unique_name_in_owner = true
+[node name="Control" type="Control" parent="Center/Panel/Margin/VBox/Header" unique_id=1620535113]
+custom_minimum_size = Vector2(70, 80)
 layout_mode = 2
+
+[node name="ItemPreview" parent="Center/Panel/Margin/VBox/Header/Control" unique_id=1364437411 instance=ExtResource("6_item")]
+unique_name_in_owner = true
+layout_mode = 1
 
 [node name="Info" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Header" unique_id=1532349657]
 layout_mode = 2
@@ -131,3 +137,32 @@ texture_normal = ExtResource("7_close")
 ignore_texture_size = true
 stretch_mode = 4
 script = ExtResource("8_press")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Center" unique_id=1947365157]
+layout_mode = 0
+offset_left = 87.0
+offset_top = 406.0
+offset_right = 312.0
+offset_bottom = 460.0
+alignment = 1
+
+[node name="UseButton" type="TextureButton" parent="Center/HBoxContainer" unique_id=901898705]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+texture_normal = ExtResource("9_btwk4")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("8_press")
+
+[node name="Label" type="Label" parent="Center/HBoxContainer/UseButton" unique_id=1475111495]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "使用"
+label_settings = ExtResource("10_ntt3x")
+horizontal_alignment = 1
+vertical_alignment = 1

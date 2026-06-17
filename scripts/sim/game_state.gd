@@ -2,6 +2,9 @@ extends Node
 
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
+const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
+const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const SIM_PATH := "res://data/simulation.json"
 const HUB_SCENE := "res://scenes/sim/cave_hub.tscn"
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
@@ -10,6 +13,42 @@ const LocationServiceScript := preload("res://scripts/expedition/location_servic
 const WorldMapServiceScript := preload("res://scripts/map/world_map_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
+const PlayerAutoBattleServiceScript := preload("res://scripts/sim/player_auto_battle_service.gd")
+const BreakthroughServiceScript := preload("res://scripts/sim/breakthrough_service.gd")
+const AlchemyServiceScript := preload("res://scripts/sim/alchemy_service.gd")
+
+const CULTIVATION_MODES := {
+	"cycle": {
+		"name": "运转周天",
+		"description": "修为、功法与知识均衡增长。",
+		"cultivation_multiplier": 1.0,
+		"knowledge_multiplier": 1.0,
+		"mastery_multiplier": 1.0,
+	},
+	"insight": {
+		"name": "专心参悟",
+		"description": "放缓修为积累，专注理解功法与其中知识。",
+		"cultivation_multiplier": 0.6,
+		"knowledge_multiplier": 1.6,
+		"mastery_multiplier": 1.5,
+	},
+	"breathing": {
+		"name": "吐纳积气",
+		"description": "集中吸纳灵气，快速积累修为。",
+		"cultivation_multiplier": 1.4,
+		"knowledge_multiplier": 0.5,
+		"mastery_multiplier": 0.6,
+	},
+	"pill": {
+		"name": "丹药炼化",
+		"description": "服用修炼丹药后打坐炼化，修为增长极快，但会积累境界虚浮。",
+		"cultivation_multiplier": 10.0,
+		"knowledge_multiplier": 0.8,
+		"mastery_multiplier": 0.8,
+	},
+}
+
+const INSTABILITY_REDUCTION_PER_WIN := 10
 
 
 var day: int:
@@ -24,6 +63,9 @@ var realm_name: String:
 var cultivation: int:
 	get: return int(DataStore.savedata.get("cultivation", 0))
 	set(value): DataStore.savedata["cultivation"] = value
+var cultivation_instability: int:
+	get: return int(DataStore.savedata.get("cultivation_instability", 0))
+	set(value): DataStore.savedata["cultivation_instability"] = maxi(0, value)
 var breakthrough_at: int:
 	get: return int(DataStore.savedata.get("breakthrough_at", 100))
 	set(value): DataStore.savedata["breakthrough_at"] = value
@@ -54,14 +96,17 @@ var hp: float:
 var mp: float:
 	get: return float(DataStore.savedata.get("mp", 100.0))
 	set(value): DataStore.savedata["mp"] = value
-var unlocked_skills: Array:
-	get: return DataStore.savedata.get("unlocked_skills", []) as Array
-	set(value): DataStore.savedata["unlocked_skills"] = value
-var equipped_skills: Array:
-	get: return DataStore.savedata.get("equipped_skills", []) as Array
-	set(value): DataStore.savedata["equipped_skills"] = value
+var knowledge: Dictionary:
+	get: return DataStore.savedata.get("knowledge", {}) as Dictionary
+	set(value): DataStore.savedata["knowledge"] = value
+var unlocked_abilities: Array:
+	get: return DataStore.savedata.get("unlocked_abilities", []) as Array
+	set(value): DataStore.savedata["unlocked_abilities"] = value
+var equipped_abilities: Array:
+	get: return DataStore.savedata.get("equipped_abilities", []) as Array
+	set(value): DataStore.savedata["equipped_abilities"] = value
 var unlocked_methods: Array:
-	get: return DataStore.savedata.get("unlocked_methods", ["five_elements_art"]) as Array
+	get: return DataStore.savedata.get("unlocked_methods", ["method.hunyuan.1"]) as Array
 	set(value): DataStore.savedata["unlocked_methods"] = value
 var cultivation_method_slots: Dictionary:
 	get: return DataStore.savedata.get("cultivation_method_slots", {}) as Dictionary
@@ -81,12 +126,18 @@ var owned_equips: Array:
 var equip_slots: Array:
 	get: return DataStore.savedata.get("equip_slots", [-1, -1]) as Array
 	set(value): DataStore.savedata["equip_slots"] = value
+var treasure_item_slots: Array:
+	get: return DataStore.savedata.get("treasure_item_slots", ["", ""]) as Array
+	set(value): DataStore.savedata["treasure_item_slots"] = value
 var item_slots: Array:
 	get: return DataStore.savedata.get("item_slots", ["", ""]) as Array
 	set(value): DataStore.savedata["item_slots"] = value
 var inventory: Dictionary:
 	get: return DataStore.savedata.get("inventory", {}) as Dictionary
 	set(value): DataStore.savedata["inventory"] = value
+var alchemy: Dictionary:
+	get: return DataStore.savedata.get("alchemy", AlchemyServiceScript.default_state()) as Dictionary
+	set(value): DataStore.savedata["alchemy"] = AlchemyServiceScript.normalize_state(value)
 var world_state: Dictionary:
 	get: return DataStore.savedata.get("world_state", {}) as Dictionary
 	set(value): DataStore.savedata["world_state"] = value
@@ -129,8 +180,12 @@ var map_discovered_locations: Array:
 
 
 func _ready() -> void:
-	if attrs.is_empty():
-		new_game()
+	_bootstrap_savedata()
+
+
+func _bootstrap_savedata() -> void:
+	# 主界面负责新局与读档，启动时不自动加载存档。
+	pass
 
 
 func new_game() -> void:
@@ -140,6 +195,7 @@ func new_game() -> void:
 	day = 1
 	realm_index = 0
 	cultivation = 0
+	cultivation_instability = 0
 	injury_days = 0
 	ling_stones = 0
 	player_name = str(initial.get("name", "修士"))
@@ -149,19 +205,22 @@ func new_game() -> void:
 	refresh_derived_attrs(false)
 	hp = float(attrs.get(FightAttr.HP_MAX, 100.0))
 	mp = float(attrs.get(FightAttr.MP_MAX, 100.0))
-	unlocked_skills = _initial_skill_ids(initial)
-	equipped_skills = _initial_equipped_skills(initial, unlocked_skills)
+	unlocked_abilities = _initial_ability_ids(initial)
+	equipped_abilities = _initial_equipped_abilities(initial, unlocked_abilities)
 	unlocked_methods = _initial_method_ids(initial)
 	cultivation_method_slots = (initial.get("method_slots", {
-		"main": "five_elements_art", "support_1": "", "support_2": "", "movement": "",
+		"main": "method.hunyuan.1", "support_1": "", "support_2": "", "movement": "",
 	}) as Dictionary).duplicate(true)
+	_seed_starter_knowledge()
 	auto_battle_enabled = true
 	auto_battle_preset = "balanced"
 	auto_battle_rules = {}
 	owned_equips = (initial.get("equips", []) as Array).duplicate(true)
 	equip_slots = (initial.get("equip_slots", [-1, -1]) as Array).duplicate(true)
+	treasure_item_slots = (initial.get("treasure_item_slots", ["", ""]) as Array).duplicate(true)
 	item_slots = (initial.get("item_slots", ["", ""]) as Array).duplicate(true)
 	inventory = (initial.get("inventory", {}) as Dictionary).duplicate(true)
+	alchemy = AlchemyServiceScript.default_state()
 	storage = (initial.get("storage", {}) as Dictionary).duplicate(true)
 	storage_equips = (initial.get("storage_equips", []) as Array).duplicate(true)
 	activity_log = []
@@ -180,41 +239,38 @@ func new_game() -> void:
 	_sync_realm()
 
 
-func _initial_skill_ids(initial: Dictionary) -> Array:
+func _initial_ability_ids(initial: Dictionary) -> Array:
 	var out: Array = []
-	for sid_v in initial.get("skills", []) as Array:
-		out.append(int(sid_v))
+	for aid_v in initial.get("abilities", ["ability.combat.qi_bolt"]) as Array:
+		var aid := str(aid_v).strip_edges()
+		if aid != "" and not out.has(aid):
+			out.append(aid)
 	return out
 
 
 func _initial_method_ids(initial: Dictionary) -> Array:
 	var out: Array = []
-	for method_id_v in initial.get("methods", ["five_elements_art"]) as Array:
+	for method_id_v in initial.get("methods", ["method.hunyuan.1"]) as Array:
 		var method_id := str(method_id_v).strip_edges()
 		if method_id != "":
 			out.append(method_id)
 	return out
 
 
-func _initial_equipped_skills(initial: Dictionary, unlocked: Array) -> Array:
-	var raw_v: Variant = initial.get("equipped_skills", [])
+func _initial_equipped_abilities(initial: Dictionary, unlocked: Array) -> Array:
+	var raw_v: Variant = initial.get("equipped_abilities", [])
 	if raw_v is Array and not (raw_v as Array).is_empty():
-		return _normalize_skill_slots(raw_v as Array)
-	var slots: Array = [-1, -1, -1, -1, -1]
+		return DataStore._normalize_ability_slots(raw_v)
+	var slots: Array = ["", "", "", "", ""]
 	for i in unlocked.size():
 		if i >= 5:
 			break
-		slots[i] = int(unlocked[i])
-	return slots
+		slots[i] = str(unlocked[i])
+	return DataStore._normalize_ability_slots(slots)
 
 
-func _normalize_skill_slots(raw: Array) -> Array:
-	var slots: Array = []
-	for sid_v in raw:
-		slots.append(int(sid_v))
-	while slots.size() < 5:
-		slots.append(-1)
-	return slots.slice(0, 5)
+func _seed_starter_knowledge() -> void:
+	KnowledgeServiceScript.grant_level(DataStore.savedata, "foundation.breathing", 1)
 
 
 func can_persist() -> bool:
@@ -265,16 +321,294 @@ func load_game(slot: int) -> Dictionary:
 
 
 func cultivate() -> int:
+	var result := cultivate_session("cycle", 1)
+	return int(result.get("cultivation_gained", 0))
+
+
+func alchemy_recipes() -> Array:
+	return AlchemyServiceScript.all_recipes()
+
+
+func alchemy_strategies() -> Array:
+	return AlchemyServiceScript.all_strategies()
+
+
+func preview_alchemy(recipe_id: String, strategy_id: String = "standard", selection_mode: String = "lowest") -> Dictionary:
+	return AlchemyServiceScript.preview(
+		recipe_id,
+		strategy_id,
+		selection_mode,
+		alchemy,
+		inventory,
+		foundations,
+		aptitudes
+	)
+
+
+func brew_alchemy(
+	recipe_id: String,
+	strategy_id: String = "standard",
+	selection_mode: String = "lowest",
+	seed_override: int = -1
+) -> Dictionary:
+	if not can_persist():
+		return {"ok": false, "error": "历练中无法炼丹"}
+	var preview := preview_alchemy(recipe_id, strategy_id, selection_mode)
+	if not bool(preview.get("ok", false)):
+		return preview
+	var rng := RandomNumberGenerator.new()
+	if seed_override >= 0:
+		rng.seed = seed_override
+	else:
+		rng.randomize()
+	var result := AlchemyServiceScript.roll(preview, rng)
+	if not bool(result.get("ok", false)):
+		return result
+	for ingredient_v in result.get("ingredients", []) as Array:
+		var ingredient := ingredient_v as Dictionary
+		InventoryServiceScript.remove_item(
+			inventory,
+			str(ingredient.get("id", "")),
+			int(ingredient.get("count", 0))
+		)
+	var product_id := str(result.get("product_id", ""))
+	if product_id != "":
+		result["added"] = InventoryServiceScript.add_item(inventory, product_id, int(result.get("count", 0)))
+	else:
+		result["added"] = 0
+	var next_alchemy := AlchemyServiceScript.apply_xp(alchemy, int(result.get("xp", 0)))
+	next_alchemy = AlchemyServiceScript.apply_recipe_mastery(
+		next_alchemy,
+		recipe_id,
+		int(result.get("mastery_gain", 0))
+	)
+	var furnace_id := str(next_alchemy.get("equipped_furnace", ""))
+	var owned := next_alchemy.get("owned_furnaces", {}) as Dictionary
+	var furnace_state_v: Variant = owned.get(furnace_id, {})
+	var furnace_state := furnace_state_v as Dictionary if furnace_state_v is Dictionary else {}
+	furnace_state["durability"] = maxi(0, int(furnace_state.get("durability", 0)) - 1)
+	owned[furnace_id] = furnace_state
+	next_alchemy["owned_furnaces"] = owned
+	next_alchemy["last_recipe"] = recipe_id
+	next_alchemy["last_strategy"] = strategy_id
+	next_alchemy["total_batches"] = int(next_alchemy.get("total_batches", 0)) + 1
+	alchemy = next_alchemy
+	var elapsed := int(result.get("days", 1))
+	day += elapsed
+	injury_days = maxi(0, injury_days - elapsed)
+	var outcome := str(result.get("quality_name", "无产物"))
+	var log_text := "炼制%s：%s" % [str(result.get("pill_name", "丹药")), outcome]
+	if int(result.get("added", 0)) > 0:
+		log_text += " x%d" % int(result.get("added", 0))
+	_append_activity(log_text)
+	result["alchemy_level"] = int(alchemy.get("level", 1))
+	result["alchemy_xp"] = int(alchemy.get("xp", 0))
+	result["recipe_mastery"] = AlchemyServiceScript.mastery_for(alchemy, recipe_id)
+	result["furnace_durability"] = int(furnace_state.get("durability", 0))
+	auto_save()
+	return result
+
+
+func preview_cultivation_session(mode_id: String = "cycle", days: int = 1, pill_id: String = "") -> Dictionary:
+	var mode := _cultivation_mode(mode_id)
+	var safe_days := clampi(days, 1, 30)
+	var resolved_pill_id := ""
+	var pill_ids: Array = []
+	if mode_id == "pill":
+		resolved_pill_id = resolve_cultivation_pill_id(pill_id)
+		if resolved_pill_id == "":
+			return {
+				"ok": false,
+				"error": "背包中没有可用于修炼的丹药。",
+			}
+		var owned_pills := int(inventory.get(resolved_pill_id, 0))
+		if owned_pills < safe_days:
+			return {
+				"ok": false,
+				"error": "丹药炼化每日至少需要一枚%s，当前仅有 %d 枚。" % [
+					ConfigManager.get_item_display_name(resolved_pill_id),
+					owned_pills,
+				],
+			}
+		for _day_index in safe_days:
+			pill_ids.append(resolved_pill_id)
 	var cfg := _activity_cfg("cultivate")
 	var base_gain := maxi(0, int(cfg.get("cultivation_gain", 20)))
 	var speed := CultivationMethodServiceScript.cultivation_speed(cultivation_method_slots)
 	if speed <= 0.0:
-		return 0
+		return {"ok": false, "error": "需要先装备主功法"}
 	base_gain = maxi(1, int(round(float(base_gain) * speed)))
-	var gain := base_gain / 2 if injury_days > 0 else base_gain
-	cultivation += gain
-	_finish_activity("修炼：修为 +%d" % gain, true)
-	return gain
+	var estimated_gain := 0
+	var remaining_injury := injury_days
+	for day_index in safe_days:
+		var normal_gain := base_gain / 2 if remaining_injury > 0 else base_gain
+		var multiplier := float(mode["cultivation_multiplier"])
+		if mode_id == "pill":
+			multiplier = cultivation_pill_multiplier(str(pill_ids[day_index]))
+		estimated_gain += maxi(1, int(round(float(normal_gain) * multiplier)))
+		remaining_injury = maxi(0, remaining_injury - 1)
+	var main_id := str(cultivation_method_slots.get("main", ""))
+	var method := CultivationMethodServiceScript.by_id(main_id)
+	return {
+		"ok": true,
+		"mode_id": mode_id,
+		"mode": mode.duplicate(true),
+		"days": safe_days,
+		"estimated_cultivation": estimated_gain,
+		"start_day": day,
+		"end_day": day + safe_days,
+		"method_id": main_id,
+		"method_name": str(method.get("name", "未装备主功法")),
+		"method_mastery": CultivationMethodServiceScript.method_mastery(DataStore.savedata, main_id),
+		"knowledge_rows": CultivationMethodServiceScript.resolved_knowledge(main_id),
+		"pill_ids": pill_ids,
+		"pill_id": resolved_pill_id,
+		"instability_gain": _cultivation_pill_instability_total(pill_ids) if mode_id == "pill" else 0,
+		"cultivation_instability": cultivation_instability,
+	}
+
+
+func cultivate_session(mode_id: String = "cycle", days: int = 1, pill_id: String = "") -> Dictionary:
+	var preview := preview_cultivation_session(mode_id, days, pill_id)
+	if not bool(preview.get("ok", false)):
+		return preview
+	var mode: Dictionary = preview.get("mode", {}) as Dictionary
+	var safe_days := int(preview.get("days", 1))
+	var method_id := str(preview.get("method_id", ""))
+	var mastery_before := CultivationMethodServiceScript.method_mastery(DataStore.savedata, method_id)
+	var cultivation_before := cultivation
+	var realm_before := realm_name
+	var instability_before := cultivation_instability
+	var pill_ids := preview.get("pill_ids", []) as Array
+	var knowledge_summary: Dictionary = {}
+	var layer_advances := 0
+	for day_index in safe_days:
+		var cfg := _activity_cfg("cultivate")
+		var base_gain := maxi(0, int(cfg.get("cultivation_gain", 20)))
+		var speed := CultivationMethodServiceScript.cultivation_speed(cultivation_method_slots)
+		base_gain = maxi(1, int(round(float(base_gain) * speed)))
+		var normal_gain := base_gain / 2 if injury_days > 0 else base_gain
+		var multiplier := float(mode["cultivation_multiplier"])
+		if mode_id == "pill":
+			var active_pill_id := str(pill_ids[day_index])
+			InventoryServiceScript.remove_item(inventory, active_pill_id, 1)
+			multiplier = cultivation_pill_multiplier(active_pill_id)
+			cultivation_instability += cultivation_pill_instability(active_pill_id)
+		var gain := maxi(1, int(round(float(normal_gain) * multiplier)))
+		cultivation += gain
+		var cycle := CultivationMethodServiceScript.apply_cultivation_cycle(
+			DataStore.savedata,
+			float(normal_gain),
+			float(mode["knowledge_multiplier"]),
+			float(mode["mastery_multiplier"])
+		)
+		for row_v in cycle.get("knowledge", []) as Array:
+			var row := row_v as Dictionary
+			var skill_id := str(row.get("skillId", ""))
+			var applied := row.get("applied", {}) as Dictionary
+			var aggregate: Dictionary = knowledge_summary.get(skill_id, {
+				"skill_id": skill_id,
+				"xp": 0.0,
+				"levels_gained": 0,
+			})
+			aggregate["xp"] = float(aggregate["xp"]) + float(applied.get("applied", 0.0))
+			aggregate["levels_gained"] = int(aggregate["levels_gained"]) + int(applied.get("levels_gained", 0))
+			knowledge_summary[skill_id] = aggregate
+		layer_advances += _auto_advance_layers()
+		_finish_activity("修炼·%s" % str(mode["name"]), true)
+	var knowledge_gains: Array = []
+	for row in knowledge_summary.values():
+		knowledge_gains.append(row)
+	var gained := cultivation - cultivation_before
+	var activity_text := "闭关 %d 日：%s，修为 +%d" % [safe_days, str(mode["name"]), gained]
+	if layer_advances > 0:
+		activity_text += "，提升至%s" % realm_name
+	if cultivation_instability > instability_before:
+		activity_text += "，境界虚浮 +%d" % (cultivation_instability - instability_before)
+	_append_activity(activity_text)
+	return {
+		"ok": true,
+		"mode_id": mode_id,
+		"mode_name": str(mode["name"]),
+		"days": safe_days,
+		"start_day": int(preview.get("start_day", day - safe_days)),
+		"end_day": day,
+		"cultivation_gained": gained,
+		"cultivation": cultivation,
+		"breakthrough_at": breakthrough_at,
+		"method_id": method_id,
+		"method_name": str(preview.get("method_name", "")),
+		"mastery_gained": CultivationMethodServiceScript.method_mastery(DataStore.savedata, method_id) - mastery_before,
+		"method_mastery": CultivationMethodServiceScript.method_mastery(DataStore.savedata, method_id),
+		"knowledge_gains": knowledge_gains,
+		"layer_advances": layer_advances,
+		"realm_before": realm_before,
+		"realm_name": realm_name,
+		"instability_gained": cultivation_instability - instability_before,
+		"cultivation_instability": cultivation_instability,
+	}
+
+
+func _cultivation_mode(mode_id: String) -> Dictionary:
+	var row_v: Variant = CULTIVATION_MODES.get(mode_id, CULTIVATION_MODES["cycle"])
+	return (row_v as Dictionary).duplicate(true)
+
+
+func resolve_cultivation_pill_id(preferred_id: String = "") -> String:
+	var preferred := preferred_id.strip_edges()
+	if preferred != "" and int(inventory.get(preferred, 0)) > 0 and is_cultivation_pill(preferred):
+		return preferred
+	return best_owned_cultivation_pill_id()
+
+
+func best_owned_cultivation_pill_id() -> String:
+	var best_id := ""
+	var best_rank := -1
+	for item_id_v in inventory.keys():
+		var item_id := str(item_id_v)
+		if int(inventory.get(item_id_v, 0)) <= 0 or not is_cultivation_pill(item_id):
+			continue
+		var rank := cultivation_pill_rank(item_id)
+		if rank > best_rank:
+			best_rank = rank
+			best_id = item_id
+	return best_id
+
+
+func is_cultivation_pill(item_id: String) -> bool:
+	var def := ConfigManager.item_def_by_id(item_id)
+	return def != null and def.is_cultivation_pill()
+
+
+func cultivation_pill_multiplier(item_id: String) -> float:
+	var def := ConfigManager.item_def_by_id(item_id)
+	if def == null:
+		return float(CULTIVATION_MODES["pill"]["cultivation_multiplier"])
+	var multiplier: float = def.get_use_effect_amount("pill_cultivation")
+	if multiplier <= 0.0:
+		return float(CULTIVATION_MODES["pill"]["cultivation_multiplier"])
+	return multiplier
+
+
+func cultivation_pill_instability(item_id: String) -> int:
+	var def := ConfigManager.item_def_by_id(item_id)
+	if def == null:
+		return 0
+	return maxi(0, int(round(def.get_use_effect_amount("instability"))))
+
+
+func cultivation_pill_rank(item_id: String) -> int:
+	var def := ConfigManager.item_def_by_id(item_id)
+	if def == null:
+		return 0
+	return def.quality * 1000 + int(round(cultivation_pill_multiplier(item_id) * 100.0))
+
+
+func _cultivation_pill_instability_total(pill_ids: Array) -> int:
+	var total := 0
+	for pill_id_v in pill_ids:
+		total += cultivation_pill_instability(str(pill_id_v))
+	return total
 
 
 func rest() -> void:
@@ -284,28 +618,191 @@ func rest() -> void:
 	_finish_activity("休息：恢复气血与法力", false)
 
 
+## 重复调用 [method rest] 直至伤势清零；每次均推进 1 日并恢复气血法力。
+func rest_until_injury_cleared() -> int:
+	var rests := 0
+	while injury_days > 0:
+		rest()
+		rests += 1
+		if rests > 64:
+			break
+	return rests
+
+
+## 增加修为并触发小境界自动提升与属性重算（不推进日数）。
+func grant_cultivation(amount: int) -> Dictionary:
+	var added := maxi(0, amount)
+	if added <= 0:
+		return {"ok": false, "error": "增加量必须大于 0", "added": 0, "layer_advances": 0}
+	cultivation += added
+	var layer_advances := _auto_advance_layers()
+	var log_text := "修为 +%d" % added
+	if layer_advances > 0:
+		log_text += "，提升至%s" % realm_name
+	_append_activity(log_text)
+	return {"ok": true, "added": added, "layer_advances": layer_advances}
+
+
+## 将修为补至当前突破门槛并尝试小境界自动提升（不推进日数）。
+func fill_cultivation_to_breakthrough() -> Dictionary:
+	cultivation = breakthrough_at
+	var layer_advances := _auto_advance_layers()
+	var log_text := "修为已至突破门槛 %d" % breakthrough_at
+	if layer_advances > 0:
+		log_text += "，提升至%s" % realm_name
+	_append_activity(log_text)
+	return {"ok": true, "layer_advances": layer_advances}
+
+
+## 按正常规则提升一个境界：大境界走 [method breakthrough]，小层走自动升层。
+func advance_realm_one_step() -> Dictionary:
+	if can_breakthrough():
+		return breakthrough()
+	if cultivation < breakthrough_at:
+		cultivation = breakthrough_at
+	var layer_advances := _auto_advance_layers()
+	if layer_advances > 0:
+		_append_activity("境界提升至%s" % realm_name)
+		return {"ok": true, "mode": "layer", "new_realm": realm_name, "layer_advances": layer_advances}
+	if realm_index + 1 >= _realms().size():
+		return {"ok": false, "error": "已达最高境界"}
+	return {"ok": false, "error": "当前无法继续提升境界"}
+
+
+## 逐步调用 [method advance_realm_one_step] 直至达到目标境界索引。
+func advance_realm_to_index(target_index: int) -> Dictionary:
+	var realms := _realms()
+	if realms.is_empty():
+		return {"ok": false, "error": "境界表为空"}
+	var safe_target := clampi(target_index, 0, realms.size() - 1)
+	var steps := 0
+	while realm_index < safe_target:
+		var result := advance_realm_one_step()
+		if not bool(result.get("ok", false)):
+			return result
+		steps += 1
+		if steps > realms.size() + 4:
+			return {"ok": false, "error": "境界提升步数异常"}
+	var row := _realm_row(realm_index)
+	cultivation = maxi(cultivation, int(row.get("breakthrough_at", breakthrough_at)))
+	_sync_realm()
+	return {"ok": true, "steps": steps, "new_realm": realm_name, "realm_index": realm_index}
+
+
+## 经 [method RewardService.apply_rewards] 发放奖励（物品、灵石等）。
+func grant_rewards(rewards: Array) -> Array:
+	return RewardServiceScript.apply_rewards(self, rewards)
+
+
 func can_breakthrough() -> bool:
-	return cultivation >= breakthrough_at
+	if cultivation < breakthrough_at:
+		return false
+	var next_index := realm_index + 1
+	if next_index >= _realms().size():
+		return false
+	return not _same_major_realm(realm_index, next_index)
+
+
+func next_realm_name() -> String:
+	var next_index := realm_index + 1
+	var realms := _realms()
+	if next_index >= realms.size():
+		return ""
+	return str(_realm_row(next_index).get("name", ""))
+
+
+func preview_breakthrough() -> Dictionary:
+	var realms := _realms()
+	if realms.is_empty():
+		return {"ok": false, "error": "境界表为空"}
+	return BreakthroughServiceScript.compute_breakdown(DataStore.savedata, realms, realm_index)
+
+
+func attempt_breakthrough() -> Dictionary:
+	if cultivation < breakthrough_at:
+		return {"ok": false, "error": "修为尚未达到突破门槛"}
+	var realms := _realms()
+	if realms.is_empty():
+		return {"ok": false, "error": "境界表为空"}
+	if not BreakthroughServiceScript.is_major_breakthrough(realms, realm_index):
+		return {"ok": false, "error": "同境界小层已自动提升，无需突破"}
+	var breakdown := BreakthroughServiceScript.compute_breakdown(DataStore.savedata, realms, realm_index)
+	if not bool(breakdown.get("ok", false)):
+		return breakdown
+	if not bool(breakdown.get("can_attempt", false)):
+		return {"ok": false, "error": str(breakdown.get("hint", "突破值过低，无法突破"))}
+	var old_name := realm_name
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	var result := BreakthroughServiceScript.resolve(DataStore.savedata, realms, realm_index, rng)
+	if not bool(result.get("ok", false)):
+		return result
+	if bool(result.get("success", false)):
+		_apply_breakthrough_vitals()
+		_sync_realm()
+		_append_activity("突破成功：%s → %s（%s）" % [
+			old_name, realm_name, str(result.get("tier_label", "")),
+		])
+		return _breakthrough_result_dict(old_name, result)
+	_append_activity("突破失败，境界不稳")
+	return {
+		"ok": true,
+		"success": false,
+		"error": str(result.get("error", "突破失败，境界不稳")),
+		"tier_label": str(result.get("tier_label", "")),
+		"breakdown": breakdown,
+	}
 
 
 func breakthrough() -> Dictionary:
-	if not can_breakthrough():
+	if cultivation < breakthrough_at:
 		return {"ok": false, "error": "修为尚未达到突破门槛"}
+	var realms := _realms()
+	if realms.is_empty():
+		return {"ok": false, "error": "境界表为空"}
+	if not BreakthroughServiceScript.is_major_breakthrough(realms, realm_index):
+		return {"ok": false, "error": "同境界小层已自动提升，无需突破"}
+	var breakdown := preview_breakthrough()
+	if not bool(breakdown.get("ok", false)):
+		return breakdown
+	if str(breakdown.get("knowledge_error", "")) != "":
+		return {"ok": false, "error": str(breakdown.get("knowledge_error", ""))}
+	if bool(breakdown.get("can_attempt", false)):
+		return attempt_breakthrough()
+	# 突破值未达新系统门槛时，沿用简易突破，确保修为达标后可跨入大境界。
 	var old_name := realm_name
 	realm_index += 1
 	var grown: Dictionary = CharacterStatsScript.normalize_foundations(foundations)
 	for key in grown.keys():
 		grown[key] = float(grown[key]) + 1.0
 	foundations = grown
-	refresh_derived_attrs(true)
+	_apply_breakthrough_vitals()
 	_sync_realm()
-	return {
+	_append_activity("突破成功：%s → %s" % [old_name, realm_name])
+	return _breakthrough_result_dict(old_name, {})
+
+
+func _apply_breakthrough_vitals() -> void:
+	refresh_derived_attrs(false)
+	hp = float(attrs.get(FightAttr.HP_MAX, 100.0))
+	mp = float(attrs.get(FightAttr.MP_MAX, 100.0))
+
+
+func _breakthrough_result_dict(old_name: String, service_result: Dictionary) -> Dictionary:
+	var payload := {
 		"ok": true,
-		"old_realm": old_name,
-		"new_realm": realm_name,
+		"success": true,
+		"old_realm": str(service_result.get("old_realm", old_name)),
+		"new_realm": str(service_result.get("new_realm", realm_name)),
 		"day": day,
 		"totals": totals.duplicate(true),
 	}
+	if not service_result.is_empty():
+		payload["tier_label"] = str(service_result.get("tier_label", ""))
+		payload["quality"] = int(service_result.get("quality", 0))
+		payload["foundation_growth"] = float(service_result.get("foundation_growth", 0.0))
+		payload["perks"] = (service_result.get("perks", []) as Array).duplicate()
+	return payload
 
 
 func begin_expedition(location_id: String) -> Dictionary:
@@ -375,14 +872,30 @@ func apply_battle_player_runtime(summary: Dictionary) -> void:
 		)
 
 
+func _skills_include_id(skills: Array, skill_id: int) -> bool:
+	for row_v in skills:
+		if not row_v is Dictionary:
+			continue
+		if int((row_v as Dictionary).get("id", -1)) == skill_id:
+			return true
+	return false
+
+
 func build_player_battle_snapshot(runtime: Dictionary) -> Dictionary:
 	var runtime_inv := (runtime.get("inventory", {}) as Dictionary).duplicate(true)
 	var runtime_slots := (runtime.get("item_slots", item_slots) as Array).duplicate(true)
 	var skills: Array = []
-	for sid_v in equipped_skills:
-		skills.append({"id": int(sid_v), "cd": 0.0})
+	for aid_v in equipped_abilities:
+		var aid := str(aid_v).strip_edges()
+		var combat_id := AbilityServiceScript.combat_id_for(aid) if aid != "" else -1
+		skills.append({"id": combat_id, "cd": 0.0})
 	while skills.size() < 5:
 		skills.append({"id": -1, "cd": 0.0})
+	if not _skills_include_id(skills, 0):
+		for i in skills.size():
+			if int((skills[i] as Dictionary).get("id", -1)) < 0:
+				skills[i] = {"id": 0, "cd": 0.0}
+				break
 	var equips: Array = []
 	for eid_v in equip_slots:
 		var eid := int(eid_v)
@@ -413,9 +926,11 @@ func build_battle_init(event: Dictionary) -> Dictionary:
 		"item_slots": item_slots,
 	})
 	var enemy := ExpeditionEventServiceScript.build_battle_enemy(event)
+	var enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
 	return {
 		"player": player,
 		"enemy": enemy,
+		"enemies": enemies,
 		"battle_time_limit": 200.0,
 		"auto_battle": {"player": auto_battle_enabled, "enemy": true},
 		"spd_jitter_ratio": 0.0,
@@ -462,6 +977,8 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 		if not lost_v is Dictionary:
 			continue
 		var lost := lost_v as Dictionary
+		if str(lost.get("source", "inventory")) == "session_loot":
+			continue
 		InventoryServiceScript.remove_item(
 			inventory,
 			str(lost.get("id", "")),
@@ -477,6 +994,11 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 	totals["battles"] = int(totals.get("battles", 0)) + int(stats.get("battles", 0))
 	totals["wins"] = int(totals.get("wins", 0)) + int(stats.get("wins", 0))
 	totals["losses"] = int(totals.get("losses", 0)) + int(stats.get("losses", 0))
+	var instability_reduced := mini(
+		cultivation_instability,
+		int(stats.get("wins", 0)) * INSTABILITY_REDUCTION_PER_WIN
+	)
+	cultivation_instability -= instability_reduced
 	if start_day > 0:
 		day = start_day + elapsed_days
 	else:
@@ -496,14 +1018,25 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 		log_text += "，带回 %s" % "、".join(reward_labels)
 	if exit_reason == "defeated":
 		log_text += "（战败撤退）"
+	if instability_reduced > 0:
+		log_text += "，境界虚浮 -%d" % instability_reduced
 	activity_log.append({"day": day, "text": log_text})
 	if activity_log.size() > 30:
 		activity_log = activity_log.slice(activity_log.size() - 30)
 	last_settled_expedition_id = settlement_id
+	result["instability_reduced"] = instability_reduced
+	result["cultivation_instability"] = cultivation_instability
 	last_expedition_summary = result.duplicate(true)
 	_apply_world_changes(result.get("world_changes", []) as Array)
+	TutorialService.game_event("tutorial.expedition_returned")
 	auto_save()
-	return {"ok": true, "rewards": last_rewards.duplicate(true), "elapsed_days": elapsed_days}
+	return {
+		"ok": true,
+		"rewards": last_rewards.duplicate(true),
+		"elapsed_days": elapsed_days,
+		"instability_reduced": instability_reduced,
+		"cultivation_instability": cultivation_instability,
+	}
 
 
 func to_dict() -> Dictionary:
@@ -531,10 +1064,17 @@ func refresh_derived_attrs(preserve_vital_ratio: bool = true) -> void:
 	var old_mp_max := maxf(1.0, float(attrs.get(FightAttr.MP_MAX, 100.0)))
 	var hp_ratio := clampf(hp / old_hp_max, 0.0, 1.0)
 	var mp_ratio := clampf(mp / old_mp_max, 0.0, 1.0)
-	var method_mods := CultivationMethodServiceScript.build_modifiers(cultivation_method_slots)
+	var method_mods := CultivationMethodServiceScript.build_modifiers(
+		cultivation_method_slots, DataStore.savedata
+	)
+	var flat_mods: Dictionary = (method_mods.get("flat", {}) as Dictionary).duplicate(true)
+	var realm_mods := CharacterStatsScript.realm_flat_modifiers(realm_index)
+	for key in realm_mods.keys():
+		var stat := str(key)
+		flat_mods[stat] = float(flat_mods.get(stat, 0.0)) + float(realm_mods[stat])
 	attrs = CharacterStatsScript.build_combat_attrs(
 		foundations,
-		method_mods.get("flat", {}) as Dictionary,
+		flat_mods,
 		method_mods.get("percent", {}) as Dictionary
 	)
 	if preserve_vital_ratio:
@@ -542,31 +1082,62 @@ func refresh_derived_attrs(preserve_vital_ratio: bool = true) -> void:
 		mp = float(attrs.get(FightAttr.MP_MAX, 100.0)) * mp_ratio
 
 
-func learn_skill(skill_id: int) -> Dictionary:
-	if ConfigManager.skill_by_id(skill_id).is_empty():
+func major_realm_id() -> String:
+	return _major_realm_id(_realm_row(realm_index))
+
+
+func grant_knowledge(skill_id: String, level: int) -> void:
+	KnowledgeServiceScript.grant_level(DataStore.savedata, skill_id, level)
+
+
+func learn_ability(ability_id: String) -> Dictionary:
+	var aid := ability_id.strip_edges()
+	if AbilityServiceScript.by_id(aid).is_empty():
 		return {"ok": false, "error": "未知技能"}
-	if unlocked_skills.has(skill_id):
+	if not AbilityServiceScript.can_learn(aid, DataStore.savedata, major_realm_id()):
+		return {"ok": false, "error": "尚未满足学习条件"}
+	if unlocked_abilities.has(aid):
 		return {"ok": false, "error": "已经掌握该技能"}
-	unlocked_skills.append(skill_id)
-	for i in equipped_skills.size():
-		if int(equipped_skills[i]) < 0:
-			equipped_skills[i] = skill_id
-			return {"ok": true, "skill_id": skill_id}
-	for i in 5:
-		if i >= equipped_skills.size():
-			equipped_skills.append(skill_id)
-			break
-	return {"ok": true, "skill_id": skill_id}
+	unlocked_abilities.append(aid)
+	var slots := equipped_abilities.duplicate(true)
+	for i in slots.size():
+		if str(slots[i]).strip_edges() == "":
+			slots[i] = aid
+			equipped_abilities = DataStore._normalize_ability_slots(slots)
+			return {"ok": true, "ability_id": aid}
+	equipped_abilities = DataStore._normalize_ability_slots(slots)
+	return {"ok": true, "ability_id": aid}
 
 
 func learn_method(method_id: String) -> Dictionary:
 	var row := CultivationMethodServiceScript.by_id(method_id)
 	if row.is_empty():
 		return {"ok": false, "error": "未知功法"}
+	if not CultivationMethodServiceScript.can_learn(row, DataStore.savedata, major_realm_id()):
+		return {"ok": false, "error": "尚未满足学习条件"}
 	if unlocked_methods.has(method_id):
 		return {"ok": false, "error": "已经掌握该功法"}
 	unlocked_methods.append(method_id)
 	return {"ok": true, "method_id": method_id}
+
+
+func use_inventory_item(item_id: String) -> Dictionary:
+	var iid := item_id.strip_edges()
+	if iid == "":
+		return {"ok": false, "error": "无效物品"}
+	var def := ConfigManager.item_def_by_id(iid)
+	if def == null or int(inventory.get(iid, 0)) <= 0:
+		return {"ok": false, "error": "背包中没有该物品"}
+	var result: Dictionary
+	if def.is_learning_book():
+		result = use_learning_book(iid)
+	elif _has_alchemy_mastery_effect(def):
+		result = _use_alchemy_mastery_notes(iid, def)
+	else:
+		return {"ok": false, "error": "该物品无法直接使用"}
+	if bool(result.get("ok", false)):
+		DataEvents.emit_inventory_changed()
+	return result
 
 
 func use_learning_book(item_id: String) -> Dictionary:
@@ -574,8 +1145,8 @@ func use_learning_book(item_id: String) -> Dictionary:
 	if def == null or int(inventory.get(item_id, 0)) <= 0:
 		return {"ok": false, "error": "背包中没有该典籍"}
 	var result: Dictionary
-	if def.learn_skill_id >= 0:
-		result = learn_skill(def.learn_skill_id)
+	if def.learn_ability_id != "":
+		result = learn_ability(def.learn_ability_id)
 	elif def.learn_method_id != "":
 		result = learn_method(def.learn_method_id)
 	else:
@@ -583,6 +1154,47 @@ func use_learning_book(item_id: String) -> Dictionary:
 	if bool(result.get("ok", false)):
 		InventoryServiceScript.remove_item(inventory, item_id, 1)
 	return result
+
+
+func _has_alchemy_mastery_effect(def: ItemDef) -> bool:
+	for row_v in def.use_effect:
+		if not row_v is Dictionary:
+			continue
+		if str((row_v as Dictionary).get("op", "")).strip_edges().to_lower() == "alchemy_mastery":
+			return true
+	return false
+
+
+func _use_alchemy_mastery_notes(item_id: String, def: ItemDef) -> Dictionary:
+	var recipe_id := "recipe.juqi"
+	var amount := 180
+	for row_v in def.use_effect:
+		if not row_v is Dictionary:
+			continue
+		var row := row_v as Dictionary
+		if str(row.get("op", "")).strip_edges().to_lower() != "alchemy_mastery":
+			continue
+		var args_v: Variant = row.get("args", [])
+		if args_v is Array:
+			var args := args_v as Array
+			if not args.is_empty():
+				recipe_id = str(args[0])
+			if args.size() > 1:
+				amount = int(args[1])
+		break
+	var before := AlchemyServiceScript.mastery_for(alchemy, recipe_id)
+	var next_alchemy := AlchemyServiceScript.apply_recipe_mastery(alchemy, recipe_id, amount)
+	alchemy = next_alchemy
+	var gained := AlchemyServiceScript.mastery_for(alchemy, recipe_id) - before
+	var recipe := AlchemyServiceScript.recipe_by_id(recipe_id)
+	var recipe_name := str(recipe.get("pill_name", recipe.get("name", "丹方")))
+	InventoryServiceScript.remove_item(inventory, item_id, 1)
+	return {
+		"ok": true,
+		"message": "研读心得，%s熟练度 +%d" % [recipe_name, gained],
+		"mastery_gain": gained,
+		"recipe_id": recipe_id,
+	}
 
 
 func equip_method(slot_key: String, method_id: String) -> Dictionary:
@@ -599,43 +1211,124 @@ func equip_method(slot_key: String, method_id: String) -> Dictionary:
 	return {"ok": true}
 
 
-func equip_skill(slot_index: int, skill_id: int) -> Dictionary:
-	if slot_index < 0 or slot_index >= 5 or not unlocked_skills.has(skill_id):
+func equip_ability(slot_index: int, ability_id: String) -> Dictionary:
+	var aid := ability_id.strip_edges()
+	if slot_index < 0 or slot_index >= 5:
 		return {"ok": false, "error": "无法配置该技能"}
-	var slots := equipped_skills.duplicate(true)
-	while slots.size() < 5:
-		slots.append(-1)
-	var previous := slots.find(skill_id)
+	if aid != "" and not unlocked_abilities.has(aid):
+		return {"ok": false, "error": "无法配置该技能"}
+	var slots := DataStore._normalize_ability_slots(equipped_abilities)
+	var previous := slots.find(aid)
 	if previous >= 0:
-		slots[previous] = -1
-	slots[slot_index] = skill_id
-	equipped_skills = slots.slice(0, 5)
+		slots[previous] = ""
+	slots[slot_index] = aid
+	equipped_abilities = slots
 	return {"ok": true}
 
 
+func assign_equip_slot(slot_index: int, equip_id: int) -> Dictionary:
+	if slot_index < 0 or slot_index >= equip_slots.size():
+		return {"ok": false, "error": "无效法宝槽位"}
+	var slots := (equip_slots as Array).duplicate(true)
+	var treasure_slots := (treasure_item_slots as Array).duplicate(true)
+	if equip_id <= 0:
+		slots[slot_index] = -1
+		equip_slots = slots
+		return {"ok": true}
+	if not _owns_equip_id(equip_id):
+		return {"ok": false, "error": "未拥有该法宝"}
+	for i in slots.size():
+		if i != slot_index and int(slots[i]) == equip_id:
+			slots[i] = -1
+	slots[slot_index] = equip_id
+	equip_slots = slots
+	if slot_index < treasure_slots.size():
+		treasure_slots[slot_index] = ""
+		treasure_item_slots = treasure_slots
+	var cfg := ConfigManager.equip_by_id(equip_id)
+	return {"ok": true, "message": "已装备 %s。" % str(cfg.get("name", "法宝"))}
+
+
+func assign_treasure_item_slot(slot_index: int, item_id: String) -> Dictionary:
+	if slot_index < 0 or slot_index >= treasure_item_slots.size():
+		return {"ok": false, "error": "无效法宝槽位"}
+	var iid := item_id.strip_edges()
+	var treasure_slots := (treasure_item_slots as Array).duplicate(true)
+	var equip_slot_values := (equip_slots as Array).duplicate(true)
+	if iid == "":
+		treasure_slots[slot_index] = ""
+		treasure_item_slots = treasure_slots
+		return {"ok": true}
+	if int(inventory.get(iid, 0)) <= 0:
+		return {"ok": false, "error": "背包中没有该法宝"}
+	var def := ConfigManager.item_def_by_id(iid)
+	if def == null or def.item_type != EnumItemType.LABEL_TREASURE:
+		return {"ok": false, "error": "该物品不是法宝"}
+	for i in treasure_slots.size():
+		if i != slot_index and str(treasure_slots[i]) == iid:
+			treasure_slots[i] = ""
+	treasure_slots[slot_index] = iid
+	treasure_item_slots = treasure_slots
+	if slot_index < equip_slot_values.size():
+		equip_slot_values[slot_index] = -1
+		equip_slots = equip_slot_values
+	return {"ok": true, "message": "已装备 %s。" % def.name}
+
+
+func _owns_equip_id(equip_id: int) -> bool:
+	for eid_v in owned_equips:
+		if int(eid_v) == equip_id:
+			return true
+	return false
+
+
+func assign_item_slot(slot_index: int, item_id: String) -> Dictionary:
+	if slot_index < 0 or slot_index >= item_slots.size():
+		return {"ok": false, "error": "无效道具槽位"}
+	var iid := item_id.strip_edges()
+	var slots := (item_slots as Array).duplicate(true)
+	if iid == "":
+		slots[slot_index] = ""
+		item_slots = slots
+		return {"ok": true}
+	if int(inventory.get(iid, 0)) <= 0:
+		return {"ok": false, "error": "背包中没有该道具"}
+	var def := ConfigManager.item_def_by_id(iid)
+	if def == null or not def.has_fight_config():
+		return {"ok": false, "error": "该物品不可带入战斗"}
+	for i in slots.size():
+		if i != slot_index and str(slots[i]) == iid:
+			slots[i] = ""
+	slots[slot_index] = iid
+	item_slots = slots
+	return {"ok": true, "message": "已装备 %s。" % def.name}
+
+
 func resolved_auto_battle_rules() -> Dictionary:
-	if not auto_battle_rules.is_empty():
-		return auto_battle_rules.duplicate(true)
-	var rules: Array = []
-	match auto_battle_preset:
-		"aggressive":
-			for sid_v in equipped_skills:
-				var sid := int(sid_v)
-				if sid > 0:
-					rules.append({"when": {"skill_ready": sid}, "action": {"type": "skill", "skill_id": sid}})
-		"conservative":
-			rules.append({"when": {"self_hp_ratio_lte": 0.45, "item_count_gte": {"slot": 0, "count": 1}}, "action": {"type": "item", "slot_index": 0}})
-			for sid_v in equipped_skills:
-				var sid := int(sid_v)
-				if sid > 0:
-					rules.append({"when": {"self_mp_gte": 40, "skill_ready": sid}, "action": {"type": "skill", "skill_id": sid}})
-		_:
-			for sid_v in equipped_skills:
-				var sid := int(sid_v)
-				if sid > 0:
-					rules.append({"when": {"skill_ready": sid}, "action": {"type": "skill", "skill_id": sid}})
-	rules.append({"when": {}, "action": {"type": "basic"}})
-	return {"version": 1, "policy": "rule_list", "rules": rules}
+	return PlayerAutoBattleServiceScript.normalize_rules(auto_battle_rules)
+
+
+func auto_battle_strategies() -> Array:
+	var rules := resolved_auto_battle_rules()
+	return (rules.get("strategies", []) as Array).duplicate(true)
+
+
+func set_auto_battle_strategies(strategies: Array) -> void:
+	auto_battle_rules = PlayerAutoBattleServiceScript.with_strategies(strategies)
+
+
+func append_auto_battle_strategy(strategy: Dictionary) -> void:
+	var strategies := auto_battle_strategies()
+	strategies.append(strategy.duplicate(true))
+	set_auto_battle_strategies(strategies)
+
+
+func remove_auto_battle_strategy(index: int) -> void:
+	var strategies := auto_battle_strategies()
+	if index < 0 or index >= strategies.size():
+		return
+	strategies.remove_at(index)
+	set_auto_battle_strategies(strategies)
 
 
 func reward_label(reward: Dictionary) -> String:
@@ -654,19 +1347,76 @@ func reward_label(reward: Dictionary) -> String:
 func _finish_activity(text: String, reduce_injury: bool) -> void:
 	if reduce_injury and injury_days > 0:
 		injury_days -= 1
-	activity_log.append({"day": day, "text": text})
-	if activity_log.size() > 30:
-		activity_log = activity_log.slice(activity_log.size() - 30)
+	_append_activity(text)
 	day += 1
 
 
-func _sync_realm() -> void:
-	var root := _simulation_root()
-	var realms := root.get("realms", []) as Array
+func _append_activity(text: String) -> void:
+	activity_log.append({"day": day, "text": text})
+	if activity_log.size() > 30:
+		activity_log = activity_log.slice(activity_log.size() - 30)
+
+
+func _realms() -> Array:
+	return _simulation_root().get("realms", []) as Array
+
+
+func _realm_row(index: int) -> Dictionary:
+	var realms := _realms()
+	if realms.is_empty():
+		return {}
+	var safe_index := clampi(index, 0, realms.size() - 1)
+	var row_v: Variant = realms[safe_index]
+	return row_v as Dictionary if row_v is Dictionary else {}
+
+
+func _major_realm_id(row: Dictionary) -> String:
+	var major := str(row.get("major_realm", "")).strip_edges()
+	if major != "":
+		return major
+	var id := str(row.get("id", "")).strip_edges()
+	if id == "":
+		return ""
+	return id.split("_", false, 1)[0]
+
+
+func _same_major_realm(index_a: int, index_b: int) -> bool:
+	var major_a := _major_realm_id(_realm_row(index_a))
+	var major_b := _major_realm_id(_realm_row(index_b))
+	return major_a != "" and major_a == major_b
+
+
+func _can_auto_advance_layer() -> bool:
+	if cultivation < breakthrough_at:
+		return false
+	var next_index := realm_index + 1
+	if next_index >= _realms().size():
+		return false
+	return _same_major_realm(realm_index, next_index)
+
+
+func _auto_advance_layers() -> int:
+	var advances := 0
+	while _can_auto_advance_layer():
+		realm_index += 1
+		advances += 1
+		_apply_realm_row()
+	if advances > 0:
+		refresh_derived_attrs(true)
+	return advances
+
+
+func _apply_realm_row() -> void:
+	var realms := _realms()
 	var index := mini(realm_index, maxi(0, realms.size() - 1))
-	var row := realms[index] as Dictionary if not realms.is_empty() else {}
+	var row := _realm_row(index)
 	realm_name = str(row.get("name", "炼气一层"))
 	breakthrough_at = maxi(cultivation + 100, int(row.get("breakthrough_at", 100))) if realm_index >= realms.size() else int(row.get("breakthrough_at", 100))
+
+
+func _sync_realm() -> void:
+	_apply_realm_row()
+	_auto_advance_layers()
 
 
 func _activity_cfg(activity_id: String) -> Dictionary:

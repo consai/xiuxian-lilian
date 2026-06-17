@@ -12,4 +12,7 @@ static func settle_active_expedition(reason: String) -> Dictionary:
 		return result
 	if GameState == null:
 		return {"ok": false, "error": "缺少 GameState"}
-	return GameState.settle_expedition(result)
+	var settled: Dictionary = GameState.settle_expedition(result)
+	if not bool(settled.get("ok", false)):
+		return settled
+	return result

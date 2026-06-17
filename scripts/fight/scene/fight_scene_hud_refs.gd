@@ -28,7 +28,7 @@ var buff_status_right: BuffStatusBar
 var interval_left: IntervalTrackView
 var interval_right: IntervalTrackView
 var fighttime: Label
-var sprite_left: Sprite2D
+var sprite_left: EnemyFormationSlotView
 var sprite_right: Sprite2D
 var center: Control
 var chk_auto_player: CheckButton

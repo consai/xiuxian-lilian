@@ -33,10 +33,12 @@ func _ready() -> void:
 	_collect_map_nodes()
 	_connect_popups()
 	refresh_map()
+	TutorialService.game_event("tutorial.world_map_opened")
 
 
 func refresh_map() -> void:
 	var map_data := GameState.map_data()
+	map_data = _sync_nearby_region_discovery(map_data)
 	_update_header(map_data)
 	_update_cities(map_data)
 	_update_regions(map_data)
@@ -66,9 +68,6 @@ func select_city(city_id: String) -> void:
 
 func select_wilderness(region_id: String) -> void:
 	var map_data := GameState.map_data()
-	var state := WorldMapServiceScript.region_visual_state(region_id, map_data)
-	if state != "discovered":
-		return
 	var region := WorldMapServiceScript.wilderness_region_by_id(region_id)
 	if region.is_empty():
 		return
@@ -86,8 +85,6 @@ func select_wilderness(region_id: String) -> void:
 			str(can_enter.get("error", "")),
 			bounds
 		)
-
-
 func select_wilderness_location(location_id: String) -> void:
 	var map_data := GameState.map_data()
 	var current_city := str(map_data.get("current_city_id", ""))
@@ -108,6 +105,8 @@ func select_wilderness_location(location_id: String) -> void:
 			str(can_enter.get("error", "")),
 			0
 		)
+	if location_id == "wild_wolf_valley":
+		TutorialService.game_event("tutorial.wolf_valley_selected")
 
 
 func request_travel(target_city_id: String) -> void:
@@ -117,13 +116,7 @@ func request_travel(target_city_id: String) -> void:
 	if not bool(preview.get("ok", false)):
 		return
 	DataStore.map_runtime()["pending_travel"] = preview.duplicate(true)
-	if _travel_popup.has_method("show_preview"):
-		_travel_popup.call(
-			"show_preview",
-			preview,
-			str(WorldMapServiceScript.city_by_id(from_id).get("name", from_id)),
-			str(WorldMapServiceScript.city_by_id(target_city_id).get("name", target_city_id))
-		)
+	confirm_travel()
 
 
 func confirm_travel() -> void:
@@ -394,3 +387,12 @@ func _polygon_center(points: Array) -> Vector2:
 	return total / float(points.size())
 
 
+func _sync_nearby_region_discovery(map_data: Dictionary) -> Dictionary:
+	var current_city := str(map_data.get("current_city_id", ""))
+	var before: Array = (map_data.get("discovered_regions", []) as Array).duplicate()
+	var synced := WorldMapServiceScript.discover_regions_near_city(map_data, current_city)
+	var after: Array = synced.get("discovered_regions", []) as Array
+	if after.size() != before.size():
+		GameState.set_map_data(synced)
+		return synced
+	return map_data

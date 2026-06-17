@@ -22,6 +22,7 @@ func process_frame(ctx: FightSceneContext, hud: FightSceneHud, presentation: Fig
 					schedule_side_act(ctx, BattleDomainService.SIDE_PLAYER)
 				BattleDomainService.SIGNAL_ENEMY_READY:
 					BattleDebugLog.write("场景", "敌方走条满，进入暂停")
+					ctx.battle_enemy = ctx.domain.enemy
 					ctx.domain.enter_paused(BattleDomainService.SIDE_ENEMY)
 					hud.update_skill_input_enabled(ctx)
 					schedule_side_act(ctx, BattleDomainService.SIDE_ENEMY)
@@ -76,6 +77,7 @@ func side_act_and_present(
 	if ctx.domain.paused_side != side:
 		return
 	if side == BattleDomainService.SIDE_ENEMY:
+		ctx.battle_enemy = ctx.domain.enemy
 		var enemy_resolved := FightSceneActions.resolve_enemy_action_with_ai(ctx)
 		var enemy_payload: Dictionary = enemy_resolved.get("payload", {}) as Dictionary
 		var enemy_desc: Dictionary = enemy_resolved.get("descriptor", {}) as Dictionary
@@ -104,6 +106,8 @@ func side_act_and_present(
 			hud.sync_from_domain(ctx)
 			await presentation.run_presentation(ctx, hud, player_payload, on_battle_ended)
 			return
+	if side == BattleDomainService.SIDE_ENEMY:
+		ctx.battle_enemy = ctx.domain.enemy
 	var actor := ctx.battle_player if side == BattleDomainService.SIDE_PLAYER else ctx.battle_enemy
 	var check_interactive := side == BattleDomainService.SIDE_PLAYER
 	var slot_index := FightSceneActions.find_auto_skill_slot(ctx, actor, check_interactive)
@@ -253,10 +257,13 @@ func return_battle_end(ctx: FightSceneContext, hud: FightSceneHud, reason: Strin
 		if ExpeditionState != null and ExpeditionState.active and ExpeditionState.phase == "battle":
 			display_summary["rewards"] = ExpeditionState.pending_battle_rewards.duplicate(true)
 		hud.show_battle_result(ctx, display_summary)
+	var player_hp := ctx.domain.player.hp if ctx.domain.player != null else -1.0
+	var enemy_hp := ctx.domain.enemy.hp if ctx.domain.enemy != null else 0.0
 	BattleDebugLog.write("结束", "战斗结束", {
 		"原因": BattleDebugLog.end_reason_label(reason),
-		"玩家生命": ctx.domain.player.hp,
-		"敌方生命": ctx.domain.enemy.hp,
+		"玩家生命": player_hp,
+		"敌方生命": enemy_hp,
+		"敌方数量": ctx.domain.enemies.size(),
 		"快照": ctx.domain.get_debug_snapshot(),
 	})
 	BattleDebugLog.clear_domain()

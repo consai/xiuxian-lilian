@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="XiuXianLiLian"
-run/main_scene="res://scenes/sim/cave_hub.tscn"
+run/main_scene="res://scenes/ui/main_menu.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -27,6 +27,9 @@ GameState="*res://scripts/sim/game_state.gd"
 ExpeditionState="*res://scripts/expedition/expedition_state.gd"
 ItemInfoPopupHost="*res://scripts/ui/item_info_popup_host.gd"
 SceneManager="*res://scripts/core/scene_manager.gd"
+GmPanelHost="*res://scripts/ui/gm_panel_host.gd"
+StoryDirector="*res://scripts/story/story_director.gd"
+TutorialService="*res://scripts/story/tutorial_service.gd"
 
 [display]
 

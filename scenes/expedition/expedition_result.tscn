@@ -4,14 +4,14 @@
 [ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_theme"]
 [ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="3_bg"]
 [ext_resource type="Texture2D" uid="uid://byo31enqsiwst" path="res://assets/art/ui_new/img_suc.png" id="4_success"]
-[ext_resource type="Texture2D" uid="uid://1impvpgc21e8" path="res://assets/art/ui_new/shuye.png" id="5_herb"]
-[ext_resource type="Texture2D" uid="uid://7ppj3d5hwhen" path="res://assets/art/ui_new/wanzi.png" id="6_core"]
-[ext_resource type="Texture2D" uid="uid://c76pqy6eaf2sc" path="res://assets/art/ui_new/shuijing.png" id="7_orb"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="9_title"]
+[ext_resource type="Script" path="res://scripts/ui/components/long_press_scroll_container.gd" id="9_lpsc"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="10_h2"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="11_h3"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="12_body"]
 [ext_resource type="FontFile" uid="uid://btkp4vukwqrul" path="res://assets/art/AlimamaDaoLiTi.ttf" id="14_font"]
+[ext_resource type="PackedScene" path="res://scenes/expedition/expedition_log_panel.tscn" id="15_log_panel"]
+[ext_resource type="PackedScene" uid="uid://bx04spldnbiyv" path="res://scenes/items/item.tscn" id="16_item"]
 
 [sub_resource type="StyleBoxFlat" id="PanelMain"]
 bg_color = Color(1, 0.945, 0.835, 0.985)
@@ -50,18 +50,6 @@ corner_radius_top_left = 17
 corner_radius_top_right = 17
 corner_radius_bottom_right = 17
 corner_radius_bottom_left = 17
-
-[sub_resource type="StyleBoxFlat" id="RewardSlot"]
-bg_color = Color(0.96, 0.86, 0.7, 0.48)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.65, 0.47, 0.29, 0.78)
-corner_radius_top_left = 13
-corner_radius_top_right = 13
-corner_radius_bottom_right = 13
-corner_radius_bottom_left = 13
 
 [sub_resource type="StyleBoxFlat" id="ReturnNormal"]
 bg_color = Color(0.61, 0.7, 0.39, 1)
@@ -191,6 +179,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="ResultMessage" type="Label" parent="Dialog/OutcomeCard" unique_id=1254079714]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 20.0
 offset_top = 250.0
@@ -201,77 +190,6 @@ label_settings = ExtResource("12_body")
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
-
-[node name="Divider" type="HSeparator" parent="Dialog/OutcomeCard" unique_id=172503100]
-layout_mode = 0
-offset_left = 22.0
-offset_top = 318.0
-offset_right = 294.0
-offset_bottom = 322.0
-
-[node name="LootHeading" type="Label" parent="Dialog/OutcomeCard" unique_id=1542292744]
-layout_mode = 0
-offset_left = 20.0
-offset_top = 330.0
-offset_right = 296.0
-offset_bottom = 360.0
-text = "代表性收获"
-label_settings = ExtResource("11_h3")
-horizontal_alignment = 1
-
-[node name="HerbSlot" type="Panel" parent="Dialog/OutcomeCard" unique_id=3233903]
-layout_mode = 0
-offset_left = 24.0
-offset_top = 368.0
-offset_right = 104.0
-offset_bottom = 424.0
-theme_override_styles/panel = SubResource("RewardSlot")
-
-[node name="Icon" type="TextureRect" parent="Dialog/OutcomeCard/HerbSlot" unique_id=2068477713]
-layout_mode = 0
-offset_left = 15.0
-offset_top = 3.0
-offset_right = 65.0
-offset_bottom = 53.0
-texture = ExtResource("5_herb")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="CoreSlot" type="Panel" parent="Dialog/OutcomeCard" unique_id=1328351560]
-layout_mode = 0
-offset_left = 118.0
-offset_top = 368.0
-offset_right = 198.0
-offset_bottom = 424.0
-theme_override_styles/panel = SubResource("RewardSlot")
-
-[node name="Icon" type="TextureRect" parent="Dialog/OutcomeCard/CoreSlot" unique_id=1518960043]
-layout_mode = 0
-offset_left = 15.0
-offset_top = 3.0
-offset_right = 65.0
-offset_bottom = 53.0
-texture = ExtResource("6_core")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="OrbSlot" type="Panel" parent="Dialog/OutcomeCard" unique_id=1457481867]
-layout_mode = 0
-offset_left = 212.0
-offset_top = 368.0
-offset_right = 292.0
-offset_bottom = 424.0
-theme_override_styles/panel = SubResource("RewardSlot")
-
-[node name="Icon" type="TextureRect" parent="Dialog/OutcomeCard/OrbSlot" unique_id=1949782926]
-layout_mode = 0
-offset_left = 15.0
-offset_top = 3.0
-offset_right = 65.0
-offset_bottom = 53.0
-texture = ExtResource("7_orb")
-expand_mode = 1
-stretch_mode = 5
 
 [node name="DetailCard" type="Panel" parent="Dialog" unique_id=331816958]
 layout_mode = 0
@@ -299,16 +217,22 @@ offset_right = 558.0
 offset_bottom = 56.0
 
 [node name="Scroll" type="ScrollContainer" parent="Dialog/DetailCard" unique_id=1935539412]
+script = ExtResource("9_lpsc")
 layout_mode = 0
 offset_left = 28.0
 offset_top = 68.0
 offset_right = 554.0
-offset_bottom = 416.0
+offset_bottom = 372.0
 horizontal_scroll_mode = 0
 
-[node name="Body" type="RichTextLabel" parent="Dialog/DetailCard/Scroll" unique_id=1776452034]
+[node name="VBox" type="VBoxContainer" parent="Dialog/DetailCard/Scroll" unique_id=1935539413]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Body" type="RichTextLabel" parent="Dialog/DetailCard/Scroll/VBox" unique_id=1776452034]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(500, 340)
+custom_minimum_size = Vector2(500, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/default_color = Color(0.333333, 0.196078, 0.184314, 1)
@@ -318,11 +242,73 @@ theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
 theme_override_fonts/normal_font = ExtResource("14_font")
 theme_override_font_sizes/normal_font_size = 20
-text = "深入 6 层，事件 8 个，消耗 3 日
+text = "最高难度 4，事件 8 个，消耗 12 日
 战斗 3 场，胜 3，负 0
-最终气血 82，法力 46
-获得：灵草 x4、妖丹 x1、寒潭珠 x1"
+最终气血 82，法力 46"
 fit_content = true
+
+[node name="LootHeading" type="Label" parent="Dialog/DetailCard/Scroll/VBox" unique_id=1935539414]
+unique_name_in_owner = true
+layout_mode = 2
+text = "获得道具"
+label_settings = ExtResource("11_h3")
+
+[node name="LootItems" type="GridContainer" parent="Dialog/DetailCard/Scroll/VBox" unique_id=1935539415]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 5
+
+[node name="LootItemTemplate" parent="Dialog/DetailCard/Scroll/VBox/LootItems" unique_id=1935539416 instance=ExtResource("16_item")]
+visible = false
+layout_mode = 2
+
+[node name="LootEmpty" type="Label" parent="Dialog/DetailCard/Scroll/VBox" unique_id=1935539417]
+unique_name_in_owner = true
+layout_mode = 2
+text = "无收获"
+label_settings = ExtResource("12_body")
+horizontal_alignment = 1
+
+[node name="LootLostHeading" type="Label" parent="Dialog/DetailCard/Scroll/VBox" unique_id=1935539418]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.28, 0.22, 1)
+text = "战败掉落"
+label_settings = ExtResource("11_h3")
+
+[node name="LootLostItems" type="GridContainer" parent="Dialog/DetailCard/Scroll/VBox" unique_id=1935539419]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 5
+
+[node name="LootLostItemTemplate" parent="Dialog/DetailCard/Scroll/VBox/LootLostItems" unique_id=1935539420 instance=ExtResource("16_item")]
+visible = false
+layout_mode = 2
+modulate = Color(0.82, 0.62, 0.62, 1)
+
+[node name="LogButton" type="Button" parent="Dialog/DetailCard" unique_id=2147483646]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 140.0
+offset_top = 384.0
+offset_right = 440.0
+offset_bottom = 432.0
+theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
+theme_override_colors/font_hover_color = Color(0.2, 0.14, 0.08, 1)
+theme_override_fonts/font = ExtResource("14_font")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("ReturnNormal")
+theme_override_styles/pressed = SubResource("ReturnHover")
+theme_override_styles/hover = SubResource("ReturnHover")
+text = "查看历练记录"
 
 [node name="RulePanel" type="Panel" parent="Dialog" unique_id=407967364]
 layout_mode = 0
@@ -362,3 +348,13 @@ theme_override_styles/normal = SubResource("ReturnNormal")
 theme_override_styles/pressed = SubResource("ReturnHover")
 theme_override_styles/hover = SubResource("ReturnHover")
 text = "返回洞府"
+
+[node name="ExpeditionLogPanel" parent="." unique_id=2147483647 instance=ExtResource("15_log_panel")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

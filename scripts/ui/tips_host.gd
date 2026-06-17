@@ -22,7 +22,7 @@ var _bus: TipBus
 
 
 func _ready() -> void:
-	layer = 1000
+	layer = 1010
 	follow_viewport_enabled = true
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_setup_tip_runtime()

@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="Texture2D" uid="uid://bvyowwe1lh8j2" path="res://assets/art/character_panel_icons/equip_thunder_seal.png" id="2_icon"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/16.tres" id="3_small"]
+[sub_resource type="StyleBoxFlat" id="SlotStyle"]
+bg_color = Color(0.97, 0.88, 0.73, 0.48)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.66, 0.47, 0.29, 0.72)
+corner_radius_top_left = 13
+corner_radius_top_right = 13
+corner_radius_bottom_right = 13
+corner_radius_bottom_left = 13
+[node name="LoadoutEquipmentSlot" type="Panel"]
+custom_minimum_size = Vector2(82, 108)
+theme = ExtResource("1_theme")
+theme_override_styles/panel = SubResource("SlotStyle")
+[node name="Icon" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 13.0
+offset_top = 8.0
+offset_right = 69.0
+offset_bottom = 64.0
+texture = ExtResource("2_icon")
+expand_mode = 1
+stretch_mode = 5
+[node name="NameLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 4.0
+offset_top = 70.0
+offset_right = 78.0
+offset_bottom = 102.0
+text = "天雷印"
+label_settings = ExtResource("3_small")
+horizontal_alignment = 1

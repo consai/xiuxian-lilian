@@ -5,7 +5,6 @@ const LocationServiceScript := preload("res://scripts/expedition/location_servic
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
-const ExpeditionDirectorServiceScript := preload("res://scripts/expedition/expedition_director_service.gd")
 const ExpeditionLogServiceScript := preload("res://scripts/expedition/expedition_log_service.gd")
 
 signal log_updated
@@ -191,7 +190,11 @@ func _advance_single_day() -> Dictionary:
 		days_without_event += 1
 		_save_rng()
 		return {"ok": true, "mode": "pass_day"}
-	var event := ExpeditionDirectorServiceScript.select_next_event(_director_context(), _rng)
+	var event := ExpeditionEventServiceScript.roll_next_event(
+		effective_location(),
+		visited_once_events,
+		_rng
+	)
 	if event.is_empty():
 		days_without_event += 1
 		_save_rng()
@@ -396,9 +399,11 @@ func build_battle_init() -> Dictionary:
 	if not PlayerBattleSnapshot.collect_errors(player).is_empty():
 		return {}
 	var enemy := ExpeditionEventServiceScript.build_battle_enemy(event)
+	var enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
 	var init_data := {
 		"player": player,
 		"enemy": enemy,
+		"enemies": enemies,
 		"battle_time_limit": 200.0,
 		"auto_battle": {"player": bool(_game_state.auto_battle_enabled), "enemy": true},
 		"spd_jitter_ratio": 0.0,
@@ -438,6 +443,8 @@ func settle_pending_battle() -> Dictionary:
 	if won:
 		stats["wins"] = int(stats.get("wins", 0)) + 1
 		var battle_rewards := pending_battle_rewards.duplicate(true)
+		if TutorialService.is_active() and StoryDirector.is_waiting_for("tutorial.first_battle_won"):
+			battle_rewards.append({"kind": "item", "id": "items_LingCao", "count": 2})
 		_apply_session_rewards(battle_rewards)
 		pending_battle_rewards = []
 		_apply_step_after_event(
@@ -451,6 +458,7 @@ func settle_pending_battle() -> Dictionary:
 			phase = "resolving"
 		current_choices = []
 		pending_decision_event = {}
+		TutorialService.game_event("tutorial.first_battle_won")
 		return {"ok": true, "won": true, "mode": "auto_done", "event": event}
 	stats["losses"] = int(stats.get("losses", 0)) + 1
 	if not event.is_empty():
@@ -516,14 +524,20 @@ func finish(exit_reason: String) -> Dictionary:
 		return {"ok": false, "error": "没有可结算的历练"}
 	var reason := exit_reason
 	var elapsed_days: int = ExpeditionRulesServiceScript.elapsed_days(days)
+	var settlement_loot := loot.duplicate(true)
 	var loot_lost: Array = []
 	if reason == "defeated":
 		_restore_rng()
-		var loss := ExpeditionRewardServiceScript.apply_inventory_loss_on_defeat(
-			_project_inventory_for_settlement(), _rng
-		)
+		var loot_loss := ExpeditionRewardServiceScript.apply_loot_loss_on_defeat(settlement_loot, _rng)
+		loot_lost.append_array(loot_loss.get("lost", []) as Array)
+		for kept_v in settlement_loot:
+			if kept_v is Dictionary:
+				var kept := (kept_v as Dictionary).duplicate(true)
+				if int(kept.get("count", 0)) > 0:
+					kept["source"] = "session_loot"
+					loot_lost.append(kept)
+		settlement_loot = []
 		_save_rng()
-		loot_lost = loss.get("lost", []) as Array
 		var rules: Dictionary = ExpeditionRulesServiceScript.rules()
 		var hp_max := float((player_snapshot.get("attrs", {}) as Dictionary).get(FightAttr.HP_MAX, 100.0))
 		runtime["hp"] = maxf(float(runtime.get("hp", 0.0)), hp_max * float(rules.get("defeat_hp_floor_ratio", 0.25)))
@@ -536,10 +550,11 @@ func finish(exit_reason: String) -> Dictionary:
 		"hp": float(runtime.get("hp", 0.0)),
 		"mp": float(runtime.get("mp", 0.0)),
 		"items": _runtime_items_for_settlement(),
-		"loot": loot.duplicate(true),
+		"loot": settlement_loot,
 		"loot_lost": loot_lost,
 		"location_name": str(LocationServiceScript.by_id(location_id).get("name", location_id)),
 		"stats": stats.duplicate(true),
+		"event_log": _duplicate_event_log(),
 		"chronicle": _build_chronicle(),
 		"world_changes": _world_changes(),
 	})
@@ -718,7 +733,7 @@ func _copy_player_snapshot(game_state: Node) -> Dictionary:
 		"name": str(game_state.player_name),
 		"icon": str(game_state.player_icon),
 		"attrs": (game_state.attrs as Dictionary).duplicate(true),
-		"equipped_skills": (game_state.equipped_skills as Array).duplicate(true),
+		"equipped_abilities": (game_state.equipped_abilities as Array).duplicate(true),
 		"equip_slots": (game_state.equip_slots as Array).duplicate(true),
 	}
 
@@ -748,18 +763,6 @@ func effective_location() -> Dictionary:
 	return LocationServiceScript.by_id(location_id)
 
 
-func _director_context() -> Dictionary:
-	return {
-		"location": effective_location(),
-		"active_chain_id": active_chain_id,
-		"completed_events": completed_events,
-		"runtime": runtime,
-		"player_attrs": player_snapshot.get("attrs", {}) as Dictionary,
-		"world_state": _game_state.world_state if _game_state != null else {},
-		"stats": stats,
-	}
-
-
 func _world_changes() -> Array:
 	var changes: Array = []
 	for event_id_v in completed_events:
@@ -768,6 +771,14 @@ func _world_changes() -> Array:
 			if change_v is Dictionary:
 				changes.append((change_v as Dictionary).duplicate(true))
 	return changes
+
+
+func _duplicate_event_log() -> Array:
+	var out: Array = []
+	for entry_v in event_log:
+		if entry_v is Dictionary:
+			out.append((entry_v as Dictionary).duplicate(true))
+	return out
 
 
 func _build_chronicle() -> Array:

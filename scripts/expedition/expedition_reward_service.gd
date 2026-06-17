@@ -68,7 +68,44 @@ static func apply_inventory_loss_on_defeat(inventory: Dictionary, rng: RandomNum
 		if drop <= 0:
 			continue
 		InventoryServiceScript.remove_item(inventory, iid, drop)
-		lost.append({"kind": "item", "id": iid, "count": drop})
+		lost.append({"kind": "item", "id": iid, "count": drop, "source": "inventory"})
+	return {"lost": lost}
+
+
+static func apply_loot_loss_on_defeat(loot: Array, rng: RandomNumberGenerator) -> Dictionary:
+	var rules := ExpeditionRulesServiceScript.rules()
+	var min_stacks := maxi(0, int(rules.get("defeat_loot_drop_min_stacks", 1)))
+	var max_stacks := maxi(min_stacks, int(rules.get("defeat_loot_drop_max_stacks", 2)))
+	var min_ratio := clampf(float(rules.get("defeat_loot_drop_min_ratio", 0.25)), 0.0, 1.0)
+	var max_ratio := clampf(float(rules.get("defeat_loot_drop_max_ratio", 0.75)), min_ratio, 1.0)
+	var candidate_indices: Array = []
+	for i in loot.size():
+		var row_v: Variant = loot[i]
+		if not row_v is Dictionary:
+			continue
+		if int((row_v as Dictionary).get("count", 0)) > 0:
+			candidate_indices.append(i)
+	if candidate_indices.is_empty():
+		return {"lost": []}
+	_shuffle_array(candidate_indices, rng)
+	var pick_count := mini(candidate_indices.size(), rng.randi_range(min_stacks, max_stacks))
+	var lost: Array = []
+	for i in pick_count:
+		var idx: int = int(candidate_indices[i])
+		var row := loot[idx] as Dictionary
+		var kind := str(row.get("kind", "item"))
+		var id_key := str(row.get("id", ""))
+		var count := int(row.get("count", 0))
+		if count <= 0:
+			continue
+		var min_drop := maxi(1, int(floor(float(count) * min_ratio)))
+		var max_drop := maxi(min_drop, int(floor(float(count) * max_ratio)))
+		var drop := mini(count, rng.randi_range(min_drop, max_drop))
+		if drop <= 0:
+			continue
+		_remove_reward_count(loot, idx, drop)
+		lost.append({"kind": kind, "id": id_key, "count": drop, "source": "session_loot"})
+	_prune_empty_loot(loot)
 	return {"lost": lost}
 
 
@@ -90,6 +127,26 @@ static func merge_into_loot(loot: Array, rewards: Array) -> void:
 				break
 		if not merged:
 			loot.append(reward.duplicate(true))
+
+
+static func _remove_reward_count(loot: Array, idx: int, amount: int) -> void:
+	if idx < 0 or idx >= loot.size():
+		return
+	var row_v: Variant = loot[idx]
+	if not row_v is Dictionary:
+		return
+	var row := row_v as Dictionary
+	row["count"] = maxi(0, int(row.get("count", 0)) - amount)
+
+
+static func _prune_empty_loot(loot: Array) -> void:
+	for i in range(loot.size() - 1, -1, -1):
+		var row_v: Variant = loot[i]
+		if not row_v is Dictionary:
+			loot.remove_at(i)
+			continue
+		if int((row_v as Dictionary).get("count", 0)) <= 0:
+			loot.remove_at(i)
 
 
 static func _shuffle_array(values: Array, rng: RandomNumberGenerator) -> void:

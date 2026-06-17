@@ -4,20 +4,21 @@
     "travel": {
       "type": "travel",
       "mode": "auto",
-      "name": "继续赶路",
-      "desc": "沿着地图上的道路继续前行。",
+      "name": "循路前行",
+      "desc": "你辨明方向，沿着尚可通行的道路继续深入。",
       "risk_text": "平安",
       "weight": 26,
       "difficulty": 1,
       "once_per_expedition": false,
       "effects": [],
       "rewards": [],
+      "outcome_text": "一路虽无奇遇，你却对周遭地势多了几分把握。",
       "duration_key": "travel"
     },
     "gather_herbs": {
       "type": "gather",
-      "name": "采集灵药",
-      "desc": "你发现了适合此地生长的灵药。",
+      "name": "寻访灵植",
+      "desc": "草木间灵气聚而不散，似有可用灵植藏于其中。",
       "risk_text": "安全",
       "weight": 30,
       "difficulty": 1,
@@ -25,12 +26,14 @@
       "effects": [],
       "reward_pool": "herbs",
       "reward_rolls": 1,
+      "success_text": "你依照药性小心采下，收得{loot}。",
+      "empty_text": "你循着灵气搜寻许久，只找到几株尚未成熟的幼苗。",
       "duration_key": "gather"
     },
     "gather_ore": {
       "type": "gather",
-      "name": "采集矿材",
-      "desc": "附近岩层显露出可采集的矿材。",
+      "name": "勘察矿脉",
+      "desc": "岩层间偶有灵光闪动，或许埋藏着可用矿材。",
       "risk_text": "安全",
       "weight": 18,
       "difficulty": 2,
@@ -38,12 +41,14 @@
       "effects": [],
       "reward_pool": "ore",
       "reward_rolls": 1,
+      "success_text": "你凿开浮石，从岩层中取出{loot}。",
+      "empty_text": "岩层看似不凡，凿开后却只有一片寻常碎石。",
       "duration_key": "gather"
     },
     "recover_mp": {
       "type": "recover",
-      "name": "灵气调息",
-      "desc": "此地灵气尚可，可暂歇恢复法力。",
+      "name": "纳气调息",
+      "desc": "此处灵气流转平稳，正适合静坐吐纳片刻。",
       "risk_text": "安全",
       "weight": 22,
       "difficulty": 1,
@@ -56,8 +61,8 @@
     },
     "recover_hp": {
       "type": "recover",
-      "name": "寻地疗伤",
-      "desc": "你找到一处相对安稳的地方调息气血。",
+      "name": "静处疗伤",
+      "desc": "你寻到一处避风静地，决定先处理沿途积下的伤势。",
       "risk_text": "安全",
       "weight": 16,
       "difficulty": 2,
@@ -71,8 +76,8 @@
     "local_beast": {
       "type": "battle",
       "mode": "auto",
-      "name": "妖兽袭击",
-      "desc": "当地妖兽循着气息突然现身。",
+      "name": "兽影逼近",
+      "desc": "林野骤然安静，一道凶戾气息正从暗处迅速逼近。",
       "risk_text": "普通",
       "weight": 20,
       "difficulty": 2,
@@ -82,6 +87,110 @@
       "enemy_pool": "beast",
       "reward_rolls": 2,
       "duration_key": "battle"
+    },
+    "gather_fruit": {
+      "type": "gather",
+      "name": "灵果飘香",
+      "desc": "微风送来清甜果香，附近似有吸纳灵气而生的果木。",
+      "risk_text": "安全",
+      "weight": 15,
+      "difficulty": 1,
+      "once_per_expedition": false,
+      "effects": [],
+      "reward_pool": "fruit",
+      "reward_rolls": 1,
+      "success_text": "你避开虫蛇，摘得{loot}。",
+      "empty_text": "枝头只余鸟兽啄食后的残果，已无可取之物。",
+      "duration_key": "gather"
+    },
+    "hidden_cache": {
+      "type": "gather",
+      "name": "前人遗落",
+      "desc": "一处被草叶遮掩的痕迹引起你的注意，像是前人匆忙留下的藏物。",
+      "risk_text": "机缘",
+      "weight": 10,
+      "difficulty": 2,
+      "once_per_expedition": true,
+      "effects": [],
+      "reward_pool": "cache",
+      "reward_rolls": 2,
+      "success_text": "你谨慎查验四周，从藏物中取出{loot}。",
+      "empty_text": "藏物早已被人取走，只余几片腐朽布帛。",
+      "duration_key": "search"
+    },
+    "harsh_terrain": {
+      "type": "hazard",
+      "name": "险路难行",
+      "desc": "前方地势陡然恶化，每一步都需耗费更多心力。",
+      "risk_text": "轻微",
+      "weight": 14,
+      "difficulty": 2,
+      "once_per_expedition": false,
+      "effects": [
+        {"type": "drain_mp_percent", "value": 0.1}
+      ],
+      "rewards": [],
+      "duration_key": "hazard"
+    },
+    "deep_rest": {
+      "type": "recover",
+      "name": "安营整备",
+      "desc": "天色渐暗，你找到一处易守难攻的落脚点，得以安心整备。",
+      "risk_text": "休整",
+      "weight": 9,
+      "difficulty": 2,
+      "once_per_expedition": false,
+      "effects": [
+        {"type": "heal_hp_percent", "value": 0.15},
+        {"type": "restore_mp_percent", "value": 0.2}
+      ],
+      "rewards": [],
+      "duration_key": "deep_rest"
+    },
+    "wandering_cultivator": {
+      "type": "decision",
+      "mode": "decision",
+      "name": "途中相逢",
+      "desc": "一名风尘仆仆的散修在路旁停步，与你遥遥拱手。",
+      "risk_text": "抉择",
+      "weight": 11,
+      "difficulty": 2,
+      "once_per_expedition": false,
+      "options": [
+        {
+          "id": "exchange",
+          "label": "交换见闻",
+          "desc": "与对方分享沿途消息，也许能换来一些实用物资。",
+          "risk_text": "机缘",
+          "reward_pool": "traveler",
+          "reward_rolls": 1,
+          "effects": []
+        },
+        {
+          "id": "keep_distance",
+          "label": "谨慎告辞",
+          "desc": "荒野相逢难辨善恶，你礼貌告辞后继续上路。",
+          "risk_text": "稳妥",
+          "effects": [],
+          "rewards": []
+        }
+      ],
+      "duration_key": "decision"
+    },
+    "local_elite": {
+      "type": "elite",
+      "mode": "auto",
+      "name": "凶兽盘踞",
+      "desc": "浓重妖气笼罩前路，一头久踞此地的凶兽挡住了去路。",
+      "risk_text": "精英",
+      "weight": 7,
+      "difficulty": 4,
+      "once_per_expedition": true,
+      "effects": [],
+      "reward_pool": "elite",
+      "enemy_pool": "elite",
+      "reward_rolls": 3,
+      "duration_key": "elite_battle"
     }
   }
 }

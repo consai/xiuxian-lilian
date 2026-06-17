@@ -6,6 +6,7 @@ const EnemyAiContextScript = preload("res://scripts/fight/ai/enemy_ai_context.gd
 const EnemyAiPhaseResolverScript = preload("res://scripts/fight/ai/enemy_ai_phase_resolver.gd")
 const EnemyAiPolicyPriorityScript = preload("res://scripts/fight/ai/enemy_ai_policy_priority.gd")
 const EnemyAiPolicyRuleListScript = preload("res://scripts/fight/ai/enemy_ai_policy_rule_list.gd")
+const EnemyAiPolicyPlayerAutoScript = preload("res://scripts/fight/ai/enemy_ai_policy_player_auto.gd")
 
 
 static func decide_enemy_action(
@@ -16,7 +17,8 @@ static func decide_enemy_action(
 		runtime: EnemyAiRuntimeState = null,
 		domain_ctx: Dictionary = {},
 		item_cfg: Dictionary = {},
-		equip_cfg: Dictionary = {}
+		equip_cfg: Dictionary = {},
+		debug_log: bool = true
 ) -> Dictionary:
 	if enemy == null or player == null:
 		return EnemyAiTypesScript.fail(EnemyAiTypesScript.REASON_INVALID_AI_CONFIG)
@@ -45,18 +47,21 @@ static func decide_enemy_action(
 			result = EnemyAiPolicyPriorityScript.decide(ctx, policy_cfg)
 		"rule_list":
 			result = EnemyAiPolicyRuleListScript.decide(ctx, policy_cfg)
+		"player_auto":
+			result = EnemyAiPolicyPlayerAutoScript.decide(ctx, policy_cfg)
 		_:
 			result = EnemyAiTypesScript.fail(EnemyAiTypesScript.REASON_INVALID_AI_CONFIG)
-	BattleDebugLog.write("AI", "敌方决策", {
-		"policy": policy,
-		"phase_id": str(result.get("phase_id", ctx.active_phase_id)),
-		"ok": bool(result.get("ok", false)),
-		"action": str(result.get("action_type", "")),
-		"skill_id": int(result.get("skill_id", -1)),
-		"slot_index": int(result.get("slot_index", -1)),
-		"reason": str(result.get("reason", "")),
-		"enemy_mp": enemy.mp,
-		"enemy_hp": enemy.hp,
-		"player_hp": player.hp,
-	})
+	if debug_log:
+		BattleDebugLog.write("AI", "敌方决策", {
+			"policy": policy,
+			"phase_id": str(result.get("phase_id", ctx.active_phase_id)),
+			"ok": bool(result.get("ok", false)),
+			"action": str(result.get("action_type", "")),
+			"skill_id": int(result.get("skill_id", -1)),
+			"slot_index": int(result.get("slot_index", -1)),
+			"reason": str(result.get("reason", "")),
+			"enemy_mp": enemy.mp,
+			"enemy_hp": enemy.hp,
+			"player_hp": player.hp,
+		})
 	return result

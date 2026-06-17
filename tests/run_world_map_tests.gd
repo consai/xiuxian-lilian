@@ -19,12 +19,14 @@ func _run_all() -> void:
 	_run("coalesce adds map defaults", _test_coalesce_map_defaults)
 	_run("go_world_map allowed when idle", _test_go_world_map_allowed)
 	_run("go_world_map blocked when expedition active", _test_go_world_map_blocked)
+	_run("travel discovers nearby wilderness regions", _test_travel_discovers_nearby_regions)
+	_run("wilderness entry requires nearby city", _test_wilderness_entry_requires_nearby_city)
 	if not _failures.is_empty():
 		for failure in _failures:
 			printerr("FAIL: %s" % failure)
 		quit(1)
 		return
-	print("All %d world map tests passed." % 7)
+	print("All %d world map tests passed." % 9)
 	quit(0)
 
 
@@ -102,6 +104,39 @@ func _test_go_world_map_blocked() -> void:
 	var nav: Dictionary = root.get_node("SceneManager").go_world_map()
 	_expect_false(bool(nav.get("ok", true)), "world map blocked")
 	_expect_true(expedition.active, "expedition still active")
+
+
+func _test_travel_discovers_nearby_regions() -> void:
+	_reset_game()
+	var map_data: Dictionary = _game_state().map_data()
+	_expect_false(
+		"blackwater_marsh" in (map_data.get("discovered_regions", []) as Array),
+		"blackwater not discovered at starter city"
+	)
+	var preview := WorldMapServiceScript.build_travel_preview("qingshi_market", "yunlan_city", map_data)
+	_expect_true(bool(preview.get("ok", false)), "travel preview ok")
+	map_data = WorldMapServiceScript.discover_along_path(map_data, preview.get("path", []) as Array)
+	map_data["current_city_id"] = "yunlan_city"
+	_expect_true(
+		"blackwater_marsh" in (map_data.get("discovered_regions", []) as Array),
+		"blackwater discovered after arriving at yunlan"
+	)
+
+
+func _test_wilderness_entry_requires_nearby_city() -> void:
+	_reset_game()
+	var map_data: Dictionary = _game_state().map_data()
+	map_data["current_city_id"] = "yunlan_city"
+	var qinglan := WorldMapServiceScript.can_enter_wilderness("qinglan_mountain", map_data)
+	_expect_false(bool(qinglan.get("ok", true)), "qinglan blocked from yunlan")
+	_expect_true(str(qinglan.get("error", "")).contains("青石坊市"), "qinglan hints entry city")
+	map_data["current_city_id"] = "qingshi_market"
+	var qinglan_ok := WorldMapServiceScript.can_enter_wilderness("qinglan_mountain", map_data)
+	_expect_true(bool(qinglan_ok.get("ok", false)), "qinglan enterable from qingshi")
+	map_data = WorldMapServiceScript.discover_regions_near_city(map_data, "yunlan_city")
+	map_data["current_city_id"] = "yunlan_city"
+	var marsh := WorldMapServiceScript.can_enter_wilderness("blackwater_marsh", map_data)
+	_expect_true(bool(marsh.get("ok", false)), "blackwater enterable from yunlan")
 
 
 func _expect_true(value: bool, message: String) -> void:

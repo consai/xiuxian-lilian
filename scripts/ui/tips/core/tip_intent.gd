@@ -14,7 +14,7 @@ const TYPE_TOAST := "toast"
 const TYPE_HINT := "hint"
 const TYPE_BLOCK_REASON := "block_reason"
 
-const DEFAULT_TTL_MS := 5000
+const DEFAULT_TTL_MS := 2000
 
 
 static func make(fields: Dictionary) -> Dictionary:

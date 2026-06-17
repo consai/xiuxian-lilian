@@ -5,7 +5,7 @@ extends RefCounted
 const PREFIX := "[Battle]"
 
 ## 总开关；可在 fight_scene 导出项覆盖。
-static var enabled: bool = true
+static var enabled: bool = false
 ## 为 true 时，推进态约每秒打印一次走条进度（否则仅在到点/状态变化时打印）。
 static var verbose_tick: bool = false
 
@@ -135,8 +135,10 @@ static func log_unit(unit: FightObj, role: String) -> Dictionary:
 		"角色": side_label(role) if role in ["player", "enemy"] else role,
 		"生命": "%.1f/%.1f" % [unit.hp, unit.get_hp_max()],
 		"法力": "%.1f/%.1f" % [unit.mp, unit.get_mp_max()],
-		"攻击": unit.get_attr(FightObj.ATTR_ATK),
-		"防御": unit.get_attr(FightObj.ATTR_DEF),
+		"物理攻击": unit.get_attr(FightObj.ATTR_PHYSICAL_ATK),
+		"法术攻击": unit.get_attr(FightObj.ATTR_MAGIC_ATK),
+		"物理防御": unit.get_attr(FightObj.ATTR_PHYSICAL_DEF),
+		"法术防御": unit.get_attr(FightObj.ATTR_MAGIC_DEF),
 		"速度": unit.get_attr(FightObj.ATTR_SPD),
 		"行动进度速率": CombatBalance.action_progress_rate_for(unit),
 		"预计出手间隔": CombatBalance.interval_cap_for(unit),

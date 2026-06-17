@@ -67,7 +67,7 @@ static func can_actor_use_skill_at(
 	var cfg := lookup_skill_cfg(ctx, skill_id)
 	if cfg.is_empty():
 		return false
-	return actor.mp >= float(cfg.get("mp_cost", 0.0))
+	return actor.can_pay_costs(cfg)
 
 
 static func can_use_player_item_at(ctx: FightSceneContext, index: int) -> bool:
@@ -84,7 +84,7 @@ static func can_use_player_item_at(ctx: FightSceneContext, index: int) -> bool:
 	var cfg := FightObj._lookup_cfg(ctx.item_cfg, item_id)
 	if cfg.is_empty():
 		return false
-	return ctx.domain.player.mp >= float(cfg.get("mp_cost", 0.0))
+	return ctx.domain.player.can_pay_costs(cfg)
 
 
 static func can_use_player_equip_at(ctx: FightSceneContext, index: int) -> bool:
@@ -99,8 +99,8 @@ static func can_use_player_equip_at(ctx: FightSceneContext, index: int) -> bool:
 	var cfg := FightObj._lookup_cfg(ctx.equip_cfg, equip_id)
 	if cfg.is_empty():
 		return false
-	var need := float(slot.get("mp_cost", cfg.get("mp_cost", 0.0)))
-	return ctx.domain.player.mp >= need
+	var cost_cfg := _slot_cost_cfg(slot, cfg)
+	return ctx.domain.player.can_pay_costs(cost_cfg)
 
 
 static func get_skill_block_reason(ctx: FightSceneContext, index: int) -> Dictionary:
@@ -124,7 +124,7 @@ static func get_skill_block_reason(ctx: FightSceneContext, index: int) -> Dictio
 	var cfg := lookup_skill_cfg(ctx, skill_id)
 	if cfg.is_empty():
 		return empty_slot_reason()
-	var need := float(cfg.get("mp_cost", 0.0))
+	var need := FightObj.combat_resource_cost(cfg)
 	var have := ctx.domain.player.mp
 	if have < need:
 		return build_insufficient_mp_reason(need, have)
@@ -149,7 +149,7 @@ static func get_item_block_reason(ctx: FightSceneContext, index: int) -> Diction
 	if count <= 0:
 		return build_no_count_reason(count)
 	var cfg := FightObj._lookup_cfg(ctx.item_cfg, item_id)
-	var need := float(cfg.get("mp_cost", 0.0))
+	var need := FightObj.combat_resource_cost(cfg)
 	var have := ctx.domain.player.mp
 	if have < need:
 		return build_insufficient_mp_reason(need, have)
@@ -171,7 +171,8 @@ static func get_equip_block_reason(ctx: FightSceneContext, index: int) -> Dictio
 	if cd > 0.0:
 		return build_cooldown_reason(cd)
 	var cfg := FightObj._lookup_cfg(ctx.equip_cfg, equip_id)
-	var need := float(slot.get("mp_cost", cfg.get("mp_cost", 0.0)))
+	var cost_cfg := _slot_cost_cfg(slot, cfg)
+	var need := FightObj.combat_resource_cost(cost_cfg)
 	var have := ctx.domain.player.mp
 	if have < need:
 		return build_insufficient_mp_reason(need, have)
@@ -242,11 +243,15 @@ static func resolve_side_slot(
 
 
 static func resolve_enemy_action_with_ai(ctx: FightSceneContext) -> Dictionary:
-	if ctx.domain == null or ctx.battle_enemy == null or ctx.battle_player == null:
+	if ctx.domain == null or ctx.battle_player == null:
+		return {}
+	ctx.battle_enemy = ctx.domain.enemy
+	if ctx.battle_enemy == null:
 		return {}
 	var prev_phase := ""
-	if ctx.enemy_ai_runtime != null:
-		prev_phase = ctx.enemy_ai_runtime.last_phase_id
+	var runtime := _enemy_ai_runtime_for_current(ctx)
+	if runtime != null:
+		prev_phase = runtime.last_phase_id
 	var domain_ctx := {
 		"battle_elapsed": ctx.domain.battle_elapsed_advancing,
 	}
@@ -254,14 +259,14 @@ static func resolve_enemy_action_with_ai(ctx: FightSceneContext) -> Dictionary:
 		ctx.battle_enemy,
 		ctx.battle_player,
 		ctx.skill_cfg,
-		ctx.enemy_ai_cfg,
-		ctx.enemy_ai_runtime,
+		_enemy_ai_cfg_for_current(ctx),
+		_enemy_ai_runtime_for_current(ctx),
 		domain_ctx,
 		ctx.item_cfg,
 		ctx.equip_cfg
 	)
-	if ctx.enemy_ai_runtime != null:
-		var new_phase := str(decision.get("phase_id", ctx.enemy_ai_runtime.last_phase_id))
+	if runtime != null:
+		var new_phase := str(decision.get("phase_id", runtime.last_phase_id))
 		if new_phase != "" and new_phase != prev_phase:
 			BattleDebugLog.write("场景", "敌方 AI 阶段切换", {
 				"from": prev_phase,
@@ -303,7 +308,10 @@ static func resolve_enemy_action_with_ai(ctx: FightSceneContext) -> Dictionary:
 
 
 static func resolve_player_action_with_ai(ctx: FightSceneContext) -> Dictionary:
-	if ctx.domain == null or ctx.battle_player == null or ctx.battle_enemy == null:
+	if ctx.domain == null or ctx.battle_player == null:
+		return {}
+	ctx.battle_enemy = ctx.domain.enemy
+	if ctx.battle_enemy == null:
 		return {}
 	var decision := EnemyAiServiceScript.decide_enemy_action(
 		ctx.battle_player,
@@ -336,6 +344,70 @@ static func resolve_player_action_with_ai(ctx: FightSceneContext) -> Dictionary:
 		_:
 			return {}
 	return {"payload": payload, "descriptor": desc} if bool(payload.get("ok", false)) else {}
+
+
+static func _enemy_ai_cfg_for_current(ctx: FightSceneContext) -> Dictionary:
+	if ctx.domain == null:
+		return ctx.enemy_ai_cfg
+	var idx := ctx.domain.active_enemy_index
+	if idx >= 0 and idx < ctx.battle_enemy_rows.size():
+		var row_v: Variant = ctx.battle_enemy_rows[idx]
+		if row_v is Dictionary:
+			var ai_v: Variant = (row_v as Dictionary).get("ai")
+			if ai_v is Dictionary:
+				return (ai_v as Dictionary).duplicate(true)
+	return ctx.enemy_ai_cfg
+
+
+static func _enemy_ai_runtime_for_current(ctx: FightSceneContext) -> EnemyAiRuntimeState:
+	if ctx.domain == null:
+		return ctx.enemy_ai_runtime
+	var idx := ctx.domain.active_enemy_index
+	if idx >= 0 and idx < ctx.enemy_ai_runtimes.size():
+		var runtime_v: Variant = ctx.enemy_ai_runtimes[idx]
+		return runtime_v as EnemyAiRuntimeState if runtime_v is EnemyAiRuntimeState else ctx.enemy_ai_runtime
+	return ctx.enemy_ai_runtime
+
+
+static func preview_enemy_action(ctx: FightSceneContext, enemy_index: int) -> Dictionary:
+	if ctx.domain == null or ctx.battle_player == null:
+		return {"action_type": EnemyAiTypesScript.ACTION_BASIC, "skill_id": 0, "slot_index": -1}
+	var unit := ctx.domain._enemy_at(enemy_index)
+	if unit == null:
+		return {"action_type": EnemyAiTypesScript.ACTION_BASIC, "skill_id": 0, "slot_index": -1}
+	var ai_cfg := ctx.enemy_ai_cfg
+	if enemy_index >= 0 and enemy_index < ctx.battle_enemy_rows.size():
+		var row_v: Variant = ctx.battle_enemy_rows[enemy_index]
+		if row_v is Dictionary:
+			var ai_v: Variant = (row_v as Dictionary).get("ai")
+			if ai_v is Dictionary:
+				ai_cfg = (ai_v as Dictionary).duplicate(true)
+	var preview_unit := _enemy_unit_for_intent_preview(ctx, enemy_index, unit)
+	var decision := EnemyAiServiceScript.decide_enemy_action(
+		preview_unit,
+		ctx.battle_player,
+		ctx.skill_cfg,
+		ai_cfg,
+		null,
+		{"battle_elapsed": ctx.domain.battle_elapsed_advancing},
+		ctx.item_cfg,
+		ctx.equip_cfg,
+		false
+	)
+	if not bool(decision.get("ok", false)):
+		return {"action_type": EnemyAiTypesScript.ACTION_BASIC, "skill_id": 0, "slot_index": -1}
+	return decision
+
+
+static func _enemy_unit_for_intent_preview(
+		ctx: FightSceneContext,
+		enemy_index: int,
+		unit: FightObj
+) -> FightObj:
+	if ctx.domain == null or unit == null:
+		return unit
+	var advancing_seconds: float = ctx.domain.advancing_seconds_until_enemy_turn(enemy_index)
+	return FightObj.duplicate_with_advancing_projection(unit, advancing_seconds)
 
 
 static func descriptor_for_skill_or_basic(skill_id: int) -> Dictionary:
@@ -373,6 +445,15 @@ static func lookup_skill_cfg(ctx: FightSceneContext, skill_id: int) -> Dictionar
 		var v2: Variant = ctx.skill_cfg[ks]
 		return v2 as Dictionary if v2 is Dictionary else {}
 	return {}
+
+
+static func _slot_cost_cfg(slot: Dictionary, base_cfg: Dictionary) -> Dictionary:
+	var cost_cfg := base_cfg.duplicate(true)
+	if slot.has("costs"):
+		cost_cfg["costs"] = slot.get("costs", [])
+	elif slot.has("mp_cost"):
+		cost_cfg["mp_cost"] = slot.get("mp_cost", 0.0)
+	return cost_cfg
 
 
 static func ok_reason() -> Dictionary:

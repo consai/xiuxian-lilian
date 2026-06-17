@@ -1,8 +1,10 @@
 extends Node
 
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
+const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
+const AlchemyServiceScript := preload("res://scripts/sim/alchemy_service.gd")
 
-const SAVEDATA_SCHEMA_VERSION := 1
+const SAVEDATA_SCHEMA_VERSION := 2
 const RUNDATA_SCHEMA_VERSION := 1
 
 var savedata: Dictionary = {}
@@ -37,24 +39,32 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 	out["day"] = maxi(1, int(out.get("day", 1)))
 	out["realm_index"] = maxi(0, int(out.get("realm_index", 0)))
 	out["cultivation"] = maxi(0, int(out.get("cultivation", 0)))
+	out["cultivation_instability"] = maxi(0, int(out.get("cultivation_instability", 0)))
 	out["injury_days"] = maxi(0, int(out.get("injury_days", 0)))
 	out["ling_stones"] = maxi(0, int(out.get("ling_stones", 0)))
 	var equip_slots := (out.get("equip_slots", [-1, -1]) as Array).duplicate(true)
 	while equip_slots.size() < 2:
 		equip_slots.append(-1)
 	out["equip_slots"] = equip_slots.slice(0, 2)
+	var treasure_item_slots := (out.get("treasure_item_slots", ["", ""]) as Array).duplicate(true)
+	while treasure_item_slots.size() < 2:
+		treasure_item_slots.append("")
+	out["treasure_item_slots"] = treasure_item_slots.slice(0, 2)
 	var item_slots := (out.get("item_slots", ["", ""]) as Array).duplicate(true)
 	while item_slots.size() < 2:
 		item_slots.append("")
 	out["item_slots"] = item_slots.slice(0, 2)
 	var method_slots_v: Variant = out.get("cultivation_method_slots", {})
 	var method_slots := method_slots_v as Dictionary if method_slots_v is Dictionary else {}
+	var default_main := "method.hunyuan.1"
+	var main_method := str(method_slots.get("main", default_main))
 	out["cultivation_method_slots"] = {
-		"main": str(method_slots.get("main", "five_elements_art")),
+		"main": main_method,
 		"support_1": str(method_slots.get("support_1", "")),
 		"support_2": str(method_slots.get("support_2", "")),
 		"movement": str(method_slots.get("movement", "")),
 	}
+	out = _coalesce_dao_savedata(out)
 	var rules_v: Variant = out.get("auto_battle_rules", {})
 	out["auto_battle_rules"] = (rules_v as Dictionary).duplicate(true) if rules_v is Dictionary else {}
 	if not out.get("totals") is Dictionary:
@@ -67,6 +77,28 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 	out["map"] = _coalesce_map_savedata(out.get("map", {}))
 	out["foundations"] = CharacterStatsScript.normalize_foundations(out.get("foundations", {}))
 	out["aptitudes"] = CharacterStatsScript.normalize_aptitudes(out.get("aptitudes", {}))
+	var bonuses_v: Variant = out.get("breakthrough_bonuses", {})
+	var bonuses := bonuses_v as Dictionary if bonuses_v is Dictionary else {}
+	out["breakthrough_bonuses"] = {
+		"pills": maxi(0, int(bonuses.get("pills", 0))),
+		"mind": maxi(0, int(bonuses.get("mind", 0))),
+		"other": maxi(0, int(bonuses.get("other", 0))),
+	}
+	var quality_v: Variant = out.get("realm_quality", {})
+	var quality := quality_v as Dictionary if quality_v is Dictionary else {}
+	out["realm_quality"] = {
+		"foundation": maxi(0, int(quality.get("foundation", 0))),
+		"core": maxi(0, int(quality.get("core", 0))),
+		"nascent": maxi(0, int(quality.get("nascent", 0))),
+	}
+	out["breakthrough_attempt_cooldown_days"] = maxi(0, int(out.get("breakthrough_attempt_cooldown_days", 0)))
+	out["alchemy"] = AlchemyServiceScript.normalize_state(out.get("alchemy", {}))
+	out["story"] = _coalesce_story_savedata(out.get("story", {}))
+	if data.has("tutorial"):
+		out["tutorial"] = _coalesce_tutorial_savedata(data.get("tutorial", {}))
+	else:
+		# Existing saves predate onboarding and must not be forced through the prologue.
+		out["tutorial"] = _completed_tutorial_savedata()
 	return out
 
 
@@ -88,6 +120,10 @@ func reset_rundata() -> void:
 			"expedition_exit_reason": "manual",
 		},
 		"map": _default_map_runtime(),
+		"story": {
+			"active_snapshot": {},
+			"pending_event": "",
+		},
 	}
 
 
@@ -146,6 +182,13 @@ func map_runtime() -> Dictionary:
 	if not rundata.has("map"):
 		rundata["map"] = _default_map_runtime()
 	return rundata["map"] as Dictionary
+
+
+func story_runtime() -> Dictionary:
+	ensure_initialized()
+	if not rundata.has("story"):
+		rundata["story"] = {"active_snapshot": {}, "pending_event": ""}
+	return rundata["story"] as Dictionary
 
 
 func scene_runtime() -> Dictionary:
@@ -261,6 +304,7 @@ func _default_savedata() -> Dictionary:
 		"realm_index": 0,
 		"realm_name": "",
 		"cultivation": 0,
+		"cultivation_instability": 0,
 		"breakthrough_at": 100,
 		"injury_days": 0,
 		"ling_stones": 0,
@@ -271,17 +315,20 @@ func _default_savedata() -> Dictionary:
 		"attrs": {},
 		"hp": 1000.0,
 		"mp": 1000.0,
-		"unlocked_skills": [],
-		"equipped_skills": [],
-		"unlocked_methods": ["five_elements_art"],
+		"knowledge": {},
+		"method_mastery": {},
+		"unlocked_abilities": ["ability.combat.qi_bolt"],
+		"equipped_abilities": ["", "ability.combat.qi_bolt", "", "", ""],
+		"unlocked_methods": ["method.hunyuan.1"],
 		"cultivation_method_slots": {
-			"main": "five_elements_art", "support_1": "", "support_2": "", "movement": ""
+			"main": "method.hunyuan.1", "support_1": "", "support_2": "", "movement": ""
 		},
 		"auto_battle_enabled": true,
 		"auto_battle_preset": "balanced",
 		"auto_battle_rules": {},
 		"owned_equips": [],
 		"equip_slots": [-1, -1],
+		"treasure_item_slots": ["", ""],
 		"item_slots": ["", ""],
 		"inventory": {},
 		"storage": {},
@@ -290,6 +337,25 @@ func _default_savedata() -> Dictionary:
 		"world_state": {"wolf_threat": 35, "sword_tomb_opening": 0, "sect_unrest": 30},
 		"map": _default_map_savedata(),
 		"totals": _default_totals(),
+		"breakthrough_bonuses": {
+			"pills": 0,
+			"mind": 0,
+			"other": 0,
+		},
+		"realm_quality": {
+			"foundation": 0,
+			"core": 0,
+			"nascent": 0,
+		},
+		"breakthrough_attempt_cooldown_days": 0,
+		"alchemy": AlchemyServiceScript.default_state(),
+		"story": {
+			"completed": [],
+			"flags": {},
+			"history": [],
+			"active_snapshot": {},
+		},
+		"tutorial": _default_tutorial_savedata(),
 	}
 
 
@@ -345,6 +411,56 @@ func _default_totals() -> Dictionary:
 	}
 
 
+func _default_tutorial_savedata() -> Dictionary:
+	return {
+		"chapter": "prologue_lost_master",
+		"step": "T00",
+		"completed": false,
+		"skipped": false,
+		"flags": {},
+		"seen_context_tips": [],
+	}
+
+
+func _completed_tutorial_savedata() -> Dictionary:
+	var out := _default_tutorial_savedata()
+	out["step"] = "T10"
+	out["completed"] = true
+	return out
+
+
+func _coalesce_tutorial_savedata(data: Variant) -> Dictionary:
+	var out := _default_tutorial_savedata()
+	if not data is Dictionary:
+		return out
+	var src := data as Dictionary
+	for key in ["chapter", "step"]:
+		out[key] = str(src.get(key, out[key]))
+	for key in ["completed", "skipped"]:
+		out[key] = bool(src.get(key, out[key]))
+	if src.get("flags") is Dictionary:
+		out["flags"] = (src.get("flags") as Dictionary).duplicate(true)
+	if src.get("seen_context_tips") is Array:
+		out["seen_context_tips"] = (src.get("seen_context_tips") as Array).duplicate()
+	return out
+
+
+func _coalesce_story_savedata(data: Variant) -> Dictionary:
+	var out := {"completed": [], "flags": {}, "history": [], "active_snapshot": {}}
+	if not data is Dictionary:
+		return out
+	var src := data as Dictionary
+	if src.get("completed") is Array:
+		out["completed"] = (src.get("completed") as Array).duplicate()
+	if src.get("flags") is Dictionary:
+		out["flags"] = (src.get("flags") as Dictionary).duplicate(true)
+	if src.get("history") is Array:
+		out["history"] = (src.get("history") as Array).duplicate(true)
+	if src.get("active_snapshot") is Dictionary:
+		out["active_snapshot"] = (src.get("active_snapshot") as Dictionary).duplicate(true)
+	return out
+
+
 func _default_scene() -> Dictionary:
 	return {
 		"current_id": "",
@@ -353,6 +469,46 @@ func _default_scene() -> Dictionary:
 		"payloads": {},
 		"history": [],
 	}
+
+
+func _coalesce_dao_savedata(out: Dictionary) -> Dictionary:
+	if not out.get("knowledge") is Dictionary:
+		out["knowledge"] = {}
+	if not out.get("method_mastery") is Dictionary:
+		out["method_mastery"] = {}
+	var methods_v: Variant = out.get("unlocked_methods", [])
+	if methods_v is Array:
+		var methods: Array = []
+		for method_id_v in methods_v as Array:
+			var method_id := str(method_id_v)
+			if method_id != "" and not methods.has(method_id):
+				methods.append(method_id)
+		out["unlocked_methods"] = methods
+	var unlocked_abilities_v: Variant = out.get("unlocked_abilities")
+	if not unlocked_abilities_v is Array or (unlocked_abilities_v as Array).is_empty():
+		out["unlocked_abilities"] = ["ability.combat.qi_bolt"]
+	var equipped_abilities_v: Variant = out.get("equipped_abilities")
+	if not equipped_abilities_v is Array or (equipped_abilities_v as Array).is_empty():
+		out["equipped_abilities"] = _normalize_ability_slots(equipped_abilities_v)
+	else:
+		out["equipped_abilities"] = _normalize_ability_slots(equipped_abilities_v)
+	if (out.get("knowledge", {}) as Dictionary).is_empty():
+		KnowledgeServiceScript.grant_level(out, "foundation.breathing", 1)
+	return out
+
+
+static func _normalize_ability_slots(raw: Variant) -> Array:
+	var slots: Array = []
+	if raw is Array:
+		for entry_v in raw as Array:
+			var entry := str(entry_v).strip_edges()
+			if entry == "-1" or entry == "":
+				slots.append("")
+			else:
+				slots.append(entry)
+	while slots.size() < 5:
+		slots.append("")
+	return slots.slice(0, 5)
 
 
 func _default_expedition() -> Dictionary:

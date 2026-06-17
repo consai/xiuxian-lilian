@@ -1,0 +1,101 @@
+[gd_scene format=3 uid="uid://he7jm4l0n1k0"]
+
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="PackedScene" uid="uid://dvun4oamukfyn" path="res://scenes/items/bag_base.tscn" id="2_seocu"]
+[ext_resource type="Texture2D" uid="uid://8mwstvi8kywh" path="res://assets/art/ui_new/btn_close.png" id="3_close"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="21_title"]
+[ext_resource type="Script" path="res://scripts/ui/backpack_panel.gd" id="22_script"]
+
+[sub_resource type="StyleBoxFlat" id="TitlePanel"]
+bg_color = Color(0.91, 0.72, 0.48, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.4, 0.25, 0.14, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="BackpackPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_theme")
+script = ExtResource("22_script")
+
+[node name="Dimmer" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.12, 0.08, 0.04, 0.42)
+
+[node name="BagBase" parent="." instance=ExtResource("2_seocu")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -213.0
+offset_top = -290.0
+offset_right = 213.0
+offset_bottom = 290.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" parent="BagBase" index="1"]
+visible = false
+
+[node name="TitleBack" type="Panel" parent="BagBase"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -92.5
+offset_top = -23.0
+offset_right = 92.5
+offset_bottom = 43.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("TitlePanel")
+
+[node name="Title" type="Label" parent="BagBase/TitleBack"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "背 包"
+label_settings = ExtResource("21_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="TextureButton" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 181.0
+offset_top = -318.0
+offset_right = 253.0
+offset_bottom = -246.0
+grow_horizontal = 2
+grow_vertical = 2
+texture_normal = ExtResource("3_close")
+ignore_texture_size = true
+stretch_mode = 5
+
+[editable path="BagBase"]

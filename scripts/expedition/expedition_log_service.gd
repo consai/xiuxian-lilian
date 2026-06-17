@@ -119,16 +119,22 @@ static func join_scene_outcome(scene: String, outcome: String) -> String:
 
 
 static func travel_outcome(event: Dictionary) -> String:
+	var configured := str(event.get("outcome_text", "")).strip_edges()
+	if configured != "":
+		return configured
 	var desc := str(event.get("desc", "")).strip_edges()
 	if desc != "":
 		return "前路尚远，你未停步履。"
 	return "山道蜿蜒，风声掠过林梢，你稳步向前。"
 
 
-static func gather_outcome(rewards: Array) -> String:
+static func gather_outcome(event: Dictionary, rewards: Array) -> String:
 	var loot := reward_list(rewards)
 	if loot == "":
-		return "你仔细搜寻半晌，却一无所获。"
+		return str(event.get("empty_text", "你仔细搜寻半晌，却一无所获。"))
+	var configured := str(event.get("success_text", "")).strip_edges()
+	if configured != "":
+		return configured.replace("{loot}", loot)
 	return "你俯身采摘，收得%s。" % loot
 
 

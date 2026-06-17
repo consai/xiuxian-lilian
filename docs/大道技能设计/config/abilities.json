@@ -1,0 +1,3310 @@
+{
+  "schemaVersion": 3,
+  "configId": "abilities",
+  "metadata": {
+    "name": "技能配置",
+    "description": "技能自身配置学习门槛，知识提供门槛后的效果成长",
+    "abilityCount": 45
+  },
+  "rules": {
+    "knowledgeTreeConfigId": "dao_tree",
+    "cultivationMethodConfigId": "cultivation_methods",
+    "learningPolicy": "ability_config_knowledge_requirements",
+    "knowledgeBonusMax": 0.75,
+    "knowledgeMasteryFormula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+    "effectFormula": "scale effect magnitude by scalingMode, then clamp to clampMin and clampMax",
+    "types": [
+      "combat_active",
+      "combat_passive",
+      "combat_upkeep",
+      "general_passive"
+    ],
+    "generalPassivePolicy": "always_active_after_learning_same_stack_group_uses_highest",
+    "combatPassivePolicy": "active_when_equipped",
+    "combatUpkeepPolicy": "active_while_toggled_and_upkeep_cost_is_paid",
+    "combatActivePolicy": "cast_from_combat_skill_slot",
+    "generalPassiveStackPolicy": "highest",
+    "effectCatalogConfigId": "effect_catalog"
+  },
+  "abilities": [
+    {
+      "id": "ability.combat.qi_bolt",
+      "name": "御气弹",
+      "type": "combat_active",
+      "realm": "qi",
+      "rarity": "common",
+      "description": "御气弹",
+      "tags": [
+        "spell",
+        "ranged"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "spell.projectile",
+            "requiredLevel": 1,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "foundation.control",
+            "requiredLevel": 1,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 0.8,
+        "cooldown": 3,
+        "costs": [
+          {
+            "resource": "mana",
+            "value": 8
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "damage_spiritual",
+          "base": 40,
+          "masteryGrowth": 18,
+          "operation": "add_flat",
+          "target": "enemy",
+          "stackGroup": "damage_spiritual",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        }
+      ],
+      "learningRequirements": {
+        "realm": "qi",
+        "knowledge": [
+          {
+            "skillId": "spell.projectile",
+            "level": 1
+          },
+          {
+            "skillId": "foundation.control",
+            "level": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.wind_step",
+      "name": "流风步",
+      "type": "combat_active",
+      "realm": "qi",
+      "rarity": "common",
+      "description": "流风步",
+      "tags": [
+        "mobility"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "spell.escape",
+            "requiredLevel": 1,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "cultivation.cycle",
+            "requiredLevel": 1,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "position",
+        "castTime": 0.8,
+        "cooldown": 5,
+        "costs": [
+          {
+            "resource": "mana",
+            "value": 6
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "dash_distance",
+          "base": 5,
+          "masteryGrowth": 1.2,
+          "operation": "add_flat",
+          "target": "self",
+          "stackGroup": "dash_distance",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "evasion_window",
+          "base": 0.15,
+          "masteryGrowth": 0.06,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "evasion_window",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.6
+        }
+      ],
+      "learningRequirements": {
+        "realm": "qi",
+        "knowledge": [
+          {
+            "skillId": "spell.escape",
+            "level": 1
+          },
+          {
+            "skillId": "cultivation.cycle",
+            "level": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.sword_qi",
+      "name": "破空剑气",
+      "type": "combat_active",
+      "realm": "qi",
+      "rarity": "uncommon",
+      "description": "破空剑气",
+      "tags": [
+        "sword",
+        "ranged"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "sword.qi",
+            "requiredLevel": 1,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "sword.weapon",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 0.8,
+        "cooldown": 4,
+        "costs": [
+          {
+            "resource": "mana",
+            "value": 12
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "damage_sword",
+          "base": 55,
+          "masteryGrowth": 22,
+          "operation": "add_flat",
+          "target": "enemy",
+          "stackGroup": "damage_sword",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "armor_pierce",
+          "base": 0.08,
+          "masteryGrowth": 0.04,
+          "operation": "add_percent",
+          "target": "enemy",
+          "stackGroup": "armor_pierce",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.7
+        }
+      ],
+      "learningRequirements": {
+        "realm": "qi",
+        "knowledge": [
+          {
+            "skillId": "sword.qi",
+            "level": 1
+          },
+          {
+            "skillId": "sword.weapon",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.blood_strike",
+      "name": "震血拳",
+      "type": "combat_active",
+      "realm": "foundation",
+      "rarity": "uncommon",
+      "description": "震血拳",
+      "tags": [
+        "body",
+        "melee"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "body.bone",
+            "requiredLevel": 2,
+            "scalingWeight": 2
+          },
+          {
+            "skillId": "body.recovery",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 0.8,
+        "cooldown": 6,
+        "costs": [
+          {
+            "resource": "stamina",
+            "value": 18
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "damage_physical",
+          "base": 75,
+          "masteryGrowth": 28,
+          "operation": "add_flat",
+          "target": "enemy",
+          "stackGroup": "damage_physical",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "stagger_power",
+          "base": 0.15,
+          "masteryGrowth": 0.06,
+          "operation": "add_percent",
+          "target": "enemy",
+          "stackGroup": "stagger_power",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 1
+        }
+      ],
+      "learningRequirements": {
+        "realm": "foundation",
+        "knowledge": [
+          {
+            "skillId": "body.bone",
+            "level": 2
+          },
+          {
+            "skillId": "body.recovery",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.five_phase_burst",
+      "name": "五行轮爆",
+      "type": "combat_active",
+      "realm": "foundation",
+      "rarity": "rare",
+      "description": "五行轮爆",
+      "tags": [
+        "spell",
+        "area"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "spell.five_phase",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "spell.elements",
+            "requiredLevel": 3,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "area",
+        "castTime": 1.2,
+        "cooldown": 10,
+        "costs": [
+          {
+            "resource": "mana",
+            "value": 28
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "damage_elemental",
+          "base": 95,
+          "masteryGrowth": 34,
+          "operation": "add_flat",
+          "target": "area",
+          "stackGroup": "damage_elemental",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "elemental_vulnerability",
+          "base": 0.1,
+          "masteryGrowth": 0.04,
+          "operation": "add_percent",
+          "target": "area",
+          "stackGroup": "elemental_vulnerability",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.5
+        }
+      ],
+      "learningRequirements": {
+        "realm": "foundation",
+        "knowledge": [
+          {
+            "skillId": "spell.five_phase",
+            "level": 2
+          },
+          {
+            "skillId": "spell.elements",
+            "level": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.seal_bind",
+      "name": "镇灵封印",
+      "type": "combat_active",
+      "realm": "foundation",
+      "rarity": "rare",
+      "description": "镇灵封印",
+      "tags": [
+        "talisman",
+        "control"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "talisman.seal",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "spirit.sense",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 1.1,
+        "cooldown": 14,
+        "costs": [
+          {
+            "resource": "mana",
+            "value": 24
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "control_duration",
+          "base": 2,
+          "masteryGrowth": 0.5,
+          "operation": "add_flat",
+          "target": "enemy",
+          "stackGroup": "control_duration",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "spirit_suppression",
+          "base": 0.12,
+          "masteryGrowth": 0.05,
+          "operation": "add_percent",
+          "target": "enemy",
+          "stackGroup": "spirit_suppression",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.7
+        }
+      ],
+      "learningRequirements": {
+        "realm": "foundation",
+        "knowledge": [
+          {
+            "skillId": "talisman.seal",
+            "level": 2
+          },
+          {
+            "skillId": "spirit.sense",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.thunder_judgment",
+      "name": "九霄雷击",
+      "type": "combat_active",
+      "realm": "core",
+      "rarity": "rare",
+      "description": "九霄雷击",
+      "tags": [
+        "spell",
+        "thunder"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "spell.thunder",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "cultivation.core_fire",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 1,
+        "cooldown": 12,
+        "costs": [
+          {
+            "resource": "mana",
+            "value": 45
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "damage_thunder",
+          "base": 150,
+          "masteryGrowth": 45,
+          "operation": "add_flat",
+          "target": "enemy",
+          "stackGroup": "damage_thunder",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "stun_chance",
+          "base": 0.12,
+          "masteryGrowth": 0.05,
+          "operation": "add_percent",
+          "target": "enemy",
+          "stackGroup": "stun_chance",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.6
+        }
+      ],
+      "learningRequirements": {
+        "realm": "core",
+        "knowledge": [
+          {
+            "skillId": "spell.thunder",
+            "level": 2
+          },
+          {
+            "skillId": "cultivation.core_fire",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.sword_array",
+      "name": "七星剑阵",
+      "type": "combat_active",
+      "realm": "core",
+      "rarity": "epic",
+      "description": "七星剑阵",
+      "tags": [
+        "sword",
+        "formation",
+        "area"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "sword.formation",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "formation.array",
+            "requiredLevel": 2,
+            "scalingWeight": 2
+          },
+          {
+            "skillId": "spirit.sense",
+            "requiredLevel": 3,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "area",
+        "castTime": 2,
+        "cooldown": 24,
+        "costs": [
+          {
+            "resource": "mana",
+            "value": 65
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "damage_sword_area",
+          "base": 180,
+          "masteryGrowth": 50,
+          "operation": "add_flat",
+          "target": "area",
+          "stackGroup": "damage_sword_area",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "array_duration",
+          "base": 6,
+          "masteryGrowth": 1.5,
+          "operation": "add_flat",
+          "target": "area",
+          "stackGroup": "array_duration",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        }
+      ],
+      "learningRequirements": {
+        "realm": "core",
+        "knowledge": [
+          {
+            "skillId": "sword.formation",
+            "level": 2
+          },
+          {
+            "skillId": "formation.array",
+            "level": 2
+          },
+          {
+            "skillId": "spirit.sense",
+            "level": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.soul_shock",
+      "name": "撼魂钟鸣",
+      "type": "combat_active",
+      "realm": "core",
+      "rarity": "rare",
+      "description": "撼魂钟鸣",
+      "tags": [
+        "spirit",
+        "area"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "spirit.soul",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "talisman.curse",
+            "requiredLevel": 1,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "area",
+        "castTime": 0.8,
+        "cooldown": 16,
+        "costs": [
+          {
+            "resource": "spirit",
+            "value": 40
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "damage_spirit",
+          "base": 130,
+          "masteryGrowth": 42,
+          "operation": "add_flat",
+          "target": "area",
+          "stackGroup": "damage_spirit",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "cast_interrupt_chance",
+          "base": 0.2,
+          "masteryGrowth": 0.06,
+          "operation": "add_percent",
+          "target": "area",
+          "stackGroup": "cast_interrupt_chance",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.8
+        }
+      ],
+      "learningRequirements": {
+        "realm": "core",
+        "knowledge": [
+          {
+            "skillId": "spirit.soul",
+            "level": 2
+          },
+          {
+            "skillId": "talisman.curse",
+            "level": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.dharma_palm",
+      "name": "法相镇岳掌",
+      "type": "combat_active",
+      "realm": "spirit",
+      "rarity": "epic",
+      "description": "法相镇岳掌",
+      "tags": [
+        "body",
+        "area"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "body.dharma_form",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "spell.domain",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "area",
+        "castTime": 1.5,
+        "cooldown": 22,
+        "costs": [
+          {
+            "resource": "stamina",
+            "value": 100
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "damage_physical_area",
+          "base": 320,
+          "masteryGrowth": 75,
+          "operation": "add_flat",
+          "target": "area",
+          "stackGroup": "damage_physical_area",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "knockdown_duration",
+          "base": 1.5,
+          "masteryGrowth": 0.4,
+          "operation": "add_flat",
+          "target": "area",
+          "stackGroup": "knockdown_duration",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        }
+      ],
+      "learningRequirements": {
+        "realm": "spirit",
+        "knowledge": [
+          {
+            "skillId": "body.dharma_form",
+            "level": 2
+          },
+          {
+            "skillId": "spell.domain",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.dream_prison",
+      "name": "梦狱",
+      "type": "combat_active",
+      "realm": "spirit",
+      "rarity": "epic",
+      "description": "梦狱",
+      "tags": [
+        "spirit",
+        "control"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "spirit.dream",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "spirit.inner_demon",
+            "requiredLevel": 3,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 1.8,
+        "cooldown": 26,
+        "costs": [
+          {
+            "resource": "spirit",
+            "value": 85
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "control_duration",
+          "base": 4,
+          "masteryGrowth": 1,
+          "operation": "add_flat",
+          "target": "enemy",
+          "stackGroup": "control_duration",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "damage_spirit",
+          "base": 180,
+          "masteryGrowth": 55,
+          "operation": "add_flat",
+          "target": "enemy",
+          "stackGroup": "damage_spirit",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        }
+      ],
+      "learningRequirements": {
+        "realm": "spirit",
+        "knowledge": [
+          {
+            "skillId": "spirit.dream",
+            "level": 2
+          },
+          {
+            "skillId": "spirit.inner_demon",
+            "level": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.void_slash",
+      "name": "斩虚",
+      "type": "combat_active",
+      "realm": "void",
+      "rarity": "epic",
+      "description": "斩虚",
+      "tags": [
+        "sword",
+        "void"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "sword.void_cut",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "spell.void",
+            "requiredLevel": 2,
+            "scalingWeight": 2
+          }
+        ]
+      },
+      "combat": {
+        "target": "line",
+        "castTime": 1.2,
+        "cooldown": 18,
+        "costs": [
+          {
+            "resource": "mana",
+            "value": 150
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "damage_void",
+          "base": 480,
+          "masteryGrowth": 105,
+          "operation": "add_flat",
+          "target": "line",
+          "stackGroup": "damage_void",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "space_pierce",
+          "base": 0.3,
+          "masteryGrowth": 0.08,
+          "operation": "add_percent",
+          "target": "line",
+          "stackGroup": "space_pierce",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.9
+        }
+      ],
+      "learningRequirements": {
+        "realm": "void",
+        "knowledge": [
+          {
+            "skillId": "sword.void_cut",
+            "level": 2
+          },
+          {
+            "skillId": "spell.void",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.true_name_curse",
+      "name": "真名蚀魂咒",
+      "type": "combat_active",
+      "realm": "void",
+      "rarity": "epic",
+      "description": "真名蚀魂咒",
+      "tags": [
+        "curse",
+        "spirit"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "talisman.true_name",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "spirit.void_thought",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 2,
+        "cooldown": 25,
+        "costs": [
+          {
+            "resource": "spirit",
+            "value": 130
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "damage_spirit_over_time",
+          "base": 0.22,
+          "masteryGrowth": 0.07,
+          "operation": "add_percent",
+          "target": "enemy",
+          "stackGroup": "damage_spirit_over_time",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 1
+        },
+        {
+          "effectId": "healing_reduction",
+          "base": 0.25,
+          "masteryGrowth": 0.06,
+          "operation": "add_percent",
+          "target": "enemy",
+          "stackGroup": "healing_reduction",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.8
+        }
+      ],
+      "learningRequirements": {
+        "realm": "void",
+        "knowledge": [
+          {
+            "skillId": "talisman.true_name",
+            "level": 2
+          },
+          {
+            "skillId": "spirit.void_thought",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.law_command",
+      "name": "律令·止",
+      "type": "combat_active",
+      "realm": "integration",
+      "rarity": "legendary",
+      "description": "律令·止",
+      "tags": [
+        "law",
+        "control",
+        "area"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "spell.law",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "talisman.command",
+            "requiredLevel": 3,
+            "scalingWeight": 2
+          },
+          {
+            "skillId": "heaven.law_seed",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "area",
+        "castTime": 2.5,
+        "cooldown": 45,
+        "costs": [
+          {
+            "resource": "mana",
+            "value": 240
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "control_duration",
+          "base": 5,
+          "masteryGrowth": 1.1,
+          "operation": "add_flat",
+          "target": "area",
+          "stackGroup": "control_duration",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "law_suppression",
+          "base": 0.3,
+          "masteryGrowth": 0.08,
+          "operation": "add_percent",
+          "target": "area",
+          "stackGroup": "law_suppression",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.9
+        }
+      ],
+      "learningRequirements": {
+        "realm": "integration",
+        "knowledge": [
+          {
+            "skillId": "spell.law",
+            "level": 2
+          },
+          {
+            "skillId": "talisman.command",
+            "level": 3
+          },
+          {
+            "skillId": "heaven.law_seed",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.open_heaven",
+      "name": "开天一式",
+      "type": "combat_active",
+      "realm": "tribulation",
+      "rarity": "mythic",
+      "description": "开天一式",
+      "tags": [
+        "sword",
+        "law",
+        "ultimate"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "sword.heaven_cut",
+            "requiredLevel": 3,
+            "scalingWeight": 4
+          },
+          {
+            "skillId": "sword.dao",
+            "requiredLevel": 4,
+            "scalingWeight": 2
+          },
+          {
+            "skillId": "heaven.law_mastery",
+            "requiredLevel": 3,
+            "scalingWeight": 2
+          }
+        ]
+      },
+      "combat": {
+        "target": "line",
+        "castTime": 4,
+        "cooldown": 120,
+        "costs": [
+          {
+            "resource": "mana",
+            "value": 500
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "damage_law",
+          "base": 1600,
+          "masteryGrowth": 300,
+          "operation": "add_flat",
+          "target": "line",
+          "stackGroup": "damage_law",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "law_pierce",
+          "base": 0.5,
+          "masteryGrowth": 0.08,
+          "operation": "add_percent",
+          "target": "line",
+          "stackGroup": "law_pierce",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 1
+        }
+      ],
+      "learningRequirements": {
+        "realm": "tribulation",
+        "knowledge": [
+          {
+            "skillId": "sword.heaven_cut",
+            "level": 3
+          },
+          {
+            "skillId": "sword.dao",
+            "level": 4
+          },
+          {
+            "skillId": "heaven.law_mastery",
+            "level": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.cataclysm",
+      "name": "劫灭神通",
+      "type": "combat_active",
+      "realm": "tribulation",
+      "rarity": "mythic",
+      "description": "劫灭神通",
+      "tags": [
+        "spell",
+        "tribulation",
+        "ultimate"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "spell.cataclysm",
+            "requiredLevel": 3,
+            "scalingWeight": 4
+          },
+          {
+            "skillId": "heaven.tribulation",
+            "requiredLevel": 3,
+            "scalingWeight": 2
+          },
+          {
+            "skillId": "spell.world",
+            "requiredLevel": 3,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "area",
+        "castTime": 5,
+        "cooldown": 150,
+        "costs": [
+          {
+            "resource": "mana",
+            "value": 550
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "damage_tribulation",
+          "base": 1400,
+          "masteryGrowth": 280,
+          "operation": "add_flat",
+          "target": "area",
+          "stackGroup": "damage_tribulation",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "tribulation_mark",
+          "base": 0.35,
+          "masteryGrowth": 0.08,
+          "operation": "add_percent",
+          "target": "area",
+          "stackGroup": "tribulation_mark",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 1
+        }
+      ],
+      "learningRequirements": {
+        "realm": "tribulation",
+        "knowledge": [
+          {
+            "skillId": "spell.cataclysm",
+            "level": 3
+          },
+          {
+            "skillId": "heaven.tribulation",
+            "level": 3
+          },
+          {
+            "skillId": "spell.world",
+            "level": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.passive.iron_bone",
+      "name": "铁骨",
+      "type": "combat_passive",
+      "realm": "qi",
+      "rarity": "common",
+      "description": "铁骨",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "body.bone",
+            "requiredLevel": 1,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "body.tempering",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 0,
+        "cooldown": 0,
+        "costs": [],
+        "upkeepCostsPerSecond": [],
+        "activation": "equipped"
+      },
+      "effects": [
+        {
+          "effectId": "physical_resistance",
+          "base": 0.05,
+          "masteryGrowth": 0.025,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "physical_resistance",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.6
+        }
+      ],
+      "learningRequirements": {
+        "realm": "qi",
+        "knowledge": [
+          {
+            "skillId": "body.bone",
+            "level": 1
+          },
+          {
+            "skillId": "body.tempering",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.passive.sword_heart",
+      "name": "剑心通明",
+      "type": "combat_passive",
+      "realm": "nascent",
+      "rarity": "epic",
+      "description": "剑心通明",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "sword.heart",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "spirit.soul",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 0,
+        "cooldown": 0,
+        "costs": [],
+        "upkeepCostsPerSecond": [],
+        "activation": "equipped"
+      },
+      "effects": [
+        {
+          "effectId": "critical_chance",
+          "base": 0.08,
+          "masteryGrowth": 0.035,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "critical_chance",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.6
+        },
+        {
+          "effectId": "weakness_detection",
+          "base": 0.1,
+          "masteryGrowth": 0.04,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "weakness_detection",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        }
+      ],
+      "learningRequirements": {
+        "realm": "nascent",
+        "knowledge": [
+          {
+            "skillId": "sword.heart",
+            "level": 2
+          },
+          {
+            "skillId": "spirit.soul",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.passive.soul_guard",
+      "name": "固魂守一",
+      "type": "combat_passive",
+      "realm": "core",
+      "rarity": "rare",
+      "description": "固魂守一",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "spirit.soul",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "spirit.inner_demon",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 0,
+        "cooldown": 0,
+        "costs": [],
+        "upkeepCostsPerSecond": [],
+        "activation": "equipped"
+      },
+      "effects": [
+        {
+          "effectId": "soul_resistance",
+          "base": 0.12,
+          "masteryGrowth": 0.04,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "soul_resistance",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.8
+        }
+      ],
+      "learningRequirements": {
+        "realm": "core",
+        "knowledge": [
+          {
+            "skillId": "spirit.soul",
+            "level": 2
+          },
+          {
+            "skillId": "spirit.inner_demon",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.passive.blood_rebirth",
+      "name": "滴血不灭",
+      "type": "combat_passive",
+      "realm": "nascent",
+      "rarity": "epic",
+      "description": "滴血不灭",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "body.regeneration",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "body.recovery",
+            "requiredLevel": 4,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 0,
+        "cooldown": 0,
+        "costs": [],
+        "upkeepCostsPerSecond": [],
+        "activation": "equipped"
+      },
+      "effects": [
+        {
+          "effectId": "health_regen",
+          "base": 0.12,
+          "masteryGrowth": 0.04,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "health_regen",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.8
+        },
+        {
+          "effectId": "fatal_resistance",
+          "base": 0.06,
+          "masteryGrowth": 0.025,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "fatal_resistance",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.5
+        }
+      ],
+      "learningRequirements": {
+        "realm": "nascent",
+        "knowledge": [
+          {
+            "skillId": "body.regeneration",
+            "level": 2
+          },
+          {
+            "skillId": "body.recovery",
+            "level": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.passive.weapon_union",
+      "name": "人兵相契",
+      "type": "combat_passive",
+      "realm": "integration",
+      "rarity": "legendary",
+      "description": "人兵相契",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "sword.unity",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "artifact.life_bound",
+            "requiredLevel": 3,
+            "scalingWeight": 2
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 0,
+        "cooldown": 0,
+        "costs": [],
+        "upkeepCostsPerSecond": [],
+        "activation": "equipped"
+      },
+      "effects": [
+        {
+          "effectId": "weapon_damage",
+          "base": 0.22,
+          "masteryGrowth": 0.06,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "weapon_damage",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 1.2
+        },
+        {
+          "effectId": "weapon_loss_resistance",
+          "base": 0.4,
+          "masteryGrowth": 0.1,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "weapon_loss_resistance",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 1
+        }
+      ],
+      "learningRequirements": {
+        "realm": "integration",
+        "knowledge": [
+          {
+            "skillId": "sword.unity",
+            "level": 2
+          },
+          {
+            "skillId": "artifact.life_bound",
+            "level": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.passive.dao_heart",
+      "name": "不坏道心",
+      "type": "combat_passive",
+      "realm": "mahayana",
+      "rarity": "legendary",
+      "description": "不坏道心",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "spirit.dao_heart",
+            "requiredLevel": 3,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "heaven.causality",
+            "requiredLevel": 3,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 0,
+        "cooldown": 0,
+        "costs": [],
+        "upkeepCostsPerSecond": [],
+        "activation": "equipped"
+      },
+      "effects": [
+        {
+          "effectId": "mental_resistance",
+          "base": 0.35,
+          "masteryGrowth": 0.08,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "mental_resistance",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.9
+        },
+        {
+          "effectId": "control_resistance",
+          "base": 0.2,
+          "masteryGrowth": 0.06,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "control_resistance",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.8
+        }
+      ],
+      "learningRequirements": {
+        "realm": "mahayana",
+        "knowledge": [
+          {
+            "skillId": "spirit.dao_heart",
+            "level": 3
+          },
+          {
+            "skillId": "heaven.causality",
+            "level": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.passive.tribulation_body",
+      "name": "万劫不坏",
+      "type": "combat_passive",
+      "realm": "tribulation",
+      "rarity": "mythic",
+      "description": "万劫不坏",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "body.tribulation_body",
+            "requiredLevel": 3,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "heaven.thunder_body",
+            "requiredLevel": 4,
+            "scalingWeight": 2
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 0,
+        "cooldown": 0,
+        "costs": [],
+        "upkeepCostsPerSecond": [],
+        "activation": "equipped"
+      },
+      "effects": [
+        {
+          "effectId": "tribulation_resistance",
+          "base": 0.4,
+          "masteryGrowth": 0.08,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "tribulation_resistance",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.9
+        },
+        {
+          "effectId": "all_resistance",
+          "base": 0.12,
+          "masteryGrowth": 0.04,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "all_resistance",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.6
+        }
+      ],
+      "learningRequirements": {
+        "realm": "tribulation",
+        "knowledge": [
+          {
+            "skillId": "body.tribulation_body",
+            "level": 3
+          },
+          {
+            "skillId": "heaven.thunder_body",
+            "level": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.upkeep.sword_domain",
+      "name": "太虚剑域",
+      "type": "combat_upkeep",
+      "realm": "spirit",
+      "rarity": "epic",
+      "description": "太虚剑域",
+      "tags": [
+        "sword",
+        "domain"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "sword.domain",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "spell.domain",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "area",
+        "castTime": 0,
+        "cooldown": 0,
+        "costs": [],
+        "upkeepCostsPerSecond": [
+          {
+            "resource": "mana",
+            "value": 18
+          }
+        ],
+        "activation": "toggle"
+      },
+      "effects": [
+        {
+          "effectId": "sword_damage",
+          "base": 0.25,
+          "masteryGrowth": 0.06,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "sword_damage",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        },
+        {
+          "effectId": "enemy_slow",
+          "base": 0.15,
+          "masteryGrowth": 0.04,
+          "operation": "add_percent",
+          "target": "area",
+          "stackGroup": "enemy_slow",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "magnitude",
+          "clampMin": -1,
+          "clampMax": 0
+        }
+      ],
+      "learningRequirements": {
+        "realm": "spirit",
+        "knowledge": [
+          {
+            "skillId": "sword.domain",
+            "level": 2
+          },
+          {
+            "skillId": "spell.domain",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.upkeep.thunder_domain",
+      "name": "赤霄雷域",
+      "type": "combat_upkeep",
+      "realm": "spirit",
+      "rarity": "epic",
+      "description": "赤霄雷域",
+      "tags": [
+        "spell",
+        "domain"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "spell.domain",
+            "requiredLevel": 2,
+            "scalingWeight": 2
+          },
+          {
+            "skillId": "spell.thunder",
+            "requiredLevel": 4,
+            "scalingWeight": 3
+          }
+        ]
+      },
+      "combat": {
+        "target": "area",
+        "castTime": 0,
+        "cooldown": 0,
+        "costs": [],
+        "upkeepCostsPerSecond": [
+          {
+            "resource": "mana",
+            "value": 22
+          }
+        ],
+        "activation": "toggle"
+      },
+      "effects": [
+        {
+          "effectId": "thunder_damage",
+          "base": 0.28,
+          "masteryGrowth": 0.07,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "thunder_damage",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        },
+        {
+          "effectId": "enemy_cast_slow",
+          "base": 0.18,
+          "masteryGrowth": 0.04,
+          "operation": "add_percent",
+          "target": "area",
+          "stackGroup": "enemy_cast_slow",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "magnitude",
+          "clampMin": -1,
+          "clampMax": 0
+        }
+      ],
+      "learningRequirements": {
+        "realm": "spirit",
+        "knowledge": [
+          {
+            "skillId": "spell.domain",
+            "level": 2
+          },
+          {
+            "skillId": "spell.thunder",
+            "level": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.upkeep.dharma_form",
+      "name": "金刚法相",
+      "type": "combat_upkeep",
+      "realm": "spirit",
+      "rarity": "epic",
+      "description": "金刚法相",
+      "tags": [
+        "body",
+        "transform"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "body.dharma_form",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "body.jade",
+            "requiredLevel": 4,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 0,
+        "cooldown": 0,
+        "costs": [],
+        "upkeepCostsPerSecond": [
+          {
+            "resource": "stamina",
+            "value": 20
+          }
+        ],
+        "activation": "toggle"
+      },
+      "effects": [
+        {
+          "effectId": "max_health",
+          "base": 0.3,
+          "masteryGrowth": 0.08,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "max_health",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        },
+        {
+          "effectId": "melee_damage",
+          "base": 0.22,
+          "masteryGrowth": 0.06,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "melee_damage",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        }
+      ],
+      "learningRequirements": {
+        "realm": "spirit",
+        "knowledge": [
+          {
+            "skillId": "body.dharma_form",
+            "level": 2
+          },
+          {
+            "skillId": "body.jade",
+            "level": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.upkeep.primordial_projection",
+      "name": "元神出窍",
+      "type": "combat_upkeep",
+      "realm": "spirit",
+      "rarity": "epic",
+      "description": "元神出窍",
+      "tags": [
+        "spirit",
+        "transform"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "spirit.primordial",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "spirit.split",
+            "requiredLevel": 3,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 0,
+        "cooldown": 0,
+        "costs": [],
+        "upkeepCostsPerSecond": [
+          {
+            "resource": "spirit",
+            "value": 24
+          }
+        ],
+        "activation": "toggle"
+      },
+      "effects": [
+        {
+          "effectId": "spirit_power",
+          "base": 0.3,
+          "masteryGrowth": 0.08,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "spirit_power",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        },
+        {
+          "effectId": "physical_resistance",
+          "base": -0.35,
+          "masteryGrowth": 0.04,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "physical_resistance",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "magnitude",
+          "clampMin": -1,
+          "clampMax": 0
+        }
+      ],
+      "learningRequirements": {
+        "realm": "spirit",
+        "knowledge": [
+          {
+            "skillId": "spirit.primordial",
+            "level": 2
+          },
+          {
+            "skillId": "spirit.split",
+            "level": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.upkeep.law_field",
+      "name": "法则领域",
+      "type": "combat_upkeep",
+      "realm": "integration",
+      "rarity": "legendary",
+      "description": "法则领域",
+      "tags": [
+        "law",
+        "domain"
+      ],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "heaven.law_mastery",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "spell.law",
+            "requiredLevel": 3,
+            "scalingWeight": 2
+          }
+        ]
+      },
+      "combat": {
+        "target": "area",
+        "castTime": 0,
+        "cooldown": 0,
+        "costs": [],
+        "upkeepCostsPerSecond": [
+          {
+            "resource": "mana",
+            "value": 55
+          }
+        ],
+        "activation": "toggle"
+      },
+      "effects": [
+        {
+          "effectId": "law_power",
+          "base": 0.35,
+          "masteryGrowth": 0.08,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "law_power",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        },
+        {
+          "effectId": "enemy_law_resistance",
+          "base": -0.2,
+          "masteryGrowth": 0.04,
+          "operation": "add_percent",
+          "target": "area",
+          "stackGroup": "enemy_law_resistance",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "magnitude",
+          "clampMin": -1,
+          "clampMax": 0
+        }
+      ],
+      "learningRequirements": {
+        "realm": "integration",
+        "knowledge": [
+          {
+            "skillId": "heaven.law_mastery",
+            "level": 2
+          },
+          {
+            "skillId": "spell.law",
+            "level": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.general.qi_absorption",
+      "name": "灵气亲和",
+      "type": "general_passive",
+      "realm": "qi",
+      "rarity": "common",
+      "description": "灵气亲和",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "cultivation.qi_sense",
+            "requiredLevel": 1,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "foundation.breathing",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": null,
+      "effects": [
+        {
+          "effectId": "cultivation_speed",
+          "base": 0.05,
+          "masteryGrowth": 0.025,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "cultivation_speed",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        }
+      ],
+      "learningRequirements": {
+        "realm": "qi",
+        "knowledge": [
+          {
+            "skillId": "cultivation.qi_sense",
+            "level": 1
+          },
+          {
+            "skillId": "foundation.breathing",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.general.meridian_knowledge",
+      "name": "经脉通识",
+      "type": "general_passive",
+      "realm": "qi",
+      "rarity": "common",
+      "description": "经脉通识",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "foundation.meridians",
+            "requiredLevel": 1,
+            "scalingWeight": 3
+          }
+        ]
+      },
+      "combat": null,
+      "effects": [
+        {
+          "effectId": "injury_diagnosis",
+          "base": 0.15,
+          "masteryGrowth": 0.06,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "injury_diagnosis",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        }
+      ],
+      "learningRequirements": {
+        "realm": "qi",
+        "knowledge": [
+          {
+            "skillId": "foundation.meridians",
+            "level": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.general.appraiser",
+      "name": "鉴宝师",
+      "type": "general_passive",
+      "realm": "qi",
+      "rarity": "common",
+      "description": "鉴宝师",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "world.appraisal",
+            "requiredLevel": 1,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "foundation.literacy",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": null,
+      "effects": [
+        {
+          "effectId": "appraisal_accuracy",
+          "base": 0.15,
+          "masteryGrowth": 0.06,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "appraisal_accuracy",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        }
+      ],
+      "learningRequirements": {
+        "realm": "qi",
+        "knowledge": [
+          {
+            "skillId": "world.appraisal",
+            "level": 1
+          },
+          {
+            "skillId": "foundation.literacy",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.general.herbalist",
+      "name": "灵植师",
+      "type": "general_passive",
+      "realm": "qi",
+      "rarity": "common",
+      "description": "灵植师",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "alchemy.herbs",
+            "requiredLevel": 1,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "world.gathering",
+            "requiredLevel": 1,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": null,
+      "effects": [
+        {
+          "effectId": "herb_yield",
+          "base": 0.12,
+          "masteryGrowth": 0.05,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "herb_yield",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        }
+      ],
+      "learningRequirements": {
+        "realm": "qi",
+        "knowledge": [
+          {
+            "skillId": "alchemy.herbs",
+            "level": 1
+          },
+          {
+            "skillId": "world.gathering",
+            "level": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.general.smith",
+      "name": "炼器师",
+      "type": "general_passive",
+      "realm": "foundation",
+      "rarity": "uncommon",
+      "description": "炼器师",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "artifact.smelting",
+            "requiredLevel": 2,
+            "scalingWeight": 2
+          },
+          {
+            "skillId": "artifact.materials",
+            "requiredLevel": 3,
+            "scalingWeight": 2
+          }
+        ]
+      },
+      "combat": null,
+      "effects": [
+        {
+          "effectId": "craft_quality",
+          "base": 0.12,
+          "masteryGrowth": 0.05,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "craft_quality",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        },
+        {
+          "effectId": "material_efficiency",
+          "base": 0.08,
+          "masteryGrowth": 0.04,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "material_efficiency",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        }
+      ],
+      "learningRequirements": {
+        "realm": "foundation",
+        "knowledge": [
+          {
+            "skillId": "artifact.smelting",
+            "level": 2
+          },
+          {
+            "skillId": "artifact.materials",
+            "level": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.general.alchemist",
+      "name": "炼丹师",
+      "type": "general_passive",
+      "realm": "foundation",
+      "rarity": "uncommon",
+      "description": "炼丹师",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "alchemy.furnace",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "alchemy.herbs",
+            "requiredLevel": 3,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": null,
+      "effects": [
+        {
+          "effectId": "pill_quality",
+          "base": 0.12,
+          "masteryGrowth": 0.05,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "pill_quality",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        },
+        {
+          "effectId": "alchemy_success",
+          "base": 0.1,
+          "masteryGrowth": 0.04,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "alchemy_success",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        }
+      ],
+      "learningRequirements": {
+        "realm": "foundation",
+        "knowledge": [
+          {
+            "skillId": "alchemy.furnace",
+            "level": 2
+          },
+          {
+            "skillId": "alchemy.herbs",
+            "level": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.general.array_master",
+      "name": "阵法师",
+      "type": "general_passive",
+      "realm": "foundation",
+      "rarity": "uncommon",
+      "description": "阵法师",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "formation.array",
+            "requiredLevel": 2,
+            "scalingWeight": 2
+          },
+          {
+            "skillId": "formation.runes",
+            "requiredLevel": 3,
+            "scalingWeight": 2
+          }
+        ]
+      },
+      "combat": null,
+      "effects": [
+        {
+          "effectId": "formation_power",
+          "base": 0.12,
+          "masteryGrowth": 0.05,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "formation_power",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        },
+        {
+          "effectId": "formation_setup_speed",
+          "base": 0.1,
+          "masteryGrowth": 0.04,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "formation_setup_speed",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        }
+      ],
+      "learningRequirements": {
+        "realm": "foundation",
+        "knowledge": [
+          {
+            "skillId": "formation.array",
+            "level": 2
+          },
+          {
+            "skillId": "formation.runes",
+            "level": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.general.talisman_master",
+      "name": "符师",
+      "type": "general_passive",
+      "realm": "foundation",
+      "rarity": "uncommon",
+      "description": "符师",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "talisman.script",
+            "requiredLevel": 3,
+            "scalingWeight": 2
+          },
+          {
+            "skillId": "talisman.activation",
+            "requiredLevel": 3,
+            "scalingWeight": 2
+          }
+        ]
+      },
+      "combat": null,
+      "effects": [
+        {
+          "effectId": "talisman_quality",
+          "base": 0.12,
+          "masteryGrowth": 0.05,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "talisman_quality",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        },
+        {
+          "effectId": "talisman_activation_speed",
+          "base": 0.1,
+          "masteryGrowth": 0.04,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "talisman_activation_speed",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        }
+      ],
+      "learningRequirements": {
+        "realm": "foundation",
+        "knowledge": [
+          {
+            "skillId": "talisman.script",
+            "level": 3
+          },
+          {
+            "skillId": "talisman.activation",
+            "level": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.general.beast_master",
+      "name": "御兽师",
+      "type": "general_passive",
+      "realm": "foundation",
+      "rarity": "uncommon",
+      "description": "御兽师",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "world.beast",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "talisman.seal",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": null,
+      "effects": [
+        {
+          "effectId": "beast_growth",
+          "base": 0.12,
+          "masteryGrowth": 0.05,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "beast_growth",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        },
+        {
+          "effectId": "beast_capacity",
+          "base": 1,
+          "masteryGrowth": 1,
+          "operation": "add_flat",
+          "target": "self",
+          "stackGroup": "beast_capacity",
+          "stackPolicy": "highest",
+          "scalingMode": "positive"
+        }
+      ],
+      "learningRequirements": {
+        "realm": "foundation",
+        "knowledge": [
+          {
+            "skillId": "world.beast",
+            "level": 2
+          },
+          {
+            "skillId": "talisman.seal",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.general.geomancer",
+      "name": "堪舆师",
+      "type": "general_passive",
+      "realm": "core",
+      "rarity": "rare",
+      "description": "堪舆师",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "world.geomancy",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "formation.array",
+            "requiredLevel": 3,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": null,
+      "effects": [
+        {
+          "effectId": "spirit_vein_detection",
+          "base": 0.18,
+          "masteryGrowth": 0.06,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "spirit_vein_detection",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        },
+        {
+          "effectId": "rare_find_chance",
+          "base": 0.08,
+          "masteryGrowth": 0.035,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "rare_find_chance",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        }
+      ],
+      "learningRequirements": {
+        "realm": "core",
+        "knowledge": [
+          {
+            "skillId": "world.geomancy",
+            "level": 2
+          },
+          {
+            "skillId": "formation.array",
+            "level": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.general.void_traveler",
+      "name": "虚空行者",
+      "type": "general_passive",
+      "realm": "void",
+      "rarity": "epic",
+      "description": "虚空行者",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "world.void_survival",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "body.void_body",
+            "requiredLevel": 2,
+            "scalingWeight": 2
+          }
+        ]
+      },
+      "combat": null,
+      "effects": [
+        {
+          "effectId": "void_survival",
+          "base": 0.3,
+          "masteryGrowth": 0.08,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "void_survival",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        },
+        {
+          "effectId": "void_travel_speed",
+          "base": 0.15,
+          "masteryGrowth": 0.05,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "void_travel_speed",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        }
+      ],
+      "learningRequirements": {
+        "realm": "void",
+        "knowledge": [
+          {
+            "skillId": "world.void_survival",
+            "level": 2
+          },
+          {
+            "skillId": "body.void_body",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.general.sect_governor",
+      "name": "宗门执掌",
+      "type": "general_passive",
+      "realm": "integration",
+      "rarity": "legendary",
+      "description": "宗门执掌",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "world.civilization",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "world.trade",
+            "requiredLevel": 4,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": null,
+      "effects": [
+        {
+          "effectId": "settlement_output",
+          "base": 0.2,
+          "masteryGrowth": 0.06,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "settlement_output",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        },
+        {
+          "effectId": "governance_efficiency",
+          "base": 0.15,
+          "masteryGrowth": 0.05,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "governance_efficiency",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        }
+      ],
+      "learningRequirements": {
+        "realm": "integration",
+        "knowledge": [
+          {
+            "skillId": "world.civilization",
+            "level": 2
+          },
+          {
+            "skillId": "world.trade",
+            "level": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.general.tribulation_scholar",
+      "name": "应劫宗师",
+      "type": "general_passive",
+      "realm": "tribulation",
+      "rarity": "mythic",
+      "description": "应劫宗师",
+      "tags": [],
+      "knowledgeScaling": {
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery",
+        "knowledge": [
+          {
+            "skillId": "heaven.tribulation",
+            "requiredLevel": 3,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "heaven.astrology",
+            "requiredLevel": 4,
+            "scalingWeight": 1
+          }
+        ]
+      },
+      "combat": null,
+      "effects": [
+        {
+          "effectId": "tribulation_forecast",
+          "base": 0.35,
+          "masteryGrowth": 0.08,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "tribulation_forecast",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        },
+        {
+          "effectId": "ascension_success",
+          "base": 0.1,
+          "masteryGrowth": 0.04,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "ascension_success",
+          "stackPolicy": "highest",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 0.5
+        }
+      ],
+      "learningRequirements": {
+        "realm": "tribulation",
+        "knowledge": [
+          {
+            "skillId": "heaven.tribulation",
+            "level": 3
+          },
+          {
+            "skillId": "heaven.astrology",
+            "level": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.nascent_blade",
+      "name": "元婴御灵斩",
+      "type": "combat_active",
+      "realm": "nascent",
+      "rarity": "epic",
+      "description": "元婴御灵斩",
+      "tags": [
+        "sword",
+        "spirit",
+        "ranged"
+      ],
+      "knowledgeScaling": {
+        "knowledge": [
+          {
+            "skillId": "foundation.nascent_theory",
+            "requiredLevel": 2,
+            "scalingWeight": 2
+          },
+          {
+            "skillId": "spirit.split",
+            "requiredLevel": 2,
+            "scalingWeight": 2
+          },
+          {
+            "skillId": "sword.qi",
+            "requiredLevel": 4,
+            "scalingWeight": 1
+          }
+        ],
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
+      },
+      "combat": {
+        "target": "enemy",
+        "castTime": 1,
+        "cooldown": 14,
+        "costs": [
+          {
+            "resource": "mana",
+            "value": 80
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "damage_spirit_sword",
+          "base": 240,
+          "masteryGrowth": 65,
+          "operation": "add_flat",
+          "target": "enemy",
+          "stackGroup": "damage_spirit_sword",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "remote_control_range",
+          "base": 0.18,
+          "masteryGrowth": 0.05,
+          "operation": "add_percent",
+          "target": "self",
+          "stackGroup": "remote_control_range",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        }
+      ],
+      "learningRequirements": {
+        "realm": "nascent",
+        "knowledge": [
+          {
+            "skillId": "foundation.nascent_theory",
+            "level": 2
+          },
+          {
+            "skillId": "spirit.split",
+            "level": 2
+          },
+          {
+            "skillId": "sword.qi",
+            "level": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.soul_contract_command",
+      "name": "魂契敕令",
+      "type": "combat_active",
+      "realm": "nascent",
+      "rarity": "epic",
+      "description": "魂契敕令",
+      "tags": [
+        "talisman",
+        "command"
+      ],
+      "knowledgeScaling": {
+        "knowledge": [
+          {
+            "skillId": "talisman.soul_seal",
+            "requiredLevel": 2,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "spirit.split",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ],
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
+      },
+      "combat": {
+        "target": "controlled_entity",
+        "castTime": 0.6,
+        "cooldown": 18,
+        "costs": [
+          {
+            "resource": "spirit",
+            "value": 70
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "controlled_entity_damage",
+          "base": 0.25,
+          "masteryGrowth": 0.07,
+          "operation": "add_percent",
+          "target": "controlled_entity",
+          "stackGroup": "controlled_entity_damage",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        },
+        {
+          "effectId": "command_duration",
+          "base": 8,
+          "masteryGrowth": 2,
+          "operation": "add_flat",
+          "target": "controlled_entity",
+          "stackGroup": "command_duration",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        }
+      ],
+      "learningRequirements": {
+        "realm": "nascent",
+        "knowledge": [
+          {
+            "skillId": "talisman.soul_seal",
+            "level": 2
+          },
+          {
+            "skillId": "spirit.split",
+            "level": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.dao_sword_river",
+      "name": "道剑长河",
+      "type": "combat_active",
+      "realm": "mahayana",
+      "rarity": "legendary",
+      "description": "道剑长河",
+      "tags": [
+        "sword",
+        "law",
+        "area"
+      ],
+      "knowledgeScaling": {
+        "knowledge": [
+          {
+            "skillId": "sword.dao",
+            "requiredLevel": 3,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "spell.world",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          },
+          {
+            "skillId": "heaven.dao_fruit",
+            "requiredLevel": 3,
+            "scalingWeight": 2
+          }
+        ],
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
+      },
+      "combat": {
+        "target": "area",
+        "castTime": 3,
+        "cooldown": 65,
+        "costs": [
+          {
+            "resource": "mana",
+            "value": 340
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "damage_law_area",
+          "base": 900,
+          "masteryGrowth": 190,
+          "operation": "add_flat",
+          "target": "area",
+          "stackGroup": "damage_law_area",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "law_pierce",
+          "base": 0.35,
+          "masteryGrowth": 0.07,
+          "operation": "add_percent",
+          "target": "area",
+          "stackGroup": "law_pierce",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive",
+          "clampMin": 0,
+          "clampMax": 2
+        }
+      ],
+      "learningRequirements": {
+        "realm": "mahayana",
+        "knowledge": [
+          {
+            "skillId": "sword.dao",
+            "level": 3
+          },
+          {
+            "skillId": "spell.world",
+            "level": 2
+          },
+          {
+            "skillId": "heaven.dao_fruit",
+            "level": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "ability.combat.world_suppression",
+      "name": "掌中天地·镇",
+      "type": "combat_active",
+      "realm": "mahayana",
+      "rarity": "legendary",
+      "description": "掌中天地·镇",
+      "tags": [
+        "world",
+        "control",
+        "area"
+      ],
+      "knowledgeScaling": {
+        "knowledge": [
+          {
+            "skillId": "spell.world",
+            "requiredLevel": 3,
+            "scalingWeight": 3
+          },
+          {
+            "skillId": "formation.cave_heaven",
+            "requiredLevel": 3,
+            "scalingWeight": 2
+          },
+          {
+            "skillId": "heaven.law_mastery",
+            "requiredLevel": 2,
+            "scalingWeight": 1
+          }
+        ],
+        "formula": "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))",
+        "bonusFormula": "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
+      },
+      "combat": {
+        "target": "area",
+        "castTime": 3.5,
+        "cooldown": 80,
+        "costs": [
+          {
+            "resource": "mana",
+            "value": 380
+          }
+        ],
+        "upkeepCostsPerSecond": [],
+        "activation": "cast"
+      },
+      "effects": [
+        {
+          "effectId": "control_duration",
+          "base": 7,
+          "masteryGrowth": 1.2,
+          "operation": "add_flat",
+          "target": "area",
+          "stackGroup": "control_duration",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "positive"
+        },
+        {
+          "effectId": "enemy_all_resistance",
+          "base": -0.22,
+          "masteryGrowth": 0.05,
+          "operation": "add_percent",
+          "target": "area",
+          "stackGroup": "enemy_all_resistance",
+          "stackPolicy": "ability_instance",
+          "scalingMode": "magnitude",
+          "clampMin": -1,
+          "clampMax": 0
+        }
+      ],
+      "learningRequirements": {
+        "realm": "mahayana",
+        "knowledge": [
+          {
+            "skillId": "spell.world",
+            "level": 3
+          },
+          {
+            "skillId": "formation.cave_heaven",
+            "level": 3
+          },
+          {
+            "skillId": "heaven.law_mastery",
+            "level": 2
+          }
+        ]
+      }
+    }
+  ]
+}

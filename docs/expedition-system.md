@@ -94,6 +94,13 @@ flowchart LR
 | `data/expedition_events.json` | 与地图绑定的大多数唯一事件（抉择、事件链、精英、首领、世界效果等） |
 | `data/expedition_rules.json` | 全局规则（遭遇概率、战败惩罚、自动推进间隔等） |
 
+地点通过 `expedition_mode` 软分型：
+
+| mode | 用途 | 事件池规则 |
+|------|------|------------|
+| `resource` | 刷材料地图 | 只配置 `common_event_pool` 与 `common_event_generation`，`map_event_pool` 必须为空 |
+| `story` | 剧情/事件地图 | 只配置 `map_event_pool`，`common_event_pool` 必须为空 |
+
 ---
 
 ## 4. 状态机
@@ -156,6 +163,8 @@ advance_day()
 
 公共事件由 `common_event_pool` 引用模板，并在抽取时使用地点的 `common_event_generation` 物化。生成实例 ID 为
 `common::<location_id>::<template_id>`，因此奖励、敌人和 `duration_days` 可随当前地图变化，同时战斗跨场景后仍可按 ID 恢复。
+
+公共事件只服务 `resource` 地图，用于材料、普通战斗、恢复和地形消耗循环；`story` 地图不使用公共模板，只从 `map_event_pool` 抽取地图专属剧情、抉择、战斗和事件链。
 
 ### 5.3 战斗
 
@@ -300,3 +309,4 @@ advance_day()
 | 2026-06-10 | 深度改为难度：事件 `difficulty`、地点难度范围，取消 `depth` 自动递增 |
 | 2026-06-10 | 新增自动/手动推进切换与「前进」按钮 |
 | 2026-06-11 | 移除独立地点选择场景；历练入口改经世界地图弹窗与 `start_expedition` |
+| 2026-06-16 | 地点新增 `expedition_mode`：材料地图只用公共事件，剧情地图只用地图专属事件 |

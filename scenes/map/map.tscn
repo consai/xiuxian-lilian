@@ -209,6 +209,17 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
+[node name="WildWolfValley" parent="MapFrame/MapCanvas/WildernessLocations" instance=ExtResource("7_mgs8m")]
+layout_mode = 0
+offset_left = 93.0
+offset_top = 385.0
+offset_right = 219.0
+offset_bottom = 477.0
+location_id = "wild_wolf_valley"
+
+[node name="NameLabel" parent="MapFrame/MapCanvas/WildernessLocations/WildWolfValley" index="1"]
+text = "野狼谷"
+
 [node name="SpiritSpringValley" parent="MapFrame/MapCanvas/WildernessLocations" unique_id=2015339708 instance=ExtResource("7_mgs8m")]
 layout_mode = 0
 offset_left = 12.0

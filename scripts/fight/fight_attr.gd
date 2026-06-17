@@ -6,8 +6,6 @@ extends RefCounted
 const HP_MAX := "hp_max"
 const MP_MAX := "mp_max"
 const SHIELD := "shield"
-const ATK := "atk"
-const DEF := "def"
 const SPD := "spd"
 const CRIT := "crit"
 const CRIT_DAMAGE := "crit_damage"
@@ -23,30 +21,33 @@ const HP_REGEN := "hp_regen"
 const MP_REGEN := "mp_regen"
 const CARRY := "carry"
 const DAMAGE_BONUS := "damage_bonus"
+const DAMAGE_TAKEN := "damage_taken"
 const COMBAT_MP_RESTORE_2S := "combat_mp_restore_2s"
 
 const DAMAGE_PHYSICAL := "physical"
 const DAMAGE_MAGIC := "magic"
+const DAMAGE_TRUE := "true"
 const DEFENSE_CONSTANT := 100.0
 const HIT_CONSTANT := 200.0
 const CONTROL_CONSTANT := 200.0
 
 ## 进战校验必填（与 [BattleInitData] 一致）。
-const CORE_KEYS: Array[String] = [HP_MAX, MP_MAX, ATK, DEF, SPD]
+const CORE_KEYS: Array[String] = [
+	HP_MAX, MP_MAX, PHYSICAL_ATK, MAGIC_ATK, PHYSICAL_DEF, MAGIC_DEF, SPD,
+]
 
 const ALL_KEYS: Array[String] = [
-	HP_MAX, MP_MAX, SHIELD, ATK, DEF, SPD, CRIT, CRIT_DAMAGE,
+	HP_MAX, MP_MAX, SHIELD, SPD, CRIT, CRIT_DAMAGE,
 	PHYSICAL_ATK, MAGIC_ATK, PHYSICAL_DEF, MAGIC_DEF, ACCURACY, EVASION,
 	CONTROL_POWER, CONTROL_RESIST, HP_REGEN, MP_REGEN, CARRY,
 	DAMAGE_BONUS, COMBAT_MP_RESTORE_2S,
+	DAMAGE_TAKEN,
 ]
 
 const TEST_DEFAULTS: Dictionary = {
 	HP_MAX: 100.0,
 	MP_MAX: 100.0,
 	SHIELD: 0.0,
-	ATK: 100.0,
-	DEF: 100.0,
 	SPD: 100.0,
 	CRIT: 100.0,
 	CRIT_DAMAGE: 100.0,
@@ -62,6 +63,7 @@ const TEST_DEFAULTS: Dictionary = {
 	MP_REGEN: 0.0,
 	CARRY: 0.0,
 	DAMAGE_BONUS: 0.0,
+	DAMAGE_TAKEN: 0.0,
 	COMBAT_MP_RESTORE_2S: 0.0,
 }
 
@@ -108,7 +110,7 @@ static func validate_core(attrs: Dictionary) -> PackedStringArray:
 
 ## 按 Buff [code]modifiers[/code] 叠层修正（加法，与 [code]data/buff.json[/code] 示例一致）。
 static func apply_modifiers(attrs: Dictionary, modifiers: Dictionary, stacks: int = 1) -> Dictionary:
-	if modifiers.is_empty() or stacks <= 0:
+	if modifiers.is_empty() or stacks == 0:
 		return attrs.duplicate(true)
 	var mult := float(stacks)
 	var out := attrs.duplicate(true)
@@ -205,27 +207,19 @@ static func damage_after_defense(raw_damage: float, defense: float) -> float:
 
 
 static func attack_for(attrs: Dictionary, damage_type: String) -> float:
-	var physical := get_attr(attrs, PHYSICAL_ATK, get_attr(attrs, ATK))
-	var magic := get_attr(attrs, MAGIC_ATK, get_attr(attrs, ATK))
-	var legacy := get_attr(attrs, ATK, maxf(physical, magic))
-	# atk 与兼容别名不一致时，视为旧配置或旧 Buff 的显式全攻击覆盖。
-	if not is_equal_approx(legacy, maxf(physical, magic)):
-		return legacy
 	if damage_type == DAMAGE_MAGIC:
-		return magic
-	return physical
+		return get_attr(attrs, MAGIC_ATK)
+	if damage_type == DAMAGE_TRUE:
+		return maxf(get_attr(attrs, PHYSICAL_ATK), get_attr(attrs, MAGIC_ATK))
+	return get_attr(attrs, PHYSICAL_ATK)
 
 
 static func defense_for(attrs: Dictionary, damage_type: String) -> float:
-	var physical := get_attr(attrs, PHYSICAL_DEF, get_attr(attrs, DEF))
-	var magic := get_attr(attrs, MAGIC_DEF, get_attr(attrs, DEF))
-	var legacy := get_attr(attrs, DEF, minf(physical, magic))
-	# def 与兼容别名不一致时，视为旧配置或旧 Buff 的显式全防御覆盖。
-	if not is_equal_approx(legacy, minf(physical, magic)):
-		return legacy
 	if damage_type == DAMAGE_MAGIC:
-		return magic
-	return physical
+		return get_attr(attrs, MAGIC_DEF)
+	if damage_type == DAMAGE_TRUE:
+		return 0.0
+	return get_attr(attrs, PHYSICAL_DEF)
 
 
 ## 普攻使用物理攻防与软减伤，可暴击。
@@ -244,12 +238,53 @@ static func calc_skill_damage(
 		defender: Dictionary,
 		power_scale: float,
 		flat_bonus: float,
-		damage_type: String = DAMAGE_MAGIC
+		damage_type: String = DAMAGE_MAGIC,
+		armor_pierce: float = 0.0
 ) -> Dictionary:
-	var resolved_type := DAMAGE_PHYSICAL if damage_type == DAMAGE_PHYSICAL else DAMAGE_MAGIC
+	var resolved_type := resolve_damage_type(damage_type)
 	var raw := attack_for(attacker, resolved_type) * power_scale + flat_bonus
-	var dmg := damage_after_defense(raw, defense_for(defender, resolved_type))
+	var dmg := maxf(1.0, raw)
+	if resolved_type != DAMAGE_TRUE:
+		var effective_defense := defense_for(defender, resolved_type) * (1.0 - clampf(armor_pierce, 0.0, 0.7))
+		dmg = damage_after_defense(raw, effective_defense)
 	dmg *= 1.0 + maxf(0.0, get_attr(attacker, DAMAGE_BONUS, 0.0))
+	dmg *= 1.0 + maxf(-0.75, get_attr(defender, DAMAGE_TAKEN, 0.0))
 	var crit := roll_crit(get_attr(attacker, CRIT))
 	dmg = apply_crit_multiplier(dmg, get_attr(attacker, CRIT_DAMAGE), crit)
 	return {"damage": dmg, "is_crit": crit, "damage_type": resolved_type}
+
+
+## 意图预览：按非暴击期望伤害估算，避免随机波动。
+static func estimate_basic_damage(attacker: Dictionary, defender: Dictionary) -> float:
+	var raw := attack_for(attacker, DAMAGE_PHYSICAL)
+	var dmg := damage_after_defense(raw, defense_for(defender, DAMAGE_PHYSICAL))
+	dmg *= 1.0 + maxf(0.0, get_attr(attacker, DAMAGE_BONUS, 0.0))
+	return maxf(0.0, dmg)
+
+
+static func estimate_skill_damage(
+		attacker: Dictionary,
+		defender: Dictionary,
+		power_scale: float,
+		flat_bonus: float,
+		damage_type: String = DAMAGE_MAGIC,
+		armor_pierce: float = 0.0
+) -> float:
+	var resolved_type := resolve_damage_type(damage_type)
+	var raw := attack_for(attacker, resolved_type) * power_scale + flat_bonus
+	var dmg := maxf(1.0, raw)
+	if resolved_type != DAMAGE_TRUE:
+		var effective_defense := defense_for(defender, resolved_type) * (1.0 - clampf(armor_pierce, 0.0, 0.7))
+		dmg = damage_after_defense(raw, effective_defense)
+	dmg *= 1.0 + maxf(0.0, get_attr(attacker, DAMAGE_BONUS, 0.0))
+	dmg *= 1.0 + maxf(-0.75, get_attr(defender, DAMAGE_TAKEN, 0.0))
+	return maxf(0.0, dmg)
+
+
+static func resolve_damage_type(damage_type: String) -> String:
+	var normalized := damage_type.strip_edges().to_lower()
+	if normalized == DAMAGE_PHYSICAL:
+		return DAMAGE_PHYSICAL
+	if normalized == DAMAGE_TRUE:
+		return DAMAGE_TRUE
+	return DAMAGE_MAGIC

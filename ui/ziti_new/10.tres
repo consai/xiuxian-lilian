@@ -1,0 +1,9 @@
+[gd_resource type="LabelSettings" format=3 uid="uid://qay8a76fn7a3"]
+
+[ext_resource type="FontFile" uid="uid://btkp4vukwqrul" path="res://assets/art/AlimamaDaoLiTi.ttf" id="1_kfq8t"]
+
+[resource]
+font = ExtResource("1_kfq8t")
+font_size = 13
+font_color = Color(0.33333334, 0.19607843, 0.18431373, 1)
+outline_size = 2

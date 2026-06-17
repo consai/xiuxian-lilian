@@ -41,6 +41,9 @@ static func collect_errors(scene_id: String, data: Dictionary) -> PackedStringAr
 			if reason not in ExpeditionResult.VALID_EXIT_REASONS:
 				errors.append("expedition_result.reason 无效: %s" % reason)
 		SCENE_BREAKTHROUGH_SUMMARY:
+			var mode := str(data.get("mode", "result")).strip_edges()
+			if mode == "panel":
+				return errors
 			if str(data.get("new_realm", "")).strip_edges() == "":
 				errors.append("breakthrough_summary 缺少 new_realm")
 	return errors

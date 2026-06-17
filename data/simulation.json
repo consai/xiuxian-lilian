@@ -9,8 +9,37 @@
     "battle_loss_hp_floor_ratio": 0.25
   },
   "realms": [
-    {"id": "qi_1", "name": "炼气一层", "breakthrough_at": 100},
-    {"id": "qi_2", "name": "炼气二层", "breakthrough_at": 220}
+    {"id": "qi_1", "name": "炼气一层", "major_realm": "qi", "breakthrough_at": 100},
+    {"id": "qi_2", "name": "炼气二层", "major_realm": "qi", "breakthrough_at": 220},
+    {"id": "qi_3", "name": "炼气三层", "major_realm": "qi", "breakthrough_at": 360},
+    {"id": "qi_4", "name": "炼气四层", "major_realm": "qi", "breakthrough_at": 520},
+    {"id": "qi_5", "name": "炼气五层", "major_realm": "qi", "breakthrough_at": 700},
+    {"id": "qi_6", "name": "炼气六层", "major_realm": "qi", "breakthrough_at": 900},
+    {"id": "qi_7", "name": "炼气七层", "major_realm": "qi", "breakthrough_at": 1120},
+    {"id": "qi_8", "name": "炼气八层", "major_realm": "qi", "breakthrough_at": 1360},
+    {"id": "qi_9", "name": "炼气九层", "major_realm": "qi", "breakthrough_at": 1620},
+    {"id": "foundation_early", "name": "筑基初期", "major_realm": "foundation", "breakthrough_at": 2000},
+    {"id": "foundation_mid", "name": "筑基中期", "major_realm": "foundation", "breakthrough_at": 2600},
+    {"id": "foundation_late", "name": "筑基后期", "major_realm": "foundation", "breakthrough_at": 3300},
+    {"id": "core_early", "name": "金丹初期", "major_realm": "core", "breakthrough_at": 4200},
+    {"id": "core_mid", "name": "金丹中期", "major_realm": "core", "breakthrough_at": 5400},
+    {"id": "core_late", "name": "金丹后期", "major_realm": "core", "breakthrough_at": 6900},
+    {"id": "nascent_early", "name": "元婴初期", "major_realm": "nascent", "breakthrough_at": 8800},
+    {"id": "nascent_mid", "name": "元婴中期", "major_realm": "nascent", "breakthrough_at": 11200},
+    {"id": "nascent_late", "name": "元婴后期", "major_realm": "nascent", "breakthrough_at": 14200},
+    {"id": "transform_early", "name": "化神初期", "major_realm": "transform", "breakthrough_at": 18000},
+    {"id": "transform_mid", "name": "化神中期", "major_realm": "transform", "breakthrough_at": 22800},
+    {"id": "transform_late", "name": "化神后期", "major_realm": "transform", "breakthrough_at": 28800},
+    {"id": "void_early", "name": "炼虚初期", "major_realm": "void", "breakthrough_at": 36500},
+    {"id": "void_mid", "name": "炼虚中期", "major_realm": "void", "breakthrough_at": 46000},
+    {"id": "void_late", "name": "炼虚后期", "major_realm": "void", "breakthrough_at": 58000},
+    {"id": "merge_early", "name": "合体初期", "major_realm": "merge", "breakthrough_at": 73000},
+    {"id": "merge_mid", "name": "合体中期", "major_realm": "merge", "breakthrough_at": 92000},
+    {"id": "merge_late", "name": "合体后期", "major_realm": "merge", "breakthrough_at": 116000},
+    {"id": "great_early", "name": "大乘初期", "major_realm": "great", "breakthrough_at": 146000},
+    {"id": "great_mid", "name": "大乘中期", "major_realm": "great", "breakthrough_at": 184000},
+    {"id": "great_late", "name": "大乘后期", "major_realm": "great", "breakthrough_at": 232000},
+    {"id": "tribulation", "name": "渡劫期", "major_realm": "tribulation", "breakthrough_at": 290000}
   ],
   "initial_player": {
     "name": "清风剑仙",
@@ -29,17 +58,23 @@
         "wood": 35
       }
     },
-    "skills": [1],
-    "equipped_skills": [1, -1, -1, -1, -1],
-    "methods": ["five_elements_art"],
+    "abilities": ["ability.combat.qi_bolt"],
+    "equipped_abilities": ["", "ability.combat.qi_bolt", "", "", ""],
+    "methods": ["method.hunyuan.1"],
     "method_slots": {
-      "main": "five_elements_art",
+      "main": "method.hunyuan.1",
       "support_1": "",
       "support_2": "",
       "movement": ""
     },
     "equips": [],
-    "inventory": {},
+    "inventory": {
+      "items_JuQiDan": 2,
+      "items_LingCao": 2,
+      "items_LingGuo": 1,
+      "items_YaoDan": 1,
+      "items_AlchemyNotes_JuQi": 1
+    },
     "item_slots": ["", ""],
     "equip_slots": [-1, -1]
   }

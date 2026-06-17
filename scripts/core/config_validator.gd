@@ -4,6 +4,10 @@ extends RefCounted
 const ExpeditionDataValidatorScript := preload("res://scripts/expedition/expedition_data_validator.gd")
 const WorldMapDataValidatorScript := preload("res://scripts/map/world_map_data_validator.gd")
 const SceneManagerScript := preload("res://scripts/core/scene_manager.gd")
+const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
+const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
+const RealmBalanceServiceScript := preload("res://scripts/sim/realm_balance_service.gd")
 
 
 static func collect_all_errors(config_manager: Node, game_state: Node = null) -> PackedStringArray:
@@ -14,9 +18,80 @@ static func collect_all_errors(config_manager: Node, game_state: Node = null) ->
 	errors.append_array(_validate_unique_ids(config_manager))
 	errors.append_array(_validate_scene_paths())
 	errors.append_array(_validate_expedition_rules(config_manager))
+	errors.append_array(_validate_realm_balance())
 	errors.append_array(_validate_location_preview_rewards(config_manager))
+	errors.append_array(_validate_v1_abilities())
+	errors.append_array(_validate_method_stack_policies())
 	errors.append_array(ExpeditionDataValidatorScript.collect_errors(game_state))
 	errors.append_array(WorldMapDataValidatorScript.collect_errors())
+	return errors
+
+
+static func _validate_realm_balance() -> PackedStringArray:
+	var simulation := JsonLoader._read_json_root_object("res://data/simulation.json")
+	var realms_v: Variant = simulation.get("realms", [])
+	var realms := realms_v as Array if realms_v is Array else []
+	return RealmBalanceServiceScript.collect_config_errors(realms)
+
+
+static func _validate_v1_abilities() -> PackedStringArray:
+	var errors: PackedStringArray = []
+	for ability_v in AbilityServiceScript.all_abilities():
+		var ability := ability_v as Dictionary
+		for effect_v in ability.get("effects", []) as Array:
+			var effect := effect_v as Dictionary
+			if effect.has("masteryGrowth"):
+				errors.append("技能 %s 的效果 %s 使用了禁用字段 masteryGrowth" % [
+					ability.get("id", ""), effect.get("effectId", ""),
+				])
+		if str(ability.get("type", "")) != "combat_active":
+			continue
+		var combat := ability.get("combat", {}) as Dictionary
+		if not combat.has("powerScale") or float(combat.get("powerScale", -1.0)) < 0.0:
+			errors.append("技能 %s 缺少有效 powerScale" % str(ability.get("id", "")))
+		errors.append_array(_validate_combat_costs(ability, combat))
+		for effect_v in ability.get("effects", []) as Array:
+			var effect := effect_v as Dictionary
+			var effect_id := str(effect.get("effectId", ""))
+			if not EffectResolverScript.has_combat_mapping(effect_id):
+				errors.append("技能 %s 的效果 %s 未映射到战斗运行时" % [ability.get("id", ""), effect_id])
+			if str(effect.get("operation", "")) == "add_percent" \
+					and (not effect.has("clampMin") or not effect.has("clampMax")):
+				errors.append("技能 %s 的百分比效果 %s 缺少上下限" % [ability.get("id", ""), effect_id])
+	return errors
+
+
+static func _validate_combat_costs(ability: Dictionary, combat: Dictionary) -> PackedStringArray:
+	var errors: PackedStringArray = []
+	var ability_id := str(ability.get("id", ""))
+	var costs_v: Variant = combat.get("costs", [])
+	if not costs_v is Array:
+		errors.append("技能 %s combat.costs 必须是数组" % ability_id)
+		return errors
+	var allowed := {"mana": true, "stamina": true, "spirit": true}
+	for cost_v in costs_v as Array:
+		if not cost_v is Dictionary:
+			errors.append("技能 %s combat.costs 包含非对象项" % ability_id)
+			continue
+		var cost := cost_v as Dictionary
+		var resource := str(cost.get("resource", "")).strip_edges().to_lower()
+		if not allowed.has(resource):
+			errors.append("技能 %s 使用未知战斗资源 %s" % [ability_id, resource])
+		if float(cost.get("value", -1.0)) < 0.0:
+			errors.append("技能 %s 的资源消耗不能为负" % ability_id)
+	return errors
+
+
+static func _validate_method_stack_policies() -> PackedStringArray:
+	var errors: PackedStringArray = []
+	for method_v in CultivationMethodServiceScript.all_methods():
+		var method := method_v as Dictionary
+		for effect_v in method.get("effects", []) as Array:
+			var effect := effect_v as Dictionary
+			if str(effect.get("stackPolicy", "")) == "add_capped" and not effect.has("cap"):
+				errors.append("功法 %s 的效果 %s 使用 add_capped 但缺少 cap" % [
+					method.get("id", ""), effect.get("effectId", ""),
+				])
 	return errors
 
 

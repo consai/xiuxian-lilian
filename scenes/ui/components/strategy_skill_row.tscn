@@ -1,0 +1,109 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="Texture2D" uid="uid://bhg77w45fl12w" path="res://assets/art/character_panel_icons/skill_basic_attack.png" id="2_icon"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="3_h2"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="4_body"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/16.tres" id="5_small"]
+[sub_resource type="StyleBoxFlat" id="RowPanel"]
+bg_color = Color(0.97, 0.88, 0.73, 0.46)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.66, 0.47, 0.29, 0.7)
+corner_radius_top_left = 13
+corner_radius_top_right = 13
+corner_radius_bottom_right = 13
+corner_radius_bottom_left = 13
+[sub_resource type="StyleBoxFlat" id="FieldPanel"]
+bg_color = Color(1, 0.96, 0.86, 0.7)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.65, 0.47, 0.29, 0.65)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+[node name="StrategySkillRow" type="Panel"]
+custom_minimum_size = Vector2(0, 74)
+theme = ExtResource("1_theme")
+theme_override_styles/panel = SubResource("RowPanel")
+[node name="Priority" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 10.0
+offset_top = 22.0
+offset_right = 42.0
+offset_bottom = 52.0
+text = "1"
+label_settings = ExtResource("4_body")
+horizontal_alignment = 1
+[node name="Icon" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 50.0
+offset_top = 7.0
+offset_right = 110.0
+offset_bottom = 67.0
+texture = ExtResource("2_icon")
+expand_mode = 1
+stretch_mode = 5
+[node name="Info" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 122.0
+offset_top = 9.0
+offset_right = 342.0
+offset_bottom = 66.0
+text = "普攻    攻击\n基础攻击，造成少量伤害。"
+label_settings = ExtResource("5_small")
+[node name="Condition" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 350.0
+offset_top = 8.0
+offset_right = 500.0
+offset_bottom = 66.0
+theme_override_styles/panel = SubResource("FieldPanel")
+[node name="ConditionLabel" type="Label" parent="Condition"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "条件\n始终释放"
+label_settings = ExtResource("5_small")
+vertical_alignment = 1
+[node name="Target" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 508.0
+offset_top = 8.0
+offset_right = 614.0
+offset_bottom = 66.0
+theme_override_styles/panel = SubResource("FieldPanel")
+[node name="TargetLabel" type="Label" parent="Target"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "目标\n敌人"
+label_settings = ExtResource("5_small")
+vertical_alignment = 1
+[node name="Drag" type="Label" parent="."]
+layout_mode = 0
+offset_left = 620.0
+offset_top = 20.0
+offset_right = 648.0
+offset_bottom = 54.0
+text = "≡"
+label_settings = ExtResource("3_h2")
+horizontal_alignment = 1

@@ -1,10 +1,12 @@
-[gd_scene format=3 uid="uid://bqxmpbarui001"]
+[gd_scene format=3 uid="uid://c440pyv03mhf8"]
 
-[ext_resource type="StyleBoxFlat" path="res://ui/hp_bar_back.tres" id="1_back"]
-[ext_resource type="StyleBoxFlat" path="res://ui/mp_bar_fill.tres" id="2_fill"]
+[ext_resource type="StyleBox" path="res://ui/hp_bar_back.tres" id="1_back"]
+[ext_resource type="StyleBox" uid="uid://fpbcqcclrgv3" path="res://ui/mp_bar_fill.tres" id="2_fill"]
 
-[node name="MpBar" type="ProgressBar"]
+[node name="MpBar" type="ProgressBar" unique_id=961359202]
 custom_minimum_size = Vector2(0, 20)
+offset_right = 197.0
+offset_bottom = 20.0
 size_flags_horizontal = 3
 theme_override_styles/background = ExtResource("1_back")
 theme_override_styles/fill = ExtResource("2_fill")

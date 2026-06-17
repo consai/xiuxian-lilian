@@ -1,0 +1,62 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/ui_new/xiulian.png" id="1_icon"]
+
+[sub_resource type="StyleBoxFlat" id="Style_normal"]
+bg_color = Color(0.909804, 0.862745, 0.698039, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.27451, 0.180392, 0.101961, 0.92)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+
+[sub_resource type="StyleBoxFlat" id="Style_hover"]
+bg_color = Color(0.968627, 0.909804, 0.741176, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.376471, 0.254902, 0.133333, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+
+[sub_resource type="StyleBoxFlat" id="Style_pressed"]
+bg_color = Color(0.67451, 0.756863, 0.470588, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.25098, 0.160784, 0.0901961, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+
+[node name="CultivationModeButton" type="Button"]
+custom_minimum_size = Vector2(0, 88)
+theme_override_colors/font_color = Color(0.2, 0.12549, 0.0705882, 1)
+theme_override_colors/font_hover_color = Color(0.2, 0.12549, 0.0705882, 1)
+theme_override_colors/font_pressed_color = Color(0.2, 0.12549, 0.0705882, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("Style_normal")
+theme_override_styles/hover = SubResource("Style_hover")
+theme_override_styles/pressed = SubResource("Style_pressed")
+text = "运转周天\n修为 100% · 知识 100%"
+
+[node name="Icon" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 14.0
+offset_right = 74.0
+offset_bottom = 74.0
+mouse_filter = 2
+texture = ExtResource("1_icon")
+expand_mode = 1
+stretch_mode = 5
+

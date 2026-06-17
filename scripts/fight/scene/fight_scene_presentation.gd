@@ -41,6 +41,8 @@ func run_presentation(
 		return
 	var source_id := str(payload.get("source_id", ""))
 	var target_id := str(payload.get("target_id", ""))
+	var source_actor_id := str(payload.get("source_actor_id", source_id))
+	var target_actor_id := str(payload.get("target_actor_id", target_id))
 	var report: Dictionary = payload.get("report", {}) as Dictionary
 	var cfg: Dictionary = payload.get("cfg", {}) as Dictionary
 	ctx.presentation_busy = true
@@ -65,7 +67,7 @@ func run_presentation(
 		hud.update_skill_input_enabled(ctx)
 		return
 	hud.update_skill_input_enabled(ctx)
-	await play_combat_vfx(ctx, hud, source_id, target_id, report, cfg)
+	await play_combat_vfx(ctx, hud, source_actor_id, target_actor_id, report, cfg)
 	BattleDebugLog.write("场景", "VFX 播放 await 返回")
 	ctx.domain.finish_presentation()
 	var end_reason := ctx.domain.check_end_after_resolve()

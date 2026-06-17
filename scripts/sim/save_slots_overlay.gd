@@ -1,6 +1,9 @@
 extends Control
 
 signal closed(message: String)
+signal loaded(slot: int)
+
+@export var load_only := false
 
 
 func _ready() -> void:
@@ -11,6 +14,16 @@ func _ready() -> void:
 	%Slot1LoadButton.pressed.connect(_on_load_pressed.bind(1))
 	%Slot2LoadButton.pressed.connect(_on_load_pressed.bind(2))
 	%Slot3LoadButton.pressed.connect(_on_load_pressed.bind(3))
+	_apply_mode()
+
+
+func _apply_mode() -> void:
+	if not load_only:
+		return
+	%Title.text = "读取存档"
+	%Slot1SaveButton.visible = false
+	%Slot2SaveButton.visible = false
+	%Slot3SaveButton.visible = false
 
 
 func refresh() -> void:
@@ -61,6 +74,7 @@ func _on_load_pressed(slot: int) -> void:
 	var result: Dictionary = GameState.load_game(slot)
 	if bool(result.get("ok", false)):
 		refresh()
+		loaded.emit(slot)
 		closed.emit("已读档：槽位 %d。" % slot)
 		visible = false
 	else:

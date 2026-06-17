@@ -1,0 +1,564 @@
+[gd_scene format=3 uid="uid://ca10didvwyvff"]
+
+[ext_resource type="Script" uid="uid://3t6blkicyihd" path="res://scripts/sim/cultivation_panel.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_theme"]
+[ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="3_bg"]
+[ext_resource type="Texture2D" uid="uid://10mdce84j7yj" path="res://assets/art/ui_new/dazuoxiaoren.png" id="4_meditator"]
+[ext_resource type="Texture2D" uid="uid://8mwstvi8kywh" path="res://assets/art/ui_new/btn_close.png" id="6_close"]
+[ext_resource type="Texture2D" uid="uid://0861fa5a5myi" path="res://assets/art/ui_new/gongfa.png" id="9_insight"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/cultivation_mode_button.tscn" id="13_mode"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="15_title"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="16_head"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="17_text"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="18_small"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/cultivation_primary_button.tscn" id="19_primary"]
+[ext_resource type="PackedScene" uid="uid://bx04spldnbiyv" path="res://scenes/items/item.tscn" id="20_item"]
+[ext_resource type="PackedScene" uid="uid://dgqc00b7e6pfa" path="res://scenes/ui/loadout_bag_popup.tscn" id="21_pill_picker"]
+
+[sub_resource type="StyleBoxFlat" id="Style_float_card"]
+content_margin_left = 18.0
+content_margin_top = 18.0
+content_margin_right = 18.0
+content_margin_bottom = 18.0
+bg_color = Color(1, 0.94902, 0.85098, 0.94)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 0.92)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0.243137, 0.14902, 0.0705882, 0.2)
+shadow_size = 5
+
+[sub_resource type="StyleBoxFlat" id="Style_banner"]
+bg_color = Color(1, 0.890196, 0.690196, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 0.95)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0.243137, 0.14902, 0.0705882, 0.2)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="Style_meditation_aura"]
+bg_color = Color(0.952941, 0.85098, 0.521569, 0.24)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.607843, 0.541176, 0.278431, 0.55)
+corner_radius_top_left = 120
+corner_radius_top_right = 120
+corner_radius_bottom_right = 120
+corner_radius_bottom_left = 120
+
+[sub_resource type="StyleBoxFlat" id="Style_panel"]
+content_margin_left = 18.0
+content_margin_top = 18.0
+content_margin_right = 18.0
+content_margin_bottom = 18.0
+bg_color = Color(1, 0.941176, 0.803922, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 0.92)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0.243137, 0.14902, 0.0705882, 0.24)
+shadow_size = 7
+
+[sub_resource type="StyleBoxFlat" id="Style_progress_back"]
+bg_color = Color(0.403922, 0.313726, 0.2, 0.26)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25098, 0.160784, 0.0901961, 0.65)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[sub_resource type="StyleBoxFlat" id="Style_progress_fill"]
+bg_color = Color(0.639216, 0.698039, 0.411765, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="Style_day_normal"]
+bg_color = Color(1, 0.92549, 0.760784, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 0.92)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="Style_day_hover"]
+bg_color = Color(0.866667, 0.898039, 0.666667, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="CultivationPanel" type="Control" unique_id=668666561]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1416509767]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="WarmOverlay" type="ColorRect" parent="." unique_id=476884812]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0.878431, 0.65098, 0.08)
+
+[node name="PlayerCard" type="PanelContainer" parent="." unique_id=1585739557]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 18.0
+offset_right = 292.0
+offset_bottom = 93.0
+theme_override_styles/panel = SubResource("Style_float_card")
+
+[node name="PlayerLabel" type="Label" parent="PlayerCard" unique_id=1948393983]
+unique_name_in_owner = true
+layout_mode = 2
+text = "清风剑仙 · 炼气一层"
+label_settings = ExtResource("17_text")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeaderBanner" type="Panel" parent="." unique_id=2007712919]
+custom_minimum_size = Vector2(190, 54)
+layout_mode = 0
+offset_left = 462.0
+offset_top = 18.0
+offset_right = 818.0
+offset_bottom = 88.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_banner")
+
+[node name="Title" type="Label" parent="HeaderBanner" unique_id=16185090]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 14.0
+offset_right = 353.0
+offset_bottom = 55.0
+text = "运 功 修 炼"
+label_settings = ExtResource("15_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DayCard" type="Panel" parent="." unique_id=2064696104]
+layout_mode = 0
+offset_left = 977.0
+offset_top = 18.0
+offset_right = 1158.0
+offset_bottom = 79.0
+theme_override_styles/panel = SubResource("Style_float_card")
+
+[node name="DayLabel" type="Label" parent="DayCard" unique_id=2095002617]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 18.0
+offset_top = 18.0
+offset_right = 163.0
+offset_bottom = 43.0
+text = "第 1 日"
+label_settings = ExtResource("17_text")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="TextureButton" parent="." unique_id=114442987]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1184.0
+offset_top = 17.0
+offset_right = 1250.0
+offset_bottom = 83.0
+texture_normal = ExtResource("6_close")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="MeditationAura" type="Panel" parent="." unique_id=44545731]
+layout_mode = 0
+offset_left = 487.0
+offset_top = 126.0
+offset_right = 793.0
+offset_bottom = 422.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_meditation_aura")
+
+[node name="MeditatorGlow" type="TextureRect" parent="." unique_id=466071520]
+layout_mode = 0
+offset_left = 516.0
+offset_top = 145.0
+offset_right = 764.0
+offset_bottom = 399.0
+mouse_filter = 2
+texture = ExtResource("4_meditator")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MethodPanel" type="PanelContainer" parent="." unique_id=1500873684]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 148.0
+offset_right = 355.0
+offset_bottom = 570.0
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="MethodContent" type="VBoxContainer" parent="MethodPanel" unique_id=1754542254]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TopSpacer" type="Control" parent="MethodPanel/MethodContent" unique_id=469620354]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MethodIcon" type="TextureRect" parent="MethodPanel/MethodContent" unique_id=2018737290]
+custom_minimum_size = Vector2(0, 74)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("9_insight")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MethodLabel" type="Label" parent="MethodPanel/MethodContent" unique_id=1132903891]
+unique_name_in_owner = true
+layout_mode = 2
+text = "混元归一经"
+label_settings = ExtResource("16_head")
+horizontal_alignment = 1
+
+[node name="MasteryLabel" type="Label" parent="MethodPanel/MethodContent" unique_id=1532461028]
+unique_name_in_owner = true
+layout_mode = 2
+text = "功法熟练度 0%"
+label_settings = ExtResource("17_text")
+horizontal_alignment = 1
+
+[node name="MasteryBar" type="ProgressBar" parent="MethodPanel/MethodContent" unique_id=1695152291]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+theme_override_styles/background = SubResource("Style_progress_back")
+theme_override_styles/fill = SubResource("Style_progress_fill")
+show_percentage = false
+
+[node name="KnowledgeLabel" type="Label" parent="MethodPanel/MethodContent" unique_id=818745388]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "本功法可领悟"
+label_settings = ExtResource("18_small")
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="MethodBanner" type="PanelContainer" parent="." unique_id=638381226]
+custom_minimum_size = Vector2(190, 54)
+layout_mode = 0
+offset_left = 87.0
+offset_top = 124.0
+offset_right = 296.0
+offset_bottom = 184.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_banner")
+
+[node name="Title" type="Label" parent="MethodBanner" unique_id=2006484246]
+layout_mode = 2
+text = "当前主修功法"
+label_settings = ExtResource("16_head")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlanPanel" type="PanelContainer" parent="." unique_id=1223828267]
+layout_mode = 0
+offset_left = 925.0
+offset_top = 148.0
+offset_right = 1252.0
+offset_bottom = 570.0
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="PlanContent" type="VBoxContainer" parent="PlanPanel" unique_id=1581980640]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TopSpacer" type="Control" parent="PlanPanel/PlanContent" unique_id=1925088126]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Days" type="HBoxContainer" parent="PlanPanel/PlanContent" unique_id=79311205]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="OneDayButton" type="Button" parent="PlanPanel/PlanContent/Days" unique_id=147868607]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(82, 58)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.12549, 0.0705882, 1)
+theme_override_colors/font_pressed_color = Color(0.2, 0.12549, 0.0705882, 1)
+theme_override_colors/font_hover_color = Color(0.2, 0.12549, 0.0705882, 1)
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("Style_day_normal")
+theme_override_styles/pressed = SubResource("Style_day_hover")
+theme_override_styles/hover = SubResource("Style_day_hover")
+text = "一日"
+
+[node name="ThreeDayButton" type="Button" parent="PlanPanel/PlanContent/Days" unique_id=728032793]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(82, 58)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.12549, 0.0705882, 1)
+theme_override_colors/font_pressed_color = Color(0.2, 0.12549, 0.0705882, 1)
+theme_override_colors/font_hover_color = Color(0.2, 0.12549, 0.0705882, 1)
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("Style_day_normal")
+theme_override_styles/pressed = SubResource("Style_day_hover")
+theme_override_styles/hover = SubResource("Style_day_hover")
+text = "三日"
+
+[node name="SevenDayButton" type="Button" parent="PlanPanel/PlanContent/Days" unique_id=994751523]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(82, 58)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.12549, 0.0705882, 1)
+theme_override_colors/font_pressed_color = Color(0.2, 0.12549, 0.0705882, 1)
+theme_override_colors/font_hover_color = Color(0.2, 0.12549, 0.0705882, 1)
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("Style_day_normal")
+theme_override_styles/pressed = SubResource("Style_day_hover")
+theme_override_styles/hover = SubResource("Style_day_hover")
+text = "七日"
+
+[node name="Divider" type="HSeparator" parent="PlanPanel/PlanContent" unique_id=1958102969]
+layout_mode = 2
+
+[node name="PillSelectRow" type="VBoxContainer" parent="PlanPanel/PlanContent" unique_id=602958291]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Heading" type="Label" parent="PlanPanel/PlanContent/PillSelectRow" unique_id=511613217]
+layout_mode = 2
+text = "本次修炼耗材"
+label_settings = ExtResource("18_small")
+horizontal_alignment = 1
+
+[node name="Choice" type="HBoxContainer" parent="PlanPanel/PlanContent/PillSelectRow" unique_id=1017986175]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="PillSlot" parent="PlanPanel/PlanContent/PillSelectRow/Choice" unique_id=657087446 instance=ExtResource("20_item")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(76, 76)
+layout_mode = 2
+show_info_on_click = false
+click_enabled = true
+
+[node name="PillHint" type="Label" parent="PlanPanel/PlanContent/PillSelectRow/Choice" unique_id=283367664]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "点击选择修炼丹药"
+label_settings = ExtResource("18_small")
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="PreviewLabel" type="Label" parent="PlanPanel/PlanContent" unique_id=739752265]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "闭关 1 日
+预计修为 +20"
+label_settings = ExtResource("17_text")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="ResultLabel" type="Label" parent="PlanPanel/PlanContent" unique_id=1264247840]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+label_settings = ExtResource("18_small")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="PlanBanner" type="PanelContainer" parent="." unique_id=1744672276]
+custom_minimum_size = Vector2(190, 54)
+layout_mode = 0
+offset_left = 984.0
+offset_top = 124.0
+offset_right = 1193.0
+offset_bottom = 184.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_banner")
+
+[node name="Title" type="Label" parent="PlanBanner" unique_id=1009509553]
+layout_mode = 2
+text = "闭关计划"
+label_settings = ExtResource("16_head")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ModePanel" type="Panel" parent="." unique_id=1124238297]
+layout_mode = 0
+offset_left = 250.0
+offset_top = 547.0
+offset_right = 1030.0
+offset_bottom = 690.0
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="ModeContent" type="VBoxContainer" parent="ModePanel" unique_id=524861393]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 18.0
+offset_right = 762.0
+offset_bottom = 112.0
+theme_override_constants/separation = 5
+
+[node name="TopSpacer" type="Control" parent="ModePanel/ModeContent" unique_id=1126024186]
+custom_minimum_size = Vector2(0, 27.53)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ModeButtons" type="HBoxContainer" parent="ModePanel/ModeContent" unique_id=93072855]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CycleButton" parent="ModePanel/ModeContent/ModeButtons" unique_id=843442501 instance=ExtResource("13_mode")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(172, 68)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "运转周天
+修为 100%"
+
+[node name="Icon" parent="ModePanel/ModeContent/ModeButtons/CycleButton" index="0"]
+visible = false
+
+[node name="InsightButton" parent="ModePanel/ModeContent/ModeButtons" unique_id=1336294501 instance=ExtResource("13_mode")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(172, 68)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "专心参悟
+知识 160%"
+
+[node name="Icon" parent="ModePanel/ModeContent/ModeButtons/InsightButton" index="0"]
+visible = false
+
+[node name="BreathingButton" parent="ModePanel/ModeContent/ModeButtons" unique_id=610650633 instance=ExtResource("13_mode")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(172, 68)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "吐纳积气
+修为 140%"
+
+[node name="Icon" parent="ModePanel/ModeContent/ModeButtons/BreathingButton" index="0"]
+visible = false
+
+[node name="PillButton" parent="ModePanel/ModeContent/ModeButtons" unique_id=358483665 instance=ExtResource("13_mode")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(172, 68)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "丹药炼化
+消耗丹药"
+
+[node name="Icon" parent="ModePanel/ModeContent/ModeButtons/PillButton" index="0"]
+visible = false
+
+[node name="ModeDescription" type="Label" parent="ModePanel/ModeContent" unique_id=1577581406]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+text = "修为、功法与知识均衡增长。"
+label_settings = ExtResource("18_small")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="ModeBanner" type="PanelContainer" parent="ModePanel" unique_id=337765227]
+custom_minimum_size = Vector2(190, 54)
+layout_mode = 0
+offset_left = 285.0
+offset_top = -24.0
+offset_right = 495.0
+offset_bottom = 35.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_banner")
+
+[node name="Title" type="Label" parent="ModePanel/ModeBanner" unique_id=822289093]
+layout_mode = 2
+text = "选择修炼方式"
+label_settings = ExtResource("16_head")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PillPicker" parent="." unique_id=802084422 instance=ExtResource("21_pill_picker")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+mouse_filter = 2
+
+[node name="StartButton" parent="." unique_id=1772438226 instance=ExtResource("19_primary")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 481.0
+offset_top = 700.0
+offset_right = 799.0
+offset_bottom = 772.0
+
+[editable path="PlanPanel/PlanContent/PillSelectRow/Choice/PillSlot"]
+[editable path="ModePanel/ModeContent/ModeButtons/CycleButton"]
+[editable path="ModePanel/ModeContent/ModeButtons/InsightButton"]
+[editable path="ModePanel/ModeContent/ModeButtons/BreathingButton"]
+[editable path="ModePanel/ModeContent/ModeButtons/PillButton"]

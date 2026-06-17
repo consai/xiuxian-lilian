@@ -17,12 +17,15 @@ func _run_all() -> void:
 	_run("start creates isolated runtime", _test_start_creates_isolated_runtime)
 	_run("roll next event obeys difficulty", _test_roll_next_event_obey_difficulty)
 	_run("common events use location generation", _test_common_events_use_location_generation)
+	_run("expedition modes keep event pools separate", _test_expedition_modes_keep_event_pools_separate)
 	_run("common event duration advances days", _test_common_event_duration_advances_days)
 	_run("decision event exposes options", _test_decision_event_exposes_options)
+	_run("common decision choice resolves", _test_common_decision_choice_resolves)
 	_run("non battle events advance expedition", _test_non_battle_events_advance)
 	_run("manual exit keeps all loot", _test_manual_exit_keeps_all_loot)
 	_run("defeat exit drops inventory and injury", _test_defeat_exit_drops_inventory_and_injury)
 	_run("defeat inventory drop is deterministic", _test_defeat_inventory_drop_deterministic)
+	_run("defeat loot drop is deterministic", _test_defeat_loot_drop_deterministic)
 	_run("elapsed days track expedition days", _test_elapsed_days_track_expedition_days)
 	_run("quiet days advance time without logs", _test_quiet_days_advance_without_logs)
 	_run("battle win returns to expedition", _test_battle_win_returns_to_expedition)
@@ -30,7 +33,8 @@ func _run_all() -> void:
 	_run("boss battle resolves at high difficulty", _test_boss_battle_resolves_at_high_difficulty)
 	_run("game settlement occurs once", _test_game_settlement_occurs_once)
 	_run("distinct expeditions do not collide on settlement", _test_distinct_expeditions_settlement_ids)
-	_run("director is deterministic from event pool", _test_director_deterministic)
+	_run("event pick is deterministic from event pool", _test_event_pick_deterministic)
+	_run("result screen uses finish payload not settle return", _test_result_payload_from_finish)
 	_run("completed events change world state", _test_completed_events_world_change)
 	if _failures.is_empty():
 		print("PASS: %d expedition tests" % _tests_run)
@@ -71,7 +75,7 @@ func _test_start_creates_isolated_runtime() -> void:
 
 
 func _test_roll_next_event_obey_difficulty() -> void:
-	var location := LocationServiceScript.by_id("qinglan_mountain")
+	var location := LocationServiceScript.by_id("wild_wolf_valley")
 	var capped := location.duplicate(true)
 	capped["max_difficulty"] = 2
 	for _i in 20:
@@ -83,24 +87,77 @@ func _test_roll_next_event_obey_difficulty() -> void:
 	_expect_true(str(shallow.get("id", "")) != "qinglan_serpent", "elite hidden when max difficulty is 2")
 
 
+func _test_event_pick_deterministic() -> void:
+	var game := _state()
+	var expedition := _expedition()
+	expedition.start("qinglan_mountain", game, 3333)
+	var first := _first_event_from_advance_steps(expedition)
+	_expect_true(not first.is_empty(), "first pool event selected")
+	expedition.reset()
+	expedition.start("qinglan_mountain", game, 3333)
+	var repeated := _first_event_from_advance_steps(expedition)
+	_expect_eq(first, repeated, "same seed same rolled event")
+
+
 func _test_common_events_use_location_generation() -> void:
-	var location := LocationServiceScript.by_id("qinglan_mountain")
+	var location := LocationServiceScript.by_id("blackwater_marsh")
 	var pool := ExpeditionEventServiceScript.event_pool_for_location(location)
 	var herbs := _find_event_by_template(pool, "gather_herbs")
 	var beast := _find_event_by_template(pool, "local_beast")
-	_expect_eq(str(herbs.get("id", "")), "common::qinglan_mountain::gather_herbs", "common event gets stable generated id")
-	_expect_eq(str(herbs.get("location_id", "")), "qinglan_mountain", "common event binds current location")
+	var traveler := _find_event_by_template(pool, "wandering_cultivator")
+	_expect_eq(str(herbs.get("id", "")), "common::blackwater_marsh::gather_herbs", "common event gets stable generated id")
+	_expect_eq(str(herbs.get("location_id", "")), "blackwater_marsh", "common event binds current location")
 	_expect_true(not (herbs.get("rewards", []) as Array).is_empty(), "common gather uses location reward pool")
 	_expect_eq(int(beast.get("duration_days", 0)), 2, "common battle uses location duration")
-	_expect_eq(str((beast.get("enemy", {}) as Dictionary).get("name", "")), "青牙狼", "common battle uses location enemy")
+	_expect_eq(str((beast.get("enemy", {}) as Dictionary).get("name", "")), "毒沼蛇", "common battle uses location enemy")
 	_expect_eq(ExpeditionEventServiceScript.by_id(str(beast.get("id", ""))), beast, "generated event can be restored by id")
+	for template_id in ["gather_fruit", "hidden_cache", "harsh_terrain", "deep_rest", "wandering_cultivator", "local_elite"]:
+		_expect_true(not _find_event_by_template(pool, template_id).is_empty(), "rich common template generated: %s" % template_id)
+	var exchange := ExpeditionEventServiceScript.find_decision_option(traveler, "exchange")
+	_expect_true(not (exchange.get("rewards", []) as Array).is_empty(), "common decision option uses location reward pool")
+
+
+func _test_expedition_modes_keep_event_pools_separate() -> void:
+	var resource_location := LocationServiceScript.by_id("qinglan_mountain")
+	_expect_eq(str(resource_location.get("expedition_mode", "")), "resource", "qinglan is resource mode")
+	var blackwater_location := LocationServiceScript.by_id("blackwater_marsh")
+	_expect_eq(str(blackwater_location.get("expedition_mode", "")), "resource", "blackwater is resource mode")
+	var resource_pool := ExpeditionEventServiceScript.event_pool_for_location(resource_location)
+	_expect_true(not resource_pool.is_empty(), "resource pool has events")
+	var has_material_event := false
+	var has_battle_event := false
+	var has_recover_event := false
+	for event_v in resource_pool:
+		var event := event_v as Dictionary
+		_expect_eq(str(event.get("scope", "")), "common", "resource map only uses generated common events")
+		match str(event.get("type", "")):
+			"gather":
+				has_material_event = true
+			"battle", "elite", "boss":
+				has_battle_event = true
+			"recover":
+				has_recover_event = true
+	_expect_true(has_material_event, "resource map can gather materials")
+	_expect_true(has_battle_event, "resource map can roll common battle")
+	_expect_true(has_recover_event, "resource map can roll common recover")
+	var story_location := LocationServiceScript.by_id("wild_wolf_valley")
+	_expect_eq(str(story_location.get("expedition_mode", "")), "story", "wild wolf valley is story mode")
+	var story_pool := ExpeditionEventServiceScript.event_pool_for_location(story_location)
+	_expect_true(not story_pool.is_empty(), "story pool has events")
+	var has_story_battle := false
+	for event_v in story_pool:
+		var event := event_v as Dictionary
+		_expect_true(str(event.get("scope", "")) != "common", "story map does not use generated common events")
+		if str(event.get("id", "")) == "qinglan_wolf":
+			has_story_battle = true
+	_expect_true(has_story_battle, "story map keeps configured map events")
 
 
 func _test_common_event_duration_advances_days() -> void:
 	var game := _state()
 	var expedition := _expedition()
-	expedition.start("qinglan_mountain", game, 3030)
-	var event := ExpeditionEventServiceScript.by_id("common::qinglan_mountain::recover_hp")
+	expedition.start("blackwater_marsh", game, 3030)
+	var event := ExpeditionEventServiceScript.by_id("common::blackwater_marsh::recover_hp")
 	event["duration_days"] = 3
 	expedition.runtime["hp"] = 10.0
 	expedition.current_choices = [event]
@@ -111,18 +168,35 @@ func _test_common_event_duration_advances_days() -> void:
 
 
 func _test_decision_event_exposes_options() -> void:
-	var tracks := ExpeditionEventServiceScript.by_id("qinglan_wolf_tracks")
-	_expect_true(ExpeditionEventServiceScript.is_decision_event(tracks), "wolf tracks is decision")
-	var options := ExpeditionEventServiceScript.decision_options_as_choices(tracks)
+	var traveler := ExpeditionEventServiceScript.by_id("common::blackwater_marsh::wandering_cultivator")
+	_expect_true(ExpeditionEventServiceScript.is_decision_event(traveler), "wandering cultivator is decision")
+	var options := ExpeditionEventServiceScript.decision_options_as_choices(traveler)
 	_expect_eq(options.size(), 2, "two decision options")
 	_expect_true(str((options[0] as Dictionary).get("id", "")).contains("::"), "composite choice id")
+
+
+func _test_common_decision_choice_resolves() -> void:
+	var traveler := ExpeditionEventServiceScript.by_id("common::blackwater_marsh::wandering_cultivator")
+	var options := ExpeditionEventServiceScript.decision_options_as_choices(traveler)
+	var choice_id := str((options[0] as Dictionary).get("id", ""))
+	var parsed := ExpeditionEventServiceScript.parse_decision_choice_id(choice_id)
+	_expect_eq(str(parsed.get("parent_id", "")), str(traveler.get("id", "")), "parses parent id from composite choice id")
+	_expect_eq(str(parsed.get("option_id", "")), "exchange", "parses option id from composite choice id")
+	var game := _state()
+	var expedition := _expedition()
+	expedition.start("blackwater_marsh", game, 505)
+	expedition.pending_decision_event = traveler.duplicate(true)
+	expedition.current_choices = options
+	expedition.phase = "choosing"
+	var result: Dictionary = expedition.choose_event(choice_id)
+	_expect_true(bool(result.get("ok", false)), "common decision choice resolves")
 
 
 func _test_non_battle_events_advance() -> void:
 	var game := _state()
 	var expedition := _expedition()
-	expedition.start("qinglan_mountain", game, 404)
-	var herbs := ExpeditionEventServiceScript.by_id("common::qinglan_mountain::gather_herbs")
+	expedition.start("blackwater_marsh", game, 404)
+	var herbs := ExpeditionEventServiceScript.by_id("common::blackwater_marsh::gather_herbs")
 	var before_steps: int = int(expedition.steps)
 	var before_max_diff: int = int((expedition.stats as Dictionary).get("max_difficulty", 0))
 	var before_loot: int = (expedition.loot as Array).size()
@@ -130,6 +204,7 @@ func _test_non_battle_events_advance() -> void:
 	expedition.phase = "choosing"
 	var result: Dictionary = expedition.choose_event(str(herbs.get("id", "")))
 	_expect_true(bool(result.get("ok", false)), "gather resolves")
+	_expect_true(str(result.get("outcome", "")).contains("依照药性"), "gather uses event-specific outcome text")
 	_expect_eq(expedition.steps, before_steps + 1, "steps increased")
 	_expect_true(int((expedition.stats as Dictionary).get("max_difficulty", 0)) >= before_max_diff, "max difficulty tracked")
 	_expect_true(expedition.loot.size() >= before_loot, "session loot tracked")
@@ -143,15 +218,21 @@ func _test_non_battle_events_advance() -> void:
 	_expect_eq(int(game.inventory.get("items_LingCao", 0)), inv_before, "game inventory unchanged during expedition")
 	game.hp = 10.0
 	expedition.runtime["hp"] = 10.0
-	var shelter := ExpeditionEventServiceScript.by_id("common::qinglan_mountain::recover_hp")
+	var shelter := ExpeditionEventServiceScript.by_id("common::blackwater_marsh::recover_hp")
 	expedition.current_choices = [shelter]
 	expedition.phase = "choosing"
 	expedition.choose_event(str(shelter.get("id", "")))
 	_expect_true(float(expedition.runtime.get("hp", 0.0)) > 10.0, "recover raises hp")
+	var terrain := ExpeditionEventServiceScript.by_id("common::blackwater_marsh::harsh_terrain")
+	expedition.current_choices = [terrain]
+	expedition.phase = "choosing"
+	var terrain_result: Dictionary = expedition.choose_event(str(terrain.get("id", "")))
+	_expect_true(str(terrain_result.get("outcome", "")).contains("脱身"), "hazard uses location-specific feedback")
 
 
 func _test_manual_exit_keeps_all_loot() -> void:
 	var game := _state()
+	var lingcao_before := int(game.inventory.get("items_LingCao", 0))
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 505)
 	ExpeditionRewardServiceScript.merge_into_loot(
@@ -160,7 +241,7 @@ func _test_manual_exit_keeps_all_loot() -> void:
 	var finish: Dictionary = expedition.finish("manual")
 	var settled: Dictionary = game.settle_expedition(finish)
 	_expect_true(bool(settled.get("ok", false)), "settlement ok")
-	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 4, "loot merged into inventory")
+	_expect_eq(int(game.inventory.get("items_LingCao", 0)), lingcao_before + 4, "loot merged into inventory")
 	_expect_eq(game.day, 2, "manual exit advances at least one day")
 
 
@@ -178,7 +259,13 @@ func _test_defeat_exit_drops_inventory_and_injury() -> void:
 	var finish: Dictionary = expedition.finish("defeated")
 	_expect_eq(_inventory_total(game.inventory), inv_before, "game inventory unchanged before settle")
 	_expect_true(not (finish.get("loot_lost", []) as Array).is_empty(), "loot_lost recorded")
+	var loot_arr := finish.get("loot", []) as Array
+	var loot_total := 0
+	for r in loot_arr:
+		loot_total += int((r as Dictionary).get("count", 0))
+	_expect_true(loot_total < 5, "session loot reduced on defeat")
 	game.settle_expedition(finish)
+	_expect_eq(_inventory_total(game.inventory), inv_before, "background inventory intact after defeat")
 	_expect_near(game.hp, 25.0, "defeat hp floor")
 	_expect_eq(game.injury_days, 3, "defeat injury applied after elapsed reduction")
 
@@ -192,6 +279,19 @@ func _test_defeat_inventory_drop_deterministic() -> void:
 	_expect_eq(loss_a, loss_b, "same seed same loss result")
 	_expect_true(not (loss_a.get("lost", []) as Array).is_empty(), "drops at least one stack")
 	_expect_true(_inventory_total(inventory_a) < 12, "inventory count reduced")
+
+
+func _test_defeat_loot_drop_deterministic() -> void:
+	var loot_a: Array = [{"kind": "item", "id": "items_LingCao", "count": 6}, {"kind": "item", "id": "items_HuiQiDan", "count": 4}]
+	var loot_b: Array = [{"kind": "item", "id": "items_LingCao", "count": 6}, {"kind": "item", "id": "items_HuiQiDan", "count": 4}]
+	var loss_a := ExpeditionRewardServiceScript.apply_loot_loss_on_defeat(loot_a, _rng(7777))
+	var loss_b := ExpeditionRewardServiceScript.apply_loot_loss_on_defeat(loot_b, _rng(7777))
+	_expect_eq(loss_a, loss_b, "same seed same loot loss result")
+	_expect_true(not (loss_a.get("lost", []) as Array).is_empty(), "drops at least one loot stack")
+	var remaining := 0
+	for r in loot_a:
+		remaining += int((r as Dictionary).get("count", 0))
+	_expect_true(remaining < 10, "session loot count reduced")
 
 
 func _test_elapsed_days_track_expedition_days() -> void:
@@ -278,6 +378,7 @@ func _test_boss_battle_resolves_at_high_difficulty() -> void:
 
 func _test_game_settlement_occurs_once() -> void:
 	var game := _state()
+	var lingcao_before := int(game.inventory.get("items_LingCao", 0))
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 1001)
 	ExpeditionRewardServiceScript.merge_into_loot(
@@ -289,13 +390,13 @@ func _test_game_settlement_occurs_once() -> void:
 	var second: Dictionary = game.settle_expedition(finish)
 	_expect_true(bool(first.get("ok", false)), "first settlement ok")
 	_expect_true(bool(second.get("duplicate", false)), "duplicate settlement rejected")
-	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 2, "inventory not doubled at settlement")
+	_expect_eq(int(game.inventory.get("items_LingCao", 0)), lingcao_before + 2, "inventory not doubled at settlement")
 	_expect_eq(game.day, 2, "day advanced once")
 
 
 func _test_distinct_expeditions_settlement_ids() -> void:
 	var game := _state()
-	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 0, "fresh inventory before expeditions")
+	var lingcao_before := int(game.inventory.get("items_LingCao", 0))
 	var expedition := _expedition()
 	expedition.start("qinglan_mountain", game, 2001)
 	ExpeditionRewardServiceScript.merge_into_loot(
@@ -314,26 +415,14 @@ func _test_distinct_expeditions_settlement_ids() -> void:
 	)
 	var second: Dictionary = game.settle_expedition(second_finish)
 	_expect_true(bool(second.get("ok", false)), "second distinct settlement ok")
-	_expect_eq(int(game.inventory.get("items_LingCao", 0)), 2, "both loot applied")
-
-
-func _test_director_deterministic() -> void:
-	var game := _state()
-	var expedition := _expedition()
-	expedition.start("qinglan_mountain", game, 3333)
-	var first := _first_event_from_advance_steps(expedition)
-	_expect_true(not first.is_empty(), "first pool event selected")
-	expedition.reset()
-	expedition.start("qinglan_mountain", game, 3333)
-	var repeated := _first_event_from_advance_steps(expedition)
-	_expect_eq(first, repeated, "same seed same director event")
+	_expect_eq(int(game.inventory.get("items_LingCao", 0)), lingcao_before + 2, "both loot applied")
 
 
 func _test_completed_events_world_change() -> void:
 	var game := _state()
 	var before := int(game.world_state.get("wolf_threat", 0))
 	var expedition := _expedition()
-	expedition.start("qinglan_mountain", game, 4444)
+	expedition.start("wild_wolf_valley", game, 4444)
 	expedition.completed_events = ["wolf_king_boss"]
 	var finish: Dictionary = expedition.finish("manual")
 	game.settle_expedition(finish)
@@ -345,6 +434,31 @@ func _inventory_total(inventory: Dictionary) -> int:
 	for count_v in inventory.values():
 		total += int(count_v)
 	return total
+
+
+func _test_result_payload_from_finish() -> void:
+	var game := _state()
+	var expedition := _expedition()
+	expedition.start("qinglan_mountain", game, 7777)
+	_first_event_from_advance_steps(expedition)
+	expedition.stats["battles"] = 3
+	expedition.stats["wins"] = 2
+	expedition.stats["steps"] = 5
+	expedition.stats["max_difficulty"] = 4
+	expedition.runtime["hp"] = 75.0
+	expedition.runtime["mp"] = 42.0
+	var finish: Dictionary = expedition.finish("manual")
+	var settled: Dictionary = game.settle_expedition(finish)
+	_expect_true(bool(settled.get("ok", false)), "settlement ok")
+	_expect_true(not settled.has("stats"), "settle return is compact")
+	_expect_true(settled.has("elapsed_days"), "settle return has elapsed_days")
+	var stats := finish.get("stats", {}) as Dictionary
+	_expect_eq(int(stats.get("battles", 0)), 3, "finish payload includes battles")
+	_expect_eq(int(stats.get("steps", 0)), 5, "finish payload includes steps")
+	_expect_eq(float(finish.get("hp", 0.0)), 75.0, "finish payload includes hp")
+	_expect_eq(float(finish.get("mp", 0.0)), 42.0, "finish payload includes mp")
+	var event_log := finish.get("event_log", []) as Array
+	_expect_true(not event_log.is_empty(), "finish payload includes event log")
 
 
 func _find_event_by_template(pool: Array, template_id: String) -> Dictionary:

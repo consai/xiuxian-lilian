@@ -1,17 +1,22 @@
 class_name BagBaseView
 extends Control
 
-## 储物/背包公用组件：视口内仅保留 [member max_slots_show] 个格子，滚动时动态换绑数据。
+## 储物/背包公用组件：无物品时不显示占位格；有物品时视口内最多 [member max_slots_show] 格，滚动时动态换绑数据。
 
 const ItemScene := preload("res://scenes/items/item.tscn")
 const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
 const ItemDefScript := preload("res://scripts/core/item_def.gd")
+const ItemInfoPayloadBuilderScript := preload("res://scripts/ui/item_info_payload_builder.gd")
 const EnumItemTypeScript := preload("res://scripts/enum/enum_itemtype.gd")
+const HoverTipSourceScript := preload("res://scripts/ui/hover/hover_tip_source.gd")
+const HoverTipPayloadScript := preload("res://scripts/ui/hover/hover_tip_payload.gd")
+const ItemHoverTipBuilderScript := preload("res://scripts/ui/hover/builders/item_hover_tip_builder.gd")
+const EquipHoverTipBuilderScript := preload("res://scripts/ui/hover/builders/equip_hover_tip_builder.gd")
 
 enum TabFilter { ALL, MATERIAL, PILL, EQUIP }
+enum PickerFilter { NONE, EQUIP, BATTLE_ITEM, CULTIVATION_PILL }
 
-const TAB_THEME_ACTIVE := &"TabActive"
-const TAB_THEME_IDLE := &"TabIdle"
+const TAB_LABELS := ["全部", "材料", "丹药", "法宝"]
 
 signal entry_clicked(entry: Dictionary)
 signal entry_right_clicked(entry: Dictionary)
@@ -26,29 +31,27 @@ signal sort_requested(entries: Array)
 @onready var _content: Control = %BagContent
 @onready var _grid: GridContainer = %BagGrid
 @onready var _scroll: ScrollContainer = %Scroll
-@onready var _tab_all: Button = %BagTabAll
-@onready var _tab_material: Button = %BagTabMaterial
-@onready var _tab_pill: Button = %BagTabPill
-@onready var _tab_equip: Button = %BagTabEquip
-@onready var _sort_button: Button = %BagSort
+@onready var _filter_option: OptionButton = %FilterOption
+@onready var _sort_button: TextureButton = %BagSort
+@onready var _tabs_row: HBoxContainer = $Tabs
 
 var _entries: Array = []
 var _filtered_cache: Array = []
 var _active_tab: TabFilter = TabFilter.ALL
+var _picker_filter: PickerFilter = PickerFilter.NONE
+var _saved_show_info_on_click := true
 var _window_start: int = -1
 var _slot_pool: Array[ItemView] = []
 var _row_height: float = 96.0
-var _tabs: Array[Button] = []
 
 
 func _ready() -> void:
 	_grid.columns = maxi(1, grid_columns)
 	_title.text = title_text
-	_tabs = [_tab_all, _tab_material, _tab_pill, _tab_equip]
-	_tab_all.pressed.connect(_on_tab_pressed.bind(TabFilter.ALL))
-	_tab_material.pressed.connect(_on_tab_pressed.bind(TabFilter.MATERIAL))
-	_tab_pill.pressed.connect(_on_tab_pressed.bind(TabFilter.PILL))
-	_tab_equip.pressed.connect(_on_tab_pressed.bind(TabFilter.EQUIP))
+	for label in TAB_LABELS:
+		_filter_option.add_item(label)
+	_filter_option.item_selected.connect(_on_filter_selected)
+	_bind_option_menu(_filter_option)
 	_sort_button.pressed.connect(_on_sort_pressed)
 	_scroll.get_v_scroll_bar().value_changed.connect(_on_scroll_changed)
 	_set_active_tab(TabFilter.ALL)
@@ -66,6 +69,22 @@ func set_title(text: String) -> void:
 func set_entries(entries: Array) -> void:
 	_entries = _normalize_entries(entries)
 	if is_node_ready():
+		_scroll.scroll_vertical = 0
+		_refresh()
+
+
+func set_picker_mode(filter: PickerFilter) -> void:
+	if filter != PickerFilter.NONE and _picker_filter == PickerFilter.NONE:
+		_saved_show_info_on_click = show_info_on_click
+	_picker_filter = filter
+	var is_picker := filter != PickerFilter.NONE
+	show_info_on_click = false if is_picker else _saved_show_info_on_click
+	if is_picker:
+		_active_tab = TabFilter.ALL
+	if is_node_ready():
+		_set_picker_chrome(not is_picker)
+		if is_picker:
+			_set_active_tab(TabFilter.ALL)
 		_scroll.scroll_vertical = 0
 		_refresh()
 
@@ -91,6 +110,7 @@ static func build_entries_from_inventory(inventory: Dictionary, owned_equips: Ar
 		var entry := _entry_from_equip(eid)
 		if not entry.is_empty():
 			out.append(entry)
+	out.sort_custom(_compare_entries)
 	return out
 
 
@@ -128,10 +148,13 @@ func _measure_row_height() -> void:
 func _configure_content_size() -> void:
 	var cols := maxi(1, grid_columns)
 	var item_count := _filtered_cache.size()
-	var viewport_rows := _visible_row_count()
-	var data_rows := ceili(float(item_count) / float(cols)) if item_count > 0 else 0
-	var total_rows := maxi(viewport_rows, data_rows)
-	var content_h := maxf(_row_height, total_rows * _row_height)
+	if item_count <= 0:
+		if _content != null:
+			_content.custom_minimum_size = Vector2.ZERO
+		_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		return
+	var data_rows := ceili(float(item_count) / float(cols))
+	var content_h := maxf(_row_height, data_rows * _row_height)
 	if _content != null:
 		_content.custom_minimum_size = Vector2(0.0, content_h)
 	var viewport_h := float(_scroll.size.y)
@@ -158,6 +181,12 @@ func _on_scroll_changed(_value: float) -> void:
 func _sync_window_from_scroll(force: bool) -> void:
 	if _slot_pool.is_empty() or _row_height <= 0.0:
 		return
+	if _filtered_cache.is_empty():
+		_window_start = 0
+		_grid.position = Vector2.ZERO
+		for view in _slot_pool:
+			_hide_slot(view)
+		return
 	var cols := maxi(1, grid_columns)
 	var start_row := mini(_max_window_start_row(), maxi(0, int(floor(float(_scroll.scroll_vertical) / _row_height))))
 	var new_start := start_row * cols
@@ -166,11 +195,13 @@ func _sync_window_from_scroll(force: bool) -> void:
 	_window_start = new_start
 	_grid.position = Vector2(0.0, start_row * _row_height)
 	for i in _slot_pool.size():
+		var view: ItemView = _slot_pool[i]
 		var data_index := _window_start + i
 		if data_index < _filtered_cache.size():
-			_bind_entry(_slot_pool[i], _filtered_cache[data_index] as Dictionary, data_index)
+			view.visible = true
+			_bind_entry(view, _filtered_cache[data_index] as Dictionary, data_index)
 		else:
-			_bind_empty(_slot_pool[i])
+			_hide_slot(view)
 
 
 func _create_slot_view() -> ItemView:
@@ -181,15 +212,19 @@ func _create_slot_view() -> ItemView:
 	var view := node as ItemView
 	view.show_name_label = true
 	view.click_enabled = true
+	view.visible = false
 	_grid.add_child(view)
 	return view
 
 
-func _bind_empty(view: ItemView) -> void:
+func _hide_slot(view: ItemView) -> void:
 	if view == null:
 		return
 	_disconnect_slot(view)
-	view.apply_empty(null, Color(1, 1, 1, 0))
+	_clear_hover_tip(view)
+	view.apply_empty(null)
+	view.set_learn_blocked(false)
+	view.visible = false
 	view.show_info_on_click = false
 	view.set_click_enabled(false)
 
@@ -220,10 +255,18 @@ func _bind_entry(view: ItemView, entry: Dictionary, index: int) -> void:
 				icon = ItemDefScript.resolve_icon_texture(def.icon_path, null)
 				if quality == "":
 					quality = def.rarity
-	view.apply_display(icon, item_name, count, Color.WHITE, quality)
+	var learn_blocked := false
+	if kind == "item" and ConfigManager != null:
+		var item_def := ConfigManager.item_def_by_id(str(entry.get("id", "")))
+		learn_blocked = ItemInfoPayloadBuilderScript.learning_book_condition_unmet(item_def)
+	view.apply_display(icon, item_name, count, Color.WHITE, quality, learn_blocked)
 	view.show_info_on_click = show_info_on_click
-	view.set_info_entry(entry)
+	if show_info_on_click:
+		view.set_info_entry(entry)
+	else:
+		view.clear_info_entry()
 	view.set_click_enabled(true)
+	_bind_hover_tip(view, entry)
 	view.clicked.connect(_on_slot_clicked.bind(index))
 	view.right_clicked.connect(_on_slot_right_clicked.bind(index))
 
@@ -249,8 +292,8 @@ func _on_slot_right_clicked(index: int) -> void:
 	entry_right_clicked.emit((_filtered_cache[index] as Dictionary).duplicate(true))
 
 
-func _on_tab_pressed(tab: TabFilter) -> void:
-	_set_active_tab(tab)
+func _on_filter_selected(index: int) -> void:
+	_set_active_tab(index as TabFilter)
 	_scroll.scroll_vertical = 0
 	_refresh()
 
@@ -264,17 +307,17 @@ func _on_sort_pressed() -> void:
 
 func _set_active_tab(tab: TabFilter) -> void:
 	_active_tab = tab
-	var tab_nodes := [
-		[_tab_all, TabFilter.ALL],
-		[_tab_material, TabFilter.MATERIAL],
-		[_tab_pill, TabFilter.PILL],
-		[_tab_equip, TabFilter.EQUIP],
-	]
-	for pair in tab_nodes:
-		var btn := pair[0] as Button
-		if btn == null:
-			continue
-		btn.theme_type_variation = TAB_THEME_ACTIVE if pair[1] == tab else TAB_THEME_IDLE
+	if _filter_option != null and _filter_option.selected != int(tab):
+		_filter_option.select(int(tab))
+
+
+func _bind_option_menu(option: OptionButton) -> void:
+	var panel_theme := theme
+	if panel_theme == null or option == null:
+		return
+	var popup := option.get_popup()
+	if popup != null:
+		popup.theme = panel_theme
 
 
 func _filtered_entries() -> Array:
@@ -283,9 +326,96 @@ func _filtered_entries() -> Array:
 		if not entry_v is Dictionary:
 			continue
 		var entry := entry_v as Dictionary
-		if _matches_tab(entry, _active_tab):
+		if not _matches_picker_filter(entry, _picker_filter):
+			continue
+		if _picker_filter != PickerFilter.NONE or _matches_tab(entry, _active_tab):
 			out.append(entry)
 	return out
+
+
+func _set_picker_chrome(show_chrome: bool) -> void:
+	if _tabs_row != null:
+		_tabs_row.visible = show_chrome
+	if _sort_button != null:
+		_sort_button.visible = show_chrome
+
+
+func _ensure_hover_tip(view: ItemView) -> HoverTipSource:
+	var tip := view.get_node_or_null("BagHoverTip") as HoverTipSource
+	if tip == null:
+		tip = HoverTipSourceScript.new()
+		tip.name = "BagHoverTip"
+		tip.target_path = NodePath("..")
+		view.add_child(tip)
+	return tip
+
+
+func _bind_hover_tip(view: ItemView, entry: Dictionary) -> void:
+	var tip := _ensure_hover_tip(view)
+	var payload := _hover_payload_for_entry(entry)
+	tip.enabled = not HoverTipPayloadScript.is_empty(payload)
+	if tip.enabled:
+		tip.set_payload(payload)
+	else:
+		tip.clear_payload()
+
+
+func _clear_hover_tip(view: ItemView) -> void:
+	var tip := view.get_node_or_null("BagHoverTip") as HoverTipSource
+	if tip != null:
+		tip.clear_payload()
+		tip.enabled = false
+
+
+func _hover_payload_for_entry(entry: Dictionary) -> Dictionary:
+	if str(entry.get("kind", "item")) == "equip":
+		return EquipHoverTipBuilderScript.build(int(entry.get("id", -1)))
+	var item_id := str(entry.get("id", "")).strip_edges()
+	var def := _item_def(item_id)
+	if def != null and def.has_fight_config():
+		return ItemHoverTipBuilderScript.build(
+			def.fight_id, null, maxi(1, int(entry.get("count", 1)))
+		)
+	var info := ItemInfoPayloadBuilderScript.from_entry(entry)
+	if info.is_empty():
+		return {}
+	var lines: PackedStringArray = PackedStringArray()
+	var desc := str(info.get("desc", "")).strip_edges()
+	if desc != "":
+		lines.append(desc)
+	for line_v in info.get("detail_lines", []) as Array:
+		var line := str(line_v).strip_edges()
+		if line != "":
+			lines.append(line)
+	return HoverTipPayloadScript.make({
+		"title": str(info.get("title", "")),
+		"title_color": info.get("title_color", Color.WHITE),
+		"lines": lines,
+		"icon": info.get("icon"),
+		"footer": str(info.get("footer", "")).strip_edges(),
+	})
+
+
+static func _matches_picker_filter(entry: Dictionary, filter: PickerFilter) -> bool:
+	match filter:
+		PickerFilter.NONE:
+			return true
+		PickerFilter.EQUIP:
+			var kind := str(entry.get("kind", "item"))
+			if kind == "equip":
+				return true
+			return kind == "item" and str(entry.get("item_type", "")) == EnumItemTypeScript.LABEL_TREASURE
+		PickerFilter.BATTLE_ITEM:
+			if str(entry.get("kind", "item")) != "item":
+				return false
+			var def := _item_def(str(entry.get("id", "")))
+			return def != null and def.has_fight_config()
+		PickerFilter.CULTIVATION_PILL:
+			if str(entry.get("kind", "item")) != "item":
+				return false
+			var pill_def := _item_def(str(entry.get("id", "")))
+			return pill_def != null and pill_def.is_cultivation_pill()
+	return true
 
 
 static func _matches_tab(entry: Dictionary, tab: TabFilter) -> bool:

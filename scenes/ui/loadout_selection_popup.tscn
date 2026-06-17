@@ -5,6 +5,7 @@
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="3_title"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="4_body"]
 [ext_resource type="Script" path="res://scripts/ui/loadout_selection_popup.gd" id="5_script"]
+[ext_resource type="Script" path="res://scripts/ui/components/long_press_scroll_container.gd" id="6_lpsc"]
 
 [sub_resource type="StyleBoxFlat" id="MainPanel"]
 bg_color = Color(1, 0.945, 0.835, 0.995)
@@ -121,6 +122,7 @@ theme_override_constants/separation = 10
 alignment = 1
 
 [node name="EntryScroll" type="ScrollContainer" parent="Panel"]
+script = ExtResource("6_lpsc")
 layout_mode = 0
 offset_left = 28.0
 offset_top = 140.0

@@ -25,6 +25,12 @@ func _run_all() -> void:
 	_run("go_world_map allowed when idle", _test_world_map_allowed_when_idle)
 	_run("go_world_map blocked when expedition active", _test_world_map_blocked_when_active)
 	_run("go_expedition_loop rejected without active", _test_go_expedition_loop_rejected_without_active)
+	_run("go_breakthrough_panel payload", _test_breakthrough_panel_payload)
+	_run("go cultivation panel", _test_cultivation_panel)
+	_run("go alchemy panel", _test_alchemy_panel)
+	_run("go alchemy progress payload", _test_alchemy_progress)
+	_run("go alchemy result payload", _test_alchemy_result)
+	_run("go cultivation progress payload", _test_cultivation_progress)
 	_run("go_breakthrough_summary payload consumed once", _test_breakthrough_summary_payload)
 	_run("go_expedition_result passes reason", _test_expedition_result_reason)
 	_run("go_back pops panel stack instead of previous_id", _test_go_back_panel_stack)
@@ -94,9 +100,103 @@ func _test_go_expedition_loop_rejected_without_active() -> void:
 	_expect_false(bool(nav.get("ok", true)), "loop rejected")
 
 
+func _test_breakthrough_panel_payload() -> void:
+	_reset_game()
+	var nav: Dictionary = _scene_manager().go_breakthrough_panel()
+	_expect_true(bool(nav.get("ok", false)), "panel navigation ok")
+	var peeked: Dictionary = _scene_manager().peek_payload(SceneManagerScript.BREAKTHROUGH_SUMMARY)
+	_expect_eq(str(peeked.get("mode", "")), "panel", "panel payload mode")
+
+
+func _test_cultivation_panel() -> void:
+	_reset_game()
+	var nav: Dictionary = _scene_manager().go_cultivation_panel()
+	_expect_true(bool(nav.get("ok", false)), "cultivation panel navigation ok")
+	_expect_eq(
+		str(nav.get("path", "")),
+		"res://scenes/sim/cultivation_panel.tscn",
+		"cultivation panel path"
+	)
+
+
+func _test_cultivation_progress() -> void:
+	_reset_game()
+	var invalid: Dictionary = _scene_manager().go_cultivation_progress({"mode_id": "", "days": 3})
+	_expect_false(bool(invalid.get("ok", true)), "empty mode rejected")
+	var nav: Dictionary = _scene_manager().go_cultivation_progress({
+		"mode_id": "cycle",
+		"days": 3,
+		"method_name": "混元归一经",
+		"mode_name": "运转周天",
+		"start_day": 1,
+	})
+	_expect_true(bool(nav.get("ok", false)), "cultivation progress navigation ok")
+	_expect_eq(
+		str(nav.get("path", "")),
+		"res://scenes/sim/cultivation_progress_fullscreen.tscn",
+		"cultivation progress path"
+	)
+	var peeked: Dictionary = _scene_manager().peek_payload(SceneManagerScript.CULTIVATION_PROGRESS)
+	_expect_eq(int(peeked.get("days", 0)), 3, "cultivation progress payload days")
+
+
+func _test_alchemy_panel() -> void:
+	_reset_game()
+	var nav: Dictionary = _scene_manager().go_alchemy_panel()
+	_expect_true(bool(nav.get("ok", false)), "alchemy panel navigation ok")
+	_expect_eq(
+		str(nav.get("path", "")),
+		"res://scenes/sim/alchemy_panel.tscn",
+		"alchemy panel path"
+	)
+
+
+func _test_alchemy_progress() -> void:
+	_reset_game()
+	var invalid: Dictionary = _scene_manager().go_alchemy_progress({"recipe_id": "", "strategy_id": "standard", "days": 2})
+	_expect_false(bool(invalid.get("ok", true)), "empty recipe rejected")
+	var nav: Dictionary = _scene_manager().go_alchemy_progress({
+		"recipe_id": "recipe.huiqi",
+		"strategy_id": "standard",
+		"selection_mode": "lowest",
+		"days": 1,
+		"recipe_name": "回气丹方",
+		"start_day": 1,
+	})
+	_expect_true(bool(nav.get("ok", false)), "alchemy progress navigation ok")
+	_expect_eq(
+		str(nav.get("path", "")),
+		"res://scenes/sim/alchemy_progress_fullscreen.tscn",
+		"alchemy progress path"
+	)
+	var peeked: Dictionary = _scene_manager().peek_payload(SceneManagerScript.ALCHEMY_PROGRESS)
+	_expect_eq(str(peeked.get("recipe_id", "")), "recipe.huiqi", "alchemy progress payload recipe")
+
+
+func _test_alchemy_result() -> void:
+	_reset_game()
+	var invalid: Dictionary = _scene_manager().go_alchemy_result({"ok": false, "error": "bad"})
+	_expect_false(bool(invalid.get("ok", true)), "failed result rejected")
+	var nav: Dictionary = _scene_manager().go_alchemy_result({
+		"ok": true,
+		"quality": "medium",
+		"quality_name": "中品",
+		"product_id": "items_HuiQiDan",
+		"added": 3,
+		"xp": 8,
+		"days": 1,
+	})
+	_expect_true(bool(nav.get("ok", false)), "alchemy result navigation ok")
+	_expect_eq(
+		str(nav.get("path", "")),
+		"res://scenes/sim/alchemy_result_popup.tscn",
+		"alchemy result path"
+	)
+
+
 func _test_breakthrough_summary_payload() -> void:
 	_reset_game()
-	var summary := {"old_realm": "炼气一层", "new_realm": "炼气二层", "day": 3}
+	var summary := {"old_realm": "炼气一层", "new_realm": "炼气二层", "day": 3, "success": true}
 	var nav: Dictionary = _scene_manager().go_breakthrough_summary(summary)
 	_expect_true(bool(nav.get("ok", false)), "summary navigation ok")
 	var peeked: Dictionary = _scene_manager().peek_payload(SceneManagerScript.BREAKTHROUGH_SUMMARY)
@@ -149,12 +249,26 @@ func _test_go_back_panel_stack() -> void:
 	var loadout_nav: Dictionary = sm.go_combat_loadout_panel()
 	_expect_true(bool(loadout_nav.get("ok", false)), "loadout navigation ok")
 	ds.scene_runtime()["transitioning"] = false
+	var dao_nav: Dictionary = sm.go_dao_tree_panel()
+	_expect_true(bool(dao_nav.get("ok", false)), "dao tree navigation ok")
+	ds.scene_runtime()["transitioning"] = false
+	var strategy_nav: Dictionary = sm.go_skill_release_strategy_panel()
+	_expect_true(bool(strategy_nav.get("ok", false)), "strategy navigation ok")
+	ds.scene_runtime()["transitioning"] = false
+	var back_to_loadout: Dictionary = sm.go_back()
+	_expect_true(bool(back_to_loadout.get("ok", false)), "back to loadout ok")
+	_expect_eq(
+		str(ds.scene_runtime().get("current_id", "")),
+		SceneManagerScript.COMBAT_LOADOUT_PANEL,
+		"current is loadout after strategy back"
+	)
+	ds.scene_runtime()["transitioning"] = false
 	var back_to_attrs: Dictionary = sm.go_back()
 	_expect_true(bool(back_to_attrs.get("ok", false)), "back to attributes ok")
 	_expect_eq(
 		str(ds.scene_runtime().get("current_id", "")),
 		SceneManagerScript.CHARACTER_ATTRIBUTES_PANEL,
-		"current is attributes after first back"
+		"current is attributes after loadout back"
 	)
 	ds.scene_runtime()["transitioning"] = false
 	var back_to_hub: Dictionary = sm.go_back()

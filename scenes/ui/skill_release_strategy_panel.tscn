@@ -1,0 +1,364 @@
+[gd_scene format=3 uid="uid://erm6v4yu361f"]
+
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://8mwstvi8kywh" path="res://assets/art/ui_new/btn_close.png" id="3_close"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/strategy_mode_button.tscn" id="5_mode"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/strategy_setting_row.tscn" id="6_setting"]
+[ext_resource type="Texture2D" uid="uid://c3f3nny73kvhg" path="res://assets/art/ui_new/btn_lv.png" id="11_green"]
+[ext_resource type="Texture2D" uid="uid://gyhsfoix048v" path="res://assets/art/ui_new/btn_lan.png" id="12_blue"]
+[ext_resource type="Texture2D" uid="uid://hwomn6aon70a" path="res://assets/art/ui_new/btn_huang.png" id="13_yellow"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="14_title"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="15_h2"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="16_small"]
+[ext_resource type="Script" uid="uid://13p5wfwy3xc" path="res://scripts/ui/skill_release_strategy_panel.gd" id="17_script"]
+
+[sub_resource type="StyleBoxFlat" id="MainPanel"]
+bg_color = Color(1, 0.945, 0.835, 0.985)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.31, 0.19, 0.12, 1)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+shadow_color = Color(0.12, 0.07, 0.03, 0.45)
+shadow_size = 16
+
+[sub_resource type="StyleBoxFlat" id="TitlePanel"]
+bg_color = Color(0.91, 0.72, 0.48, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.4, 0.25, 0.14, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="InsetPanel"]
+bg_color = Color(1, 0.965, 0.89, 0.76)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.57, 0.38, 0.22, 0.85)
+corner_radius_top_left = 17
+corner_radius_top_right = 17
+corner_radius_bottom_right = 17
+corner_radius_bottom_left = 17
+
+[node name="SkillReleaseStrategyPanel" type="Control" unique_id=761047464]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_theme")
+script = ExtResource("17_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=666977769]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Dimmer" type="ColorRect" parent="." unique_id=525315132]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.12, 0.08, 0.04, 0.48)
+
+[node name="Panel" type="Panel" parent="." unique_id=765390630]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -560.0
+offset_top = -350.0
+offset_right = 560.0
+offset_bottom = 350.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("MainPanel")
+
+[node name="TitleBack" type="Panel" parent="Panel" unique_id=717518608]
+layout_mode = 0
+offset_left = 360.0
+offset_top = -18.0
+offset_right = 760.0
+offset_bottom = 60.0
+theme_override_styles/panel = SubResource("TitlePanel")
+
+[node name="Title" type="Label" parent="Panel/TitleBack" unique_id=568745119]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "技能释放策略"
+label_settings = ExtResource("14_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="TextureButton" parent="Panel" unique_id=510187021]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1060.0
+offset_top = -16.0
+offset_right = 1132.0
+offset_bottom = 56.0
+texture_normal = ExtResource("3_close")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="SkillListCard" type="Panel" parent="Panel" unique_id=1953292034]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 78.0
+offset_right = 704.0
+offset_bottom = 590.0
+theme_override_styles/panel = SubResource("InsetPanel")
+
+[node name="Heading" type="Label" parent="Panel/SkillListCard" unique_id=781330965]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 10.0
+offset_right = 650.0
+offset_bottom = 42.0
+text = "技能列表（拖拽可调整优先级）"
+label_settings = ExtResource("15_h2")
+horizontal_alignment = 1
+
+[node name="Rows" type="VBoxContainer" parent="Panel/SkillListCard" unique_id=640963300]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 14.0
+offset_top = 50.0
+offset_right = 666.0
+offset_bottom = 458.0
+theme_override_constants/separation = 8
+
+[node name="AddButton" type="TextureButton" parent="Panel/SkillListCard" unique_id=1478011632]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 20.0
+offset_top = 464.0
+offset_right = 190.0
+offset_bottom = 506.0
+texture_normal = ExtResource("11_green")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Panel/SkillListCard/AddButton" unique_id=1687991667]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "添加技能"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ModeCard" type="Panel" parent="Panel" unique_id=86922440]
+layout_mode = 0
+offset_left = 720.0
+offset_top = 78.0
+offset_right = 1096.0
+offset_bottom = 269.0
+theme_override_styles/panel = SubResource("InsetPanel")
+
+[node name="Heading" type="Label" parent="Panel/ModeCard" unique_id=622793008]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 12.0
+offset_right = 361.0
+offset_bottom = 44.0
+text = "策略模式"
+label_settings = ExtResource("15_h2")
+horizontal_alignment = 1
+
+[node name="Modes" type="HBoxContainer" parent="Panel/ModeCard" unique_id=1569153562]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 22.0
+offset_top = 56.0
+offset_right = 354.0
+offset_bottom = 98.0
+theme_override_constants/separation = 10
+
+[node name="Balanced" parent="Panel/ModeCard/Modes" unique_id=1247025229 instance=ExtResource("5_mode")]
+layout_mode = 2
+text = "均衡"
+
+[node name="Aggressive" parent="Panel/ModeCard/Modes" unique_id=93985481 instance=ExtResource("5_mode")]
+layout_mode = 2
+text = "激进"
+
+[node name="Conservative" parent="Panel/ModeCard/Modes" unique_id=1277032622 instance=ExtResource("5_mode")]
+layout_mode = 2
+text = "保守"
+
+[node name="Description" type="Label" parent="Panel/ModeCard" unique_id=971675802]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 114.0
+offset_right = 352.0
+offset_bottom = 188.0
+text = "均衡模式下的释放逻辑：
+优先攻击，低血量自动治疗，灵气不足时使用回灵丹保持续航。"
+label_settings = ExtResource("16_small")
+autowrap_mode = 2
+
+[node name="SettingsCard" type="Panel" parent="Panel" unique_id=1249799442]
+layout_mode = 0
+offset_left = 720.0
+offset_top = 279.0
+offset_right = 1096.0
+offset_bottom = 592.0
+theme_override_styles/panel = SubResource("InsetPanel")
+
+[node name="Heading" type="Label" parent="Panel/SettingsCard" unique_id=744937332]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 12.0
+offset_right = 361.0
+offset_bottom = 44.0
+text = "通用设置"
+label_settings = ExtResource("15_h2")
+horizontal_alignment = 1
+
+[node name="Settings" type="VBoxContainer" parent="Panel/SettingsCard" unique_id=1020491958]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 18.0
+offset_top = 56.0
+offset_right = 358.0
+offset_bottom = 274.0
+theme_override_constants/separation = 8
+
+[node name="Cooldown" parent="Panel/SettingsCard/Settings" unique_id=1788599701 instance=ExtResource("6_setting")]
+layout_mode = 2
+
+[node name="NameLabel" parent="Panel/SettingsCard/Settings/Cooldown" index="0"]
+text = "技能公共冷却间隔"
+
+[node name="ValueLabel" parent="Panel/SettingsCard/Settings/Cooldown/ValuePanel" index="0"]
+text = "1.0 秒"
+
+[node name="SameSkill" parent="Panel/SettingsCard/Settings" unique_id=1551754603 instance=ExtResource("6_setting")]
+layout_mode = 2
+
+[node name="NameLabel" parent="Panel/SettingsCard/Settings/SameSkill" index="0"]
+text = "同类技能同时存在时"
+
+[node name="ValueLabel" parent="Panel/SettingsCard/Settings/SameSkill/ValuePanel" index="0"]
+text = "最高优先级"
+
+[node name="Range" parent="Panel/SettingsCard/Settings" unique_id=1514612180 instance=ExtResource("6_setting")]
+layout_mode = 2
+
+[node name="NameLabel" parent="Panel/SettingsCard/Settings/Range" index="0"]
+text = "技能释放范围"
+
+[node name="ValueLabel" parent="Panel/SettingsCard/Settings/Range/ValuePanel" index="0"]
+text = "攻击范围内"
+
+[node name="AutoPill" parent="Panel/SettingsCard/Settings" unique_id=1658216537 instance=ExtResource("6_setting")]
+layout_mode = 2
+
+[node name="NameLabel" parent="Panel/SettingsCard/Settings/AutoPill" index="0"]
+text = "自动使用丹药"
+
+[node name="ValueLabel" parent="Panel/SettingsCard/Settings/AutoPill/ValuePanel" index="0"]
+text = "开启"
+
+[node name="AutoBuff" parent="Panel/SettingsCard/Settings" unique_id=21642948 instance=ExtResource("6_setting")]
+layout_mode = 2
+
+[node name="NameLabel" parent="Panel/SettingsCard/Settings/AutoBuff" index="0"]
+text = "开场释放增益技能"
+
+[node name="ValueLabel" parent="Panel/SettingsCard/Settings/AutoBuff/ValuePanel" index="0"]
+text = "开启"
+
+[node name="Hint" type="Label" parent="Panel" unique_id=303854537]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 35.0
+offset_top = 612.0
+offset_right = 690.0
+offset_bottom = 650.0
+text = "提示：从上到下依次检查条件，满足条件时释放对应技能。"
+label_settings = ExtResource("16_small")
+vertical_alignment = 1
+
+[node name="ConfirmButton" type="TextureButton" parent="Panel" unique_id=2133056835]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 710.0
+offset_top = 610.0
+offset_right = 910.0
+offset_bottom = 666.0
+texture_normal = ExtResource("12_blue")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Panel/ConfirmButton" unique_id=686670850]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "确认"
+label_settings = ExtResource("15_h2")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CancelButton" type="TextureButton" parent="Panel" unique_id=1881473672]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 920.0
+offset_top = 610.0
+offset_right = 1080.0
+offset_bottom = 666.0
+texture_normal = ExtResource("13_yellow")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Panel/CancelButton" unique_id=916555335]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "取消"
+label_settings = ExtResource("15_h2")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[editable path="Panel/SettingsCard/Settings/Cooldown"]
+[editable path="Panel/SettingsCard/Settings/SameSkill"]
+[editable path="Panel/SettingsCard/Settings/Range"]
+[editable path="Panel/SettingsCard/Settings/AutoPill"]
+[editable path="Panel/SettingsCard/Settings/AutoBuff"]

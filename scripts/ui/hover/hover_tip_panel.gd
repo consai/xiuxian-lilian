@@ -60,7 +60,8 @@ func show_at_anchor(anchor: Control, show_token: int, token_check: Callable) -> 
 		return
 	_present_generation += 1
 	var generation := _present_generation
-	hide_immediate()
+	visible = false
+	modulate.a = 0.0
 
 	_apply_panel_width(_MAX_WIDTH)
 	await get_tree().process_frame
@@ -95,13 +96,7 @@ func _can_present(
 		return false
 	if token_check.is_valid() and not bool(token_check.call(show_token)):
 		return false
-	return _is_anchor_hovered(anchor)
-
-
-func _is_anchor_hovered(anchor: Control) -> bool:
-	if anchor == null or not is_instance_valid(anchor):
-		return false
-	return anchor.get_global_rect().has_point(anchor.get_global_mouse_position())
+	return true
 
 
 func _reset_layout_sizes() -> void:

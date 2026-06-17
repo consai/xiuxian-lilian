@@ -54,6 +54,18 @@ static func _build_common_event(location: Dictionary, template_id: String) -> Di
 	if reward_pool_id != "":
 		var reward_pools := generation.get("reward_pools", {}) as Dictionary
 		event["rewards"] = (reward_pools.get(reward_pool_id, []) as Array).duplicate(true)
+	var generated_options: Array = []
+	for option_v in event.get("options", []) as Array:
+		if not option_v is Dictionary:
+			continue
+		var option := (option_v as Dictionary).duplicate(true)
+		var option_reward_pool_id := str(option.get("reward_pool", "")).strip_edges()
+		if option_reward_pool_id != "":
+			var option_reward_pools := generation.get("reward_pools", {}) as Dictionary
+			option["rewards"] = (option_reward_pools.get(option_reward_pool_id, []) as Array).duplicate(true)
+		generated_options.append(option)
+	if not generated_options.is_empty():
+		event["options"] = generated_options
 	var enemy_pool_id := str(event.get("enemy_pool", "")).strip_edges()
 	if enemy_pool_id != "":
 		var enemy_pools := generation.get("enemy_pools", {}) as Dictionary
@@ -113,10 +125,15 @@ static func decision_choice_id(parent_id: String, option_id: String) -> String:
 
 
 static func parse_decision_choice_id(choice_id: String) -> Dictionary:
-	var parts := choice_id.split("::", false)
-	if parts.size() != 2:
+	var cid := choice_id.strip_edges()
+	var sep_pos := cid.rfind("::")
+	if sep_pos < 0:
 		return {}
-	return {"parent_id": str(parts[0]).strip_edges(), "option_id": str(parts[1]).strip_edges()}
+	var parent_id := cid.substr(0, sep_pos).strip_edges()
+	var option_id := cid.substr(sep_pos + 2).strip_edges()
+	if parent_id == "" or option_id == "":
+		return {}
+	return {"parent_id": parent_id, "option_id": option_id}
 
 
 static func find_decision_option(event: Dictionary, option_id: String) -> Dictionary:
@@ -213,7 +230,7 @@ static func resolve_non_battle_event(
 	match event_type:
 		"gather":
 			var rewards := ExpeditionRewardServiceScript.roll_event_rewards(event, rng)
-			var gather_result := ExpeditionLogServiceScript.gather_outcome(rewards)
+			var gather_result := ExpeditionLogServiceScript.gather_outcome(event, rewards)
 			return {
 				"ok": true,
 				"rewards": rewards,
@@ -251,11 +268,33 @@ static func resolve_non_battle_event(
 
 static func build_battle_enemy(event: Dictionary) -> Dictionary:
 	var enemy := (event.get("enemy", {}) as Dictionary).duplicate(true)
+	return _normalize_battle_enemy(enemy)
+
+
+static func build_battle_enemies(event: Dictionary) -> Array:
+	var configured_v: Variant = event.get("enemies", [])
+	var out: Array = []
+	if configured_v is Array and not (configured_v as Array).is_empty():
+		for enemy_v in configured_v as Array:
+			if enemy_v is Dictionary:
+				out.append(_normalize_battle_enemy(enemy_v as Dictionary))
+		return out
+	var base := build_battle_enemy(event)
+	if base.is_empty():
+		return []
+	var count := _battle_enemy_count(event)
+	for i in count:
+		out.append(_scale_enemy_for_group(base, i, count))
+	return out
+
+
+static func _normalize_battle_enemy(enemy_src: Dictionary) -> Dictionary:
+	var enemy := enemy_src.duplicate(true)
 	var attrs := (enemy.get("attrs", {}) as Dictionary).duplicate(true)
 	if enemy.has("foundations"):
 		attrs = CharacterStatsScript.build_combat_attrs(enemy.get("foundations", {}))
 	else:
-		attrs = CharacterStatsScript.migrate_legacy_enemy_attrs(attrs)
+		attrs = CharacterStatsScript.finalize_combat_attrs(attrs)
 	enemy["attrs"] = attrs
 	if attrs.has(FightAttr.HP_MAX):
 		enemy["hp"] = float(attrs[FightAttr.HP_MAX])
@@ -267,6 +306,38 @@ static func build_battle_enemy(event: Dictionary) -> Dictionary:
 	enemy["skills"] = enemy_skills
 	enemy["items"] = []
 	enemy["equips"] = []
+	return enemy
+
+
+static func _battle_enemy_count(event: Dictionary) -> int:
+	if event.has("enemy_count"):
+		return clampi(int(event.get("enemy_count", 1)), 1, 8)
+	var event_type := str(event.get("type", "")).strip_edges()
+	if event_type == "boss":
+		return 1
+	var difficulty := maxi(1, int(event.get("difficulty", 1)))
+	return clampi(2 + int(floor(float(difficulty) / 2.0)), 2, 5)
+
+
+static func _scale_enemy_for_group(base: Dictionary, index: int, count: int) -> Dictionary:
+	var enemy := base.duplicate(true)
+	var attrs := (enemy.get("attrs", {}) as Dictionary).duplicate(true)
+	var hp_scale := 0.48 if count <= 2 else 0.38
+	var atk_scale := 0.58 if count <= 2 else 0.45
+	if attrs.has(FightAttr.HP_MAX):
+		attrs[FightAttr.HP_MAX] = maxf(1.0, float(attrs[FightAttr.HP_MAX]) * hp_scale)
+	for key in [FightAttr.PHYSICAL_ATK, FightAttr.MAGIC_ATK]:
+		if attrs.has(key):
+			attrs[key] = maxf(1.0, float(attrs[key]) * atk_scale)
+	if attrs.has(FightAttr.SPD):
+		var offset := (float(index) - float(count - 1) * 0.5) * 3.0
+		attrs[FightAttr.SPD] = maxf(1.0, float(attrs[FightAttr.SPD]) + offset)
+	enemy["attrs"] = attrs
+	if attrs.has(FightAttr.HP_MAX):
+		enemy["hp"] = float(attrs[FightAttr.HP_MAX])
+	var base_name := str(base.get("name", "敌人")).strip_edges()
+	if count > 1:
+		enemy["name"] = "%s·%d" % [base_name, index + 1]
 	return enemy
 
 
@@ -306,7 +377,10 @@ static func _apply_effects(
 				var hp_before := float(runtime.get("hp", 0.0))
 				var damage := minf(hp_before - 1.0, hp_max_d * value)
 				runtime["hp"] = maxf(1.0, hp_before - hp_max_d * value)
-				if damage >= 1.0:
+				var damage_feedback := _configured_effect_feedback(effect, damage)
+				if damage_feedback != "":
+					feedback_parts.append(damage_feedback)
+				elif damage >= 1.0:
 					feedback_parts.append("猝不及防一阵剧痛，气血受损 %d 点。" % int(round(damage)))
 				else:
 					feedback_parts.append("虽有磕碰，所幸无大碍。")
@@ -315,11 +389,21 @@ static func _apply_effects(
 				var mp_now := float(runtime.get("mp", 0.0))
 				var drained := minf(mp_now, mp_max_d * value)
 				runtime["mp"] = maxf(0.0, mp_now - mp_max_d * value)
-				if drained >= 1.0:
+				var drain_feedback := _configured_effect_feedback(effect, drained)
+				if drain_feedback != "":
+					feedback_parts.append(drain_feedback)
+				elif drained >= 1.0:
 					feedback_parts.append("雾气侵体，法力流失 %d 点。" % int(round(drained)))
 				else:
 					feedback_parts.append("心神微乱，法力略有损耗。")
 	return feedback_parts
+
+
+static func _configured_effect_feedback(effect: Dictionary, amount: float) -> String:
+	var feedback := str(effect.get("feedback", "")).strip_edges()
+	if feedback == "":
+		return ""
+	return feedback.replace("{amount}", str(int(round(amount))))
 
 
 static func _join_feedback(prefix: String, body: String) -> String:

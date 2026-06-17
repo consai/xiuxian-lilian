@@ -1,0 +1,384 @@
+[gd_scene format=3 uid="uid://bxcjbms7woypb"]
+
+[ext_resource type="Script" uid="uid://dv4jlj1aodydp" path="res://scripts/sim/cultivation_progress_fullscreen.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://10mdce84j7yj" path="res://assets/art/ui_new/dazuoxiaoren.png" id="3_meditator"]
+[ext_resource type="Texture2D" uid="uid://0861fa5a5myi" path="res://assets/art/ui_new/gongfa.png" id="4_method"]
+[ext_resource type="Texture2D" uid="uid://ctw0jxkm6iryg" path="res://assets/art/ui_new/xiuwei.png" id="5_cultivation"]
+[ext_resource type="Texture2D" uid="uid://c76pqy6eaf2sc" path="res://assets/art/ui_new/shuijing.png" id="6_crystal"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/cultivation_primary_button.tscn" id="9_primary"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="10_title"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="12_text"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="13_small"]
+[ext_resource type="PackedScene" uid="uid://c3cpgohstp0rt" path="res://scenes/ui/cultivation_result_popup.tscn" id="14_result_popup"]
+
+[sub_resource type="StyleBoxFlat" id="Style_banner"]
+bg_color = Color(1, 0.890196, 0.690196, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 0.95)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0.243137, 0.14902, 0.0705882, 0.2)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="Style_chip"]
+bg_color = Color(1, 0.941176, 0.803922, 0.94)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 0.9)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="Style_ring_outer"]
+bg_color = Color(0.760784, 0.886275, 0.956863, 0.06)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.513726, 0.831373, 0.956863, 0.58)
+corner_radius_top_left = 220
+corner_radius_top_right = 220
+corner_radius_bottom_right = 220
+corner_radius_bottom_left = 220
+shadow_color = Color(0.513726, 0.831373, 0.956863, 0.22)
+shadow_size = 16
+
+[sub_resource type="StyleBoxFlat" id="Style_ring_middle"]
+bg_color = Color(1, 0.85098, 0.4, 0.04)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 0.8, 0.329412, 0.7)
+corner_radius_top_left = 180
+corner_radius_top_right = 180
+corner_radius_bottom_right = 180
+corner_radius_bottom_left = 180
+shadow_color = Color(1, 0.74902, 0.2, 0.28)
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="Style_ring_inner"]
+bg_color = Color(0.701961, 0.901961, 1, 0.08)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.65098, 0.921569, 1, 0.76)
+corner_radius_top_left = 140
+corner_radius_top_right = 140
+corner_radius_bottom_right = 140
+corner_radius_bottom_left = 140
+shadow_color = Color(0.580392, 0.890196, 1, 0.32)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="Style_panel"]
+content_margin_left = 18.0
+content_margin_top = 18.0
+content_margin_right = 18.0
+content_margin_bottom = 18.0
+bg_color = Color(1, 0.941176, 0.803922, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 0.92)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0.243137, 0.14902, 0.0705882, 0.24)
+shadow_size = 7
+
+[sub_resource type="StyleBoxFlat" id="Style_progress_back"]
+bg_color = Color(0.403922, 0.313726, 0.2, 0.34)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 0.86)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="Style_progress_fill"]
+bg_color = Color(0.443137, 0.713726, 0.835294, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.87058824, 0.9607843, 1, 0)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0.443137, 0.713726, 0.835294, 0.5)
+shadow_size = 8
+
+[node name="CultivationProgressFullscreen" type="Control" unique_id=1161534766]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1108422034]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="DimOverlay" type="ColorRect" parent="." unique_id=298225279]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.160784, 0.109804, 0.0705882, 0.34)
+
+[node name="WarmGlow" type="ColorRect" parent="." unique_id=1888661956]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0.764706, 0.313726, 0.12)
+
+[node name="HeaderBanner" type="PanelContainer" parent="." unique_id=300179309]
+custom_minimum_size = Vector2(190, 54)
+layout_mode = 0
+offset_left = 454.0
+offset_top = 24.0
+offset_right = 826.0
+offset_bottom = 104.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_banner")
+
+[node name="Title" type="Label" parent="HeaderBanner" unique_id=186950062]
+layout_mode = 2
+text = "闭 关 修 炼"
+label_settings = ExtResource("10_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MethodCard" type="PanelContainer" parent="." unique_id=1782413239]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 26.0
+offset_right = 330.0
+offset_bottom = 120.0
+theme_override_styles/panel = SubResource("Style_chip")
+
+[node name="Content" type="HBoxContainer" parent="MethodCard" unique_id=2024275119]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Icon" type="TextureRect" parent="MethodCard/Content" unique_id=330748478]
+custom_minimum_size = Vector2(66, 66)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("4_method")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="MethodLabel" type="Label" parent="MethodCard/Content" unique_id=1017932885]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "混元归一经
+运转周天"
+label_settings = ExtResource("12_text")
+vertical_alignment = 1
+
+[node name="TimeCard" type="PanelContainer" parent="." unique_id=1367744470]
+layout_mode = 0
+offset_left = 958.0
+offset_top = 26.0
+offset_right = 1250.0
+offset_bottom = 120.0
+theme_override_styles/panel = SubResource("Style_chip")
+
+[node name="Content" type="HBoxContainer" parent="TimeCard" unique_id=526111540]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Icon" type="TextureRect" parent="TimeCard/Content" unique_id=1679051415]
+custom_minimum_size = Vector2(58, 58)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("5_cultivation")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DayLabel" type="Label" parent="TimeCard/Content" unique_id=632852078]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "闭关第 2 / 3 日
+第十四日"
+label_settings = ExtResource("12_text")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="OuterQiRing" type="Panel" parent="." unique_id=807793712]
+layout_mode = 0
+offset_left = 365.0
+offset_top = 142.0
+offset_right = 915.0
+offset_bottom = 626.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_ring_outer")
+
+[node name="MiddleQiRing" type="Panel" parent="." unique_id=461976322]
+layout_mode = 0
+offset_left = 426.0
+offset_top = 196.0
+offset_right = 854.0
+offset_bottom = 584.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_ring_middle")
+
+[node name="InnerQiRing" type="Panel" parent="." unique_id=185414767]
+layout_mode = 0
+offset_left = 484.0
+offset_top = 248.0
+offset_right = 796.0
+offset_bottom = 548.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_ring_inner")
+
+[node name="CrystalLeft" type="TextureRect" parent="." unique_id=1138117680]
+modulate = Color(0.8, 0.941176, 1, 0.86)
+layout_mode = 0
+offset_left = 400.0
+offset_top = 390.0
+offset_right = 468.0
+offset_bottom = 462.0
+mouse_filter = 2
+texture = ExtResource("6_crystal")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CrystalRight" type="TextureRect" parent="." unique_id=1594855251]
+modulate = Color(1, 0.886275, 0.521569, 0.86)
+layout_mode = 0
+offset_left = 812.0
+offset_top = 328.0
+offset_right = 880.0
+offset_bottom = 400.0
+mouse_filter = 2
+texture = ExtResource("6_crystal")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Meditator" type="TextureRect" parent="." unique_id=1641360756]
+layout_mode = 0
+offset_left = 514.0
+offset_top = 312.0
+offset_right = 766.0
+offset_bottom = 546.0
+mouse_filter = 2
+texture = ExtResource("3_meditator")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StageBanner" type="PanelContainer" parent="." unique_id=1654730114]
+custom_minimum_size = Vector2(190, 54)
+layout_mode = 0
+offset_left = 514.0
+offset_top = 570.0
+offset_right = 766.0
+offset_bottom = 628.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_banner")
+
+[node name="StageTitle" type="Label" parent="StageBanner" unique_id=2061750790]
+unique_name_in_owner = true
+layout_mode = 2
+text = "灵气沿经脉运转"
+label_settings = ExtResource("12_text")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ProgressPanel" type="PanelContainer" parent="." unique_id=1090723058]
+layout_mode = 0
+offset_left = 250.0
+offset_top = 642.0
+offset_right = 1030.0
+offset_bottom = 778.0
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="Content" type="VBoxContainer" parent="ProgressPanel" unique_id=1950562057]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="StatusRow" type="HBoxContainer" parent="ProgressPanel/Content" unique_id=291139307]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="ProgressPanel/Content/StatusRow" unique_id=2043124362]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "第二周天 · 气息渐稳"
+label_settings = ExtResource("12_text")
+
+[node name="ProgressLabel" type="Label" parent="ProgressPanel/Content/StatusRow" unique_id=1298025728]
+unique_name_in_owner = true
+layout_mode = 2
+text = "42%"
+label_settings = ExtResource("12_text")
+horizontal_alignment = 2
+
+[node name="ProgressBar" type="ProgressBar" parent="ProgressPanel/Content" unique_id=1914505589]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+theme_override_styles/background = SubResource("Style_progress_back")
+theme_override_styles/fill = SubResource("Style_progress_fill")
+value = 42.0
+show_percentage = false
+
+[node name="TipLabel" type="Label" parent="ProgressPanel/Content" unique_id=473033320]
+unique_name_in_owner = true
+layout_mode = 2
+text = "心神归一，莫受外物侵扰。闭关期间世界时间仍会流逝。"
+label_settings = ExtResource("13_small")
+horizontal_alignment = 1
+
+[node name="SkipButton" parent="." unique_id=321132963 instance=ExtResource("9_primary")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(168, 68)
+layout_mode = 0
+offset_left = 1080.0
+offset_top = 700.0
+offset_right = 1248.0
+offset_bottom = 768.0
+text = "跳过"
+
+[node name="ResultPopup" parent="." unique_id=128423060 instance=ExtResource("14_result_popup")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1

@@ -1,0 +1,163 @@
+[gd_scene format=3 uid="uid://bmainmenu001"]
+
+[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_theme"]
+[ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="3_bg"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="4_label28"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="5_label20"]
+[ext_resource type="PackedScene" uid="uid://cwdqcxgu67n23" path="res://scenes/sim/save_slots_overlay.tscn" id="6_save"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/cultivation_primary_button.tscn" id="7_primary"]
+
+[sub_resource type="StyleBoxFlat" id="Style_panel"]
+bg_color = Color(1, 0.933333, 0.823529, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.333333, 0.196078, 0.184314, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0.258824, 0.145098, 0.105882, 0.3)
+shadow_size = 8
+
+[sub_resource type="StyleBoxFlat" id="Style_secondary_normal"]
+bg_color = Color(0.847059, 0.933333, 0.968627, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.25098, 0.160784, 0.0901961, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_color = Color(0.243137, 0.14902, 0.0705882, 0.24)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="Style_secondary_hover"]
+bg_color = Color(0.909804, 0.968627, 0.992157, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.25098, 0.160784, 0.0901961, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+shadow_color = Color(0.243137, 0.14902, 0.0705882, 0.3)
+shadow_size = 6
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.08, 0.05, 0.04, 0.35)
+
+[node name="MenuPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -220.0
+offset_right = 220.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="Title" type="Label" parent="MenuPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 28.0
+offset_right = 416.0
+offset_bottom = 72.0
+text = "修仙历练"
+label_settings = ExtResource("4_label28")
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="MenuPanel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 76.0
+offset_right = 416.0
+offset_bottom = 104.0
+text = "踏入洞府，开启修行之路"
+label_settings = ExtResource("5_label20")
+horizontal_alignment = 1
+
+[node name="Actions" type="VBoxContainer" parent="MenuPanel"]
+layout_mode = 0
+offset_left = 61.0
+offset_top = 128.0
+offset_right = 379.0
+offset_bottom = 312.0
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="StartButton" parent="MenuPanel/Actions" instance=ExtResource("7_primary")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "开始游戏"
+
+[node name="LoadButton" type="Button" parent="MenuPanel/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(318, 72)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.12549, 0.0705882, 1)
+theme_override_colors/font_hover_color = Color(0.2, 0.12549, 0.0705882, 1)
+theme_override_colors/font_pressed_color = Color(0.2, 0.12549, 0.0705882, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("Style_secondary_normal")
+theme_override_styles/hover = SubResource("Style_secondary_hover")
+theme_override_styles/pressed = SubResource("Style_secondary_hover")
+text = "读取存档"
+
+[node name="MessageLabel" type="Label" parent="MenuPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 24.0
+offset_top = 328.0
+offset_right = 416.0
+offset_bottom = 396.0
+text = "请选择开始新游戏，或读取已有存档。"
+label_settings = ExtResource("5_label20")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="SaveSlotsOverlay" parent="." instance=ExtResource("6_save")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+load_only = true

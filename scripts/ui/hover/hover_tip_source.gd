@@ -84,7 +84,12 @@ func _on_mouse_exited() -> void:
 func _request_hide() -> void:
 	if _target == null or not is_instance_valid(_target):
 		return
-	if _target.get_global_rect().has_point(_target.get_global_mouse_position()):
+	var vp := _target.get_viewport()
+	if vp != null:
+		var hovered: Control = vp.gui_get_hovered_control()
+		if hovered != null and (hovered == _target or _target.is_ancestor_of(hovered)):
+			return
+	elif _target.get_global_rect().has_point(_target.get_global_mouse_position()):
 		return
 	_hover_depth = maxi(_hover_depth - 1, 0)
 	if _hover_depth > 0:

@@ -12,6 +12,7 @@ func _ready() -> void:
 	_inventory_overlay.visible = false
 	_save_slots_overlay.visible = false
 	_connect_actions()
+	GameState.refresh_derived_attrs(true)
 	_refresh()
 
 
@@ -21,7 +22,7 @@ func _connect_actions() -> void:
 	$CultivateObjectButton.pressed.connect(_on_cultivate)
 	$RestButton.pressed.connect(_on_rest)
 	$ExpeditionObjectButton.pressed.connect(_on_encounter)
-	$BackpackButton.pressed.connect(_toggle_inventory)
+	$BackpackButton.pressed.connect(_on_backpack)
 	$BottomActions/CultivateButton.pressed.connect(_on_cultivate)
 	$BottomActions/BreakthroughButton.pressed.connect(_on_breakthrough)
 	$BottomActions/ExpeditionButton.pressed.connect(_on_encounter)
@@ -36,9 +37,9 @@ func _refresh(message: String = "") -> void:
 	_realm_label.text = "%s · 修为 %d/%d" % [
 		GameState.realm_name, GameState.cultivation, GameState.breakthrough_at
 	]
-	var status := "第 %d 日  |  灵石 %d  |  气血 %.0f/%.0f  |  法力 %.0f/%.0f  |  伤势 %d 日" % [
+	var status := "第 %d 日  |  灵石 %d  |  气血 %.0f/%.0f  |  法力 %.0f/%.0f  |  伤势 %d 日  |  境界虚浮 %d" % [
 		GameState.day, GameState.ling_stones, GameState.hp, hp_max,
-		GameState.mp, mp_max, GameState.injury_days
+		GameState.mp, mp_max, GameState.injury_days, GameState.cultivation_instability
 	]
 	if GameState.active_save_slot > 0:
 		status += "  |  存档槽 %d" % GameState.active_save_slot
@@ -74,12 +75,17 @@ func _resolve_message(message: String) -> String:
 
 
 func _on_alchemy() -> void:
-	_refresh("炼丹炉火候正好，炼丹功能尚待开启。")
+	TutorialService.game_event("tutorial.alchemy_opened")
+	var nav: Dictionary = SceneManager.go_alchemy_panel()
+	if not bool(nav.get("ok", false)):
+		_refresh(str(nav.get("error", "无法打开炼丹界面")))
 
 
 func _on_cultivate() -> void:
-	var gain: int = GameState.cultivate()
-	_refresh("静心修炼一日，修为 +%d。" % gain)
+	TutorialService.game_event("tutorial.cultivation_panel_opened")
+	var nav: Dictionary = SceneManager.go_cultivation_panel()
+	if not bool(nav.get("ok", false)):
+		_refresh(str(nav.get("error", "无法打开修炼界面")))
 
 
 func _on_rest() -> void:
@@ -97,19 +103,27 @@ func _on_encounter() -> void:
 
 
 func _on_breakthrough() -> void:
-	var result: Dictionary = GameState.breakthrough()
-	if bool(result.get("ok", false)):
-		var nav: Dictionary = SceneManager.go_breakthrough_summary(result)
-		if not bool(nav.get("ok", false)):
-			_refresh(str(nav.get("error", "无法打开突破摘要")))
-	else:
-		_refresh(str(result.get("error", "无法突破")))
+	if not GameState.can_breakthrough():
+		_refresh("修为尚未达到大境界突破门槛。")
+		return
+	var nav: Dictionary = SceneManager.go_breakthrough_panel()
+	if not bool(nav.get("ok", false)):
+		_refresh(str(nav.get("error", "无法打开突破界面")))
 
 
 func _on_character_attributes() -> void:
+	TutorialService.game_event("tutorial.attributes_opened")
 	var nav: Dictionary = SceneManager.go_character_attributes_panel()
 	if not bool(nav.get("ok", false)):
 		_refresh(str(nav.get("error", "无法打开人物属性")))
+
+
+func _on_backpack() -> void:
+	TutorialService.game_event("tutorial.alchemy_notes_backpack_opened")
+	TutorialService.game_event("tutorial.backpack_opened")
+	var nav: Dictionary = SceneManager.go_backpack_panel()
+	if not bool(nav.get("ok", false)):
+		_refresh(str(nav.get("error", "无法打开背包")))
 
 
 func _toggle_inventory() -> void:

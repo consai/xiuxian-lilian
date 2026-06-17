@@ -25,6 +25,18 @@ static func find_basic_slot(enemy: FightObj) -> int:
 	return -1
 
 
+static func find_first_usable_skill_by_slot(enemy: FightObj, skill_cfg: Dictionary) -> Dictionary:
+	if enemy == null or not enemy.skills is Array:
+		return {}
+	for i in (enemy.skills as Array).size():
+		var sid := int(enemy.get_skill_slot_at(i).get("id", -1))
+		if sid <= 0:
+			continue
+		if can_use_skill(enemy, sid, skill_cfg):
+			return {"skill_id": sid, "slot_index": i}
+	return {}
+
+
 static func can_use_skill(enemy: FightObj, skill_id: int, skill_cfg: Dictionary) -> bool:
 	if enemy == null or skill_id <= 0:
 		return false
@@ -54,8 +66,7 @@ static func can_use_item(enemy: FightObj, slot_index: int, item_cfg: Dictionary)
 	var cfg := FightObj._lookup_cfg(item_cfg, item_id)
 	if cfg.is_empty():
 		return false
-	var mp_cost := float(cfg.get("mp_cost", 0.0))
-	return mp_cost <= 0.0 or enemy.mp >= mp_cost
+	return enemy.can_pay_costs(cfg)
 
 
 static func can_use_equip(enemy: FightObj, slot_index: int, equip_cfg: Dictionary) -> bool:
@@ -70,8 +81,12 @@ static func can_use_equip(enemy: FightObj, slot_index: int, equip_cfg: Dictionar
 	if float(slot.get("cd", 0.0)) > 0.0:
 		return false
 	var base_cfg := FightObj._lookup_cfg(equip_cfg, equip_id)
-	var mp_cost := float(slot.get("mp_cost", base_cfg.get("mp_cost", 0.0)))
-	return mp_cost <= 0.0 or enemy.mp >= mp_cost
+	var cost_cfg := base_cfg.duplicate(true)
+	if slot.has("costs"):
+		cost_cfg["costs"] = slot.get("costs", [])
+	elif slot.has("mp_cost"):
+		cost_cfg["mp_cost"] = slot.get("mp_cost", 0.0)
+	return enemy.can_pay_costs(cost_cfg)
 
 
 static func resolve_action(
@@ -126,4 +141,4 @@ static func _is_skill_usable_at_slot(
 	var cfg := FightObj._lookup_cfg(skill_cfg, skill_id)
 	if cfg.is_empty():
 		return false
-	return enemy.mp >= float(cfg.get("mp_cost", 0.0))
+	return enemy.can_pay_costs(cfg)

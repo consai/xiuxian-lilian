@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/story/components/story_choice_button.tscn" id="1_choice"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="2_prompt"]
+
+[sub_resource type="StyleBoxFlat" id="Style_prompt"]
+bg_color = Color(1, 0.890196, 0.690196, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 0.92)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="StoryChoicePanel" type="VBoxContainer"]
+custom_minimum_size = Vector2(376, 214)
+theme_override_constants/separation = 12
+
+[node name="PromptBack" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_prompt")
+
+[node name="PromptLabel" type="Label" parent="PromptBack"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "你准备如何回应？"
+label_settings = ExtResource("2_prompt")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Choices" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ChoiceA" parent="Choices" instance=ExtResource("1_choice")]
+layout_mode = 2
+text = "静心运气"
+
+[node name="ChoiceB" parent="Choices" instance=ExtResource("1_choice")]
+layout_mode = 2
+text = "追问师父下落"

@@ -1,0 +1,65 @@
+[gd_scene format=3 uid="uid://noqq7xyqitlp"]
+
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="Texture2D" uid="uid://si46blfimdsw" path="res://assets/art/ui_new/pugong.png" id="2_icon"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="3_body"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="4_small"]
+
+[sub_resource type="StyleBoxFlat" id="RowStyle"]
+bg_color = Color(0.97, 0.88, 0.73, 0.48)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.66, 0.47, 0.29, 0.72)
+corner_radius_top_left = 13
+corner_radius_top_right = 13
+corner_radius_bottom_right = 13
+corner_radius_bottom_left = 13
+
+[node name="LoadoutSkillOrderRow" type="Panel" unique_id=625593000]
+custom_minimum_size = Vector2(0, 76)
+theme = ExtResource("1_theme")
+theme_override_styles/panel = SubResource("RowStyle")
+
+[node name="PriorityLabel" type="Label" parent="." unique_id=884550757]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 10.0
+offset_top = 23.0
+offset_right = 42.0
+offset_bottom = 53.0
+text = "1"
+label_settings = ExtResource("3_body")
+horizontal_alignment = 1
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1242872713]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 52.0
+offset_top = 8.0
+offset_right = 112.0
+offset_bottom = 68.0
+texture = ExtResource("2_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="." unique_id=1134539068]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 124.0
+offset_top = 12.0
+offset_right = 260.0
+offset_bottom = 42.0
+text = "普攻"
+label_settings = ExtResource("3_body")
+
+[node name="MetaLabel" type="Label" parent="." unique_id=489324522]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 124.0
+offset_top = 43.0
+offset_right = 260.0
+offset_bottom = 68.0
+text = "基础攻击"
+label_settings = ExtResource("4_small")

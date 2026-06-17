@@ -1,0 +1,192 @@
+[gd_scene format=3 uid="uid://bwjhqpomlti45"]
+
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="PackedScene" path="res://scenes/story/components/story_control_button.tscn" id="4_control"]
+[ext_resource type="PackedScene" path="res://scenes/story/components/story_focus_prompt.tscn" id="6_prompt"]
+[ext_resource type="PackedScene" path="res://scenes/story/components/story_dialogue_panel.tscn" id="7_dialogue"]
+[ext_resource type="PackedScene" path="res://scenes/story/components/story_focus_ring.tscn" id="8_focus_ring"]
+[ext_resource type="PackedScene" path="res://scenes/story/components/story_guide_mask.tscn" id="8_guide_mask"]
+[ext_resource type="PackedScene" path="res://scenes/story/components/story_choice_panel.tscn" id="9_choice_panel"]
+[ext_resource type="PackedScene" path="res://scenes/story/components/story_history_panel.tscn" id="10_history"]
+[ext_resource type="PackedScene" path="res://scenes/story/components/story_skip_confirm.tscn" id="11_skip"]
+[ext_resource type="PackedScene" path="res://scenes/story/components/story_chapter_card.tscn" id="12_chapter"]
+[ext_resource type="PackedScene" path="res://scenes/story/components/story_end_card.tscn" id="13_end"]
+[ext_resource type="Script" uid="uid://rhn4sj1raqc7" path="res://scripts/story/story_playback_presenter.gd" id="14_presenter"]
+
+[sub_resource type="StyleBoxFlat" id="Style_selected"]
+bg_color = Color(0.819608, 0.843137, 0.619608, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[node name="StoryPlaybackUI" type="Control" unique_id=1779450944]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_theme")
+script = ExtResource("14_presenter")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1540449560]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.03137255, 0.03137255, 0.03137255, 0.62)
+
+[node name="GuideMask" parent="." unique_id=1920096844 instance=ExtResource("8_guide_mask")]
+
+[node name="FocusRing" parent="." unique_id=1214565169 instance=ExtResource("8_focus_ring")]
+layout_mode = 0
+offset_left = 583.0
+offset_top = 397.0
+offset_right = 731.0
+offset_bottom = 525.0
+
+[node name="FocusPrompt" parent="." unique_id=837878454 instance=ExtResource("6_prompt")]
+layout_mode = 0
+offset_left = 557.0
+offset_top = 530.0
+offset_right = 757.0
+offset_bottom = 582.0
+
+[node name="DialoguePanel" parent="." unique_id=2145702004 instance=ExtResource("7_dialogue")]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 38.0
+offset_top = -252.0
+offset_right = -38.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="AdvanceOverlay" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0, 0, 0, 0)
+
+[node name="StoryControls" type="HBoxContainer" parent="." unique_id=1978989229]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -342.0
+offset_top = 20.0
+offset_right = -18.0
+offset_bottom = 76.0
+grow_horizontal = 0
+theme_override_constants/separation = 10
+
+[node name="AutoButton" parent="StoryControls" unique_id=238612601 instance=ExtResource("4_control")]
+layout_mode = 2
+
+[node name="SkipButton" parent="StoryControls" unique_id=725480136 instance=ExtResource("4_control")]
+layout_mode = 2
+text = "跳过"
+
+[node name="HistoryButton" parent="StoryControls" unique_id=2029828821 instance=ExtResource("4_control")]
+layout_mode = 2
+text = "回顾"
+
+[node name="ModalShade" type="ColorRect" parent="." unique_id=1934321510]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.180392, 0.137255, 0.0901961, 0.42)
+
+[node name="ChoicePanel" parent="." unique_id=309864618 instance=ExtResource("9_choice_panel")]
+layout_mode = 0
+offset_left = 866.0
+offset_top = 260.0
+offset_right = 1242.0
+offset_bottom = 474.0
+
+[node name="ChoiceA" parent="ChoicePanel/Choices" index="0"]
+theme_override_styles/normal = SubResource("Style_selected")
+
+[node name="HistoryPanel" parent="." unique_id=1116970821 instance=ExtResource("10_history")]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -280.0
+offset_right = 360.0
+offset_bottom = 280.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SkipConfirm" parent="." unique_id=576434688 instance=ExtResource("11_skip")]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -130.0
+offset_right = 280.0
+offset_bottom = 130.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ChapterCard" parent="." unique_id=1221375642 instance=ExtResource("12_chapter")]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -340.0
+offset_top = -125.0
+offset_right = 340.0
+offset_bottom = 125.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="EndCard" parent="." unique_id=1957407053 instance=ExtResource("13_end")]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -310.0
+offset_top = -165.0
+offset_right = 310.0
+offset_bottom = 165.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[editable path="ChoicePanel"]
+[editable path="DialoguePanel"]

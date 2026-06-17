@@ -28,6 +28,12 @@ func _ready() -> void:
 
 
 func reload_all() -> void:
+	const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
+	const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+	const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
+	DaoTreeServiceScript.reload()
+	CultivationMethodServiceScript.reload()
+	AbilityServiceScript.reload()
 	_load_items_local()
 	_load_skills_local()
 	_load_equips_local()
@@ -64,6 +70,18 @@ func item_def_by_id(item_id: String) -> ItemDef:
 
 
 func skill_by_id(skill_id: int) -> Dictionary:
+	const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
+	var game_state: Node = null
+	if is_inside_tree():
+		game_state = get_tree().root.get_node_or_null("GameState")
+	var savedata: Dictionary = {}
+	if game_state != null and game_state.has_method("to_dict"):
+		savedata = game_state.to_dict()
+	var aid := AbilityServiceScript.ability_id_for_combat_id(int(skill_id))
+	if aid != "":
+		var runtime := AbilityServiceScript.to_runtime_dict(aid, savedata)
+		if not runtime.is_empty():
+			return runtime
 	var v: Variant = _skills_by_id.get(skill_id, _skills_by_id.get(str(skill_id), null))
 	if v is SkillDef:
 		return (v as SkillDef).to_runtime_dict()
@@ -436,18 +454,22 @@ func _load_expedition_rules_local() -> void:
 func _load_skills_local() -> void:
 	_skills_by_id.clear()
 	_battle_time_limit_default = 200.0
-	var bundle: Dictionary = JsonLoader.load_skills_bundle()
+	const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
+	AbilityServiceScript.reload()
+	var bundle: Dictionary = AbilityServiceScript.build_skill_cfg({})
 	_battle_time_limit_default = maxf(1.0, float(bundle.get("battle_time_limit", 200.0)))
-	var skills_v: Variant = bundle.get("skills", [])
-	if not skills_v is Array:
+	var skills_v: Variant = bundle.get("skills", {})
+	if not skills_v is Dictionary:
 		return
-	for sv in skills_v as Array:
-		if sv is SkillDef:
-			_skills_by_id[(sv as SkillDef).id] = sv
-		elif sv is Dictionary:
-			var skill = SkillDef.from_dict(sv as Dictionary)
-			if skill != null:
-				_skills_by_id[skill.id] = skill
+	for key in (skills_v as Dictionary).keys():
+		var row_v: Variant = (skills_v as Dictionary)[key]
+		if not row_v is Dictionary:
+			continue
+		var row := (row_v as Dictionary).duplicate(true)
+		row["id"] = int(key)
+		var skill = SkillDef.from_dict(row)
+		if skill != null:
+			_skills_by_id[skill.id] = skill
 
 
 func _load_equips_local() -> void:

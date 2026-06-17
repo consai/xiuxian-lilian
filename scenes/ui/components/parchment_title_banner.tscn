@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://bubsu4t1og6rs"]
+
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="1_label"]
+
+[sub_resource type="StyleBoxFlat" id="Style_banner"]
+bg_color = Color(1, 0.890196, 0.690196, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 0.95)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0.243137, 0.14902, 0.0705882, 0.2)
+shadow_size = 4
+
+[node name="ParchmentTitleBanner" type="PanelContainer" unique_id=1418786944]
+custom_minimum_size = Vector2(190, 54)
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_banner")
+
+[node name="Title" type="Label" parent="." unique_id=1963207034]
+layout_mode = 2
+text = "面板标题"
+label_settings = ExtResource("1_label")
+horizontal_alignment = 1
+vertical_alignment = 1

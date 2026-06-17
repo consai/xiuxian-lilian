@@ -1,0 +1,34 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/story/story_guide_mask.gd" id="1_script"]
+
+[node name="StoryGuideMask" type="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Top" type="ColorRect" parent="."]
+layout_mode = 0
+mouse_filter = 0
+color = Color(0.03137255, 0.03137255, 0.03137255, 0.62)
+
+[node name="Bottom" type="ColorRect" parent="."]
+layout_mode = 0
+mouse_filter = 0
+color = Color(0.03137255, 0.03137255, 0.03137255, 0.62)
+
+[node name="Left" type="ColorRect" parent="."]
+layout_mode = 0
+mouse_filter = 0
+color = Color(0.03137255, 0.03137255, 0.03137255, 0.62)
+
+[node name="Right" type="ColorRect" parent="."]
+layout_mode = 0
+mouse_filter = 0
+color = Color(0.03137255, 0.03137255, 0.03137255, 0.62)

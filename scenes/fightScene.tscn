@@ -29,6 +29,8 @@
 [ext_resource type="PackedScene" uid="uid://do06os1xqkp8m" path="res://scenes/fight/battle_result_overlay.tscn" id="26_resultoverlay"]
 [ext_resource type="PackedScene" uid="uid://bwekah2swk2g3" path="res://scenes/fight/interval_track_view.tscn" id="27_interval"]
 [ext_resource type="PackedScene" path="res://scenes/fight/buff_status_bar.tscn" id="28_buffbar"]
+[ext_resource type="Script" path="res://scripts/ui/components/long_press_scroll_container.gd" id="29_lpsc"]
+[ext_resource type="PackedScene" uid="uid://cacywilhlbfpq" path="res://scenes/fight/enemy_formation_slot.tscn" id="30_enemy_slot"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_beab3"]
 bg_color = Color(0.45882353, 0.28627452, 0.25882354, 1)
@@ -331,6 +333,7 @@ vertical_alignment = 1
 
 [node name="buff_status_left" parent="head/left" unique_id=1543137868 instance=ExtResource("28_buffbar")]
 unique_name_in_owner = true
+visible = false
 layout_mode = 0
 offset_left = 180.0
 offset_top = 128.0
@@ -369,6 +372,7 @@ expand_mode = 1
 stretch_mode = 4
 
 [node name="right" type="Control" parent="head" unique_id=1925484926]
+visible = false
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
@@ -496,6 +500,7 @@ vertical_alignment = 1
 
 [node name="buff_status_right" parent="head/right" unique_id=1336526454 instance=ExtResource("28_buffbar")]
 unique_name_in_owner = true
+visible = false
 layout_mode = 0
 offset_left = 48.0
 offset_top = 128.0
@@ -641,9 +646,9 @@ vertical_alignment = 1
 [node name="BattleLogPanel" type="Panel" parent="." unique_id=1331554018]
 unique_name_in_owner = true
 layout_mode = 1
-offset_left = 472.0
+offset_left = 196.0
 offset_top = 462.0
-offset_right = 808.0
+offset_right = 532.0
 offset_bottom = 594.0
 theme = SubResource("Theme_rbqh8")
 theme_override_styles/panel = SubResource("StyleLogCard")
@@ -661,6 +666,7 @@ offset_right = -10.0
 offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("29_lpsc")
 
 [node name="BattleLogBody" type="RichTextLabel" parent="BattleLogPanel/BattleLogScroll" unique_id=844153575]
 unique_name_in_owner = true
@@ -672,6 +678,7 @@ fit_content = true
 scroll_active = false
 
 [node name="center" type="Control" parent="." unique_id=66841021]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -681,15 +688,60 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="sprite_left" type="Sprite2D" parent="center" unique_id=1019927927]
+[node name="sprite_left" parent="center" unique_id=1019927927 instance=ExtResource("30_enemy_slot")]
 unique_name_in_owner = true
 position = Vector2(-358, 6)
-texture = ExtResource("14_brar2")
 
 [node name="sprite_right" type="Sprite2D" parent="center" unique_id=1778740699]
 unique_name_in_owner = true
-position = Vector2(328, -11)
+visible = false
+position = Vector2(560, -11)
 texture = ExtResource("15_6irjl")
+
+[node name="EnemySlot_0" parent="center" unique_id=1170104318 instance=ExtResource("30_enemy_slot")]
+position = Vector2(96, -82)
+
+[node name="EnemySlot_1" parent="center" unique_id=1703641528 instance=ExtResource("30_enemy_slot")]
+position = Vector2(132, -18)
+
+[node name="EnemySlot_2" parent="center" unique_id=1673865008 instance=ExtResource("30_enemy_slot")]
+position = Vector2(169, 46)
+
+[node name="EnemySlot_3" parent="center" unique_id=1201716536 instance=ExtResource("30_enemy_slot")]
+position = Vector2(215, 106)
+
+[node name="EnemySlot_4" parent="center" unique_id=2075805232 instance=ExtResource("30_enemy_slot")]
+position = Vector2(252, 170)
+
+[node name="EnemySlot_5" parent="center" unique_id=1560976258 instance=ExtResource("30_enemy_slot")]
+position = Vector2(226, -82)
+
+[node name="EnemySlot_6" parent="center" unique_id=96599165 instance=ExtResource("30_enemy_slot")]
+position = Vector2(262, -18)
+
+[node name="EnemySlot_7" parent="center" unique_id=945348374 instance=ExtResource("30_enemy_slot")]
+position = Vector2(299, 46)
+
+[node name="EnemySlot_8" parent="center" unique_id=2024117541 instance=ExtResource("30_enemy_slot")]
+position = Vector2(345, 106)
+
+[node name="EnemySlot_9" parent="center" unique_id=578804603 instance=ExtResource("30_enemy_slot")]
+position = Vector2(382, 170)
+
+[node name="EnemySlot_10" parent="center" unique_id=1460611612 instance=ExtResource("30_enemy_slot")]
+position = Vector2(353, -82)
+
+[node name="EnemySlot_11" parent="center" unique_id=260308700 instance=ExtResource("30_enemy_slot")]
+position = Vector2(392, -18)
+
+[node name="EnemySlot_12" parent="center" unique_id=498169488 instance=ExtResource("30_enemy_slot")]
+position = Vector2(432, 46)
+
+[node name="EnemySlot_13" parent="center" unique_id=820126145 instance=ExtResource("30_enemy_slot")]
+position = Vector2(478, 106)
+
+[node name="EnemySlot_14" parent="center" unique_id=614128274 instance=ExtResource("30_enemy_slot")]
+position = Vector2(518, 170)
 
 [node name="botton" type="Panel" parent="." unique_id=1376481080]
 layout_mode = 1

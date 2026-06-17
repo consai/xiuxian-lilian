@@ -8,6 +8,8 @@ signal tip_hints(entries: Array)
 signal tip_intent(intent: Dictionary)
 signal tip_intents(intents: Array)
 signal error(message: String)
+## 背包/仓库物品数量变化（使用、获得、转移等）
+signal inventory_changed
 ## 效果系统请求：地图解锁（支持全局概率、候选地图、逐地图概率）
 signal effect_map_unlock_request(percent: int, candidate_map_ids: Array, unlock_rows: Array)
 ## 效果系统请求：执行一次突破判定（与 UI 点「突破」共用逻辑）
@@ -49,6 +51,10 @@ func emit_error(message: String) -> void:
 	## 参数说明：
 	## - message: 错误文本
 	error.emit(message)
+
+
+func emit_inventory_changed() -> void:
+	inventory_changed.emit()
 
 
 func emit_effect_map_unlock_request(percent: int, candidate_map_ids: Array = [], unlock_rows: Array = []) -> void:

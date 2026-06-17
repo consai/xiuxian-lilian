@@ -19,7 +19,7 @@
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="17_label24"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="18_label28"]
 [ext_resource type="PackedScene" uid="uid://d4c01tu5e581m" path="res://scenes/sim/inventory_overlay.tscn" id="19_breup"]
-[ext_resource type="PackedScene" path="res://scenes/sim/save_slots_overlay.tscn" id="20_save"]
+[ext_resource type="PackedScene" uid="uid://cwdqcxgu67n23" path="res://scenes/sim/save_slots_overlay.tscn" id="20_save"]
 
 [sub_resource type="StyleBoxFlat" id="Style_panel"]
 bg_color = Color(1, 0.933333, 0.823529, 0.96)

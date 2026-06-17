@@ -2,14 +2,16 @@ class_name JsonLoader
 extends RefCounted
 
 const ITEMS_PATH := "res://data/item.json"
-const SKILLS_PATH := "res://data/skill.json"
+const DAO_TREE_PATH := "res://data/dao_tree.json"
+const CULTIVATION_METHODS_PATH := "res://data/cultivation_methods.json"
+const ABILITIES_PATH := "res://data/abilities.json"
+const EFFECT_CATALOG_PATH := "res://data/effect_catalog.json"
 const EQUIPS_PATH := "res://data/equip.json"
 const BUFFS_PATH := "res://data/buff.json"
 const COMBAT_VFX_INDEX_PATH := "res://data/combat/vfx_index.json"
 const COMBAT_FLOAT_STYLES_PATH := "res://data/combat/float_styles.json"
 const COMBAT_VFX_PRESETS_DIR := "res://data/combat/presets"
 const ItemDefScript = preload("res://scripts/core/item_def.gd")
-const SkillDefScript = preload("res://scripts/fight/skill_def.gd")
 const EquipDefScript = preload("res://scripts/fight/equip_def.gd")
 const BuffDefScript = preload("res://scripts/fight/buff_def.gd")
 
@@ -77,64 +79,6 @@ static func load_items() -> Array:
 		if it != null:
 			out.append(it)
 	return out
-
-
-static func load_skills_bundle() -> Dictionary:
-	var root := _read_json_root_object(SKILLS_PATH)
-	var out := {
-		"battle_time_limit": 200.0,
-		"skills": {},
-	}
-	if root.is_empty():
-		return out
-	out["battle_time_limit"] = maxf(1.0, float(root.get("battle_time_limit", 200.0)))
-	out["skills"] = _parse_skill_rows(root.get("skills", {}))
-	return out
-
-
-static func _parse_skill_rows(raw: Variant) -> Array:
-	var skills_out: Array = []
-	if not raw is Dictionary:
-		push_error("JsonLoader: skill.json 'skills' must be an object keyed by skill id")
-		return skills_out
-	var d := raw as Dictionary
-	var keys: Array = d.keys()
-	keys.sort_custom(_sort_skill_dict_keys)
-	for k in keys:
-		var key_str := str(k).strip_edges()
-		if not key_str.is_valid_int():
-			push_error("JsonLoader: skill.json skills key must be numeric id, got '%s'" % key_str)
-			continue
-		var sid := int(key_str)
-		if sid < 0:
-			push_error("JsonLoader: skill id must be non-negative, got %d" % sid)
-			continue
-		var row_v: Variant = d[k]
-		if not row_v is Dictionary:
-			push_error("JsonLoader: skill %d entry must be an object" % sid)
-			continue
-		var row := (row_v as Dictionary).duplicate(true)
-		if row.has("id") and int(row["id"]) != sid:
-			push_warning(
-				"JsonLoader: skill.json skills['%s'].id=%s ignored; key is skill id"
-				% [key_str, str(row["id"])]
-			)
-		row["id"] = sid
-		_validate_combat_effects_schema(
-			row.get("effects", row.get("fight_effect", [])),
-			"skill.json skills['%s']" % key_str,
-			true
-		)
-		_append_skill_row(skills_out, row)
-	return skills_out
-
-
-static func _append_skill_row(out: Array, item: Variant) -> void:
-	if not item is Dictionary:
-		return
-	var skill = SkillDefScript.from_dict(item as Dictionary)
-	if skill != null:
-		out.append(skill)
 
 
 static func _sort_skill_dict_keys(a: Variant, b: Variant) -> bool:
@@ -301,6 +245,22 @@ static func load_combat_vfx_preset_file(preset_ref: String) -> Dictionary:
 	if raw == null or not raw is Dictionary:
 		return {}
 	return strip_json_comments(raw) as Dictionary
+
+
+static func load_dao_tree() -> Dictionary:
+	return _read_json_root_object(DAO_TREE_PATH)
+
+
+static func load_cultivation_methods_bundle() -> Dictionary:
+	return _read_json_root_object(CULTIVATION_METHODS_PATH)
+
+
+static func load_abilities_bundle() -> Dictionary:
+	return _read_json_root_object(ABILITIES_PATH)
+
+
+static func load_effect_catalog() -> Dictionary:
+	return _read_json_root_object(EFFECT_CATALOG_PATH)
 
 
 static func load_combat_vfx_presets() -> Dictionary:

@@ -6,8 +6,6 @@ extends RefCounted
 const ATTR_HP_MAX := FightAttr.HP_MAX
 const ATTR_MP_MAX := FightAttr.MP_MAX
 const ATTR_SHIELD := FightAttr.SHIELD
-const ATTR_ATK := FightAttr.ATK
-const ATTR_DEF := FightAttr.DEF
 const ATTR_SPD := FightAttr.SPD
 const ATTR_CRIT := FightAttr.CRIT
 const ATTR_CRIT_DAMAGE := FightAttr.CRIT_DAMAGE
@@ -17,6 +15,10 @@ const ATTR_PHYSICAL_DEF := FightAttr.PHYSICAL_DEF
 const ATTR_MAGIC_DEF := FightAttr.MAGIC_DEF
 const CombatEventScript = preload("res://scripts/fight/combat_event.gd")
 const CombatReportScript = preload("res://scripts/fight/combat_report.gd")
+
+const RESOURCE_MANA := "mana"
+const RESOURCE_SPIRIT := "spirit"
+const RESOURCE_STAMINA := "stamina"
 
 const test_attr: Dictionary = FightAttr.TEST_DEFAULTS
 
@@ -277,6 +279,38 @@ func add_buff(buff_id: String, stacks_add: int = 1, duration_override: float = -
 	return applied
 
 
+func add_runtime_modifier_buff(
+		buff_id: String,
+		duration: float,
+		flat_modifiers: Dictionary = {},
+		percent_modifiers: Dictionary = {}
+) -> bool:
+	var bid := buff_id.strip_edges()
+	if bid == "" or duration <= 0.0:
+		return false
+	if buffs.has(bid):
+		_expire_buff(bid)
+	var resolved: Dictionary = {}
+	for key in flat_modifiers.keys():
+		resolved[str(key)] = float(flat_modifiers[key])
+	for key in percent_modifiers.keys():
+		var stat := str(key)
+		resolved[stat] = float(resolved.get(stat, 0.0)) + get_attr(stat, 0.0) * float(percent_modifiers[key])
+	var inst := {
+		"id": bid,
+		"stacks": 1,
+		"duration_left": duration,
+		"tick_accum": 0.0,
+		"ticktime": 1.0,
+		"tick_effects": [],
+		"stat_modifiers": resolved,
+	}
+	buffs[bid] = inst
+	if not resolved.is_empty():
+		attrs = FightAttr.apply_modifiers(attrs, resolved)
+	return true
+
+
 func remove_buff(buff_id: String, stacks_remove: int = 1) -> void:
 	var bid := buff_id.strip_edges()
 	if bid == "" or stacks_remove <= 0:
@@ -415,10 +449,9 @@ func use_skill(skill_id: int, skill_cfg: Dictionary = {}, target: FightObj = nul
 	var cfg := _lookup_cfg(skill_cfg, skill_id)
 	if cfg.is_empty():
 		return _fail_use("no_cfg")
-	var mp_cost := float(cfg.get("mp_cost", 0.0))
-	if mp < mp_cost:
+	if not can_pay_costs(cfg):
 		return _fail_use("no_mp")
-	change_mp(-mp_cost)
+	pay_costs(cfg)
 	var cd_total := float(slot.get("cd_total", cfg.get("cd", 0.0)))
 	slot["cd"] = cd_total
 	var fx_report := _apply_skill_effects(cfg, target)
@@ -436,11 +469,9 @@ func use_item(item_id: int, item_cfg: Dictionary = {}) -> Dictionary:
 	if count <= 0:
 		return _fail_use("no_count")
 	var cfg := _lookup_cfg(item_cfg, item_id)
-	var mp_cost := float(cfg.get("mp_cost", 0.0))
-	if mp_cost > 0.0 and mp < mp_cost:
+	if not can_pay_costs(cfg):
 		return _fail_use("no_mp")
-	if mp_cost > 0.0:
-		change_mp(-mp_cost)
+	pay_costs(cfg)
 	slot["count"] = count - 1
 	var cd_total := float(slot.get("cd_total", cfg.get("cd", 0.0)))
 	slot["cd"] = cd_total
@@ -466,11 +497,9 @@ func use_item_at(slot_index: int, item_cfg: Dictionary = {}, target: FightObj = 
 	var cfg := _lookup_cfg(item_cfg, item_id)
 	if cfg.is_empty():
 		return _fail_use("no_cfg")
-	var mp_cost := float(cfg.get("mp_cost", 0.0))
-	if mp_cost > 0.0 and mp < mp_cost:
+	if not can_pay_costs(cfg):
 		return _fail_use("no_mp")
-	if mp_cost > 0.0:
-		change_mp(-mp_cost)
+	pay_costs(cfg)
 	slot["count"] = count - 1
 	var cd_total := float(slot.get("cd_total", cfg.get("cd", 0.0)))
 	slot["cd"] = cd_total
@@ -491,11 +520,14 @@ func use_equip_at(slot_index: int, target: FightObj = null, equip_cfg: Dictionar
 	if cd > 0.0:
 		return _fail_use("on_cooldown")
 	var base_cfg := _lookup_cfg(equip_cfg, equip_id)
-	var mp_cost := float(slot.get("mp_cost", base_cfg.get("mp_cost", 0.0)))
-	if mp_cost > 0.0 and mp < mp_cost:
+	var cost_cfg := base_cfg.duplicate(true)
+	if slot.has("costs"):
+		cost_cfg["costs"] = slot.get("costs", [])
+	elif slot.has("mp_cost"):
+		cost_cfg["mp_cost"] = slot.get("mp_cost", 0.0)
+	if not can_pay_costs(cost_cfg):
 		return _fail_use("no_mp")
-	if mp_cost > 0.0:
-		change_mp(-mp_cost)
+	pay_costs(cost_cfg)
 	var cd_total := float(slot.get("cd_total", base_cfg.get("cd_total", base_cfg.get("cd", 0.0))))
 	slot["cd"] = cd_total
 	var effect_src := slot.duplicate(true)
@@ -534,6 +566,29 @@ func tick_cooldowns(delta: float) -> void:
 	for slot_v in items:
 		if slot_v is Dictionary:
 			_tick_slot_cd(slot_v as Dictionary, delta)
+
+
+## 按走条推进时长折算冷却/回蓝，用于敌人意图预测（不含暂停与表现阶段）。
+func apply_advancing_projection(advancing_seconds: float) -> void:
+	if advancing_seconds <= 0.0:
+		return
+	tick_cooldowns(advancing_seconds)
+	var mp_ticks := int(floor(advancing_seconds / 2.0))
+	if mp_ticks > 0:
+		var mp_gain := get_attr(FightAttr.COMBAT_MP_RESTORE_2S, 0.0) * float(mp_ticks)
+		if mp_gain > 0.0:
+			change_mp(mp_gain)
+	clamp_vitals()
+
+
+static func duplicate_with_advancing_projection(source: FightObj, advancing_seconds: float) -> FightObj:
+	if source == null:
+		return null
+	if advancing_seconds <= 0.0:
+		return source
+	var projected := FightObj.new(source.to_dict())
+	projected.apply_advancing_projection(advancing_seconds)
+	return projected
 
 
 func get_skill_slot_at(index: int) -> Dictionary:
@@ -628,6 +683,45 @@ static func _lookup_cfg(cfg_map: Dictionary, id: int) -> Dictionary:
 	return {}
 
 
+func can_pay_costs(cfg: Dictionary) -> bool:
+	return mp >= combat_resource_cost(cfg)
+
+
+func pay_costs(cfg: Dictionary) -> void:
+	var cost := combat_resource_cost(cfg)
+	if cost > 0.0:
+		change_mp(-cost)
+
+
+static func combat_resource_cost(cfg: Dictionary) -> float:
+	var costs := normalize_costs(cfg)
+	var total := 0.0
+	for cost_v in costs:
+		if cost_v is Dictionary:
+			total += maxf(0.0, float((cost_v as Dictionary).get("value", 0.0)))
+	return total
+
+
+static func normalize_costs(cfg: Dictionary) -> Array:
+	var out: Array = []
+	var costs_v: Variant = cfg.get("costs", [])
+	if costs_v is Array:
+		for cost_v in costs_v as Array:
+			if not cost_v is Dictionary:
+				continue
+			var cost := cost_v as Dictionary
+			var resource := str(cost.get("resource", RESOURCE_MANA)).strip_edges().to_lower()
+			var value := maxf(0.0, float(cost.get("value", 0.0)))
+			if value <= 0.0:
+				continue
+			out.append({"resource": resource, "value": value})
+	if out.is_empty():
+		var mp_cost := maxf(0.0, float(cfg.get("mp_cost", 0.0)))
+		if mp_cost > 0.0:
+			out.append({"resource": RESOURCE_MANA, "value": mp_cost})
+	return out
+
+
 static func _fail_use(reason: String) -> Dictionary:
 	return {"ok": false, "reason": reason}
 
@@ -706,7 +800,8 @@ func _apply_effects_with_routing(cfg: Dictionary, default_target: FightObj = nul
 					continue
 				var hit := FightAttr.calc_skill_damage(
 					attrs, target.attrs, power_scale, _scaled_effect_value(eff),
-					str(eff.get("damage_type", damage_type))
+					str(eff.get("damage_type", damage_type)),
+					float(eff.get("armor_pierce", 0.0))
 				)
 				var dmg := float(hit.get("damage", 0.0))
 				if bool(hit.get("is_crit", false)):
@@ -744,6 +839,31 @@ func _apply_effects_with_routing(cfg: Dictionary, default_target: FightObj = nul
 				var buff_result := _collect_buff_names_from_effect(eff, target, buff_names)
 				if bool(buff_result.get("resisted", false)):
 					report[CombatReportScript.KEY_CONTROL_RESISTED] = true
+			"timed_modifier":
+				var mod_target := target if target != null else self
+				var mod_id := str(eff.get("id", "runtime_modifier"))
+				if mod_target.add_runtime_modifier_buff(
+						mod_id,
+						float(eff.get("duration", 1.0)),
+						eff.get("modifiers", {}) as Dictionary,
+						eff.get("percent_modifiers", {}) as Dictionary
+				):
+					buff_names.append(str(eff.get("name", mod_id)))
+			"control":
+				if target == null:
+					continue
+				var base_chance := float(eff.get("control_chance", 1.0))
+				if not FightAttr.roll_control(attrs, target.attrs, base_chance):
+					report[CombatReportScript.KEY_CONTROL_RESISTED] = true
+					continue
+				var control_id := str(eff.get("id", "runtime_control"))
+				if target.add_runtime_modifier_buff(
+						control_id,
+						float(eff.get("duration", 0.5)),
+						{},
+						{FightAttr.SPD: -0.95}
+				):
+					buff_names.append(str(eff.get("name", control_id)))
 	report["buff_names"] = buff_names
 	return report
 
@@ -760,13 +880,15 @@ func _scaled_effect_value(effect: Dictionary) -> float:
 
 static func _damage_type_from_cfg(cfg: Dictionary) -> String:
 	var explicit := str(cfg.get("damage_type", "")).strip_edges().to_lower()
-	if explicit in [FightAttr.DAMAGE_PHYSICAL, FightAttr.DAMAGE_MAGIC]:
+	if explicit in [FightAttr.DAMAGE_PHYSICAL, FightAttr.DAMAGE_MAGIC, FightAttr.DAMAGE_TRUE]:
 		return explicit
 	var tags_v: Variant = cfg.get("tags", [])
 	if tags_v is Array:
 		for tag_v in tags_v as Array:
 			if str(tag_v).strip_edges().to_lower() == FightAttr.DAMAGE_PHYSICAL:
 				return FightAttr.DAMAGE_PHYSICAL
+			if str(tag_v).strip_edges().to_lower() == FightAttr.DAMAGE_TRUE:
+				return FightAttr.DAMAGE_TRUE
 	return FightAttr.DAMAGE_MAGIC
 
 

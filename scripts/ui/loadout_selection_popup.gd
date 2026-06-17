@@ -2,6 +2,7 @@ class_name LoadoutSelectionPopup
 extends Control
 
 const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
 
 signal selected(entry_id: Variant)
@@ -69,16 +70,16 @@ func _build_method_entries() -> void:
 
 
 func _build_skill_entries() -> void:
-	for skill_id_v in GameState.unlocked_skills:
-		var skill_id := int(skill_id_v)
-		var row := ConfigManager.skill_by_id(skill_id)
+	for ability_id_v in GameState.unlocked_abilities:
+		var ability_id := str(ability_id_v)
+		var row := AbilityServiceScript.to_runtime_dict(ability_id, GameState.to_dict())
 		if row.is_empty():
 			continue
 		var category := _skill_category(row)
 		if _filter != "all" and category != _filter:
 			continue
-		var equipped := GameState.equipped_skills.has(skill_id)
-		_add_entry(skill_id, row, category, equipped)
+		var equipped := GameState.equipped_abilities.has(ability_id)
+		_add_entry(ability_id, row, category, equipped)
 	_add_empty_skill_entry()
 
 
@@ -131,7 +132,11 @@ func _is_equipped_at_target(entry_id: Variant) -> bool:
 	if _mode == "method":
 		return str(GameState.cultivation_method_slots.get(str(_target_key), "")) == str(entry_id)
 	var index := int(_target_key)
-	return index >= 0 and index < GameState.equipped_skills.size() and int(GameState.equipped_skills[index]) == int(entry_id)
+	return (
+		index >= 0
+		and index < GameState.equipped_abilities.size()
+		and str(GameState.equipped_abilities[index]) == str(entry_id)
+	)
 
 
 func _entry_icon(row: Dictionary) -> Texture2D:

@@ -30,9 +30,13 @@ func _ready() -> void:
 
 
 func apply_event(event: Dictionary, _depth: int = 0) -> void:
-	var enemy := ExpeditionEventServiceScript.build_battle_enemy(event)
+	var enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
+	var enemy := enemies[0] as Dictionary if not enemies.is_empty() else ExpeditionEventServiceScript.build_battle_enemy(event)
 	var attrs := enemy.get("attrs", {}) as Dictionary
 	var enemy_title := str(enemy.get("name", "")).strip_edges()
+	if enemies.size() > 1:
+		var base_name := str((event.get("enemy", {}) as Dictionary).get("name", enemy_title)).strip_edges()
+		enemy_title = "%s x%d" % [base_name if base_name != "" else enemy_title, enemies.size()]
 	var event_title := str(event.get("name", "")).strip_edges()
 	_event_title.text = event_title if event_title != "" else "遭遇战"
 	_event_title.add_theme_color_override("font_color", _TITLE_COLOR)
@@ -48,8 +52,16 @@ func apply_event(event: Dictionary, _depth: int = 0) -> void:
 	_desc_label.text = desc
 	_desc_label.visible = desc != ""
 
+	var total_hp := 0.0
+	for row_v in enemies:
+		if row_v is Dictionary:
+			var row := row_v as Dictionary
+			var row_attrs := row.get("attrs", {}) as Dictionary
+			total_hp += float(row.get("hp", row_attrs.get(FightAttr.HP_MAX, 0.0)))
+	if total_hp <= 0.0:
+		total_hp = float(enemy.get("hp", attrs.get(FightAttr.HP_MAX, 0.0)))
 	var stat_lines: PackedStringArray = PackedStringArray([
-		"气血  %.0f" % float(enemy.get("hp", attrs.get(FightAttr.HP_MAX, 0.0))),
+		"气血  %.0f" % total_hp,
 		"物攻  %.0f    法攻  %.0f" % [
 			float(attrs.get(FightAttr.PHYSICAL_ATK, 0.0)),
 			float(attrs.get(FightAttr.MAGIC_ATK, 0.0)),

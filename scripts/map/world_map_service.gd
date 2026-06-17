@@ -78,12 +78,41 @@ static func can_enter_wilderness(region_id: String, map_data: Dictionary) -> Dic
 		return {"ok": false, "error": "该区域已消失"}
 	if not is_discovered(map_data, region_id, "region"):
 		return {"ok": false, "error": "尚未发现该区域"}
+	var current_city := str(map_data.get("current_city_id", ""))
+	if not can_enter_region_from_city(region_id, current_city):
+		return {"ok": false, "error": region_entry_city_hint(region_id)}
 	var expedition_id := expedition_location_id_for_region(region_id)
 	if expedition_id == "":
 		return {"ok": false, "error": "尚未开放"}
 	if not LocationServiceScript.has_location(expedition_id):
 		return {"ok": false, "error": "尚未开放"}
 	return {"ok": true, "location_id": expedition_id}
+
+
+static func can_enter_region_from_city(region_id: String, city_id: String) -> bool:
+	var region := wilderness_region_by_id(region_id)
+	if region.is_empty():
+		return false
+	var near_cities: Array = region.get("near_city", []) as Array
+	if near_cities.is_empty():
+		return true
+	for near_city_v in near_cities:
+		if str(near_city_v) == city_id:
+			return true
+	return false
+
+
+static func region_entry_city_hint(region_id: String) -> String:
+	var region := wilderness_region_by_id(region_id)
+	var names: PackedStringArray = []
+	for near_city_v in region.get("near_city", []) as Array:
+		var near_id := str(near_city_v)
+		var city_name := str(city_by_id(near_id).get("name", near_id))
+		if city_name not in names:
+			names.append(city_name)
+	if names.is_empty():
+		return "当前城市无法进入该区域"
+	return "需从%s进入" % "、".join(names)
 
 
 static func can_enter_wilderness_location(location_id: String, map_data: Dictionary) -> Dictionary:
@@ -187,11 +216,25 @@ static func apply_starter_discovery(map_data: Dictionary) -> Dictionary:
 			out = discover_route(out, from_id, to_id)
 			var other := to_id if from_id == starter else from_id
 			out = discover_map_node(out, other, "city")
+	out = discover_regions_near_city(out, starter)
+	for location_id in all_wilderness_location_ids():
+		var row := wilderness_location_by_id(str(location_id))
+		if bool(row.get("default_discovered", false)):
+			out = discover_map_node(out, str(location_id), "location")
+	return out
+
+
+static func discover_regions_near_city(map_data: Dictionary, city_id: String) -> Dictionary:
+	var out := map_data.duplicate(true)
+	var cid := city_id.strip_edges()
+	if cid == "":
+		return out
 	for region_id in all_wilderness_region_ids():
 		var region := wilderness_region_by_id(str(region_id))
 		for near_city_v in region.get("near_city", []) as Array:
-			if str(near_city_v) == starter:
+			if str(near_city_v) == cid:
 				out = discover_map_node(out, str(region_id), "region")
+				break
 	return out
 
 
@@ -232,7 +275,9 @@ static func discover_route(map_data: Dictionary, from_id: String, to_id: String)
 static func discover_along_path(map_data: Dictionary, path: Array) -> Dictionary:
 	var out := map_data.duplicate(true)
 	for city_id_v in path:
-		out = discover_map_node(out, str(city_id_v), "city")
+		var city_id := str(city_id_v)
+		out = discover_map_node(out, city_id, "city")
+		out = discover_regions_near_city(out, city_id)
 	for i in range(path.size() - 1):
 		out = discover_route(out, str(path[i]), str(path[i + 1]))
 	return out

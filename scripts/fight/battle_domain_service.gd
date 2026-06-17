@@ -14,6 +14,10 @@ const SIGNAL_TIME_LIMIT := "time_limit"
 const SIGNAL_PLAYER_DEAD := "player_dead"
 const SIGNAL_ENEMY_DEAD := "enemy_dead"
 
+const DEFAULT_FORMATION_COLUMNS := 3
+const DEFAULT_FORMATION_ROWS := 5
+const DEFAULT_ACTIVE_COLUMNS := 1
+
 var state: BattleState = BattleState.ADVANCING
 var paused_side: String = ""
 ## 进入 PRESENTATION 时的出手方（避免 paused_side 丢失导致走条不归零）。
@@ -22,17 +26,31 @@ var end_reason: String = ""
 
 var player: FightObj
 var enemy: FightObj
+## 全部敌人运行时对象；阵型槽位保存的是这个数组里的索引。
+var enemies: Array = []
+## 当前目标/行动者在 enemies 中的索引。
+var active_enemy_index: int = 0
+var acting_enemy_index: int = -1
+var active_enemy_slot: int = 0
+var acting_enemy_slot: int = -1
+var formation_columns: int = DEFAULT_FORMATION_COLUMNS
+var formation_rows: int = DEFAULT_FORMATION_ROWS
+var active_columns: int = DEFAULT_ACTIVE_COLUMNS
+var enemy_formation_slots: Array = []
+var enemy_reserve_indices: Array = []
 var skill_cfg: Dictionary = {}
 var item_cfg: Dictionary = {}
 var equip_cfg: Dictionary = {}
 
 var interval_elapsed_player: float = 0.0
 var interval_elapsed_enemy: float = 0.0
+var interval_elapsed_enemies: Array = []
 ## 兼容旧字段名：现在表示固定行动进度上限，而非下一次出手所需秒数。
 var interval_T_player: float = CombatBalance.ACTION_PROGRESS_MAX
 var interval_T_enemy: float = CombatBalance.ACTION_PROGRESS_MAX
 var _overflow_player: float = 0.0
 var _overflow_enemy: float = 0.0
+var _overflow_enemies: Array = []
 
 var battle_elapsed_advancing: float = 0.0
 var battle_time_limit: float = 200.0
@@ -48,8 +66,40 @@ func start_battle(
 		p_item_cfg: Dictionary = {},
 		p_equip_cfg: Dictionary = {}
 ) -> void:
+	start_battle_many(
+		p_player,
+		[p_enemy],
+		p_skill_cfg,
+		p_time_limit,
+		p_item_cfg,
+		p_equip_cfg
+	)
+
+
+func start_battle_many(
+		p_player: FightObj,
+		p_enemies: Array,
+		p_skill_cfg: Dictionary,
+		p_time_limit: float = 200.0,
+		p_item_cfg: Dictionary = {},
+		p_equip_cfg: Dictionary = {},
+		p_formation: Dictionary = {}
+) -> void:
 	player = p_player
-	enemy = p_enemy
+	_apply_formation_config(p_formation)
+	enemies = []
+	for enemy_v in p_enemies:
+		if enemy_v is FightObj:
+			enemies.append(enemy_v)
+	if enemies.is_empty() and enemy != null:
+		enemies.append(enemy)
+	_rebuild_formation_slots()
+	_compact_formation()
+	active_enemy_index = _first_active_enemy_index()
+	acting_enemy_index = -1
+	active_enemy_slot = _slot_for_enemy_index(active_enemy_index)
+	acting_enemy_slot = -1
+	enemy = _enemy_at(active_enemy_index)
 	skill_cfg = p_skill_cfg
 	item_cfg = p_item_cfg
 	equip_cfg = p_equip_cfg
@@ -57,10 +107,15 @@ func start_battle(
 	battle_elapsed_advancing = 0.0
 	interval_elapsed_player = 0.0
 	interval_elapsed_enemy = 0.0
+	interval_elapsed_enemies.clear()
 	interval_T_player = CombatBalance.ACTION_PROGRESS_MAX
 	interval_T_enemy = CombatBalance.ACTION_PROGRESS_MAX
 	_overflow_player = 0.0
 	_overflow_enemy = 0.0
+	_overflow_enemies.clear()
+	for _i in enemies.size():
+		interval_elapsed_enemies.append(0.0)
+		_overflow_enemies.append(0.0)
 	paused_side = ""
 	presentation_side = ""
 	end_reason = ""
@@ -73,6 +128,8 @@ func start_battle(
 		"时限": battle_time_limit,
 		"玩家走条速率": CombatBalance.action_progress_rate_for(player),
 		"敌方走条速率": CombatBalance.action_progress_rate_for(enemy),
+		"敌方数量": enemies.size(),
+		"阵型": "%dx%d" % [formation_columns, formation_rows],
 	})
 
 
@@ -82,7 +139,10 @@ func tick_advancing(delta: float) -> String:
 	if delta <= 0.0:
 		return ""
 	player.tick_cooldowns(delta)
-	enemy.tick_cooldowns(delta)
+	for idx in _active_enemy_indices():
+		var active_unit := _enemy_at(idx)
+		if active_unit != null and not active_unit.is_dead():
+			active_unit.tick_cooldowns(delta)
 	_tick_passive_recovery(delta)
 	_drain_runtime_events()
 	var dot_end := check_end_after_resolve()
@@ -94,7 +154,12 @@ func tick_advancing(delta: float) -> String:
 		BattleDebugLog.write("走条", "达到战斗时限", get_debug_snapshot())
 		return SIGNAL_TIME_LIMIT
 	interval_elapsed_player += delta * CombatBalance.action_progress_rate_for(player)
-	interval_elapsed_enemy += delta * CombatBalance.action_progress_rate_for(enemy)
+	for i in _active_enemy_indices():
+		var unit := _enemy_at(i)
+		if unit == null or unit.is_dead():
+			continue
+		interval_elapsed_enemies[i] = float(interval_elapsed_enemies[i]) + delta * CombatBalance.action_progress_rate_for(unit)
+	_sync_legacy_enemy_interval()
 	BattleDebugLog.tick_progress(self, delta)
 	if interval_elapsed_player >= interval_T_player:
 		BattleDebugLog.write("走条", "玩家走条已满", {
@@ -102,10 +167,16 @@ func tick_advancing(delta: float) -> String:
 			"敌方走条": format_interval(SIDE_ENEMY),
 		})
 		return SIGNAL_PLAYER_READY
-	if interval_elapsed_enemy >= interval_T_enemy:
+	var ready_enemy := _first_ready_enemy_index()
+	if ready_enemy >= 0:
+		active_enemy_index = ready_enemy
+		active_enemy_slot = _slot_for_enemy_index(active_enemy_index)
+		enemy = _enemy_at(active_enemy_index)
+		_sync_legacy_enemy_interval()
 		BattleDebugLog.write("走条", "敌方走条已满", {
 			"玩家走条": format_interval(SIDE_PLAYER),
 			"敌方走条": format_interval(SIDE_ENEMY),
+			"敌方序号": active_enemy_index + 1,
 		})
 		return SIGNAL_ENEMY_READY
 	return ""
@@ -115,7 +186,7 @@ func _tick_passive_recovery(delta: float) -> void:
 	_passive_tick_accum += delta
 	while _passive_tick_accum >= 2.0:
 		_passive_tick_accum -= 2.0
-		for unit in [player, enemy]:
+		for unit in _all_alive_units():
 			if unit == null or unit.is_dead():
 				continue
 			var mp_gain: float = unit.get_attr(FightAttr.COMBAT_MP_RESTORE_2S, 0.0)
@@ -135,8 +206,14 @@ func enter_paused(side: String) -> void:
 		_overflow_player = _capture_overflow(interval_elapsed_player, interval_T_player)
 		interval_elapsed_player = interval_T_player
 	elif side == SIDE_ENEMY:
-		_overflow_enemy = _capture_overflow(interval_elapsed_enemy, interval_T_enemy)
-		interval_elapsed_enemy = interval_T_enemy
+		acting_enemy_index = active_enemy_index
+		acting_enemy_slot = active_enemy_slot
+		_overflow_enemies[acting_enemy_index] = _capture_overflow(
+			float(interval_elapsed_enemies[acting_enemy_index]),
+			interval_T_enemy
+		)
+		interval_elapsed_enemies[acting_enemy_index] = interval_T_enemy
+		_sync_legacy_enemy_interval()
 	_set_state(BattleState.PAUSED, "进入暂停(%s)" % BattleDebugLog.side_label(side))
 	BattleDebugLog.write("流程", "进入暂停", {
 		"出手方": BattleDebugLog.side_label(side),
@@ -162,7 +239,8 @@ func resolve_player_skill(skill_id: int) -> Dictionary:
 			"原因": BattleDebugLog.fail_reason_label("not_paused"),
 		})
 		return _fail_payload("not_paused")
-	var result := player.use_skill(skill_id, skill_cfg, enemy)
+	var target := _current_enemy()
+	var result := player.use_skill(skill_id, skill_cfg, target)
 	if not bool(result.get("ok", false)):
 		var reason := str(result.get("reason", "failed"))
 		BattleDebugLog.write("行动", "玩家技能失败", {
@@ -178,29 +256,31 @@ func resolve_player_skill(skill_id: int) -> Dictionary:
 		"玩家": BattleDebugLog.log_unit(player, "player"),
 		"敌方": BattleDebugLog.log_unit(enemy, "enemy"),
 	})
-	return _ok_payload(SIDE_PLAYER, SIDE_ENEMY, result, cfg)
+	return _with_actor_ids(_ok_payload(SIDE_PLAYER, SIDE_ENEMY, result, cfg), SIDE_PLAYER, _enemy_index_for_unit(target))
 
 
 func resolve_player_item(slot_index: int) -> Dictionary:
 	if not can_player_act():
 		return _fail_payload("not_paused")
-	var result := player.use_item_at(slot_index, item_cfg, enemy)
+	var target := _current_enemy()
+	var result := player.use_item_at(slot_index, item_cfg, target)
 	if not bool(result.get("ok", false)):
 		return _fail_payload(str(result.get("reason", "failed")))
 	var cfg := FightObj._lookup_cfg(item_cfg, int(result.get("item_id", -1)))
-	return _ok_payload(SIDE_PLAYER, SIDE_ENEMY, result, cfg)
+	return _with_actor_ids(_ok_payload(SIDE_PLAYER, SIDE_ENEMY, result, cfg), SIDE_PLAYER, _enemy_index_for_unit(target))
 
 
 func resolve_player_equip(slot_index: int) -> Dictionary:
 	if not can_player_act():
 		return _fail_payload("not_paused")
-	var result := player.use_equip_at(slot_index, enemy, equip_cfg)
+	var target := _current_enemy()
+	var result := player.use_equip_at(slot_index, target, equip_cfg)
 	if not bool(result.get("ok", false)):
 		return _fail_payload(str(result.get("reason", "failed")))
 	var equip_id := int(result.get("equip_id", -1))
 	var slot := player.get_equip_slot_at(slot_index)
 	var cfg := _merge_equip_runtime_cfg(slot, equip_id)
-	return _ok_payload(SIDE_PLAYER, SIDE_ENEMY, result, cfg)
+	return _with_actor_ids(_ok_payload(SIDE_PLAYER, SIDE_ENEMY, result, cfg), SIDE_PLAYER, _enemy_index_for_unit(target))
 
 
 func resolve_enemy_basic() -> Dictionary:
@@ -214,6 +294,7 @@ func resolve_enemy_skill(skill_id: int) -> Dictionary:
 			"原因": BattleDebugLog.fail_reason_label("not_paused"),
 		})
 		return _fail_payload("not_paused")
+	enemy = _current_enemy()
 	var result := enemy.use_skill(skill_id, skill_cfg, player)
 	if not bool(result.get("ok", false)):
 		var reason := str(result.get("reason", "failed"))
@@ -230,29 +311,31 @@ func resolve_enemy_skill(skill_id: int) -> Dictionary:
 		"敌方": BattleDebugLog.log_unit(enemy, "enemy"),
 		"玩家": BattleDebugLog.log_unit(player, "player"),
 	})
-	return _ok_payload(SIDE_ENEMY, SIDE_PLAYER, result, cfg)
+	return _with_actor_ids(_ok_payload(SIDE_ENEMY, SIDE_PLAYER, result, cfg), SIDE_ENEMY, active_enemy_index)
 
 
 func resolve_enemy_item(slot_index: int) -> Dictionary:
 	if state != BattleState.PAUSED or paused_side != SIDE_ENEMY:
 		return _fail_payload("not_paused")
+	enemy = _current_enemy()
 	var result := enemy.use_item_at(slot_index, item_cfg, player)
 	if not bool(result.get("ok", false)):
 		return _fail_payload(str(result.get("reason", "failed")))
 	var cfg := FightObj._lookup_cfg(item_cfg, int(result.get("item_id", -1)))
-	return _ok_payload(SIDE_ENEMY, SIDE_PLAYER, result, cfg)
+	return _with_actor_ids(_ok_payload(SIDE_ENEMY, SIDE_PLAYER, result, cfg), SIDE_ENEMY, active_enemy_index)
 
 
 func resolve_enemy_equip(slot_index: int) -> Dictionary:
 	if state != BattleState.PAUSED or paused_side != SIDE_ENEMY:
 		return _fail_payload("not_paused")
+	enemy = _current_enemy()
 	var result := enemy.use_equip_at(slot_index, player, equip_cfg)
 	if not bool(result.get("ok", false)):
 		return _fail_payload(str(result.get("reason", "failed")))
 	var equip_id := int(result.get("equip_id", -1))
 	var slot := enemy.get_equip_slot_at(slot_index)
 	var cfg := _merge_equip_runtime_cfg(slot, equip_id)
-	return _ok_payload(SIDE_ENEMY, SIDE_PLAYER, result, cfg)
+	return _with_actor_ids(_ok_payload(SIDE_ENEMY, SIDE_PLAYER, result, cfg), SIDE_ENEMY, active_enemy_index)
 
 
 ## 表现结束：恢复走条并回到 ADVANCING（可重复调用）。
@@ -270,6 +353,9 @@ func finish_presentation() -> void:
 	var before_enemy := interval_elapsed_enemy
 	presentation_side = ""
 	_apply_interval_after_action(side)
+	if side == SIDE_ENEMY:
+		acting_enemy_index = -1
+		acting_enemy_slot = -1
 	paused_side = ""
 	_set_state(BattleState.ADVANCING, "表现结束(%s)" % BattleDebugLog.side_label(side))
 	BattleDebugLog.write("表现", "表现结束，恢复走条", {
@@ -291,10 +377,12 @@ func check_end_after_resolve() -> String:
 		_set_end(SIGNAL_PLAYER_DEAD, "结算后检查胜负")
 		BattleDebugLog.write("结束", "玩家阵亡", get_debug_snapshot())
 		return SIGNAL_PLAYER_DEAD
-	if enemy.is_dead():
+	_compact_formation()
+	if _all_enemies_dead():
 		_set_end(SIGNAL_ENEMY_DEAD, "结算后检查胜负")
 		BattleDebugLog.write("结束", "敌方阵亡", get_debug_snapshot())
 		return SIGNAL_ENEMY_DEAD
+	_refresh_active_enemy()
 	return ""
 
 
@@ -304,6 +392,9 @@ func get_ui_snapshot() -> Dictionary:
 			"left": {"elapsed": interval_elapsed_player, "cap": interval_T_player},
 			"right": {"elapsed": interval_elapsed_enemy, "cap": interval_T_enemy},
 		},
+		"enemy_index": active_enemy_index,
+		"enemy_count": enemies.size(),
+		"formation": get_formation_snapshot(),
 	}
 
 
@@ -330,7 +421,9 @@ func begin_presentation(side: String) -> void:
 	if side == SIDE_PLAYER:
 		_overflow_player = _capture_overflow(interval_elapsed_player, interval_T_player)
 	elif side == SIDE_ENEMY:
-		_overflow_enemy = _capture_overflow(interval_elapsed_enemy, interval_T_enemy)
+		var idx := _acting_enemy_index()
+		_overflow_enemies[idx] = _capture_overflow(float(interval_elapsed_enemies[idx]), interval_T_enemy)
+		_sync_legacy_enemy_interval()
 	presentation_side = side
 	_set_state(BattleState.PRESENTATION, "开始表现(%s)" % BattleDebugLog.side_label(side))
 	BattleDebugLog.write("表现", "开始播放", {
@@ -361,8 +454,10 @@ func _apply_interval_after_action(side: String) -> void:
 		interval_elapsed_player = minf(_overflow_player, interval_T_player)
 		_overflow_player = 0.0
 	elif side == SIDE_ENEMY:
-		interval_elapsed_enemy = minf(_overflow_enemy, interval_T_enemy)
-		_overflow_enemy = 0.0
+		var idx := _acting_enemy_index()
+		interval_elapsed_enemies[idx] = minf(float(_overflow_enemies[idx]), interval_T_enemy)
+		_overflow_enemies[idx] = 0.0
+		_sync_legacy_enemy_interval()
 
 
 func _resolve_basic(side: String) -> Dictionary:
@@ -385,10 +480,11 @@ func _resolve_basic(side: String) -> Dictionary:
 	var target_id: String
 	if side == SIDE_PLAYER:
 		attacker = player
-		defender = enemy
+		defender = _current_enemy()
 		source_id = SIDE_PLAYER
 		target_id = SIDE_ENEMY
 	else:
+		enemy = _current_enemy()
 		attacker = enemy
 		defender = player
 		source_id = SIDE_ENEMY
@@ -407,7 +503,10 @@ func _resolve_basic(side: String) -> Dictionary:
 		cfg = (basic_v as Dictionary).duplicate(true)
 	else:
 		cfg = {"tags": ["attack", "physical"]}
-	return _ok_payload(source_id, target_id, report, cfg)
+	var payload := _ok_payload(source_id, target_id, report, cfg)
+	if side == SIDE_PLAYER:
+		return _with_actor_ids(payload, SIDE_PLAYER, _enemy_index_for_unit(defender))
+	return _with_actor_ids(payload, SIDE_ENEMY, active_enemy_index)
 
 
 func _lookup_skill_cfg(skill_id: int) -> Dictionary:
@@ -427,7 +526,7 @@ func _merge_equip_runtime_cfg(slot: Dictionary, equip_id: int) -> Dictionary:
 		return cfg
 	if slot.has("effects"):
 		cfg["effects"] = (slot["effects"] as Array).duplicate(true)
-	for key in ["vfx_type", "vfx", "mp_cost", "power", "tags"]:
+	for key in ["vfx_type", "vfx", "costs", "cost_text", "mp_cost", "power", "tags"]:
 		if slot.has(key):
 			cfg[key] = slot[key]
 	return cfg
@@ -440,9 +539,10 @@ func format_interval(side: String) -> String:
 			CombatBalance.action_progress_rate_for(player), _overflow_player,
 		]
 	if side == SIDE_ENEMY:
-		return "%.1f/%.0f（速率 %.1f/s，溢出 %.1f）" % [
+		return "%.1f/%.0f（速率 %.1f/s，溢出 %.1f，slot %d）" % [
 			interval_elapsed_enemy, interval_T_enemy,
 			CombatBalance.action_progress_rate_for(enemy), _overflow_enemy,
+			active_enemy_slot,
 		]
 	return ""
 
@@ -459,6 +559,7 @@ func get_debug_snapshot() -> Dictionary:
 		"敌方走条": format_interval(SIDE_ENEMY),
 		"玩家": BattleDebugLog.log_unit(player, "player"),
 		"敌方": BattleDebugLog.log_unit(enemy, "enemy"),
+		"阵型": get_formation_snapshot(),
 	}
 
 
@@ -482,9 +583,335 @@ func _drain_runtime_events() -> void:
 			if ev is Dictionary:
 				_runtime_events.append(ev)
 	if enemy != null and enemy.has_method("pop_runtime_events"):
-		for ev in enemy.call("pop_runtime_events", SIDE_ENEMY):
-			if ev is Dictionary:
-				_runtime_events.append(ev)
+		pass
+	for unit_v in enemies:
+		if unit_v is FightObj and (unit_v as FightObj).has_method("pop_runtime_events"):
+			for ev in (unit_v as FightObj).call("pop_runtime_events", SIDE_ENEMY):
+				if ev is Dictionary:
+					_runtime_events.append(ev)
+
+
+func _enemy_at(index: int) -> FightObj:
+	if index < 0 or index >= enemies.size():
+		return null
+	var unit_v: Variant = enemies[index]
+	return unit_v as FightObj if unit_v is FightObj else null
+
+
+func _current_enemy() -> FightObj:
+	if paused_side == SIDE_ENEMY and acting_enemy_index >= 0:
+		active_enemy_index = acting_enemy_index
+		active_enemy_slot = acting_enemy_slot
+	var current := _enemy_at(active_enemy_index)
+	if current == null or current.is_dead() or not _is_active_enemy_index(active_enemy_index):
+		_refresh_active_enemy()
+		current = _enemy_at(active_enemy_index)
+	enemy = current
+	_sync_legacy_enemy_interval()
+	return enemy
+
+
+func _refresh_active_enemy() -> void:
+	_compact_formation()
+	if enemies.is_empty():
+		enemy = null
+		return
+	if active_enemy_index >= 0 and active_enemy_index < enemies.size() and _is_active_enemy_index(active_enemy_index):
+		var active := _enemy_at(active_enemy_index)
+		if active != null and not active.is_dead():
+			enemy = active
+			active_enemy_slot = _slot_for_enemy_index(active_enemy_index)
+			_sync_legacy_enemy_interval()
+			return
+	for i in _active_enemy_indices():
+		var candidate := _enemy_at(i)
+		if candidate != null and not candidate.is_dead():
+			active_enemy_index = i
+			active_enemy_slot = _slot_for_enemy_index(i)
+			enemy = candidate
+			_sync_legacy_enemy_interval()
+			return
+	enemy = null
+
+
+func _first_ready_enemy_index() -> int:
+	for i in _active_enemy_indices():
+		var unit := _enemy_at(i)
+		if unit == null or unit.is_dead():
+			continue
+		if float(interval_elapsed_enemies[i]) >= interval_T_enemy:
+			return i
+	return -1
+
+
+func _acting_enemy_index() -> int:
+	if acting_enemy_index >= 0 and acting_enemy_index < enemies.size():
+		return acting_enemy_index
+	return clampi(active_enemy_index, 0, maxi(0, enemies.size() - 1))
+
+
+func _all_enemies_dead() -> bool:
+	for unit_v in enemies:
+		if unit_v is FightObj and not (unit_v as FightObj).is_dead():
+			return false
+	return true
+
+
+func _all_alive_units() -> Array:
+	var out: Array = []
+	if player != null and not player.is_dead():
+		out.append(player)
+	for unit_v in enemies:
+		if unit_v is FightObj and not (unit_v as FightObj).is_dead() and _is_active_enemy_index(enemies.find(unit_v)):
+			out.append(unit_v)
+	return out
+
+
+func _sync_legacy_enemy_interval() -> void:
+	if active_enemy_index >= 0 and active_enemy_index < interval_elapsed_enemies.size():
+		interval_elapsed_enemy = float(interval_elapsed_enemies[active_enemy_index])
+	if active_enemy_index >= 0 and active_enemy_index < _overflow_enemies.size():
+		_overflow_enemy = float(_overflow_enemies[active_enemy_index])
+
+
+func _apply_formation_config(cfg: Dictionary) -> void:
+	formation_columns = clampi(int(cfg.get("columns", DEFAULT_FORMATION_COLUMNS)), 1, 6)
+	formation_rows = clampi(int(cfg.get("rows", DEFAULT_FORMATION_ROWS)), 1, 8)
+	active_columns = clampi(int(cfg.get("active_columns", DEFAULT_ACTIVE_COLUMNS)), 1, formation_columns)
+
+
+func _formation_capacity() -> int:
+	return formation_columns * formation_rows
+
+
+func _slot_index(column: int, row: int) -> int:
+	return column * formation_rows + row
+
+
+func _slot_column(slot: int) -> int:
+	return int(floor(float(slot) / float(maxi(1, formation_rows))))
+
+
+func _slot_row(slot: int) -> int:
+	return slot % maxi(1, formation_rows)
+
+
+func _rebuild_formation_slots() -> void:
+	enemy_formation_slots.clear()
+	enemy_reserve_indices.clear()
+	var cap := _formation_capacity()
+	for i in cap:
+		enemy_formation_slots.append(-1)
+	if formation_rows == DEFAULT_FORMATION_ROWS and enemies.size() <= formation_rows:
+		var centered_rows := _centered_row_order()
+		for i in enemies.size():
+			var row := int(centered_rows[i])
+			enemy_formation_slots[_slot_index(0, row)] = i
+		return
+	for i in mini(cap, enemies.size()):
+		enemy_formation_slots[i] = i
+	for i in range(cap, enemies.size()):
+		enemy_reserve_indices.append(i)
+
+
+func _compact_formation() -> void:
+	for i in range(enemy_reserve_indices.size() - 1, -1, -1):
+		var reserve_idx := int(enemy_reserve_indices[i])
+		var reserve_unit := _enemy_at(reserve_idx)
+		if reserve_unit == null or reserve_unit.is_dead():
+			enemy_reserve_indices.remove_at(i)
+	for slot in enemy_formation_slots.size():
+		var idx := int(enemy_formation_slots[slot])
+		var unit := _enemy_at(idx)
+		if idx < 0 or unit == null or unit.is_dead():
+			enemy_formation_slots[slot] = -1
+	for row in formation_rows:
+		for col in formation_columns:
+			var slot := _slot_index(col, row)
+			if int(enemy_formation_slots[slot]) >= 0:
+				continue
+			var moved := false
+			for next_col in range(col + 1, formation_columns):
+				var next_slot := _slot_index(next_col, row)
+				var next_idx := int(enemy_formation_slots[next_slot])
+				if next_idx >= 0:
+					enemy_formation_slots[slot] = next_idx
+					enemy_formation_slots[next_slot] = -1
+					moved = true
+					break
+			if not moved:
+				enemy_formation_slots[slot] = _pop_next_reserve_alive()
+	active_enemy_index = _first_active_enemy_index()
+	active_enemy_slot = _slot_for_enemy_index(active_enemy_index)
+	enemy = _enemy_at(active_enemy_index)
+	_sync_legacy_enemy_interval()
+
+
+func _pop_next_reserve_alive() -> int:
+	while not enemy_reserve_indices.is_empty():
+		var idx := int(enemy_reserve_indices.pop_front())
+		var unit := _enemy_at(idx)
+		if unit != null and not unit.is_dead():
+			return idx
+	return -1
+
+
+func _active_enemy_indices() -> Array:
+	var out: Array = []
+	var rows := _active_row_order()
+	for col in active_columns:
+		for row_v in rows:
+			var row := int(row_v)
+			var slot := _slot_index(col, row)
+			if slot < 0 or slot >= enemy_formation_slots.size():
+				continue
+			var idx := int(enemy_formation_slots[slot])
+			var unit := _enemy_at(idx)
+			if idx >= 0 and unit != null and not unit.is_dead():
+				out.append(idx)
+	return out
+
+
+func _is_active_enemy_index(index: int) -> bool:
+	if index < 0:
+		return false
+	var rows := _active_row_order()
+	for col in active_columns:
+		for row_v in rows:
+			var row := int(row_v)
+			var slot := _slot_index(col, row)
+			if slot < enemy_formation_slots.size() and int(enemy_formation_slots[slot]) == index:
+				return true
+	return false
+
+
+func _first_active_enemy_index() -> int:
+	var active := _active_enemy_indices()
+	if active.is_empty():
+		return -1
+	return int(active[0])
+
+
+func _slot_for_enemy_index(index: int) -> int:
+	for slot in enemy_formation_slots.size():
+		if int(enemy_formation_slots[slot]) == index:
+			return slot
+	return -1
+
+
+func _centered_row_order() -> Array:
+	var out: Array = []
+	var center := int(floor(float(formation_rows) / 2.0))
+	out.append(center)
+	for offset in range(1, formation_rows):
+		var upper := center - offset
+		var lower := center + offset
+		if upper >= 0:
+			out.append(upper)
+		if lower < formation_rows:
+			out.append(lower)
+	return out
+
+
+func _active_row_order() -> Array:
+	if formation_rows == DEFAULT_FORMATION_ROWS:
+		return _centered_row_order()
+	var out: Array = []
+	for row in formation_rows:
+		out.append(row)
+	return out
+
+
+func actor_id_for_enemy_index(index: int) -> String:
+	var slot := _slot_for_enemy_index(index)
+	if slot < 0:
+		return SIDE_ENEMY
+	return "enemy_%d_%d" % [_slot_column(slot), _slot_row(slot)]
+
+
+func get_formation_snapshot() -> Dictionary:
+	var slots: Array = []
+	for slot in enemy_formation_slots.size():
+		var idx := int(enemy_formation_slots[slot])
+		var unit := _enemy_at(idx)
+		if idx < 0 or unit == null:
+			slots.append({"empty": true, "slot": slot, "column": _slot_column(slot), "row": _slot_row(slot)})
+			continue
+		slots.append({
+			"empty": false,
+			"dead": unit.is_dead(),
+			"slot": slot,
+			"enemy_index": idx,
+			"actor_id": actor_id_for_enemy_index(idx),
+			"column": _slot_column(slot),
+			"row": _slot_row(slot),
+			"active": _slot_column(slot) < active_columns,
+			"current": idx == active_enemy_index,
+			"hp": unit.hp,
+			"hp_max": unit.get_hp_max(),
+			"mp": unit.mp,
+			"mp_max": unit.get_mp_max(),
+			"interval": {
+				"elapsed": float(interval_elapsed_enemies[idx]) if idx < interval_elapsed_enemies.size() else 0.0,
+				"cap": interval_T_enemy,
+			},
+		})
+	return {
+		"columns": formation_columns,
+		"rows": formation_rows,
+		"active_columns": active_columns,
+		"slots": slots,
+		"reserve_count": enemy_reserve_indices.size(),
+	}
+
+
+## 距离指定敌人轮到行动还需经过的走条推进时长（秒）；暂停/表现阶段返回 0。
+func advancing_seconds_until_enemy_turn(enemy_index: int) -> float:
+	if state == BattleState.END:
+		return 0.0
+	if not _is_active_enemy_index(enemy_index):
+		return 0.0
+	var unit := _enemy_at(enemy_index)
+	if unit == null or unit.is_dead():
+		return 0.0
+	if enemy_index >= interval_elapsed_enemies.size():
+		return 0.0
+	if state == BattleState.PAUSED:
+		if paused_side == SIDE_ENEMY:
+			var acting_idx := _acting_enemy_index()
+			if enemy_index == acting_idx or (acting_idx < 0 and enemy_index == active_enemy_index):
+				return 0.0
+		return 0.0
+	if state == BattleState.PRESENTATION:
+		return 0.0
+	var elapsed := float(interval_elapsed_enemies[enemy_index])
+	if elapsed >= interval_T_enemy:
+		return 0.0
+	var rate := CombatBalance.action_progress_rate_for(unit)
+	if rate <= 0.0:
+		return 0.0
+	return (interval_T_enemy - elapsed) / rate
+
+
+func _enemy_index_for_unit(unit: FightObj) -> int:
+	if unit == null:
+		return -1
+	for i in enemies.size():
+		if enemies[i] == unit:
+			return i
+	return -1
+
+
+func _with_actor_ids(payload: Dictionary, source_side: String, target_enemy_index: int) -> Dictionary:
+	if payload.is_empty():
+		return payload
+	if source_side == SIDE_PLAYER:
+		payload["source_actor_id"] = SIDE_PLAYER
+		payload["target_actor_id"] = actor_id_for_enemy_index(target_enemy_index)
+	else:
+		payload["source_actor_id"] = actor_id_for_enemy_index(target_enemy_index)
+		payload["target_actor_id"] = SIDE_PLAYER
+	return payload
 
 
 static func _ok_payload(

@@ -1,6 +1,6 @@
 extends Node
 
-const SCHEMA_VERSION := 1
+const SCHEMA_VERSION := 2
 const SLOT_COUNT := 3
 const AUTO_SAVE_SLOT := 1
 
@@ -53,6 +53,34 @@ func slot_info(slot: int) -> Dictionary:
 		"realm_name": str(game.get("realm_name", "未知")),
 		"cultivation": int(game.get("cultivation", 0)),
 	}
+
+
+func find_latest_slot() -> int:
+	var latest_slot := 0
+	var latest_time := -1
+	for slot in range(1, SLOT_COUNT + 1):
+		var saved_unix := _read_saved_unix(slot)
+		if saved_unix < 0:
+			continue
+		if saved_unix >= latest_time:
+			latest_time = saved_unix
+			latest_slot = slot
+	return latest_slot
+
+
+func _read_saved_unix(slot: int) -> int:
+	if slot < 1 or slot > SLOT_COUNT or not FileAccess.file_exists(_path(slot)):
+		return -1
+	var parser := JSON.new()
+	if parser.parse(FileAccess.get_file_as_string(_path(slot))) != OK:
+		return -1
+	var parsed: Variant = parser.data
+	if not parsed is Dictionary:
+		return -1
+	var envelope := parsed as Dictionary
+	if int(envelope.get("schema_version", -1)) != SCHEMA_VERSION:
+		return -1
+	return int(envelope.get("saved_unix", 0))
 
 
 func _path(slot: int) -> String:

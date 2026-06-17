@@ -22,7 +22,7 @@ var fight_effect: Array = []
 var fight_id: int = 0
 var fight_cd: float = 0.0
 var fight_mp_cost: float = 0.0
-var learn_skill_id: int = -1
+var learn_ability_id: String = ""
 var learn_method_id: String = ""
 
 
@@ -39,8 +39,29 @@ func has_use_effect() -> bool:
 	return not use_effect.is_empty()
 
 
+func get_use_effect_amount(op: String, default_value: float = 0.0) -> float:
+	for effect_v in use_effect:
+		if not effect_v is Dictionary:
+			continue
+		var effect := effect_v as Dictionary
+		if str(effect.get("op", "")) != op:
+			continue
+		var args_v: Variant = effect.get("args", [])
+		if args_v is Array and not (args_v as Array).is_empty():
+			return float((args_v as Array)[0])
+	return default_value
+
+
+func is_cultivation_pill() -> bool:
+	return get_use_effect_amount("pill_cultivation") > 0.0
+
+
 func has_fight_config() -> bool:
 	return fight_id > 0 and not fight_effect.is_empty()
+
+
+func is_learning_book() -> bool:
+	return learn_ability_id != "" or learn_method_id != ""
 
 
 func to_fight_runtime_dict() -> Dictionary:
@@ -93,7 +114,7 @@ static func from_dict(data: Dictionary) -> ItemDef:
 	item.fight_id = maxi(0, int(data.get("fight_id", 0)))
 	item.fight_cd = maxf(0.0, float(data.get("fight_cd", data.get("cd", 0.0))))
 	item.fight_mp_cost = maxf(0.0, float(data.get("fight_mp_cost", data.get("mp_cost", 0.0))))
-	item.learn_skill_id = int(data.get("learn_skill_id", -1))
+	item.learn_ability_id = str(data.get("learn_ability_id", "")).strip_edges()
 	item.learn_method_id = str(data.get("learn_method_id", "")).strip_edges()
 	if not item.stackable:
 		item.max_stack = 1

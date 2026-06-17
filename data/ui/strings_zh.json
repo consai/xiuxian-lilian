@@ -69,6 +69,13 @@
     "use_hp": "使用效果：恢复气血 {value}",
     "use_mp": "使用效果：恢复法力 {value}",
     "use_heart_demon": "使用效果：心魔 {value}",
+    "use_cultivation": "使用效果：修为 +{value}",
+    "use_instability": "使用效果：境界虚浮 {value}",
+    "use_pill_cultivation": "使用效果：修炼「丹药炼化」修为约 ×{value}",
+    "use_injury": "使用效果：缩短伤势 {value} 日",
+    "use_sell_only": "使用效果：无药效，仅可出售",
+    "use_alchemy_mastery": "使用效果：{recipe} 熟练度 +{value}",
+    "use_fight_prefix": "战斗使用：{value}",
     "fight_mp_cost": "战斗消耗：法力 {value}",
     "fight_cd": "战斗冷却：{value} 秒"
   },

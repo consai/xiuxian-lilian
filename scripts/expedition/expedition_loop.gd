@@ -4,7 +4,6 @@ const LocationServiceScript := preload("res://scripts/expedition/location_servic
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const ItemDefScript := preload("res://scripts/core/item_def.gd")
-const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
 const ExpeditionBattlePopupView := preload("res://scripts/expedition/expedition_battle_popup_view.gd")
 const ExpeditionLogServiceScript := preload("res://scripts/expedition/expedition_log_service.gd")
 
@@ -338,10 +337,15 @@ func _prepare_battle_popup() -> void:
 
 
 func _show_pending_battle_popup(event: Dictionary) -> void:
+	_locked = true
+	if ExpeditionState.auto_advance:
+		_refresh_controls()
+		call_deferred("_on_battle_fight_requested")
+		return
 	var popup := %BattlePopup as ExpeditionBattlePopupView
 	if popup == null:
+		_locked = false
 		return
-	_locked = true
 	popup.apply_event(event, maxi(1, int(event.get("difficulty", 1))))
 	popup.visible = true
 	_refresh_controls()
@@ -436,50 +440,4 @@ func _make_loot_item() -> ItemView:
 
 
 func _apply_loot_row(view: ItemView, row: Dictionary) -> void:
-	if view == null:
-		return
-	var kind := str(row.get("kind", "item"))
-	var count := maxi(1, int(row.get("count", row.get("amount", 1))))
-	var item_name := str(row.get("name", row.get("item_name", ""))).strip_edges()
-	var quality := str(row.get("quality", row.get("pin_zhi", ""))).strip_edges()
-	var icon: Texture2D = null
-	var icon_v: Variant = row.get("icon")
-	if icon_v is Texture2D:
-		icon = icon_v
-	elif kind == "currency":
-		if item_name == "":
-			item_name = "灵石" if str(row.get("id", "")) == "ling_stones" else str(row.get("id", "货币"))
-	elif kind == "equip":
-		var equip_cfg := ConfigManager.equip_by_id(int(row.get("id", -1)))
-		if item_name == "":
-			item_name = str(equip_cfg.get("name", "法宝"))
-		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
-		if quality == "":
-			quality = _quality_label_from_int(int(equip_cfg.get("quality", 1)))
-	elif kind == "item":
-		var item_id := str(row.get("id", ""))
-		if item_name == "" and ConfigManager != null:
-			item_name = str(ConfigManager.get_item_display_name(item_id))
-		if ConfigManager != null:
-			var def := ConfigManager.item_def_by_id(item_id)
-			if def != null:
-				icon = ItemDefScript.resolve_icon_texture(def.icon_path, null)
-				if quality == "":
-					quality = def.rarity
-	else:
-		if item_name == "":
-			item_name = str(row.get("id", "奖励"))
-		var path := str(row.get("icon_path", row.get("icon", ""))).strip_edges()
-		if path != "":
-			icon = ItemDefScript.resolve_icon_texture(path, null)
-	view.apply_display(icon, item_name, count, Color.WHITE, quality)
-	view.show_name_label = true
-	view.set_info_entry(ItemView.entry_from_reward_row(row))
-
-
-func _quality_label_from_int(quality: int) -> String:
-	if quality >= 5:
-		return "传说"
-	if quality >= 3:
-		return "稀有"
-	return ""
+	ItemView.apply_reward_row(view, row)

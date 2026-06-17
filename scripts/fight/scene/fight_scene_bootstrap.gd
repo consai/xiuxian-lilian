@@ -46,6 +46,10 @@ static func apply_battle_setup(ctx: FightSceneContext, hud: FightSceneHud, setup
 		return false
 	ctx.battle_player = setup.player
 	ctx.battle_enemy = setup.enemy
+	ctx.battle_enemies = setup.enemies.duplicate()
+	ctx.battle_enemy_rows = setup.enemy_rows.duplicate(true)
+	ctx.battle_player_row = setup.player_row.duplicate(true)
+	ctx.enemy_formation = setup.enemy_formation.duplicate(true)
 	ctx.skill_cfg = setup.skill_cfg
 	ctx.battle_time_limit = setup.battle_time_limit
 	apply_auto_battle_from_init(ctx, hud, setup.auto_battle)
@@ -55,6 +59,9 @@ static func apply_battle_setup(ctx: FightSceneContext, hud: FightSceneHud, setup
 	ctx.equip_cfg = setup.equip_cfg.duplicate(true)
 	ctx.enemy_ai_cfg = setup.get_enemy_ai_cfg()
 	ctx.enemy_ai_runtime = EnemyAiRuntimeStateScript.new()
+	ctx.enemy_ai_runtimes.clear()
+	for _i in ctx.battle_enemies.size():
+		ctx.enemy_ai_runtimes.append(EnemyAiRuntimeStateScript.new())
 	ctx.player_ai_cfg = setup.get_player_ai_cfg()
 	ctx.player_ai_runtime = EnemyAiRuntimeStateScript.new()
 	hud.apply_battle(ctx, setup.ui_payload)
@@ -75,14 +82,25 @@ static func apply_battle_setup(ctx: FightSceneContext, hud: FightSceneHud, setup
 static func start_battle(ctx: FightSceneContext, hud: FightSceneHud) -> void:
 	ctx.domain = BattleDomainService.new()
 	BattleDebugLog.set_domain(ctx.domain)
-	ctx.domain.start_battle(
-		ctx.battle_player,
-		ctx.battle_enemy,
-		ctx.skill_cfg,
-		ctx.battle_time_limit,
-		ctx.item_cfg,
-		ctx.equip_cfg
-	)
+	if ctx.battle_enemies.is_empty():
+		ctx.domain.start_battle(
+			ctx.battle_player,
+			ctx.battle_enemy,
+			ctx.skill_cfg,
+			ctx.battle_time_limit,
+			ctx.item_cfg,
+			ctx.equip_cfg
+		)
+	else:
+		ctx.domain.start_battle_many(
+			ctx.battle_player,
+			ctx.battle_enemies,
+			ctx.skill_cfg,
+			ctx.battle_time_limit,
+			ctx.item_cfg,
+			ctx.equip_cfg,
+			ctx.enemy_formation
+		)
 	if ctx.recorder != null:
 		ctx.recorder.begin({
 			"session_id": ctx.battle_session_id,

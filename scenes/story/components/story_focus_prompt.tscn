@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="1_label"]
+
+[sub_resource type="StyleBoxFlat" id="Style_prompt"]
+bg_color = Color(1, 0.94902, 0.85098, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 0.92)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="StoryFocusPrompt" type="PanelContainer"]
+custom_minimum_size = Vector2(200, 52)
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_prompt")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+text = "完成一次修炼"
+label_settings = ExtResource("1_label")
+horizontal_alignment = 1
+vertical_alignment = 1

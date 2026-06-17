@@ -22,6 +22,7 @@ const ItemDefScript := preload("res://scripts/core/item_def.gd")
 var _log_formatter = null
 var _log_entries: Array = []
 var _log_names: Dictionary = {}
+var _log_popup_auto_follow := true
 
 
 func _ready() -> void:
@@ -36,6 +37,10 @@ func _ready() -> void:
 		_btn_log.pressed.connect(_on_log_button_pressed)
 	if _btn_log_popup_close != null:
 		_btn_log_popup_close.pressed.connect(_hide_log_popup)
+	if _log_popup_scroll != null and _log_popup_scroll.has_signal("user_scrolled"):
+		var handler := Callable(self, "_on_log_popup_user_scrolled")
+		if not _log_popup_scroll.is_connected("user_scrolled", handler):
+			_log_popup_scroll.connect("user_scrolled", handler)
 
 
 func apply_summary(summary: Dictionary, formatter, entries_tail: Array = [], names: Dictionary = {}) -> void:
@@ -70,6 +75,7 @@ func _on_log_button_pressed() -> void:
 		return
 	_log_popup_body.bbcode_enabled = true
 	_log_popup_body.text = text
+	_log_popup_auto_follow = true
 	_log_popup.visible = true
 	_scroll_log_to_end()
 
@@ -94,10 +100,17 @@ func _hide_log_popup() -> void:
 
 
 func _scroll_log_to_end() -> void:
-	if _log_popup_scroll == null:
+	if _log_popup_scroll == null or not _log_popup_auto_follow:
 		return
 	await get_tree().process_frame
-	_log_popup_scroll.scroll_vertical = int(_log_popup_scroll.get_v_scroll_bar().max_value)
+	if _log_popup_scroll.has_method("scroll_vertical_quiet"):
+		_log_popup_scroll.scroll_vertical_quiet(int(_log_popup_scroll.get_v_scroll_bar().max_value))
+	else:
+		_log_popup_scroll.scroll_vertical = int(_log_popup_scroll.get_v_scroll_bar().max_value)
+
+
+func _on_log_popup_user_scrolled() -> void:
+	_log_popup_auto_follow = false
 
 
 func _sync_outcome_visual(outcome: String) -> void:

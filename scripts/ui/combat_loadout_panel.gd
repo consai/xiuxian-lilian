@@ -1,27 +1,41 @@
 extends Control
 
 const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
-const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
+const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
+const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
 
+const METHOD_ROWS := [
+	{"node": "Main", "key": "main", "label": "主功法"},
+	{"node": "Support1", "key": "support_1", "label": "辅助一"},
+	{"node": "Support2", "key": "support_2", "label": "辅助二"},
+	{"node": "Movement", "key": "movement", "label": "身法"},
+]
+
 @onready var _close_button: TextureButton = %CloseButton
-@onready var _back_button: TextureButton = %BackButton
+@onready var _fightset_button: TextureButton = %FightsetButton
+@onready var _save_button: TextureButton = %SaveButton
 @onready var _methods: VBoxContainer = %MethodsContainer
 @onready var _method_summary: Label = %MethodSummaryLabel
 @onready var _skills: VBoxContainer = %SkillsContainer
-@onready var _equipment: GridContainer = %EquipmentContainer
-@onready var _auto: VBoxContainer = %AutoContainer
+@onready var _treasure_slots: HBoxContainer = $Panel/EquipmentCard/TreasurePanel/Slots
+@onready var _item_slots: GridContainer = %EquipmentContainer
 @onready var _status: Label = %StatusLabel
 @onready var _selection_popup: LoadoutSelectionPopup = %SelectionPopup
+@onready var _bag_popup = %BagPopup
 
 var _selection_mode := ""
 var _selection_target: Variant = -1
+var _wired := false
 
 
 func _ready() -> void:
 	_close_button.pressed.connect(_go_back)
-	_back_button.pressed.connect(_go_back)
+	_fightset_button.pressed.connect(_on_fightset_pressed)
+	_save_button.pressed.connect(_on_save_pressed)
 	_selection_popup.selected.connect(_on_popup_selected)
+	_bag_popup.entry_picked.connect(_on_bag_entry_picked)
+	_wire_interactions()
 	_refresh()
 
 
@@ -31,112 +45,154 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+func _wire_interactions() -> void:
+	if _wired:
+		return
+	_wired = true
+	for spec in METHOD_ROWS:
+		var row := _methods.get_node(str(spec["node"])) as Control
+		_make_clickable(row, _open_selection.bind("method", spec["key"]))
+	for i in _skills.get_child_count():
+		_make_clickable(_skills.get_child(i) as Control, _open_selection.bind("skill", i))
+	for i in _treasure_slots.get_child_count():
+		_make_clickable(_treasure_slots.get_child(i) as Control, _open_equip_picker.bind(i))
+	for i in _item_slots.get_child_count():
+		_make_clickable(_item_slots.get_child(i) as Control, _open_item_picker.bind(i))
+
+
+func _make_clickable(control: Control, action: Callable) -> void:
+	control.mouse_filter = Control.MOUSE_FILTER_STOP
+	control.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventMouseButton:
+			var mouse := event as InputEventMouseButton
+			if mouse.pressed and mouse.button_index == MOUSE_BUTTON_LEFT:
+				action.call()
+	)
+
+
 func _refresh(message: String = "") -> void:
-	_clear(_methods)
-	_clear(_skills)
-	_clear(_equipment)
-	_clear(_auto)
-	_build_methods()
-	_build_skills()
-	_build_equipment()
-	_build_auto_strategy()
-	_status.text = message if message != "" else "点击功法、技能、法宝或道具槽位即可调整配置。"
+	_bind_methods()
+	_bind_skills()
+	_bind_treasure()
+	_bind_items()
+	_bind_method_summary()
+	_status.text = message if message != "" else "点击功法、技能调整配置；点击法宝或道具槽位打开背包装备。"
 
 
-func _build_methods() -> void:
-	var specs := [
-		{"key": "main", "label": "主功法"},
-		{"key": "support_1", "label": "辅助一"},
-		{"key": "support_2", "label": "辅助二"},
-		{"key": "movement", "label": "身法"},
-	]
-	for spec in specs:
+func _bind_methods() -> void:
+	for spec in METHOD_ROWS:
 		var slot_key := str(spec["key"])
 		var method_id := str(GameState.cultivation_method_slots.get(slot_key, ""))
 		var method := CultivationMethodServiceScript.by_id(method_id)
-		var button := Button.new()
-		button.custom_minimum_size = Vector2(0, 54)
-		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		button.text = "%s  |  %s\n%s" % [
+		_bind_method_row(
+			_methods.get_node(str(spec["node"])) as Control,
 			str(spec["label"]),
-			str(method.get("name", "空槽位")),
-			_method_effect(method),
-		]
-		button.tooltip_text = str(method.get("desc", "点击选择功法"))
-		button.icon = _entry_icon(method)
-		button.expand_icon = true
-		button.pressed.connect(_open_selection.bind("method", slot_key))
-		_methods.add_child(button)
+			method
+		)
+
+
+func _bind_method_row(row: Control, type_label: String, method: Dictionary) -> void:
+	row.get_node("%TypeLabel").text = type_label
+	row.get_node("%NameLabel").text = str(method.get("name", "空槽位"))
+	row.get_node("%MetaLabel").text = _method_effect(method)
+	row.tooltip_text = str(method.get("desc", "点击选择功法"))
+	var icon := row.get_node("%Icon") as TextureRect
+	var texture := _entry_icon(method)
+	icon.texture = texture
+	icon.visible = texture != null
+
+
+func _bind_method_summary() -> void:
 	var main := CultivationMethodServiceScript.by_id(str(GameState.cultivation_method_slots.get("main", "")))
+	var mastery := CultivationMethodServiceScript.method_mastery(
+		GameState.to_dict(), str(main.get("id", ""))
+	)
+	var mp_restore := EffectResolverScript.combat_mp_restore_from_method(
+		main.get("effects", []) as Array, mastery
+	)
 	_method_summary.text = "当前主修：%s\n修炼速度 ×%.2f\n战斗每 2 秒恢复 %.0f 法力" % [
 		str(main.get("name", "未配置")),
 		CultivationMethodServiceScript.cultivation_speed(GameState.cultivation_method_slots),
-		float(main.get("combat_mp_restore_2s", 0.0)),
+		mp_restore,
 	]
 
 
-func _build_skills() -> void:
-	for i in 5:
-		var sid := int(GameState.equipped_skills[i]) if i < GameState.equipped_skills.size() else -1
-		var skill := ConfigManager.skill_by_id(sid)
-		var button := Button.new()
-		button.custom_minimum_size = Vector2(0, 54)
-		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		button.text = "%d    %s\n%s" % [
-			i + 1,
-			str(skill.get("name", "空槽位")),
-			_skill_effect(skill),
-		]
-		button.tooltip_text = "点击选择第 %d 顺位技能" % (i + 1)
-		button.icon = _entry_icon(skill)
-		button.expand_icon = true
-		button.pressed.connect(_open_selection.bind("skill", i))
-		_skills.add_child(button)
+func _bind_skills() -> void:
+	for i in _skills.get_child_count():
+		var aid := str(GameState.equipped_abilities[i]) if i < GameState.equipped_abilities.size() else ""
+		var sid := AbilityServiceScript.combat_id_for(aid)
+		var skill := AbilityServiceScript.to_runtime_dict(aid, GameState.to_dict()) if aid != "" else {}
+		var row := _skills.get_child(i) as Control
+		row.get_node("%PriorityLabel").text = str(i + 1)
+		row.get_node("%NameLabel").text = str(skill.get("name", "空槽位"))
+		row.get_node("%MetaLabel").text = _skill_effect(skill)
+		row.tooltip_text = "点击选择第 %d 顺位技能" % (i + 1)
+		var icon := row.get_node("%Icon") as TextureRect
+		var texture := _entry_icon(skill)
+		icon.texture = texture
+		icon.visible = texture != null
 
 
-func _build_equipment() -> void:
-	for i in 2:
-		_add_equipment_button("法宝 %d\n%s" % [i + 1, _equip_name(i)], _cycle_equip.bind(i))
-	for i in 2:
-		_add_equipment_button("道具 %d\n%s" % [i + 1, _item_name(i)], _cycle_item.bind(i))
+func _bind_treasure() -> void:
+	for i in _treasure_slots.get_child_count():
+		var slot := _treasure_slots.get_child(i) as Control
+		_bind_equipment_slot(slot, _equip_entry(i))
+		slot.tooltip_text = "点击打开背包，选择法宝装备"
 
 
-func _build_auto_strategy() -> void:
-	var row := HBoxContainer.new()
-	var enabled := CheckButton.new()
-	enabled.text = "历练自动战斗"
-	enabled.button_pressed = GameState.auto_battle_enabled
-	enabled.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	enabled.toggled.connect(func(value: bool) -> void:
-		GameState.auto_battle_enabled = value
-		_status.text = "历练自动战斗已%s。" % ("开启" if value else "关闭")
-	)
-	row.add_child(enabled)
-	var preset := OptionButton.new()
-	for entry in [["balanced", "均衡"], ["aggressive", "进攻"], ["conservative", "保守"]]:
-		preset.add_item(str(entry[1]))
-		preset.set_item_metadata(preset.item_count - 1, str(entry[0]))
-		if GameState.auto_battle_preset == str(entry[0]):
-			preset.select(preset.item_count - 1)
-	preset.item_selected.connect(func(index: int) -> void:
-		GameState.auto_battle_preset = str(preset.get_item_metadata(index))
-		GameState.auto_battle_rules = {}
-		_status.text = "自动战斗策略已切换为%s。" % preset.get_item_text(index)
-	)
-	row.add_child(preset)
-	_auto.add_child(row)
-	var note := Label.new()
-	note.text = "均衡按槽位施法；进攻优先输出；保守低血先用道具。"
-	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_auto.add_child(note)
+func _bind_items() -> void:
+	for i in _item_slots.get_child_count():
+		var slot := _item_slots.get_child(i) as Control
+		_bind_equipment_slot(slot, _item_entry(i))
+		slot.tooltip_text = "点击打开背包，选择战斗道具"
 
 
-func _add_equipment_button(text: String, action: Callable) -> void:
-	var button := Button.new()
-	button.text = text
-	button.custom_minimum_size = Vector2(150, 76)
-	button.pressed.connect(action)
-	_equipment.add_child(button)
+func _bind_equipment_slot(slot: Control, entry: Dictionary) -> void:
+	slot.get_node("%NameLabel").text = str(entry.get("label", "空"))
+	var icon := slot.get_node("%Icon") as TextureRect
+	var texture: Texture2D = entry.get("icon")
+	icon.texture = texture
+	icon.visible = texture != null
+
+
+func _equip_entry(index: int) -> Dictionary:
+	var item_id := ""
+	if index < GameState.treasure_item_slots.size():
+		item_id = str(GameState.treasure_item_slots[index]).strip_edges()
+	if item_id != "":
+		var def := ConfigManager.item_def_by_id(item_id)
+		if def != null:
+			var runtime := def.to_fight_runtime_dict()
+			return {
+				"label": def.name,
+				"icon": _entry_icon(runtime),
+			}
+		return {"label": ConfigManager.get_item_display_name(item_id)}
+	var eid := int(GameState.equip_slots[index]) if index < GameState.equip_slots.size() else -1
+	if eid <= 0:
+		return {"label": "空"}
+	var equip := ConfigManager.equip_by_id(eid)
+	return {
+		"label": str(equip.get("name", "空")),
+		"icon": _entry_icon(equip),
+	}
+
+
+func _item_entry(index: int) -> Dictionary:
+	var iid := str(GameState.item_slots[index]) if index < GameState.item_slots.size() else ""
+	if iid == "":
+		return {"label": "空"}
+	var item_name := ConfigManager.get_item_display_name(iid)
+	var count := int(GameState.inventory.get(iid, 0))
+	var label := "%s x%d" % [item_name, count] if count > 1 else item_name
+	var icon: Texture2D = null
+	var def := ConfigManager.item_def_by_id(iid)
+	if def != null:
+		icon = _entry_icon(def.to_fight_runtime_dict())
+	return {
+		"label": label,
+		"icon": icon,
+	}
 
 
 func _open_selection(mode: String, target: Variant) -> void:
@@ -147,40 +203,58 @@ func _open_selection(mode: String, target: Variant) -> void:
 
 func _on_popup_selected(entry_id: Variant) -> void:
 	if _selection_mode == "method":
-		var result: Dictionary = GameState.equip_method(str(_selection_target), str(entry_id))
-		_refresh(str(result.get("error", "功法配置已更新。")))
+		var method_result: Dictionary = GameState.equip_method(str(_selection_target), str(entry_id))
+		_refresh(str(method_result.get("error", "功法配置已更新。")))
 		return
-	var sid := int(entry_id)
-	if sid < 0:
-		var slots := GameState.equipped_skills.duplicate(true)
-		while slots.size() < 5:
-			slots.append(-1)
-		slots[int(_selection_target)] = -1
-		GameState.equipped_skills = slots
+	var aid := str(entry_id).strip_edges()
+	if aid == "" or aid == "-1":
+		var slots := DataStore._normalize_ability_slots(GameState.equipped_abilities)
+		slots[int(_selection_target)] = ""
+		GameState.equipped_abilities = slots
 		_refresh("技能槽已清空。")
 		return
-	var result: Dictionary = GameState.equip_skill(int(_selection_target), sid)
-	_refresh(str(result.get("error", "技能配置已更新。")))
+	var skill_result: Dictionary = GameState.equip_ability(int(_selection_target), aid)
+	_refresh(str(skill_result.get("error", "技能配置已更新。")))
 
 
-func _cycle_equip(index: int) -> void:
-	InventoryServiceScript.cycle_equip_slot(GameState.owned_equips, GameState.equip_slots, index)
-	_refresh("法宝配置已更新。")
+func _open_equip_picker(slot_index: int) -> void:
+	_bag_popup.open_for_equip(slot_index)
 
 
-func _cycle_item(index: int) -> void:
-	InventoryServiceScript.cycle_item_slot(GameState.inventory, GameState.item_slots, index)
-	_refresh("道具配置已更新。")
+func _open_item_picker(slot_index: int) -> void:
+	_bag_popup.open_for_item(slot_index)
 
 
-func _equip_name(index: int) -> String:
-	var eid := int(GameState.equip_slots[index]) if index < GameState.equip_slots.size() else -1
-	return str(ConfigManager.equip_by_id(eid).get("name", "空"))
+func _on_bag_entry_picked(entry: Dictionary) -> void:
+	var slot_index := int(entry.get("loadout_slot", -1))
+	var kind := str(entry.get("loadout_kind", ""))
+	if kind == "equip":
+		var result: Dictionary
+		if str(entry.get("kind", "item")) == "item":
+			result = GameState.assign_treasure_item_slot(slot_index, str(entry.get("id", "")))
+		else:
+			result = GameState.assign_equip_slot(slot_index, int(entry.get("id", -1)))
+		_refresh(_loadout_message(result, "法宝配置已更新。"))
+		return
+	if kind == "item":
+		var result: Dictionary = GameState.assign_item_slot(slot_index, str(entry.get("id", "")))
+		_refresh(_loadout_message(result, "道具配置已更新。"))
+		return
+	_refresh("配置失败。")
 
 
-func _item_name(index: int) -> String:
-	var iid := str(GameState.item_slots[index]) if index < GameState.item_slots.size() else ""
-	return ConfigManager.get_item_display_name(iid) if iid != "" else "空"
+func _loadout_message(result: Dictionary, fallback: String) -> String:
+	if not bool(result.get("ok", false)):
+		return str(result.get("error", fallback))
+	return str(result.get("message", fallback))
+
+
+func _on_fightset_pressed() -> void:
+	SceneManager.go_skill_release_strategy_panel()
+
+
+func _on_save_pressed() -> void:
+	_refresh("战斗配置已保存。")
 
 
 func _method_effect(method: Dictionary) -> String:
@@ -209,11 +283,6 @@ func _entry_icon(entry: Dictionary) -> Texture2D:
 	if entry.is_empty() or not entry.has("icon") or entry.get("icon") == null:
 		return null
 	return BattleInitDataScript._resolve_icon_texture(entry)
-
-
-func _clear(container: Node) -> void:
-	for child in container.get_children():
-		child.queue_free()
 
 
 func _go_back() -> void:

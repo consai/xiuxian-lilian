@@ -1,0 +1,58 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="3_title"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="4_subtitle"]
+
+[sub_resource type="StyleBoxFlat" id="Style_parchment"]
+bg_color = Color(1, 0.941176, 0.803922, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 0.92)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0.243137, 0.14902, 0.0705882, 0.24)
+shadow_size = 7
+content_margin_left = 18.0
+content_margin_top = 18.0
+content_margin_right = 18.0
+content_margin_bottom = 18.0
+
+[node name="StoryChapterCard" type="PanelContainer"]
+custom_minimum_size = Vector2(680, 250)
+theme = ExtResource("1_theme")
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_override_styles/panel = SubResource("Style_parchment")
+
+[node name="Content" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="ChapterLabel" type="Label" parent="Panel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "第一章"
+label_settings = ExtResource("4_subtitle")
+horizontal_alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Panel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "残灯照归途"
+label_settings = ExtResource("3_title")
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="Panel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "洞府禁制尚在，而山外的风已经变了。"
+label_settings = ExtResource("4_subtitle")
+horizontal_alignment = 1
+autowrap_mode = 2

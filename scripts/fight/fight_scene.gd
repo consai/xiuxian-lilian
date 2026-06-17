@@ -1,6 +1,7 @@
 extends Control
 
 const ExpeditionBattleFlow := preload("res://scripts/expedition/expedition_battle_flow.gd")
+const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 
 ## 战斗场景编排层：布局在 [code]fightScene.tscn[/code]，逻辑按职责拆至 [code]scripts/fight/scene/[/code]。
 ## 域层 [BattleDomainService]、表现 [FightScenePresentation]、HUD [FightSceneHud] 各司其职。
@@ -19,7 +20,7 @@ signal battle_finished(summary: Dictionary)
 @export var editor_auto_sample: bool = true
 
 @export_group("Debug")
-@export var battle_debug_enabled: bool = true
+@export var battle_debug_enabled: bool = false
 @export var battle_debug_verbose_tick: bool = false
 
 @onready var _head_left: TextureRect = %head_left
@@ -45,9 +46,9 @@ signal battle_finished(summary: Dictionary)
 @onready var _interval_left: IntervalTrackView = %interval_left
 @onready var _interval_right: IntervalTrackView = %interval_right
 @onready var _fighttime: Label = %fighttime
-@onready var _sprite_left: Sprite2D = %sprite_left
+@onready var _sprite_left: EnemyFormationSlotView = %sprite_left
 @onready var _sprite_right: Sprite2D = %sprite_right
-@onready var _center: Control = $center
+@onready var _center: Control = %center
 @onready var _chk_auto_player: CheckButton = %auto
 @onready var _vfx: FightVfxManager = %FightVfxManager
 @onready var _float_layer: CombatFloatLayer = %CombatFloatLayer
@@ -274,5 +275,18 @@ func _on_battle_result_close_requested() -> void:
 func _on_battle_finished(summary: Dictionary) -> void:
 	if ExpeditionBattleFlow.is_expedition_source(_ctx.battle_source):
 		ExpeditionBattleFlow.handle_battle_finished(summary)
+		_schedule_expedition_auto_result_close()
 		return
 	GameState.apply_battle_player_runtime(summary)
+
+
+func _schedule_expedition_auto_result_close() -> void:
+	if not _ctx.auto_battle_player:
+		return
+	var wait := maxf(0.1, float(
+		ExpeditionRulesServiceScript.rules().get("auto_event_advance_seconds", 1.0)
+	))
+	get_tree().create_timer(wait).timeout.connect(
+		_on_battle_result_close_requested,
+		CONNECT_ONE_SHOT
+	)

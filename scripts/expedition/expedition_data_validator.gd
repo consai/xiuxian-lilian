@@ -17,6 +17,7 @@ static func collect_errors(game_state: Node = null) -> PackedStringArray:
 			errors.append("地点 %s 的 max_difficulty 小于 min_difficulty" % location_id)
 		var common_ids := location.get("common_event_pool", []) as Array
 		var map_ids := location.get("map_event_pool", location.get("event_pool", [])) as Array
+		errors.append_array(_validate_location_expedition_mode(location, location_id, common_ids, map_ids))
 		for template_id_v in common_ids:
 			var template_id := str(template_id_v)
 			var common_event := ExpeditionEventServiceScript.event_pool_for_location(location).filter(
@@ -43,6 +44,7 @@ static func collect_errors(game_state: Node = null) -> PackedStringArray:
 			if ExpeditionEventServiceScript.is_decision_event(event):
 				errors.append_array(_validate_decision_event(event, event_id))
 			elif ExpeditionRulesServiceScript.is_battle_type(str(event.get("type", ""))):
+				errors.append_array(_validate_v1_enemy_attrs(event, event_id))
 				var init := _build_sample_battle_init(event, game_state)
 				for msg in BattleInitData.collect_errors(init):
 					errors.append("事件 %s: %s" % [event_id, msg])
@@ -58,6 +60,37 @@ static func collect_errors(game_state: Node = null) -> PackedStringArray:
 	return errors
 
 
+static func _validate_location_expedition_mode(
+		location: Dictionary,
+		location_id: String,
+		common_ids: Array,
+		map_ids: Array
+) -> PackedStringArray:
+	var errors: PackedStringArray = []
+	var mode := str(location.get("expedition_mode", "")).strip_edges()
+	if mode not in ["resource", "story"]:
+		errors.append("地点 %s 缺少有效 expedition_mode" % location_id)
+		return errors
+	if mode == "resource":
+		if common_ids.is_empty():
+			errors.append("材料历练地点 %s 必须配置 common_event_pool" % location_id)
+		if not map_ids.is_empty():
+			errors.append("材料历练地点 %s 不能配置 map_event_pool" % location_id)
+		var generation := location.get("common_event_generation", {}) as Dictionary
+		if generation.is_empty():
+			errors.append("材料历练地点 %s 缺少 common_event_generation" % location_id)
+		else:
+			for key in ["duration_days", "reward_pools", "enemy_pools"]:
+				if (generation.get(key, {}) as Dictionary).is_empty():
+					errors.append("材料历练地点 %s 的 common_event_generation 缺少 %s" % [location_id, key])
+	elif mode == "story":
+		if not common_ids.is_empty():
+			errors.append("剧情历练地点 %s 不能配置 common_event_pool" % location_id)
+		if map_ids.is_empty():
+			errors.append("剧情历练地点 %s 必须配置 map_event_pool" % location_id)
+	return errors
+
+
 static func _validate_generated_common_event(event: Dictionary, location_id: String, game_state: Node) -> PackedStringArray:
 	var errors: PackedStringArray = []
 	var event_id := str(event.get("id", ""))
@@ -68,11 +101,31 @@ static func _validate_generated_common_event(event: Dictionary, location_id: Str
 	if str(event.get("enemy_pool", "")).strip_edges() != "" and (event.get("enemy", {}) as Dictionary).is_empty():
 		errors.append("地点 %s 的公共事件 %s 未生成敌人池" % [location_id, event_id])
 	if ExpeditionRulesServiceScript.is_battle_type(str(event.get("type", ""))):
+		errors.append_array(_validate_v1_enemy_attrs(event, event_id))
 		for msg in BattleInitData.collect_errors(_build_sample_battle_init(event, game_state)):
 			errors.append("公共事件 %s: %s" % [event_id, msg])
+	if ExpeditionEventServiceScript.is_decision_event(event):
+		errors.append_array(_validate_decision_event(event, event_id))
 	for reward_v in event.get("rewards", []) as Array:
 		if reward_v is Dictionary:
 			errors.append_array(_validate_reward(reward_v as Dictionary, "公共事件 %s" % event_id))
+	return errors
+
+
+static func _validate_v1_enemy_attrs(event: Dictionary, event_id: String) -> PackedStringArray:
+	var errors: PackedStringArray = []
+	var enemy := event.get("enemy", {}) as Dictionary
+	var attrs := enemy.get("attrs", {}) as Dictionary
+	if enemy.is_empty() or attrs.is_empty():
+		return errors
+	for key in [
+		FightAttr.PHYSICAL_ATK, FightAttr.MAGIC_ATK,
+		FightAttr.PHYSICAL_DEF, FightAttr.MAGIC_DEF,
+		FightAttr.ACCURACY, FightAttr.EVASION,
+		FightAttr.CONTROL_POWER, FightAttr.CONTROL_RESIST,
+	]:
+		if not attrs.has(key):
+			errors.append("事件 %s 的敌人缺少首版属性 %s" % [event_id, key])
 	return errors
 
 
@@ -95,8 +148,10 @@ static func _build_sample_battle_init(event: Dictionary, game_state: Node) -> Di
 			"attrs": FightAttr.from_stat_block({
 				FightAttr.HP_MAX: 100.0,
 				FightAttr.MP_MAX: 100.0,
-				FightAttr.ATK: 100.0,
-				FightAttr.DEF: 100.0,
+				FightAttr.PHYSICAL_ATK: 100.0,
+				FightAttr.MAGIC_ATK: 100.0,
+				FightAttr.PHYSICAL_DEF: 100.0,
+				FightAttr.MAGIC_DEF: 100.0,
 				FightAttr.SPD: 100.0,
 			}),
 			"skills": [{"id": 0, "cd": 0.0}, {"id": -1, "cd": 0.0}, {"id": -1, "cd": 0.0}, {"id": -1, "cd": 0.0}, {"id": -1, "cd": 0.0}],
@@ -106,6 +161,7 @@ static func _build_sample_battle_init(event: Dictionary, game_state: Node) -> Di
 	return {
 		"player": player,
 		"enemy": ExpeditionEventServiceScript.build_battle_enemy(event),
+		"enemies": ExpeditionEventServiceScript.build_battle_enemies(event),
 		"battle_time_limit": 200.0,
 	}
 

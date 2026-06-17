@@ -4,6 +4,9 @@
 [ext_resource type="Script" uid="uid://drjuyybf1c53a" path="res://scenes/items/bag_base.gd" id="2_1muc5"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="3_1muc5"]
 [ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="3_xubt2"]
+[ext_resource type="Script" path="res://scripts/ui/components/long_press_scroll_container.gd" id="4_lpsc"]
+[ext_resource type="Texture2D" uid="uid://c3f3nny73kvhg" path="res://assets/art/ui_new/btn_lv.png" id="6_bw8nj"]
+[ext_resource type="LabelSettings" uid="uid://dg7uds3ec0xtu" path="res://ui/ziti_new/22.tres" id="7_21ql5"]
 
 [node name="BagBase" type="Control" unique_id=54537540]
 custom_minimum_size = Vector2(420, 580)
@@ -47,45 +50,16 @@ anchor_right = 1.0
 offset_left = 45.0
 offset_top = 80.0
 offset_right = -40.0
-offset_bottom = 116.0
+offset_bottom = 128.0
 grow_horizontal = 2
 theme_override_constants/separation = 8
 
-[node name="BagTabAll" type="Button" parent="Tabs" unique_id=85638745]
+[node name="FilterOption" type="OptionButton" parent="Tabs" unique_id=85638745]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"TabActive"
-text = "全部"
-script = ExtResource("3_xubt2")
-
-[node name="BagTabMaterial" type="Button" parent="Tabs" unique_id=1175076478]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"TabIdle"
-text = "材料"
-script = ExtResource("3_xubt2")
-
-[node name="BagTabPill" type="Button" parent="Tabs" unique_id=633330071]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"TabIdle"
-text = "丹药"
-script = ExtResource("3_xubt2")
-
-[node name="BagTabEquip" type="Button" parent="Tabs" unique_id=572937593]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 36)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"TabIdle"
-text = "法宝"
-script = ExtResource("3_xubt2")
+theme_override_font_sizes/font_size = 20
 
 [node name="Scroll" type="ScrollContainer" parent="." unique_id=1373702494]
 unique_name_in_owner = true
@@ -104,6 +78,7 @@ grow_vertical = 2
 size_flags_vertical = 3
 theme = ExtResource("1_theme")
 horizontal_scroll_mode = 0
+script = ExtResource("4_lpsc")
 
 [node name="BagContent" type="Control" parent="Scroll" unique_id=1373702495]
 unique_name_in_owner = true
@@ -118,7 +93,7 @@ theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 columns = 5
 
-[node name="BagSort" type="Button" parent="." unique_id=249945284]
+[node name="BagSort" type="TextureButton" parent="." unique_id=565399566]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 1
@@ -135,5 +110,19 @@ grow_horizontal = 0
 grow_vertical = 0
 size_flags_horizontal = 3
 theme_type_variation = &"TabActive"
-text = "整理"
+texture_normal = ExtResource("6_bw8nj")
+ignore_texture_size = true
+stretch_mode = 0
 script = ExtResource("3_xubt2")
+
+[node name="Label" type="Label" parent="BagSort" unique_id=768634335]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "整理"
+label_settings = ExtResource("7_21ql5")
+horizontal_alignment = 1
+vertical_alignment = 1

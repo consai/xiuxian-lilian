@@ -12,12 +12,17 @@ var scene: Control
 var domain: BattleDomainService
 var battle_player: FightObj
 var battle_enemy: FightObj
+var battle_enemies: Array = []
+var battle_enemy_rows: Array = []
+var battle_player_row: Dictionary = {}
+var enemy_formation: Dictionary = {}
 
 var skill_cfg: Dictionary = {}
 var item_cfg: Dictionary = {}
 var equip_cfg: Dictionary = {}
 var enemy_ai_cfg: Dictionary = {}
 var enemy_ai_runtime: EnemyAiRuntimeState
+var enemy_ai_runtimes: Array = []
 var player_ai_cfg: Dictionary = {}
 var player_ai_runtime: EnemyAiRuntimeState
 

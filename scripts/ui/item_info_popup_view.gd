@@ -2,6 +2,7 @@ class_name ItemInfoPopupView
 extends Control
 
 signal close_requested
+signal use_requested
 
 const _TITLE_COLOR_DEFAULT := Color(0.33333334, 0.19607843, 0.18431373, 1.0)
 const _BODY_COLOR := Color(0.4117647, 0.3019608, 0.27450982, 1.0)
@@ -14,6 +15,8 @@ const _FOOTER_COLOR := Color(0.5372549, 0.42745098, 0.3882353, 1.0)
 @onready var _desc_label: Label = %DescLabel
 @onready var _detail_label: Label = %DetailLabel
 @onready var _footer_label: Label = %FooterLabel
+@onready var _use_button: TextureButton = %UseButton
+@onready var _use_button_label: Label = %UseButton.get_node("Label") as Label
 @onready var _close_button: TextureButton = %CloseButton
 
 
@@ -22,6 +25,7 @@ func _ready() -> void:
 	_item_preview.show_name_label = false
 	_item_preview.set_click_enabled(false)
 	_item_preview.show_info_on_click = false
+	_use_button.pressed.connect(_on_use_pressed)
 	_close_button.pressed.connect(_request_close)
 	_backdrop.gui_input.connect(_on_backdrop_gui_input)
 
@@ -55,10 +59,21 @@ func apply_payload(payload: Dictionary) -> void:
 	_footer_label.text = footer
 	_footer_label.visible = footer != ""
 
+	var can_use := bool(payload.get("can_use", false))
+	var use_label := str(payload.get("use_label", "")).strip_edges()
+	var action_row := _use_button.get_parent() as Control
+	if action_row != null:
+		action_row.visible = can_use
+	_use_button.disabled = not can_use
+	if use_label != "":
+		_use_button_label.text = use_label
+
 	var icon_v: Variant = payload.get("icon", null)
 	var icon := icon_v as Texture2D if icon_v is Texture2D else null
 	var quality := str(payload.get("quality", "")).strip_edges()
-	_item_preview.apply_display(icon, title, 0, Color.WHITE, quality)
+	var learn_blocked := bool(payload.get("learn_blocked", false))
+	var count := maxi(0, int(payload.get("count", 0)))
+	_item_preview.apply_display(icon, title, count, Color.WHITE, quality, learn_blocked)
 
 
 func _on_backdrop_gui_input(event: InputEvent) -> void:
@@ -68,6 +83,10 @@ func _on_backdrop_gui_input(event: InputEvent) -> void:
 		var mb := event as InputEventMouseButton
 		if mb.button_index == MOUSE_BUTTON_LEFT and mb.pressed:
 			_request_close()
+
+
+func _on_use_pressed() -> void:
+	use_requested.emit()
 
 
 func _request_close() -> void:

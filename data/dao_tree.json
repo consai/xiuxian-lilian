@@ -1,0 +1,3175 @@
+{
+  "schemaVersion": 1,
+  "configId": "dao_tree",
+  "metadata": {
+    "name": "大道知识树",
+    "description": "仿 EVE 式长期训练系统，覆盖练气至渡劫",
+    "skillCount": 132
+  },
+  "training": {
+    "maxLevel": 5,
+    "basePoints": 250,
+    "levelMultipliers": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "speedFormula": "primary + secondary / 2",
+    "pointsFormula": "basePoints * rank * levelMultipliers[level - 1]"
+  },
+  "attributes": {
+    "comprehension": "悟性",
+    "sense": "神识",
+    "body": "根骨",
+    "will": "心性",
+    "fortune": "福缘"
+  },
+  "realms": [
+    {
+      "id": "qi",
+      "name": "练气",
+      "order": 1,
+      "gate": 0
+    },
+    {
+      "id": "foundation",
+      "name": "筑基",
+      "order": 2,
+      "gate": 20
+    },
+    {
+      "id": "core",
+      "name": "金丹",
+      "order": 3,
+      "gate": 60
+    },
+    {
+      "id": "nascent",
+      "name": "元婴",
+      "order": 4,
+      "gate": 130
+    },
+    {
+      "id": "transform",
+      "name": "化神",
+      "order": 5,
+      "gate": 240
+    },
+    {
+      "id": "void",
+      "name": "炼虚",
+      "order": 6,
+      "gate": 400
+    },
+    {
+      "id": "merge",
+      "name": "合体",
+      "order": 7,
+      "gate": 620
+    },
+    {
+      "id": "great",
+      "name": "大乘",
+      "order": 8,
+      "gate": 900
+    },
+    {
+      "id": "tribulation",
+      "name": "渡劫",
+      "order": 9,
+      "gate": 1250
+    }
+  ],
+  "domains": [
+    {
+      "id": "foundation",
+      "name": "修真通识",
+      "description": "生存、境界与一切大道的公共根基",
+      "primary": "comprehension",
+      "secondary": "will"
+    },
+    {
+      "id": "cultivation",
+      "name": "功法周天",
+      "description": "纳气、真元、道基与法力循环",
+      "primary": "comprehension",
+      "secondary": "body"
+    },
+    {
+      "id": "body",
+      "name": "炼体血脉",
+      "description": "肉身、恢复、血脉与近战承载",
+      "primary": "body",
+      "secondary": "will"
+    },
+    {
+      "id": "spirit",
+      "name": "神魂心境",
+      "description": "神识、心防、分神与元神",
+      "primary": "sense",
+      "secondary": "will"
+    },
+    {
+      "id": "spell",
+      "name": "术法五行",
+      "description": "元素、遁法、领域与规则术式",
+      "primary": "comprehension",
+      "secondary": "sense"
+    },
+    {
+      "id": "sword",
+      "name": "兵道剑道",
+      "description": "武器操控、剑意、剑域与杀伐",
+      "primary": "body",
+      "secondary": "comprehension"
+    },
+    {
+      "id": "artifact",
+      "name": "炼器机关",
+      "description": "法器、傀儡、飞舟与本命重器",
+      "primary": "comprehension",
+      "secondary": "sense"
+    },
+    {
+      "id": "alchemy",
+      "name": "丹道医理",
+      "description": "灵植、丹药、医治、毒理与药性",
+      "primary": "comprehension",
+      "secondary": "fortune"
+    },
+    {
+      "id": "formation",
+      "name": "阵法禁制",
+      "description": "阵纹、洞府、防御、传送与空间阵",
+      "primary": "sense",
+      "secondary": "comprehension"
+    },
+    {
+      "id": "talisman",
+      "name": "符箓咒法",
+      "description": "符纸、咒文、封印与因果敕令",
+      "primary": "sense",
+      "secondary": "will"
+    },
+    {
+      "id": "world",
+      "name": "天地百艺",
+      "description": "采集、鉴定、贸易、御兽与探索",
+      "primary": "fortune",
+      "secondary": "comprehension"
+    },
+    {
+      "id": "heaven",
+      "name": "天道劫数",
+      "description": "气运、因果、法则、劫雷与飞升",
+      "primary": "will",
+      "secondary": "fortune"
+    }
+  ],
+  "domainGroups": [
+    {
+      "id": "cultivation_root",
+      "name": "修行根本",
+      "domains": [
+        "foundation",
+        "cultivation",
+        "body"
+      ]
+    },
+    {
+      "id": "mind_combat",
+      "name": "神魂斗法",
+      "domains": [
+        "spirit",
+        "spell",
+        "sword"
+      ]
+    },
+    {
+      "id": "craft_arts",
+      "name": "百工四艺",
+      "domains": [
+        "artifact",
+        "alchemy",
+        "formation",
+        "talisman"
+      ]
+    },
+    {
+      "id": "world_heaven",
+      "name": "天地劫运",
+      "domains": [
+        "world",
+        "heaven"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "id": "foundation.breathing",
+      "name": "吐纳入门",
+      "domain": "foundation",
+      "realm": "qi",
+      "rank": 1,
+      "maxLevel": 5,
+      "prereqs": [],
+      "description": "感知灵气并完成最基础的吐纳。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive",
+        "breakthrough"
+      ]
+    },
+    {
+      "id": "foundation.meridians",
+      "name": "经脉辨识",
+      "domain": "foundation",
+      "realm": "qi",
+      "rank": 1,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.breathing",
+          "level": 2
+        }
+      ],
+      "description": "识别经络、穴窍与灵力损伤。",
+      "usageDomains": [
+        "general_passive",
+        "breakthrough"
+      ]
+    },
+    {
+      "id": "foundation.control",
+      "name": "灵力操控",
+      "domain": "foundation",
+      "realm": "qi",
+      "rank": 2,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.breathing",
+          "level": 3
+        }
+      ],
+      "description": "提高施法、炼制与御物的稳定度。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability",
+        "breakthrough"
+      ]
+    },
+    {
+      "id": "foundation.literacy",
+      "name": "修真博闻",
+      "domain": "foundation",
+      "realm": "qi",
+      "rank": 1,
+      "maxLevel": 5,
+      "prereqs": [],
+      "description": "识别常见灵材、术语、势力和风险。",
+      "usageDomains": [
+        "general_passive",
+        "breakthrough"
+      ]
+    },
+    {
+      "id": "foundation.dao_base",
+      "name": "道基构筑",
+      "domain": "foundation",
+      "realm": "foundation",
+      "rank": 3,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.meridians",
+          "level": 4
+        },
+        {
+          "id": "foundation.control",
+          "level": 4
+        }
+      ],
+      "description": "将散乱修为固化为可持续成长的道基。",
+      "usageDomains": [
+        "cultivation_method",
+        "breakthrough"
+      ]
+    },
+    {
+      "id": "foundation.core_theory",
+      "name": "结丹总纲",
+      "domain": "foundation",
+      "realm": "core",
+      "rank": 5,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.dao_base",
+          "level": 4
+        },
+        {
+          "id": "spirit.inner_demon",
+          "level": 2
+        }
+      ],
+      "description": "平衡精气神并凝聚金丹。",
+      "usageDomains": [
+        "cultivation_method",
+        "breakthrough"
+      ]
+    },
+    {
+      "id": "foundation.nascent_theory",
+      "name": "元婴道解",
+      "domain": "foundation",
+      "realm": "nascent",
+      "rank": 7,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.core_theory",
+          "level": 4
+        },
+        {
+          "id": "spirit.soul",
+          "level": 3
+        }
+      ],
+      "description": "令金丹孕化为第二生命核心。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability",
+        "breakthrough"
+      ]
+    },
+    {
+      "id": "foundation.spirit_theory",
+      "name": "化神真解",
+      "domain": "foundation",
+      "realm": "transform",
+      "rank": 9,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.nascent_theory",
+          "level": 4
+        },
+        {
+          "id": "spirit.split",
+          "level": 4
+        }
+      ],
+      "description": "让元神与天地法理发生共鸣。",
+      "usageDomains": [
+        "cultivation_method",
+        "breakthrough"
+      ]
+    },
+    {
+      "id": "foundation.void_theory",
+      "name": "炼虚玄章",
+      "domain": "foundation",
+      "realm": "void",
+      "rank": 12,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.spirit_theory",
+          "level": 4
+        },
+        {
+          "id": "formation.teleport",
+          "level": 4
+        }
+      ],
+      "description": "理解虚实转换与空间存续。",
+      "usageDomains": [
+        "cultivation_method",
+        "breakthrough"
+      ]
+    },
+    {
+      "id": "foundation.integration_theory",
+      "name": "合体道典",
+      "domain": "foundation",
+      "realm": "merge",
+      "rank": 16,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.void_theory",
+          "level": 4
+        },
+        {
+          "id": "body.unity",
+          "level": 3
+        }
+      ],
+      "description": "统合肉身、元神、法相与洞天。",
+      "usageDomains": [
+        "cultivation_method",
+        "breakthrough"
+      ]
+    },
+    {
+      "id": "foundation.mahayana_theory",
+      "name": "大乘道果",
+      "domain": "foundation",
+      "realm": "great",
+      "rank": 22,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.integration_theory",
+          "level": 4
+        },
+        {
+          "id": "heaven.law_seed",
+          "level": 3
+        }
+      ],
+      "description": "将所修大道凝为完整道果。",
+      "usageDomains": [
+        "cultivation_method",
+        "breakthrough"
+      ]
+    },
+    {
+      "id": "foundation.ascension",
+      "name": "飞升总纲",
+      "domain": "foundation",
+      "realm": "tribulation",
+      "rank": 32,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.mahayana_theory",
+          "level": 5
+        },
+        {
+          "id": "heaven.tribulation",
+          "level": 4
+        }
+      ],
+      "description": "准备渡过天劫并完成生命层次跃迁。",
+      "usageDomains": [
+        "cultivation_method",
+        "breakthrough"
+      ]
+    },
+    {
+      "id": "cultivation.qi_sense",
+      "name": "引气术",
+      "domain": "cultivation",
+      "realm": "qi",
+      "rank": 1,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.breathing",
+          "level": 1
+        }
+      ],
+      "description": "提升灵气吸收效率。",
+      "usageDomains": [
+        "general_passive"
+      ]
+    },
+    {
+      "id": "cultivation.cycle",
+      "name": "小周天",
+      "domain": "cultivation",
+      "realm": "qi",
+      "rank": 2,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "cultivation.qi_sense",
+          "level": 3
+        },
+        {
+          "id": "foundation.meridians",
+          "level": 2
+        }
+      ],
+      "description": "建立稳定灵力循环。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "cultivation.purity",
+      "name": "真气纯化",
+      "domain": "cultivation",
+      "realm": "qi",
+      "rank": 2,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "cultivation.cycle",
+          "level": 3
+        }
+      ],
+      "description": "减少杂质与功法冲突。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "cultivation.great_cycle",
+      "name": "大周天",
+      "domain": "cultivation",
+      "realm": "foundation",
+      "rank": 4,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "cultivation.cycle",
+          "level": 5
+        },
+        {
+          "id": "foundation.dao_base",
+          "level": 2
+        }
+      ],
+      "description": "贯通主要经脉并扩大储量。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "cultivation.liquid_mana",
+      "name": "真元化液",
+      "domain": "cultivation",
+      "realm": "foundation",
+      "rank": 4,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "cultivation.purity",
+          "level": 4
+        },
+        {
+          "id": "cultivation.great_cycle",
+          "level": 3
+        }
+      ],
+      "description": "将灵力压缩为高密度真元。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "cultivation.core_fire",
+      "name": "丹火自生",
+      "domain": "cultivation",
+      "realm": "core",
+      "rank": 6,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "cultivation.liquid_mana",
+          "level": 5
+        },
+        {
+          "id": "foundation.core_theory",
+          "level": 2
+        }
+      ],
+      "description": "驱动金丹并供给炼制与战斗。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "cultivation.nascent_cycle",
+      "name": "婴息周天",
+      "domain": "cultivation",
+      "realm": "nascent",
+      "rank": 8,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "cultivation.core_fire",
+          "level": 4
+        },
+        {
+          "id": "foundation.nascent_theory",
+          "level": 2
+        }
+      ],
+      "description": "让元婴独立吐纳并维持本体。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "cultivation.heaven_cycle",
+      "name": "天地周天",
+      "domain": "cultivation",
+      "realm": "transform",
+      "rank": 10,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "cultivation.nascent_cycle",
+          "level": 4
+        },
+        {
+          "id": "spell.resonance",
+          "level": 3
+        }
+      ],
+      "description": "借天地灵机替代部分自身消耗。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "cultivation.void_furnace",
+      "name": "虚空烘炉",
+      "domain": "cultivation",
+      "realm": "void",
+      "rank": 14,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "cultivation.heaven_cycle",
+          "level": 4
+        },
+        {
+          "id": "foundation.void_theory",
+          "level": 2
+        }
+      ],
+      "description": "从虚空乱流中提炼可用力量。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "cultivation.endless",
+      "name": "法力无涯",
+      "domain": "cultivation",
+      "realm": "merge",
+      "rank": 18,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "cultivation.void_furnace",
+          "level": 4
+        },
+        {
+          "id": "foundation.integration_theory",
+          "level": 3
+        }
+      ],
+      "description": "形成近乎闭合的法力生态。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "cultivation.dao_engine",
+      "name": "道果运转",
+      "domain": "cultivation",
+      "realm": "great",
+      "rank": 24,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "cultivation.endless",
+          "level": 5
+        },
+        {
+          "id": "foundation.mahayana_theory",
+          "level": 3
+        }
+      ],
+      "description": "以道果驱动全部功法。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "cultivation.immortal_qi",
+      "name": "仙灵转化",
+      "domain": "cultivation",
+      "realm": "tribulation",
+      "rank": 36,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "cultivation.dao_engine",
+          "level": 5
+        },
+        {
+          "id": "foundation.ascension",
+          "level": 2
+        }
+      ],
+      "description": "承载并转化劫后仙灵之气。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "body.tempering",
+      "name": "皮肉锻炼",
+      "domain": "body",
+      "realm": "qi",
+      "rank": 1,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.breathing",
+          "level": 1
+        }
+      ],
+      "description": "提升基础体魄与负重。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "body.bone",
+      "name": "锻骨易筋",
+      "domain": "body",
+      "realm": "qi",
+      "rank": 2,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "body.tempering",
+          "level": 3
+        },
+        {
+          "id": "foundation.meridians",
+          "level": 2
+        }
+      ],
+      "description": "强化骨骼、筋膜和爆发力。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "body.recovery",
+      "name": "气血搬运",
+      "domain": "body",
+      "realm": "qi",
+      "rank": 2,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "body.tempering",
+          "level": 2
+        },
+        {
+          "id": "cultivation.cycle",
+          "level": 2
+        }
+      ],
+      "description": "加速伤势与疲劳恢复。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "body.jade",
+      "name": "玉骨灵身",
+      "domain": "body",
+      "realm": "foundation",
+      "rank": 4,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "body.bone",
+          "level": 4
+        },
+        {
+          "id": "foundation.dao_base",
+          "level": 2
+        }
+      ],
+      "description": "让肉身具备抗灵力侵蚀能力。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "body.bloodline",
+      "name": "血脉觉醒",
+      "domain": "body",
+      "realm": "core",
+      "rank": 6,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "body.jade",
+          "level": 4
+        },
+        {
+          "id": "alchemy.blood",
+          "level": 2
+        }
+      ],
+      "description": "激活、辨识并驾驭血脉特性。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "body.regeneration",
+      "name": "滴血重生",
+      "domain": "body",
+      "realm": "nascent",
+      "rank": 9,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "body.bloodline",
+          "level": 4
+        },
+        {
+          "id": "body.recovery",
+          "level": 5
+        }
+      ],
+      "description": "从重创中高速再生。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "body.dharma_form",
+      "name": "法相真身",
+      "domain": "body",
+      "realm": "transform",
+      "rank": 11,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "body.regeneration",
+          "level": 3
+        },
+        {
+          "id": "foundation.spirit_theory",
+          "level": 2
+        }
+      ],
+      "description": "以神魂法理放大肉身。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "body.void_body",
+      "name": "虚空法体",
+      "domain": "body",
+      "realm": "void",
+      "rank": 15,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "body.dharma_form",
+          "level": 4
+        },
+        {
+          "id": "foundation.void_theory",
+          "level": 2
+        }
+      ],
+      "description": "抵御空间乱流和虚实撕裂。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive"
+      ]
+    },
+    {
+      "id": "body.unity",
+      "name": "精气神合一",
+      "domain": "body",
+      "realm": "merge",
+      "rank": 19,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "body.void_body",
+          "level": 4
+        },
+        {
+          "id": "spirit.primordial",
+          "level": 4
+        }
+      ],
+      "description": "消除肉身、法力与元神间的损耗。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "body.indestructible",
+      "name": "不灭道身",
+      "domain": "body",
+      "realm": "great",
+      "rank": 26,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "body.unity",
+          "level": 5
+        },
+        {
+          "id": "foundation.mahayana_theory",
+          "level": 3
+        }
+      ],
+      "description": "以道果维系肉身不灭性。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "body.tribulation_body",
+      "name": "劫体",
+      "domain": "body",
+      "realm": "tribulation",
+      "rank": 38,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "body.indestructible",
+          "level": 5
+        },
+        {
+          "id": "heaven.thunder_body",
+          "level": 4
+        }
+      ],
+      "description": "利用劫雷完成最终淬体。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spirit.meditation",
+      "name": "入定",
+      "domain": "spirit",
+      "realm": "qi",
+      "rank": 1,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.breathing",
+          "level": 1
+        }
+      ],
+      "description": "提高专注、恢复与抗干扰能力。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "spirit.sense",
+      "name": "神识初生",
+      "domain": "spirit",
+      "realm": "qi",
+      "rank": 2,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spirit.meditation",
+          "level": 3
+        },
+        {
+          "id": "foundation.control",
+          "level": 2
+        }
+      ],
+      "description": "在感官外探查与操控。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spirit.inner_demon",
+      "name": "心魔辨识",
+      "domain": "spirit",
+      "realm": "foundation",
+      "rank": 3,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spirit.meditation",
+          "level": 4
+        },
+        {
+          "id": "foundation.dao_base",
+          "level": 2
+        }
+      ],
+      "description": "识别执念、幻境与精神污染。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spirit.soul",
+      "name": "魂魄固化",
+      "domain": "spirit",
+      "realm": "core",
+      "rank": 6,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spirit.sense",
+          "level": 5
+        },
+        {
+          "id": "spirit.inner_demon",
+          "level": 3
+        }
+      ],
+      "description": "抵御搜魂、夺舍和魂伤。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spirit.split",
+      "name": "分神化念",
+      "domain": "spirit",
+      "realm": "nascent",
+      "rank": 8,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spirit.soul",
+          "level": 4
+        },
+        {
+          "id": "foundation.nascent_theory",
+          "level": 2
+        }
+      ],
+      "description": "并行操控法器、术法或化身。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spirit.primordial",
+      "name": "元神出窍",
+      "domain": "spirit",
+      "realm": "transform",
+      "rank": 11,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spirit.split",
+          "level": 4
+        },
+        {
+          "id": "foundation.spirit_theory",
+          "level": 2
+        }
+      ],
+      "description": "令元神脱离肉身独立行动。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spirit.dream",
+      "name": "梦界行走",
+      "domain": "spirit",
+      "realm": "transform",
+      "rank": 10,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spirit.inner_demon",
+          "level": 5
+        },
+        {
+          "id": "spirit.primordial",
+          "level": 2
+        }
+      ],
+      "description": "进入、塑造并防御梦境。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spirit.void_thought",
+      "name": "一念生灭",
+      "domain": "spirit",
+      "realm": "void",
+      "rank": 15,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spirit.primordial",
+          "level": 4
+        },
+        {
+          "id": "foundation.void_theory",
+          "level": 2
+        }
+      ],
+      "description": "让神念跨越虚实并高速演算。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spirit.myriad",
+      "name": "万念归一",
+      "domain": "spirit",
+      "realm": "merge",
+      "rank": 20,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spirit.void_thought",
+          "level": 4
+        },
+        {
+          "id": "body.unity",
+          "level": 3
+        }
+      ],
+      "description": "统一分神、化身与本我。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "spirit.dao_heart",
+      "name": "不坏道心",
+      "domain": "spirit",
+      "realm": "great",
+      "rank": 27,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spirit.myriad",
+          "level": 5
+        },
+        {
+          "id": "heaven.causality",
+          "level": 3
+        }
+      ],
+      "description": "在大道冲击与因果反噬中保持自我。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spirit.tribulation_mind",
+      "name": "心劫超脱",
+      "domain": "spirit",
+      "realm": "tribulation",
+      "rank": 40,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spirit.dao_heart",
+          "level": 5
+        },
+        {
+          "id": "heaven.tribulation",
+          "level": 4
+        }
+      ],
+      "description": "主动面对并渡过最终心劫。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "spell.elements",
+      "name": "五行辨性",
+      "domain": "spell",
+      "realm": "qi",
+      "rank": 1,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.control",
+          "level": 2
+        }
+      ],
+      "description": "理解五行生克与灵根适性。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spell.projectile",
+      "name": "御气成术",
+      "domain": "spell",
+      "realm": "qi",
+      "rank": 2,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spell.elements",
+          "level": 2
+        },
+        {
+          "id": "foundation.control",
+          "level": 3
+        }
+      ],
+      "description": "施展稳定的远程基础术法。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spell.escape",
+      "name": "轻身遁术",
+      "domain": "spell",
+      "realm": "qi",
+      "rank": 2,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "cultivation.cycle",
+          "level": 3
+        }
+      ],
+      "description": "以灵力强化移动与脱离。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spell.five_phase",
+      "name": "五行术典",
+      "domain": "spell",
+      "realm": "foundation",
+      "rank": 4,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spell.elements",
+          "level": 4
+        },
+        {
+          "id": "foundation.dao_base",
+          "level": 2
+        }
+      ],
+      "description": "组合并转换五行术法。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spell.thunder",
+      "name": "雷法",
+      "domain": "spell",
+      "realm": "core",
+      "rank": 7,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spell.five_phase",
+          "level": 4
+        },
+        {
+          "id": "cultivation.core_fire",
+          "level": 2
+        }
+      ],
+      "description": "驾驭高爆发且克邪的雷霆。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spell.resonance",
+      "name": "天地共鸣",
+      "domain": "spell",
+      "realm": "nascent",
+      "rank": 9,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spell.five_phase",
+          "level": 5
+        },
+        {
+          "id": "foundation.nascent_theory",
+          "level": 2
+        }
+      ],
+      "description": "借环境放大或改变术法。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "spell.domain",
+      "name": "术法领域",
+      "domain": "spell",
+      "realm": "transform",
+      "rank": 12,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spell.resonance",
+          "level": 4
+        },
+        {
+          "id": "foundation.spirit_theory",
+          "level": 3
+        }
+      ],
+      "description": "持续改写一定范围内的术法规则。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spell.void",
+      "name": "虚空术",
+      "domain": "spell",
+      "realm": "void",
+      "rank": 16,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spell.domain",
+          "level": 4
+        },
+        {
+          "id": "formation.space",
+          "level": 3
+        }
+      ],
+      "description": "切割空间、放逐或跨越阻隔。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spell.law",
+      "name": "言出法随",
+      "domain": "spell",
+      "realm": "merge",
+      "rank": 21,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spell.void",
+          "level": 4
+        },
+        {
+          "id": "talisman.true_name",
+          "level": 3
+        }
+      ],
+      "description": "以自身法则短暂覆盖现实。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spell.world",
+      "name": "掌中天地",
+      "domain": "spell",
+      "realm": "great",
+      "rank": 29,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spell.law",
+          "level": 5
+        },
+        {
+          "id": "formation.cave_heaven",
+          "level": 4
+        }
+      ],
+      "description": "展开自有小天地压制敌手。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "spell.cataclysm",
+      "name": "劫灭神通",
+      "domain": "spell",
+      "realm": "tribulation",
+      "rank": 42,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spell.world",
+          "level": 5
+        },
+        {
+          "id": "heaven.tribulation",
+          "level": 4
+        }
+      ],
+      "description": "将劫数引入攻击性神通。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "sword.weapon",
+      "name": "百兵基础",
+      "domain": "sword",
+      "realm": "qi",
+      "rank": 1,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "body.tempering",
+          "level": 1
+        }
+      ],
+      "description": "掌握武器姿态、距离与发力。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "sword.qi",
+      "name": "御剑与剑气",
+      "domain": "sword",
+      "realm": "qi",
+      "rank": 3,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "sword.weapon",
+          "level": 3
+        },
+        {
+          "id": "foundation.control",
+          "level": 3
+        }
+      ],
+      "description": "远程御器并释放剑气。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "sword.intent",
+      "name": "兵意萌芽",
+      "domain": "sword",
+      "realm": "foundation",
+      "rank": 4,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "sword.weapon",
+          "level": 5
+        },
+        {
+          "id": "spirit.meditation",
+          "level": 3
+        }
+      ],
+      "description": "形成个人战斗意志。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "sword.formation",
+      "name": "剑阵操控",
+      "domain": "sword",
+      "realm": "core",
+      "rank": 7,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "sword.qi",
+          "level": 4
+        },
+        {
+          "id": "formation.array",
+          "level": 2
+        }
+      ],
+      "description": "同时控制多柄飞剑构阵。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "sword.heart",
+      "name": "剑心通明",
+      "domain": "sword",
+      "realm": "nascent",
+      "rank": 9,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "sword.intent",
+          "level": 5
+        },
+        {
+          "id": "spirit.soul",
+          "level": 3
+        }
+      ],
+      "description": "减少招式迟疑并看破破绽。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "sword.domain",
+      "name": "剑域",
+      "domain": "sword",
+      "realm": "transform",
+      "rank": 12,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "sword.heart",
+          "level": 4
+        },
+        {
+          "id": "foundation.spirit_theory",
+          "level": 2
+        }
+      ],
+      "description": "以兵意控制战场空间。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "sword.void_cut",
+      "name": "斩虚",
+      "domain": "sword",
+      "realm": "void",
+      "rank": 16,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "sword.domain",
+          "level": 4
+        },
+        {
+          "id": "spell.void",
+          "level": 2
+        }
+      ],
+      "description": "攻击空间结构与无形目标。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "sword.unity",
+      "name": "人兵合一",
+      "domain": "sword",
+      "realm": "merge",
+      "rank": 21,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "sword.void_cut",
+          "level": 4
+        },
+        {
+          "id": "artifact.life_bound",
+          "level": 3
+        }
+      ],
+      "description": "让本命兵器成为自身延伸。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "sword.dao",
+      "name": "一剑成道",
+      "domain": "sword",
+      "realm": "great",
+      "rank": 30,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "sword.unity",
+          "level": 5
+        },
+        {
+          "id": "foundation.mahayana_theory",
+          "level": 3
+        }
+      ],
+      "description": "以一条完整兵道统合杀伐。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "sword.heaven_cut",
+      "name": "开天一式",
+      "domain": "sword",
+      "realm": "tribulation",
+      "rank": 44,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "sword.dao",
+          "level": 5
+        },
+        {
+          "id": "heaven.law_mastery",
+          "level": 3
+        }
+      ],
+      "description": "以道果发出足以破劫的极致一击。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "artifact.materials",
+      "name": "灵材性理",
+      "domain": "artifact",
+      "realm": "qi",
+      "rank": 1,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.literacy",
+          "level": 2
+        }
+      ],
+      "description": "理解矿物、木石与妖材特性。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "artifact.smelting",
+      "name": "火候与锻造",
+      "domain": "artifact",
+      "realm": "qi",
+      "rank": 2,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "artifact.materials",
+          "level": 3
+        },
+        {
+          "id": "foundation.control",
+          "level": 2
+        }
+      ],
+      "description": "制造凡器与低阶法器胚胎。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "artifact.inscription",
+      "name": "器纹铭刻",
+      "domain": "artifact",
+      "realm": "foundation",
+      "rank": 4,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "artifact.smelting",
+          "level": 4
+        },
+        {
+          "id": "formation.runes",
+          "level": 2
+        }
+      ],
+      "description": "将功能阵纹稳定刻入器物。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "artifact.treasure",
+      "name": "法宝炼制",
+      "domain": "artifact",
+      "realm": "core",
+      "rank": 7,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "artifact.inscription",
+          "level": 4
+        },
+        {
+          "id": "cultivation.core_fire",
+          "level": 3
+        }
+      ],
+      "description": "炼制可成长的法宝。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "artifact.puppet",
+      "name": "傀儡机关",
+      "domain": "artifact",
+      "realm": "core",
+      "rank": 6,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "artifact.inscription",
+          "level": 3
+        },
+        {
+          "id": "spirit.sense",
+          "level": 3
+        }
+      ],
+      "description": "制造并控制自主机关。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "artifact.life_bound",
+      "name": "本命法宝",
+      "domain": "artifact",
+      "realm": "nascent",
+      "rank": 9,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "artifact.treasure",
+          "level": 4
+        },
+        {
+          "id": "spirit.soul",
+          "level": 3
+        }
+      ],
+      "description": "让法宝与性命交修、同步成长。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "artifact.spirit",
+      "name": "器灵孕育",
+      "domain": "artifact",
+      "realm": "transform",
+      "rank": 12,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "artifact.life_bound",
+          "level": 4
+        },
+        {
+          "id": "spirit.split",
+          "level": 3
+        }
+      ],
+      "description": "赋予高阶法宝人格与自主性。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "artifact.void_ship",
+      "name": "虚空飞舟",
+      "domain": "artifact",
+      "realm": "void",
+      "rank": 17,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "artifact.spirit",
+          "level": 3
+        },
+        {
+          "id": "formation.space",
+          "level": 4
+        }
+      ],
+      "description": "建造可穿行虚空的大型载具。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "artifact.dao_weapon",
+      "name": "道器炼制",
+      "domain": "artifact",
+      "realm": "merge",
+      "rank": 22,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "artifact.spirit",
+          "level": 5
+        },
+        {
+          "id": "heaven.law_seed",
+          "level": 3
+        }
+      ],
+      "description": "让器物承载独立法则。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "artifact.world_treasure",
+      "name": "洞天重器",
+      "domain": "artifact",
+      "realm": "great",
+      "rank": 31,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "artifact.dao_weapon",
+          "level": 5
+        },
+        {
+          "id": "formation.cave_heaven",
+          "level": 4
+        }
+      ],
+      "description": "炼制承载世界的重器。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "artifact.immortal",
+      "name": "仙器蜕变",
+      "domain": "artifact",
+      "realm": "tribulation",
+      "rank": 45,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "artifact.world_treasure",
+          "level": 5
+        },
+        {
+          "id": "heaven.tribulation",
+          "level": 4
+        }
+      ],
+      "description": "以天劫完成法宝的仙器蜕变。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "alchemy.herbs",
+      "name": "灵植辨识",
+      "domain": "alchemy",
+      "realm": "qi",
+      "rank": 1,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.literacy",
+          "level": 1
+        }
+      ],
+      "description": "识别药性、年份与采摘方式。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "alchemy.medicine",
+      "name": "药理与医术",
+      "domain": "alchemy",
+      "realm": "qi",
+      "rank": 2,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "alchemy.herbs",
+          "level": 3
+        },
+        {
+          "id": "foundation.meridians",
+          "level": 2
+        }
+      ],
+      "description": "诊断并治疗常见伤病。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "alchemy.furnace",
+      "name": "控火开炉",
+      "domain": "alchemy",
+      "realm": "foundation",
+      "rank": 4,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "alchemy.herbs",
+          "level": 4
+        },
+        {
+          "id": "foundation.control",
+          "level": 3
+        }
+      ],
+      "description": "炼制基础丹药并控制丹毒。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "alchemy.poison",
+      "name": "毒理",
+      "domain": "alchemy",
+      "realm": "foundation",
+      "rank": 4,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "alchemy.medicine",
+          "level": 4
+        },
+        {
+          "id": "alchemy.herbs",
+          "level": 4
+        }
+      ],
+      "description": "制作、识别并解除毒素。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "alchemy.blood",
+      "name": "血肉药性",
+      "domain": "alchemy",
+      "realm": "core",
+      "rank": 6,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "alchemy.furnace",
+          "level": 3
+        },
+        {
+          "id": "alchemy.medicine",
+          "level": 4
+        }
+      ],
+      "description": "处理妖兽、血脉与炼体药材。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "alchemy.soul",
+      "name": "养魂丹法",
+      "domain": "alchemy",
+      "realm": "nascent",
+      "rank": 9,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "alchemy.furnace",
+          "level": 5
+        },
+        {
+          "id": "spirit.soul",
+          "level": 3
+        }
+      ],
+      "description": "治疗魂伤并滋养元婴。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "alchemy.life",
+      "name": "生机造化",
+      "domain": "alchemy",
+      "realm": "transform",
+      "rank": 12,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "alchemy.soul",
+          "level": 4
+        },
+        {
+          "id": "body.regeneration",
+          "level": 3
+        }
+      ],
+      "description": "重塑器官、根骨与生命状态。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "alchemy.void_herb",
+      "name": "虚空灵植",
+      "domain": "alchemy",
+      "realm": "void",
+      "rank": 16,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "alchemy.life",
+          "level": 3
+        },
+        {
+          "id": "world.void_survival",
+          "level": 3
+        }
+      ],
+      "description": "培育并使用虚空生态药材。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "alchemy.dao_pill",
+      "name": "道丹",
+      "domain": "alchemy",
+      "realm": "merge",
+      "rank": 22,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "alchemy.life",
+          "level": 5
+        },
+        {
+          "id": "heaven.law_seed",
+          "level": 3
+        }
+      ],
+      "description": "将法则片段炼入丹药。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "alchemy.resurrection",
+      "name": "逆命续生",
+      "domain": "alchemy",
+      "realm": "great",
+      "rank": 31,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "alchemy.dao_pill",
+          "level": 5
+        },
+        {
+          "id": "heaven.causality",
+          "level": 4
+        }
+      ],
+      "description": "在因果允许时挽回濒灭生命。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "alchemy.ascension_pill",
+      "name": "渡劫仙丹",
+      "domain": "alchemy",
+      "realm": "tribulation",
+      "rank": 45,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "alchemy.resurrection",
+          "level": 5
+        },
+        {
+          "id": "heaven.tribulation",
+          "level": 3
+        }
+      ],
+      "description": "炼制辅助渡劫与仙灵转化的顶阶丹药。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "formation.runes",
+      "name": "阵纹基础",
+      "domain": "formation",
+      "realm": "qi",
+      "rank": 1,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.literacy",
+          "level": 2
+        },
+        {
+          "id": "foundation.control",
+          "level": 2
+        }
+      ],
+      "description": "读取和绘制基础阵纹。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "formation.array",
+      "name": "聚灵与警戒阵",
+      "domain": "formation",
+      "realm": "qi",
+      "rank": 2,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "formation.runes",
+          "level": 3
+        }
+      ],
+      "description": "部署小型实用阵法。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability",
+        "general_passive",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "formation.defense",
+      "name": "护山阵理",
+      "domain": "formation",
+      "realm": "foundation",
+      "rank": 4,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "formation.array",
+          "level": 4
+        },
+        {
+          "id": "foundation.dao_base",
+          "level": 2
+        }
+      ],
+      "description": "设计多节点防御阵。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "formation.restriction",
+      "name": "禁制破解",
+      "domain": "formation",
+      "realm": "core",
+      "rank": 6,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "formation.runes",
+          "level": 5
+        },
+        {
+          "id": "spirit.sense",
+          "level": 4
+        }
+      ],
+      "description": "分析、绕过或重写禁制。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "formation.teleport",
+      "name": "传送阵",
+      "domain": "formation",
+      "realm": "nascent",
+      "rank": 9,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "formation.defense",
+          "level": 4
+        },
+        {
+          "id": "formation.restriction",
+          "level": 3
+        }
+      ],
+      "description": "建立坐标锚点与稳定传送。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "formation.domain",
+      "name": "领域阵",
+      "domain": "formation",
+      "realm": "transform",
+      "rank": 12,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "formation.teleport",
+          "level": 3
+        },
+        {
+          "id": "spell.domain",
+          "level": 3
+        }
+      ],
+      "description": "将领域固化为持续阵法。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "formation.space",
+      "name": "空间阵理",
+      "domain": "formation",
+      "realm": "void",
+      "rank": 16,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "formation.teleport",
+          "level": 5
+        },
+        {
+          "id": "foundation.void_theory",
+          "level": 2
+        }
+      ],
+      "description": "折叠、封锁和稳定空间。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "formation.cave_heaven",
+      "name": "洞天营造",
+      "domain": "formation",
+      "realm": "merge",
+      "rank": 22,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "formation.space",
+          "level": 4
+        },
+        {
+          "id": "spell.law",
+          "level": 3
+        }
+      ],
+      "description": "构筑可成长的独立小世界。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "formation.star",
+      "name": "周天星斗阵",
+      "domain": "formation",
+      "realm": "great",
+      "rank": 31,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "formation.cave_heaven",
+          "level": 5
+        },
+        {
+          "id": "heaven.astrology",
+          "level": 4
+        }
+      ],
+      "description": "借星辰级能量驱动巨型阵法。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "formation.tribulation",
+      "name": "欺天渡劫阵",
+      "domain": "formation",
+      "realm": "tribulation",
+      "rank": 46,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "formation.star",
+          "level": 5
+        },
+        {
+          "id": "heaven.tribulation",
+          "level": 4
+        }
+      ],
+      "description": "分流、约束并利用天劫。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "talisman.script",
+      "name": "符文书写",
+      "domain": "talisman",
+      "realm": "qi",
+      "rank": 1,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.literacy",
+          "level": 2
+        },
+        {
+          "id": "foundation.control",
+          "level": 2
+        }
+      ],
+      "description": "把简单术式封入载体。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "talisman.activation",
+      "name": "符箓激发",
+      "domain": "talisman",
+      "realm": "qi",
+      "rank": 2,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "talisman.script",
+          "level": 3
+        }
+      ],
+      "description": "快速、安全地使用符箓。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "talisman.seal",
+      "name": "封印术",
+      "domain": "talisman",
+      "realm": "foundation",
+      "rank": 4,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "talisman.script",
+          "level": 4
+        },
+        {
+          "id": "spirit.sense",
+          "level": 2
+        }
+      ],
+      "description": "封锁力量、物件或行动。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability",
+        "general_passive",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "talisman.curse",
+      "name": "咒法与解咒",
+      "domain": "talisman",
+      "realm": "core",
+      "rank": 6,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "talisman.seal",
+          "level": 3
+        },
+        {
+          "id": "spirit.inner_demon",
+          "level": 3
+        }
+      ],
+      "description": "施加并解除持续性咒法。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "talisman.soul_seal",
+      "name": "魂契",
+      "domain": "talisman",
+      "realm": "nascent",
+      "rank": 9,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "talisman.seal",
+          "level": 5
+        },
+        {
+          "id": "spirit.soul",
+          "level": 4
+        }
+      ],
+      "description": "建立可验证的灵魂契约。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "talisman.command",
+      "name": "敕令",
+      "domain": "talisman",
+      "realm": "transform",
+      "rank": 12,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "talisman.soul_seal",
+          "level": 3
+        },
+        {
+          "id": "spell.resonance",
+          "level": 4
+        }
+      ],
+      "description": "借天地认可强制执行命令。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "talisman.true_name",
+      "name": "真名秘术",
+      "domain": "talisman",
+      "realm": "void",
+      "rank": 17,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "talisman.command",
+          "level": 4
+        },
+        {
+          "id": "spirit.void_thought",
+          "level": 3
+        }
+      ],
+      "description": "通过真名定位和影响目标本质。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "talisman.causality_seal",
+      "name": "因果封印",
+      "domain": "talisman",
+      "realm": "merge",
+      "rank": 23,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "talisman.true_name",
+          "level": 4
+        },
+        {
+          "id": "heaven.causality",
+          "level": 3
+        }
+      ],
+      "description": "封锁事件结果或因果联系。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "talisman.heaven_decree",
+      "name": "代天敕命",
+      "domain": "talisman",
+      "realm": "great",
+      "rank": 32,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "talisman.causality_seal",
+          "level": 5
+        },
+        {
+          "id": "heaven.law_mastery",
+          "level": 3
+        }
+      ],
+      "description": "以自身道果颁布局部天则。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "talisman.tribulation_edict",
+      "name": "劫数敕书",
+      "domain": "talisman",
+      "realm": "tribulation",
+      "rank": 47,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "talisman.heaven_decree",
+          "level": 5
+        },
+        {
+          "id": "heaven.tribulation",
+          "level": 4
+        }
+      ],
+      "description": "短暂调整劫数的对象与表现。",
+      "usageDomains": [
+        "cultivation_method",
+        "recipe_or_crafting"
+      ]
+    },
+    {
+      "id": "world.survival",
+      "name": "野外生存",
+      "domain": "world",
+      "realm": "qi",
+      "rank": 1,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.literacy",
+          "level": 1
+        }
+      ],
+      "description": "处理饮食、气候、地形与常见妖患。",
+      "usageDomains": [
+        "cultivation_method",
+        "world_or_management"
+      ]
+    },
+    {
+      "id": "world.appraisal",
+      "name": "鉴宝估物",
+      "domain": "world",
+      "realm": "qi",
+      "rank": 1,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.literacy",
+          "level": 2
+        }
+      ],
+      "description": "判断物品用途、价值与风险。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive",
+        "world_or_management"
+      ]
+    },
+    {
+      "id": "world.gathering",
+      "name": "灵材采集",
+      "domain": "world",
+      "realm": "qi",
+      "rank": 2,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "world.survival",
+          "level": 2
+        },
+        {
+          "id": "world.appraisal",
+          "level": 2
+        }
+      ],
+      "description": "安全、高效地收集资源。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive",
+        "world_or_management"
+      ]
+    },
+    {
+      "id": "world.trade",
+      "name": "修真经营",
+      "domain": "world",
+      "realm": "foundation",
+      "rank": 3,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "world.appraisal",
+          "level": 4
+        }
+      ],
+      "description": "处理坊市、契约、供需与声望。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive",
+        "world_or_management"
+      ]
+    },
+    {
+      "id": "world.beast",
+      "name": "御兽",
+      "domain": "world",
+      "realm": "foundation",
+      "rank": 4,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "world.survival",
+          "level": 4
+        },
+        {
+          "id": "spirit.sense",
+          "level": 2
+        }
+      ],
+      "description": "理解、驯养和指挥灵兽。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive",
+        "world_or_management"
+      ]
+    },
+    {
+      "id": "world.geomancy",
+      "name": "堪舆寻脉",
+      "domain": "world",
+      "realm": "core",
+      "rank": 6,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "world.gathering",
+          "level": 4
+        },
+        {
+          "id": "formation.array",
+          "level": 3
+        }
+      ],
+      "description": "寻找灵脉、遗迹和地势节点。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive",
+        "world_or_management"
+      ]
+    },
+    {
+      "id": "world.weather",
+      "name": "观天测候",
+      "domain": "world",
+      "realm": "nascent",
+      "rank": 8,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "world.geomancy",
+          "level": 4
+        },
+        {
+          "id": "spell.resonance",
+          "level": 2
+        }
+      ],
+      "description": "预判天象、兽潮和灵气变化。",
+      "usageDomains": [
+        "cultivation_method",
+        "world_or_management"
+      ]
+    },
+    {
+      "id": "world.realm_travel",
+      "name": "界域行旅",
+      "domain": "world",
+      "realm": "transform",
+      "rank": 11,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "world.weather",
+          "level": 4
+        },
+        {
+          "id": "formation.teleport",
+          "level": 3
+        }
+      ],
+      "description": "跨越危险界域并建立路线。",
+      "usageDomains": [
+        "cultivation_method",
+        "world_or_management"
+      ]
+    },
+    {
+      "id": "world.void_survival",
+      "name": "虚空生存",
+      "domain": "world",
+      "realm": "void",
+      "rank": 15,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "world.realm_travel",
+          "level": 4
+        },
+        {
+          "id": "body.void_body",
+          "level": 2
+        }
+      ],
+      "description": "在虚空、绝灵区和破碎世界存续。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive",
+        "world_or_management"
+      ]
+    },
+    {
+      "id": "world.civilization",
+      "name": "宗门与文明治理",
+      "domain": "world",
+      "realm": "merge",
+      "rank": 20,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "world.trade",
+          "level": 5
+        },
+        {
+          "id": "world.realm_travel",
+          "level": 4
+        }
+      ],
+      "description": "经营跨界势力、知识和资源网络。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive",
+        "world_or_management"
+      ]
+    },
+    {
+      "id": "world.world_shepherd",
+      "name": "世界牧养",
+      "domain": "world",
+      "realm": "great",
+      "rank": 29,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "world.civilization",
+          "level": 5
+        },
+        {
+          "id": "formation.cave_heaven",
+          "level": 4
+        }
+      ],
+      "description": "调节一方世界的生态与修真文明。",
+      "usageDomains": [
+        "cultivation_method",
+        "world_or_management"
+      ]
+    },
+    {
+      "id": "world.ascension_route",
+      "name": "飞升航路",
+      "domain": "world",
+      "realm": "tribulation",
+      "rank": 43,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "world.world_shepherd",
+          "level": 5
+        },
+        {
+          "id": "heaven.astrology",
+          "level": 5
+        }
+      ],
+      "description": "定位并维护跨越天劫后的航路。",
+      "usageDomains": [
+        "cultivation_method",
+        "world_or_management"
+      ]
+    },
+    {
+      "id": "heaven.omen",
+      "name": "趋吉避凶",
+      "domain": "heaven",
+      "realm": "qi",
+      "rank": 2,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spirit.meditation",
+          "level": 2
+        },
+        {
+          "id": "world.survival",
+          "level": 2
+        }
+      ],
+      "description": "感知模糊危险征兆。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "heaven.astrology",
+      "name": "星象历法",
+      "domain": "heaven",
+      "realm": "foundation",
+      "rank": 4,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "heaven.omen",
+          "level": 3
+        },
+        {
+          "id": "world.gathering",
+          "level": 3
+        }
+      ],
+      "description": "计算天时与大型仪式窗口。",
+      "usageDomains": [
+        "cultivation_method",
+        "general_passive"
+      ]
+    },
+    {
+      "id": "heaven.karma",
+      "name": "功德业力",
+      "domain": "heaven",
+      "realm": "core",
+      "rank": 7,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "heaven.omen",
+          "level": 5
+        },
+        {
+          "id": "spirit.inner_demon",
+          "level": 4
+        }
+      ],
+      "description": "辨识行为产生的长期天道反馈。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "heaven.fate",
+      "name": "命数观测",
+      "domain": "heaven",
+      "realm": "nascent",
+      "rank": 10,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "heaven.karma",
+          "level": 4
+        },
+        {
+          "id": "spirit.soul",
+          "level": 4
+        }
+      ],
+      "description": "观察可能性与关键命运节点。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    },
+    {
+      "id": "heaven.causality",
+      "name": "因果之线",
+      "domain": "heaven",
+      "realm": "transform",
+      "rank": 13,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "heaven.fate",
+          "level": 4
+        },
+        {
+          "id": "foundation.spirit_theory",
+          "level": 3
+        }
+      ],
+      "description": "追踪、建立或切断有限因果。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "heaven.law_seed",
+      "name": "法则种子",
+      "domain": "heaven",
+      "realm": "void",
+      "rank": 17,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "heaven.causality",
+          "level": 4
+        },
+        {
+          "id": "foundation.void_theory",
+          "level": 3
+        }
+      ],
+      "description": "领悟并培育一条个人法则。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "heaven.law_mastery",
+      "name": "法则执掌",
+      "domain": "heaven",
+      "realm": "merge",
+      "rank": 23,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "heaven.law_seed",
+          "level": 5
+        },
+        {
+          "id": "foundation.integration_theory",
+          "level": 3
+        }
+      ],
+      "description": "稳定调用并对抗同类法则。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "heaven.dao_fruit",
+      "name": "道果圆融",
+      "domain": "heaven",
+      "realm": "great",
+      "rank": 32,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "heaven.law_mastery",
+          "level": 5
+        },
+        {
+          "id": "foundation.mahayana_theory",
+          "level": 4
+        }
+      ],
+      "description": "令法则、经历与自我凝为道果。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "heaven.thunder_body",
+      "name": "劫雷适应",
+      "domain": "heaven",
+      "realm": "great",
+      "rank": 30,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "spell.thunder",
+          "level": 5
+        },
+        {
+          "id": "body.indestructible",
+          "level": 3
+        }
+      ],
+      "description": "逐步适应劫雷、天火与法则冲击。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability"
+      ]
+    },
+    {
+      "id": "heaven.tribulation",
+      "name": "天劫推演",
+      "domain": "heaven",
+      "realm": "tribulation",
+      "rank": 42,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "heaven.dao_fruit",
+          "level": 5
+        },
+        {
+          "id": "heaven.thunder_body",
+          "level": 4
+        }
+      ],
+      "description": "推演自身天劫构成并制定应劫方案。",
+      "usageDomains": [
+        "cultivation_method",
+        "combat_ability",
+        "general_passive"
+      ]
+    },
+    {
+      "id": "heaven.ascendant",
+      "name": "劫后新生",
+      "domain": "heaven",
+      "realm": "tribulation",
+      "rank": 50,
+      "maxLevel": 5,
+      "prereqs": [
+        {
+          "id": "foundation.ascension",
+          "level": 5
+        },
+        {
+          "id": "spirit.tribulation_mind",
+          "level": 5
+        },
+        {
+          "id": "body.tribulation_body",
+          "level": 5
+        }
+      ],
+      "description": "完成渡劫后的生命、因果与法则重构。",
+      "usageDomains": [
+        "cultivation_method"
+      ]
+    }
+  ]
+}
