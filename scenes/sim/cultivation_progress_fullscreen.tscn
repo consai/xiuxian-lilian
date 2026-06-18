@@ -380,5 +380,4 @@ text = "跳过"
 
 [node name="ResultPopup" parent="." unique_id=128423060 instance=ExtResource("14_result_popup")]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1

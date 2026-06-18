@@ -21,12 +21,6 @@ var phase: String:
 var location_id: String:
 	get: return str(DataStore.expedition_runtime().get("location_id", ""))
 	set(value): DataStore.expedition_runtime()["location_id"] = value
-var active_chain_id: String:
-	get: return str(DataStore.expedition_runtime().get("active_chain_id", ""))
-	set(value): DataStore.expedition_runtime()["active_chain_id"] = value
-var completed_events: Array:
-	get: return DataStore.expedition_runtime().get("completed_events", []) as Array
-	set(value): DataStore.expedition_runtime()["completed_events"] = value
 var auto_advance: bool:
 	get: return bool(DataStore.expedition_runtime().get("auto_advance", true))
 	set(value): DataStore.expedition_runtime()["auto_advance"] = value
@@ -122,8 +116,6 @@ func start(location_id_value: String, game_state: Node, seed_override: int = -1)
 	start_day = int(game_state.day) if game_state != null else 0
 	expedition_id = _new_expedition_id()
 	location_id = location_id_value
-	active_chain_id = ""
-	completed_events = []
 	seed = seed_override if seed_override >= 0 else int(Time.get_unix_time_from_system()) % 2147483647
 	_rng.seed = seed
 	rng_state = _rng.state
@@ -530,13 +522,6 @@ func finish(exit_reason: String) -> Dictionary:
 		_restore_rng()
 		var loot_loss := ExpeditionRewardServiceScript.apply_loot_loss_on_defeat(settlement_loot, _rng)
 		loot_lost.append_array(loot_loss.get("lost", []) as Array)
-		for kept_v in settlement_loot:
-			if kept_v is Dictionary:
-				var kept := (kept_v as Dictionary).duplicate(true)
-				if int(kept.get("count", 0)) > 0:
-					kept["source"] = "session_loot"
-					loot_lost.append(kept)
-		settlement_loot = []
 		_save_rng()
 		var rules: Dictionary = ExpeditionRulesServiceScript.rules()
 		var hp_max := float((player_snapshot.get("attrs", {}) as Dictionary).get(FightAttr.HP_MAX, 100.0))
@@ -556,7 +541,6 @@ func finish(exit_reason: String) -> Dictionary:
 		"stats": stats.duplicate(true),
 		"event_log": _duplicate_event_log(),
 		"chronicle": _build_chronicle(),
-		"world_changes": _world_changes(),
 	})
 	var result_errors := ExpeditionResult.collect_errors(result)
 	if not result_errors.is_empty():
@@ -655,12 +639,6 @@ func _apply_step_after_event(
 			)
 		)
 	log_updated.emit()
-	var event_id := str(event.get("id", ""))
-	if event_id != "" and not completed_events.has(event_id):
-		completed_events.append(event_id)
-	var chain_id := str(event.get("chain_id", ""))
-	if active_chain_id == "" and chain_id != "":
-		active_chain_id = chain_id
 
 
 func _apply_event_duration(event: Dictionary) -> void:
@@ -761,16 +739,6 @@ func effective_location() -> Dictionary:
 	if stored_v is Dictionary and not (stored_v as Dictionary).is_empty():
 		return (stored_v as Dictionary).duplicate(true)
 	return LocationServiceScript.by_id(location_id)
-
-
-func _world_changes() -> Array:
-	var changes: Array = []
-	for event_id_v in completed_events:
-		var event := ExpeditionEventServiceScript.by_id(str(event_id_v))
-		for change_v in event.get("world_effects", []) as Array:
-			if change_v is Dictionary:
-				changes.append((change_v as Dictionary).duplicate(true))
-	return changes
 
 
 func _duplicate_event_log() -> Array:

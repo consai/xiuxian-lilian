@@ -69,11 +69,6 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 	out["auto_battle_rules"] = (rules_v as Dictionary).duplicate(true) if rules_v is Dictionary else {}
 	if not out.get("totals") is Dictionary:
 		out["totals"] = _default_totals()
-	var world_state_v: Variant = out.get("world_state", {})
-	var world_state := world_state_v as Dictionary if world_state_v is Dictionary else {}
-	for key in ["wolf_threat", "sword_tomb_opening", "sect_unrest"]:
-		world_state[key] = clampi(int(world_state.get(key, 0)), 0, 100)
-	out["world_state"] = world_state
 	out["map"] = _coalesce_map_savedata(out.get("map", {}))
 	out["foundations"] = CharacterStatsScript.normalize_foundations(out.get("foundations", {}))
 	out["aptitudes"] = CharacterStatsScript.normalize_aptitudes(out.get("aptitudes", {}))
@@ -334,7 +329,6 @@ func _default_savedata() -> Dictionary:
 		"storage": {},
 		"storage_equips": [],
 		"activity_log": [],
-		"world_state": {"wolf_threat": 35, "sword_tomb_opening": 0, "sect_unrest": 30},
 		"map": _default_map_savedata(),
 		"totals": _default_totals(),
 		"breakthrough_bonuses": {
@@ -517,8 +511,6 @@ func _default_expedition() -> Dictionary:
 		"phase": "idle",
 		"location_id": "",
 		"journey_step": 0,
-		"active_chain_id": "",
-		"completed_events": [],
 		"auto_advance": true,
 		"steps": 0,
 		"days": 0,

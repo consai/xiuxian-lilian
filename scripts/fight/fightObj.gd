@@ -449,6 +449,7 @@ func use_skill(skill_id: int, skill_cfg: Dictionary = {}, target: FightObj = nul
 	var cfg := _lookup_cfg(skill_cfg, skill_id)
 	if cfg.is_empty():
 		return _fail_use("no_cfg")
+	cfg = merged_slot_runtime_cfg(slot, cfg)
 	if not can_pay_costs(cfg):
 		return _fail_use("no_mp")
 	pay_costs(cfg)
@@ -681,6 +682,41 @@ static func _lookup_cfg(cfg_map: Dictionary, id: int) -> Dictionary:
 		var v2: Variant = cfg_map[ks]
 		return v2 as Dictionary if v2 is Dictionary else {}
 	return {}
+
+
+static func merged_slot_runtime_cfg(slot: Dictionary, base_cfg: Dictionary) -> Dictionary:
+	var cfg := base_cfg.duplicate(true)
+	if slot.is_empty():
+		return cfg
+	for key in ["costs", "cost_text", "mp_cost", "can_miss", "accuracy_bonus"]:
+		if slot.has(key):
+			cfg[key] = slot[key]
+	if slot.has("power_scale"):
+		cfg["power"] = float(cfg.get("power", 1000.0)) * float(slot.get("power_scale", 1.0))
+	elif slot.has("power"):
+		cfg["power"] = slot["power"]
+	var effect_scale := float(slot.get("effect_value_scale", slot.get("damage_scale", 1.0)))
+	if not is_equal_approx(effect_scale, 1.0):
+		cfg["effects"] = _scaled_runtime_effects(
+			cfg.get("effects", cfg.get("fight_effect", [])),
+			effect_scale
+		)
+	return cfg
+
+
+static func _scaled_runtime_effects(raw: Variant, scale: float) -> Array:
+	var out: Array = []
+	if not raw is Array:
+		return out
+	for eff_v in raw as Array:
+		if not eff_v is Dictionary:
+			continue
+		var eff := (eff_v as Dictionary).duplicate(true)
+		var effect_type := str(eff.get("type", "")).strip_edges().to_lower()
+		if effect_type in ["damage", "heal", "shield", "restore_mp"] and eff.has("value"):
+			eff["value"] = float(eff.get("value", 0.0)) * scale
+		out.append(eff)
+	return out
 
 
 func can_pay_costs(cfg: Dictionary) -> bool:

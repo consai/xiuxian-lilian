@@ -17,6 +17,8 @@ func _run_all() -> void:
 	_run("start creates isolated runtime", _test_start_creates_isolated_runtime)
 	_run("roll next event obeys difficulty", _test_roll_next_event_obey_difficulty)
 	_run("common events use location generation", _test_common_events_use_location_generation)
+	_run("early common battles stay single target", _test_early_common_battles_stay_single_target)
+	_run("group battles scale skill slots", _test_group_battles_scale_skill_slots)
 	_run("expedition modes keep event pools separate", _test_expedition_modes_keep_event_pools_separate)
 	_run("common event duration advances days", _test_common_event_duration_advances_days)
 	_run("decision event exposes options", _test_decision_event_exposes_options)
@@ -35,7 +37,6 @@ func _run_all() -> void:
 	_run("distinct expeditions do not collide on settlement", _test_distinct_expeditions_settlement_ids)
 	_run("event pick is deterministic from event pool", _test_event_pick_deterministic)
 	_run("result screen uses finish payload not settle return", _test_result_payload_from_finish)
-	_run("completed events change world state", _test_completed_events_world_change)
 	if _failures.is_empty():
 		print("PASS: %d expedition tests" % _tests_run)
 		quit(0)
@@ -115,6 +116,43 @@ func _test_common_events_use_location_generation() -> void:
 		_expect_true(not _find_event_by_template(pool, template_id).is_empty(), "rich common template generated: %s" % template_id)
 	var exchange := ExpeditionEventServiceScript.find_decision_option(traveler, "exchange")
 	_expect_true(not (exchange.get("rewards", []) as Array).is_empty(), "common decision option uses location reward pool")
+
+
+func _test_early_common_battles_stay_single_target() -> void:
+	var event := ExpeditionEventServiceScript.by_id("common::qinglan_mountain::local_beast")
+	var enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
+	_expect_eq(enemies.size(), 1, "qinglan starter beast should not spawn a pack")
+	var enemy := enemies[0] as Dictionary
+	_expect_true(float(enemy.get("hp", 0.0)) >= 50.0, "single starter enemy keeps readable hp")
+	_expect_true(not str(enemy.get("name", "")).contains("·"), "single starter enemy keeps base name")
+	var slots := enemy.get("skills", []) as Array
+	for slot_v in slots:
+		var slot := slot_v as Dictionary
+		if int(slot.get("id", -1)) > 0:
+			_expect_true(
+				float(slot.get("effect_value_scale", 1.0)) <= 0.4,
+				"starter enemy skill fixed effects are toned down"
+			)
+
+
+func _test_group_battles_scale_skill_slots() -> void:
+	var event := ExpeditionEventServiceScript.by_id("common::qinglan_mountain::local_beast")
+	event["difficulty"] = 6
+	var enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
+	_expect_eq(enemies.size(), 3, "difficulty six common battle forms a small group")
+	for enemy_v in enemies:
+		var enemy := enemy_v as Dictionary
+		var slots := enemy.get("skills", []) as Array
+		var found_scaled_skill := false
+		for slot_v in slots:
+			var slot := slot_v as Dictionary
+			if int(slot.get("id", -1)) > 0:
+				found_scaled_skill = true
+				_expect_true(
+					float(slot.get("effect_value_scale", 1.0)) <= 0.5,
+					"group enemy skill fixed effects should scale down"
+				)
+		_expect_true(found_scaled_skill, "group enemy keeps active skill slot")
 
 
 func _test_expedition_modes_keep_event_pools_separate() -> void:
@@ -263,9 +301,10 @@ func _test_defeat_exit_drops_inventory_and_injury() -> void:
 	var loot_total := 0
 	for r in loot_arr:
 		loot_total += int((r as Dictionary).get("count", 0))
+	_expect_true(loot_total > 0, "defeat keeps partial session loot")
 	_expect_true(loot_total < 5, "session loot reduced on defeat")
 	game.settle_expedition(finish)
-	_expect_eq(_inventory_total(game.inventory), inv_before, "background inventory intact after defeat")
+	_expect_eq(_inventory_total(game.inventory), inv_before + loot_total, "kept session loot merged on settle")
 	_expect_near(game.hp, 25.0, "defeat hp floor")
 	_expect_eq(game.injury_days, 3, "defeat injury applied after elapsed reduction")
 
@@ -416,17 +455,6 @@ func _test_distinct_expeditions_settlement_ids() -> void:
 	var second: Dictionary = game.settle_expedition(second_finish)
 	_expect_true(bool(second.get("ok", false)), "second distinct settlement ok")
 	_expect_eq(int(game.inventory.get("items_LingCao", 0)), lingcao_before + 2, "both loot applied")
-
-
-func _test_completed_events_world_change() -> void:
-	var game := _state()
-	var before := int(game.world_state.get("wolf_threat", 0))
-	var expedition := _expedition()
-	expedition.start("wild_wolf_valley", game, 4444)
-	expedition.completed_events = ["wolf_king_boss"]
-	var finish: Dictionary = expedition.finish("manual")
-	game.settle_expedition(finish)
-	_expect_eq(int(game.world_state.get("wolf_threat", 0)), maxi(0, before - 20), "perfect wolf hunt lowers threat")
 
 
 func _inventory_total(inventory: Dictionary) -> int:

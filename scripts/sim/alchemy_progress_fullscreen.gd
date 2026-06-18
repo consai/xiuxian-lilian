@@ -27,7 +27,9 @@ const STATUS_TEXTS := [
 var _recipe_id := ""
 var _strategy_id := ""
 var _selection_mode := "lowest"
+var _batch_count := 1
 var _days := 1
+var _days_per_batch := 1
 var _start_day := 1
 var _recipe_name := ""
 var _running := false
@@ -52,7 +54,9 @@ func _apply_payload(payload: Dictionary) -> bool:
 	_recipe_id = str(payload.get("recipe_id", "")).strip_edges()
 	_strategy_id = str(payload.get("strategy_id", "")).strip_edges()
 	_selection_mode = str(payload.get("selection_mode", "lowest"))
+	_batch_count = maxi(1, int(payload.get("batch_count", 1)))
 	_days = int(payload.get("days", 0))
+	_days_per_batch = maxi(1, int(payload.get("days_per_batch", _days)))
 	if _recipe_id == "" or _strategy_id == "" or _days <= 0:
 		return false
 	_start_day = int(payload.get("start_day", GameState.day))
@@ -114,7 +118,12 @@ func _finish_progress() -> void:
 	_finishing = true
 	_cancel_button.disabled = true
 	_speed_button.disabled = true
-	var result: Dictionary = GameState.brew_alchemy(_recipe_id, _strategy_id, _selection_mode)
+	var result: Dictionary = GameState.brew_alchemy_batches(
+		_recipe_id,
+		_strategy_id,
+		_selection_mode,
+		_batch_count
+	)
 	if not bool(result.get("ok", false)):
 		push_warning(str(result.get("error", "炼制失败")))
 		var back_nav: Dictionary = SceneManager.go_alchemy_panel()

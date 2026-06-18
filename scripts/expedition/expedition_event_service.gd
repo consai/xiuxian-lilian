@@ -284,7 +284,7 @@ static func build_battle_enemies(event: Dictionary) -> Array:
 		return []
 	var count := _battle_enemy_count(event)
 	for i in count:
-		out.append(_scale_enemy_for_group(base, i, count))
+		out.append(_scale_enemy_for_group(base, event, i, count))
 	return out
 
 
@@ -302,7 +302,13 @@ static func _normalize_battle_enemy(enemy_src: Dictionary) -> Dictionary:
 		enemy["hp"] = float(enemy["hp"])
 	var enemy_skills: Array = []
 	for sid_v in enemy.get("skills", [0]) as Array:
-		enemy_skills.append({"id": int(sid_v), "cd": 0.0})
+		if sid_v is Dictionary:
+			var slot := (sid_v as Dictionary).duplicate(true)
+			slot["id"] = int(slot.get("id", -1))
+			slot["cd"] = maxf(0.0, float(slot.get("cd", 0.0)))
+			enemy_skills.append(slot)
+		else:
+			enemy_skills.append({"id": int(sid_v), "cd": 0.0})
 	enemy["skills"] = enemy_skills
 	enemy["items"] = []
 	enemy["equips"] = []
@@ -316,14 +322,24 @@ static func _battle_enemy_count(event: Dictionary) -> int:
 	if event_type == "boss":
 		return 1
 	var difficulty := maxi(1, int(event.get("difficulty", 1)))
-	return clampi(2 + int(floor(float(difficulty) / 2.0)), 2, 5)
+	if event_type == "elite":
+		return clampi(1 + int(floor(float(difficulty - 3) / 2.0)), 1, 3)
+	return clampi(1 + int(floor(float(difficulty - 2) / 2.0)), 1, 4)
 
 
-static func _scale_enemy_for_group(base: Dictionary, index: int, count: int) -> Dictionary:
+static func _scale_enemy_for_group(
+		base: Dictionary,
+		event: Dictionary,
+		index: int,
+		count: int
+) -> Dictionary:
 	var enemy := base.duplicate(true)
 	var attrs := (enemy.get("attrs", {}) as Dictionary).duplicate(true)
-	var hp_scale := 0.48 if count <= 2 else 0.38
-	var atk_scale := 0.58 if count <= 2 else 0.45
+	var hp_scale := 1.0
+	var atk_scale := 1.0
+	if count > 1:
+		hp_scale = 0.48 if count <= 2 else 0.38
+		atk_scale = 0.58 if count <= 2 else 0.45
 	if attrs.has(FightAttr.HP_MAX):
 		attrs[FightAttr.HP_MAX] = maxf(1.0, float(attrs[FightAttr.HP_MAX]) * hp_scale)
 	for key in [FightAttr.PHYSICAL_ATK, FightAttr.MAGIC_ATK]:
@@ -335,10 +351,44 @@ static func _scale_enemy_for_group(base: Dictionary, index: int, count: int) -> 
 	enemy["attrs"] = attrs
 	if attrs.has(FightAttr.HP_MAX):
 		enemy["hp"] = float(attrs[FightAttr.HP_MAX])
+	var skill_effect_scale := _enemy_skill_effect_scale(event, atk_scale, count)
+	enemy["skills"] = _scale_enemy_skill_slots(enemy.get("skills", []), skill_effect_scale)
 	var base_name := str(base.get("name", "敌人")).strip_edges()
 	if count > 1:
 		enemy["name"] = "%s·%d" % [base_name, index + 1]
 	return enemy
+
+
+static func _enemy_skill_effect_scale(event: Dictionary, atk_scale: float, count: int) -> float:
+	if event.has("enemy_skill_effect_scale"):
+		return clampf(float(event.get("enemy_skill_effect_scale", 1.0)), 0.1, 1.0)
+	var event_type := str(event.get("type", "")).strip_edges()
+	if event_type == "boss":
+		return 1.0
+	var difficulty := maxi(1, int(event.get("difficulty", 1)))
+	var scale := 1.0
+	if event_type == "elite":
+		scale = clampf(0.55 + float(difficulty) * 0.05, 0.65, 0.95)
+	else:
+		scale = clampf(0.30 + float(difficulty) * 0.05, 0.35, 0.85)
+	if count > 1:
+		scale = minf(scale, atk_scale)
+	return scale
+
+
+static func _scale_enemy_skill_slots(raw: Variant, effect_scale: float) -> Array:
+	var out: Array = []
+	if not raw is Array:
+		return out
+	for slot_v in raw as Array:
+		if not slot_v is Dictionary:
+			continue
+		var slot := (slot_v as Dictionary).duplicate(true)
+		var skill_id := int(slot.get("id", -1))
+		if skill_id > 0 and effect_scale < 1.0 and not slot.has("effect_value_scale"):
+			slot["effect_value_scale"] = clampf(effect_scale, 0.1, 1.0)
+		out.append(slot)
+	return out
 
 
 static func _apply_effects(

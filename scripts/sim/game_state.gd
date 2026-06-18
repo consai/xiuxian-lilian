@@ -17,37 +17,6 @@ const PlayerAutoBattleServiceScript := preload("res://scripts/sim/player_auto_ba
 const BreakthroughServiceScript := preload("res://scripts/sim/breakthrough_service.gd")
 const AlchemyServiceScript := preload("res://scripts/sim/alchemy_service.gd")
 
-const CULTIVATION_MODES := {
-	"cycle": {
-		"name": "运转周天",
-		"description": "修为、功法与知识均衡增长。",
-		"cultivation_multiplier": 1.0,
-		"knowledge_multiplier": 1.0,
-		"mastery_multiplier": 1.0,
-	},
-	"insight": {
-		"name": "专心参悟",
-		"description": "放缓修为积累，专注理解功法与其中知识。",
-		"cultivation_multiplier": 0.6,
-		"knowledge_multiplier": 1.6,
-		"mastery_multiplier": 1.5,
-	},
-	"breathing": {
-		"name": "吐纳积气",
-		"description": "集中吸纳灵气，快速积累修为。",
-		"cultivation_multiplier": 1.4,
-		"knowledge_multiplier": 0.5,
-		"mastery_multiplier": 0.6,
-	},
-	"pill": {
-		"name": "丹药炼化",
-		"description": "服用修炼丹药后打坐炼化，修为增长极快，但会积累境界虚浮。",
-		"cultivation_multiplier": 10.0,
-		"knowledge_multiplier": 0.8,
-		"mastery_multiplier": 0.8,
-	},
-}
-
 const INSTABILITY_REDUCTION_PER_WIN := 10
 
 
@@ -138,9 +107,6 @@ var inventory: Dictionary:
 var alchemy: Dictionary:
 	get: return DataStore.savedata.get("alchemy", AlchemyServiceScript.default_state()) as Dictionary
 	set(value): DataStore.savedata["alchemy"] = AlchemyServiceScript.normalize_state(value)
-var world_state: Dictionary:
-	get: return DataStore.savedata.get("world_state", {}) as Dictionary
-	set(value): DataStore.savedata["world_state"] = value
 var storage: Dictionary:
 	get: return DataStore.savedata.get("storage", {}) as Dictionary
 	set(value): DataStore.savedata["storage"] = value
@@ -224,7 +190,6 @@ func new_game() -> void:
 	storage = (initial.get("storage", {}) as Dictionary).duplicate(true)
 	storage_equips = (initial.get("storage_equips", []) as Array).duplicate(true)
 	activity_log = []
-	world_state = {"wolf_threat": 35, "sword_tomb_opening": 0, "sect_unrest": 30}
 	totals = {
 		"battles": 0, "wins": 0, "losses": 0, "items_gained": 0,
 		"expeditions": 0, "expedition_steps": 0, "max_difficulty": 0,
@@ -321,7 +286,7 @@ func load_game(slot: int) -> Dictionary:
 
 
 func cultivate() -> int:
-	var result := cultivate_session("cycle", 1)
+	var result := cultivate_session(EnumCultivationMode.LABEL_CYCLE, 1)
 	return int(result.get("cultivation_gained", 0))
 
 
@@ -345,25 +310,79 @@ func preview_alchemy(recipe_id: String, strategy_id: String = "standard", select
 	)
 
 
+func max_alchemy_batch_count(preview: Dictionary) -> int:
+	return AlchemyServiceScript.max_batch_count(preview, inventory, alchemy)
+
+
 func brew_alchemy(
 	recipe_id: String,
 	strategy_id: String = "standard",
 	selection_mode: String = "lowest",
 	seed_override: int = -1
 ) -> Dictionary:
+	return brew_alchemy_batches(recipe_id, strategy_id, selection_mode, 1, seed_override)
+
+
+func brew_alchemy_batches(
+	recipe_id: String,
+	strategy_id: String = "standard",
+	selection_mode: String = "lowest",
+	batch_count: int = 1,
+	seed_override: int = -1
+) -> Dictionary:
 	if not can_persist():
 		return {"ok": false, "error": "历练中无法炼丹"}
-	var preview := preview_alchemy(recipe_id, strategy_id, selection_mode)
-	if not bool(preview.get("ok", false)):
-		return preview
+	batch_count = maxi(1, batch_count)
+	var initial_preview := preview_alchemy(recipe_id, strategy_id, selection_mode)
+	if not bool(initial_preview.get("ok", false)):
+		return initial_preview
+	var max_allowed := max_alchemy_batch_count(initial_preview)
+	if batch_count > max_allowed:
+		return {"ok": false, "error": "药材或丹炉不足以连炼 %d 炉" % batch_count}
 	var rng := RandomNumberGenerator.new()
 	if seed_override >= 0:
 		rng.seed = seed_override
 	else:
 		rng.randomize()
-	var result := AlchemyServiceScript.roll(preview, rng)
-	if not bool(result.get("ok", false)):
-		return result
+	var results: Array = []
+	for _index in batch_count:
+		var preview := preview_alchemy(recipe_id, strategy_id, selection_mode)
+		if not bool(preview.get("ok", false)):
+			break
+		var rolled := AlchemyServiceScript.roll(preview, rng)
+		if not bool(rolled.get("ok", false)):
+			return rolled
+		var applied := _apply_alchemy_brew_result(recipe_id, strategy_id, rolled, batch_count > 1)
+		results.append(applied)
+	if results.is_empty():
+		return {"ok": false, "error": "炼制失败"}
+	var result: Dictionary
+	if results.size() == 1:
+		result = results[0] as Dictionary
+	else:
+		result = AlchemyServiceScript.aggregate_batch_results(results)
+		result["recipe_mastery"] = AlchemyServiceScript.mastery_for(alchemy, recipe_id)
+		result["alchemy_level"] = int(alchemy.get("level", 1))
+		result["alchemy_xp"] = int(alchemy.get("xp", 0))
+		var furnace_id := str(alchemy.get("equipped_furnace", ""))
+		var owned := alchemy.get("owned_furnaces", {}) as Dictionary
+		var furnace_state := owned.get(furnace_id, {}) as Dictionary
+		result["furnace_durability"] = int(furnace_state.get("durability", 0))
+		_append_activity("连炼%d炉%s：%s" % [
+			results.size(),
+			str(result.get("pill_name", "丹药")),
+			str(result.get("quality_summary", "")),
+		])
+	auto_save()
+	return result
+
+
+func _apply_alchemy_brew_result(
+	recipe_id: String,
+	strategy_id: String,
+	result: Dictionary,
+	defer_activity_log: bool = false
+) -> Dictionary:
 	for ingredient_v in result.get("ingredients", []) as Array:
 		var ingredient := ingredient_v as Dictionary
 		InventoryServiceScript.remove_item(
@@ -396,25 +415,34 @@ func brew_alchemy(
 	var elapsed := int(result.get("days", 1))
 	day += elapsed
 	injury_days = maxi(0, injury_days - elapsed)
-	var outcome := str(result.get("quality_name", "无产物"))
-	var log_text := "炼制%s：%s" % [str(result.get("pill_name", "丹药")), outcome]
-	if int(result.get("added", 0)) > 0:
-		log_text += " x%d" % int(result.get("added", 0))
-	_append_activity(log_text)
+	if not defer_activity_log:
+		var outcome := str(result.get("quality_name", "无产物"))
+		var log_text := "炼制%s：%s" % [str(result.get("pill_name", "丹药")), outcome]
+		if int(result.get("added", 0)) > 0:
+			log_text += " x%d" % int(result.get("added", 0))
+		_append_activity(log_text)
 	result["alchemy_level"] = int(alchemy.get("level", 1))
 	result["alchemy_xp"] = int(alchemy.get("xp", 0))
 	result["recipe_mastery"] = AlchemyServiceScript.mastery_for(alchemy, recipe_id)
 	result["furnace_durability"] = int(furnace_state.get("durability", 0))
-	auto_save()
 	return result
 
 
-func preview_cultivation_session(mode_id: String = "cycle", days: int = 1, pill_id: String = "") -> Dictionary:
+func max_cultivation_days(mode_id: String = EnumCultivationMode.LABEL_CYCLE, pill_id: String = "") -> int:
+	if EnumCultivationMode.is_pill_mode(mode_id):
+		var resolved_pill_id := resolve_cultivation_pill_id(pill_id)
+		if resolved_pill_id == "":
+			return 1
+		return mini(30, int(inventory.get(resolved_pill_id, 0)))
+	return 30
+
+
+func preview_cultivation_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: int = 1, pill_id: String = "") -> Dictionary:
 	var mode := _cultivation_mode(mode_id)
 	var safe_days := clampi(days, 1, 30)
 	var resolved_pill_id := ""
 	var pill_ids: Array = []
-	if mode_id == "pill":
+	if EnumCultivationMode.is_pill_mode(mode_id):
 		resolved_pill_id = resolve_cultivation_pill_id(pill_id)
 		if resolved_pill_id == "":
 			return {
@@ -443,7 +471,7 @@ func preview_cultivation_session(mode_id: String = "cycle", days: int = 1, pill_
 	for day_index in safe_days:
 		var normal_gain := base_gain / 2 if remaining_injury > 0 else base_gain
 		var multiplier := float(mode["cultivation_multiplier"])
-		if mode_id == "pill":
+		if EnumCultivationMode.is_pill_mode(mode_id):
 			multiplier = cultivation_pill_multiplier(str(pill_ids[day_index]))
 		estimated_gain += maxi(1, int(round(float(normal_gain) * multiplier)))
 		remaining_injury = maxi(0, remaining_injury - 1)
@@ -463,12 +491,12 @@ func preview_cultivation_session(mode_id: String = "cycle", days: int = 1, pill_
 		"knowledge_rows": CultivationMethodServiceScript.resolved_knowledge(main_id),
 		"pill_ids": pill_ids,
 		"pill_id": resolved_pill_id,
-		"instability_gain": _cultivation_pill_instability_total(pill_ids) if mode_id == "pill" else 0,
+		"instability_gain": _cultivation_pill_instability_total(pill_ids) if EnumCultivationMode.is_pill_mode(mode_id) else 0,
 		"cultivation_instability": cultivation_instability,
 	}
 
 
-func cultivate_session(mode_id: String = "cycle", days: int = 1, pill_id: String = "") -> Dictionary:
+func cultivate_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: int = 1, pill_id: String = "") -> Dictionary:
 	var preview := preview_cultivation_session(mode_id, days, pill_id)
 	if not bool(preview.get("ok", false)):
 		return preview
@@ -489,7 +517,7 @@ func cultivate_session(mode_id: String = "cycle", days: int = 1, pill_id: String
 		base_gain = maxi(1, int(round(float(base_gain) * speed)))
 		var normal_gain := base_gain / 2 if injury_days > 0 else base_gain
 		var multiplier := float(mode["cultivation_multiplier"])
-		if mode_id == "pill":
+		if EnumCultivationMode.is_pill_mode(mode_id):
 			var active_pill_id := str(pill_ids[day_index])
 			InventoryServiceScript.remove_item(inventory, active_pill_id, 1)
 			multiplier = cultivation_pill_multiplier(active_pill_id)
@@ -550,8 +578,7 @@ func cultivate_session(mode_id: String = "cycle", days: int = 1, pill_id: String
 
 
 func _cultivation_mode(mode_id: String) -> Dictionary:
-	var row_v: Variant = CULTIVATION_MODES.get(mode_id, CULTIVATION_MODES["cycle"])
-	return (row_v as Dictionary).duplicate(true)
+	return EnumCultivationMode.config(mode_id)
 
 
 func resolve_cultivation_pill_id(preferred_id: String = "") -> String:
@@ -583,10 +610,10 @@ func is_cultivation_pill(item_id: String) -> bool:
 func cultivation_pill_multiplier(item_id: String) -> float:
 	var def := ConfigManager.item_def_by_id(item_id)
 	if def == null:
-		return float(CULTIVATION_MODES["pill"]["cultivation_multiplier"])
+		return float(EnumCultivationMode.config(EnumCultivationMode.LABEL_PILL)["cultivation_multiplier"])
 	var multiplier: float = def.get_use_effect_amount("pill_cultivation")
 	if multiplier <= 0.0:
-		return float(CULTIVATION_MODES["pill"]["cultivation_multiplier"])
+		return float(EnumCultivationMode.config(EnumCultivationMode.LABEL_PILL)["cultivation_multiplier"])
 	return multiplier
 
 
@@ -1027,7 +1054,6 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 	result["instability_reduced"] = instability_reduced
 	result["cultivation_instability"] = cultivation_instability
 	last_expedition_summary = result.duplicate(true)
-	_apply_world_changes(result.get("world_changes", []) as Array)
 	TutorialService.game_event("tutorial.expedition_returned")
 	auto_save()
 	return {
@@ -1445,14 +1471,3 @@ func _initialize_map_state() -> void:
 	if str(map_state.get("current_city_id", "")) == "":
 		map_state["current_city_id"] = WorldMapServiceScript.starter_city_id()
 	set_map_data(WorldMapServiceScript.apply_starter_discovery(map_data()))
-
-
-func _apply_world_changes(changes: Array) -> void:
-	for change_v in changes:
-		if not change_v is Dictionary:
-			continue
-		var change := change_v as Dictionary
-		var key := str(change.get("state", ""))
-		if not world_state.has(key):
-			continue
-		world_state[key] = clampi(int(world_state.get(key, 0)) + int(change.get("value", 0)), 0, 100)

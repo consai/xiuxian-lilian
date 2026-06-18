@@ -31,4 +31,3 @@ alwaysApply: true
 
 - **可导航的全屏/面板场景**（经 `change_scene` 切换的）统一登记在 `SceneManager.SCENE_PATHS`，通过 `SceneManager.go_to()` 或对应 helper 进入；不要在各业务脚本中重复 `preload` 全场景或直接 `change_scene_to_file`。
 - **子场景、列表项模板、全局浮层 Host**（如 `item.tscn`、行组件、`item_info_popup_host`）仍可在所属脚本中 `preload` 后 `instantiate`。
-- **脚本类引用**（类型检查、静态调用）的 `preload("res://.../*.gd")` 不受此限。

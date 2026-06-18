@@ -5,6 +5,7 @@ const OVERLAY_DAMAGE := "damage"
 const OVERLAY_SHIELD := "shield"
 
 const _SHIELD_ICON := preload("res://assets/art/ui_new/hudun_icon.png")
+const EnemyAiActionPickerScript := preload("res://scripts/fight/ai/enemy_ai_action_picker.gd")
 
 
 static func enrich_skill_row(
@@ -16,7 +17,8 @@ static func enrich_skill_row(
 ) -> Dictionary:
 	if attacker == null or defender == null:
 		return row
-	var overlay := _resolve_overlay(attacker, defender, skill_cfg, skill_id)
+	var resolved_cfg := _attacker_skill_cfg(attacker, skill_cfg, skill_id)
+	var overlay := _resolve_overlay(attacker, defender, resolved_cfg, skill_id)
 	if overlay.is_empty():
 		return row
 	var out := row.duplicate(true)
@@ -36,7 +38,7 @@ static func _resolve_overlay(
 			return {}
 		return {
 			"intent_overlay": OVERLAY_DAMAGE,
-			"estimated_damage": _display_damage(basic_damage),
+			"estimated_damage": _display_hp_damage(basic_damage, defender),
 		}
 	var damage_total := 0.0
 	var has_shield := false
@@ -64,7 +66,7 @@ static func _resolve_overlay(
 	if damage_total > 0.0:
 		return {
 			"intent_overlay": OVERLAY_DAMAGE,
-			"estimated_damage": _display_damage(damage_total),
+			"estimated_damage": _display_hp_damage(damage_total, defender),
 		}
 	if has_shield or _cfg_has_shield_tag(skill_cfg):
 		return {
@@ -72,6 +74,19 @@ static func _resolve_overlay(
 			"intent_icon": _SHIELD_ICON,
 		}
 	return {}
+
+
+## 与 [method FightObj.use_skill] 一致：合并攻击方技能槽上的缩放与覆盖。
+static func _attacker_skill_cfg(attacker: FightObj, skill_cfg: Dictionary, skill_id: int) -> Dictionary:
+	if skill_id <= 0 or attacker == null or skill_cfg.is_empty():
+		return skill_cfg
+	var slot_index := EnemyAiActionPickerScript.find_skill_slot(attacker, skill_id)
+	if slot_index < 0:
+		return skill_cfg
+	var slot := attacker.get_skill_slot_at(slot_index)
+	if slot.is_empty():
+		return skill_cfg
+	return FightObj.merged_slot_runtime_cfg(slot, skill_cfg)
 
 
 static func _targets_player(effect: Dictionary) -> bool:
@@ -117,5 +132,13 @@ static func _cfg_has_shield_tag(cfg: Dictionary) -> bool:
 	return false
 
 
-static func _display_damage(value: float) -> int:
-	return maxi(1, int(roundf(value)))
+## 预览展示扣盾后的预计气血伤害，与 [method FightObj.be_attacked] 一致。
+static func _hp_damage_after_shield(raw_damage: float, defender: FightObj) -> float:
+	if defender == null or raw_damage <= 0.0:
+		return maxf(0.0, raw_damage)
+	var shield := maxf(0.0, defender.get_attr(FightAttr.SHIELD, 0.0))
+	return maxf(0.0, raw_damage - shield)
+
+
+static func _display_hp_damage(raw_damage: float, defender: FightObj) -> int:
+	return maxi(0, int(roundf(_hp_damage_after_shield(raw_damage, defender))))

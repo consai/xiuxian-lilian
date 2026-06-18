@@ -1,8 +1,6 @@
 extends Control
 
 const AlchemyServiceScript := preload("res://scripts/sim/alchemy_service.gd")
-const QUALITY_KEYS := ["none", "waste", "low", "medium", "high", "supreme"]
-const QUALITY_NAMES := ["无产物", "废丹", "下品", "中品", "上品", "极品"]
 const SELECTION_MODES := ["lowest", "highest"]
 const TUTORIAL_RECIPE_ID := "recipe.juqi"
 const TUTORIAL_STRATEGY_ID := "steady"
@@ -24,6 +22,8 @@ const TUTORIAL_BREW_LOCK_EVENTS := [
 @onready var _player_label: Label = $PlayerChip/Text
 @onready var _probability_card: PanelContainer = $StrategyPanel/StrategyContent/ProbabilityCard
 @onready var _material_slots: Array[ItemView] = [%MaterialSlot0, %MaterialSlot1, %MaterialSlot2]
+@onready var _pill_preview: ItemView = %PillPreviewSlot
+@onready var _batch_popup: AlchemyBatchPopup = %BatchPopup
 
 var _recipes: Array = []
 var _strategies: Array = []
@@ -49,6 +49,8 @@ func _ready() -> void:
 	_probability_card.gui_input.connect(_on_preview_area_gui_input)
 	%CloseButton.pressed.connect(_on_close_pressed)
 	_brew_button.pressed.connect(_on_brew_pressed)
+	_batch_popup.confirmed.connect(_on_batch_confirmed)
+	_batch_popup.cancelled.connect(func() -> void: pass)
 	_refresh()
 
 
@@ -97,12 +99,14 @@ func _refresh() -> void:
 		_ingredient_label.text = str(preview.get("error", "当前无法炼制"))
 		_probability_label.text = "备齐药材后可查看成丹概率。"
 		_detail_label.text = ""
-		_refresh_material_slots([])
+		_refresh_material_slots(preview.get("ingredients", []) as Array)
+		_refresh_pill_preview(_selected_recipe())
 		_brew_button.disabled = true
 		return
 	_ingredient_label.text = _format_ingredients(preview.get("ingredients", []) as Array)
 	_probability_label.text = _format_probabilities(preview.get("probabilities", {}) as Dictionary)
 	_refresh_material_slots(preview.get("ingredients", []) as Array)
+	_refresh_pill_preview(preview.get("recipe", {}) as Dictionary)
 	var strategy := preview.get("strategy", {}) as Dictionary
 	_detail_label.text = (
 		"当前丹方熟练度 %d/1000（品质分 %+.1f）\n成功率 %.1f%% · 上品以上 %.1f%% · 基础成丹分 %.1f\n"
@@ -148,6 +152,17 @@ func _preview() -> Dictionary:
 	return GameState.preview_alchemy(recipe_id, strategy_id, selection_mode)
 
 
+func _selected_recipe() -> Dictionary:
+	if _recipes.is_empty():
+		return {}
+	if _is_tutorial_alchemy_forced():
+		for recipe_v in _recipes:
+			if str((recipe_v as Dictionary).get("id", "")) == TUTORIAL_RECIPE_ID:
+				return recipe_v as Dictionary
+	var index := clampi(_recipe_option.selected, 0, _recipes.size() - 1)
+	return _recipes[index] as Dictionary
+
+
 func _format_ingredients(rows: Array) -> String:
 	var lines: PackedStringArray = ["本炉药材"]
 	for row_v in rows:
@@ -171,25 +186,45 @@ func _refresh_material_slots(ingredients: Array) -> void:
 		slot.visible = true
 		var item_id := str(row.get("id", ""))
 		var required := int(row.get("count", 0))
-		var owned := int(GameState.inventory.get(item_id, 0))
+		var sufficient := bool(row.get("sufficient", true))
 		ItemView.apply_item_id(slot, item_id, required, {
 			"show_name": true,
-			"name_override": "%s %d/%d" % [str(row.get("family", "药材")), owned, required],
+			"name_override": str(row.get("family", "药材")),
+			"always_show_count": true,
 			"show_info_on_click": true,
 			"click_enabled": true,
+			"insufficient": not sufficient,
 		})
 
 
+func _refresh_pill_preview(recipe: Dictionary) -> void:
+	var product_id := AlchemyServiceScript.recipe_preview_product_id(recipe)
+	if product_id == "":
+		_pill_preview.visible = false
+		_pill_preview.apply_empty(null)
+		return
+	_pill_preview.visible = true
+	ItemView.apply_item_id(_pill_preview, product_id, 0, {
+		"show_name": true,
+		"name_override": str(recipe.get("pill_name", "丹药")),
+		"show_info_on_click": true,
+		"click_enabled": true,
+	})
+
+
 func _format_probabilities(probabilities: Dictionary) -> String:
-	var failure := float(probabilities.get("none", 0.0)) + float(probabilities.get("waste", 0.0))
+	var failure := (
+		float(probabilities.get(EnumAlchemyQuality.LABEL_NONE, 0.0))
+		+ float(probabilities.get(EnumAlchemyQuality.LABEL_WASTE, 0.0))
+	)
 	var lines: PackedStringArray = [
 		"炼制成功 %.1f%% · 失败 %.1f%%" % [(1.0 - failure) * 100.0, failure * 100.0],
 		"下品及以上视为成功",
 	]
-	for index in QUALITY_KEYS.size():
+	for quality_label in EnumAlchemyQuality.ALL_LABELS:
 		lines.append("%s  %5.1f%%" % [
-			QUALITY_NAMES[index],
-			float(probabilities.get(QUALITY_KEYS[index], 0.0)) * 100.0,
+			EnumAlchemyQuality.display_name(quality_label),
+			float(probabilities.get(quality_label, 0.0)) * 100.0,
 		])
 	return "\n".join(lines)
 
@@ -199,13 +234,35 @@ func _on_brew_pressed() -> void:
 	if not bool(preview.get("ok", false)):
 		_result_label.text = str(preview.get("error", "炼制失败"))
 		return
+	if _is_tutorial_alchemy_forced():
+		_start_brew(1, preview)
+		return
+	var max_batch := GameState.max_alchemy_batch_count(preview)
+	if max_batch <= 1:
+		_start_brew(1, preview)
+		return
+	_batch_popup.open(preview, max_batch)
+
+
+func _on_batch_confirmed(batch_count: int) -> void:
+	var preview := _preview()
+	if not bool(preview.get("ok", false)):
+		_result_label.text = str(preview.get("error", "炼制失败"))
+		return
+	_start_brew(batch_count, preview)
+
+
+func _start_brew(batch_count: int, preview: Dictionary) -> void:
 	var recipe := preview.get("recipe", {}) as Dictionary
 	var strategy := preview.get("strategy", {}) as Dictionary
+	var days_per_batch := int(preview.get("days", 1))
 	var nav: Dictionary = SceneManager.go_alchemy_progress({
 		"recipe_id": str(recipe.get("id", "")),
 		"strategy_id": str(strategy.get("id", "")),
 		"selection_mode": str(preview.get("selection_mode", "lowest")),
-		"days": int(preview.get("days", 1)),
+		"days": days_per_batch * batch_count,
+		"days_per_batch": days_per_batch,
+		"batch_count": batch_count,
 		"recipe_name": str(recipe.get("name", "丹方")),
 		"strategy_name": str(strategy.get("name", "策略")),
 		"start_day": GameState.day,

@@ -210,7 +210,7 @@ func _deferred_register_vfx_actors() -> void:
 
 
 func _schedule_player_side_act() -> void:
-	_combat.schedule_side_act(_ctx, BattleDomainService.SIDE_PLAYER)
+	_combat.schedule_side_act(_ctx, EnumBattleSide.PLAYER)
 
 
 func _deferred_side_act(side: String) -> void:

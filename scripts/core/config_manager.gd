@@ -197,9 +197,6 @@ func expedition_event_by_id(event_id: String) -> Dictionary:
 		return {}
 	var row := (row_v as Dictionary).duplicate(true)
 	row["id"] = eid
-	for key in ["chain_id", "beat_tags", "requires", "chain_effects", "world_effects"]:
-		if not row.has(key):
-			row[key] = [] if key in ["beat_tags", "chain_effects", "world_effects"] else ({} if key == "requires" else "")
 	return row
 
 

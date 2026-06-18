@@ -159,6 +159,6 @@ static func tick_progress(domain: BattleDomainService, delta: float) -> void:
 		return
 	_tick_log_accum = 0.0
 	write("走条", "推进中", {
-		"玩家走条": domain.format_interval(BattleDomainService.SIDE_PLAYER),
-		"敌方走条": domain.format_interval(BattleDomainService.SIDE_ENEMY),
+		"玩家走条": domain.format_interval(EnumBattleSide.PLAYER),
+		"敌方走条": domain.format_interval(EnumBattleSide.ENEMY),
 	})

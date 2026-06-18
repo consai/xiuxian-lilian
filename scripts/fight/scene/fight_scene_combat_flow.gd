@@ -8,7 +8,7 @@ func process_frame(ctx: FightSceneContext, hud: FightSceneHud, presentation: Fig
 	if ctx.domain == null:
 		return
 	match ctx.domain.state:
-		BattleDomainService.BattleState.ADVANCING:
+		EnumBattleState.State.ADVANCING:
 			var ready_signal := ctx.domain.tick_advancing(delta)
 			presentation.consume_runtime_events(ctx, hud)
 			hud.sync_from_domain(ctx)
@@ -17,15 +17,15 @@ func process_frame(ctx: FightSceneContext, hud: FightSceneHud, presentation: Fig
 			match ready_signal:
 				BattleDomainService.SIGNAL_PLAYER_READY:
 					BattleDebugLog.write("场景", "玩家走条满，进入暂停")
-					ctx.domain.enter_paused(BattleDomainService.SIDE_PLAYER)
+					ctx.domain.enter_paused(EnumBattleSide.PLAYER)
 					hud.update_skill_input_enabled(ctx)
-					schedule_side_act(ctx, BattleDomainService.SIDE_PLAYER)
+					schedule_side_act(ctx, EnumBattleSide.PLAYER)
 				BattleDomainService.SIGNAL_ENEMY_READY:
 					BattleDebugLog.write("场景", "敌方走条满，进入暂停")
 					ctx.battle_enemy = ctx.domain.enemy
-					ctx.domain.enter_paused(BattleDomainService.SIDE_ENEMY)
+					ctx.domain.enter_paused(EnumBattleSide.ENEMY)
 					hud.update_skill_input_enabled(ctx)
-					schedule_side_act(ctx, BattleDomainService.SIDE_ENEMY)
+					schedule_side_act(ctx, EnumBattleSide.ENEMY)
 				BattleDomainService.SIGNAL_TIME_LIMIT:
 					BattleDebugLog.write("场景", "战斗超时，结束")
 					return_battle_end(ctx, hud, ctx.domain.end_reason)
@@ -34,7 +34,7 @@ func process_frame(ctx: FightSceneContext, hud: FightSceneHud, presentation: Fig
 						"原因": BattleDebugLog.end_reason_label(ready_signal),
 					})
 					return_battle_end(ctx, hud, ready_signal)
-		BattleDomainService.BattleState.PAUSED, BattleDomainService.BattleState.PRESENTATION:
+		EnumBattleState.State.PAUSED, EnumBattleState.State.PRESENTATION:
 			hud.sync_from_domain(ctx)
 			hud.sync_runtime_slot_interactive(ctx)
 			hud.update_skill_input_enabled(ctx)
@@ -43,7 +43,7 @@ func process_frame(ctx: FightSceneContext, hud: FightSceneHud, presentation: Fig
 
 
 func schedule_side_act(ctx: FightSceneContext, side: String) -> void:
-	if side == BattleDomainService.SIDE_PLAYER:
+	if side == EnumBattleSide.PLAYER:
 		if not ctx.auto_battle_player:
 			return
 		if ctx.player_act_scheduled:
@@ -51,7 +51,7 @@ func schedule_side_act(ctx: FightSceneContext, side: String) -> void:
 		ctx.player_act_scheduled = true
 		if ctx.scene != null:
 			ctx.scene.call_deferred("_deferred_side_act", side)
-	elif side == BattleDomainService.SIDE_ENEMY:
+	elif side == EnumBattleSide.ENEMY:
 		if ctx.enemy_act_scheduled:
 			return
 		ctx.enemy_act_scheduled = true
@@ -66,17 +66,17 @@ func side_act_and_present(
 		side: String,
 		on_battle_ended: Callable
 ) -> void:
-	if side == BattleDomainService.SIDE_PLAYER:
+	if side == EnumBattleSide.PLAYER:
 		ctx.player_act_scheduled = false
 	else:
 		ctx.enemy_act_scheduled = false
 	if ctx.domain == null or ctx.presentation_busy:
 		return
-	if ctx.domain.state != BattleDomainService.BattleState.PAUSED:
+	if ctx.domain.state != EnumBattleState.State.PAUSED:
 		return
 	if ctx.domain.paused_side != side:
 		return
-	if side == BattleDomainService.SIDE_ENEMY:
+	if side == EnumBattleSide.ENEMY:
 		ctx.battle_enemy = ctx.domain.enemy
 		var enemy_resolved := FightSceneActions.resolve_enemy_action_with_ai(ctx)
 		var enemy_payload: Dictionary = enemy_resolved.get("payload", {}) as Dictionary
@@ -89,7 +89,7 @@ func side_act_and_present(
 				BattleDebugLog.write("场景", "敌方降级普攻失败，安全推进状态机避免卡死", {
 					"原因": BattleDebugLog.fail_reason_label(str(enemy_payload.get("reason", ""))),
 				})
-				ctx.domain.begin_presentation(BattleDomainService.SIDE_ENEMY)
+				ctx.domain.begin_presentation(EnumBattleSide.ENEMY)
 				ctx.domain.finish_presentation()
 				return
 		BattleDebugLog.write("场景", "敌方 AI 出手，进入表现")
@@ -97,7 +97,7 @@ func side_act_and_present(
 		hud.sync_from_domain(ctx)
 		await presentation.run_presentation(ctx, hud, enemy_payload, on_battle_ended)
 		return
-	if side == BattleDomainService.SIDE_PLAYER and not ctx.player_ai_cfg.is_empty():
+	if side == EnumBattleSide.PLAYER and not ctx.player_ai_cfg.is_empty():
 		var player_resolved := FightSceneActions.resolve_player_action_with_ai(ctx)
 		var player_payload: Dictionary = player_resolved.get("payload", {}) as Dictionary
 		var player_desc: Dictionary = player_resolved.get("descriptor", {}) as Dictionary
@@ -106,10 +106,10 @@ func side_act_and_present(
 			hud.sync_from_domain(ctx)
 			await presentation.run_presentation(ctx, hud, player_payload, on_battle_ended)
 			return
-	if side == BattleDomainService.SIDE_ENEMY:
+	if side == EnumBattleSide.ENEMY:
 		ctx.battle_enemy = ctx.domain.enemy
-	var actor := ctx.battle_player if side == BattleDomainService.SIDE_PLAYER else ctx.battle_enemy
-	var check_interactive := side == BattleDomainService.SIDE_PLAYER
+	var actor := ctx.battle_player if side == EnumBattleSide.PLAYER else ctx.battle_enemy
+	var check_interactive := side == EnumBattleSide.PLAYER
 	var slot_index := FightSceneActions.find_auto_skill_slot(ctx, actor, check_interactive)
 	var skill_id := FightSceneActions.skill_id_at(actor, slot_index)
 	if slot_index < 0:

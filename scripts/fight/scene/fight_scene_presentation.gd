@@ -58,7 +58,7 @@ func run_presentation(
 	})
 	BattleDebugLog.log_domain(ctx.domain, "表现前")
 	ctx.domain.begin_presentation(source_id)
-	if ctx.domain.state != BattleDomainService.BattleState.PRESENTATION:
+	if ctx.domain.state != EnumBattleState.State.PRESENTATION:
 		BattleDebugLog.write("场景", "开始表现失败，跳过此次表现", {
 			"来源": BattleDebugLog.side_label(source_id),
 			"域状态": BattleDebugLog.state_label(ctx.domain.state),
@@ -83,7 +83,7 @@ func run_presentation(
 	if end_reason != "":
 		if on_record.is_valid():
 			on_record.call(end_reason)
-	elif ctx.domain.state == BattleDomainService.BattleState.END:
+	elif ctx.domain.state == EnumBattleState.State.END:
 		if on_record.is_valid():
 			on_record.call(ctx.domain.end_reason)
 
@@ -147,7 +147,7 @@ func on_vfx_event_finished(ctx: FightSceneContext, hud: FightSceneHud) -> void:
 func on_vfx_queue_finished(ctx: FightSceneContext) -> void:
 	if ctx.domain == null or not ctx.presentation_busy:
 		return
-	if ctx.domain.state == BattleDomainService.BattleState.PRESENTATION:
+	if ctx.domain.state == EnumBattleState.State.PRESENTATION:
 		BattleDebugLog.write("场景", "VFX 队列结束事件", {
 			"状态": BattleDebugLog.state_label(ctx.domain.state),
 			"表现中": ctx.presentation_busy,

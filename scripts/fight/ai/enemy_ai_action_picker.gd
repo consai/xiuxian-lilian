@@ -141,4 +141,5 @@ static func _is_skill_usable_at_slot(
 	var cfg := FightObj._lookup_cfg(skill_cfg, skill_id)
 	if cfg.is_empty():
 		return false
+	cfg = FightObj.merged_slot_runtime_cfg(slot, cfg)
 	return enemy.can_pay_costs(cfg)

@@ -2,15 +2,6 @@ extends Control
 
 const AlchemyServiceScript := preload("res://scripts/sim/alchemy_service.gd")
 
-const QUALITY_COLORS := {
-	"none": Color(0.62, 0.62, 0.62),
-	"waste": Color(0.55, 0.48, 0.42),
-	"low": Color(0.72, 0.78, 0.62),
-	"medium": Color(0.58, 0.68, 0.42),
-	"high": Color(0.45, 0.62, 0.38),
-	"supreme": Color(0.82, 0.62, 0.18),
-}
-
 @onready var _quality_label: Label = $Dialog/Content/RewardRow/RewardInfo/Quality/Text
 @onready var _name_label: Label = $Dialog/Content/RewardRow/RewardInfo/Name
 @onready var _description_label: Label = $Dialog/Content/RewardRow/RewardInfo/Description
@@ -40,27 +31,50 @@ func _ready() -> void:
 
 
 func _apply_result(result: Dictionary) -> void:
-	var quality := str(result.get("quality", "none"))
+	var quality := str(result.get("quality", EnumAlchemyQuality.LABEL_NONE))
 	var quality_name := str(result.get("quality_name", "无产物"))
 	var pill_name := str(result.get("pill_name", "丹药"))
 	var added := int(result.get("added", 0))
 	var product_id := str(result.get("product_id", ""))
 
+	var batch_count := int(result.get("batch_count", 1))
 	var succeeded := bool(result.get("succeeded", false))
-	_quality_label.text = "%s · %s" % [
-		"炼制成功" if succeeded else "炼制失败",
-		quality_name if quality_name != "" else "无产物",
-	]
+	if batch_count > 1:
+		var success_count := int(result.get("success_count", 0))
+		_quality_label.text = "连炼 %d 炉 · 成功 %d 炉" % [batch_count, success_count]
+	else:
+		_quality_label.text = "%s · %s" % [
+			"炼制成功" if succeeded else "炼制失败",
+			quality_name if quality_name != "" else "无产物",
+		]
 	_apply_quality_style(quality)
-	if added > 0 and product_id != "":
+	if batch_count > 1:
+		var product_line := _format_batch_products(
+			result.get("product_totals", {}) as Dictionary,
+			str(result.get("recipe_id", ""))
+		)
+		var quality_summary := str(result.get("quality_summary", "")).strip_edges()
+		if product_line != "":
+			_name_label.text = product_line
+			_description_label.text = (
+				"炉次：%s" % quality_summary if quality_summary != "" else ""
+			)
+		elif quality_summary != "":
+			_name_label.text = quality_summary
+			_description_label.text = ""
+		else:
+			_name_label.text = pill_name
+			_description_label.text = ""
+	elif added > 0 and product_id != "":
 		_name_label.text = "%s%s ×%d" % [
 			quality_name,
 			ConfigManager.get_item_display_name(product_id),
 			added,
 		]
+		_description_label.text = _product_description(result)
 	else:
 		_name_label.text = "%s · %s" % [pill_name, quality_name]
-	_description_label.text = _product_description(result)
+		_description_label.text = _product_description(result)
 
 	var product_count := added if added > 0 else int(result.get("count", 0))
 	if product_id != "":
@@ -96,8 +110,46 @@ func _apply_result(result: Dictionary) -> void:
 	_render_materials(result.get("ingredients", []) as Array)
 
 
+func _format_batch_products(product_totals: Dictionary, recipe_id: String) -> String:
+	var rows: Array = []
+	for product_id_v in product_totals.keys():
+		var batch_product_id := str(product_id_v)
+		var amount := int(product_totals.get(product_id_v, 0))
+		if amount <= 0:
+			continue
+		rows.append({
+			"product_id": batch_product_id,
+			"amount": amount,
+			"rank": _product_quality_rank(batch_product_id, recipe_id),
+		})
+	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		if int(a.get("rank", 0)) != int(b.get("rank", 0)):
+			return int(a.get("rank", 0)) > int(b.get("rank", 0))
+		return str(a.get("product_id", "")) < str(b.get("product_id", ""))
+	)
+	var parts: PackedStringArray = []
+	for row_v in rows:
+		var row := row_v as Dictionary
+		parts.append("%s ×%d" % [
+			ConfigManager.get_item_display_name(str(row.get("product_id", ""))),
+			int(row.get("amount", 0)),
+		])
+	return " · ".join(parts)
+
+
+func _product_quality_rank(product_id: String, recipe_id: String) -> int:
+	if product_id == "items_WasteDan":
+		return EnumAlchemyQuality.rank(EnumAlchemyQuality.LABEL_WASTE)
+	var recipe := AlchemyServiceScript.recipe_by_id(recipe_id)
+	for quality_key_v in (recipe.get("products", {}) as Dictionary).keys():
+		var quality_key := str(quality_key_v)
+		if str((recipe.get("products", {}) as Dictionary).get(quality_key_v, "")) == product_id:
+			return EnumAlchemyQuality.rank(quality_key)
+	return 0
+
+
 func _apply_quality_style(quality: String) -> void:
-	var color: Color = QUALITY_COLORS.get(quality, QUALITY_COLORS["medium"]) as Color
+	var color := EnumAlchemyQuality.result_color(quality)
 	var style := _quality_panel.get_theme_stylebox("panel")
 	if style is StyleBoxFlat:
 		var flat := (style as StyleBoxFlat).duplicate() as StyleBoxFlat
@@ -108,31 +160,13 @@ func _apply_quality_style(quality: String) -> void:
 func _product_description(result: Dictionary) -> String:
 	var product_id := str(result.get("product_id", ""))
 	if product_id == "":
-		return _failure_flavor(str(result.get("quality", "none")))
+		return EnumAlchemyQuality.failure_flavor(str(result.get("quality", EnumAlchemyQuality.LABEL_NONE)))
 	var def := ConfigManager.item_def_by_id(product_id)
 	if def != null:
 		var text := ItemInfoPayloadBuilder.describe_item(def).strip_edges()
 		if text != "":
 			return text
-	return _failure_flavor(str(result.get("quality", "none")))
-
-
-static func _failure_flavor(quality: String) -> String:
-	match quality:
-		"none":
-			return "炉火熄灭，药材化为灰烬，未能凝丹。"
-		"waste":
-			return "丹形粗劣，药力涣散，仅可作废丹处理。"
-		"low":
-			return "丹色暗淡，药力勉强可用。"
-		"medium":
-			return "丹色均匀，药力稳定，可日常使用。"
-		"high":
-			return "丹色莹润，药力充盈，效果出众。"
-		"supreme":
-			return "丹纹天成，药香四溢，堪称极品。"
-		_:
-			return "炉火渐熄，炼制告一段落。"
+	return EnumAlchemyQuality.failure_flavor(str(result.get("quality", EnumAlchemyQuality.LABEL_NONE)))
 
 
 func _render_materials(ingredients: Array) -> void:

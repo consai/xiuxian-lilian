@@ -4,8 +4,7 @@ const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_m
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const ItemViewScript := preload("res://scenes/items/item.gd")
 
-const MODE_IDS := ["cycle", "insight", "breathing", "pill"]
-const DAY_OPTIONS := [1, 3, 7]
+const MODE_IDS := EnumCultivationMode.MODE_IDS
 
 @onready var _player_label: Label = %PlayerLabel
 @onready var _day_label: Label = %DayLabel
@@ -18,13 +17,15 @@ const DAY_OPTIONS := [1, 3, 7]
 @onready var _result_label: Label = %ResultLabel
 @onready var _start_button: Button = %StartButton
 @onready var _mode_buttons: Array[Button] = [%CycleButton, %InsightButton, %BreathingButton, %PillButton]
-@onready var _day_buttons: Array[Button] = [%OneDayButton, %ThreeDayButton, %SevenDayButton]
+@onready var _day_count_label: Label = %DayCountLabel
+@onready var _day_slider: HSlider = %DaySlider
+@onready var _day_max_button: Button = %DayMaxButton
 @onready var _pill_select_row: Control = %PillSelectRow
 @onready var _pill_slot: ItemView = %PillSlot
 @onready var _pill_hint: Label = %PillHint
 @onready var _pill_picker: LoadoutBagPopup = %PillPicker
 
-var _mode_id := "cycle"
+var _mode_id := EnumCultivationMode.LABEL_CYCLE
 var _days := 1
 var _selected_pill_id := ""
 
@@ -34,8 +35,8 @@ func _ready() -> void:
 	_start_button.pressed.connect(_on_start_pressed)
 	for index in _mode_buttons.size():
 		_mode_buttons[index].pressed.connect(_select_mode.bind(MODE_IDS[index]))
-	for index in _day_buttons.size():
-		_day_buttons[index].pressed.connect(_select_days.bind(DAY_OPTIONS[index]))
+	_day_slider.value_changed.connect(_on_day_slider_changed)
+	_day_max_button.pressed.connect(_on_day_max_pressed)
 	_pill_slot.click_enabled = true
 	_pill_slot.show_info_on_click = false
 	_pill_slot.clicked.connect(_on_pill_slot_clicked)
@@ -44,15 +45,16 @@ func _ready() -> void:
 
 
 func _refresh() -> void:
-	if _mode_id == "pill":
+	if EnumCultivationMode.is_pill_mode(_mode_id):
 		_selected_pill_id = GameState.resolve_cultivation_pill_id(_selected_pill_id)
+	_sync_day_slider()
 	var preview: Dictionary = _build_preview()
 	_player_label.text = "%s · %s" % [GameState.player_name, GameState.realm_name]
 	_day_label.text = "第 %d 日" % GameState.day
-	_pill_select_row.visible = _mode_id == "pill"
+	_pill_select_row.visible = EnumCultivationMode.is_pill_mode(_mode_id)
 	_refresh_pill_slot(preview)
 	if not bool(preview.get("ok", false)):
-		var method_preview: Dictionary = GameState.preview_cultivation_session("cycle", _days)
+		var method_preview: Dictionary = GameState.preview_cultivation_session(EnumCultivationMode.LABEL_CYCLE, _days)
 		if bool(method_preview.get("ok", false)):
 			_bind_method_preview(method_preview)
 		else:
@@ -61,7 +63,7 @@ func _refresh() -> void:
 			_mastery_bar.value = 0.0
 			_knowledge_label.text = "装备主功法后方可运功修炼。"
 		_mode_description.text = _format_mode_description(
-			GameState.CULTIVATION_MODES.get(_mode_id, {}) as Dictionary,
+			EnumCultivationMode.config(_mode_id),
 			preview
 		)
 		_preview_label.text = str(preview.get("error", "当前无法修炼"))
@@ -96,6 +98,29 @@ func _refresh() -> void:
 	_update_button_states()
 
 
+func _sync_day_slider() -> void:
+	var max_days := maxi(1, GameState.max_cultivation_days(_mode_id, _selected_pill_id))
+	_day_slider.max_value = float(max_days)
+	_days = clampi(_days, 1, max_days)
+	if int(round(_day_slider.value)) != _days:
+		_day_slider.set_value_no_signal(float(_days))
+	_day_max_button.disabled = max_days <= 1
+	_day_count_label.text = "闭关 %d 日" % _days
+
+
+func _on_day_slider_changed(value: float) -> void:
+	var new_days := int(round(value))
+	if new_days == _days:
+		return
+	_days = new_days
+	_day_count_label.text = "闭关 %d 日" % _days
+	_refresh()
+
+
+func _on_day_max_pressed() -> void:
+	_day_slider.value = _day_slider.max_value
+
+
 func _bind_method_preview(preview: Dictionary) -> void:
 	_method_label.text = str(preview.get("method_name", "主功法"))
 	var mastery := float(preview.get("method_mastery", 0.0))
@@ -105,13 +130,13 @@ func _bind_method_preview(preview: Dictionary) -> void:
 
 
 func _build_preview() -> Dictionary:
-	if _mode_id == "pill":
+	if EnumCultivationMode.is_pill_mode(_mode_id):
 		return GameState.preview_cultivation_session(_mode_id, _days, _selected_pill_id)
 	return GameState.preview_cultivation_session(_mode_id, _days)
 
 
 func _format_mode_description(mode: Dictionary, preview: Dictionary) -> String:
-	if _mode_id != "pill":
+	if not EnumCultivationMode.is_pill_mode(_mode_id):
 		return str(mode.get("description", ""))
 	var pill_id := str(preview.get("pill_id", ""))
 	if pill_id == "":
@@ -125,7 +150,7 @@ func _format_mode_description(mode: Dictionary, preview: Dictionary) -> String:
 
 
 func _refresh_pill_slot(preview: Dictionary) -> void:
-	if _mode_id != "pill":
+	if not EnumCultivationMode.is_pill_mode(_mode_id):
 		return
 	var pill_id := str(preview.get("pill_id", ""))
 	if pill_id == "":
@@ -163,20 +188,15 @@ func _format_knowledge_routes(rows: Array) -> String:
 
 func _select_mode(mode_id: String) -> void:
 	_mode_id = mode_id
-	if mode_id == "pill":
+	if EnumCultivationMode.is_pill_mode(mode_id):
 		_selected_pill_id = GameState.resolve_cultivation_pill_id(_selected_pill_id)
 	_refresh()
-	if mode_id == "pill":
+	if EnumCultivationMode.is_pill_mode(mode_id):
 		TutorialService.game_event("tutorial.pill_mode_selected")
 
 
-func _select_days(days: int) -> void:
-	_days = days
-	_refresh()
-
-
 func _on_pill_slot_clicked() -> void:
-	if _mode_id != "pill":
+	if not EnumCultivationMode.is_pill_mode(_mode_id):
 		return
 	_pill_picker.open_for_cultivation_pill()
 
@@ -189,8 +209,6 @@ func _on_pill_picked(entry: Dictionary) -> void:
 func _update_button_states() -> void:
 	for index in _mode_buttons.size():
 		_mode_buttons[index].modulate = Color(0.72, 0.9, 0.62) if MODE_IDS[index] == _mode_id else Color.WHITE
-	for index in _day_buttons.size():
-		_day_buttons[index].modulate = Color(0.72, 0.9, 0.62) if DAY_OPTIONS[index] == _days else Color.WHITE
 
 
 func _on_start_pressed() -> void:
@@ -206,7 +224,7 @@ func _on_start_pressed() -> void:
 		"mode_name": str(mode.get("name", "运转周天")),
 		"start_day": int(preview.get("start_day", GameState.day)),
 	}
-	if _mode_id == "pill":
+	if EnumCultivationMode.is_pill_mode(_mode_id):
 		session["pill_id"] = str(preview.get("pill_id", ""))
 	var nav: Dictionary = SceneManager.go_cultivation_progress(session)
 	if not bool(nav.get("ok", false)):

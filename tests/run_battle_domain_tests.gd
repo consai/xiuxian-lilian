@@ -5,6 +5,7 @@ const FightObjScript := preload("res://scripts/fight/fightObj.gd")
 const CombatEventScript := preload("res://scripts/fight/combat_event.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
+const EnemyIntentPreviewScript := preload("res://scripts/fight/enemy_intent_preview.gd")
 
 var _failures: Array[String] = []
 var _tests_run := 0
@@ -22,6 +23,7 @@ func _init() -> void:
 	_run("physical and magic damage use matching defense", _test_damage_types_use_matching_defense)
 	_run("true damage bypasses defense", _test_true_damage_bypasses_defense)
 	_run("non mana ability costs are paid", _test_non_mana_ability_costs_are_paid)
+	_run("skill slot scales runtime effects", _test_skill_slot_scales_runtime_effects)
 	_run("accuracy and evasion affect hit chance", _test_accuracy_evasion_hit_chance)
 	_run("control attributes affect status chance", _test_control_attributes_status_chance)
 	_run("effect scaling uses combat attributes", _test_effect_scaling)
@@ -35,6 +37,8 @@ func _init() -> void:
 	_run("runtime modifier expires cleanly", _test_runtime_modifier_expires)
 	_run("qi and foundation active abilities resolve effects", _test_v1_abilities_resolve_effects)
 	_run("knowledge growth interpolates from base to maximum", _test_knowledge_growth)
+	_run("intent preview subtracts defender shield", _test_intent_preview_subtracts_shield)
+	_run("intent preview honors slot effect scale", _test_intent_preview_honors_slot_effect_scale)
 
 	if _failures.is_empty():
 		print("PASS: %d battle domain tests" % _tests_run)
@@ -75,7 +79,7 @@ func _test_paused_freezes_simulation_clock() -> void:
 	var enemy := _make_unit()
 	player.buffs["test_dot"] = _runtime_dot(3.0, 1.0, 10.0)
 	var domain := _start_domain(player, enemy)
-	domain.enter_paused(BattleDomainServiceScript.SIDE_PLAYER)
+	domain.enter_paused(EnumBattleSide.PLAYER)
 
 	_expect_eq(domain.tick_advancing(10.0), "", "paused tick should be ignored")
 	_expect_near(domain.battle_elapsed_advancing, 0.0, "paused advancing time")
@@ -89,8 +93,8 @@ func _test_presentation_freezes_simulation_clock() -> void:
 	var enemy := _make_unit()
 	player.buffs["test_dot"] = _runtime_dot(3.0, 1.0, 10.0)
 	var domain := _start_domain(player, enemy)
-	domain.enter_paused(BattleDomainServiceScript.SIDE_PLAYER)
-	domain.begin_presentation(BattleDomainServiceScript.SIDE_PLAYER)
+	domain.enter_paused(EnumBattleSide.PLAYER)
+	domain.begin_presentation(EnumBattleSide.PLAYER)
 
 	_expect_eq(domain.tick_advancing(10.0), "", "presentation tick should be ignored")
 	_expect_near(domain.battle_elapsed_advancing, 0.0, "presentation advancing time")
@@ -117,10 +121,10 @@ func _test_action_resets_actor_and_preserves_opponent_progress() -> void:
 	var cap := domain.interval_T_player
 	var ready_time := CombatBalance.interval_cap_for(domain.player)
 	_expect_eq(domain.tick_advancing(ready_time), BattleDomainServiceScript.SIGNAL_PLAYER_READY, "player ready")
-	domain.enter_paused(BattleDomainServiceScript.SIDE_PLAYER)
+	domain.enter_paused(EnumBattleSide.PLAYER)
 	var payload := domain.resolve_player_basic()
 	_expect_true(bool(payload.get("ok", false)), "player basic attack should resolve")
-	domain.begin_presentation(BattleDomainServiceScript.SIDE_PLAYER)
+	domain.begin_presentation(EnumBattleSide.PLAYER)
 	domain.finish_presentation()
 
 	_expect_near(domain.interval_elapsed_player, 0.0, "actor action bar reset")
@@ -142,15 +146,15 @@ func _test_dot_death_ends_battle_during_advancing() -> void:
 		BattleDomainServiceScript.SIGNAL_ENEMY_DEAD,
 		"fatal dot should end battle"
 	)
-	_expect_eq(domain.state, BattleDomainServiceScript.BattleState.END, "fatal dot end state")
+	_expect_eq(domain.state, EnumBattleState.State.END, "fatal dot end state")
 
 
 func _test_time_limit_counts_advancing_only() -> void:
 	var domain := _start_domain(_make_unit(), _make_unit(), 2.0)
-	domain.enter_paused(BattleDomainServiceScript.SIDE_PLAYER)
+	domain.enter_paused(EnumBattleSide.PLAYER)
 	domain.tick_advancing(100.0)
 	_expect_near(domain.battle_elapsed_advancing, 0.0, "paused time limit")
-	domain.begin_presentation(BattleDomainServiceScript.SIDE_PLAYER)
+	domain.begin_presentation(EnumBattleSide.PLAYER)
 	domain.tick_advancing(100.0)
 	_expect_near(domain.battle_elapsed_advancing, 0.0, "presentation time limit")
 	domain.finish_presentation()
@@ -160,7 +164,7 @@ func _test_time_limit_counts_advancing_only() -> void:
 		BattleDomainServiceScript.SIGNAL_TIME_LIMIT,
 		"time limit should count advancing time"
 	)
-	_expect_eq(domain.state, BattleDomainServiceScript.BattleState.END, "time limit end state")
+	_expect_eq(domain.state, EnumBattleState.State.END, "time limit end state")
 
 
 func _test_damage_types_use_matching_defense() -> void:
@@ -208,6 +212,39 @@ func _test_non_mana_ability_costs_are_paid() -> void:
 	var used := player.use_skill(int(skill.get("id", -1)), {int(skill.get("id", -1)): skill}, enemy)
 	_expect_true(bool(used.get("ok", false)), "stamina-cost skill resolves")
 	_expect_near(player.mp, 2.0, "stamina-cost skill consumes shared combat resource")
+
+
+func _test_skill_slot_scales_runtime_effects() -> void:
+	var unscaled := _make_unit(100.0, 100.0)
+	var scaled := _make_unit(100.0, 100.0)
+	scaled.skills = [{"id": 1, "cd": 0.0, "effect_value_scale": 0.45}]
+	for unit in [unscaled, scaled]:
+		unit.attrs[FightAttr.MAGIC_ATK] = 10.0
+		unit.attrs[FightAttr.ACCURACY] = 999.0
+	var unscaled_target := _make_unit(200.0, 100.0)
+	var scaled_target := _make_unit(200.0, 100.0)
+	for target in [unscaled_target, scaled_target]:
+		target.attrs[FightAttr.HP_MAX] = 200.0
+		target.attrs[FightAttr.MAGIC_DEF] = 24.0
+		target.attrs[FightAttr.EVASION] = 0.0
+	var cfg := {
+		1: {
+			"mp_cost": 0.0,
+			"cd": 0.0,
+			"power": 1000.0,
+			"effects": [
+				{"type": "damage", "value": 40.0, "damage_type": FightAttr.DAMAGE_MAGIC, "can_miss": false},
+			],
+		},
+	}
+	var raw_hit := unscaled.use_skill(1, cfg, unscaled_target)
+	var scaled_hit := scaled.use_skill(1, cfg, scaled_target)
+	_expect_true(bool(raw_hit.get("ok", false)), "unscaled skill resolves")
+	_expect_true(bool(scaled_hit.get("ok", false)), "scaled skill resolves")
+	_expect_true(
+		float(scaled_hit.get("damage", 0.0)) < float(raw_hit.get("damage", 0.0)) * 0.65,
+		"slot effect scale lowers fixed damage"
+	)
 
 
 func _test_accuracy_evasion_hit_chance() -> void:
@@ -283,7 +320,7 @@ func _test_one_player_can_fight_multiple_enemies() -> void:
 	second.attrs[FightAttr.EVASION] = 0.0
 	var domain := BattleDomainServiceScript.new()
 	domain.start_battle_many(player, [first, second], {}, 200.0)
-	domain.enter_paused(BattleDomainServiceScript.SIDE_PLAYER)
+	domain.enter_paused(EnumBattleSide.PLAYER)
 	var payload := domain.resolve_player_basic()
 	_expect_true(bool(payload.get("ok", false)), "player should hit first enemy")
 	_expect_true(first.is_dead(), "first enemy should die")
@@ -423,6 +460,72 @@ func _test_knowledge_growth() -> void:
 	var full := EffectResolverScript.resolve_combat_effects(rows, 1.0)
 	_expect_near(float((base[0] as Dictionary)["value"]), 40.0, "threshold knowledge uses base")
 	_expect_near(float((full[0] as Dictionary)["value"]), 58.0, "full knowledge adds growth")
+
+
+func _test_intent_preview_subtracts_shield() -> void:
+	AbilityServiceScript.reload()
+	var attacker := _make_unit()
+	attacker.attrs[FightObjScript.ATTR_MAGIC_ATK] = 30.0
+	var defender := _make_unit()
+	defender.set_attr(FightObjScript.ATTR_SHIELD, 24.0)
+	var skill_cfg := AbilityServiceScript.to_runtime_dict("ability.combat.qi_bolt", {"knowledge": {}})
+	var row := EnemyIntentPreviewScript.enrich_skill_row(
+		{},
+		attacker,
+		defender,
+		skill_cfg,
+		int(skill_cfg.get("id", -1)),
+	)
+	var estimated := int(row.get("estimated_damage", -1))
+	var raw := FightAttr.estimate_skill_damage(
+		attacker.attrs,
+		defender.attrs,
+		float(skill_cfg.get("power", 1000.0)) / 1000.0,
+		float(((skill_cfg.get("effects", []) as Array)[0] as Dictionary).get("value", 0.0)),
+		FightAttr.DAMAGE_MAGIC,
+	)
+	var expected_hp_damage := maxi(0, int(roundf(float(raw) - 24.0)))
+	_expect_eq(estimated, expected_hp_damage, "intent preview shows hp damage after shield")
+	_expect_true(estimated < int(roundf(float(raw))), "shielded preview is lower than raw damage")
+
+
+func _test_intent_preview_honors_slot_effect_scale() -> void:
+	var attacker := _make_unit()
+	attacker.skills = [{"id": 1, "cd": 0.0, "effect_value_scale": 0.45}]
+	attacker.attrs[FightObjScript.ATTR_MAGIC_ATK] = 10.0
+	var defender := _make_unit()
+	defender.attrs[FightObjScript.ATTR_MAGIC_DEF] = 24.0
+	var cfg := {
+		"power": 1000.0,
+		"effects": [
+			{
+				"type": "damage",
+				"value": 40.0,
+				"damage_type": FightAttr.DAMAGE_MAGIC,
+				"target": "enemy",
+			},
+		],
+	}
+	var row := EnemyIntentPreviewScript.enrich_skill_row({}, attacker, defender, cfg, 1)
+	var estimated := int(row.get("estimated_damage", -1))
+	var merged := FightObjScript.merged_slot_runtime_cfg(attacker.skills[0], cfg)
+	var effect := (merged.get("effects", []) as Array)[0] as Dictionary
+	var expected := int(roundf(FightAttr.estimate_skill_damage(
+		attacker.attrs,
+		defender.attrs,
+		float(merged.get("power", 1000.0)) / 1000.0,
+		float(effect.get("value", 0.0)),
+		FightAttr.DAMAGE_MAGIC,
+	)))
+	_expect_eq(estimated, expected, "intent preview uses slot effect scale")
+	var unscaled := int(roundf(FightAttr.estimate_skill_damage(
+		attacker.attrs,
+		defender.attrs,
+		1.0,
+		40.0,
+		FightAttr.DAMAGE_MAGIC,
+	)))
+	_expect_true(estimated < unscaled, "scaled preview lower than base skill cfg")
 
 
 func _make_unit(hp: float = 100.0, spd: float = 100.0, skill_cd: float = 0.0) -> FightObj:

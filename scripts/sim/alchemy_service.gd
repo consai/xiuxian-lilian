@@ -2,14 +2,6 @@ class_name AlchemyService
 extends RefCounted
 
 const DATA_PATH := "res://data/alchemy.json"
-const QUALITY_NAMES := {
-	"none": "无产物",
-	"waste": "废丹",
-	"low": "下品",
-	"medium": "中品",
-	"high": "上品",
-	"supreme": "极品",
-}
 const MAX_RECIPE_MASTERY := 1000
 const MASTERY_SCORE_MAX := 20.0
 const MASTERY_EXTRA_PILL_CHANCE_MAX := 0.75
@@ -79,6 +71,17 @@ static func furnace_by_id(furnace_id: String) -> Dictionary:
 	return _by_id((_root().get("furnaces", []) as Array), furnace_id)
 
 
+static func recipe_preview_product_id(recipe: Dictionary) -> String:
+	var products_v: Variant = recipe.get("products", {})
+	if not products_v is Dictionary:
+		return ""
+	var products := products_v as Dictionary
+	for quality in EnumAlchemyQuality.PRODUCT_SCAN_LABELS:
+		if products.has(quality):
+			return str(products.get(quality, ""))
+	return ""
+
+
 static func preview(
 	recipe_id: String,
 	strategy_id: String,
@@ -94,19 +97,35 @@ static func preview(
 		return {"ok": false, "error": "未知丹方或炼制策略"}
 	var state := normalize_state(alchemy_state)
 	if not (state.get("known_recipes", []) as Array).has(recipe_id):
-		return {"ok": false, "error": "尚未掌握该丹方"}
+		return {"ok": false, "error": "尚未掌握该丹方", "recipe": recipe}
+	var selection := _select_ingredients(recipe, inventory, selection_mode)
+	var ingredients := selection.get("ingredients", []) as Array
 	if int(state.get("level", 1)) < int(recipe.get("minimum_level", 1)):
-		return {"ok": false, "error": "炼丹术等级不足"}
+		return {
+			"ok": false,
+			"error": "炼丹术等级不足",
+			"recipe": recipe,
+			"ingredients": ingredients,
+		}
 	var furnace_id := str(state.get("equipped_furnace", ""))
 	var furnace := furnace_by_id(furnace_id)
 	var owned := state.get("owned_furnaces", {}) as Dictionary
 	var furnace_state_v: Variant = owned.get(furnace_id, {})
 	var furnace_state := furnace_state_v as Dictionary if furnace_state_v is Dictionary else {}
 	if furnace.is_empty() or int(furnace_state.get("durability", 0)) <= 0:
-		return {"ok": false, "error": "当前丹炉不可用"}
-	var selection := _select_ingredients(recipe, inventory, selection_mode)
+		return {
+			"ok": false,
+			"error": "当前丹炉不可用",
+			"recipe": recipe,
+			"ingredients": ingredients,
+		}
 	if not bool(selection.get("ok", false)):
-		return selection
+		return {
+			"ok": false,
+			"error": str(selection.get("error", "药材不足")),
+			"recipe": recipe,
+			"ingredients": ingredients,
+		}
 	var ingredient_score := float(selection.get("average_quality", 1.0)) * 8.0 - 8.0
 	var attribute_score := _attribute_score(foundations, aptitudes)
 	var recipe_mastery := mastery_for(state, recipe_id)
@@ -125,9 +144,11 @@ static func preview(
 		+ attribute_score
 		+ mastery_score
 	)
+	var spread_bounds := _strategy_spread_bounds(strategy)
 	var probabilities := _probabilities(
 		base_score,
-		int(strategy.get("spread", 12)),
+		spread_bounds[0],
+		spread_bounds[1],
 		clampf(float(furnace.get("safety", 0.0)) + float(strategy.get("safety", 0.0)), 0.0, 1.0)
 	)
 	var days := maxi(1, int(recipe.get("base_days", 1)) + int(strategy.get("days", 0)))
@@ -163,26 +184,125 @@ static func preview(
 	}
 
 
+static func max_batch_count(preview_data: Dictionary, inventory: Dictionary, alchemy_state: Dictionary) -> int:
+	if not bool(preview_data.get("ok", false)):
+		return 0
+	var max_batches := 1_000_000
+	for ingredient_v in preview_data.get("ingredients", []) as Array:
+		var ingredient := ingredient_v as Dictionary
+		var required := maxi(1, int(ingredient.get("count", 1)))
+		var owned := int(inventory.get(str(ingredient.get("id", "")), 0))
+		max_batches = mini(max_batches, owned / required)
+	var state := normalize_state(alchemy_state)
+	var furnace_id := str(state.get("equipped_furnace", ""))
+	var owned_furnaces := state.get("owned_furnaces", {}) as Dictionary
+	var furnace_state_v: Variant = owned_furnaces.get(furnace_id, {})
+	var furnace_state := furnace_state_v as Dictionary if furnace_state_v is Dictionary else {}
+	max_batches = mini(max_batches, int(furnace_state.get("durability", 0)))
+	return maxi(0, max_batches)
+
+
+static func aggregate_batch_results(results: Array) -> Dictionary:
+	if results.is_empty():
+		return {"ok": false, "error": "没有炼丹结果"}
+	var first := results[0] as Dictionary
+	var quality_counts := {}
+	var product_totals := {}
+	var total_xp := 0
+	var total_mastery := 0
+	var total_days := 0
+	var total_extra_pills := 0
+	var total_saved := 0
+	var total_score := 0.0
+	var success_count := 0
+	var best_quality := EnumAlchemyQuality.LABEL_NONE
+	var best_rank := -1
+	var last := first
+	for result_v in results:
+		var result := result_v as Dictionary
+		last = result
+		var quality := str(result.get("quality", "none"))
+		quality_counts[quality] = int(quality_counts.get(quality, 0)) + 1
+		var rank := EnumAlchemyQuality.rank(quality)
+		if rank > best_rank:
+			best_rank = rank
+			best_quality = quality
+		if bool(result.get("succeeded", false)):
+			success_count += 1
+		var product_id := str(result.get("product_id", ""))
+		var count := int(result.get("added", result.get("count", 0)))
+		if product_id != "" and count > 0:
+			product_totals[product_id] = int(product_totals.get(product_id, 0)) + count
+		total_xp += int(result.get("xp", 0))
+		total_mastery += int(result.get("mastery_gain", 0))
+		total_days += int(result.get("days", 0))
+		total_extra_pills += int(result.get("extra_pills", 0))
+		total_saved += int(result.get("saved_material_count", 0))
+		total_score += float(result.get("score", 0.0))
+	var summary_parts: PackedStringArray = []
+	for quality_key in EnumAlchemyQuality.SUMMARY_LABELS:
+		var amount := int(quality_counts.get(quality_key, 0))
+		if amount <= 0:
+			continue
+		summary_parts.append("%s×%d" % [EnumAlchemyQuality.display_name(quality_key), amount])
+	var showcase_product_id := ""
+	var showcase_count := 0
+	for product_id_v in product_totals.keys():
+		var product_id := str(product_id_v)
+		var amount := int(product_totals.get(product_id_v, 0))
+		if amount > showcase_count:
+			showcase_count = amount
+			showcase_product_id = product_id
+	return {
+		"ok": true,
+		"batch_count": results.size(),
+		"quality": best_quality,
+		"quality_name": EnumAlchemyQuality.display_name(best_quality),
+		"succeeded": success_count > 0,
+		"outcome_name": "炼制成功" if success_count > 0 else "炼制失败",
+		"success_count": success_count,
+		"quality_summary": " · ".join(summary_parts),
+		"product_totals": product_totals,
+		"product_id": showcase_product_id,
+		"count": showcase_count,
+		"added": showcase_count,
+		"score": total_score / float(results.size()),
+		"xp": total_xp,
+		"mastery_gain": total_mastery,
+		"days": total_days,
+		"extra_pills": total_extra_pills,
+		"saved_material_count": total_saved,
+		"ingredients": last.get("ingredients", []),
+		"recipe_id": str(first.get("recipe_id", "")),
+		"recipe_name": str(first.get("recipe_name", "")),
+		"pill_name": str(first.get("pill_name", "丹药")),
+		"strategy_id": str(first.get("strategy_id", "")),
+		"recipe_mastery_before": int(first.get("recipe_mastery_before", 0)),
+	}
+
+
 static func roll(preview_data: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 	if not bool(preview_data.get("ok", false)):
 		return {"ok": false, "error": str(preview_data.get("error", "炼制条件不足"))}
 	var strategy := preview_data.get("strategy", {}) as Dictionary
 	var furnace := preview_data.get("furnace", {}) as Dictionary
-	var spread := int(strategy.get("spread", 12))
+	var spread_bounds := _strategy_spread_bounds(strategy)
+	var spread_down: int = spread_bounds[0]
+	var spread_up: int = spread_bounds[1]
 	var score := float(preview_data.get("base_score", 0.0))
-	score += rng.randi_range(-spread, spread) + rng.randi_range(-spread, spread)
+	score += rng.randi_range(-spread_down, spread_up) + rng.randi_range(-spread_down, spread_up)
 	var quality := _quality_for_score(score)
 	var safety := clampf(float(furnace.get("safety", 0.0)) + float(strategy.get("safety", 0.0)), 0.0, 1.0)
-	if quality == "none" and rng.randf() < safety:
-		quality = "waste"
+	if quality == EnumAlchemyQuality.LABEL_NONE and rng.randf() < safety:
+		quality = EnumAlchemyQuality.LABEL_WASTE
 	var recipe := preview_data.get("recipe", {}) as Dictionary
 	var product_id := ""
 	var count := 0
 	var extra_pills := 0
-	if quality == "waste":
+	if quality == EnumAlchemyQuality.LABEL_WASTE:
 		product_id = "items_WasteDan"
 		count = 1
-	elif quality not in ["none", "waste"]:
+	elif quality not in [EnumAlchemyQuality.LABEL_NONE, EnumAlchemyQuality.LABEL_WASTE]:
 		product_id = str((recipe.get("products", {}) as Dictionary).get(quality, ""))
 		count = int(preview_data.get("product_count", 1))
 		if rng.randf() < float(preview_data.get("extra_pill_chance", 0.0)):
@@ -200,16 +320,15 @@ static func roll(preview_data: Dictionary, rng: RandomNumberGenerator) -> Dictio
 		- _ingredient_count(consumed_ingredients)
 	)
 	var xp := maxi(2, int(recipe.get("difficulty", 0)) - int(preview_data.get("alchemy_level", 1)) * 4)
-	var xp_scale := {"none": 0.7, "waste": 0.9, "low": 1.0, "medium": 1.1, "high": 1.2, "supreme": 1.4}
-	xp = maxi(1, int(round(float(xp) * float(xp_scale.get(quality, 1.0)))))
-	var succeeded := quality in ["low", "medium", "high", "supreme"]
+	xp = maxi(1, int(round(float(xp) * EnumAlchemyQuality.xp_scale(quality))))
+	var succeeded := EnumAlchemyQuality.is_success(quality)
 	var mastery_gain := maxi(4, int(round(float(recipe.get("difficulty", 0)) * 0.25)))
 	if not succeeded:
 		mastery_gain = maxi(mastery_gain + 1, int(round(float(mastery_gain) * FAILURE_MASTERY_MULTIPLIER)))
 	return {
 		"ok": true,
 		"quality": quality,
-		"quality_name": str(QUALITY_NAMES.get(quality, quality)),
+		"quality_name": EnumAlchemyQuality.display_name(quality),
 		"succeeded": succeeded,
 		"outcome_name": "炼制成功" if succeeded else "炼制失败",
 		"score": score,
@@ -266,6 +385,8 @@ static func _select_ingredients(recipe: Dictionary, inventory: Dictionary, selec
 	var chosen: Array = []
 	var total_quality := 0.0
 	var total_weight := 0.0
+	var first_error := ""
+	var all_ok := true
 	for ingredient_v in recipe.get("ingredients", []) as Array:
 		var ingredient := ingredient_v as Dictionary
 		var options := (ingredient.get("options", []) as Array).duplicate(true)
@@ -281,22 +402,32 @@ static func _select_ingredients(recipe: Dictionary, inventory: Dictionary, selec
 			if int(inventory.get(str(option.get("id", "")), 0)) >= count:
 				selected = option
 				break
-		if selected.is_empty():
-			return {"ok": false, "error": "缺少%s x%d" % [str(ingredient.get("family", "药材")), count]}
-		var weight := float(ingredient.get("weight", 1))
+		var sufficient := not selected.is_empty()
+		if not sufficient:
+			all_ok = false
+			if first_error == "":
+				first_error = "缺少%s x%d" % [str(ingredient.get("family", "药材")), count]
+			if not options.is_empty():
+				selected = options[0] as Dictionary
 		chosen.append({
 			"id": str(selected.get("id", "")),
 			"family": str(ingredient.get("family", "药材")),
 			"count": count,
 			"quality": int(selected.get("quality", 1)),
+			"sufficient": sufficient,
 		})
-		total_quality += float(selected.get("quality", 1)) * weight
-		total_weight += weight
-	return {
-		"ok": true,
+		if sufficient:
+			var weight := float(ingredient.get("weight", 1))
+			total_quality += float(selected.get("quality", 1)) * weight
+			total_weight += weight
+	var result := {
+		"ok": all_ok,
 		"ingredients": chosen,
-		"average_quality": total_quality / maxf(1.0, total_weight),
+		"average_quality": total_quality / maxf(1.0, total_weight) if total_weight > 0.0 else 1.0,
 	}
+	if not all_ok:
+		result["error"] = first_error
+	return result
 
 
 static func _attribute_score(foundations: Dictionary, aptitudes: Dictionary) -> float:
@@ -308,16 +439,25 @@ static func _attribute_score(foundations: Dictionary, aptitudes: Dictionary) -> 
 	return minf(10.0, clampf((sense - 10.0) * 0.25, 0.0, 5.0) + clampf((comprehension - 10.0) * 0.2, 0.0, 4.0) + root_fit)
 
 
-static func _probabilities(base_score: float, spread: int, safety: float) -> Dictionary:
-	var counts := {"none": 0.0, "waste": 0.0, "low": 0.0, "medium": 0.0, "high": 0.0, "supreme": 0.0}
-	var total := float((spread * 2 + 1) * (spread * 2 + 1))
-	for first in range(-spread, spread + 1):
-		for second in range(-spread, spread + 1):
+static func _strategy_spread_bounds(strategy: Dictionary) -> Array:
+	var spread := int(strategy.get("spread", 12))
+	return [
+		int(strategy.get("spread_down", spread)),
+		int(strategy.get("spread_up", spread)),
+	]
+
+
+static func _probabilities(base_score: float, spread_down: int, spread_up: int, safety: float) -> Dictionary:
+	var counts := EnumAlchemyQuality.empty_probability_counts()
+	var span := spread_down + spread_up + 1
+	var total := float(span * span)
+	for first in range(-spread_down, spread_up + 1):
+		for second in range(-spread_down, spread_up + 1):
 			var quality := _quality_for_score(base_score + first + second)
 			counts[quality] = float(counts[quality]) + 1.0
-	var convertible := float(counts["none"]) * clampf(safety, 0.0, 1.0)
-	counts["none"] = float(counts["none"]) - convertible
-	counts["waste"] = float(counts["waste"]) + convertible
+	var convertible := float(counts[EnumAlchemyQuality.LABEL_NONE]) * clampf(safety, 0.0, 1.0)
+	counts[EnumAlchemyQuality.LABEL_NONE] = float(counts[EnumAlchemyQuality.LABEL_NONE]) - convertible
+	counts[EnumAlchemyQuality.LABEL_WASTE] = float(counts[EnumAlchemyQuality.LABEL_WASTE]) + convertible
 	for key in counts.keys():
 		counts[key] = float(counts[key]) / total
 	return counts
@@ -325,17 +465,17 @@ static func _probabilities(base_score: float, spread: int, safety: float) -> Dic
 
 static func _success_probability(probabilities: Dictionary) -> float:
 	return (
-		float(probabilities.get("low", 0.0))
-		+ float(probabilities.get("medium", 0.0))
-		+ float(probabilities.get("high", 0.0))
-		+ float(probabilities.get("supreme", 0.0))
+		float(probabilities.get(EnumAlchemyQuality.LABEL_LOW, 0.0))
+		+ float(probabilities.get(EnumAlchemyQuality.LABEL_MEDIUM, 0.0))
+		+ float(probabilities.get(EnumAlchemyQuality.LABEL_HIGH, 0.0))
+		+ float(probabilities.get(EnumAlchemyQuality.LABEL_SUPREME, 0.0))
 	)
 
 
 static func _high_quality_probability(probabilities: Dictionary) -> float:
 	return (
-		float(probabilities.get("high", 0.0))
-		+ float(probabilities.get("supreme", 0.0))
+		float(probabilities.get(EnumAlchemyQuality.LABEL_HIGH, 0.0))
+		+ float(probabilities.get(EnumAlchemyQuality.LABEL_SUPREME, 0.0))
 	)
 
 
@@ -360,17 +500,7 @@ static func _ingredient_count(ingredients: Array) -> int:
 
 
 static func _quality_for_score(score: float) -> String:
-	if score < 15.0:
-		return "none"
-	if score < 35.0:
-		return "waste"
-	if score < 55.0:
-		return "low"
-	if score < 70.0:
-		return "medium"
-	if score < 85.0:
-		return "high"
-	return "supreme"
+	return EnumAlchemyQuality.quality_for_score(score)
 
 
 static func _by_id(rows: Array, target_id: String) -> Dictionary:

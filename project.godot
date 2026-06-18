@@ -38,6 +38,10 @@ window/size/viewport_height=800
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[gui]
+
+theme/custom="res://ui/theme_tuhuang.tres"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"

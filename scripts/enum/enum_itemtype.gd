@@ -64,7 +64,7 @@ static func sort_order(type: Type) -> int:
 
 
 static func sort_order_for_entry(kind: String, item_type_label: String) -> int:
-	if str(kind).strip_edges() == "equip":
+	if str(kind).strip_edges() == EnumRewardKind.LABEL_EQUIP:
 		return sort_order(Type.EQUIP)
 	return sort_order(from_label(item_type_label))
 
@@ -79,3 +79,10 @@ static func is_material_label(text: String) -> bool:
 
 static func material_labels() -> PackedStringArray:
 	return PackedStringArray([LABEL_MATERIAL, LABEL_ORE])
+
+
+static func filter_sort_order_for_label(text: String) -> int:
+	var typed := from_label(text.strip_edges())
+	if typed != Type.UNKNOWN:
+		return sort_order(typed)
+	return 100

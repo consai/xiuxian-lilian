@@ -3,11 +3,6 @@ extends RefCounted
 ## 战斗域：四态状态机、实时速度行动进度、CD、整场时限与出手结算。
 const CombatEventScript = preload("res://scripts/fight/combat_event.gd")
 
-enum BattleState { ADVANCING, PAUSED, PRESENTATION, END }
-
-const SIDE_PLAYER := "player"
-const SIDE_ENEMY := "enemy"
-
 const SIGNAL_PLAYER_READY := "player_ready"
 const SIGNAL_ENEMY_READY := "enemy_ready"
 const SIGNAL_TIME_LIMIT := "time_limit"
@@ -18,7 +13,7 @@ const DEFAULT_FORMATION_COLUMNS := 3
 const DEFAULT_FORMATION_ROWS := 5
 const DEFAULT_ACTIVE_COLUMNS := 1
 
-var state: BattleState = BattleState.ADVANCING
+var state: EnumBattleState.State = EnumBattleState.State.ADVANCING
 var paused_side: String = ""
 ## 进入 PRESENTATION 时的出手方（避免 paused_side 丢失导致走条不归零）。
 var presentation_side: String = ""
@@ -122,7 +117,7 @@ func start_battle_many(
 	_runtime_events.clear()
 	_passive_tick_accum = 0.0
 	BattleDebugLog.reset_tick_throttle()
-	_set_state(BattleState.ADVANCING, "开战")
+	_set_state(EnumBattleState.State.ADVANCING, "开战")
 	BattleDebugLog.log_domain(self, "开战")
 	BattleDebugLog.write("流程", "战斗开始", {
 		"时限": battle_time_limit,
@@ -134,7 +129,7 @@ func start_battle_many(
 
 
 func tick_advancing(delta: float) -> String:
-	if state != BattleState.ADVANCING:
+	if state != EnumBattleState.State.ADVANCING:
 		return ""
 	if delta <= 0.0:
 		return ""
@@ -163,8 +158,8 @@ func tick_advancing(delta: float) -> String:
 	BattleDebugLog.tick_progress(self, delta)
 	if interval_elapsed_player >= interval_T_player:
 		BattleDebugLog.write("走条", "玩家走条已满", {
-			"玩家走条": format_interval(SIDE_PLAYER),
-			"敌方走条": format_interval(SIDE_ENEMY),
+			"玩家走条": format_interval(EnumBattleSide.PLAYER),
+			"敌方走条": format_interval(EnumBattleSide.ENEMY),
 		})
 		return SIGNAL_PLAYER_READY
 	var ready_enemy := _first_ready_enemy_index()
@@ -174,8 +169,8 @@ func tick_advancing(delta: float) -> String:
 		enemy = _enemy_at(active_enemy_index)
 		_sync_legacy_enemy_interval()
 		BattleDebugLog.write("走条", "敌方走条已满", {
-			"玩家走条": format_interval(SIDE_PLAYER),
-			"敌方走条": format_interval(SIDE_ENEMY),
+			"玩家走条": format_interval(EnumBattleSide.PLAYER),
+			"敌方走条": format_interval(EnumBattleSide.ENEMY),
 			"敌方序号": active_enemy_index + 1,
 		})
 		return SIGNAL_ENEMY_READY
@@ -195,17 +190,17 @@ func _tick_passive_recovery(delta: float) -> void:
 
 
 func enter_paused(side: String) -> void:
-	if state != BattleState.ADVANCING:
+	if state != EnumBattleState.State.ADVANCING:
 		push_warning("BattleDomainService.enter_paused: invalid state %s" % BattleDebugLog.state_label(state))
 		return
-	if side != SIDE_PLAYER and side != SIDE_ENEMY:
+	if side != EnumBattleSide.PLAYER and side != EnumBattleSide.ENEMY:
 		push_warning("BattleDomainService.enter_paused: invalid side '%s'" % side)
 		return
 	paused_side = side
-	if side == SIDE_PLAYER:
+	if side == EnumBattleSide.PLAYER:
 		_overflow_player = _capture_overflow(interval_elapsed_player, interval_T_player)
 		interval_elapsed_player = interval_T_player
-	elif side == SIDE_ENEMY:
+	elif side == EnumBattleSide.ENEMY:
 		acting_enemy_index = active_enemy_index
 		acting_enemy_slot = active_enemy_slot
 		_overflow_enemies[acting_enemy_index] = _capture_overflow(
@@ -214,22 +209,22 @@ func enter_paused(side: String) -> void:
 		)
 		interval_elapsed_enemies[acting_enemy_index] = interval_T_enemy
 		_sync_legacy_enemy_interval()
-	_set_state(BattleState.PAUSED, "进入暂停(%s)" % BattleDebugLog.side_label(side))
+	_set_state(EnumBattleState.State.PAUSED, "进入暂停(%s)" % BattleDebugLog.side_label(side))
 	BattleDebugLog.write("流程", "进入暂停", {
 		"出手方": BattleDebugLog.side_label(side),
 		"玩家溢出": _overflow_player,
 		"敌方溢出": _overflow_enemy,
-		"玩家走条": format_interval(SIDE_PLAYER),
-		"敌方走条": format_interval(SIDE_ENEMY),
+		"玩家走条": format_interval(EnumBattleSide.PLAYER),
+		"敌方走条": format_interval(EnumBattleSide.ENEMY),
 	})
 
 
 func can_player_act() -> bool:
-	return state == BattleState.PAUSED and paused_side == SIDE_PLAYER
+	return state == EnumBattleState.State.PAUSED and paused_side == EnumBattleSide.PLAYER
 
 
 func resolve_player_basic() -> Dictionary:
-	return _resolve_basic(SIDE_PLAYER)
+	return _resolve_basic(EnumBattleSide.PLAYER)
 
 
 func resolve_player_skill(skill_id: int) -> Dictionary:
@@ -256,7 +251,7 @@ func resolve_player_skill(skill_id: int) -> Dictionary:
 		"玩家": BattleDebugLog.log_unit(player, "player"),
 		"敌方": BattleDebugLog.log_unit(enemy, "enemy"),
 	})
-	return _with_actor_ids(_ok_payload(SIDE_PLAYER, SIDE_ENEMY, result, cfg), SIDE_PLAYER, _enemy_index_for_unit(target))
+	return _with_actor_ids(_ok_payload(EnumBattleSide.PLAYER, EnumBattleSide.ENEMY, result, cfg), EnumBattleSide.PLAYER, _enemy_index_for_unit(target))
 
 
 func resolve_player_item(slot_index: int) -> Dictionary:
@@ -267,7 +262,7 @@ func resolve_player_item(slot_index: int) -> Dictionary:
 	if not bool(result.get("ok", false)):
 		return _fail_payload(str(result.get("reason", "failed")))
 	var cfg := FightObj._lookup_cfg(item_cfg, int(result.get("item_id", -1)))
-	return _with_actor_ids(_ok_payload(SIDE_PLAYER, SIDE_ENEMY, result, cfg), SIDE_PLAYER, _enemy_index_for_unit(target))
+	return _with_actor_ids(_ok_payload(EnumBattleSide.PLAYER, EnumBattleSide.ENEMY, result, cfg), EnumBattleSide.PLAYER, _enemy_index_for_unit(target))
 
 
 func resolve_player_equip(slot_index: int) -> Dictionary:
@@ -280,15 +275,15 @@ func resolve_player_equip(slot_index: int) -> Dictionary:
 	var equip_id := int(result.get("equip_id", -1))
 	var slot := player.get_equip_slot_at(slot_index)
 	var cfg := _merge_equip_runtime_cfg(slot, equip_id)
-	return _with_actor_ids(_ok_payload(SIDE_PLAYER, SIDE_ENEMY, result, cfg), SIDE_PLAYER, _enemy_index_for_unit(target))
+	return _with_actor_ids(_ok_payload(EnumBattleSide.PLAYER, EnumBattleSide.ENEMY, result, cfg), EnumBattleSide.PLAYER, _enemy_index_for_unit(target))
 
 
 func resolve_enemy_basic() -> Dictionary:
-	return _resolve_basic(SIDE_ENEMY)
+	return _resolve_basic(EnumBattleSide.ENEMY)
 
 
 func resolve_enemy_skill(skill_id: int) -> Dictionary:
-	if state != BattleState.PAUSED or paused_side != SIDE_ENEMY:
+	if state != EnumBattleState.State.PAUSED or paused_side != EnumBattleSide.ENEMY:
 		BattleDebugLog.write("行动", "敌方技能被拒绝", {
 			"技能ID": skill_id,
 			"原因": BattleDebugLog.fail_reason_label("not_paused"),
@@ -311,22 +306,22 @@ func resolve_enemy_skill(skill_id: int) -> Dictionary:
 		"敌方": BattleDebugLog.log_unit(enemy, "enemy"),
 		"玩家": BattleDebugLog.log_unit(player, "player"),
 	})
-	return _with_actor_ids(_ok_payload(SIDE_ENEMY, SIDE_PLAYER, result, cfg), SIDE_ENEMY, active_enemy_index)
+	return _with_actor_ids(_ok_payload(EnumBattleSide.ENEMY, EnumBattleSide.PLAYER, result, cfg), EnumBattleSide.ENEMY, active_enemy_index)
 
 
 func resolve_enemy_item(slot_index: int) -> Dictionary:
-	if state != BattleState.PAUSED or paused_side != SIDE_ENEMY:
+	if state != EnumBattleState.State.PAUSED or paused_side != EnumBattleSide.ENEMY:
 		return _fail_payload("not_paused")
 	enemy = _current_enemy()
 	var result := enemy.use_item_at(slot_index, item_cfg, player)
 	if not bool(result.get("ok", false)):
 		return _fail_payload(str(result.get("reason", "failed")))
 	var cfg := FightObj._lookup_cfg(item_cfg, int(result.get("item_id", -1)))
-	return _with_actor_ids(_ok_payload(SIDE_ENEMY, SIDE_PLAYER, result, cfg), SIDE_ENEMY, active_enemy_index)
+	return _with_actor_ids(_ok_payload(EnumBattleSide.ENEMY, EnumBattleSide.PLAYER, result, cfg), EnumBattleSide.ENEMY, active_enemy_index)
 
 
 func resolve_enemy_equip(slot_index: int) -> Dictionary:
-	if state != BattleState.PAUSED or paused_side != SIDE_ENEMY:
+	if state != EnumBattleState.State.PAUSED or paused_side != EnumBattleSide.ENEMY:
 		return _fail_payload("not_paused")
 	enemy = _current_enemy()
 	var result := enemy.use_equip_at(slot_index, player, equip_cfg)
@@ -335,35 +330,35 @@ func resolve_enemy_equip(slot_index: int) -> Dictionary:
 	var equip_id := int(result.get("equip_id", -1))
 	var slot := enemy.get_equip_slot_at(slot_index)
 	var cfg := _merge_equip_runtime_cfg(slot, equip_id)
-	return _with_actor_ids(_ok_payload(SIDE_ENEMY, SIDE_PLAYER, result, cfg), SIDE_ENEMY, active_enemy_index)
+	return _with_actor_ids(_ok_payload(EnumBattleSide.ENEMY, EnumBattleSide.PLAYER, result, cfg), EnumBattleSide.ENEMY, active_enemy_index)
 
 
 ## 表现结束：恢复走条并回到 ADVANCING（可重复调用）。
 func finish_presentation() -> void:
-	if state != BattleState.PRESENTATION:
+	if state != EnumBattleState.State.PRESENTATION:
 		BattleDebugLog.write("表现", "跳过结束表现（状态不符）", {
 			"当前状态": BattleDebugLog.state_label(state),
 		})
 		return
 	var side := presentation_side if presentation_side != "" else paused_side
-	if side != SIDE_PLAYER and side != SIDE_ENEMY:
+	if side != EnumBattleSide.PLAYER and side != EnumBattleSide.ENEMY:
 		push_warning("BattleDomainService.finish_presentation: invalid actor '%s'" % side)
-		side = SIDE_PLAYER
+		side = EnumBattleSide.PLAYER
 	var before_player := interval_elapsed_player
 	var before_enemy := interval_elapsed_enemy
 	presentation_side = ""
 	_apply_interval_after_action(side)
-	if side == SIDE_ENEMY:
+	if side == EnumBattleSide.ENEMY:
 		acting_enemy_index = -1
 		acting_enemy_slot = -1
 	paused_side = ""
-	_set_state(BattleState.ADVANCING, "表现结束(%s)" % BattleDebugLog.side_label(side))
+	_set_state(EnumBattleState.State.ADVANCING, "表现结束(%s)" % BattleDebugLog.side_label(side))
 	BattleDebugLog.write("表现", "表现结束，恢复走条", {
 		"出手方": BattleDebugLog.side_label(side),
 		"玩家走条前": "%.2f" % before_player,
-		"玩家走条后": format_interval(SIDE_PLAYER),
+		"玩家走条后": format_interval(EnumBattleSide.PLAYER),
 		"敌方走条前": "%.2f" % before_enemy,
-		"敌方走条后": format_interval(SIDE_ENEMY),
+		"敌方走条后": format_interval(EnumBattleSide.ENEMY),
 	})
 	BattleDebugLog.log_domain(self, "表现后")
 
@@ -404,12 +399,12 @@ static func _capture_overflow(elapsed: float, cap: float) -> float:
 
 ## 编排层开始播 VFX 前调用；此前须已完成数据结算（仍为 PAUSED）。
 func begin_presentation(side: String) -> void:
-	if state != BattleState.PAUSED:
+	if state != EnumBattleState.State.PAUSED:
 		push_warning(
 			"BattleDomainService.begin_presentation: invalid state %s" % BattleDebugLog.state_label(state)
 		)
 		return
-	if side != SIDE_PLAYER and side != SIDE_ENEMY:
+	if side != EnumBattleSide.PLAYER and side != EnumBattleSide.ENEMY:
 		push_warning("BattleDomainService.begin_presentation: invalid side '%s'" % side)
 		return
 	if paused_side != side:
@@ -418,14 +413,14 @@ func begin_presentation(side: String) -> void:
 			% [paused_side, side]
 		)
 		return
-	if side == SIDE_PLAYER:
+	if side == EnumBattleSide.PLAYER:
 		_overflow_player = _capture_overflow(interval_elapsed_player, interval_T_player)
-	elif side == SIDE_ENEMY:
+	elif side == EnumBattleSide.ENEMY:
 		var idx := _acting_enemy_index()
 		_overflow_enemies[idx] = _capture_overflow(float(interval_elapsed_enemies[idx]), interval_T_enemy)
 		_sync_legacy_enemy_interval()
 	presentation_side = side
-	_set_state(BattleState.PRESENTATION, "开始表现(%s)" % BattleDebugLog.side_label(side))
+	_set_state(EnumBattleState.State.PRESENTATION, "开始表现(%s)" % BattleDebugLog.side_label(side))
 	BattleDebugLog.write("表现", "开始播放", {
 		"出手方": BattleDebugLog.side_label(side),
 		"玩家溢出": _overflow_player,
@@ -435,7 +430,7 @@ func begin_presentation(side: String) -> void:
 
 ## 数据已结算但表现未播时回滚（如 VFX 节点缺失）。
 func abort_presentation() -> void:
-	if state != BattleState.PRESENTATION:
+	if state != EnumBattleState.State.PRESENTATION:
 		return
 	finish_presentation()
 
@@ -450,10 +445,10 @@ func consume_runtime_events() -> Array:
 
 func _apply_interval_after_action(side: String) -> void:
 	# 出手后重置行动进度，再加回越过 100 的溢出进度。
-	if side == SIDE_PLAYER:
+	if side == EnumBattleSide.PLAYER:
 		interval_elapsed_player = minf(_overflow_player, interval_T_player)
 		_overflow_player = 0.0
-	elif side == SIDE_ENEMY:
+	elif side == EnumBattleSide.ENEMY:
 		var idx := _acting_enemy_index()
 		interval_elapsed_enemies[idx] = minf(float(_overflow_enemies[idx]), interval_T_enemy)
 		_overflow_enemies[idx] = 0.0
@@ -461,7 +456,7 @@ func _apply_interval_after_action(side: String) -> void:
 
 
 func _resolve_basic(side: String) -> Dictionary:
-	if state != BattleState.PAUSED:
+	if state != EnumBattleState.State.PAUSED:
 		BattleDebugLog.write("行动", "普攻被拒绝", {
 			"出手方": BattleDebugLog.side_label(side),
 			"原因": BattleDebugLog.fail_reason_label("not_paused"),
@@ -478,17 +473,17 @@ func _resolve_basic(side: String) -> Dictionary:
 	var defender: FightObj
 	var source_id: String
 	var target_id: String
-	if side == SIDE_PLAYER:
+	if side == EnumBattleSide.PLAYER:
 		attacker = player
 		defender = _current_enemy()
-		source_id = SIDE_PLAYER
-		target_id = SIDE_ENEMY
+		source_id = EnumBattleSide.PLAYER
+		target_id = EnumBattleSide.ENEMY
 	else:
 		enemy = _current_enemy()
 		attacker = enemy
 		defender = player
-		source_id = SIDE_ENEMY
-		target_id = SIDE_PLAYER
+		source_id = EnumBattleSide.ENEMY
+		target_id = EnumBattleSide.PLAYER
 	var report := FightObj.resolve_basic_attack(attacker, defender)
 	BattleDebugLog.write("行动", "普攻结算完成", {
 		"出手方": BattleDebugLog.side_label(side),
@@ -504,9 +499,9 @@ func _resolve_basic(side: String) -> Dictionary:
 	else:
 		cfg = {"tags": ["attack", "physical"]}
 	var payload := _ok_payload(source_id, target_id, report, cfg)
-	if side == SIDE_PLAYER:
-		return _with_actor_ids(payload, SIDE_PLAYER, _enemy_index_for_unit(defender))
-	return _with_actor_ids(payload, SIDE_ENEMY, active_enemy_index)
+	if side == EnumBattleSide.PLAYER:
+		return _with_actor_ids(payload, EnumBattleSide.PLAYER, _enemy_index_for_unit(defender))
+	return _with_actor_ids(payload, EnumBattleSide.ENEMY, active_enemy_index)
 
 
 func _lookup_skill_cfg(skill_id: int) -> Dictionary:
@@ -533,12 +528,12 @@ func _merge_equip_runtime_cfg(slot: Dictionary, equip_id: int) -> Dictionary:
 
 
 func format_interval(side: String) -> String:
-	if side == SIDE_PLAYER:
+	if side == EnumBattleSide.PLAYER:
 		return "%.1f/%.0f（速率 %.1f/s，溢出 %.1f）" % [
 			interval_elapsed_player, interval_T_player,
 			CombatBalance.action_progress_rate_for(player), _overflow_player,
 		]
-	if side == SIDE_ENEMY:
+	if side == EnumBattleSide.ENEMY:
 		return "%.1f/%.0f（速率 %.1f/s，溢出 %.1f，slot %d）" % [
 			interval_elapsed_enemy, interval_T_enemy,
 			CombatBalance.action_progress_rate_for(enemy), _overflow_enemy,
@@ -555,15 +550,15 @@ func get_debug_snapshot() -> Dictionary:
 		"表现方": BattleDebugLog.side_label(presentation_side),
 		"结束原因": BattleDebugLog.end_reason_label(end_reason),
 		"战斗用时": "%.2f/%.2f" % [battle_elapsed_advancing, battle_time_limit],
-		"玩家走条": format_interval(SIDE_PLAYER),
-		"敌方走条": format_interval(SIDE_ENEMY),
+		"玩家走条": format_interval(EnumBattleSide.PLAYER),
+		"敌方走条": format_interval(EnumBattleSide.ENEMY),
 		"玩家": BattleDebugLog.log_unit(player, "player"),
 		"敌方": BattleDebugLog.log_unit(enemy, "enemy"),
 		"阵型": get_formation_snapshot(),
 	}
 
 
-func _set_state(next: BattleState, reason: String) -> void:
+func _set_state(next: EnumBattleState.State, reason: String) -> void:
 	if state == next:
 		return
 	var from := state
@@ -574,19 +569,19 @@ func _set_state(next: BattleState, reason: String) -> void:
 func _set_end(reason: String, trigger: String = "") -> void:
 	end_reason = reason
 	var log_trigger := trigger if trigger != "" else BattleDebugLog.end_reason_label(reason)
-	_set_state(BattleState.END, log_trigger)
+	_set_state(EnumBattleState.State.END, log_trigger)
 
 
 func _drain_runtime_events() -> void:
 	if player != null and player.has_method("pop_runtime_events"):
-		for ev in player.call("pop_runtime_events", SIDE_PLAYER):
+		for ev in player.call("pop_runtime_events", EnumBattleSide.PLAYER):
 			if ev is Dictionary:
 				_runtime_events.append(ev)
 	if enemy != null and enemy.has_method("pop_runtime_events"):
 		pass
 	for unit_v in enemies:
 		if unit_v is FightObj and (unit_v as FightObj).has_method("pop_runtime_events"):
-			for ev in (unit_v as FightObj).call("pop_runtime_events", SIDE_ENEMY):
+			for ev in (unit_v as FightObj).call("pop_runtime_events", EnumBattleSide.ENEMY):
 				if ev is Dictionary:
 					_runtime_events.append(ev)
 
@@ -599,7 +594,7 @@ func _enemy_at(index: int) -> FightObj:
 
 
 func _current_enemy() -> FightObj:
-	if paused_side == SIDE_ENEMY and acting_enemy_index >= 0:
+	if paused_side == EnumBattleSide.ENEMY and acting_enemy_index >= 0:
 		active_enemy_index = acting_enemy_index
 		active_enemy_slot = acting_enemy_slot
 	var current := _enemy_at(active_enemy_index)
@@ -825,7 +820,7 @@ func _active_row_order() -> Array:
 func actor_id_for_enemy_index(index: int) -> String:
 	var slot := _slot_for_enemy_index(index)
 	if slot < 0:
-		return SIDE_ENEMY
+		return EnumBattleSide.ENEMY
 	return "enemy_%d_%d" % [_slot_column(slot), _slot_row(slot)]
 
 
@@ -867,7 +862,7 @@ func get_formation_snapshot() -> Dictionary:
 
 ## 距离指定敌人轮到行动还需经过的走条推进时长（秒）；暂停/表现阶段返回 0。
 func advancing_seconds_until_enemy_turn(enemy_index: int) -> float:
-	if state == BattleState.END:
+	if state == EnumBattleState.State.END:
 		return 0.0
 	if not _is_active_enemy_index(enemy_index):
 		return 0.0
@@ -876,13 +871,13 @@ func advancing_seconds_until_enemy_turn(enemy_index: int) -> float:
 		return 0.0
 	if enemy_index >= interval_elapsed_enemies.size():
 		return 0.0
-	if state == BattleState.PAUSED:
-		if paused_side == SIDE_ENEMY:
+	if state == EnumBattleState.State.PAUSED:
+		if paused_side == EnumBattleSide.ENEMY:
 			var acting_idx := _acting_enemy_index()
 			if enemy_index == acting_idx or (acting_idx < 0 and enemy_index == active_enemy_index):
 				return 0.0
 		return 0.0
-	if state == BattleState.PRESENTATION:
+	if state == EnumBattleState.State.PRESENTATION:
 		return 0.0
 	var elapsed := float(interval_elapsed_enemies[enemy_index])
 	if elapsed >= interval_T_enemy:
@@ -905,12 +900,12 @@ func _enemy_index_for_unit(unit: FightObj) -> int:
 func _with_actor_ids(payload: Dictionary, source_side: String, target_enemy_index: int) -> Dictionary:
 	if payload.is_empty():
 		return payload
-	if source_side == SIDE_PLAYER:
-		payload["source_actor_id"] = SIDE_PLAYER
+	if source_side == EnumBattleSide.PLAYER:
+		payload["source_actor_id"] = EnumBattleSide.PLAYER
 		payload["target_actor_id"] = actor_id_for_enemy_index(target_enemy_index)
 	else:
 		payload["source_actor_id"] = actor_id_for_enemy_index(target_enemy_index)
-		payload["target_actor_id"] = SIDE_PLAYER
+		payload["target_actor_id"] = EnumBattleSide.PLAYER
 	return payload
 
 

@@ -7,16 +7,14 @@ const ItemScene := preload("res://scenes/items/item.tscn")
 const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
 const ItemDefScript := preload("res://scripts/core/item_def.gd")
 const ItemInfoPayloadBuilderScript := preload("res://scripts/ui/item_info_payload_builder.gd")
-const EnumItemTypeScript := preload("res://scripts/enum/enum_itemtype.gd")
 const HoverTipSourceScript := preload("res://scripts/ui/hover/hover_tip_source.gd")
 const HoverTipPayloadScript := preload("res://scripts/ui/hover/hover_tip_payload.gd")
 const ItemHoverTipBuilderScript := preload("res://scripts/ui/hover/builders/item_hover_tip_builder.gd")
 const EquipHoverTipBuilderScript := preload("res://scripts/ui/hover/builders/equip_hover_tip_builder.gd")
 
-enum TabFilter { ALL, MATERIAL, PILL, EQUIP }
-enum PickerFilter { NONE, EQUIP, BATTLE_ITEM, CULTIVATION_PILL }
+const FILTER_ALL := "全部"
 
-const TAB_LABELS := ["全部", "材料", "丹药", "法宝"]
+enum PickerFilter { NONE, EQUIP, BATTLE_ITEM, CULTIVATION_PILL }
 
 signal entry_clicked(entry: Dictionary)
 signal entry_right_clicked(entry: Dictionary)
@@ -31,13 +29,13 @@ signal sort_requested(entries: Array)
 @onready var _content: Control = %BagContent
 @onready var _grid: GridContainer = %BagGrid
 @onready var _scroll: ScrollContainer = %Scroll
-@onready var _filter_option: OptionButton = %FilterOption
+@onready var _filter_bar: HBoxContainer = %FilterBar
 @onready var _sort_button: TextureButton = %BagSort
-@onready var _tabs_row: HBoxContainer = $Tabs
 
 var _entries: Array = []
 var _filtered_cache: Array = []
-var _active_tab: TabFilter = TabFilter.ALL
+var _type_filters: PackedStringArray = PackedStringArray([FILTER_ALL])
+var _active_filter: String = FILTER_ALL
 var _picker_filter: PickerFilter = PickerFilter.NONE
 var _saved_show_info_on_click := true
 var _window_start: int = -1
@@ -48,13 +46,8 @@ var _row_height: float = 96.0
 func _ready() -> void:
 	_grid.columns = maxi(1, grid_columns)
 	_title.text = title_text
-	for label in TAB_LABELS:
-		_filter_option.add_item(label)
-	_filter_option.item_selected.connect(_on_filter_selected)
-	_bind_option_menu(_filter_option)
 	_sort_button.pressed.connect(_on_sort_pressed)
 	_scroll.get_v_scroll_bar().value_changed.connect(_on_scroll_changed)
-	_set_active_tab(TabFilter.ALL)
 	_ensure_slot_pool()
 	call_deferred("_measure_row_height")
 	call_deferred("_refresh")
@@ -80,11 +73,11 @@ func set_picker_mode(filter: PickerFilter) -> void:
 	var is_picker := filter != PickerFilter.NONE
 	show_info_on_click = false if is_picker else _saved_show_info_on_click
 	if is_picker:
-		_active_tab = TabFilter.ALL
+		_active_filter = FILTER_ALL
 	if is_node_ready():
 		_set_picker_chrome(not is_picker)
 		if is_picker:
-			_set_active_tab(TabFilter.ALL)
+			_set_active_filter(FILTER_ALL)
 		_scroll.scroll_vertical = 0
 		_refresh()
 
@@ -115,6 +108,7 @@ static func build_entries_from_inventory(inventory: Dictionary, owned_equips: Ar
 
 
 func _refresh() -> void:
+	_rebuild_type_filters()
 	_filtered_cache = _filtered_entries()
 	_configure_content_size()
 	_window_start = -1
@@ -237,8 +231,8 @@ func _bind_entry(view: ItemView, entry: Dictionary, index: int) -> void:
 	var item_name := str(entry.get("name", "")).strip_edges()
 	var quality := str(entry.get("quality", "")).strip_edges()
 	var count := maxi(1, int(entry.get("count", 1)))
-	var kind := str(entry.get("kind", "item"))
-	if kind == "equip":
+	var kind := str(entry.get("kind", EnumRewardKind.LABEL_ITEM))
+	if kind == EnumRewardKind.LABEL_EQUIP:
 		var equip_cfg := ConfigManager.equip_by_id(int(entry.get("id", -1)))
 		if item_name == "":
 			item_name = str(equip_cfg.get("name", "法宝"))
@@ -256,7 +250,7 @@ func _bind_entry(view: ItemView, entry: Dictionary, index: int) -> void:
 				if quality == "":
 					quality = def.rarity
 	var learn_blocked := false
-	if kind == "item" and ConfigManager != null:
+	if kind == EnumRewardKind.LABEL_ITEM and ConfigManager != null:
 		var item_def := ConfigManager.item_def_by_id(str(entry.get("id", "")))
 		learn_blocked = ItemInfoPayloadBuilderScript.learning_book_condition_unmet(item_def)
 	view.apply_display(icon, item_name, count, Color.WHITE, quality, learn_blocked)
@@ -292,10 +286,61 @@ func _on_slot_right_clicked(index: int) -> void:
 	entry_right_clicked.emit((_filtered_cache[index] as Dictionary).duplicate(true))
 
 
-func _on_filter_selected(index: int) -> void:
-	_set_active_tab(index as TabFilter)
+func _on_filter_button_pressed(filter_label: String) -> void:
+	_set_active_filter(filter_label)
 	_scroll.scroll_vertical = 0
 	_refresh()
+
+
+func _rebuild_type_filters() -> void:
+	if _picker_filter != PickerFilter.NONE:
+		return
+	var previous := _active_filter
+	var type_set := {}
+	for entry_v in _entries:
+		if not entry_v is Dictionary:
+			continue
+		var type_label := _entry_type_label(entry_v as Dictionary)
+		if type_label != "":
+			type_set[type_label] = true
+	var types: Array = type_set.keys()
+	types.sort_custom(_compare_filter_labels)
+	var filters := PackedStringArray([FILTER_ALL])
+	for type_label_v in types:
+		filters.append(str(type_label_v))
+	if filters == _type_filters:
+		if _filter_bar.get_child_count() == 0:
+			_build_filter_buttons()
+		_sync_filter_button_states()
+		if previous in filters and _active_filter != previous:
+			_set_active_filter(previous)
+		return
+	_type_filters = filters
+	_build_filter_buttons()
+	if previous in filters:
+		_set_active_filter(previous)
+	else:
+		_set_active_filter(FILTER_ALL)
+
+
+func _build_filter_buttons() -> void:
+	_clear_container(_filter_bar)
+	for filter_label in _type_filters:
+		var button := Button.new()
+		button.text = filter_label
+		button.custom_minimum_size = Vector2(0, 40)
+		button.theme_type_variation = "TabActive" if filter_label == _active_filter else "TabIdle"
+		button.pressed.connect(_on_filter_button_pressed.bind(filter_label))
+		_filter_bar.add_child(button)
+
+
+func _sync_filter_button_states() -> void:
+	if _filter_bar == null:
+		return
+	for child in _filter_bar.get_children():
+		if child is Button:
+			var button := child as Button
+			button.theme_type_variation = "TabActive" if button.text == _active_filter else "TabIdle"
 
 
 func _on_sort_pressed() -> void:
@@ -305,19 +350,18 @@ func _on_sort_pressed() -> void:
 	sort_requested.emit(_entries.duplicate(true))
 
 
-func _set_active_tab(tab: TabFilter) -> void:
-	_active_tab = tab
-	if _filter_option != null and _filter_option.selected != int(tab):
-		_filter_option.select(int(tab))
+func _set_active_filter(filter_label: String) -> void:
+	_active_filter = filter_label if filter_label != "" else FILTER_ALL
+	if _type_filters.find(_active_filter) < 0:
+		_active_filter = FILTER_ALL
+	_sync_filter_button_states()
 
 
-func _bind_option_menu(option: OptionButton) -> void:
-	var panel_theme := theme
-	if panel_theme == null or option == null:
+func _clear_container(container: Node) -> void:
+	if container == null:
 		return
-	var popup := option.get_popup()
-	if popup != null:
-		popup.theme = panel_theme
+	for child in container.get_children():
+		child.queue_free()
 
 
 func _filtered_entries() -> Array:
@@ -328,14 +372,14 @@ func _filtered_entries() -> Array:
 		var entry := entry_v as Dictionary
 		if not _matches_picker_filter(entry, _picker_filter):
 			continue
-		if _picker_filter != PickerFilter.NONE or _matches_tab(entry, _active_tab):
+		if _picker_filter != PickerFilter.NONE or _matches_filter(entry, _active_filter):
 			out.append(entry)
 	return out
 
 
 func _set_picker_chrome(show_chrome: bool) -> void:
-	if _tabs_row != null:
-		_tabs_row.visible = show_chrome
+	if _filter_bar != null:
+		_filter_bar.visible = show_chrome
 	if _sort_button != null:
 		_sort_button.visible = show_chrome
 
@@ -368,7 +412,7 @@ func _clear_hover_tip(view: ItemView) -> void:
 
 
 func _hover_payload_for_entry(entry: Dictionary) -> Dictionary:
-	if str(entry.get("kind", "item")) == "equip":
+	if str(entry.get("kind", EnumRewardKind.LABEL_ITEM)) == EnumRewardKind.LABEL_EQUIP:
 		return EquipHoverTipBuilderScript.build(int(entry.get("id", -1)))
 	var item_id := str(entry.get("id", "")).strip_edges()
 	var def := _item_def(item_id)
@@ -401,35 +445,44 @@ static func _matches_picker_filter(entry: Dictionary, filter: PickerFilter) -> b
 		PickerFilter.NONE:
 			return true
 		PickerFilter.EQUIP:
-			var kind := str(entry.get("kind", "item"))
-			if kind == "equip":
+			var kind := str(entry.get("kind", EnumRewardKind.LABEL_ITEM))
+			if kind == EnumRewardKind.LABEL_EQUIP:
 				return true
-			return kind == "item" and str(entry.get("item_type", "")) == EnumItemTypeScript.LABEL_TREASURE
+			return kind == EnumRewardKind.LABEL_ITEM and str(entry.get("item_type", "")) == EnumItemType.LABEL_TREASURE
 		PickerFilter.BATTLE_ITEM:
-			if str(entry.get("kind", "item")) != "item":
+			if str(entry.get("kind", EnumRewardKind.LABEL_ITEM)) != EnumRewardKind.LABEL_ITEM:
 				return false
 			var def := _item_def(str(entry.get("id", "")))
 			return def != null and def.has_fight_config()
 		PickerFilter.CULTIVATION_PILL:
-			if str(entry.get("kind", "item")) != "item":
+			if str(entry.get("kind", EnumRewardKind.LABEL_ITEM)) != EnumRewardKind.LABEL_ITEM:
 				return false
 			var pill_def := _item_def(str(entry.get("id", "")))
 			return pill_def != null and pill_def.is_cultivation_pill()
 	return true
 
 
-static func _matches_tab(entry: Dictionary, tab: TabFilter) -> bool:
-	match tab:
-		TabFilter.ALL:
-			return true
-		TabFilter.MATERIAL:
-			return str(entry.get("kind", "item")) == "item" and EnumItemTypeScript.is_material_label(str(entry.get("item_type", "")))
-		TabFilter.PILL:
-			return str(entry.get("kind", "item")) == "item" and str(entry.get("item_type", "")) == EnumItemTypeScript.LABEL_PILL
-		TabFilter.EQUIP:
-			var kind := str(entry.get("kind", "item"))
-			return kind == "equip" or (kind == "item" and str(entry.get("item_type", "")) == EnumItemTypeScript.LABEL_TREASURE)
-	return true
+static func _entry_type_label(entry: Dictionary) -> String:
+	if str(entry.get("kind", EnumRewardKind.LABEL_ITEM)) == EnumRewardKind.LABEL_EQUIP:
+		return EnumItemType.LABEL_TREASURE
+	var type_label := str(entry.get("item_type", "")).strip_edges()
+	if type_label == "":
+		return "其他"
+	return type_label
+
+
+static func _compare_filter_labels(a: String, b: String) -> bool:
+	var order_a: int = EnumItemType.filter_sort_order_for_label(a)
+	var order_b: int = EnumItemType.filter_sort_order_for_label(b)
+	if order_a != order_b:
+		return order_a < order_b
+	return a < b
+
+
+static func _matches_filter(entry: Dictionary, filter_label: String) -> bool:
+	if filter_label == FILTER_ALL:
+		return true
+	return _entry_type_label(entry) == filter_label
 
 
 static func _normalize_entries(entries: Array) -> Array:
@@ -438,16 +491,16 @@ static func _normalize_entries(entries: Array) -> Array:
 		if not row_v is Dictionary:
 			continue
 		var row := (row_v as Dictionary).duplicate(true)
-		var kind := str(row.get("kind", "item"))
-		if kind == "equip":
-			row["kind"] = "equip"
+		var kind := str(row.get("kind", EnumRewardKind.LABEL_ITEM))
+		if kind == EnumRewardKind.LABEL_EQUIP:
+			row["kind"] = EnumRewardKind.LABEL_EQUIP
 			row["count"] = 1
 			if not row.has("sort_name"):
 				row["sort_name"] = str(ConfigManager.equip_by_id(int(row.get("id", -1))).get("name", "法宝"))
 			if not row.has("item_type"):
-				row["item_type"] = EnumItemTypeScript.LABEL_EQUIP
+				row["item_type"] = EnumItemType.LABEL_EQUIP
 		else:
-			row["kind"] = "item"
+			row["kind"] = EnumRewardKind.LABEL_ITEM
 			var item_id := str(row.get("id", "")).strip_edges()
 			row["id"] = item_id
 			row["count"] = maxi(1, int(row.get("count", 1)))
@@ -473,7 +526,7 @@ static func _entry_from_item(item_id: String, count: int) -> Dictionary:
 		return {}
 	var def := _item_def(iid)
 	return {
-		"kind": "item",
+		"kind": EnumRewardKind.LABEL_ITEM,
 		"id": iid,
 		"count": count,
 		"item_type": def.item_type if def != null else "",
@@ -489,10 +542,10 @@ static func _entry_from_equip(equip_id: int) -> Dictionary:
 	var cfg := ConfigManager.equip_by_id(equip_id)
 	var equip_name := str(cfg.get("name", "法宝"))
 	return {
-		"kind": "equip",
+		"kind": EnumRewardKind.LABEL_EQUIP,
 		"id": equip_id,
 		"count": 1,
-		"item_type": EnumItemTypeScript.LABEL_EQUIP,
+		"item_type": EnumItemType.LABEL_EQUIP,
 		"name": equip_name,
 		"quality": _quality_label_from_int(int(cfg.get("quality", 1))),
 		"sort_name": equip_name,
@@ -508,8 +561,8 @@ static func _compare_entries(a: Dictionary, b: Dictionary) -> bool:
 
 
 static func _entry_sort_order(entry: Dictionary) -> int:
-	return EnumItemTypeScript.sort_order_for_entry(
-		str(entry.get("kind", "item")),
+	return EnumItemType.sort_order_for_entry(
+		str(entry.get("kind", EnumRewardKind.LABEL_ITEM)),
 		str(entry.get("item_type", ""))
 	)
 

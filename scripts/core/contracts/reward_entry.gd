@@ -1,11 +1,6 @@
 class_name RewardEntry
 extends RefCounted
 
-const KIND_ITEM := "item"
-const KIND_EQUIP := "equip"
-const KIND_CURRENCY := "currency"
-const VALID_KINDS := [KIND_ITEM, KIND_EQUIP, KIND_CURRENCY]
-
 
 static func from_dict(data: Dictionary) -> Dictionary:
 	return data.duplicate(true)
@@ -24,13 +19,13 @@ static func collect_errors(data: Dictionary, label: String = "reward") -> Packed
 	if data.is_empty():
 		errors.append("%s 不能为空" % label)
 		return errors
-	var kind := str(data.get("kind", KIND_ITEM))
-	if kind not in VALID_KINDS:
+	var kind := str(data.get("kind", EnumRewardKind.LABEL_ITEM))
+	if not EnumRewardKind.is_valid_label(kind):
 		errors.append("%s.kind 无效: %s" % [label, kind])
-	if kind == KIND_EQUIP:
+	if kind == EnumRewardKind.LABEL_EQUIP:
 		if int(data.get("id", -1)) <= 0:
 			errors.append("%s 法宝 id 无效" % label)
-	elif kind == KIND_ITEM:
+	elif kind == EnumRewardKind.LABEL_ITEM:
 		if str(data.get("id", "")).strip_edges() == "":
 			errors.append("%s 物品 id 不能为空" % label)
 	if int(data.get("count", 0)) <= 0:

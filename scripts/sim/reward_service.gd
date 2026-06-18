@@ -37,17 +37,21 @@ static func apply_rewards(game_state: Node, rewards: Array) -> Array:
 		if not reward_errors.is_empty():
 			push_error("RewardEntry: %s" % reward_errors[0])
 			continue
-		var kind := str(reward.get("kind", "item"))
+		var kind := str(reward.get("kind", EnumRewardKind.LABEL_ITEM))
 		var count := maxi(1, int(reward.get("count", 1)))
-		if kind == "equip":
+		if kind == EnumRewardKind.LABEL_EQUIP:
 			var eid := int(reward.get("id", -1))
 			if InventoryServiceScript.add_equip(game_state.owned_equips, eid):
 				applied.append({"kind": kind, "id": eid, "count": 1})
 			else:
 				var compensation := count * 30
 				game_state.ling_stones += compensation
-				applied.append({"kind": "currency", "id": "ling_stones", "count": compensation})
-		elif kind == "currency":
+				applied.append({
+					"kind": EnumRewardKind.LABEL_CURRENCY,
+					"id": "ling_stones",
+					"count": compensation,
+				})
+		elif kind == EnumRewardKind.LABEL_CURRENCY:
 			var currency_id := str(reward.get("id", "ling_stones"))
 			if currency_id == "ling_stones":
 				game_state.ling_stones += count
@@ -56,7 +60,11 @@ static func apply_rewards(game_state: Node, rewards: Array) -> Array:
 			var iid := str(reward.get("id", ""))
 			var added := InventoryServiceScript.add_item(game_state.inventory, iid, count)
 			if added > 0:
-				applied.append({"kind": "item", "id": iid, "count": added})
+				applied.append({
+					"kind": EnumRewardKind.LABEL_ITEM,
+					"id": iid,
+					"count": added,
+				})
 	return applied
 
 

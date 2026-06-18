@@ -32,6 +32,8 @@ func _run_all() -> void:
 	_run("inventory and battle item slots", _test_inventory_and_battle_item_slots)
 	_run("alchemy preview and brew preserve resources", _test_alchemy_preview_and_brew)
 	_run("alchemy recipe mastery improves outcomes and rewards failure", _test_alchemy_recipe_mastery)
+	_run("alchemy steady strategy beats supreme on success rate", _test_alchemy_steady_strategy_ordering)
+	_run("alchemy batch count respects inventory and furnace", _test_alchemy_batch_count)
 	_run("battle runtime deducts inventory", _test_battle_runtime_deducts_inventory)
 	_run("transfer item respects stack cap", _test_transfer_item_stack_cap)
 	_run("expedition events build valid battle data", _test_expedition_events_build_valid_battle_data)
@@ -230,7 +232,6 @@ func _test_pill_cultivation_and_instability() -> void:
 		"loot_lost": [],
 		"stats": {"steps": 1, "battles": 1, "wins": 1, "losses": 0, "max_difficulty": 1},
 		"location_name": "测试山林",
-		"world_changes": [],
 	}
 	var settled: Dictionary = state.settle_expedition(settlement)
 	_expect_true(bool(settled.get("ok", false)), "expedition settlement succeeds")
@@ -393,6 +394,48 @@ func _test_alchemy_preview_and_brew() -> void:
 		int(result.get("recipe_mastery", 0)),
 		int(result.get("mastery_gain", 0)),
 		"recipe mastery persisted"
+	)
+
+
+func _test_alchemy_batch_count() -> void:
+	var state := _state()
+	state.inventory["items_LingCao"] = 6
+	var preview: Dictionary = state.preview_alchemy("recipe.huiqi", "standard", "lowest")
+	_expect_true(bool(preview.get("ok", false)), "batch preview succeeds")
+	_expect_eq(state.max_alchemy_batch_count(preview), 3, "batch count limited by herb stock")
+	var grass_before := int(state.inventory.get("items_LingCao", 0))
+	var day_before: int = int(state.day)
+	var batches_before := int(state.alchemy.get("total_batches", 0))
+	var result: Dictionary = state.brew_alchemy_batches("recipe.huiqi", "standard", "lowest", 2, 42)
+	_expect_true(bool(result.get("ok", false)), "batch brew succeeds")
+	_expect_eq(int(result.get("batch_count", 0)), 2, "batch brew reports count")
+	_expect_eq(int(state.inventory.get("items_LingCao", 0)), grass_before - 4, "batch brew consumes ingredients per batch")
+	_expect_eq(
+		int(state.day),
+		day_before + int(preview.get("days", 1)) * 2,
+		"batch brew advances total days"
+	)
+	_expect_eq(int(state.alchemy.get("total_batches", 0)), batches_before + 2, "batch brew increments total batches")
+
+
+func _test_alchemy_steady_strategy_ordering() -> void:
+	var state := _state()
+	state.inventory["items_LingCao"] = 4
+	state.inventory["items_LingGuo"] = 2
+	state.inventory["items_YaoDan"] = 1
+	var steady: Dictionary = state.preview_alchemy("recipe.juqi", "steady", "lowest")
+	var supreme: Dictionary = state.preview_alchemy("recipe.juqi", "supreme", "lowest")
+	_expect_true(bool(steady.get("ok", false)), "steady preview succeeds")
+	_expect_true(bool(supreme.get("ok", false)), "supreme preview succeeds")
+	_expect_gt(
+		float(steady.get("base_score", 0.0)),
+		float(supreme.get("base_score", 0.0)),
+		"steady raises base score above supreme"
+	)
+	_expect_gt(
+		float(steady.get("success_probability", 0.0)),
+		float(supreme.get("success_probability", 0.0)),
+		"higher base score strategy should not have lower success rate"
 	)
 
 

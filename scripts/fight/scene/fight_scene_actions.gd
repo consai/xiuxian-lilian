@@ -60,13 +60,15 @@ static func can_actor_use_skill_at(
 ) -> bool:
 	if skill_id <= 0:
 		return true
-	if actor.get_skill_slot_at(index).is_empty():
+	var slot := actor.get_skill_slot_at(index)
+	if slot.is_empty():
 		return false
 	if actor.get_skill_cd_at(index) > 0.0:
 		return false
 	var cfg := lookup_skill_cfg(ctx, skill_id)
 	if cfg.is_empty():
 		return false
+	cfg = FightObj.merged_slot_runtime_cfg(slot, cfg)
 	return actor.can_pay_costs(cfg)
 
 
@@ -124,6 +126,7 @@ static func get_skill_block_reason(ctx: FightSceneContext, index: int) -> Dictio
 	var cfg := lookup_skill_cfg(ctx, skill_id)
 	if cfg.is_empty():
 		return empty_slot_reason()
+	cfg = FightObj.merged_slot_runtime_cfg(slot, cfg)
 	var need := FightObj.combat_resource_cost(cfg)
 	var have := ctx.domain.player.mp
 	if have < need:
@@ -230,7 +233,7 @@ static func resolve_side_slot(
 		index: int,
 		skill_id: int
 ) -> Dictionary:
-	if side == BattleDomainService.SIDE_PLAYER:
+	if side == EnumBattleSide.PLAYER:
 		return resolve_player_slot(ctx, index, skill_id)
 	var payload: Dictionary
 	if skill_id <= 0:

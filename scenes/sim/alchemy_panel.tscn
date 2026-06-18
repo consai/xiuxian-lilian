@@ -9,6 +9,7 @@
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="10_title"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="11_text"]
 [ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="12_small"]
+[ext_resource type="PackedScene" uid="uid://bi634vsmiednp" path="res://scenes/ui/alchemy_batch_popup.tscn" id="13_batch_popup"]
 
 [sub_resource type="StyleBoxFlat" id="Style_chip"]
 bg_color = Color(1, 0.952941, 0.847059, 0.96)
@@ -215,6 +216,29 @@ texture = ExtResource("4_furnace")
 expand_mode = 1
 stretch_mode = 5
 
+[node name="PillPreviewAnchor" type="Control" parent="FurnaceArea" unique_id=1453244849]
+anchors_preset = 0
+offset_left = 95.0
+offset_top = 74.0
+offset_right = 357.0
+offset_bottom = 336.0
+mouse_filter = 2
+
+[node name="PillPreviewSlot" parent="FurnaceArea/PillPreviewAnchor" unique_id=1864769089 instance=ExtResource("5_item")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -35.0
+offset_top = -46.0
+offset_right = 35.0
+offset_bottom = 34.0
+grow_horizontal = 2
+grow_vertical = 2
+
 [node name="MaterialTitle" type="PanelContainer" parent="FurnaceArea" unique_id=199371310]
 layout_mode = 0
 offset_left = 142.0
@@ -264,7 +288,7 @@ vertical_alignment = 1
 autowrap_mode = 2
 
 [node name="TutorialSelectionBand" type="Control" parent="." unique_id=984726153]
-layout_mode = 0
+anchors_preset = 0
 offset_left = 24.0
 offset_top = 118.0
 offset_right = 1256.0
@@ -337,3 +361,7 @@ theme_override_styles/normal = SubResource("Style_brew")
 theme_override_styles/pressed = SubResource("Style_brew")
 theme_override_styles/hover = SubResource("Style_brew")
 text = "开炉炼制"
+
+[node name="BatchPopup" parent="." unique_id=97140122 instance=ExtResource("13_batch_popup")]
+unique_name_in_owner = true
+layout_mode = 1

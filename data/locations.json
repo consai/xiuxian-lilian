@@ -125,21 +125,7 @@
         "qinglan_wolf_tracks",
         "qinglan_injured_cultivator",
         "qinglan_serpent",
-        "qinglan_boss",
-        "wolf_den_choice",
-        "wolf_pack_ambush",
-        "wolf_king_boss",
-        "wolf_hunt_ending",
-        "sword_broken_blade",
-        "sword_stele_choice",
-        "sword_array",
-        "sword_guardian",
-        "sword_tomb_ending",
-        "demonic_missing_cultivator",
-        "demonic_blood_trail",
-        "demonic_ambush",
-        "demonic_ritual_boss",
-        "demonic_ritual_ending"
+        "qinglan_boss"
       ],
       "preview_rewards": [
         "items_LingCao",

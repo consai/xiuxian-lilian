@@ -66,12 +66,7 @@ func _resolve_message(message: String) -> String:
 		return "上次所得：" + "、".join(rewards)
 	if not GameState.activity_log.is_empty():
 		return str((GameState.activity_log.back() as Dictionary).get("text", ""))
-	var world := GameState.world_state
-	return "当前异动：狼患 %d · 剑冢开启 %d · 宗门混乱 %d。可随时外出历练。" % [
-		int(world.get("wolf_threat", 0)),
-		int(world.get("sword_tomb_opening", 0)),
-		int(world.get("sect_unrest", 0)),
-	]
+	return "可随时外出历练。"
 
 
 func _on_alchemy() -> void:

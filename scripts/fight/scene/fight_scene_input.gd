@@ -108,8 +108,8 @@ func set_auto_battle_player(enabled: bool) -> void:
 	if (
 		enabled
 		and _ctx.domain != null
-		and _ctx.domain.state == BattleDomainService.BattleState.PAUSED
-		and _ctx.domain.paused_side == BattleDomainService.SIDE_PLAYER
+		and _ctx.domain.state == EnumBattleState.State.PAUSED
+		and _ctx.domain.paused_side == EnumBattleSide.PLAYER
 		and _on_schedule_player_act.is_valid()
 	):
 		_on_schedule_player_act.call()

@@ -8,6 +8,8 @@ extends Control
 ## [code]%GcItemCountBadge[/code] 在 [member show_name_label] 为真且数量大于 1 时显示角标；
 ## [member always_show_count_badge] 为真时，数量大于 0 即显示角标（如消耗展示）。
 
+const INSUFFICIENT_TEXT_COLOR := Color(0.92, 0.2, 0.12, 1)
+
 signal clicked
 signal right_clicked
 
@@ -33,7 +35,7 @@ signal right_clicked
 @onready var _icon: TextureRect = %GcDetailIcon
 @onready var _learn_blocked: Control = %GcLearnBlocked
 @onready var _name_count: Label = %GcItemNameCount
-@onready var _count_badge_wrap: PanelContainer = %GcItemCountBadgeWrap
+@onready var _count_badge_wrap: Control = %GcItemCountBadgeWrap
 @onready var _count_badge: Label = %GcItemCountBadge
 @onready var _press: PressScale = %GcItemPress
 @onready var _quality_border: Panel = %GcItemHighlight
@@ -44,6 +46,11 @@ var _quality: String = ""
 var _learn_blocked_flag: bool = false
 var _icon_modulate: Color = Color.WHITE
 var _info_entry: Dictionary = {}
+var _insufficient: bool = false
+var _name_label_settings_normal: LabelSettings
+var _name_label_settings_insufficient: LabelSettings
+var _count_label_settings_normal: LabelSettings
+var _count_label_settings_insufficient: LabelSettings
 
 
 func _ready() -> void:
@@ -56,8 +63,20 @@ func _ready() -> void:
 	_apply_click_enabled()
 	_apply_quality_border(_quality)
 	_set_learn_blocked(_learn_blocked_flag)
+	_cache_label_settings()
 	_refresh_name_count_text()
 	gui_input.connect(_on_gui_input)
+
+
+func _cache_label_settings() -> void:
+	if _name_count != null and _name_count.label_settings != null:
+		_name_label_settings_normal = _name_count.label_settings
+		_name_label_settings_insufficient = _name_count.label_settings.duplicate()
+		_name_label_settings_insufficient.font_color = INSUFFICIENT_TEXT_COLOR
+	if _count_badge != null and _count_badge.label_settings != null:
+		_count_label_settings_normal = _count_badge.label_settings
+		_count_label_settings_insufficient = _count_badge.label_settings.duplicate()
+		_count_label_settings_insufficient.font_color = INSUFFICIENT_TEXT_COLOR
 
 
 func set_click_enabled(enabled: bool) -> void:
@@ -81,6 +100,7 @@ static func apply_item_id(view: ItemView, item_id: String, count: int = 0, optio
 	var name_override: String = str(options.get("name_override", "")).strip_edges()
 	var click: bool = bool(options.get("click_enabled", false))
 	var show_info: bool = bool(options.get("show_info_on_click", false))
+	var insufficient: bool = bool(options.get("insufficient", false))
 	view.show_name_label = show_name
 	view.always_show_count_badge = always_count
 	view.set_click_enabled(click)
@@ -96,8 +116,9 @@ static func apply_item_id(view: ItemView, item_id: String, count: int = 0, optio
 				item_name = def.name
 			quality = def.rarity
 	view.apply_display(icon, item_name, maxi(0, count), Color.WHITE, quality)
+	view.set_insufficient(insufficient)
 	if show_info and iid != "":
-		view.set_info_entry({"kind": "item", "id": iid, "count": maxi(1, count)})
+		view.set_info_entry({"kind": EnumRewardKind.LABEL_ITEM, "id": iid, "count": maxi(1, count)})
 	else:
 		view.clear_info_entry()
 
@@ -112,7 +133,7 @@ static func apply_reward_row(view: ItemView, row: Dictionary, options: Dictionar
 	view.set_click_enabled(click)
 	view.show_info_on_click = show_info
 	view.show_name_label = show_name
-	var kind := str(row.get("kind", "item"))
+	var kind := str(row.get("kind", EnumRewardKind.LABEL_ITEM))
 	var count := maxi(1, int(row.get("count", row.get("amount", 1))))
 	var item_name := str(row.get("name", row.get("item_name", ""))).strip_edges()
 	var quality := str(row.get("quality", row.get("pin_zhi", ""))).strip_edges()
@@ -120,17 +141,17 @@ static func apply_reward_row(view: ItemView, row: Dictionary, options: Dictionar
 	var icon_v: Variant = row.get("icon")
 	if icon_v is Texture2D:
 		icon = icon_v
-	elif kind == "currency":
+	elif kind == EnumRewardKind.LABEL_CURRENCY:
 		if item_name == "":
 			item_name = "灵石" if str(row.get("id", "")) == "ling_stones" else str(row.get("id", "货币"))
-	elif kind == "equip":
+	elif kind == EnumRewardKind.LABEL_EQUIP:
 		var equip_cfg := ConfigManager.equip_by_id(int(row.get("id", -1)))
 		if item_name == "":
 			item_name = str(equip_cfg.get("name", "法宝"))
 		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
 		if quality == "":
 			quality = _quality_label_from_int(int(equip_cfg.get("quality", 1)))
-	elif kind == "item":
+	elif kind == EnumRewardKind.LABEL_ITEM:
 		var item_id := str(row.get("id", ""))
 		if item_name == "" and ConfigManager != null:
 			item_name = str(ConfigManager.get_item_display_name(item_id))
@@ -159,19 +180,19 @@ static func _quality_label_from_int(quality: int) -> String:
 
 
 static func entry_from_reward_row(row: Dictionary) -> Dictionary:
-	var kind := str(row.get("kind", "item"))
+	var kind := str(row.get("kind", EnumRewardKind.LABEL_ITEM))
 	match kind:
-		"equip":
+		EnumRewardKind.LABEL_EQUIP:
 			var equip_id := int(row.get("id", -1))
 			if equip_id <= 0:
 				return {}
-			return {"kind": "equip", "id": equip_id, "count": 1}
-		"item":
+			return {"kind": EnumRewardKind.LABEL_EQUIP, "id": equip_id, "count": 1}
+		EnumRewardKind.LABEL_ITEM:
 			var item_id := str(row.get("id", "")).strip_edges()
 			if item_id == "":
 				return {}
 			return {
-				"kind": "item",
+				"kind": EnumRewardKind.LABEL_ITEM,
 				"id": item_id,
 				"count": maxi(1, int(row.get("count", row.get("amount", 1)))),
 			}
@@ -179,10 +200,16 @@ static func entry_from_reward_row(row: Dictionary) -> Dictionary:
 			return {}
 
 
+func set_insufficient(insufficient: bool) -> void:
+	_insufficient = insufficient
+	_apply_text_colors()
+
+
 func apply_empty(placeholder: Texture2D, icon_modulate: Color = Color(1, 1, 1, 0.28)) -> void:
 	_display_name = ""
 	_display_count = 0
 	_quality = ""
+	_insufficient = false
 	clear_info_entry()
 	_icon_modulate = icon_modulate
 	_icon.texture = placeholder
@@ -209,6 +236,25 @@ func apply_display(
 	_apply_quality_border(_quality)
 	_set_learn_blocked(learn_blocked)
 	_refresh_name_count_text()
+
+
+func _apply_text_colors() -> void:
+	if _name_label_settings_normal == null and is_node_ready():
+		_cache_label_settings()
+	if _name_count != null:
+		if _insufficient and _name_label_settings_insufficient != null:
+			_name_count.label_settings = _name_label_settings_insufficient
+		elif _name_label_settings_normal != null:
+			_name_count.label_settings = _name_label_settings_normal
+	if _count_badge != null:
+		if _insufficient:
+			if _count_label_settings_insufficient != null:
+				_count_badge.label_settings = _count_label_settings_insufficient
+			_count_badge.add_theme_color_override("font_color", INSUFFICIENT_TEXT_COLOR)
+		else:
+			if _count_label_settings_normal != null:
+				_count_badge.label_settings = _count_label_settings_normal
+			_count_badge.remove_theme_color_override("font_color")
 
 
 func set_learn_blocked(blocked: bool) -> void:
@@ -304,6 +350,7 @@ func _refresh_name_count_text() -> void:
 	else:
 		_name_count.text = ""
 		_name_count.visible = false
+	_apply_text_colors()
 	_refresh_count_badge()
 
 
@@ -316,8 +363,10 @@ func _refresh_count_badge() -> void:
 		badge.text = str(_display_count)
 		if badge_wrap != null:
 			badge_wrap.visible = true
+			badge_wrap.self_modulate = Color.WHITE
 		else:
 			badge.visible = true
+		_apply_text_colors()
 	else:
 		_set_count_badge_visible(false)
 

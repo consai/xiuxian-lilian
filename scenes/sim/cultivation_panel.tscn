@@ -330,49 +330,38 @@ custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Days" type="HBoxContainer" parent="PlanPanel/PlanContent" unique_id=79311205]
+[node name="DaySelectRow" type="VBoxContainer" parent="PlanPanel/PlanContent" unique_id=79311205]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="DayCountLabel" type="Label" parent="PlanPanel/PlanContent/DaySelectRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "闭关 1 日"
+label_settings = ExtResource("17_text")
+horizontal_alignment = 1
+
+[node name="SliderRow" type="HBoxContainer" parent="PlanPanel/PlanContent/DaySelectRow"]
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="OneDayButton" type="Button" parent="PlanPanel/PlanContent/Days" unique_id=147868607]
+[node name="DaySlider" type="HSlider" parent="PlanPanel/PlanContent/DaySelectRow/SliderRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(82, 58)
+custom_minimum_size = Vector2(220, 32)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.2, 0.12549, 0.0705882, 1)
-theme_override_colors/font_pressed_color = Color(0.2, 0.12549, 0.0705882, 1)
-theme_override_colors/font_hover_color = Color(0.2, 0.12549, 0.0705882, 1)
-theme_override_font_sizes/font_size = 22
-theme_override_styles/normal = SubResource("Style_day_normal")
-theme_override_styles/pressed = SubResource("Style_day_hover")
-theme_override_styles/hover = SubResource("Style_day_hover")
-text = "一日"
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 30.0
+step = 1.0
+value = 1.0
 
-[node name="ThreeDayButton" type="Button" parent="PlanPanel/PlanContent/Days" unique_id=728032793]
+[node name="DayMaxButton" type="Button" parent="PlanPanel/PlanContent/DaySelectRow/SliderRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(82, 58)
+custom_minimum_size = Vector2(64, 40)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.2, 0.12549, 0.0705882, 1)
-theme_override_colors/font_pressed_color = Color(0.2, 0.12549, 0.0705882, 1)
-theme_override_colors/font_hover_color = Color(0.2, 0.12549, 0.0705882, 1)
-theme_override_font_sizes/font_size = 22
-theme_override_styles/normal = SubResource("Style_day_normal")
-theme_override_styles/pressed = SubResource("Style_day_hover")
-theme_override_styles/hover = SubResource("Style_day_hover")
-text = "三日"
-
-[node name="SevenDayButton" type="Button" parent="PlanPanel/PlanContent/Days" unique_id=994751523]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(82, 58)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.2, 0.12549, 0.0705882, 1)
-theme_override_colors/font_pressed_color = Color(0.2, 0.12549, 0.0705882, 1)
-theme_override_colors/font_hover_color = Color(0.2, 0.12549, 0.0705882, 1)
-theme_override_font_sizes/font_size = 22
-theme_override_styles/normal = SubResource("Style_day_normal")
-theme_override_styles/pressed = SubResource("Style_day_hover")
-theme_override_styles/hover = SubResource("Style_day_hover")
-text = "七日"
+theme_override_font_sizes/font_size = 20
+text = "最大"
 
 [node name="Divider" type="HSeparator" parent="PlanPanel/PlanContent" unique_id=1958102969]
 layout_mode = 2

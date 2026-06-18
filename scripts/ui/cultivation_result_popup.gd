@@ -5,15 +5,12 @@ signal confirmed
 
 const KnowledgeRowScene := preload("res://scenes/ui/components/knowledge_progress_row.tscn")
 
-const DAY_OPTIONS := [1, 3, 7]
-const DAY_BUTTON_TEXTS := ["一日", "三日", "七日"]
-
 @onready var _status_label: Label = %StatusLabel
 @onready var _flavor_label: Label = %FlavorLabel
 @onready var _result_label: Label = %ResultLabel
 @onready var _knowledge_scroll: LongPressScrollContainer = %KnowledgeScroll
 @onready var _knowledge_rows: VBoxContainer = %KnowledgeRows
-@onready var _day_buttons: Array[Button] = [%OneDayButton, %ThreeDayButton, %SevenDayButton]
+@onready var _completed_days_label: Label = %CompletedDaysLabel
 @onready var _confirm_button: Button = %ConfirmButton
 @onready var _plan_title: Label = %PlanTitle
 
@@ -21,8 +18,6 @@ const DAY_BUTTON_TEXTS := ["一日", "三日", "七日"]
 func _ready() -> void:
 	visible = false
 	_plan_title.text = "闭关计划"
-	for index in _day_buttons.size():
-		_day_buttons[index].text = DAY_BUTTON_TEXTS[index]
 	_confirm_button.pressed.connect(_on_confirm_pressed)
 
 
@@ -36,10 +31,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func show_result(result: Dictionary) -> void:
 	var days := int(result.get("days", 1))
-	for index in _day_buttons.size():
-		var button := _day_buttons[index]
-		button.disabled = true
-		button.modulate = Color(0.72, 0.9, 0.62) if DAY_OPTIONS[index] == days else Color(0.82, 0.82, 0.82)
+	_completed_days_label.text = "闭关 %d 日" % days
 	_status_label.text = "周天运转完毕"
 	_flavor_label.text = _result_flavor(str(result.get("mode_id", "cycle")))
 	_result_label.text = _format_summary(result)
@@ -49,11 +41,7 @@ func show_result(result: Dictionary) -> void:
 
 func hide_popup() -> void:
 	visible = false
-	for index in _day_buttons.size():
-		var button := _day_buttons[index]
-		button.disabled = false
-		button.modulate = Color.WHITE
-		button.text = DAY_BUTTON_TEXTS[index]
+	_completed_days_label.text = "闭关 1 日"
 	_clear_knowledge_rows()
 
 

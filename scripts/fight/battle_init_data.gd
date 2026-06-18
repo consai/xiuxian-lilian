@@ -4,7 +4,6 @@ extends RefCounted
 ## 进战前经 [method set_pending] 写入 DataStore，由 [FightScene] 在 _ready 消费；切场景请用 [SceneManager.go_fight]。
 const BattleSetupScript = preload("res://scripts/fight/battle_setup.gd")
 const BattleRecordTypesScript = preload("res://scripts/fight/battle_record_types.gd")
-const EnumQualityScript = preload("res://scripts/enum/enum_quality.gd")
 
 const META_SCHEMA_VERSION := 2
 
@@ -1128,4 +1127,4 @@ static func _new_battle_session_id() -> String:
 
 
 static func _quality_back_color(quality: int) -> Color:
-	return EnumQualityScript.get_color(maxi(1, quality))
+	return EnumQuality.get_color(maxi(1, quality))
