@@ -106,20 +106,20 @@ func _test_common_events_use_location_generation() -> void:
 	var herbs := _find_event_by_template(pool, "gather_herbs")
 	var beast := _find_event_by_template(pool, "local_beast")
 	var traveler := _find_event_by_template(pool, "wandering_cultivator")
-	_expect_eq(str(herbs.get("id", "")), "common::blackwater_marsh::gather_herbs", "common event gets stable generated id")
+	_expect_eq(str(herbs.get("id", "")), "blackwater_marsh__gather_herbs", "common event gets stable generated id")
 	_expect_eq(str(herbs.get("location_id", "")), "blackwater_marsh", "common event binds current location")
-	_expect_true(not (herbs.get("rewards", []) as Array).is_empty(), "common gather uses location reward pool")
+	_expect_eq(str(herbs.get("drop_pool", "")), "herbs", "gather references location drop pool")
 	_expect_eq(int(beast.get("duration_days", 0)), 2, "common battle uses location duration")
-	_expect_eq(str((beast.get("enemy", {}) as Dictionary).get("name", "")), "毒沼蛇", "common battle uses location enemy")
+	_expect_eq(str(ExpeditionEventServiceScript.build_battle_enemy(beast).get("name", "")), "毒沼蛇", "battle resolves location enemy pool")
 	_expect_eq(ExpeditionEventServiceScript.by_id(str(beast.get("id", ""))), beast, "generated event can be restored by id")
 	for template_id in ["gather_fruit", "hidden_cache", "harsh_terrain", "deep_rest", "wandering_cultivator", "local_elite"]:
 		_expect_true(not _find_event_by_template(pool, template_id).is_empty(), "rich common template generated: %s" % template_id)
 	var exchange := ExpeditionEventServiceScript.find_decision_option(traveler, "exchange")
-	_expect_true(not (exchange.get("rewards", []) as Array).is_empty(), "common decision option uses location reward pool")
+	_expect_true(not (exchange.get("results", []) as Array).is_empty(), "decision option references location drop pool")
 
 
 func _test_early_common_battles_stay_single_target() -> void:
-	var event := ExpeditionEventServiceScript.by_id("common::qinglan_mountain::local_beast")
+	var event := ExpeditionEventServiceScript.by_id("qinglan_mountain__local_beast")
 	var enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
 	_expect_eq(enemies.size(), 1, "qinglan starter beast should not spawn a pack")
 	var enemy := enemies[0] as Dictionary
@@ -136,7 +136,7 @@ func _test_early_common_battles_stay_single_target() -> void:
 
 
 func _test_group_battles_scale_skill_slots() -> void:
-	var event := ExpeditionEventServiceScript.by_id("common::qinglan_mountain::local_beast")
+	var event := ExpeditionEventServiceScript.by_id("qinglan_mountain__local_beast")
 	event["difficulty"] = 6
 	var enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
 	_expect_eq(enemies.size(), 3, "difficulty six common battle forms a small group")
@@ -157,9 +157,9 @@ func _test_group_battles_scale_skill_slots() -> void:
 
 func _test_expedition_modes_keep_event_pools_separate() -> void:
 	var resource_location := LocationServiceScript.by_id("qinglan_mountain")
-	_expect_eq(str(resource_location.get("expedition_mode", "")), "resource", "qinglan is resource mode")
+	_expect_true((resource_location.get("tags", []) as Array).has("resource"), "qinglan is tagged resource")
 	var blackwater_location := LocationServiceScript.by_id("blackwater_marsh")
-	_expect_eq(str(blackwater_location.get("expedition_mode", "")), "resource", "blackwater is resource mode")
+	_expect_true((blackwater_location.get("tags", []) as Array).has("resource"), "blackwater is tagged resource")
 	var resource_pool := ExpeditionEventServiceScript.event_pool_for_location(resource_location)
 	_expect_true(not resource_pool.is_empty(), "resource pool has events")
 	var has_material_event := false
@@ -167,7 +167,7 @@ func _test_expedition_modes_keep_event_pools_separate() -> void:
 	var has_recover_event := false
 	for event_v in resource_pool:
 		var event := event_v as Dictionary
-		_expect_eq(str(event.get("scope", "")), "common", "resource map only uses generated common events")
+		_expect_true(str(event.get("id", "")).begins_with("qinglan_mountain__"), "resource map uses location-owned modular events")
 		match str(event.get("type", "")):
 			"gather":
 				has_material_event = true
@@ -179,13 +179,13 @@ func _test_expedition_modes_keep_event_pools_separate() -> void:
 	_expect_true(has_battle_event, "resource map can roll common battle")
 	_expect_true(has_recover_event, "resource map can roll common recover")
 	var story_location := LocationServiceScript.by_id("wild_wolf_valley")
-	_expect_eq(str(story_location.get("expedition_mode", "")), "story", "wild wolf valley is story mode")
+	_expect_true((story_location.get("tags", []) as Array).has("story"), "wild wolf valley is tagged story")
 	var story_pool := ExpeditionEventServiceScript.event_pool_for_location(story_location)
 	_expect_true(not story_pool.is_empty(), "story pool has events")
 	var has_story_battle := false
 	for event_v in story_pool:
 		var event := event_v as Dictionary
-		_expect_true(str(event.get("scope", "")) != "common", "story map does not use generated common events")
+		_expect_true(not str(event.get("id", "")).begins_with("wild_wolf_valley__"), "story map keeps authored events")
 		if str(event.get("id", "")) == "qinglan_wolf":
 			has_story_battle = true
 	_expect_true(has_story_battle, "story map keeps configured map events")
@@ -195,7 +195,7 @@ func _test_common_event_duration_advances_days() -> void:
 	var game := _state()
 	var expedition := _expedition()
 	expedition.start("blackwater_marsh", game, 3030)
-	var event := ExpeditionEventServiceScript.by_id("common::blackwater_marsh::recover_hp")
+	var event := ExpeditionEventServiceScript.by_id("blackwater_marsh__recover_hp")
 	event["duration_days"] = 3
 	expedition.runtime["hp"] = 10.0
 	expedition.current_choices = [event]
@@ -206,7 +206,7 @@ func _test_common_event_duration_advances_days() -> void:
 
 
 func _test_decision_event_exposes_options() -> void:
-	var traveler := ExpeditionEventServiceScript.by_id("common::blackwater_marsh::wandering_cultivator")
+	var traveler := ExpeditionEventServiceScript.by_id("blackwater_marsh__wandering_cultivator")
 	_expect_true(ExpeditionEventServiceScript.is_decision_event(traveler), "wandering cultivator is decision")
 	var options := ExpeditionEventServiceScript.decision_options_as_choices(traveler)
 	_expect_eq(options.size(), 2, "two decision options")
@@ -214,7 +214,7 @@ func _test_decision_event_exposes_options() -> void:
 
 
 func _test_common_decision_choice_resolves() -> void:
-	var traveler := ExpeditionEventServiceScript.by_id("common::blackwater_marsh::wandering_cultivator")
+	var traveler := ExpeditionEventServiceScript.by_id("blackwater_marsh__wandering_cultivator")
 	var options := ExpeditionEventServiceScript.decision_options_as_choices(traveler)
 	var choice_id := str((options[0] as Dictionary).get("id", ""))
 	var parsed := ExpeditionEventServiceScript.parse_decision_choice_id(choice_id)
@@ -234,7 +234,7 @@ func _test_non_battle_events_advance() -> void:
 	var game := _state()
 	var expedition := _expedition()
 	expedition.start("blackwater_marsh", game, 404)
-	var herbs := ExpeditionEventServiceScript.by_id("common::blackwater_marsh::gather_herbs")
+	var herbs := ExpeditionEventServiceScript.by_id("blackwater_marsh__gather_herbs")
 	var before_steps: int = int(expedition.steps)
 	var before_max_diff: int = int((expedition.stats as Dictionary).get("max_difficulty", 0))
 	var before_loot: int = (expedition.loot as Array).size()
@@ -247,21 +247,20 @@ func _test_non_battle_events_advance() -> void:
 	_expect_true(int((expedition.stats as Dictionary).get("max_difficulty", 0)) >= before_max_diff, "max difficulty tracked")
 	_expect_true(expedition.loot.size() >= before_loot, "session loot tracked")
 	var inv_before: int = int(game.inventory.get("items_LingCao", 0))
-	var loot_lingcao := 0
+	var loot_total := 0
 	for reward_v in expedition.loot:
 		var reward := reward_v as Dictionary
-		if str(reward.get("id", "")) == "items_LingCao":
-			loot_lingcao += int(reward.get("count", 0))
-	_expect_true(loot_lingcao > 0, "gather reward in session loot")
+		loot_total += int(reward.get("count", 0))
+	_expect_true(loot_total > 0, "gather reward in session loot")
 	_expect_eq(int(game.inventory.get("items_LingCao", 0)), inv_before, "game inventory unchanged during expedition")
 	game.hp = 10.0
 	expedition.runtime["hp"] = 10.0
-	var shelter := ExpeditionEventServiceScript.by_id("common::blackwater_marsh::recover_hp")
+	var shelter := ExpeditionEventServiceScript.by_id("blackwater_marsh__recover_hp")
 	expedition.current_choices = [shelter]
 	expedition.phase = "choosing"
 	expedition.choose_event(str(shelter.get("id", "")))
 	_expect_true(float(expedition.runtime.get("hp", 0.0)) > 10.0, "recover raises hp")
-	var terrain := ExpeditionEventServiceScript.by_id("common::blackwater_marsh::harsh_terrain")
+	var terrain := ExpeditionEventServiceScript.by_id("blackwater_marsh__harsh_terrain")
 	expedition.current_choices = [terrain]
 	expedition.phase = "choosing"
 	var terrain_result: Dictionary = expedition.choose_event(str(terrain.get("id", "")))

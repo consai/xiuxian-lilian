@@ -2,8 +2,11 @@ extends SceneTree
 
 const ConfigValidatorScript := preload("res://scripts/core/config_validator.gd")
 const ExpeditionDataValidatorScript := preload("res://scripts/expedition/expedition_data_validator.gd")
+const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
 const RealmBalanceServiceScript := preload("res://scripts/sim/realm_balance_service.gd")
+const TagServiceScript := preload("res://scripts/sim/tag_service.gd")
+const DropPoolServiceScript := preload("res://scripts/sim/drop_pool_service.gd")
 
 var _failures: Array[String] = []
 var _tests_run := 0
@@ -17,7 +20,9 @@ func _run_all() -> void:
 	_run("config validator reports no errors on boot data", _test_config_has_no_errors)
 	_run("realm balance covers simulation realms", _test_realm_balance_covers_simulation_realms)
 	_run("location service reads cached config", _test_location_service_cached)
-	_run("expedition mode validator reports pool mistakes", _test_expedition_mode_validator_reports_pool_mistakes)
+	_run("modular location validator rejects legacy fields", _test_modular_location_validator_rejects_legacy_fields)
+	_run("tag service aggregates modular tags", _test_tag_service_aggregates_tags)
+	_run("drop pool service rolls deterministic rewards", _test_drop_pool_service_deterministic)
 	if _failures.is_empty():
 		print("PASS: %d config validation tests" % _tests_run)
 		quit(0)
@@ -62,30 +67,42 @@ func _test_location_service_cached() -> void:
 	_expect_eq(str(location.get("name", "")), "青岚山脉", "location name")
 
 
-func _test_expedition_mode_validator_reports_pool_mistakes() -> void:
-	var resource_with_map := {
+func _test_modular_location_validator_rejects_legacy_fields() -> void:
+	var legacy := {
+		"recommended_realm": "炼气一层",
+		"tags": [],
+		"event_pool": ["qinglan_wolf"],
+		"enemy_pools": {},
+		"drop_pools": {},
 		"expedition_mode": "resource",
-		"common_event_generation": {"duration_days": {"gather": 1}, "reward_pools": {"herbs": []}, "enemy_pools": {"beast": {}}},
+		"common_event_generation": {},
+		"common_event_pool": [],
+		"map_event_pool": [],
 	}
-	var errors := ExpeditionDataValidatorScript._validate_location_expedition_mode(
-		resource_with_map, "bad_resource", ["gather_herbs"], ["qinglan_wolf"]
-	)
-	_expect_true(_has_error_containing(errors, "不能配置 map_event_pool"), "resource mode rejects map pool")
-	var story_with_common := {"expedition_mode": "story"}
-	errors = ExpeditionDataValidatorScript._validate_location_expedition_mode(
-		story_with_common, "bad_story", ["gather_herbs"], ["qinglan_wolf"]
-	)
-	_expect_true(_has_error_containing(errors, "不能配置 common_event_pool"), "story mode rejects common pool")
-	var resource_without_generation := {"expedition_mode": "resource"}
-	errors = ExpeditionDataValidatorScript._validate_location_expedition_mode(
-		resource_without_generation, "no_generation", ["gather_herbs"], []
-	)
-	_expect_true(_has_error_containing(errors, "缺少 common_event_generation"), "resource mode requires generation")
-	var story_without_map := {"expedition_mode": "story"}
-	errors = ExpeditionDataValidatorScript._validate_location_expedition_mode(
-		story_without_map, "no_story_events", [], []
-	)
-	_expect_true(_has_error_containing(errors, "必须配置 map_event_pool"), "story mode requires map pool")
+	var errors: PackedStringArray = ExpeditionDataValidatorScript._validate_location(legacy, "legacy_location")
+	_expect_true(_has_error_containing(errors, "旧字段 expedition_mode"), "rejects expedition_mode")
+	_expect_true(_has_error_containing(errors, "旧字段 common_event_generation"), "rejects generation")
+	_expect_true(_has_error_containing(errors, "旧字段 common_event_pool"), "rejects common pool")
+	_expect_true(_has_error_containing(errors, "旧字段 map_event_pool"), "rejects map pool")
+
+
+func _test_tag_service_aggregates_tags() -> void:
+	var stats := TagServiceScript.collect_tag_stats([
+		{"tags": ["fire", "spell"]},
+		{"tags": ["fire", "shield"]},
+		{"tags": ["spell"]},
+	])
+	_expect_eq(int(stats.get("fire", 0)), 2, "fire tag count")
+	_expect_eq(int(stats.get("spell", 0)), 2, "spell tag count")
+	_expect_eq(int(stats.get("shield", 0)), 1, "shield tag count")
+
+
+func _test_drop_pool_service_deterministic() -> void:
+	var event := ExpeditionEventServiceScript.by_id("blackwater_marsh__gather_herbs")
+	var rewards_a := DropPoolServiceScript.roll_event_rewards(event, _rng(9090))
+	var rewards_b := DropPoolServiceScript.roll_event_rewards(event, _rng(9090))
+	_expect_eq(rewards_a, rewards_b, "same seed same modular drop")
+	_expect_true(not rewards_a.is_empty(), "drop pool produces reward")
 
 
 func _has_error_containing(errors: PackedStringArray, needle: String) -> bool:
@@ -93,6 +110,12 @@ func _has_error_containing(errors: PackedStringArray, needle: String) -> bool:
 		if str(error).contains(needle):
 			return true
 	return false
+
+
+func _rng(seed_value: int) -> RandomNumberGenerator:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value
+	return rng
 
 
 func _expect_true(actual: bool, message: String) -> void:

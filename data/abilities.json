@@ -91,7 +91,13 @@
             "level": 1
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.wind_step",
@@ -169,7 +175,13 @@
             "level": 1
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "position"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.sword_qi",
@@ -248,7 +260,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.blood_strike",
@@ -327,7 +345,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.five_phase_burst",
@@ -406,7 +430,13 @@
             "level": 3
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "area"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.seal_bind",
@@ -485,7 +515,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.thunder_judgment",
@@ -564,7 +600,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.sword_array",
@@ -651,7 +693,13 @@
             "level": 3
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "area"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.soul_shock",
@@ -730,7 +778,13 @@
             "level": 1
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "area"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.dharma_palm",
@@ -807,7 +861,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "area"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.dream_prison",
@@ -884,7 +944,13 @@
             "level": 3
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.void_slash",
@@ -963,7 +1029,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "line"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.true_name_curse",
@@ -1044,7 +1116,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.law_command",
@@ -1133,7 +1211,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "area"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.open_heaven",
@@ -1170,7 +1254,7 @@
       },
       "combat": {
         "target": "line",
-        "powerScale": 3.0,
+        "powerScale": 3,
         "castTime": 4,
         "cooldown": 120,
         "costs": [
@@ -1222,7 +1306,13 @@
             "level": 3
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "line"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.cataclysm",
@@ -1311,7 +1401,13 @@
             "level": 3
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "area"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.passive.iron_bone",
@@ -1371,7 +1467,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.passive.sword_heart",
@@ -1443,7 +1545,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.passive.soul_guard",
@@ -1503,7 +1611,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.passive.blood_rebirth",
@@ -1575,7 +1689,13 @@
             "level": 4
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.passive.weapon_union",
@@ -1647,7 +1767,13 @@
             "level": 3
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.passive.dao_heart",
@@ -1719,7 +1845,13 @@
             "level": 3
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.passive.tribulation_body",
@@ -1791,7 +1923,13 @@
             "level": 4
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.upkeep.sword_domain",
@@ -1871,7 +2009,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "upkeep",
+        "target": "area"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.upkeep.thunder_domain",
@@ -1951,7 +2095,13 @@
             "level": 4
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "upkeep",
+        "target": "area"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.upkeep.dharma_form",
@@ -2031,7 +2181,13 @@
             "level": 4
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "upkeep",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.upkeep.primordial_projection",
@@ -2111,7 +2267,13 @@
             "level": 3
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "upkeep",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.upkeep.law_field",
@@ -2191,7 +2353,13 @@
             "level": 3
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "upkeep",
+        "target": "area"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.general.qi_absorption",
@@ -2244,7 +2412,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.general.meridian_knowledge",
@@ -2288,7 +2462,13 @@
             "level": 1
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.general.appraiser",
@@ -2341,7 +2521,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.general.herbalist",
@@ -2394,7 +2580,13 @@
             "level": 1
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.general.smith",
@@ -2459,7 +2651,13 @@
             "level": 3
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.general.alchemist",
@@ -2524,7 +2722,13 @@
             "level": 3
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.general.array_master",
@@ -2589,7 +2793,13 @@
             "level": 3
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.general.talisman_master",
@@ -2654,7 +2864,13 @@
             "level": 3
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.general.beast_master",
@@ -2717,7 +2933,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.general.geomancer",
@@ -2782,7 +3004,13 @@
             "level": 3
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.general.void_traveler",
@@ -2847,7 +3075,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.general.sect_governor",
@@ -2912,7 +3146,13 @@
             "level": 4
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.general.tribulation_scholar",
@@ -2977,7 +3217,13 @@
             "level": 4
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.nascent_blade",
@@ -3066,7 +3312,13 @@
             "level": 4
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "enemy"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.soul_contract_command",
@@ -3145,7 +3397,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "controlled_entity"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.dao_sword_river",
@@ -3234,7 +3492,13 @@
             "level": 3
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "area"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     },
     {
       "id": "ability.combat.world_suppression",
@@ -3323,7 +3587,13 @@
             "level": 2
           }
         ]
-      }
+      },
+      "trigger": {
+        "mode": "active",
+        "target": "area"
+      },
+      "upgrade_options": [],
+      "evolution_conditions": []
     }
   ]
 }

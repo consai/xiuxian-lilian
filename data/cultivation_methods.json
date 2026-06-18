@@ -455,7 +455,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "通用周天与稳健突破"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.hunyuan.2",
@@ -572,7 +577,12 @@
       "recommendedProgression": {
         "predecessorId": "method.hunyuan.1",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "通用周天与稳健突破"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.hunyuan.3",
@@ -689,7 +699,12 @@
       "recommendedProgression": {
         "predecessorId": "method.hunyuan.2",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "通用周天与稳健突破"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.hunyuan.4",
@@ -806,7 +821,12 @@
       "recommendedProgression": {
         "predecessorId": "method.hunyuan.3",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "通用周天与稳健突破"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.hunyuan.5",
@@ -924,7 +944,12 @@
       "recommendedProgression": {
         "predecessorId": "method.hunyuan.4",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "通用周天与稳健突破"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.hunyuan.6",
@@ -1042,7 +1067,12 @@
       "recommendedProgression": {
         "predecessorId": "method.hunyuan.5",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "通用周天与稳健突破"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.hunyuan.7",
@@ -1159,7 +1189,12 @@
       "recommendedProgression": {
         "predecessorId": "method.hunyuan.6",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "通用周天与稳健突破"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.hunyuan.8",
@@ -1277,7 +1312,12 @@
       "recommendedProgression": {
         "predecessorId": "method.hunyuan.7",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "通用周天与稳健突破"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.hunyuan.9",
@@ -1395,7 +1435,12 @@
       "recommendedProgression": {
         "predecessorId": "method.hunyuan.8",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "通用周天与稳健突破"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.changsheng.1",
@@ -1506,7 +1551,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "恢复、丹医与生命造化"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.changsheng.2",
@@ -1623,7 +1673,12 @@
       "recommendedProgression": {
         "predecessorId": "method.changsheng.1",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "恢复、丹医与生命造化"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.changsheng.3",
@@ -1741,7 +1796,12 @@
       "recommendedProgression": {
         "predecessorId": "method.changsheng.2",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "恢复、丹医与生命造化"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.changsheng.4",
@@ -1859,7 +1919,12 @@
       "recommendedProgression": {
         "predecessorId": "method.changsheng.3",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "恢复、丹医与生命造化"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.changsheng.5",
@@ -1977,7 +2042,12 @@
       "recommendedProgression": {
         "predecessorId": "method.changsheng.4",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "恢复、丹医与生命造化"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.changsheng.6",
@@ -2095,7 +2165,12 @@
       "recommendedProgression": {
         "predecessorId": "method.changsheng.5",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "恢复、丹医与生命造化"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.changsheng.7",
@@ -2212,7 +2287,12 @@
       "recommendedProgression": {
         "predecessorId": "method.changsheng.6",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "恢复、丹医与生命造化"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.changsheng.8",
@@ -2330,7 +2410,12 @@
       "recommendedProgression": {
         "predecessorId": "method.changsheng.7",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "恢复、丹医与生命造化"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.changsheng.9",
@@ -2448,7 +2533,12 @@
       "recommendedProgression": {
         "predecessorId": "method.changsheng.8",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "恢复、丹医与生命造化"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taixu_sword.1",
@@ -2559,7 +2649,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "御剑、剑域与破法杀伐"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taixu_sword.2",
@@ -2677,7 +2772,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taixu_sword.1",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "御剑、剑域与破法杀伐"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taixu_sword.3",
@@ -2794,7 +2894,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taixu_sword.2",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "御剑、剑域与破法杀伐"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taixu_sword.4",
@@ -2912,7 +3017,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taixu_sword.3",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "御剑、剑域与破法杀伐"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taixu_sword.5",
@@ -3030,7 +3140,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taixu_sword.4",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "御剑、剑域与破法杀伐"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taixu_sword.6",
@@ -3148,7 +3263,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taixu_sword.5",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "御剑、剑域与破法杀伐"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taixu_sword.7",
@@ -3266,7 +3386,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taixu_sword.6",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "御剑、剑域与破法杀伐"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taixu_sword.8",
@@ -3384,7 +3509,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taixu_sword.7",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "御剑、剑域与破法杀伐"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taixu_sword.9",
@@ -3502,7 +3632,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taixu_sword.8",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "御剑、剑域与破法杀伐"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.vajra.1",
@@ -3612,7 +3747,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "炼体、生存与正面承伤"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.vajra.2",
@@ -3729,7 +3869,12 @@
       "recommendedProgression": {
         "predecessorId": "method.vajra.1",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "炼体、生存与正面承伤"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.vajra.3",
@@ -3846,7 +3991,12 @@
       "recommendedProgression": {
         "predecessorId": "method.vajra.2",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "炼体、生存与正面承伤"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.vajra.4",
@@ -3964,7 +4114,12 @@
       "recommendedProgression": {
         "predecessorId": "method.vajra.3",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "炼体、生存与正面承伤"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.vajra.5",
@@ -4081,7 +4236,12 @@
       "recommendedProgression": {
         "predecessorId": "method.vajra.4",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "炼体、生存与正面承伤"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.vajra.6",
@@ -4198,7 +4358,12 @@
       "recommendedProgression": {
         "predecessorId": "method.vajra.5",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "炼体、生存与正面承伤"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.vajra.7",
@@ -4316,7 +4481,12 @@
       "recommendedProgression": {
         "predecessorId": "method.vajra.6",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "炼体、生存与正面承伤"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.vajra.8",
@@ -4433,7 +4603,12 @@
       "recommendedProgression": {
         "predecessorId": "method.vajra.7",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "炼体、生存与正面承伤"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.vajra.9",
@@ -4551,7 +4726,12 @@
       "recommendedProgression": {
         "predecessorId": "method.vajra.8",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "炼体、生存与正面承伤"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taiyin.1",
@@ -4662,7 +4842,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "神魂、心防与咒法"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taiyin.2",
@@ -4780,7 +4965,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taiyin.1",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "神魂、心防与咒法"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taiyin.3",
@@ -4898,7 +5088,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taiyin.2",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "神魂、心防与咒法"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taiyin.4",
@@ -5015,7 +5210,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taiyin.3",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "神魂、心防与咒法"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taiyin.5",
@@ -5133,7 +5333,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taiyin.4",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "神魂、心防与咒法"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taiyin.6",
@@ -5251,7 +5456,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taiyin.5",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "神魂、心防与咒法"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taiyin.7",
@@ -5369,7 +5579,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taiyin.6",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "神魂、心防与咒法"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taiyin.8",
@@ -5487,7 +5702,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taiyin.7",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "神魂、心防与咒法"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.taiyin.9",
@@ -5605,7 +5825,12 @@
       "recommendedProgression": {
         "predecessorId": "method.taiyin.8",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "神魂、心防与咒法"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.leihuo.1",
@@ -5716,7 +5941,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "五行雷法与爆发神通"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.leihuo.2",
@@ -5834,7 +6064,12 @@
       "recommendedProgression": {
         "predecessorId": "method.leihuo.1",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "五行雷法与爆发神通"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.leihuo.3",
@@ -5951,7 +6186,12 @@
       "recommendedProgression": {
         "predecessorId": "method.leihuo.2",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "五行雷法与爆发神通"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.leihuo.4",
@@ -6069,7 +6309,12 @@
       "recommendedProgression": {
         "predecessorId": "method.leihuo.3",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "五行雷法与爆发神通"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.leihuo.5",
@@ -6187,7 +6432,12 @@
       "recommendedProgression": {
         "predecessorId": "method.leihuo.4",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "五行雷法与爆发神通"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.leihuo.6",
@@ -6305,7 +6555,12 @@
       "recommendedProgression": {
         "predecessorId": "method.leihuo.5",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "五行雷法与爆发神通"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.leihuo.7",
@@ -6423,7 +6678,12 @@
       "recommendedProgression": {
         "predecessorId": "method.leihuo.6",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "五行雷法与爆发神通"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.leihuo.8",
@@ -6541,7 +6801,12 @@
       "recommendedProgression": {
         "predecessorId": "method.leihuo.7",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "五行雷法与爆发神通"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.leihuo.9",
@@ -6659,7 +6924,12 @@
       "recommendedProgression": {
         "predecessorId": "method.leihuo.8",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "五行雷法与爆发神通"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.zhoutian_craft.1",
@@ -6770,7 +7040,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "阵法、炼器与洞天工程"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.zhoutian_craft.2",
@@ -6888,7 +7163,12 @@
       "recommendedProgression": {
         "predecessorId": "method.zhoutian_craft.1",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "阵法、炼器与洞天工程"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.zhoutian_craft.3",
@@ -7005,7 +7285,12 @@
       "recommendedProgression": {
         "predecessorId": "method.zhoutian_craft.2",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "阵法、炼器与洞天工程"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.zhoutian_craft.4",
@@ -7123,7 +7408,12 @@
       "recommendedProgression": {
         "predecessorId": "method.zhoutian_craft.3",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "阵法、炼器与洞天工程"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.zhoutian_craft.5",
@@ -7241,7 +7531,12 @@
       "recommendedProgression": {
         "predecessorId": "method.zhoutian_craft.4",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "阵法、炼器与洞天工程"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.zhoutian_craft.6",
@@ -7359,7 +7654,12 @@
       "recommendedProgression": {
         "predecessorId": "method.zhoutian_craft.5",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "阵法、炼器与洞天工程"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.zhoutian_craft.7",
@@ -7477,7 +7777,12 @@
       "recommendedProgression": {
         "predecessorId": "method.zhoutian_craft.6",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "阵法、炼器与洞天工程"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.zhoutian_craft.8",
@@ -7595,7 +7900,12 @@
       "recommendedProgression": {
         "predecessorId": "method.zhoutian_craft.7",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "阵法、炼器与洞天工程"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.zhoutian_craft.9",
@@ -7713,7 +8023,12 @@
       "recommendedProgression": {
         "predecessorId": "method.zhoutian_craft.8",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "阵法、炼器与洞天工程"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.wanxiang.1",
@@ -7824,7 +8139,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "探索、御兽与世界经营"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.wanxiang.2",
@@ -7941,7 +8261,12 @@
       "recommendedProgression": {
         "predecessorId": "method.wanxiang.1",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "探索、御兽与世界经营"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.wanxiang.3",
@@ -8059,7 +8384,12 @@
       "recommendedProgression": {
         "predecessorId": "method.wanxiang.2",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "探索、御兽与世界经营"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.wanxiang.4",
@@ -8177,7 +8507,12 @@
       "recommendedProgression": {
         "predecessorId": "method.wanxiang.3",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "探索、御兽与世界经营"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.wanxiang.5",
@@ -8295,7 +8630,12 @@
       "recommendedProgression": {
         "predecessorId": "method.wanxiang.4",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "探索、御兽与世界经营"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.wanxiang.6",
@@ -8413,7 +8753,12 @@
       "recommendedProgression": {
         "predecessorId": "method.wanxiang.5",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "探索、御兽与世界经营"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.wanxiang.7",
@@ -8531,7 +8876,12 @@
       "recommendedProgression": {
         "predecessorId": "method.wanxiang.6",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "探索、御兽与世界经营"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.wanxiang.8",
@@ -8649,7 +8999,12 @@
       "recommendedProgression": {
         "predecessorId": "method.wanxiang.7",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "探索、御兽与世界经营"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.wanxiang.9",
@@ -8766,7 +9121,12 @@
       "recommendedProgression": {
         "predecessorId": "method.wanxiang.8",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "探索、御兽与世界经营"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.jiuji.1",
@@ -8877,7 +9237,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "劫数推演与终局飞升"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.jiuji.2",
@@ -8995,7 +9360,12 @@
       "recommendedProgression": {
         "predecessorId": "method.jiuji.1",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "劫数推演与终局飞升"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.jiuji.3",
@@ -9112,7 +9482,12 @@
       "recommendedProgression": {
         "predecessorId": "method.jiuji.2",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "劫数推演与终局飞升"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.jiuji.4",
@@ -9230,7 +9605,12 @@
       "recommendedProgression": {
         "predecessorId": "method.jiuji.3",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "劫数推演与终局飞升"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.jiuji.5",
@@ -9348,7 +9728,12 @@
       "recommendedProgression": {
         "predecessorId": "method.jiuji.4",
         "predecessorMastery": 0.8
-      }
+      },
+      "tags": [
+        "劫数推演与终局飞升"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.basic_breathing.1",
@@ -9424,7 +9809,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "单知识入门与快速补课"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.small_cycle.1",
@@ -9501,7 +9891,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "单知识入门与快速补课"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.iron_skin.1",
@@ -9578,7 +9973,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "单知识入门与快速补课"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.clear_mind.1",
@@ -9655,7 +10055,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "单知识入门与快速补课"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.sword_control.1",
@@ -9732,7 +10137,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "单知识入门与快速补课"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.herb_manual.1",
@@ -9809,7 +10219,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "单知识入门与快速补课"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.rune_manual.1",
@@ -9886,7 +10301,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "单知识入门与快速补课"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.appraisal_manual.1",
@@ -9963,7 +10383,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "单知识入门与快速补课"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.blood_burst.1",
@@ -10074,7 +10499,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "旁门爆发，以伤换攻"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.escape_art.1",
@@ -10185,7 +10615,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "专精遁法与脱离"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.poison_codex.1",
@@ -10296,7 +10731,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "毒理、炼毒与解毒"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.fate_gaze.1",
@@ -10407,7 +10847,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "趋吉避凶与天机探索"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.talisman_archive.1",
@@ -10518,7 +10963,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "符箓储备与快速激发"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     },
     {
       "id": "method.heavy_sword.1",
@@ -10629,7 +11079,12 @@
           }
         ]
       },
-      "recommendedProgression": null
+      "recommendedProgression": null,
+      "tags": [
+        "低阶高专精重剑流派"
+      ],
+      "passive_rules": [],
+      "synergy_rules": []
     }
   ],
   "effectCatalog": {

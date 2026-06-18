@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "locations": {
     "qinglan_mountain": {
       "name": "青岚山脉",
@@ -9,103 +9,224 @@
       "min_difficulty": 1,
       "max_difficulty": 6,
       "recommended_realm": "炼气一层",
-      "expedition_mode": "resource",
-      "common_event_pool": [
-        "travel",
-        "gather_herbs",
-        "gather_ore",
-        "recover_mp",
-        "recover_hp",
-        "local_beast",
-        "gather_fruit",
-        "hidden_cache",
-        "harsh_terrain",
-        "deep_rest",
-        "wandering_cultivator",
-        "local_elite"
-      ],
-      "map_event_pool": [],
-      "common_event_generation": {
-        "duration_days": {
-          "travel": 1,
-          "gather": 1,
-          "recover": 1,
-          "battle": 2,
-          "search": 2,
-          "hazard": 1,
-          "deep_rest": 2,
-          "decision": 1,
-          "elite_battle": 3
-        },
-        "reward_pools": {
-          "herbs": [
-            {"kind": "item", "id": "items_LingCao", "min": 2, "max": 4, "weight": 1}
-          ],
-          "ore": [
-            {"kind": "item", "id": "items_HanTie", "min": 1, "max": 2, "weight": 3},
-            {"kind": "currency", "id": "ling_stones", "min": 5, "max": 15, "weight": 2}
-          ],
-          "beast": [
-            {"kind": "item", "id": "items_LingCao", "min": 1, "max": 3, "weight": 5},
-            {"kind": "item", "id": "items_HuiQiDan", "min": 1, "max": 1, "weight": 2},
-            {"kind": "item", "id": "items_HuiLingDan", "min": 1, "max": 1, "weight": 2}
-          ],
-          "fruit": [
-            {"kind": "item", "id": "items_LingGuo", "min": 1, "max": 3, "weight": 4},
-            {"kind": "item", "id": "items_LingCao", "min": 1, "max": 2, "weight": 2}
-          ],
-          "cache": [
-            {"kind": "currency", "id": "ling_stones", "min": 12, "max": 30, "weight": 4},
-            {"kind": "item", "id": "items_HuiLingDan", "min": 1, "max": 2, "weight": 2},
-            {"kind": "item", "id": "items_HanTie", "min": 1, "max": 2, "weight": 2}
-          ],
-          "traveler": [
-            {"kind": "item", "id": "items_HuiQiDan", "min": 1, "max": 1, "weight": 3},
-            {"kind": "currency", "id": "ling_stones", "min": 6, "max": 16, "weight": 2}
-          ],
-          "elite": [
-            {"kind": "item", "id": "items_YaoDan", "min": 1, "max": 2, "weight": 4},
-            {"kind": "item", "id": "items_LiaoShangDan", "min": 1, "max": 2, "weight": 3},
-            {"kind": "equip", "id": 5002, "min": 1, "max": 1, "weight": 1}
-          ]
-        },
-        "enemy_pools": {
-          "beast": {
-            "name": "青牙狼",
-            "icon": "jueshe/sprite_003.png",
-            "hp": 75,
-            "mp": 30,
-            "attrs": {"hp_max": 75, "mp_max": 30, "shield": 0, "physical_atk": 21, "magic_atk": 22.4, "physical_def": 16, "magic_def": 19.2, "spd": 92, "accuracy": 85, "evasion": 92, "control_power": 45, "control_resist": 55, "crit": 5, "crit_damage": 150},
-            "skills": [1, 0]
-          },
-          "elite": {
-            "name": "铁背山罴",
-            "icon": "jueshe/sprite_001.png",
-            "hp": 165,
-            "mp": 55,
-            "attrs": {"hp_max": 165, "mp_max": 55, "shield": 18, "physical_atk": 31.2, "magic_atk": 33.3, "physical_def": 23.6, "magic_def": 28.3, "spd": 86, "accuracy": 96, "evasion": 78, "control_power": 65, "control_resist": 110, "crit": 8, "crit_damage": 155},
-            "skills": [3, 2, 0]
-          }
-        },
-        "overrides": {
-          "travel": {"name": "穿行青岚", "desc": "晨雾贴着山腰缓缓流动，你循着猎户留下的旧路向深山行去。", "outcome_text": "山路曲折，却也让你渐渐摸清了青岚山的脉络。"},
-          "gather_herbs": {"name": "雾林寻药", "desc": "湿润林地间浮着淡淡药香，几株灵草在晨露中泛起微光。"},
-          "gather_ore": {"name": "山壁寻铁", "desc": "风化山壁露出深色矿纹，敲击时传来清越回响。"},
-          "recover_mp": {"name": "灵泉纳气", "desc": "石隙间涌出一线清泉，泉畔灵气澄澈，正宜吐纳。"},
-          "recover_hp": {"name": "岩洞疗伤", "desc": "你在背风岩洞中点起微火，借着片刻安宁处理伤势。"},
-          "local_beast": {"name": "林间兽袭", "desc": "树影骤乱，饥饿的青牙狼循着生人气息从林间扑出。"},
-          "gather_fruit": {"name": "崖畔灵果", "desc": "陡崖边垂下一株老藤，叶隙间隐约可见温润果光。"},
-          "hidden_cache": {"name": "猎户石龛", "desc": "一块松动山石后藏着简陋石龛，像是前人留下的应急物资。"},
-          "harsh_terrain": {"name": "碎石陡坡", "desc": "山路被落石截断，你只能踏着松动碎石攀上陡坡。", "effects": [{"type": "drain_mp_percent", "value": 0.1, "feedback": "你以灵力稳住身形，越过陡坡后法力损耗 {amount} 点。"}]},
-          "deep_rest": {"name": "古松夜宿", "desc": "一株古松遮住风露，你布下简易警戒，终于得以安稳休整。"},
-          "wandering_cultivator": {"name": "山中遇散修", "desc": "一名采药散修从雾中现身，见你并无敌意，便停下脚步攀谈。"},
-          "local_elite": {"name": "山罴拦路", "desc": "低沉咆哮震落枝叶，一头铁背山罴从岩坡后缓缓逼近。"}
-        }
-      },
       "preview_rewards": [
         "items_LingCao",
         "items_YaoDan",
         5002
+      ],
+      "tags": [
+        "resource"
+      ],
+      "enemy_pools": {
+        "beast": {
+          "name": "青牙狼",
+          "icon": "jueshe/sprite_003.png",
+          "hp": 75,
+          "mp": 30,
+          "attrs": {
+            "hp_max": 75,
+            "mp_max": 30,
+            "shield": 0,
+            "physical_atk": 21,
+            "magic_atk": 22.4,
+            "physical_def": 16,
+            "magic_def": 19.2,
+            "spd": 92,
+            "accuracy": 85,
+            "evasion": 92,
+            "control_power": 45,
+            "control_resist": 55,
+            "crit": 5,
+            "crit_damage": 150
+          },
+          "skills": [
+            1,
+            0
+          ]
+        },
+        "elite": {
+          "name": "铁背山罴",
+          "icon": "jueshe/sprite_001.png",
+          "hp": 165,
+          "mp": 55,
+          "attrs": {
+            "hp_max": 165,
+            "mp_max": 55,
+            "shield": 18,
+            "physical_atk": 31.2,
+            "magic_atk": 33.3,
+            "physical_def": 23.6,
+            "magic_def": 28.3,
+            "spd": 86,
+            "accuracy": 96,
+            "evasion": 78,
+            "control_power": 65,
+            "control_resist": 110,
+            "crit": 8,
+            "crit_damage": 155
+          },
+          "skills": [
+            3,
+            2,
+            0
+          ]
+        }
+      },
+      "drop_pools": {
+        "herbs": {
+          "entries": [
+            {
+              "kind": "item",
+              "id": "items_LingCao",
+              "min": 2,
+              "max": 4,
+              "weight": 1
+            }
+          ]
+        },
+        "ore": {
+          "entries": [
+            {
+              "kind": "item",
+              "id": "items_HanTie",
+              "min": 1,
+              "max": 2,
+              "weight": 3
+            },
+            {
+              "kind": "currency",
+              "id": "ling_stones",
+              "min": 5,
+              "max": 15,
+              "weight": 2
+            }
+          ]
+        },
+        "beast": {
+          "entries": [
+            {
+              "kind": "item",
+              "id": "items_LingCao",
+              "min": 1,
+              "max": 3,
+              "weight": 5
+            },
+            {
+              "kind": "item",
+              "id": "items_HuiQiDan",
+              "min": 1,
+              "max": 1,
+              "weight": 2
+            },
+            {
+              "kind": "item",
+              "id": "items_HuiLingDan",
+              "min": 1,
+              "max": 1,
+              "weight": 2
+            }
+          ]
+        },
+        "fruit": {
+          "entries": [
+            {
+              "kind": "item",
+              "id": "items_LingGuo",
+              "min": 1,
+              "max": 3,
+              "weight": 4
+            },
+            {
+              "kind": "item",
+              "id": "items_LingCao",
+              "min": 1,
+              "max": 2,
+              "weight": 2
+            }
+          ]
+        },
+        "cache": {
+          "entries": [
+            {
+              "kind": "currency",
+              "id": "ling_stones",
+              "min": 12,
+              "max": 30,
+              "weight": 4
+            },
+            {
+              "kind": "item",
+              "id": "items_HuiLingDan",
+              "min": 1,
+              "max": 2,
+              "weight": 2
+            },
+            {
+              "kind": "item",
+              "id": "items_HanTie",
+              "min": 1,
+              "max": 2,
+              "weight": 2
+            }
+          ]
+        },
+        "traveler": {
+          "entries": [
+            {
+              "kind": "item",
+              "id": "items_HuiQiDan",
+              "min": 1,
+              "max": 1,
+              "weight": 3
+            },
+            {
+              "kind": "currency",
+              "id": "ling_stones",
+              "min": 6,
+              "max": 16,
+              "weight": 2
+            }
+          ]
+        },
+        "elite": {
+          "entries": [
+            {
+              "kind": "item",
+              "id": "items_YaoDan",
+              "min": 1,
+              "max": 2,
+              "weight": 4
+            },
+            {
+              "kind": "item",
+              "id": "items_LiaoShangDan",
+              "min": 1,
+              "max": 2,
+              "weight": 3
+            },
+            {
+              "kind": "equip",
+              "id": 5002,
+              "min": 1,
+              "max": 1,
+              "weight": 1
+            }
+          ]
+        }
+      },
+      "event_pool": [
+        "qinglan_mountain__travel",
+        "qinglan_mountain__gather_herbs",
+        "qinglan_mountain__gather_ore",
+        "qinglan_mountain__recover_mp",
+        "qinglan_mountain__recover_hp",
+        "qinglan_mountain__local_beast",
+        "qinglan_mountain__gather_fruit",
+        "qinglan_mountain__hidden_cache",
+        "qinglan_mountain__harsh_terrain",
+        "qinglan_mountain__deep_rest",
+        "qinglan_mountain__wandering_cultivator",
+        "qinglan_mountain__local_elite"
       ]
     },
     "wild_wolf_valley": {
@@ -116,9 +237,175 @@
       "min_difficulty": 1,
       "max_difficulty": 6,
       "recommended_realm": "炼气一层",
-      "expedition_mode": "story",
-      "common_event_pool": [],
-      "map_event_pool": [
+      "preview_rewards": [
+        "items_LingCao",
+        "items_YaoDan",
+        5002
+      ],
+      "tags": [
+        "story"
+      ],
+      "enemy_pools": {
+        "qinglan_wolf_enemy": {
+          "name": "青牙狼",
+          "icon": "jueshe/sprite_003.png",
+          "hp": 75,
+          "mp": 30,
+          "attrs": {
+            "hp_max": 75,
+            "mp_max": 30,
+            "shield": 0,
+            "physical_atk": 21,
+            "magic_atk": 22.4,
+            "physical_def": 16,
+            "magic_def": 19.2,
+            "spd": 92,
+            "accuracy": 85,
+            "evasion": 92,
+            "control_power": 45,
+            "control_resist": 55,
+            "crit": 5,
+            "crit_damage": 150
+          },
+          "skills": [
+            1,
+            0
+          ]
+        },
+        "qinglan_serpent_enemy": {
+          "name": "寒潭妖蟒",
+          "icon": "jueshe/sprite_001.png",
+          "hp": 145,
+          "mp": 70,
+          "attrs": {
+            "hp_max": 145,
+            "mp_max": 70,
+            "shield": 0,
+            "physical_atk": 27.6,
+            "magic_atk": 29.4,
+            "physical_def": 21,
+            "magic_def": 25.2,
+            "spd": 96,
+            "accuracy": 98,
+            "evasion": 90,
+            "control_power": 70,
+            "control_resist": 75,
+            "crit": 8,
+            "crit_damage": 150
+          },
+          "skills": [
+            3,
+            1,
+            0
+          ]
+        },
+        "qinglan_boss_enemy": {
+          "name": "赤焰妖王",
+          "icon": "jueshe/sprite_000.png",
+          "hp": 240,
+          "mp": 100,
+          "attrs": {
+            "hp_max": 240,
+            "mp_max": 100,
+            "shield": 0,
+            "physical_atk": 33.6,
+            "magic_atk": 35.8,
+            "physical_def": 24,
+            "magic_def": 28.8,
+            "spd": 105,
+            "accuracy": 110,
+            "evasion": 105,
+            "control_power": 90,
+            "control_resist": 95,
+            "crit": 12,
+            "crit_damage": 165
+          },
+          "skills": [
+            3,
+            1,
+            2,
+            0
+          ]
+        }
+      },
+      "drop_pools": {
+        "qinglan_wolf_drop_1": {
+          "entries": [
+            {
+              "kind": "item",
+              "id": "items_LingCao",
+              "min": 1,
+              "max": 3,
+              "weight": 5
+            },
+            {
+              "kind": "item",
+              "id": "items_HuiQiDan",
+              "min": 1,
+              "max": 1,
+              "weight": 2
+            },
+            {
+              "kind": "item",
+              "id": "items_HuiLingDan",
+              "min": 1,
+              "max": 1,
+              "weight": 2
+            }
+          ]
+        },
+        "qinglan_serpent_drop_1": {
+          "entries": [
+            {
+              "kind": "item",
+              "id": "items_YaoDan",
+              "min": 1,
+              "max": 2,
+              "weight": 4
+            },
+            {
+              "kind": "item",
+              "id": "items_LiaoShangDan",
+              "min": 1,
+              "max": 2,
+              "weight": 3
+            },
+            {
+              "kind": "equip",
+              "id": 5002,
+              "min": 1,
+              "max": 1,
+              "weight": 1
+            }
+          ]
+        },
+        "qinglan_boss_drop_1": {
+          "entries": [
+            {
+              "kind": "item",
+              "id": "items_YaoDan",
+              "min": 2,
+              "max": 4,
+              "weight": 4
+            },
+            {
+              "kind": "item",
+              "id": "items_PoJingDan",
+              "min": 1,
+              "max": 1,
+              "weight": 2
+            },
+            {
+              "kind": "equip",
+              "id": 5003,
+              "min": 1,
+              "max": 1,
+              "weight": 1
+            }
+          ]
+        }
+      },
+      "event_pool": [
         "qinglan_fog",
         "qinglan_cliff",
         "qinglan_wolf",
@@ -126,11 +413,6 @@
         "qinglan_injured_cultivator",
         "qinglan_serpent",
         "qinglan_boss"
-      ],
-      "preview_rewards": [
-        "items_LingCao",
-        "items_YaoDan",
-        5002
       ]
     },
     "blackwater_marsh": {
@@ -141,104 +423,232 @@
       "min_difficulty": 2,
       "max_difficulty": 5,
       "recommended_realm": "炼气三层",
-      "expedition_mode": "resource",
-      "common_event_pool": [
-        "travel",
-        "gather_herbs",
-        "gather_ore",
-        "recover_mp",
-        "recover_hp",
-        "local_beast",
-        "gather_fruit",
-        "hidden_cache",
-        "harsh_terrain",
-        "deep_rest",
-        "wandering_cultivator",
-        "local_elite"
-      ],
-      "map_event_pool": [],
-      "common_event_generation": {
-        "duration_days": {
-          "travel": 1,
-          "gather": 1,
-          "recover": 1,
-          "battle": 2,
-          "search": 2,
-          "hazard": 2,
-          "deep_rest": 2,
-          "decision": 1,
-          "elite_battle": 3
-        },
-        "reward_pools": {
-          "herbs": [
-            {"kind": "item", "id": "items_LingCao", "min": 2, "max": 4, "weight": 4},
-            {"kind": "item", "id": "items_LingGuo", "min": 1, "max": 2, "weight": 2}
-          ],
-          "ore": [
-            {"kind": "item", "id": "items_HanTie", "min": 1, "max": 2, "weight": 3},
-            {"kind": "currency", "id": "ling_stones", "min": 8, "max": 20, "weight": 2}
-          ],
-          "beast": [
-            {"kind": "item", "id": "items_YaoDan", "min": 1, "max": 2, "weight": 4},
-            {"kind": "item", "id": "items_LiaoShangDan", "min": 1, "max": 2, "weight": 3},
-            {"kind": "item", "id": "items_HuiLingDan", "min": 1, "max": 1, "weight": 2}
-          ],
-          "fruit": [
-            {"kind": "item", "id": "items_LingGuo", "min": 1, "max": 2, "weight": 3},
-            {"kind": "item", "id": "items_LingCao", "min": 2, "max": 4, "weight": 2}
-          ],
-          "cache": [
-            {"kind": "currency", "id": "ling_stones", "min": 18, "max": 40, "weight": 3},
-            {"kind": "item", "id": "items_LiaoShangDan", "min": 1, "max": 2, "weight": 2},
-            {"kind": "item", "id": "items_XuanJin", "min": 1, "max": 1, "weight": 1}
-          ],
-          "traveler": [
-            {"kind": "item", "id": "items_HuiLingDan", "min": 1, "max": 1, "weight": 3},
-            {"kind": "item", "id": "items_LiaoShangDan", "min": 1, "max": 1, "weight": 2}
-          ],
-          "elite": [
-            {"kind": "item", "id": "items_YaoDan", "min": 2, "max": 3, "weight": 4},
-            {"kind": "item", "id": "items_XuanJin", "min": 1, "max": 2, "weight": 2},
-            {"kind": "item", "id": "items_PoJingDan", "min": 1, "max": 1, "weight": 1}
-          ]
-        },
-        "enemy_pools": {
-          "beast": {
-            "name": "毒沼蛇",
-            "icon": "jueshe/sprite_001.png",
-            "hp": 95,
-            "mp": 40,
-            "attrs": {"hp_max": 95, "mp_max": 40, "shield": 0, "physical_atk": 24.6, "magic_atk": 26.2, "physical_def": 15, "magic_def": 18, "spd": 98, "accuracy": 96, "evasion": 102, "control_power": 55, "control_resist": 60, "crit": 6, "crit_damage": 150},
-            "skills": [1, 0]
-          },
-          "elite": {
-            "name": "腐甲鳄妖",
-            "icon": "jueshe/sprite_000.png",
-            "hp": 190,
-            "mp": 70,
-            "attrs": {"hp_max": 190, "mp_max": 70, "shield": 25, "physical_atk": 33.6, "magic_atk": 35.8, "physical_def": 25, "magic_def": 30, "spd": 82, "accuracy": 100, "evasion": 75, "control_power": 70, "control_resist": 120, "crit": 8, "crit_damage": 160},
-            "skills": [3, 2, 1, 0]
-          }
-        },
-        "overrides": {
-          "travel": {"name": "涉过黑水", "desc": "黑水没过脚踝，腐木在雾中若隐若现，你谨慎试探着每一步。", "outcome_text": "绕过几片深泥后，你终于找到一段相对坚实的旧堤。", "difficulty": 2},
-          "gather_herbs": {"name": "瘴中寻药", "desc": "几簇耐毒灵草伏在枯木根部，叶脉泛着幽蓝微光。", "difficulty": 2},
-          "gather_ore": {"name": "淤底淘金", "desc": "沉重矿砂聚在水湾底部，需以灵力隔开污泥方能采集。", "difficulty": 3},
-          "recover_mp": {"name": "芦洲调息", "desc": "一片芦洲略高于水面，清风暂时吹散了周围瘴气。", "difficulty": 2},
-          "recover_hp": {"name": "枯木避毒", "desc": "中空古木隔绝了大半毒雾，你运功逼出侵体瘴气。", "difficulty": 3},
-          "local_beast": {"name": "毒蛇破水", "desc": "水面忽然炸开，毒沼蛇拖着腥风从浑水中直扑而来。", "difficulty": 3},
-          "gather_fruit": {"name": "毒藤灵果", "desc": "一串紫黑灵果垂在毒藤深处，果香与瘴气混在一起。", "difficulty": 3},
-          "hidden_cache": {"name": "沉舟遗物", "desc": "半截腐朽舟身陷在淤泥中，舱内似乎还压着未被取走的行囊。", "difficulty": 3},
-          "harsh_terrain": {"name": "泥潭陷足", "desc": "脚下泥层骤然塌陷，你催动灵力才从吞人的泥潭中挣脱。", "effects": [{"type": "drain_mp_percent", "value": 0.18, "feedback": "你强行震开黏稠泥浆，脱身时已损耗法力 {amount} 点。"}], "difficulty": 3},
-          "deep_rest": {"name": "芦荡守夜", "desc": "你在芦荡深处寻到干燥小洲，燃起驱瘴香后轮番吐纳疗伤。", "difficulty": 3},
-          "wandering_cultivator": {"name": "遇见采毒人", "desc": "一名蒙面采毒人撑舟靠近，愿用沼泽中的消息交换补给。", "difficulty": 3},
-          "local_elite": {"name": "鳄妖潜伏", "desc": "一截浮木忽然睁开猩红双眼，腐甲鳄妖拖着泥浪封住退路。", "difficulty": 4}
-        }
-      },
       "preview_rewards": [
         "items_LingCao",
         "items_YaoDan",
         "items_LiaoShangDan"
+      ],
+      "tags": [
+        "resource"
+      ],
+      "enemy_pools": {
+        "beast": {
+          "name": "毒沼蛇",
+          "icon": "jueshe/sprite_001.png",
+          "hp": 95,
+          "mp": 40,
+          "attrs": {
+            "hp_max": 95,
+            "mp_max": 40,
+            "shield": 0,
+            "physical_atk": 24.6,
+            "magic_atk": 26.2,
+            "physical_def": 15,
+            "magic_def": 18,
+            "spd": 98,
+            "accuracy": 96,
+            "evasion": 102,
+            "control_power": 55,
+            "control_resist": 60,
+            "crit": 6,
+            "crit_damage": 150
+          },
+          "skills": [
+            1,
+            0
+          ]
+        },
+        "elite": {
+          "name": "腐甲鳄妖",
+          "icon": "jueshe/sprite_000.png",
+          "hp": 190,
+          "mp": 70,
+          "attrs": {
+            "hp_max": 190,
+            "mp_max": 70,
+            "shield": 25,
+            "physical_atk": 33.6,
+            "magic_atk": 35.8,
+            "physical_def": 25,
+            "magic_def": 30,
+            "spd": 82,
+            "accuracy": 100,
+            "evasion": 75,
+            "control_power": 70,
+            "control_resist": 120,
+            "crit": 8,
+            "crit_damage": 160
+          },
+          "skills": [
+            3,
+            2,
+            1,
+            0
+          ]
+        }
+      },
+      "drop_pools": {
+        "herbs": {
+          "entries": [
+            {
+              "kind": "item",
+              "id": "items_LingCao",
+              "min": 2,
+              "max": 4,
+              "weight": 4
+            },
+            {
+              "kind": "item",
+              "id": "items_LingGuo",
+              "min": 1,
+              "max": 2,
+              "weight": 2
+            }
+          ]
+        },
+        "ore": {
+          "entries": [
+            {
+              "kind": "item",
+              "id": "items_HanTie",
+              "min": 1,
+              "max": 2,
+              "weight": 3
+            },
+            {
+              "kind": "currency",
+              "id": "ling_stones",
+              "min": 8,
+              "max": 20,
+              "weight": 2
+            }
+          ]
+        },
+        "beast": {
+          "entries": [
+            {
+              "kind": "item",
+              "id": "items_YaoDan",
+              "min": 1,
+              "max": 2,
+              "weight": 4
+            },
+            {
+              "kind": "item",
+              "id": "items_LiaoShangDan",
+              "min": 1,
+              "max": 2,
+              "weight": 3
+            },
+            {
+              "kind": "item",
+              "id": "items_HuiLingDan",
+              "min": 1,
+              "max": 1,
+              "weight": 2
+            }
+          ]
+        },
+        "fruit": {
+          "entries": [
+            {
+              "kind": "item",
+              "id": "items_LingGuo",
+              "min": 1,
+              "max": 2,
+              "weight": 3
+            },
+            {
+              "kind": "item",
+              "id": "items_LingCao",
+              "min": 2,
+              "max": 4,
+              "weight": 2
+            }
+          ]
+        },
+        "cache": {
+          "entries": [
+            {
+              "kind": "currency",
+              "id": "ling_stones",
+              "min": 18,
+              "max": 40,
+              "weight": 3
+            },
+            {
+              "kind": "item",
+              "id": "items_LiaoShangDan",
+              "min": 1,
+              "max": 2,
+              "weight": 2
+            },
+            {
+              "kind": "item",
+              "id": "items_XuanJin",
+              "min": 1,
+              "max": 1,
+              "weight": 1
+            }
+          ]
+        },
+        "traveler": {
+          "entries": [
+            {
+              "kind": "item",
+              "id": "items_HuiLingDan",
+              "min": 1,
+              "max": 1,
+              "weight": 3
+            },
+            {
+              "kind": "item",
+              "id": "items_LiaoShangDan",
+              "min": 1,
+              "max": 1,
+              "weight": 2
+            }
+          ]
+        },
+        "elite": {
+          "entries": [
+            {
+              "kind": "item",
+              "id": "items_YaoDan",
+              "min": 2,
+              "max": 3,
+              "weight": 4
+            },
+            {
+              "kind": "item",
+              "id": "items_XuanJin",
+              "min": 1,
+              "max": 2,
+              "weight": 2
+            },
+            {
+              "kind": "item",
+              "id": "items_PoJingDan",
+              "min": 1,
+              "max": 1,
+              "weight": 1
+            }
+          ]
+        }
+      },
+      "event_pool": [
+        "blackwater_marsh__travel",
+        "blackwater_marsh__gather_herbs",
+        "blackwater_marsh__gather_ore",
+        "blackwater_marsh__recover_mp",
+        "blackwater_marsh__recover_hp",
+        "blackwater_marsh__local_beast",
+        "blackwater_marsh__gather_fruit",
+        "blackwater_marsh__hidden_cache",
+        "blackwater_marsh__harsh_terrain",
+        "blackwater_marsh__deep_rest",
+        "blackwater_marsh__wandering_cultivator",
+        "blackwater_marsh__local_elite"
       ]
     }
   }

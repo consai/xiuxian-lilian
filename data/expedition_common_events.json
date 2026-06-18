@@ -1,157 +1,328 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "events": {
-    "travel": {
+    "qinglan_mountain__travel": {
       "type": "travel",
       "mode": "auto",
-      "name": "循路前行",
-      "desc": "你辨明方向，沿着尚可通行的道路继续深入。",
+      "name": "穿行青岚",
+      "desc": "晨雾贴着山腰缓缓流动，你循着猎户留下的旧路向深山行去。",
       "risk_text": "平安",
       "weight": 26,
       "difficulty": 1,
       "once_per_expedition": false,
       "effects": [],
-      "rewards": [],
-      "outcome_text": "一路虽无奇遇，你却对周遭地势多了几分把握。",
-      "duration_key": "travel"
+      "outcome_text": "山路曲折，却也让你渐渐摸清了青岚山的脉络。",
+      "id": "qinglan_mountain__travel",
+      "template_id": "travel",
+      "location_id": "qinglan_mountain",
+      "tags": [
+        "resource",
+        "travel"
+      ],
+      "conditions": [],
+      "duration_days": 1,
+      "results": []
     },
-    "gather_herbs": {
+    "qinglan_mountain__gather_herbs": {
       "type": "gather",
-      "name": "寻访灵植",
-      "desc": "草木间灵气聚而不散，似有可用灵植藏于其中。",
+      "name": "雾林寻药",
+      "desc": "湿润林地间浮着淡淡药香，几株灵草在晨露中泛起微光。",
       "risk_text": "安全",
       "weight": 30,
       "difficulty": 1,
       "once_per_expedition": false,
       "effects": [],
-      "reward_pool": "herbs",
-      "reward_rolls": 1,
       "success_text": "你依照药性小心采下，收得{loot}。",
       "empty_text": "你循着灵气搜寻许久，只找到几株尚未成熟的幼苗。",
-      "duration_key": "gather"
+      "id": "qinglan_mountain__gather_herbs",
+      "template_id": "gather_herbs",
+      "location_id": "qinglan_mountain",
+      "tags": [
+        "resource",
+        "gather"
+      ],
+      "conditions": [],
+      "duration_days": 1,
+      "drop_pool": "herbs",
+      "results": [
+        {
+          "type": "drop",
+          "drop_pool": "herbs",
+          "rolls": 1
+        }
+      ]
     },
-    "gather_ore": {
+    "qinglan_mountain__gather_ore": {
       "type": "gather",
-      "name": "勘察矿脉",
-      "desc": "岩层间偶有灵光闪动，或许埋藏着可用矿材。",
+      "name": "山壁寻铁",
+      "desc": "风化山壁露出深色矿纹，敲击时传来清越回响。",
       "risk_text": "安全",
       "weight": 18,
       "difficulty": 2,
       "once_per_expedition": false,
       "effects": [],
-      "reward_pool": "ore",
-      "reward_rolls": 1,
       "success_text": "你凿开浮石，从岩层中取出{loot}。",
       "empty_text": "岩层看似不凡，凿开后却只有一片寻常碎石。",
-      "duration_key": "gather"
+      "id": "qinglan_mountain__gather_ore",
+      "template_id": "gather_ore",
+      "location_id": "qinglan_mountain",
+      "tags": [
+        "resource",
+        "gather"
+      ],
+      "conditions": [],
+      "duration_days": 1,
+      "drop_pool": "ore",
+      "results": [
+        {
+          "type": "drop",
+          "drop_pool": "ore",
+          "rolls": 1
+        }
+      ]
     },
-    "recover_mp": {
+    "qinglan_mountain__recover_mp": {
       "type": "recover",
-      "name": "纳气调息",
-      "desc": "此处灵气流转平稳，正适合静坐吐纳片刻。",
+      "name": "灵泉纳气",
+      "desc": "石隙间涌出一线清泉，泉畔灵气澄澈，正宜吐纳。",
       "risk_text": "安全",
       "weight": 22,
       "difficulty": 1,
       "once_per_expedition": false,
       "effects": [
-        {"type": "restore_mp_percent", "value": 0.35}
+        {
+          "type": "restore_mp_percent",
+          "value": 0.35
+        }
       ],
-      "rewards": [],
-      "duration_key": "recover"
+      "id": "qinglan_mountain__recover_mp",
+      "template_id": "recover_mp",
+      "location_id": "qinglan_mountain",
+      "tags": [
+        "resource",
+        "recover"
+      ],
+      "conditions": [],
+      "duration_days": 1,
+      "results": [
+        {
+          "type": "effects",
+          "effects": [
+            {
+              "type": "restore_mp_percent",
+              "value": 0.35
+            }
+          ]
+        }
+      ]
     },
-    "recover_hp": {
+    "qinglan_mountain__recover_hp": {
       "type": "recover",
-      "name": "静处疗伤",
-      "desc": "你寻到一处避风静地，决定先处理沿途积下的伤势。",
+      "name": "岩洞疗伤",
+      "desc": "你在背风岩洞中点起微火，借着片刻安宁处理伤势。",
       "risk_text": "安全",
       "weight": 16,
       "difficulty": 2,
       "once_per_expedition": false,
       "effects": [
-        {"type": "heal_hp_percent", "value": 0.25}
+        {
+          "type": "heal_hp_percent",
+          "value": 0.25
+        }
       ],
-      "rewards": [],
-      "duration_key": "recover"
+      "id": "qinglan_mountain__recover_hp",
+      "template_id": "recover_hp",
+      "location_id": "qinglan_mountain",
+      "tags": [
+        "resource",
+        "recover"
+      ],
+      "conditions": [],
+      "duration_days": 1,
+      "results": [
+        {
+          "type": "effects",
+          "effects": [
+            {
+              "type": "heal_hp_percent",
+              "value": 0.25
+            }
+          ]
+        }
+      ]
     },
-    "local_beast": {
+    "qinglan_mountain__local_beast": {
       "type": "battle",
       "mode": "auto",
-      "name": "兽影逼近",
-      "desc": "林野骤然安静，一道凶戾气息正从暗处迅速逼近。",
+      "name": "林间兽袭",
+      "desc": "树影骤乱，饥饿的青牙狼循着生人气息从林间扑出。",
       "risk_text": "普通",
       "weight": 20,
       "difficulty": 2,
       "once_per_expedition": false,
       "effects": [],
-      "reward_pool": "beast",
       "enemy_pool": "beast",
-      "reward_rolls": 2,
-      "duration_key": "battle"
+      "id": "qinglan_mountain__local_beast",
+      "template_id": "local_beast",
+      "location_id": "qinglan_mountain",
+      "tags": [
+        "resource",
+        "battle"
+      ],
+      "conditions": [],
+      "duration_days": 2,
+      "drop_pool": "beast",
+      "results": [
+        {
+          "type": "drop",
+          "drop_pool": "beast",
+          "rolls": 2
+        }
+      ]
     },
-    "gather_fruit": {
+    "qinglan_mountain__gather_fruit": {
       "type": "gather",
-      "name": "灵果飘香",
-      "desc": "微风送来清甜果香，附近似有吸纳灵气而生的果木。",
+      "name": "崖畔灵果",
+      "desc": "陡崖边垂下一株老藤，叶隙间隐约可见温润果光。",
       "risk_text": "安全",
       "weight": 15,
       "difficulty": 1,
       "once_per_expedition": false,
       "effects": [],
-      "reward_pool": "fruit",
-      "reward_rolls": 1,
       "success_text": "你避开虫蛇，摘得{loot}。",
       "empty_text": "枝头只余鸟兽啄食后的残果，已无可取之物。",
-      "duration_key": "gather"
+      "id": "qinglan_mountain__gather_fruit",
+      "template_id": "gather_fruit",
+      "location_id": "qinglan_mountain",
+      "tags": [
+        "resource",
+        "gather"
+      ],
+      "conditions": [],
+      "duration_days": 1,
+      "drop_pool": "fruit",
+      "results": [
+        {
+          "type": "drop",
+          "drop_pool": "fruit",
+          "rolls": 1
+        }
+      ]
     },
-    "hidden_cache": {
+    "qinglan_mountain__hidden_cache": {
       "type": "gather",
-      "name": "前人遗落",
-      "desc": "一处被草叶遮掩的痕迹引起你的注意，像是前人匆忙留下的藏物。",
+      "name": "猎户石龛",
+      "desc": "一块松动山石后藏着简陋石龛，像是前人留下的应急物资。",
       "risk_text": "机缘",
       "weight": 10,
       "difficulty": 2,
       "once_per_expedition": true,
       "effects": [],
-      "reward_pool": "cache",
-      "reward_rolls": 2,
       "success_text": "你谨慎查验四周，从藏物中取出{loot}。",
       "empty_text": "藏物早已被人取走，只余几片腐朽布帛。",
-      "duration_key": "search"
+      "id": "qinglan_mountain__hidden_cache",
+      "template_id": "hidden_cache",
+      "location_id": "qinglan_mountain",
+      "tags": [
+        "resource",
+        "gather"
+      ],
+      "conditions": [],
+      "duration_days": 2,
+      "drop_pool": "cache",
+      "results": [
+        {
+          "type": "drop",
+          "drop_pool": "cache",
+          "rolls": 2
+        }
+      ]
     },
-    "harsh_terrain": {
+    "qinglan_mountain__harsh_terrain": {
       "type": "hazard",
-      "name": "险路难行",
-      "desc": "前方地势陡然恶化，每一步都需耗费更多心力。",
+      "name": "碎石陡坡",
+      "desc": "山路被落石截断，你只能踏着松动碎石攀上陡坡。",
       "risk_text": "轻微",
       "weight": 14,
       "difficulty": 2,
       "once_per_expedition": false,
       "effects": [
-        {"type": "drain_mp_percent", "value": 0.1}
+        {
+          "type": "drain_mp_percent",
+          "value": 0.1,
+          "feedback": "你以灵力稳住身形，越过陡坡后法力损耗 {amount} 点。"
+        }
       ],
-      "rewards": [],
-      "duration_key": "hazard"
+      "id": "qinglan_mountain__harsh_terrain",
+      "template_id": "harsh_terrain",
+      "location_id": "qinglan_mountain",
+      "tags": [
+        "resource",
+        "hazard"
+      ],
+      "conditions": [],
+      "duration_days": 1,
+      "results": [
+        {
+          "type": "effects",
+          "effects": [
+            {
+              "type": "drain_mp_percent",
+              "value": 0.1,
+              "feedback": "你以灵力稳住身形，越过陡坡后法力损耗 {amount} 点。"
+            }
+          ]
+        }
+      ]
     },
-    "deep_rest": {
+    "qinglan_mountain__deep_rest": {
       "type": "recover",
-      "name": "安营整备",
-      "desc": "天色渐暗，你找到一处易守难攻的落脚点，得以安心整备。",
+      "name": "古松夜宿",
+      "desc": "一株古松遮住风露，你布下简易警戒，终于得以安稳休整。",
       "risk_text": "休整",
       "weight": 9,
       "difficulty": 2,
       "once_per_expedition": false,
       "effects": [
-        {"type": "heal_hp_percent", "value": 0.15},
-        {"type": "restore_mp_percent", "value": 0.2}
+        {
+          "type": "heal_hp_percent",
+          "value": 0.15
+        },
+        {
+          "type": "restore_mp_percent",
+          "value": 0.2
+        }
       ],
-      "rewards": [],
-      "duration_key": "deep_rest"
+      "id": "qinglan_mountain__deep_rest",
+      "template_id": "deep_rest",
+      "location_id": "qinglan_mountain",
+      "tags": [
+        "resource",
+        "recover"
+      ],
+      "conditions": [],
+      "duration_days": 2,
+      "results": [
+        {
+          "type": "effects",
+          "effects": [
+            {
+              "type": "heal_hp_percent",
+              "value": 0.15
+            },
+            {
+              "type": "restore_mp_percent",
+              "value": 0.2
+            }
+          ]
+        }
+      ]
     },
-    "wandering_cultivator": {
+    "qinglan_mountain__wandering_cultivator": {
       "type": "decision",
       "mode": "decision",
-      "name": "途中相逢",
-      "desc": "一名风尘仆仆的散修在路旁停步，与你遥遥拱手。",
+      "name": "山中遇散修",
+      "desc": "一名采药散修从雾中现身，见你并无敌意，便停下脚步攀谈。",
       "risk_text": "抉择",
       "weight": 11,
       "difficulty": 2,
@@ -162,9 +333,16 @@
           "label": "交换见闻",
           "desc": "与对方分享沿途消息，也许能换来一些实用物资。",
           "risk_text": "机缘",
-          "reward_pool": "traveler",
-          "reward_rolls": 1,
-          "effects": []
+          "effects": [],
+          "conditions": [],
+          "drop_pool": "traveler",
+          "results": [
+            {
+              "type": "drop",
+              "drop_pool": "traveler",
+              "rolls": 1
+            }
+          ]
         },
         {
           "id": "keep_distance",
@@ -172,25 +350,442 @@
           "desc": "荒野相逢难辨善恶，你礼貌告辞后继续上路。",
           "risk_text": "稳妥",
           "effects": [],
-          "rewards": []
+          "conditions": [],
+          "results": []
         }
       ],
-      "duration_key": "decision"
+      "id": "qinglan_mountain__wandering_cultivator",
+      "template_id": "wandering_cultivator",
+      "location_id": "qinglan_mountain",
+      "tags": [
+        "resource",
+        "decision"
+      ],
+      "conditions": [],
+      "duration_days": 1,
+      "results": []
     },
-    "local_elite": {
+    "qinglan_mountain__local_elite": {
       "type": "elite",
       "mode": "auto",
-      "name": "凶兽盘踞",
-      "desc": "浓重妖气笼罩前路，一头久踞此地的凶兽挡住了去路。",
+      "name": "山罴拦路",
+      "desc": "低沉咆哮震落枝叶，一头铁背山罴从岩坡后缓缓逼近。",
       "risk_text": "精英",
       "weight": 7,
       "difficulty": 4,
       "once_per_expedition": true,
       "effects": [],
-      "reward_pool": "elite",
       "enemy_pool": "elite",
-      "reward_rolls": 3,
-      "duration_key": "elite_battle"
+      "id": "qinglan_mountain__local_elite",
+      "template_id": "local_elite",
+      "location_id": "qinglan_mountain",
+      "tags": [
+        "resource",
+        "elite"
+      ],
+      "conditions": [],
+      "duration_days": 3,
+      "drop_pool": "elite",
+      "results": [
+        {
+          "type": "drop",
+          "drop_pool": "elite",
+          "rolls": 3
+        }
+      ]
+    },
+    "blackwater_marsh__travel": {
+      "type": "travel",
+      "mode": "auto",
+      "name": "涉过黑水",
+      "desc": "黑水没过脚踝，腐木在雾中若隐若现，你谨慎试探着每一步。",
+      "risk_text": "平安",
+      "weight": 26,
+      "difficulty": 2,
+      "once_per_expedition": false,
+      "effects": [],
+      "outcome_text": "绕过几片深泥后，你终于找到一段相对坚实的旧堤。",
+      "id": "blackwater_marsh__travel",
+      "template_id": "travel",
+      "location_id": "blackwater_marsh",
+      "tags": [
+        "resource",
+        "travel"
+      ],
+      "conditions": [],
+      "duration_days": 1,
+      "results": []
+    },
+    "blackwater_marsh__gather_herbs": {
+      "type": "gather",
+      "name": "瘴中寻药",
+      "desc": "几簇耐毒灵草伏在枯木根部，叶脉泛着幽蓝微光。",
+      "risk_text": "安全",
+      "weight": 30,
+      "difficulty": 2,
+      "once_per_expedition": false,
+      "effects": [],
+      "success_text": "你依照药性小心采下，收得{loot}。",
+      "empty_text": "你循着灵气搜寻许久，只找到几株尚未成熟的幼苗。",
+      "id": "blackwater_marsh__gather_herbs",
+      "template_id": "gather_herbs",
+      "location_id": "blackwater_marsh",
+      "tags": [
+        "resource",
+        "gather"
+      ],
+      "conditions": [],
+      "duration_days": 1,
+      "drop_pool": "herbs",
+      "results": [
+        {
+          "type": "drop",
+          "drop_pool": "herbs",
+          "rolls": 1
+        }
+      ]
+    },
+    "blackwater_marsh__gather_ore": {
+      "type": "gather",
+      "name": "淤底淘金",
+      "desc": "沉重矿砂聚在水湾底部，需以灵力隔开污泥方能采集。",
+      "risk_text": "安全",
+      "weight": 18,
+      "difficulty": 3,
+      "once_per_expedition": false,
+      "effects": [],
+      "success_text": "你凿开浮石，从岩层中取出{loot}。",
+      "empty_text": "岩层看似不凡，凿开后却只有一片寻常碎石。",
+      "id": "blackwater_marsh__gather_ore",
+      "template_id": "gather_ore",
+      "location_id": "blackwater_marsh",
+      "tags": [
+        "resource",
+        "gather"
+      ],
+      "conditions": [],
+      "duration_days": 1,
+      "drop_pool": "ore",
+      "results": [
+        {
+          "type": "drop",
+          "drop_pool": "ore",
+          "rolls": 1
+        }
+      ]
+    },
+    "blackwater_marsh__recover_mp": {
+      "type": "recover",
+      "name": "芦洲调息",
+      "desc": "一片芦洲略高于水面，清风暂时吹散了周围瘴气。",
+      "risk_text": "安全",
+      "weight": 22,
+      "difficulty": 2,
+      "once_per_expedition": false,
+      "effects": [
+        {
+          "type": "restore_mp_percent",
+          "value": 0.35
+        }
+      ],
+      "id": "blackwater_marsh__recover_mp",
+      "template_id": "recover_mp",
+      "location_id": "blackwater_marsh",
+      "tags": [
+        "resource",
+        "recover"
+      ],
+      "conditions": [],
+      "duration_days": 1,
+      "results": [
+        {
+          "type": "effects",
+          "effects": [
+            {
+              "type": "restore_mp_percent",
+              "value": 0.35
+            }
+          ]
+        }
+      ]
+    },
+    "blackwater_marsh__recover_hp": {
+      "type": "recover",
+      "name": "枯木避毒",
+      "desc": "中空古木隔绝了大半毒雾，你运功逼出侵体瘴气。",
+      "risk_text": "安全",
+      "weight": 16,
+      "difficulty": 3,
+      "once_per_expedition": false,
+      "effects": [
+        {
+          "type": "heal_hp_percent",
+          "value": 0.25
+        }
+      ],
+      "id": "blackwater_marsh__recover_hp",
+      "template_id": "recover_hp",
+      "location_id": "blackwater_marsh",
+      "tags": [
+        "resource",
+        "recover"
+      ],
+      "conditions": [],
+      "duration_days": 1,
+      "results": [
+        {
+          "type": "effects",
+          "effects": [
+            {
+              "type": "heal_hp_percent",
+              "value": 0.25
+            }
+          ]
+        }
+      ]
+    },
+    "blackwater_marsh__local_beast": {
+      "type": "battle",
+      "mode": "auto",
+      "name": "毒蛇破水",
+      "desc": "水面忽然炸开，毒沼蛇拖着腥风从浑水中直扑而来。",
+      "risk_text": "普通",
+      "weight": 20,
+      "difficulty": 3,
+      "once_per_expedition": false,
+      "effects": [],
+      "enemy_pool": "beast",
+      "id": "blackwater_marsh__local_beast",
+      "template_id": "local_beast",
+      "location_id": "blackwater_marsh",
+      "tags": [
+        "resource",
+        "battle"
+      ],
+      "conditions": [],
+      "duration_days": 2,
+      "drop_pool": "beast",
+      "results": [
+        {
+          "type": "drop",
+          "drop_pool": "beast",
+          "rolls": 2
+        }
+      ]
+    },
+    "blackwater_marsh__gather_fruit": {
+      "type": "gather",
+      "name": "毒藤灵果",
+      "desc": "一串紫黑灵果垂在毒藤深处，果香与瘴气混在一起。",
+      "risk_text": "安全",
+      "weight": 15,
+      "difficulty": 3,
+      "once_per_expedition": false,
+      "effects": [],
+      "success_text": "你避开虫蛇，摘得{loot}。",
+      "empty_text": "枝头只余鸟兽啄食后的残果，已无可取之物。",
+      "id": "blackwater_marsh__gather_fruit",
+      "template_id": "gather_fruit",
+      "location_id": "blackwater_marsh",
+      "tags": [
+        "resource",
+        "gather"
+      ],
+      "conditions": [],
+      "duration_days": 1,
+      "drop_pool": "fruit",
+      "results": [
+        {
+          "type": "drop",
+          "drop_pool": "fruit",
+          "rolls": 1
+        }
+      ]
+    },
+    "blackwater_marsh__hidden_cache": {
+      "type": "gather",
+      "name": "沉舟遗物",
+      "desc": "半截腐朽舟身陷在淤泥中，舱内似乎还压着未被取走的行囊。",
+      "risk_text": "机缘",
+      "weight": 10,
+      "difficulty": 3,
+      "once_per_expedition": true,
+      "effects": [],
+      "success_text": "你谨慎查验四周，从藏物中取出{loot}。",
+      "empty_text": "藏物早已被人取走，只余几片腐朽布帛。",
+      "id": "blackwater_marsh__hidden_cache",
+      "template_id": "hidden_cache",
+      "location_id": "blackwater_marsh",
+      "tags": [
+        "resource",
+        "gather"
+      ],
+      "conditions": [],
+      "duration_days": 2,
+      "drop_pool": "cache",
+      "results": [
+        {
+          "type": "drop",
+          "drop_pool": "cache",
+          "rolls": 2
+        }
+      ]
+    },
+    "blackwater_marsh__harsh_terrain": {
+      "type": "hazard",
+      "name": "泥潭陷足",
+      "desc": "脚下泥层骤然塌陷，你催动灵力才从吞人的泥潭中挣脱。",
+      "risk_text": "轻微",
+      "weight": 14,
+      "difficulty": 3,
+      "once_per_expedition": false,
+      "effects": [
+        {
+          "type": "drain_mp_percent",
+          "value": 0.18,
+          "feedback": "你强行震开黏稠泥浆，脱身时已损耗法力 {amount} 点。"
+        }
+      ],
+      "id": "blackwater_marsh__harsh_terrain",
+      "template_id": "harsh_terrain",
+      "location_id": "blackwater_marsh",
+      "tags": [
+        "resource",
+        "hazard"
+      ],
+      "conditions": [],
+      "duration_days": 2,
+      "results": [
+        {
+          "type": "effects",
+          "effects": [
+            {
+              "type": "drain_mp_percent",
+              "value": 0.18,
+              "feedback": "你强行震开黏稠泥浆，脱身时已损耗法力 {amount} 点。"
+            }
+          ]
+        }
+      ]
+    },
+    "blackwater_marsh__deep_rest": {
+      "type": "recover",
+      "name": "芦荡守夜",
+      "desc": "你在芦荡深处寻到干燥小洲，燃起驱瘴香后轮番吐纳疗伤。",
+      "risk_text": "休整",
+      "weight": 9,
+      "difficulty": 3,
+      "once_per_expedition": false,
+      "effects": [
+        {
+          "type": "heal_hp_percent",
+          "value": 0.15
+        },
+        {
+          "type": "restore_mp_percent",
+          "value": 0.2
+        }
+      ],
+      "id": "blackwater_marsh__deep_rest",
+      "template_id": "deep_rest",
+      "location_id": "blackwater_marsh",
+      "tags": [
+        "resource",
+        "recover"
+      ],
+      "conditions": [],
+      "duration_days": 2,
+      "results": [
+        {
+          "type": "effects",
+          "effects": [
+            {
+              "type": "heal_hp_percent",
+              "value": 0.15
+            },
+            {
+              "type": "restore_mp_percent",
+              "value": 0.2
+            }
+          ]
+        }
+      ]
+    },
+    "blackwater_marsh__wandering_cultivator": {
+      "type": "decision",
+      "mode": "decision",
+      "name": "遇见采毒人",
+      "desc": "一名蒙面采毒人撑舟靠近，愿用沼泽中的消息交换补给。",
+      "risk_text": "抉择",
+      "weight": 11,
+      "difficulty": 3,
+      "once_per_expedition": false,
+      "options": [
+        {
+          "id": "exchange",
+          "label": "交换见闻",
+          "desc": "与对方分享沿途消息，也许能换来一些实用物资。",
+          "risk_text": "机缘",
+          "effects": [],
+          "conditions": [],
+          "drop_pool": "traveler",
+          "results": [
+            {
+              "type": "drop",
+              "drop_pool": "traveler",
+              "rolls": 1
+            }
+          ]
+        },
+        {
+          "id": "keep_distance",
+          "label": "谨慎告辞",
+          "desc": "荒野相逢难辨善恶，你礼貌告辞后继续上路。",
+          "risk_text": "稳妥",
+          "effects": [],
+          "conditions": [],
+          "results": []
+        }
+      ],
+      "id": "blackwater_marsh__wandering_cultivator",
+      "template_id": "wandering_cultivator",
+      "location_id": "blackwater_marsh",
+      "tags": [
+        "resource",
+        "decision"
+      ],
+      "conditions": [],
+      "duration_days": 1,
+      "results": []
+    },
+    "blackwater_marsh__local_elite": {
+      "type": "elite",
+      "mode": "auto",
+      "name": "鳄妖潜伏",
+      "desc": "一截浮木忽然睁开猩红双眼，腐甲鳄妖拖着泥浪封住退路。",
+      "risk_text": "精英",
+      "weight": 7,
+      "difficulty": 4,
+      "once_per_expedition": true,
+      "effects": [],
+      "enemy_pool": "elite",
+      "id": "blackwater_marsh__local_elite",
+      "template_id": "local_elite",
+      "location_id": "blackwater_marsh",
+      "tags": [
+        "resource",
+        "elite"
+      ],
+      "conditions": [],
+      "duration_days": 3,
+      "drop_pool": "elite",
+      "results": [
+        {
+          "type": "drop",
+          "drop_pool": "elite",
+          "rolls": 3
+        }
+      ]
     }
   }
 }

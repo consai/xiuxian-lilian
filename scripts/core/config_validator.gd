@@ -38,6 +38,14 @@ static func _validate_v1_abilities() -> PackedStringArray:
 	var errors: PackedStringArray = []
 	for ability_v in AbilityServiceScript.all_abilities():
 		var ability := ability_v as Dictionary
+		if not ability.get("tags") is Array:
+			errors.append("技能 %s tags 必须是数组" % str(ability.get("id", "")))
+		if not ability.get("trigger") is Dictionary:
+			errors.append("技能 %s trigger 必须是对象" % str(ability.get("id", "")))
+		if not ability.get("upgrade_options") is Array:
+			errors.append("技能 %s upgrade_options 必须是数组" % str(ability.get("id", "")))
+		if not ability.get("evolution_conditions") is Array:
+			errors.append("技能 %s evolution_conditions 必须是数组" % str(ability.get("id", "")))
 		for effect_v in ability.get("effects", []) as Array:
 			var effect := effect_v as Dictionary
 			if effect.has("masteryGrowth"):
@@ -86,6 +94,12 @@ static func _validate_method_stack_policies() -> PackedStringArray:
 	var errors: PackedStringArray = []
 	for method_v in CultivationMethodServiceScript.all_methods():
 		var method := method_v as Dictionary
+		if not method.get("tags") is Array:
+			errors.append("功法 %s tags 必须是数组" % str(method.get("id", "")))
+		if not method.get("passive_rules") is Array:
+			errors.append("功法 %s passive_rules 必须是数组" % str(method.get("id", "")))
+		if not method.get("synergy_rules") is Array:
+			errors.append("功法 %s synergy_rules 必须是数组" % str(method.get("id", "")))
 		for effect_v in method.get("effects", []) as Array:
 			var effect := effect_v as Dictionary
 			if str(effect.get("stackPolicy", "")) == "add_capped" and not effect.has("cap"):

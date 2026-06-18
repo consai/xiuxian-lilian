@@ -16,6 +16,7 @@ const ExpeditionEventServiceScript := preload("res://scripts/expedition/expediti
 const PlayerAutoBattleServiceScript := preload("res://scripts/sim/player_auto_battle_service.gd")
 const BreakthroughServiceScript := preload("res://scripts/sim/breakthrough_service.gd")
 const AlchemyServiceScript := preload("res://scripts/sim/alchemy_service.gd")
+const PlayerBuildServiceScript := preload("res://scripts/sim/player_build_service.gd")
 
 const INSTABILITY_REDUCTION_PER_WIN := 10
 
@@ -909,40 +910,9 @@ func _skills_include_id(skills: Array, skill_id: int) -> bool:
 
 
 func build_player_battle_snapshot(runtime: Dictionary) -> Dictionary:
-	var runtime_inv := (runtime.get("inventory", {}) as Dictionary).duplicate(true)
-	var runtime_slots := (runtime.get("item_slots", item_slots) as Array).duplicate(true)
-	var skills: Array = []
-	for aid_v in equipped_abilities:
-		var aid := str(aid_v).strip_edges()
-		var combat_id := AbilityServiceScript.combat_id_for(aid) if aid != "" else -1
-		skills.append({"id": combat_id, "cd": 0.0})
-	while skills.size() < 5:
-		skills.append({"id": -1, "cd": 0.0})
-	if not _skills_include_id(skills, 0):
-		for i in skills.size():
-			if int((skills[i] as Dictionary).get("id", -1)) < 0:
-				skills[i] = {"id": 0, "cd": 0.0}
-				break
-	var equips: Array = []
-	for eid_v in equip_slots:
-		var eid := int(eid_v)
-		var equip_row := {"id": eid, "cd": 0.0}
-		if eid > 0:
-			var cfg: Dictionary = ConfigManager.equip_by_id(eid)
-			equip_row["effects"] = (cfg.get("effects", []) as Array).duplicate(true)
-			equip_row["cd_total"] = float(cfg.get("cd_total", cfg.get("cd", 0.0)))
-		equips.append(equip_row)
-	return {
-		"name": player_name,
-		"icon": player_icon,
-		"hp": float(runtime.get("hp", hp)),
-		"mp": float(runtime.get("mp", mp)),
-		"attrs": attrs.duplicate(true),
-		"skills": skills,
-		"equips": equips,
-		"items": InventoryServiceScript.build_battle_item_slots(runtime_inv, runtime_slots),
-		"ai": resolved_auto_battle_rules(),
-	}
+	var snapshot := PlayerBuildServiceScript.build_battle_snapshot(DataStore.savedata, runtime)
+	snapshot["ai"] = resolved_auto_battle_rules()
+	return snapshot
 
 
 func build_battle_init(event: Dictionary) -> Dictionary:

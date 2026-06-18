@@ -5,81 +5,28 @@ const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expediti
 const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
 const ExpeditionLogServiceScript := preload("res://scripts/expedition/expedition_log_service.gd")
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
-const COMMON_ID_PREFIX := "common::"
+const ConditionServiceScript := preload("res://scripts/sim/condition_service.gd")
 
 
 static func by_id(event_id: String) -> Dictionary:
-	if event_id.begins_with(COMMON_ID_PREFIX):
-		var parts := event_id.split("::", false)
-		if parts.size() == 3:
-			var location := _location_by_id(str(parts[1]))
-			return _build_common_event(location, str(parts[2]))
 	var cm := _config_manager()
 	if cm != null and cm.has_method("expedition_event_by_id"):
-		return cm.call("expedition_event_by_id", event_id) as Dictionary
+		var event := cm.call("expedition_event_by_id", event_id) as Dictionary
+		if not event.is_empty():
+			return event
+	if cm != null and cm.has_method("common_expedition_event_by_id"):
+		return cm.call("common_expedition_event_by_id", event_id) as Dictionary
 	return {}
 
 
 static func event_pool_for_location(location: Dictionary) -> Array:
 	var pool: Array = []
-	for template_id_v in location.get("common_event_pool", []) as Array:
-		var common_event := _build_common_event(location, str(template_id_v))
-		if not common_event.is_empty():
-			pool.append(common_event)
-	for event_id_v in location.get("map_event_pool", location.get("event_pool", [])) as Array:
+	for event_id_v in location.get("event_pool", []) as Array:
 		var event_id := str(event_id_v)
 		var event := by_id(event_id)
 		if not event.is_empty():
 			pool.append(event)
 	return pool
-
-
-static func _build_common_event(location: Dictionary, template_id: String) -> Dictionary:
-	var location_id := str(location.get("id", "")).strip_edges()
-	if location_id == "" or template_id.strip_edges() == "":
-		return {}
-	var cm := _config_manager()
-	if cm == null or not cm.has_method("common_expedition_event_by_id"):
-		return {}
-	var event := cm.call("common_expedition_event_by_id", template_id) as Dictionary
-	if event.is_empty():
-		return {}
-	var generation := location.get("common_event_generation", {}) as Dictionary
-	var overrides := generation.get("overrides", {}) as Dictionary
-	var override_v: Variant = overrides.get(template_id, {})
-	if override_v is Dictionary:
-		for key in (override_v as Dictionary).keys():
-			event[key] = (override_v as Dictionary)[key]
-	var reward_pool_id := str(event.get("reward_pool", "")).strip_edges()
-	if reward_pool_id != "":
-		var reward_pools := generation.get("reward_pools", {}) as Dictionary
-		event["rewards"] = (reward_pools.get(reward_pool_id, []) as Array).duplicate(true)
-	var generated_options: Array = []
-	for option_v in event.get("options", []) as Array:
-		if not option_v is Dictionary:
-			continue
-		var option := (option_v as Dictionary).duplicate(true)
-		var option_reward_pool_id := str(option.get("reward_pool", "")).strip_edges()
-		if option_reward_pool_id != "":
-			var option_reward_pools := generation.get("reward_pools", {}) as Dictionary
-			option["rewards"] = (option_reward_pools.get(option_reward_pool_id, []) as Array).duplicate(true)
-		generated_options.append(option)
-	if not generated_options.is_empty():
-		event["options"] = generated_options
-	var enemy_pool_id := str(event.get("enemy_pool", "")).strip_edges()
-	if enemy_pool_id != "":
-		var enemy_pools := generation.get("enemy_pools", {}) as Dictionary
-		var enemy_v: Variant = enemy_pools.get(enemy_pool_id, {})
-		if enemy_v is Dictionary:
-			event["enemy"] = (enemy_v as Dictionary).duplicate(true)
-	var duration_key := str(event.get("duration_key", event.get("type", ""))).strip_edges()
-	var durations := generation.get("duration_days", {}) as Dictionary
-	event["duration_days"] = maxi(1, int(durations.get(duration_key, event.get("duration_days", 1))))
-	event["id"] = "%s%s::%s" % [COMMON_ID_PREFIX, location_id, template_id]
-	event["template_id"] = template_id
-	event["location_id"] = location_id
-	event["scope"] = "common"
-	return event
 
 
 static func is_decision_event(event: Dictionary) -> bool:
@@ -192,12 +139,13 @@ static func resolve_decision_option(
 		return chained
 	var rewards := ExpeditionRewardServiceScript.roll_event_rewards(
 		{
-			"rewards": option.get("rewards", []),
-			"reward_rolls": maxi(1, int(option.get("reward_rolls", 1))),
+			"location_id": str(parent_event.get("location_id", "")),
+			"results": option.get("results", []),
+			"drop_pool": str(option.get("drop_pool", "")),
 		},
 		rng
 	)
-	var effect_lines := _apply_effects(option.get("effects", []) as Array, runtime, player_attrs)
+	var effect_lines := _apply_result_effects(option.get("results", []) as Array, option.get("effects", []) as Array, runtime, player_attrs)
 	var scene := str(parent_event.get("desc", "")).strip_edges()
 	var choice_text := str(option.get("desc", option.get("label", ""))).strip_edges()
 	var outcome_parts: PackedStringArray = []
@@ -250,9 +198,7 @@ static func resolve_non_battle_event(
 				"event": event,
 			}
 		"recover", "hazard":
-			var effect_lines := _apply_effects(
-				event.get("effects", []) as Array, runtime, player_attrs
-			)
+			var effect_lines := _apply_result_effects(event.get("results", []) as Array, event.get("effects", []) as Array, runtime, player_attrs)
 			var hazard_result := ExpeditionLogServiceScript.format_effect_lines(effect_lines)
 			return {
 				"ok": true,
@@ -268,6 +214,14 @@ static func resolve_non_battle_event(
 
 static func build_battle_enemy(event: Dictionary) -> Dictionary:
 	var enemy := (event.get("enemy", {}) as Dictionary).duplicate(true)
+	if enemy.is_empty():
+		var cm := _config_manager()
+		if cm != null and cm.has_method("location_enemy_pool"):
+			enemy = cm.call(
+				"location_enemy_pool",
+				str(event.get("location_id", "")),
+				str(event.get("enemy_pool", ""))
+			) as Dictionary
 	return _normalize_battle_enemy(enemy)
 
 
@@ -449,6 +403,24 @@ static func _apply_effects(
 	return feedback_parts
 
 
+static func _apply_result_effects(
+		results: Array,
+		fallback_effects: Array,
+		runtime: Dictionary,
+		player_attrs: Dictionary
+) -> PackedStringArray:
+	var effects: Array = []
+	for result_v in results:
+		if not result_v is Dictionary:
+			continue
+		var result := result_v as Dictionary
+		if str(result.get("type", "")) == "effects":
+			effects.append_array(result.get("effects", []) as Array)
+	if effects.is_empty():
+		effects = fallback_effects
+	return _apply_effects(effects, runtime, player_attrs)
+
+
 static func _configured_effect_feedback(effect: Dictionary, amount: float) -> String:
 	var feedback := str(effect.get("feedback", "")).strip_edges()
 	if feedback == "":
@@ -474,6 +446,8 @@ static func _filter_candidates(location: Dictionary, visited_once: Array) -> Arr
 		var event := event_v as Dictionary
 		var event_id := str(event.get("id", ""))
 		if bool(event.get("once_per_expedition", false)) and visited_once.has(event_id):
+			continue
+		if not ConditionServiceScript.all_met(event.get("conditions", []) as Array, {"location": location}):
 			continue
 		var event_difficulty := maxi(1, int(event.get("difficulty", 1)))
 		if event_difficulty < min_difficulty:

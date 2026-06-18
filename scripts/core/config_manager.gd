@@ -210,6 +210,28 @@ func common_expedition_event_by_id(event_id: String) -> Dictionary:
 	return row
 
 
+func location_drop_pool(location_id: String, pool_id: String) -> Dictionary:
+	var location := location_by_id(location_id)
+	var pools_v: Variant = location.get("drop_pools", {})
+	if not pools_v is Dictionary:
+		return {}
+	var pool_v: Variant = (pools_v as Dictionary).get(pool_id.strip_edges(), {})
+	if pool_v is Dictionary:
+		return (pool_v as Dictionary).duplicate(true)
+	return {}
+
+
+func location_enemy_pool(location_id: String, pool_id: String) -> Dictionary:
+	var location := location_by_id(location_id)
+	var pools_v: Variant = location.get("enemy_pools", {})
+	if not pools_v is Dictionary:
+		return {}
+	var enemy_v: Variant = (pools_v as Dictionary).get(pool_id.strip_edges(), {})
+	if enemy_v is Dictionary:
+		return (enemy_v as Dictionary).duplicate(true)
+	return {}
+
+
 func all_common_expedition_event_ids() -> Array:
 	return (_common_expedition_events_by_id.keys() as Array).duplicate()
 

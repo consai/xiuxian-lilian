@@ -1,6 +1,7 @@
 extends SceneTree
 
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
+const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
 const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
@@ -537,7 +538,7 @@ func _test_reward_pools() -> void:
 	rng.seed = 42
 	for event_id in ["qinglan_wolf", "qinglan_serpent", "qinglan_boss"]:
 		var event := ExpeditionEventServiceScript.by_id(event_id)
-		var rewards := RewardServiceScript.roll_rewards(event, rng)
+		var rewards := ExpeditionRewardServiceScript.roll_event_rewards(event, rng)
 		_expect_true(not rewards.is_empty(), "rewards should not be empty")
 		for reward_v in rewards:
 			var reward := reward_v as Dictionary

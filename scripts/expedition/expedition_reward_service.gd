@@ -4,29 +4,11 @@ extends RefCounted
 const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
+const DropPoolServiceScript := preload("res://scripts/sim/drop_pool_service.gd")
 
 
 static func roll_event_rewards(event: Dictionary, rng: RandomNumberGenerator) -> Array:
-	var pool: Array = event.get("rewards", []) as Array
-	if pool.is_empty():
-		return []
-	var rolls := maxi(0, int(event.get("reward_rolls", 1)))
-	if rolls <= 0 and not pool.is_empty():
-		rolls = 1
-	var out: Array = []
-	for _i in rolls:
-		var row := _weighted_pick(pool, rng)
-		if row.is_empty():
-			continue
-		var reward := row.duplicate(true)
-		var min_count := maxi(1, int(row.get("min", 1)))
-		var max_count := maxi(min_count, int(row.get("max", min_count)))
-		reward["count"] = rng.randi_range(min_count, max_count)
-		reward.erase("weight")
-		reward.erase("min")
-		reward.erase("max")
-		out.append(reward)
-	return RewardServiceScript.merge_rewards(out)
+	return DropPoolServiceScript.roll_event_rewards(event, rng)
 
 
 static func roll_fixed_rewards(rewards: Array) -> Array:
