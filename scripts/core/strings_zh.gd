@@ -1,9 +1,9 @@
 class_name StringsZh
 extends RefCounted
 
-## 战斗中文文案：[code]res://data/ui/strings_zh.json[/code]。
+## 战斗中文文案：[code]res://data/ui/strings_zh.yaml[/code]。
 
-const DATA_PATH := "res://data/ui/strings_zh.json"
+const DATA_PATH := "res://data/ui/strings_zh.yaml"
 
 static var _root: Dictionary = {}
 static var _loaded: bool = false
@@ -16,12 +16,9 @@ static func _ensure_loaded() -> void:
 	if not FileAccess.file_exists(DATA_PATH):
 		push_error("StringsZh: 缺少文件 %s" % DATA_PATH)
 		return
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(DATA_PATH))
-	if parsed == null:
-		push_error("StringsZh: JSON 解析失败 %s" % DATA_PATH)
-		return
+	var parsed: Variant = JsonLoader._read_json_variant(DATA_PATH)
 	if not parsed is Dictionary:
-		push_error("StringsZh: 根须为 JSON 对象 %s" % DATA_PATH)
+		push_error("StringsZh: 根须为配置对象 %s" % DATA_PATH)
 		return
 	_root = parsed as Dictionary
 

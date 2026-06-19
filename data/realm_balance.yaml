@@ -1,0 +1,313 @@
+schema_version: 1
+design_scope: "combat_and_realm_foundation"
+rules:
+  defense_constant: 100
+  hit_constant: 200
+  control_constant: 200
+  speed_interval:
+    reference_speed: 100
+    base_seconds: 1.2
+    min_seconds: 0.3
+    max_seconds: 12
+major_realms:
+  - id: "qi"
+    name: "炼气"
+    content_coefficient: 1
+    normal_duration_sec:
+      - 8
+      - 14
+    elite_duration_sec:
+      - 20
+      - 30
+    boss_duration_sec:
+      - 45
+      - 70
+  - id: "foundation"
+    name: "筑基"
+    content_coefficient: 1.7
+    normal_duration_sec:
+      - 9
+      - 15
+    elite_duration_sec:
+      - 22
+      - 34
+    boss_duration_sec:
+      - 50
+      - 80
+  - id: "core"
+    name: "金丹"
+    content_coefficient: 2.8
+    normal_duration_sec:
+      - 10
+      - 16
+    elite_duration_sec:
+      - 24
+      - 38
+    boss_duration_sec:
+      - 55
+      - 90
+  - id: "nascent"
+    name: "元婴"
+    content_coefficient: 4.5
+    normal_duration_sec:
+      - 10
+      - 18
+    elite_duration_sec:
+      - 26
+      - 42
+    boss_duration_sec:
+      - 60
+      - 100
+  - id: "transform"
+    name: "化神"
+    content_coefficient: 7
+    normal_duration_sec:
+      - 12
+      - 20
+    elite_duration_sec:
+      - 30
+      - 48
+    boss_duration_sec:
+      - 70
+      - 110
+  - id: "void"
+    name: "炼虚"
+    content_coefficient: 11
+    normal_duration_sec:
+      - 12
+      - 22
+    elite_duration_sec:
+      - 32
+      - 52
+    boss_duration_sec:
+      - 75
+      - 120
+  - id: "merge"
+    name: "合体"
+    content_coefficient: 17
+    normal_duration_sec:
+      - 14
+      - 24
+    elite_duration_sec:
+      - 36
+      - 58
+    boss_duration_sec:
+      - 80
+      - 130
+  - id: "great"
+    name: "大乘"
+    content_coefficient: 26
+    normal_duration_sec:
+      - 14
+      - 26
+    elite_duration_sec:
+      - 40
+      - 65
+    boss_duration_sec:
+      - 90
+      - 145
+  - id: "tribulation"
+    name: "渡劫"
+    content_coefficient: 40
+    normal_duration_sec:
+      - 16
+      - 28
+    elite_duration_sec:
+      - 45
+      - 72
+    boss_duration_sec:
+      - 100
+      - 160
+combat_attribute_formula:
+  hp_max:
+    base: 50
+    scale:
+      body: 5
+  mp_max:
+    base: 50
+    scale:
+      spirit: 5
+  physical_atk:
+    base: 0
+    scale:
+      body: 3
+  magic_atk:
+    base: 0
+    scale:
+      spirit: 2.4
+      sense: 0.8
+  physical_def:
+    base: 0
+    scale:
+      body: 2
+  magic_def:
+    base: 0
+    scale:
+      spirit: 1.2
+      sense: 1.2
+  spd:
+    base: 50
+    scale:
+      agility: 3
+      sense: 2
+  accuracy:
+    base: 50
+    scale:
+      sense: 3
+      agility: 1
+  evasion:
+    base: 50
+    scale:
+      agility: 3
+      sense: 1
+  control_power:
+    base: 0
+    scale:
+      sense: 3
+      spirit: 1
+  control_resist:
+    base: 0
+    scale:
+      sense: 2
+      body: 1
+  hp_regen:
+    base: 0.5
+    scale:
+      body: 0.05
+  mp_regen:
+    base: 0.5
+    scale:
+      spirit: 0.04
+      sense: 0.01
+  carry:
+    base: 20
+    scale:
+      body: 2
+  shield:
+    base: 0
+    scale: {}
+  crit:
+    base: 10
+    scale: {}
+  crit_damage:
+    base: 150
+    scale: {}
+realm_flat_per_layer:
+  hp_max: 6
+  mp_max: 6
+  physical_atk: 1.8
+  magic_atk: 1.92
+  physical_def: 1.2
+  magic_def: 1.44
+  spd: 3
+standard_players:
+  qi_early:
+    realm_index: 0
+    major_realm: "qi"
+    foundations:
+      body: 10
+      spirit: 10
+      sense: 10
+      agility: 10
+  qi_mature:
+    realm_index: 6
+    major_realm: "qi"
+    foundations:
+      body: 13
+      spirit: 13
+      sense: 13
+      agility: 13
+  foundation_early:
+    realm_index: 9
+    major_realm: "foundation"
+    foundations:
+      body: 16
+      spirit: 16
+      sense: 16
+      agility: 16
+benchmark_enemies:
+  qi_normal:
+    major_realm: "qi"
+    band: "normal"
+    attrs:
+      hp_max: 230
+      mp_max: 40
+      physical_atk: 17.5
+      magic_atk: 20
+      physical_def: 16
+      magic_def: 19
+      spd: 92
+      accuracy: 88
+      evasion: 92
+      control_power: 50
+      control_resist: 60
+      crit: 5
+      crit_damage: 150
+  qi_elite:
+    major_realm: "qi"
+    band: "elite"
+    attrs:
+      hp_max: 260
+      mp_max: 80
+      physical_atk: 19
+      magic_atk: 22
+      physical_def: 18
+      magic_def: 22
+      spd: 98
+      accuracy: 95
+      evasion: 98
+      control_power: 80
+      control_resist: 90
+      crit: 7
+      crit_damage: 155
+  foundation_normal:
+    major_realm: "foundation"
+    band: "normal"
+    attrs:
+      hp_max: 310
+      mp_max: 100
+      physical_atk: 34
+      magic_atk: 38
+      physical_def: 26
+      magic_def: 31
+      spd: 108
+      accuracy: 115
+      evasion: 110
+      control_power: 105
+      control_resist: 110
+      crit: 10
+      crit_damage: 160
+encounter_bands:
+  weak:
+    strength_min: 55
+    strength_max: 70
+  normal:
+    strength_min: 80
+    strength_max: 95
+  strong:
+    strength_min: 105
+    strength_max: 120
+  elite:
+    strength_min: 140
+    strength_max: 170
+  boss:
+    strength_min: 220
+    strength_max: 300
+budgets:
+  ability_same_tier_variance: 0.15
+  method_same_tier_variance: 0.12
+  slot_weights:
+    main: 1
+    support_1: 0.4
+    support_2: 0.4
+    movement: 0.5
+acceptance:
+  normal_win_rate_min: 0.7
+  normal_win_rate_max: 0.85
+  normal_duration_sec_min: 8
+  normal_duration_sec_max: 14
+  elite_win_rate_min: 0.35
+  elite_win_rate_max: 0.55
+  qi_mature_vs_foundation_normal_win_rate_max: 0.5
+  resource_remaining_ratio_min: 0.25
+  resource_remaining_ratio_max: 0.65

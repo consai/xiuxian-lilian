@@ -108,7 +108,7 @@ static func validate_core(attrs: Dictionary) -> PackedStringArray:
 	return errors
 
 
-## 按 Buff [code]modifiers[/code] 叠层修正（加法，与 [code]data/buff.json[/code] 示例一致）。
+## 按 Buff [code]modifiers[/code] 叠层修正（加法，与 [code]data/buff.yaml[/code] 示例一致）。
 static func apply_modifiers(attrs: Dictionary, modifiers: Dictionary, stacks: int = 1) -> Dictionary:
 	if modifiers.is_empty() or stacks == 0:
 		return attrs.duplicate(true)

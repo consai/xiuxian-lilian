@@ -1,6 +1,6 @@
-import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { readYaml, writeYaml } from "./yaml-loader.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const dataDir = path.join(root, "data");
@@ -46,8 +46,8 @@ function walkRealmFields(node, parentKey = "") {
 }
 
 async function normalizeDaoTree() {
-  const file = path.join(dataDir, "dao_tree.json");
-  const config = JSON.parse(await readFile(file, "utf8"));
+  const file = path.join(dataDir, "dao_tree.yaml");
+  const config = await readYaml(file);
 
   const nextAttrs = {};
   for (const [key, label] of Object.entries(config.attributes ?? {})) {
@@ -68,17 +68,17 @@ async function normalizeDaoTree() {
     if (skill.realm) skill.realm = renameRealmId(skill.realm);
   }
 
-  await writeFile(file, `${JSON.stringify(config, null, 2)}\n`, "utf8");
+  await writeYaml(file, config);
 }
 
 async function normalizeBundle(fileName) {
   const file = path.join(dataDir, fileName);
-  const config = JSON.parse(await readFile(file, "utf8"));
+  const config = await readYaml(file);
   walkRealmFields(config);
-  await writeFile(file, `${JSON.stringify(config, null, 2)}\n`, "utf8");
+  await writeYaml(file, config);
 }
 
 await normalizeDaoTree();
-await normalizeBundle("cultivation_methods.json");
-await normalizeBundle("abilities.json");
+await normalizeBundle("cultivation_methods.yaml");
+await normalizeBundle("abilities.yaml");
 console.log("Normalized dao config files.");

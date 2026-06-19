@@ -3,7 +3,7 @@ extends RefCounted
 
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 
-const PATH := "res://data/dao_tree.json"
+const PATH := "res://data/dao_tree.yaml"
 
 enum NodeState {
 	LEARNED,

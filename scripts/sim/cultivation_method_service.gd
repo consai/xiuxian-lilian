@@ -5,7 +5,7 @@ const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 
-const PATH := "res://data/cultivation_methods.json"
+const PATH := "res://data/cultivation_methods.yaml"
 const SLOT_MAIN := "main"
 const SLOT_SUPPORT := "support"
 const SLOT_MOVEMENT := "movement"

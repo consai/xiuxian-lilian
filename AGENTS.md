@@ -83,7 +83,7 @@ var _cached_inventory := {}
 
 ## 例外
 
-- `res://data/*.json` 等**静态配置表**由 `JsonLoader` 等工具读取，不属于运行时存档。
+- `res://data/*.yaml` 等**静态配置表**由 `JsonLoader` 等工具读取，不属于运行时存档。
 - 纯局部、帧内临时变量（如 UI 动画中间值）可留在节点脚本中，但不得替代 `DataStore` 保存跨场景/跨存档的数据。
 
 新增字段时：在 `DataStore._default_savedata()` 或对应 `_default_*()` 中补充默认值，并通过 `coalesce_savedata()` 等合并逻辑保证读档兼容。

@@ -1,7 +1,7 @@
 class_name BuffDef
 extends RefCounted
 
-## 与 [code]data/buff.json[/code] 中单条 Buff 配置对应。
+## 与 [code]data/buff.yaml[/code] 中单条 Buff 配置对应。
 
 var id: String = ""
 var name: String = ""

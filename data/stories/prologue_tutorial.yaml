@@ -1,0 +1,233 @@
+schema_version: 1
+id: "prologue_tutorial"
+entry: "empty_cave"
+nodes:
+  empty_cave:
+    type: "line"
+    speaker: ""
+    text: "雨声落在空荡洞府里。丹炉已冷，师父的蒲团空着，门边长明灯也烧到了尽头。"
+    meta:
+      narration: true
+    next: "jade_message"
+  jade_message:
+    type: "line"
+    speaker: ""
+    text: "木架上放着两枚聚气丹、几味药材与一本炼丹心得。你触碰留音玉简，师父苍老的声音随微光响起。"
+    meta:
+      narration: true
+    next: "master_confession"
+  master_confession:
+    type: "line"
+    speaker: "师父留音"
+    text: "徒儿，为师资质已尽，寿元无多。这些东西，是我能替你攒下的最后一点家底。"
+    next: "master_last_trip"
+  master_last_trip:
+    type: "line"
+    speaker: "师父留音"
+    text: "若我最后一次进山没能回来，不必寻我。先坐上蒲团吧。木架上的两枚聚气丹，会告诉你修士为何争资源，也会告诉你资源为何总伴随着代价。"
+    next: "open_pill_cultivation"
+  open_pill_cultivation:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "CultivateObjectButton"
+        reason: "打开修炼界面"
+      - type: "await_game_event"
+        event: "tutorial.cultivation_panel_opened"
+    next: "select_pill"
+  select_pill:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "PillButton"
+        reason: "普通修炼：约 20 修为/日\n聚气丹炼化：约 200 修为/日\n丹药能替你争时间。选择【丹药炼化】"
+      - type: "await_game_event"
+        event: "tutorial.pill_mode_selected"
+    next: "start_pill"
+  start_pill:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "StartButton"
+        reason: "消耗一枚聚气丹，打坐炼化一日"
+      - type: "await_game_event"
+        event: "tutorial.cultivation_result_shown"
+    next: "pill_result"
+  pill_result:
+    type: "line"
+    speaker: ""
+    text: "药力如骤雨涌入经脉，修为迅速攀升；可充盈的气息里，也多了一丝难以掌控的浮动。"
+    meta:
+      narration: true
+    next: "return_pill"
+  return_pill:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "ConfirmButton"
+        reason: "丹药修炼会增加境界虚浮；历练战斗可以压实根基。确认结果"
+      - type: "await_game_event"
+        event: "tutorial.cultivation_completed"
+    next: "open_map"
+  open_map:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "ExpeditionObjectButton"
+        reason: "前往历练：压实境界，并寻找炼丹材料"
+      - type: "await_game_event"
+        event: "tutorial.world_map_opened"
+    next: "choose_wolf_valley"
+  choose_wolf_valley:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "WildWolfValley"
+        reason: "选择野狼谷"
+      - type: "await_game_event"
+        event: "tutorial.wolf_valley_selected"
+    next: "depart_wolf_valley"
+  depart_wolf_valley:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "EnterButton"
+        reason: "进入野狼谷"
+      - type: "await_game_event"
+        event: "tutorial.expedition_started"
+    next: "mountain"
+  mountain:
+    type: "line"
+    speaker: ""
+    text: "雨后的野狼谷泥泞湿冷。草叶间留着采药刀痕，远处传来低沉狼嚎。"
+    meta:
+      narration: true
+    next: "wait_battle"
+  wait_battle:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "EventCards"
+        reason: "处理山中事件，并赢得一场战斗"
+      - type: "await_game_event"
+        event: "tutorial.first_battle_won"
+    next: "battle_press"
+  battle_press:
+    type: "line"
+    speaker: ""
+    text: "妖兽倒下后，浮在经脉表面的力量，被生死之间的压力一点点压进了根基。"
+    meta:
+      narration: true
+    next: "return_expedition"
+  return_expedition:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "ExitButton"
+        reason: "主动返程，保住材料与历练成果"
+      - type: "await_game_event"
+        event: "tutorial.expedition_returned"
+    next: "close_expedition_result"
+  close_expedition_result:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "ReturnButton"
+        reason: "查看境界压实与材料收获，返回洞府"
+      - type: "await_game_event"
+        event: "tutorial.result_closed"
+    next: "home"
+  home:
+    type: "line"
+    speaker: ""
+    text: "石门合拢，山风被隔在身后。你把材料放上木架，终于看懂师父留下的一切：修为来自修炼，丹药来自药材，药材来自历练。世上没有凭空得来的力量，每一步修行，都由前一步支撑。"
+    meta:
+      narration: true
+    next: "open_notes_backpack"
+  open_notes_backpack:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "BackpackButton"
+        reason: "打开背包，查看师父留下的炼丹心得"
+      - type: "await_game_event"
+        event: "tutorial.alchemy_notes_backpack_opened"
+    next: "open_notes_item"
+  open_notes_item:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "BagBase"
+        reason: "选择【炼丹心得（聚气丹）】"
+      - type: "await_game_event"
+        event: "tutorial.alchemy_notes_item_opened"
+    next: "use_notes"
+  use_notes:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "UseButton"
+        reason: "研读心得，提高聚气丹炼制熟练度"
+      - type: "await_game_event"
+        event: "tutorial.alchemy_notes_used"
+    next: "open_alchemy"
+  open_alchemy:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "FurnaceButton"
+        reason: "打开丹炉，把历练材料炼成丹药"
+      - type: "await_game_event"
+        event: "tutorial.alchemy_opened"
+    next: "select_recipe"
+  select_recipe:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "RecipeOption"
+        reason: "展开丹方列表，选择【聚气丹方】"
+      - type: "await_game_event"
+        event: "tutorial.alchemy_recipe_selected"
+    next: "preview_alchemy"
+  preview_alchemy:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "StrategyPanel"
+        reason: "查看成丹概率、耗时与预计产量，点击预览区继续"
+      - type: "await_game_event"
+        event: "tutorial.alchemy_preview_acknowledged"
+    next: "brew_first"
+  brew_first:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "BrewButton"
+        reason: "开炉炼制聚气丹"
+      - type: "await_game_event"
+        event: "tutorial.alchemy_result_shown"
+    next: "alchemy_result"
+  alchemy_result:
+    type: "line"
+    speaker: ""
+    text: "炉盖开启，药香混着焦气涌出。历练所得的药材，终于变成了下一次修炼所需的丹药。"
+    meta:
+      narration: true
+    next: "finish_alchemy"
+  finish_alchemy:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "ReturnButton"
+        reason: "收起丹药，返回洞府"
+      - type: "await_game_event"
+        event: "tutorial.alchemy_completed"
+    next: "last_words"
+  last_words:
+    type: "line"
+    speaker: "师父留音"
+    text: "修行从来没有捷径。为师只能替你走到这里，往后的路，要你自己去取。"
+    next: "chapter_end"
+  chapter_end:
+    type: "end"
+    result: "completed"

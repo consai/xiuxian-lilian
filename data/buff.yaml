@@ -1,0 +1,26 @@
+buffs:
+  buff_slow:
+    name: "迟缓"
+    icon: "ui_new/skill_03.png"
+    desc: "神识受扰，出手速度降低。"
+    duration: 6
+    max_stacks: 1
+    ticktime: 1
+    modifiers:
+      - spd: -20
+    tick_effects: []
+    tags:
+      - "debuff"
+  buff_dot:
+    name: "灼烧"
+    icon: "ui_new/huo.png"
+    desc: "灵毒灼烧经脉，周期损失气血。"
+    duration: 6
+    max_stacks: 1
+    ticktime: 1
+    modifiers: []
+    tick_effects:
+      - type: "damage"
+        value: 10
+    tags:
+      - "debuff"

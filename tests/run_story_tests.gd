@@ -2,8 +2,8 @@ extends SceneTree
 
 const StoryPlayerScript := preload("res://scripts/story/story_player.gd")
 const StoryValidatorScript := preload("res://scripts/story/story_validator.gd")
-const STORY_PATH := "res://data/stories/prologue_fragment.json"
-const TUTORIAL_STORY_PATH := "res://data/stories/prologue_tutorial.json"
+const STORY_PATH := "res://data/stories/prologue_fragment.yaml"
+const TUTORIAL_STORY_PATH := "res://data/stories/prologue_tutorial.yaml"
 
 var _failures: Array[String] = []
 var _tests_run := 0
@@ -114,7 +114,7 @@ func _load_story() -> Dictionary:
 
 
 func _load_story_at(path: String) -> Dictionary:
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var parsed: Variant = JsonLoader._read_json_variant(path)
 	return parsed as Dictionary if parsed is Dictionary else {}
 
 

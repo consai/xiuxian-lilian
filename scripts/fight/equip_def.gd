@@ -1,7 +1,7 @@
 class_name EquipDef
 extends RefCounted
 
-## 与 [code]data/equip.json[/code] 中单条法宝静态配置对应（名称、图标、冷却等）。
+## 与 [code]data/equip.yaml[/code] 中单条法宝静态配置对应（名称、图标、冷却等）。
 
 var id: int = 0
 var name: String = ""

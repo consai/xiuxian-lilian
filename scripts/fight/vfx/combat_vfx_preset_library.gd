@@ -44,7 +44,7 @@ func get_preset_ids() -> Array:
 	dir.list_dir_begin()
 	var fn := dir.get_next()
 	while fn != "":
-		if not dir.current_is_dir() and fn.ends_with(".json"):
+		if not dir.current_is_dir() and (fn.ends_with(".yaml") or fn.ends_with(".yml")):
 			names.append(fn.get_basename())
 		fn = dir.get_next()
 	dir.list_dir_end()

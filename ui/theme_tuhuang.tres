@@ -169,28 +169,16 @@ corner_radius_bottom_left = 8
 [sub_resource type="StyleBoxLine" id="HSeparatorLine"]
 color = Color(0.552941, 0.384314, 0.231373, 0.55)
 
-[sub_resource type="Image" id="Image_hvaav"]
-data = {
-"data": PackedByteArray(255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0),
-"format": "RGBA8",
-"height": 2,
-"mipmaps": false,
-"width": 2
-}
-
-[sub_resource type="ImageTexture" id="BlankTexture"]
-image = SubResource("Image_hvaav")
-
 [sub_resource type="DPITexture" id="SliderGrabberIcon"]
 _source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\"><circle cx=\"9\" cy=\"9\" r=\"6.5\" fill=\"#ad8050\" stroke=\"#603c1f\" stroke-width=\"2\"/></svg>
 "
 
-[sub_resource type="DPITexture" id="SliderGrabberHighlight"]
-_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\"><circle cx=\"9\" cy=\"9\" r=\"6.5\" fill=\"#f4ca80\" stroke=\"#422918\" stroke-width=\"2\"/></svg>
-"
-
 [sub_resource type="DPITexture" id="SliderGrabberDisabled"]
 _source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\"><circle cx=\"9\" cy=\"9\" r=\"6.5\" fill=\"#dfc4b1\" stroke=\"#8c7458\" stroke-width=\"2\"/></svg>
+"
+
+[sub_resource type="DPITexture" id="SliderGrabberHighlight"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\"><circle cx=\"9\" cy=\"9\" r=\"6.5\" fill=\"#f4ca80\" stroke=\"#422918\" stroke-width=\"2\"/></svg>
 "
 
 [sub_resource type="StyleBoxFlat" id="SliderGrabberArea"]
@@ -316,6 +304,18 @@ corner_radius_top_left = 9
 corner_radius_top_right = 9
 corner_radius_bottom_right = 9
 corner_radius_bottom_left = 9
+
+[sub_resource type="Image" id="Image_hvaav"]
+data = {
+"data": PackedByteArray(255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0),
+"format": "RGBA8",
+"height": 2,
+"mipmaps": false,
+"width": 2
+}
+
+[sub_resource type="ImageTexture" id="BlankTexture"]
+image = SubResource("Image_hvaav")
 
 [sub_resource type="StyleBoxEmpty" id="EmptyStyle"]
 content_margin_left = 0.0

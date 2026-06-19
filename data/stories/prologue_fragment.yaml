@@ -1,0 +1,49 @@
+schema_version: 1
+id: "prologue.fragment"
+entry: "wake"
+nodes:
+  wake:
+    type: "line"
+    speaker: "师父残念"
+    text: "洞府禁制尚在。先确认自己还能引气入体。"
+    next: "first_choice"
+    meta:
+      backdrop: "cave_hub"
+      music: "quiet_cave"
+  first_choice:
+    type: "choice"
+    prompt: "你准备如何回应？"
+    choices:
+      - id: "steady"
+        label: "静心运气"
+        hint: "稳住心神，再作打算。"
+        effects:
+          - op: "set"
+            flag: "prologue.calm"
+            value: true
+        next: "guide_cultivate"
+      - id: "search"
+        label: "追问师父下落"
+        hint: "残念或许还能回答一个问题。"
+        effects:
+          - op: "set"
+            flag: "prologue.asked_master"
+            value: true
+        next: "master_answer"
+  master_answer:
+    type: "line"
+    speaker: "师父残念"
+    text: "我已入青岚山查探异变。莫急着寻我。"
+    next: "guide_cultivate"
+  guide_cultivate:
+    type: "command"
+    commands:
+      - type: "guide_focus"
+        target: "hub.cultivate_button"
+        reason: "完成一次修炼"
+      - type: "await_game_event"
+        event: "cultivation.completed"
+    next: "chapter_end"
+  chapter_end:
+    type: "end"
+    result: "completed"

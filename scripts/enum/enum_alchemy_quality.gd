@@ -1,7 +1,7 @@
 class_name EnumAlchemyQuality
 extends RefCounted
 
-## 炼丹成丹品质档位（配置 [code]alchemy.json[/code] 产物键与结算 [code]quality[/code] 字段）。
+## 炼丹成丹品质档位（配置 [code]alchemy.yaml[/code] 产物键与结算 [code]quality[/code] 字段）。
 
 enum Quality {
 	NONE,

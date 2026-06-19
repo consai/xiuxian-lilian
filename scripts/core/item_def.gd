@@ -1,7 +1,7 @@
 class_name ItemDef
 extends RefCounted
 
-## 与 data/item.json 中 id 一致（字符串）
+## 与 data/item.yaml 中 id 一致（字符串）
 var id: String = ""
 var name: String = ""
 var item_type: String = ""

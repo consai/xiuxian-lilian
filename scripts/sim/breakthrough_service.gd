@@ -1,7 +1,7 @@
 class_name BreakthroughService
 extends RefCounted
 
-const RULES_PATH := "res://data/breakthrough_rules.json"
+const RULES_PATH := "res://data/breakthrough_rules.yaml"
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")

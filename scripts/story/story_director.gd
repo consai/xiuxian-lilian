@@ -160,8 +160,8 @@ func _restore_active() -> void:
 
 
 func _load_story(story_id: String) -> Dictionary:
-	var path := "res://data/stories/%s.json" % story_id
+	var path := "res://data/stories/%s.yaml" % story_id
 	if not FileAccess.file_exists(path):
 		return {}
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var parsed: Variant = JsonLoader._read_json_variant(path)
 	return parsed as Dictionary if parsed is Dictionary else {}

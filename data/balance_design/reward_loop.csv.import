@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bj1gu58lmycxg"
+
+[deps]
+
+files=["res://data/balance_design/reward_loop.activity.translation", "res://data/balance_design/reward_loop.phase.translation", "res://data/balance_design/reward_loop.duration.translation", "res://data/balance_design/reward_loop.target.translation", "res://data/balance_design/reward_loop.reward.translation", "res://data/balance_design/reward_loop.reward.translation", "res://data/balance_design/reward_loop.reward.translation", "res://data/balance_design/reward_loop.risk.translation", "res://data/balance_design/reward_loop.fail.translation", "res://data/balance_design/reward_loop.validation.translation"]
+
+source_file="res://data/balance_design/reward_loop.csv"
+dest_files=["res://data/balance_design/reward_loop.activity.translation", "res://data/balance_design/reward_loop.phase.translation", "res://data/balance_design/reward_loop.duration.translation", "res://data/balance_design/reward_loop.target.translation", "res://data/balance_design/reward_loop.reward.translation", "res://data/balance_design/reward_loop.reward.translation", "res://data/balance_design/reward_loop.reward.translation", "res://data/balance_design/reward_loop.risk.translation", "res://data/balance_design/reward_loop.fail.translation", "res://data/balance_design/reward_loop.validation.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

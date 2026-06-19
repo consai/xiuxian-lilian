@@ -400,7 +400,7 @@ func _load_items_local() -> void:
 
 func _load_locations_local() -> void:
 	_locations_by_id.clear()
-	var root := JsonLoader._read_json_root_object("res://data/locations.json")
+	var root := JsonLoader._read_json_root_object("res://data/locations.yaml")
 	var raw_v: Variant = root.get("locations", {})
 	if not raw_v is Dictionary:
 		return
@@ -416,7 +416,7 @@ func _load_world_map_local() -> void:
 	_world_routes.clear()
 	_wilderness_regions_by_id.clear()
 	_wilderness_locations_by_id.clear()
-	var root := JsonLoader._read_json_root_object("res://data/world_map.json")
+	var root := JsonLoader._read_json_root_object("res://data/world_map.yaml")
 	_world_map_meta = {
 		"schema_version": int(root.get("schema_version", 1)),
 		"starter_city_id": str(root.get("starter_city_id", "qingshi_market")),
@@ -449,14 +449,14 @@ func _load_world_map_local() -> void:
 func _load_expedition_events_local() -> void:
 	_common_expedition_events_by_id.clear()
 	_expedition_events_by_id.clear()
-	var common_root := JsonLoader._read_json_root_object("res://data/expedition_common_events.json")
+	var common_root := JsonLoader._read_json_root_object("res://data/expedition_common_events.yaml")
 	var common_v: Variant = common_root.get("events", {})
 	if common_v is Dictionary:
 		for key in (common_v as Dictionary).keys():
 			var row_v: Variant = (common_v as Dictionary)[key]
 			if row_v is Dictionary:
 				_common_expedition_events_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
-	var root := JsonLoader._read_json_root_object("res://data/expedition_events.json")
+	var root := JsonLoader._read_json_root_object("res://data/expedition_events.yaml")
 	var raw_v: Variant = root.get("map_events", root.get("events", {}))
 	if not raw_v is Dictionary:
 		return
@@ -467,7 +467,7 @@ func _load_expedition_events_local() -> void:
 
 
 func _load_expedition_rules_local() -> void:
-	_expedition_rules = JsonLoader._read_json_root_object("res://data/expedition_rules.json").duplicate(true)
+	_expedition_rules = JsonLoader._read_json_root_object("res://data/expedition_rules.yaml").duplicate(true)
 
 
 func _load_skills_local() -> void:

@@ -11,7 +11,7 @@ const BarTipPresenterScript := preload("res://scripts/ui/tips/presenter/bar_tip_
 const CombatBlockPresenterScript := preload("res://scripts/ui/tips/presenter/combat_block_presenter.gd")
 const TipBarScene := preload("res://scenes/ui/tip_bar.tscn")
 
-const POLICY_CFG_PATH := "res://data/ui/tip_policy.json"
+const POLICY_CFG_PATH := "res://data/ui/tip_policy.yaml"
 
 var _metrics: TipMetrics
 var _policy: TipPolicyEngine
@@ -73,11 +73,5 @@ func _publish_intent(intent: Dictionary) -> void:
 func _load_policy_config() -> Dictionary:
 	if not FileAccess.file_exists(POLICY_CFG_PATH):
 		return {}
-	var fp := FileAccess.open(POLICY_CFG_PATH, FileAccess.READ)
-	if fp == null:
-		return {}
-	var txt := fp.get_as_text()
-	var json := JSON.new()
-	if json.parse(txt) != OK:
-		return {}
-	return json.data as Dictionary if json.data is Dictionary else {}
+	var data: Variant = JsonLoader._read_json_variant(POLICY_CFG_PATH)
+	return data as Dictionary if data is Dictionary else {}

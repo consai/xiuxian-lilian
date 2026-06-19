@@ -1,7 +1,7 @@
 class_name EnumItemType
 extends RefCounted
 
-## 道具配置 [code]item.json[/code] 中的 [code]type[/code] 字段，以及背包里 [code]kind == "equip"[/code] 的排序分类。
+## 道具配置 [code]item.yaml[/code] 中的 [code]type[/code] 字段，以及背包里 [code]kind == "equip"[/code] 的排序分类。
 
 enum Type {
 	MATERIAL,

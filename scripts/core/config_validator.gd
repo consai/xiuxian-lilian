@@ -28,7 +28,7 @@ static func collect_all_errors(config_manager: Node, game_state: Node = null) ->
 
 
 static func _validate_realm_balance() -> PackedStringArray:
-	var simulation := JsonLoader._read_json_root_object("res://data/simulation.json")
+	var simulation := JsonLoader._read_json_root_object("res://data/simulation.yaml")
 	var realms_v: Variant = simulation.get("realms", [])
 	var realms := realms_v as Array if realms_v is Array else []
 	return RealmBalanceServiceScript.collect_config_errors(realms)

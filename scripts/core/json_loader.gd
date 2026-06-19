@@ -1,21 +1,21 @@
 class_name JsonLoader
 extends RefCounted
 
-const ITEMS_PATH := "res://data/item.json"
-const DAO_TREE_PATH := "res://data/dao_tree.json"
-const CULTIVATION_METHODS_PATH := "res://data/cultivation_methods.json"
-const ABILITIES_PATH := "res://data/abilities.json"
-const EFFECT_CATALOG_PATH := "res://data/effect_catalog.json"
-const EQUIPS_PATH := "res://data/equip.json"
-const BUFFS_PATH := "res://data/buff.json"
-const COMBAT_VFX_INDEX_PATH := "res://data/combat/vfx_index.json"
-const COMBAT_FLOAT_STYLES_PATH := "res://data/combat/float_styles.json"
+const ITEMS_PATH := "res://data/item.yaml"
+const DAO_TREE_PATH := "res://data/dao_tree.yaml"
+const CULTIVATION_METHODS_PATH := "res://data/cultivation_methods.yaml"
+const ABILITIES_PATH := "res://data/abilities.yaml"
+const EFFECT_CATALOG_PATH := "res://data/effect_catalog.yaml"
+const EQUIPS_PATH := "res://data/equip.yaml"
+const BUFFS_PATH := "res://data/buff.yaml"
+const COMBAT_VFX_INDEX_PATH := "res://data/combat/vfx_index.yaml"
+const COMBAT_FLOAT_STYLES_PATH := "res://data/combat/float_styles.yaml"
 const COMBAT_VFX_PRESETS_DIR := "res://data/combat/presets"
 const ItemDefScript = preload("res://scripts/core/item_def.gd")
 const EquipDefScript = preload("res://scripts/fight/equip_def.gd")
 const BuffDefScript = preload("res://scripts/fight/buff_def.gd")
 
-## 配置 JSON 中的文档用元数据键（加载后剔除）。
+## 配置文件中的文档用元数据键（加载后剔除）。
 const JSON_COMMENT_KEYS: Array[String] = ["_comment", "_说明", "_doc", "_备注"]
 const COMBAT_EFFECT_TYPES := {
 	"damage": true,
@@ -35,7 +35,7 @@ static func config_id_to_string(v: Variant) -> String:
 
 
 static func _read_json_root_object(path: String) -> Dictionary:
-	var v: Variant = _read_json_variant(path)
+	var v: Variant = _read_config_variant(path)
 	if v == null:
 		return {}
 	if v is Dictionary:
@@ -45,15 +45,188 @@ static func _read_json_root_object(path: String) -> Dictionary:
 
 
 static func _read_json_variant(path: String) -> Variant:
+	return _read_config_variant(path)
+
+
+static func _read_config_variant(path: String) -> Variant:
 	if not FileAccess.file_exists(path):
 		push_error("JsonLoader: file not found: %s" % path)
 		return null
 	var text := FileAccess.get_file_as_string(path)
+	if path.ends_with(".yaml") or path.ends_with(".yml"):
+		return _parse_yaml(text, path)
 	var parsed: Variant = JSON.parse_string(text)
 	if parsed == null:
 		push_error("JsonLoader: invalid JSON: %s" % path)
 		return null
 	return parsed
+
+
+static func _parse_yaml(text: String, path: String = "") -> Variant:
+	var trimmed := text.strip_edges()
+	if trimmed.begins_with("{") or trimmed.begins_with("["):
+		var json_fallback: Variant = JSON.parse_string(text)
+		if json_fallback != null:
+			return json_fallback
+	var lines := _yaml_significant_lines(text)
+	if lines.is_empty():
+		return {}
+	var cursor := {"i": 0}
+	var parsed: Variant = _parse_yaml_block(lines, cursor, int(lines[0].get("indent", 0)))
+	if parsed == null:
+		push_error("JsonLoader: invalid YAML: %s" % path)
+	return parsed
+
+
+static func _yaml_significant_lines(text: String) -> Array:
+	var out: Array = []
+	for raw_line in text.split("\n"):
+		var line := str(raw_line).trim_suffix("\r")
+		if line.strip_edges() == "" or line.strip_edges().begins_with("#"):
+			continue
+		var content := line.substr(_yaml_indent(line))
+		out.append({"indent": _yaml_indent(line), "text": content})
+	return out
+
+
+static func _yaml_indent(line: String) -> int:
+	var indent := 0
+	while indent < line.length() and line[indent] == " ":
+		indent += 1
+	return indent
+
+
+static func _parse_yaml_block(lines: Array, cursor: Dictionary, indent: int) -> Variant:
+	if int(cursor.get("i", 0)) >= lines.size():
+		return {}
+	var line := lines[int(cursor["i"])] as Dictionary
+	var text := str(line.get("text", ""))
+	if text.begins_with("-"):
+		return _parse_yaml_array(lines, cursor, indent)
+	return _parse_yaml_dict(lines, cursor, indent)
+
+
+static func _parse_yaml_array(lines: Array, cursor: Dictionary, indent: int) -> Array:
+	var out: Array = []
+	while int(cursor.get("i", 0)) < lines.size():
+		var line := lines[int(cursor["i"])] as Dictionary
+		var line_indent := int(line.get("indent", 0))
+		if line_indent < indent:
+			break
+		if line_indent != indent:
+			break
+		var text := str(line.get("text", ""))
+		if not text.begins_with("-"):
+			break
+		var rest := text.substr(1).strip_edges()
+		cursor["i"] = int(cursor["i"]) + 1
+		if rest == "":
+			out.append(_parse_yaml_block(lines, cursor, _yaml_next_indent(lines, cursor, indent)))
+			continue
+		var split := _yaml_split_key_value(rest)
+		if split.size() == 2:
+			var row := {}
+			_yaml_assign_pair(row, str(split[0]), str(split[1]), lines, cursor, indent)
+			if int(cursor.get("i", 0)) < lines.size():
+				var next_line := lines[int(cursor["i"])] as Dictionary
+				if int(next_line.get("indent", 0)) > indent and not str(next_line.get("text", "")).begins_with("-"):
+					var extra: Variant = _parse_yaml_dict(lines, cursor, int(next_line.get("indent", 0)))
+					if extra is Dictionary:
+						for key in (extra as Dictionary).keys():
+							row[key] = (extra as Dictionary)[key]
+			out.append(row)
+		else:
+			out.append(_yaml_parse_scalar(rest))
+	return out
+
+
+static func _parse_yaml_dict(lines: Array, cursor: Dictionary, indent: int) -> Dictionary:
+	var out := {}
+	while int(cursor.get("i", 0)) < lines.size():
+		var line := lines[int(cursor["i"])] as Dictionary
+		var line_indent := int(line.get("indent", 0))
+		if line_indent < indent:
+			break
+		if line_indent != indent:
+			break
+		var text := str(line.get("text", ""))
+		if text.begins_with("-"):
+			break
+		var split := _yaml_split_key_value(text)
+		if split.size() != 2:
+			cursor["i"] = int(cursor["i"]) + 1
+			continue
+		cursor["i"] = int(cursor["i"]) + 1
+		_yaml_assign_pair(out, str(split[0]), str(split[1]), lines, cursor, indent)
+	return out
+
+
+static func _yaml_assign_pair(out: Dictionary, raw_key: String, raw_value: String, lines: Array, cursor: Dictionary, indent: int) -> void:
+	var key_v: Variant = _yaml_parse_scalar(raw_key.strip_edges())
+	var key := str(key_v)
+	var value := raw_value.strip_edges()
+	if value == "":
+		if int(cursor.get("i", 0)) < lines.size():
+			out[key] = _parse_yaml_block(lines, cursor, _yaml_next_indent(lines, cursor, indent))
+		else:
+			out[key] = {}
+	else:
+		out[key] = _yaml_parse_scalar(value)
+
+
+static func _yaml_next_indent(lines: Array, cursor: Dictionary, fallback: int) -> int:
+	if int(cursor.get("i", 0)) >= lines.size():
+		return fallback + 2
+	return int((lines[int(cursor["i"])] as Dictionary).get("indent", fallback + 2))
+
+
+static func _yaml_split_key_value(text: String) -> Array:
+	var in_quote := false
+	var quote := ""
+	var escaped := false
+	for i in text.length():
+		var ch := text[i]
+		if escaped:
+			escaped = false
+			continue
+		if ch == "\\":
+			escaped = true
+			continue
+		if in_quote:
+			if ch == quote:
+				in_quote = false
+			continue
+		if ch == "\"" or ch == "'":
+			in_quote = true
+			quote = ch
+			continue
+		if ch == ":":
+			return [text.substr(0, i), text.substr(i + 1)]
+	return []
+
+
+static func _yaml_parse_scalar(raw: String) -> Variant:
+	var s := raw.strip_edges()
+	if s == "":
+		return ""
+	if s.begins_with("{") or s.begins_with("[") or s.begins_with("\""):
+		var parsed: Variant = JSON.parse_string(s)
+		if parsed != null:
+			return parsed
+	var lower := s.to_lower()
+	if lower == "null" or lower == "~":
+		return null
+	if lower == "true":
+		return true
+	if lower == "false":
+		return false
+	if s.is_valid_int():
+		return int(s)
+	if s.is_valid_float():
+		return float(s)
+	if (s.begins_with("'") and s.ends_with("'")) or (s.begins_with("\"") and s.ends_with("\"")):
+		return s.substr(1, s.length() - 2)
+	return s
 
 
 static func load_items() -> Array:
@@ -65,12 +238,12 @@ static func load_items() -> Array:
 		if d.has("items") and d["items"] is Array:
 			raw = d["items"] as Array
 		else:
-			push_error("JsonLoader: item.json object missing 'items' array")
+			push_error("JsonLoader: item config object missing 'items' array")
 			return out
 	elif parsed is Array:
 		raw = parsed as Array
 	else:
-		push_error("JsonLoader: item.json root must be object or array")
+		push_error("JsonLoader: item config root must be object or array")
 		return out
 	for item in raw:
 		if not item is Dictionary:
@@ -99,7 +272,7 @@ static func load_equips_bundle() -> Dictionary:
 static func _parse_equip_rows(raw: Variant) -> Array:
 	var equips_out: Array = []
 	if not raw is Dictionary:
-		push_error("JsonLoader: equip.json 'equips' must be an object keyed by equip id")
+		push_error("JsonLoader: equip config 'equips' must be an object keyed by equip id")
 		return equips_out
 	var d := raw as Dictionary
 	var keys: Array = d.keys()
@@ -107,7 +280,7 @@ static func _parse_equip_rows(raw: Variant) -> Array:
 	for k in keys:
 		var key_str := str(k).strip_edges()
 		if not key_str.is_valid_int():
-			push_error("JsonLoader: equip.json equips key must be numeric id, got '%s'" % key_str)
+			push_error("JsonLoader: equip config equips key must be numeric id, got '%s'" % key_str)
 			continue
 		var eid := int(key_str)
 		if eid <= 0:
@@ -132,13 +305,13 @@ static func load_buffs() -> Array:
 		return out
 	var raw: Variant = root.get("buffs", {})
 	if not raw is Dictionary:
-		push_error("JsonLoader: buff.json 'buffs' must be an object keyed by buff id")
+		push_error("JsonLoader: buff config 'buffs' must be an object keyed by buff id")
 		return out
 	var d := raw as Dictionary
 	for k in d.keys():
 		var bid := str(k).strip_edges()
 		if bid == "":
-			push_error("JsonLoader: buff.json buffs key must be non-empty string")
+			push_error("JsonLoader: buff config buffs key must be non-empty string")
 			continue
 		var row_v: Variant = d[k]
 		if not row_v is Dictionary:
@@ -148,7 +321,7 @@ static func load_buffs() -> Array:
 		row["id"] = bid
 		_validate_combat_effects_schema(
 			row.get("tick_effects", []),
-			"buff.json buffs['%s'].tick_effects" % bid,
+			"buff config buffs['%s'].tick_effects" % bid,
 			false
 		)
 		var buff = BuffDefScript.from_dict(row)
@@ -204,8 +377,10 @@ static func normalize_combat_vfx_preset_id(ref: String) -> String:
 	var s := ref.strip_edges()
 	if s == "":
 		return ""
-	if s.ends_with(".json"):
+	if s.ends_with(".json") or s.ends_with(".yaml"):
 		s = s.substr(0, s.length() - 5)
+	elif s.ends_with(".yml"):
+		s = s.substr(0, s.length() - 4)
 	var slash := s.rfind("/")
 	if slash >= 0:
 		s = s.substr(slash + 1)
@@ -219,18 +394,18 @@ static func combat_vfx_preset_path(preset_id: String) -> String:
 	var id := normalize_combat_vfx_preset_id(preset_id)
 	if id == "":
 		return ""
-	return "%s/%s.json" % [COMBAT_VFX_PRESETS_DIR, id]
+	return "%s/%s.yaml" % [COMBAT_VFX_PRESETS_DIR, id]
 
 
 static func load_combat_float_styles() -> Dictionary:
-	var raw: Variant = _read_json_variant(COMBAT_FLOAT_STYLES_PATH)
+	var raw: Variant = _read_config_variant(COMBAT_FLOAT_STYLES_PATH)
 	if raw == null or not raw is Dictionary:
 		return {"version": 1, "jitter_x": 18.0, "max_per_unit_per_frame": 6, "styles": {}}
 	return strip_json_comments(raw) as Dictionary
 
 
 static func load_combat_vfx_index() -> Dictionary:
-	var raw: Variant = _read_json_variant(COMBAT_VFX_INDEX_PATH)
+	var raw: Variant = _read_config_variant(COMBAT_VFX_INDEX_PATH)
 	if raw == null or not raw is Dictionary:
 		return {"version": 1, "default": "melee_default", "impact_preset": "hit_default", "preset_dir": "presets"}
 	return strip_json_comments(raw) as Dictionary
@@ -241,7 +416,7 @@ static func load_combat_vfx_preset_file(preset_ref: String) -> Dictionary:
 	if path == "" or not FileAccess.file_exists(path):
 		push_warning("JsonLoader: combat vfx preset not found: %s" % path)
 		return {}
-	var raw: Variant = _read_json_variant(path)
+	var raw: Variant = _read_config_variant(path)
 	if raw == null or not raw is Dictionary:
 		return {}
 	return strip_json_comments(raw) as Dictionary
@@ -271,7 +446,7 @@ static func load_combat_vfx_presets() -> Dictionary:
 		dir.list_dir_begin()
 		var fn := dir.get_next()
 		while fn != "":
-			if not dir.current_is_dir() and fn.ends_with(".json"):
+			if not dir.current_is_dir() and (fn.ends_with(".yaml") or fn.ends_with(".yml")):
 				names.append(fn.get_basename())
 			fn = dir.get_next()
 		dir.list_dir_end()

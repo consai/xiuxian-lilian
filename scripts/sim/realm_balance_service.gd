@@ -1,9 +1,9 @@
 class_name RealmBalanceService
 extends RefCounted
 
-## 数值配置门面：境界系数、属性公式、标杆敌人与平衡验收统一从 data/realm_balance.json 读取。
+## 数值配置门面：境界系数、属性公式、标杆敌人与平衡验收统一从 data/realm_balance.yaml 读取。
 
-const PATH := "res://data/realm_balance.json"
+const PATH := "res://data/realm_balance.yaml"
 
 const DEFAULT_ATTRIBUTE_FORMULA := {
 	FightAttr.HP_MAX: {"base": 50.0, "scale": {"body": 5.0}},

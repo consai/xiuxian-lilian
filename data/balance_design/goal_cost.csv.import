@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://dxjbtppujq87h"
+
+[deps]
+
+files=["res://data/balance_design/goal_cost.goal.translation", "res://data/balance_design/goal_cost.phase.translation", "res://data/balance_design/goal_cost.resource.translation", "res://data/balance_design/goal_cost.resource.translation", "res://data/balance_design/goal_cost.cost.translation", "res://data/balance_design/goal_cost.net.translation", "res://data/balance_design/goal_cost.target.translation", "res://data/balance_design/goal_cost.en.translation", "res://data/balance_design/goal_cost.priority.translation", "res://data/balance_design/goal_cost.validation.translation"]
+
+source_file="res://data/balance_design/goal_cost.csv"
+dest_files=["res://data/balance_design/goal_cost.goal.translation", "res://data/balance_design/goal_cost.phase.translation", "res://data/balance_design/goal_cost.resource.translation", "res://data/balance_design/goal_cost.resource.translation", "res://data/balance_design/goal_cost.cost.translation", "res://data/balance_design/goal_cost.net.translation", "res://data/balance_design/goal_cost.target.translation", "res://data/balance_design/goal_cost.en.translation", "res://data/balance_design/goal_cost.priority.translation", "res://data/balance_design/goal_cost.validation.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

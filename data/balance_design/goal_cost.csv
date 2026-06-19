@@ -1,0 +1,9 @@
+﻿goal_id,goal_name,phase_id,resource_id,resource_name,cost_amount,net_per_min,target_minutes,actual_minutes,priority,validation_note
+buy_basic_weapon,购买普通武器,newbie,ling_stone,灵石,100,23,3-5,,high,新手期应快速完成
+first_minor_breakthrough,第一次小突破,newbie,spiritual_qi,灵气,300,40,5-10,,high,作为第一段明确成长
+craft_basic_pill,炼制普通丹药,entry,herb,草药,30,3,8-12,,medium,让炼丹系统被使用
+enhance_weapon_1,武器强化一次,entry,ling_stone,灵石,160,25,5-8,,medium,强化应比买普通装略贵
+prepare_elite_fight,精英战准备,pressure,ling_stone,灵石,300,25,10-15,,high,用于购买补给或强化
+craft_breakthrough_pill,炼制突破丹,breakthrough,herb,草药,180,3,45-70,,high,长期目标但不应只靠等待
+major_breakthrough_qi_5,炼气五层突破,breakthrough,spiritual_qi,灵气,3600,65,45-90,,high,阶段目标
+unlock_spirit_cave,解锁灵脉洞,post_breakthrough,ling_stone,灵石,900,30,25-40,,medium,新区域门槛

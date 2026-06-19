@@ -1,7 +1,6 @@
-import { readFile } from "node:fs/promises";
+import { readYaml } from "./yaml-loader.mjs";
 
-const configUrl = new URL("../../data/dao_tree.json", import.meta.url);
-const config = JSON.parse(await readFile(configUrl, "utf8"));
+const config = await readYaml(new URL("../../data/dao_tree.yaml", import.meta.url));
 const { domains, realms, skills } = config;
 
 const errors = [];

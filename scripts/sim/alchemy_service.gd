@@ -1,7 +1,7 @@
 class_name AlchemyService
 extends RefCounted
 
-const DATA_PATH := "res://data/alchemy.json"
+const DATA_PATH := "res://data/alchemy.yaml"
 const MAX_RECIPE_MASTERY := 1000
 const MASTERY_SCORE_MAX := 20.0
 const MASTERY_EXTRA_PILL_CHANCE_MAX := 0.75
