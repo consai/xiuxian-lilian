@@ -83,9 +83,9 @@ func _bind_status() -> void:
 			ExpeditionState.phase,
 			ExpeditionState.steps,
 		]
-	_status_label.text = "场景 %s | 第 %d 日 %s | 修为 %d/%d | 灵石 %d | 历练 %s" % [
+	_status_label.text = "场景 %s | %s %s | 修为 %d/%d | 灵石 %d | 历练 %s" % [
 		scene_id,
-		GameState.day,
+		GameState.time_date_label(GameState.day),
 		GameState.realm_name,
 		GameState.cultivation,
 		GameState.breakthrough_at,
@@ -139,7 +139,7 @@ func _add_stones(amount: int) -> void:
 ## 无对应玩法 API：仅推进日数，不附带修炼 / 休息副作用
 func _add_days(amount: int) -> void:
 	GameState.day += maxi(0, amount)
-	_flash("日数 +%d，当前第 %d 日" % [amount, GameState.day])
+	_flash("日数 +%d，当前 %s" % [amount, GameState.time_date_label(GameState.day)])
 
 
 ## 正常途径：advance_realm_one_step（大境界 → breakthrough，小层 → _auto_advance_layers）

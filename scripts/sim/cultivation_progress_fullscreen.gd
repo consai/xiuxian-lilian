@@ -120,10 +120,10 @@ func _update_visuals(ratio: float) -> void:
 	_progress_bar.value = percent
 	_progress_label.text = "%d%%" % int(round(percent))
 	if is_equal_approx(ratio, 1.0):
-		_day_label.text = "闭关第 %d / %d 日\n第 %d 日" % [
-			_days,
-			_days,
-			_start_day + _days - 1,
+		_day_label.text = "闭关 %s / %s\n%s" % [
+			GameState.time_duration_label(_days),
+			GameState.time_duration_label(_days),
+			GameState.time_date_label(_start_day + _days - 1),
 		]
 		_status_label.text = "周天圆满 · 功行已成"
 		return
@@ -131,10 +131,10 @@ func _update_visuals(ratio: float) -> void:
 	var current_day := clampi(int(day_progress) + 1, 1, _days)
 	var within_day: float = day_progress - floor(day_progress)
 	var cycle_index := clampi(int(within_day * float(STAGE_TEXTS.size())), 0, STAGE_TEXTS.size() - 1)
-	_day_label.text = "闭关第 %d / %d 日\n第 %d 日" % [
-		current_day,
-		_days,
-		_start_day + current_day - 1,
+	_day_label.text = "闭关 %s / %s\n%s" % [
+		GameState.time_duration_label(current_day),
+		GameState.time_duration_label(_days),
+		GameState.time_date_label(_start_day + current_day - 1),
 	]
 	_status_label.text = STAGE_TEXTS[cycle_index]
 

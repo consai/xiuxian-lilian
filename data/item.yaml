@@ -1,7 +1,60 @@
+﻿generated_learning_books:
+  - category: "ability"
+    enabled: true
+    id_prefix: "book_skill_"
+    type: "技能书"
+    primary_type: "书籍"
+    secondary_type: "技能书"
+    icon: "res://assets/art/ui_new/fulu.png"
+    stackable: true
+    max_stack: 9
+    name_template: "{name}"
+    desc_template: "研读后习得技能「{name}」。"
+    rarity_map:
+      common: "普通"
+      uncommon: "普通"
+      rare: "稀有"
+      epic: "稀有"
+      legendary: "传说"
+    quality_map:
+      common: 1
+      uncommon: 2
+      rare: 3
+      epic: 5
+      legendary: 6
+  - category: "method"
+    enabled: true
+    id_prefix: "book_method_"
+    type: "功法书"
+    primary_type: "书籍"
+    secondary_type: "功法书"
+    icon: "res://assets/art/ui_new/fulu1.png"
+    stackable: true
+    max_stack: 9
+    name_template: "{name}"
+    desc_template: "研读后习得功法「{name}」。"
+    rarity_map:
+      common: "普通"
+      uncommon: "普通"
+      rare: "稀有"
+      epic: "稀有"
+      legendary: "传说"
+    quality_map:
+      common: 1
+      uncommon: 2
+      rare: 3
+      epic: 5
+      legendary: 6
+legacy_learning_book_aliases:
+  book_method_iron_body: "book_method_iron_skin_1"
+  book_method_leihuo: "book_method_leihuo_1"
+  book_method_hunyuan: "book_method_hunyuan_1"
 items:
   - id: "items_LingCao"
     name: "灵草"
     type: "材料"
+    primary_type: "道具"
+    secondary_type: "药材"
     rarity: "普通"
     quality: 1
     ling_shi: 8
@@ -12,6 +65,8 @@ items:
   - id: "items_LingGuo"
     name: "灵果"
     type: "材料"
+    primary_type: "道具"
+    secondary_type: "药材"
     rarity: "普通"
     quality: 1
     ling_shi: 14
@@ -29,6 +84,8 @@ items:
   - id: "items_YaoDan"
     name: "妖丹"
     type: "材料"
+    primary_type: "道具"
+    secondary_type: "药材"
     rarity: "稀有"
     quality: 3
     ling_shi: 62
@@ -39,6 +96,8 @@ items:
   - id: "items_HanTie"
     name: "寒铁"
     type: "矿材"
+    primary_type: "道具"
+    secondary_type: "矿石"
     rarity: "普通"
     quality: 1
     ling_shi: 10
@@ -49,6 +108,8 @@ items:
   - id: "items_XuanJin"
     name: "玄金"
     type: "矿材"
+    primary_type: "道具"
+    secondary_type: "矿石"
     rarity: "稀有"
     quality: 3
     ling_shi: 58
@@ -59,6 +120,8 @@ items:
   - id: "items_HuiQiDan"
     name: "回气丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "普通"
     quality: 1
     ling_shi: 25
@@ -79,6 +142,8 @@ items:
   - id: "items_JuQiDan"
     name: "聚气丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "普通"
     quality: 1
     ling_shi: 35
@@ -96,6 +161,8 @@ items:
   - id: "items_LiaoShangDan"
     name: "疗伤丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "普通"
     quality: 1
     ling_shi: 40
@@ -116,6 +183,8 @@ items:
   - id: "items_PoJingDan"
     name: "破境丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "稀有"
     quality: 3
     ling_shi: 120
@@ -133,6 +202,8 @@ items:
   - id: "items_HuiLingDan"
     name: "回灵丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "普通"
     quality: 1
     ling_shi: 30
@@ -159,6 +230,8 @@ items:
   - id: "items_QingFengJian"
     name: "青锋剑"
     type: "法宝"
+    primary_type: "法宝"
+    secondary_type: "主动法宝"
     rarity: "普通"
     quality: 1
     ling_shi: 85
@@ -169,6 +242,8 @@ items:
   - id: "items_XuanWuJia"
     name: "玄武甲"
     type: "法宝"
+    primary_type: "法宝"
+    secondary_type: "被动法宝"
     rarity: "普通"
     quality: 1
     ling_shi: 92
@@ -179,6 +254,8 @@ items:
   - id: "items_ZhenHunLing"
     name: "镇魂铃"
     type: "法宝"
+    primary_type: "法宝"
+    secondary_type: "被动法宝"
     rarity: "稀有"
     quality: 3
     ling_shi: 210
@@ -189,6 +266,8 @@ items:
   - id: "items_QianKunDai"
     name: "乾坤袋"
     type: "法宝"
+    primary_type: "法宝"
+    secondary_type: "移动法宝"
     rarity: "普通"
     quality: 1
     ling_shi: 155
@@ -199,6 +278,8 @@ items:
   - id: "items_JiuZhuanJinDan"
     name: "九转金丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "传说"
     quality: 6
     ling_shi: 520
@@ -219,6 +300,8 @@ items:
   - id: "items_ZhuXianJian"
     name: "诛仙剑"
     type: "法宝"
+    primary_type: "法宝"
+    secondary_type: "主动法宝"
     rarity: "传说"
     quality: 6
     ling_shi: 880
@@ -229,6 +312,8 @@ items:
   - id: "items_LunHuiYin"
     name: "轮回印"
     type: "法宝"
+    primary_type: "法宝"
+    secondary_type: "被动法宝"
     rarity: "传说"
     quality: 6
     ling_shi: 620
@@ -239,6 +324,8 @@ items:
   - id: "items_FightTestDan"
     name: "测试丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "普通"
     quality: 1
     ling_shi: 1
@@ -262,59 +349,11 @@ items:
       - type: "restore_mp"
         value: 15
         target: "self"
-  - id: "book_skill_wind_step"
-    name: "流风步"
-    type: "技能书"
-    rarity: "普通"
-    quality: 1
-    stackable: true
-    max_stack: 9
-    desc: "研读后习得身法技能「流风步」。"
-    icon: "res://assets/art/ui_new/fulu.png"
-    learn_ability_id: "ability.combat.wind_step"
-  - id: "book_skill_qi_bolt"
-    name: "御气弹"
-    type: "技能书"
-    rarity: "普通"
-    quality: 1
-    stackable: true
-    max_stack: 9
-    desc: "研读后习得术法技能「御气弹」。"
-    icon: "res://assets/art/ui_new/fulu.png"
-    learn_ability_id: "ability.combat.qi_bolt"
-  - id: "book_method_leihuo"
-    name: "赤霄雷火"
-    type: "功法书"
-    rarity: "稀有"
-    quality: 3
-    stackable: true
-    max_stack: 9
-    desc: "研读后习得主修功法「赤霄雷火典·练气篇」。"
-    icon: "res://assets/art/ui_new/fulu1.png"
-    learn_method_id: "method.leihuo.1"
-  - id: "book_method_hunyuan"
-    name: "混元归一"
-    type: "功法书"
-    rarity: "稀有"
-    quality: 3
-    stackable: true
-    max_stack: 9
-    desc: "研读后习得主修功法「混元归一经·练气篇」。"
-    icon: "res://assets/art/ui_new/fulu1.png"
-    learn_method_id: "method.hunyuan.1"
-  - id: "book_method_iron_body"
-    name: "铁衣功"
-    type: "功法书"
-    rarity: "普通"
-    quality: 1
-    stackable: true
-    max_stack: 9
-    desc: "研读后习得辅助功法「铁衣功」。"
-    icon: "res://assets/art/ui_new/fulu1.png"
-    learn_method_id: "method.iron_skin.1"
   - id: "items_LingCao_Fine"
     name: "良品灵草"
     type: "材料"
+    primary_type: "道具"
+    secondary_type: "药材"
     rarity: "普通"
     quality: 2
     ling_shi: 18
@@ -325,6 +364,8 @@ items:
   - id: "items_LingCao_Superior"
     name: "上等灵草"
     type: "材料"
+    primary_type: "道具"
+    secondary_type: "药材"
     rarity: "稀有"
     quality: 3
     ling_shi: 38
@@ -335,6 +376,8 @@ items:
   - id: "items_LingGuo_Fine"
     name: "良品灵果"
     type: "材料"
+    primary_type: "道具"
+    secondary_type: "药材"
     rarity: "普通"
     quality: 2
     ling_shi: 28
@@ -345,6 +388,8 @@ items:
   - id: "items_LingGuo_Superior"
     name: "上等灵果"
     type: "材料"
+    primary_type: "道具"
+    secondary_type: "药材"
     rarity: "稀有"
     quality: 3
     ling_shi: 55
@@ -355,6 +400,8 @@ items:
   - id: "items_WasteDan"
     name: "废丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "普通"
     quality: 1
     ling_shi: 2
@@ -367,6 +414,8 @@ items:
   - id: "items_HuiQiDan_Low"
     name: "下品回气丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "普通"
     quality: 1
     ling_shi: 16
@@ -381,6 +430,8 @@ items:
   - id: "items_HuiQiDan_High"
     name: "上品回气丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "稀有"
     quality: 3
     ling_shi: 40
@@ -395,6 +446,8 @@ items:
   - id: "items_HuiQiDan_Supreme"
     name: "极品回气丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "稀有"
     quality: 4
     ling_shi: 65
@@ -409,6 +462,8 @@ items:
   - id: "items_HuiLingDan_Low"
     name: "下品回灵丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "普通"
     quality: 1
     ling_shi: 20
@@ -429,6 +484,8 @@ items:
   - id: "items_HuiLingDan_High"
     name: "上品回灵丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "稀有"
     quality: 3
     ling_shi: 48
@@ -449,6 +506,8 @@ items:
   - id: "items_HuiLingDan_Supreme"
     name: "极品回灵丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "稀有"
     quality: 4
     ling_shi: 78
@@ -469,6 +528,8 @@ items:
   - id: "items_LiaoShangDan_Low"
     name: "下品疗伤丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "普通"
     quality: 1
     ling_shi: 26
@@ -483,6 +544,8 @@ items:
   - id: "items_LiaoShangDan_High"
     name: "上品疗伤丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "稀有"
     quality: 3
     ling_shi: 64
@@ -497,6 +560,8 @@ items:
   - id: "items_LiaoShangDan_Supreme"
     name: "极品疗伤丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "稀有"
     quality: 4
     ling_shi: 104
@@ -511,6 +576,8 @@ items:
   - id: "items_JuQiDan_Low"
     name: "下品聚气丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "普通"
     quality: 1
     ling_shi: 23
@@ -528,6 +595,8 @@ items:
   - id: "items_JuQiDan_High"
     name: "上品聚气丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "稀有"
     quality: 3
     ling_shi: 56
@@ -545,6 +614,8 @@ items:
   - id: "items_AlchemyNotes_JuQi"
     name: "炼丹心得(聚气丹)"
     type: "典籍"
+    primary_type: "书籍"
+    secondary_type: "心得"
     rarity: "普通"
     quality: 1
     ling_shi: 0
@@ -560,6 +631,8 @@ items:
   - id: "items_JuQiDan_Supreme"
     name: "极品聚气丹"
     type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
     rarity: "稀有"
     quality: 4
     ling_shi: 91

@@ -240,7 +240,11 @@ func _connect_popups() -> void:
 func _update_header(map_data: Dictionary) -> void:
 	var current_id := str(map_data.get("current_city_id", ""))
 	var city_name := str(WorldMapServiceScript.city_by_id(current_id).get("name", current_id))
-	_status_label.text = "当前位置：%s    第 %d 日    灵石 %d" % [city_name, GameState.day, GameState.ling_stones]
+	_status_label.text = "当前位置：%s    %s    灵石 %d" % [
+		city_name,
+		GameState.time_date_label(GameState.day),
+		GameState.ling_stones,
+	]
 
 
 func _update_cities(map_data: Dictionary) -> void:
@@ -325,9 +329,9 @@ func _update_selection_panel(map_data: Dictionary) -> void:
 			continue
 		var preview := WorldMapServiceScript.build_travel_preview(current_id, other, map_data)
 		if bool(preview.get("ok", false)):
-			preview_lines.append("%s %d日" % [
+			preview_lines.append("%s %s" % [
 				str(WorldMapServiceScript.city_by_id(other).get("name", other)),
-				int(preview.get("total_days", 0)),
+				str(preview.get("duration_label", GameState.time_duration_label(int(preview.get("total_days", 0))))),
 			])
 	_update_selection_for_city(city, {"ok": true, "total_days": 0})
 	_selection_summary.text = "%s\n\n%s\n\n%s" % [
@@ -343,7 +347,7 @@ func _update_selection_for_city(city: Dictionary, preview: Dictionary) -> void:
 		str(city.get("desc", "")),
 	]
 	if bool(preview.get("ok", false)) and int(preview.get("total_days", 0)) > 0:
-		_selection_summary.text += "\n\n预计路程：%d 日" % int(preview.get("total_days", 0))
+		_selection_summary.text += "\n\n预计路程：%s" % str(preview.get("duration_label", GameState.time_duration_label(int(preview.get("total_days", 0)))))
 
 
 func _update_selection_for_region(region: Dictionary, map_data: Dictionary) -> void:

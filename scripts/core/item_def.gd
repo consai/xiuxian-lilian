@@ -1,10 +1,14 @@
 class_name ItemDef
 extends RefCounted
 
+const EnumItemTypeScript := preload("res://scripts/enum/enum_itemtype.gd")
+
 ## 与 data/item.yaml 中 id 一致（字符串）
 var id: String = ""
 var name: String = ""
 var item_type: String = ""
+var primary_type: String = ""
+var secondary_type: String = ""
 var rarity: String = ""
 var quality: int = 1
 var desc: String = ""
@@ -56,12 +60,20 @@ func is_cultivation_pill() -> bool:
 	return get_use_effect_amount("pill_cultivation") > 0.0
 
 
+func is_pill() -> bool:
+	return EnumItemTypeScript.is_pill_secondary(secondary_type)
+
+
 func has_fight_config() -> bool:
 	return fight_id > 0 and not fight_effect.is_empty()
 
 
 func is_learning_book() -> bool:
 	return learn_ability_id != "" or learn_method_id != ""
+
+
+func is_treasure() -> bool:
+	return EnumItemTypeScript.is_treasure_primary(primary_type)
 
 
 func to_fight_runtime_dict() -> Dictionary:
@@ -93,7 +105,18 @@ static func from_dict(data: Dictionary) -> ItemDef:
 	if item.id == "" or item.name == "":
 		push_error("ItemDef.from_dict: id/name cannot be empty in %s" % str(data))
 		return null
-	item.item_type = str(data.get("type", ""))
+	var legacy_type := str(data.get("type", "")).strip_edges()
+	item.primary_type = EnumItemTypeScript.resolve_primary_label(
+		str(data.get("primary_type", "")),
+		str(data.get("secondary_type", "")),
+		legacy_type
+	)
+	item.secondary_type = EnumItemTypeScript.resolve_secondary_label(
+		item.primary_type,
+		str(data.get("secondary_type", "")),
+		legacy_type
+	)
+	item.item_type = EnumItemTypeScript.full_label(item.primary_type, item.secondary_type)
 	item.rarity = str(data.get("rarity", ""))
 	item.quality = maxi(1, int(data.get("quality", _quality_by_rarity(item.rarity))))
 	item.desc = str(data.get("desc", ""))

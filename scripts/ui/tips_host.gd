@@ -1,6 +1,6 @@
 extends CanvasLayer
 
-## 全局提示入口：接收 DataEvents 的 tip_intent 并交给 TipBus 策略化处理（bar / combat_block 通道）。
+## 全局提示入口：接收 DataEvents 的 tip_intent 并交给 TipBus 策略化处理。
 
 const TipIntentScript := preload("res://scripts/ui/tips/core/tip_intent.gd")
 const TipMetricsScript := preload("res://scripts/ui/tips/core/tip_metrics.gd")
@@ -9,7 +9,9 @@ const TipRouterScript := preload("res://scripts/ui/tips/core/tip_router.gd")
 const TipBusScript := preload("res://scripts/ui/tips/core/tip_bus.gd")
 const BarTipPresenterScript := preload("res://scripts/ui/tips/presenter/bar_tip_presenter.gd")
 const CombatBlockPresenterScript := preload("res://scripts/ui/tips/presenter/combat_block_presenter.gd")
+const RewardTipPresenterScript := preload("res://scripts/ui/tips/presenter/reward_tip_presenter.gd")
 const TipBarScene := preload("res://scenes/ui/tip_bar.tscn")
+const RewardTipLayerScene := preload("res://scenes/ui/reward_tip_layer.tscn")
 
 const POLICY_CFG_PATH := "res://data/ui/tip_policy.yaml"
 
@@ -59,6 +61,13 @@ func _setup_tip_runtime() -> void:
 	bar_presenter.setup(bar_root)
 	_router.register_presenter(TipIntentScript.CHANNEL_BAR, bar_presenter)
 	_router.register_presenter(TipIntentScript.CHANNEL_COMBAT_BLOCK, CombatBlockPresenterScript.new())
+	var reward_root := RewardTipLayerScene.instantiate() as Control
+	add_child(reward_root)
+	var reward_presenter := RewardTipPresenterScript.new()
+	reward_presenter.setup(reward_root)
+	_router.register_presenter(TipIntentScript.CHANNEL_REWARD_ITEM, reward_presenter)
+	_router.register_presenter(TipIntentScript.CHANNEL_REWARD_GROWTH, reward_presenter)
+	_router.register_presenter(TipIntentScript.CHANNEL_REWARD_RESOURCE, reward_presenter)
 	_bus.setup(_policy, _router, _metrics)
 
 

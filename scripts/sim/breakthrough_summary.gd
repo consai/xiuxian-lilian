@@ -136,7 +136,7 @@ func _show_success(result: Dictionary) -> void:
 	var growth := float(result.get("foundation_growth", 0.0))
 	_value_label.text = "突破成功"
 	_progress.value = _progress.max_value
-	_warning.text = "历时第 %d 日" % int(result.get("day", GameState.day))
+	_warning.text = "历时%s" % GameState.time_date_label(int(result.get("day", GameState.day)))
 	_warning.add_theme_color_override("font_color", Color(0.22, 0.42, 0.12, 1))
 	_tier_result.text = "突破成功" if tier_label == "" else tier_label
 	_tier_effect.text = _format_success_effect(result, tier_label, growth)

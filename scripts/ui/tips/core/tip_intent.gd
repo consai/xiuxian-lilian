@@ -3,8 +3,11 @@ class_name TipIntent
 
 const SCHEMA_VERSION := 1
 
-const CHANNEL_BAR := "bar"
-const CHANNEL_COMBAT_BLOCK := "combat_block"
+const CHANNEL_BAR := EnumTipChannel.LABEL_BAR
+const CHANNEL_COMBAT_BLOCK := EnumTipChannel.LABEL_COMBAT_BLOCK
+const CHANNEL_REWARD_ITEM := EnumTipChannel.LABEL_REWARD_ITEM
+const CHANNEL_REWARD_GROWTH := EnumTipChannel.LABEL_REWARD_GROWTH
+const CHANNEL_REWARD_RESOURCE := EnumTipChannel.LABEL_REWARD_RESOURCE
 
 const TONE_NEUTRAL := "neutral"
 const TONE_GAIN := "gain"
@@ -72,11 +75,7 @@ static func safe(intent: Dictionary) -> Dictionary:
 
 static func _normalize_channel(v: Variant) -> String:
 	var s := str(v).strip_edges()
-	match s:
-		CHANNEL_BAR, CHANNEL_COMBAT_BLOCK:
-			return s
-		_:
-			return CHANNEL_BAR
+	return s if EnumTipChannel.is_valid_label(s) else CHANNEL_BAR
 
 
 static func _normalize_tone(v: Variant) -> String:

@@ -30,6 +30,7 @@ static func _entry_score(query: String, entry: Dictionary) -> int:
 		str(entry.get("name", "")),
 		str(entry.get("id", "")),
 		str(entry.get("type", "")),
+		"%s %s" % [str(entry.get("primary_type", "")), str(entry.get("secondary_type", ""))],
 		str(entry.get("rarity", "")),
 	]
 	return _score_text(query, haystack)

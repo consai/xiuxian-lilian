@@ -53,10 +53,10 @@ func _render() -> void:
 	title.text = "历练结算 · %s" % reason_text
 	var stats := _result.get("stats", {}) as Dictionary
 	var lines: PackedStringArray = [
-		"最高难度 %d，事件 %d 个，消耗 %d 日" % [
+		"最高难度 %d，事件 %d 个，耗时 %s" % [
 			maxi(int(stats.get("max_difficulty", 0)), int(stats.get("max_depth", 0))),
 			int(stats.get("steps", 0)),
-			int(_result.get("elapsed_days", 1)),
+			str(_result.get("duration_label", GameState.time_duration_label(int(_result.get("elapsed_days", 1))))),
 		],
 		"战斗 %d 场，胜 %d，负 %d" % [
 			int(stats.get("battles", 0)),

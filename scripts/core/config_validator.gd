@@ -22,6 +22,8 @@ static func collect_all_errors(config_manager: Node, game_state: Node = null) ->
 	errors.append_array(_validate_location_preview_rewards(config_manager))
 	errors.append_array(_validate_v1_abilities())
 	errors.append_array(_validate_method_stack_policies())
+	errors.append_array(_validate_learning_book_coverage(config_manager))
+	errors.append_array(_validate_item_alias_targets(config_manager))
 	errors.append_array(ExpeditionDataValidatorScript.collect_errors(game_state))
 	errors.append_array(WorldMapDataValidatorScript.collect_errors())
 	return errors
@@ -109,6 +111,46 @@ static func _validate_method_stack_policies() -> PackedStringArray:
 	return errors
 
 
+static func _validate_learning_book_coverage(config_manager: Node) -> PackedStringArray:
+	var errors: PackedStringArray = []
+	var ability_books := {}
+	var method_books := {}
+	for item_v in config_manager.items():
+		if not item_v is ItemDef:
+			continue
+		var item := item_v as ItemDef
+		if item.learn_ability_id != "":
+			ability_books[item.learn_ability_id] = true
+		if item.learn_method_id != "":
+			method_books[item.learn_method_id] = true
+	for ability_v in AbilityServiceScript.all_abilities():
+		var ability := ability_v as Dictionary
+		var ability_id := str(ability.get("id", "")).strip_edges()
+		if ability_id == "" or ability_books.has(ability_id):
+			continue
+		errors.append("技能 %s 缺少学习道具配置" % ability_id)
+	for method_v in CultivationMethodServiceScript.all_methods():
+		var method := method_v as Dictionary
+		var method_id := str(method.get("id", "")).strip_edges()
+		if method_id == "" or method_books.has(method_id):
+			continue
+		errors.append("功法 %s 缺少学习道具配置" % method_id)
+	return errors
+
+
+static func _validate_item_alias_targets(config_manager: Node) -> PackedStringArray:
+	var errors: PackedStringArray = []
+	var aliases := JsonLoader.load_item_aliases()
+	for alias_id_v in aliases.keys():
+		var alias_id := str(alias_id_v).strip_edges()
+		var target_id := str(aliases.get(alias_id_v, "")).strip_edges()
+		if alias_id == "" or target_id == "":
+			continue
+		if config_manager.item_def_by_id(target_id) == null:
+			errors.append("物品别名 %s 指向了不存在的目标 %s" % [alias_id, target_id])
+	return errors
+
+
 static func _validate_unique_ids(config_manager: Node) -> PackedStringArray:
 	var errors: PackedStringArray = []
 	errors.append_array(_validate_no_duplicate_keys(config_manager.items(), "item.id", "物品"))
@@ -164,7 +206,7 @@ static func _validate_expedition_rules(config_manager: Node) -> PackedStringArra
 		errors.append("远征规则为空")
 		return errors
 	var required := [
-		"minimum_elapsed_days", "event_day_chance", "max_idle_days", "choice_count",
+		"event_day_chance", "max_idle_days", "choice_count",
 		"defeat_hp_floor_ratio", "defeat_injury_days",
 	]
 	for key in required:

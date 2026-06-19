@@ -2,6 +2,7 @@ class_name WorldMapService
 extends RefCounted
 
 const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
+const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
 
 const ROUTE_KEY_SEP := "|"
 
@@ -130,7 +131,13 @@ static func can_enter_wilderness_location(location_id: String, map_data: Diction
 
 static func build_travel_preview(from_id: String, to_id: String, map_data: Dictionary) -> Dictionary:
 	if from_id == to_id:
-		return {"ok": true, "path": [from_id], "total_days": 0, "route_keys": []}
+		return {
+			"ok": true,
+			"path": [from_id],
+			"total_days": 0,
+			"duration_label": GameTimeServiceScript.duration_label(0),
+			"route_keys": [],
+		}
 	var result := _shortest_path(from_id, to_id, map_data)
 	if not bool(result.get("ok", false)):
 		return result
@@ -138,6 +145,7 @@ static func build_travel_preview(from_id: String, to_id: String, map_data: Dicti
 		"ok": true,
 		"path": result.get("path", []),
 		"total_days": int(result.get("total_days", 0)),
+		"duration_label": GameTimeServiceScript.duration_label(int(result.get("total_days", 0))),
 		"route_keys": result.get("route_keys", []),
 	}
 

@@ -44,9 +44,9 @@ func _refresh_slot(
 	var prefix := "自动存档" if auto_save else "槽位 %d" % slot
 	var info: Dictionary = SaveService.slot_info(slot)
 	if bool(info.get("ok", false)):
-		label.text = "%s：第 %d 日 · %s · 修为 %d" % [
+		label.text = "%s：%s · %s · 修为 %d" % [
 			prefix,
-			int(info.get("day", 1)),
+			GameState.time_date_label(int(info.get("day", 1))),
 			str(info.get("realm_name", "未知")),
 			int(info.get("cultivation", 0)),
 		]

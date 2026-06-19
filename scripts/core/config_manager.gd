@@ -6,6 +6,7 @@ var _items: Array = []
 var _items_by_id: Dictionary = {}
 var _items_by_fight_id: Dictionary = {}
 var _item_name_by_id: Dictionary = {}
+var _item_id_aliases: Dictionary = {}
 var _skills_by_id: Dictionary = {}
 var _equips_by_id: Dictionary = {}
 var _battle_time_limit_default: float = 200.0
@@ -63,7 +64,8 @@ func items() -> Array:
 
 func item_def_by_id(item_id: String) -> ItemDef:
 	var iid := item_id.strip_edges()
-	var found: Variant = _items_by_id.get(iid)
+	var canonical_id := _resolve_item_id_alias(iid)
+	var found: Variant = _items_by_id.get(canonical_id)
 	if found is ItemDef:
 		return found as ItemDef
 	return null
@@ -374,12 +376,14 @@ func get_item_display_name(item_id: String) -> String:
 	var iid := item_id.strip_edges()
 	if iid == "":
 		return ""
-	return str(_item_name_by_id.get(iid, iid))
+	var canonical_id := _resolve_item_id_alias(iid)
+	return str(_item_name_by_id.get(canonical_id, canonical_id))
 
 
 func _load_items_local() -> void:
 	_items = JsonLoader.load_items()
 	_item_name_by_id.clear()
+	_item_id_aliases = JsonLoader.load_item_aliases()
 	_items_by_id.clear()
 	_items_by_fight_id.clear()
 	for it in _items:
@@ -396,6 +400,27 @@ func _load_items_local() -> void:
 		if nm == "":
 			nm = iid
 		_item_name_by_id[iid] = nm
+	for alias_id_v in _item_id_aliases.keys():
+		var alias_id := str(alias_id_v)
+		var canonical_id := _resolve_item_id_alias(alias_id)
+		if _item_name_by_id.has(canonical_id):
+			_item_name_by_id[alias_id] = _item_name_by_id[canonical_id]
+
+
+func _resolve_item_id_alias(item_id: String) -> String:
+	var iid := item_id.strip_edges()
+	if iid == "":
+		return ""
+	var seen := {}
+	var current := iid
+	while _item_id_aliases.has(current):
+		if seen.has(current):
+			break
+		seen[current] = true
+		current = str(_item_id_aliases.get(current, current)).strip_edges()
+		if current == "":
+			return iid
+	return current
 
 
 func _load_locations_local() -> void:

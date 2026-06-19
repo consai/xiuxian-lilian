@@ -96,7 +96,7 @@ func is_open() -> bool:
 	return _popup != null and _popup.visible
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if not is_open():
 		return
 	if event.is_action_pressed("ui_cancel"):

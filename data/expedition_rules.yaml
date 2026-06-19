@@ -1,5 +1,4 @@
 schema_version: 1
-minimum_elapsed_days: 1
 event_day_chance: 0.3
 max_idle_days: 5
 defeat_inventory_drop_min_stacks: 1

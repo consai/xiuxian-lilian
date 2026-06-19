@@ -41,6 +41,8 @@ var _saved_show_info_on_click := true
 var _window_start: int = -1
 var _slot_pool: Array[ItemView] = []
 var _row_height: float = 96.0
+var _entry_view_cache: Dictionary = {}
+var _hover_payload_cache: Dictionary = {}
 
 
 func _ready() -> void:
@@ -61,6 +63,8 @@ func set_title(text: String) -> void:
 
 func set_entries(entries: Array) -> void:
 	_entries = _normalize_entries(entries)
+	_entry_view_cache.clear()
+	_hover_payload_cache.clear()
 	if is_node_ready():
 		_scroll.scroll_vertical = 0
 		_refresh()
@@ -207,6 +211,8 @@ func _create_slot_view() -> ItemView:
 	view.show_name_label = true
 	view.click_enabled = true
 	view.visible = false
+	view.clicked.connect(_on_slot_view_clicked.bind(view))
+	view.right_clicked.connect(_on_slot_view_right_clicked.bind(view))
 	_grid.add_child(view)
 	return view
 
@@ -214,8 +220,9 @@ func _create_slot_view() -> ItemView:
 func _hide_slot(view: ItemView) -> void:
 	if view == null:
 		return
-	_disconnect_slot(view)
 	_clear_hover_tip(view)
+	view.set_meta("bag_entry_index", -1)
+	view.set_meta("bag_entry_cache_key", "")
 	view.apply_empty(null)
 	view.set_learn_blocked(false)
 	view.visible = false
@@ -226,52 +233,46 @@ func _hide_slot(view: ItemView) -> void:
 func _bind_entry(view: ItemView, entry: Dictionary, index: int) -> void:
 	if view == null:
 		return
-	_disconnect_slot(view)
-	var icon: Texture2D = null
-	var item_name := str(entry.get("name", "")).strip_edges()
-	var quality := str(entry.get("quality", "")).strip_edges()
-	var count := maxi(1, int(entry.get("count", 1)))
-	var kind := str(entry.get("kind", EnumRewardKind.LABEL_ITEM))
-	if kind == EnumRewardKind.LABEL_EQUIP:
-		var equip_cfg := ConfigManager.equip_by_id(int(entry.get("id", -1)))
-		if item_name == "":
-			item_name = str(equip_cfg.get("name", "法宝"))
-		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
-		if quality == "":
-			quality = _quality_label_from_int(int(equip_cfg.get("quality", 1)))
-	else:
-		var item_id := str(entry.get("id", ""))
-		if item_name == "" and ConfigManager != null:
-			item_name = str(ConfigManager.get_item_display_name(item_id))
-		if ConfigManager != null:
-			var def := ConfigManager.item_def_by_id(item_id)
-			if def != null:
-				icon = ItemDefScript.resolve_icon_texture(def.icon_path, null)
-				if quality == "":
-					quality = def.rarity
-	var learn_blocked := false
-	if kind == EnumRewardKind.LABEL_ITEM and ConfigManager != null:
-		var item_def := ConfigManager.item_def_by_id(str(entry.get("id", "")))
-		learn_blocked = ItemInfoPayloadBuilderScript.learning_book_condition_unmet(item_def)
-	view.apply_display(icon, item_name, count, Color.WHITE, quality, learn_blocked)
+	view.set_meta("bag_entry_index", index)
+	var cache_key := _entry_cache_key(entry)
+	var view_cache_key := str(view.get_meta("bag_entry_cache_key", ""))
+	if cache_key == view_cache_key:
+		view.show_info_on_click = show_info_on_click
+		if show_info_on_click:
+			view.set_info_entry(entry)
+		else:
+			view.clear_info_entry()
+		view.set_click_enabled(true)
+		return
+	view.set_meta("bag_entry_cache_key", cache_key)
+	var data := _entry_view_data(entry, cache_key)
+	view.apply_display(
+		data.get("icon") as Texture2D,
+		str(data.get("name", "")),
+		int(data.get("count", 1)),
+		Color.WHITE,
+		str(data.get("quality", "")),
+		bool(data.get("learn_blocked", false))
+	)
 	view.show_info_on_click = show_info_on_click
 	if show_info_on_click:
 		view.set_info_entry(entry)
 	else:
 		view.clear_info_entry()
 	view.set_click_enabled(true)
-	_bind_hover_tip(view, entry)
-	view.clicked.connect(_on_slot_clicked.bind(index))
-	view.right_clicked.connect(_on_slot_right_clicked.bind(index))
+	_bind_hover_tip(view, data.get("hover_payload", {}) as Dictionary)
 
 
-func _disconnect_slot(view: ItemView) -> void:
-	if view == null:
+func _on_slot_view_clicked(view: ItemView) -> void:
+	if not is_instance_valid(view):
 		return
-	for conn in view.clicked.get_connections():
-		view.clicked.disconnect(conn["callable"])
-	for conn in view.right_clicked.get_connections():
-		view.right_clicked.disconnect(conn["callable"])
+	_on_slot_clicked(int(view.get_meta("bag_entry_index", -1)))
+
+
+func _on_slot_view_right_clicked(view: ItemView) -> void:
+	if not is_instance_valid(view):
+		return
+	_on_slot_right_clicked(int(view.get_meta("bag_entry_index", -1)))
 
 
 func _on_slot_clicked(index: int) -> void:
@@ -300,7 +301,7 @@ func _rebuild_type_filters() -> void:
 	for entry_v in _entries:
 		if not entry_v is Dictionary:
 			continue
-		var type_label := _entry_type_label(entry_v as Dictionary)
+		var type_label := _entry_primary_type_label(entry_v as Dictionary)
 		if type_label != "":
 			type_set[type_label] = true
 	var types: Array = type_set.keys()
@@ -394,9 +395,8 @@ func _ensure_hover_tip(view: ItemView) -> HoverTipSource:
 	return tip
 
 
-func _bind_hover_tip(view: ItemView, entry: Dictionary) -> void:
+func _bind_hover_tip(view: ItemView, payload: Dictionary) -> void:
 	var tip := _ensure_hover_tip(view)
-	var payload := _hover_payload_for_entry(entry)
 	tip.enabled = not HoverTipPayloadScript.is_empty(payload)
 	if tip.enabled:
 		tip.set_payload(payload)
@@ -412,6 +412,15 @@ func _clear_hover_tip(view: ItemView) -> void:
 
 
 func _hover_payload_for_entry(entry: Dictionary) -> Dictionary:
+	var cache_key := _entry_cache_key(entry)
+	if _hover_payload_cache.has(cache_key):
+		return (_hover_payload_cache[cache_key] as Dictionary).duplicate(true)
+	var payload := _build_hover_payload_for_entry(entry)
+	_hover_payload_cache[cache_key] = payload.duplicate(true)
+	return payload
+
+
+func _build_hover_payload_for_entry(entry: Dictionary) -> Dictionary:
 	if str(entry.get("kind", EnumRewardKind.LABEL_ITEM)) == EnumRewardKind.LABEL_EQUIP:
 		return EquipHoverTipBuilderScript.build(int(entry.get("id", -1)))
 	var item_id := str(entry.get("id", "")).strip_edges()
@@ -440,6 +449,54 @@ func _hover_payload_for_entry(entry: Dictionary) -> Dictionary:
 	})
 
 
+func _entry_view_data(entry: Dictionary, cache_key: String = "") -> Dictionary:
+	var key := cache_key if cache_key != "" else _entry_cache_key(entry)
+	if _entry_view_cache.has(key):
+		return _entry_view_cache[key] as Dictionary
+	var icon: Texture2D = null
+	var item_name := str(entry.get("name", "")).strip_edges()
+	var quality := str(entry.get("quality", "")).strip_edges()
+	var count := maxi(1, int(entry.get("count", 1)))
+	var kind := str(entry.get("kind", EnumRewardKind.LABEL_ITEM))
+	var learn_blocked := false
+	if kind == EnumRewardKind.LABEL_EQUIP:
+		var equip_cfg := ConfigManager.equip_by_id(int(entry.get("id", -1)))
+		if item_name == "":
+			item_name = str(equip_cfg.get("name", "法宝"))
+		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
+		if quality == "":
+			quality = _quality_label_from_int(int(equip_cfg.get("quality", 1)))
+	else:
+		var item_id := str(entry.get("id", ""))
+		if item_name == "" and ConfigManager != null:
+			item_name = str(ConfigManager.get_item_display_name(item_id))
+		if ConfigManager != null:
+			var def := ConfigManager.item_def_by_id(item_id)
+			if def != null:
+				icon = ItemDefScript.resolve_icon_texture(def.icon_path, null)
+				if quality == "":
+					quality = def.rarity
+				learn_blocked = ItemInfoPayloadBuilderScript.learning_book_condition_unmet(def)
+	var data := {
+		"icon": icon,
+		"name": item_name,
+		"count": count,
+		"quality": quality,
+		"learn_blocked": learn_blocked,
+		"hover_payload": _hover_payload_for_entry(entry),
+	}
+	_entry_view_cache[key] = data
+	return data
+
+
+func _entry_cache_key(entry: Dictionary) -> String:
+	return "%s:%s:%d" % [
+		str(entry.get("kind", EnumRewardKind.LABEL_ITEM)),
+		str(entry.get("id", "")),
+		maxi(1, int(entry.get("count", 1))),
+	]
+
+
 static func _matches_picker_filter(entry: Dictionary, filter: PickerFilter) -> bool:
 	match filter:
 		PickerFilter.NONE:
@@ -448,7 +505,10 @@ static func _matches_picker_filter(entry: Dictionary, filter: PickerFilter) -> b
 			var kind := str(entry.get("kind", EnumRewardKind.LABEL_ITEM))
 			if kind == EnumRewardKind.LABEL_EQUIP:
 				return true
-			return kind == EnumRewardKind.LABEL_ITEM and str(entry.get("item_type", "")) == EnumItemType.LABEL_TREASURE
+			return (
+				kind == EnumRewardKind.LABEL_ITEM
+				and EnumItemType.is_treasure_primary(str(entry.get("primary_type", "")))
+			)
 		PickerFilter.BATTLE_ITEM:
 			if str(entry.get("kind", EnumRewardKind.LABEL_ITEM)) != EnumRewardKind.LABEL_ITEM:
 				return false
@@ -464,11 +524,23 @@ static func _matches_picker_filter(entry: Dictionary, filter: PickerFilter) -> b
 
 static func _entry_type_label(entry: Dictionary) -> String:
 	if str(entry.get("kind", EnumRewardKind.LABEL_ITEM)) == EnumRewardKind.LABEL_EQUIP:
-		return EnumItemType.LABEL_TREASURE
+		return EnumItemType.full_label(
+			EnumItemType.PRIMARY_TREASURE,
+			EnumItemType.SECONDARY_ACTIVE_TREASURE
+		)
 	var type_label := str(entry.get("item_type", "")).strip_edges()
 	if type_label == "":
 		return "其他"
 	return type_label
+
+
+static func _entry_primary_type_label(entry: Dictionary) -> String:
+	if str(entry.get("kind", EnumRewardKind.LABEL_ITEM)) == EnumRewardKind.LABEL_EQUIP:
+		return EnumItemType.PRIMARY_TREASURE
+	var primary_label := str(entry.get("primary_type", "")).strip_edges()
+	if primary_label == "":
+		return "其他"
+	return primary_label
 
 
 static func _compare_filter_labels(a: String, b: String) -> bool:
@@ -482,7 +554,7 @@ static func _compare_filter_labels(a: String, b: String) -> bool:
 static func _matches_filter(entry: Dictionary, filter_label: String) -> bool:
 	if filter_label == FILTER_ALL:
 		return true
-	return _entry_type_label(entry) == filter_label
+	return _entry_primary_type_label(entry) == filter_label
 
 
 static func _normalize_entries(entries: Array) -> Array:
@@ -498,7 +570,12 @@ static func _normalize_entries(entries: Array) -> Array:
 			if not row.has("sort_name"):
 				row["sort_name"] = str(ConfigManager.equip_by_id(int(row.get("id", -1))).get("name", "法宝"))
 			if not row.has("item_type"):
-				row["item_type"] = EnumItemType.LABEL_EQUIP
+				row["item_type"] = EnumItemType.full_label(
+					EnumItemType.PRIMARY_TREASURE,
+					EnumItemType.SECONDARY_ACTIVE_TREASURE
+				)
+			row["primary_type"] = EnumItemType.PRIMARY_TREASURE
+			row["secondary_type"] = EnumItemType.SECONDARY_ACTIVE_TREASURE
 		else:
 			row["kind"] = EnumRewardKind.LABEL_ITEM
 			var item_id := str(row.get("id", "")).strip_edges()
@@ -508,6 +585,10 @@ static func _normalize_entries(entries: Array) -> Array:
 			if def != null:
 				if not row.has("item_type"):
 					row["item_type"] = def.item_type
+				if not row.has("primary_type"):
+					row["primary_type"] = def.primary_type
+				if not row.has("secondary_type"):
+					row["secondary_type"] = def.secondary_type
 				if not row.has("name"):
 					row["name"] = def.name
 				if not row.has("quality"):
@@ -516,6 +597,10 @@ static func _normalize_entries(entries: Array) -> Array:
 				row["sort_name"] = str(row.get("name", item_id))
 			if not row.has("item_type"):
 				row["item_type"] = ""
+			if not row.has("primary_type"):
+				row["primary_type"] = ""
+			if not row.has("secondary_type"):
+				row["secondary_type"] = ""
 		out.append(row)
 	return out
 
@@ -530,6 +615,8 @@ static func _entry_from_item(item_id: String, count: int) -> Dictionary:
 		"id": iid,
 		"count": count,
 		"item_type": def.item_type if def != null else "",
+		"primary_type": def.primary_type if def != null else "",
+		"secondary_type": def.secondary_type if def != null else "",
 		"name": def.name if def != null else iid,
 		"quality": def.rarity if def != null else "",
 		"sort_name": def.name if def != null else iid,
@@ -545,7 +632,12 @@ static func _entry_from_equip(equip_id: int) -> Dictionary:
 		"kind": EnumRewardKind.LABEL_EQUIP,
 		"id": equip_id,
 		"count": 1,
-		"item_type": EnumItemType.LABEL_EQUIP,
+		"item_type": EnumItemType.full_label(
+			EnumItemType.PRIMARY_TREASURE,
+			EnumItemType.SECONDARY_ACTIVE_TREASURE
+		),
+		"primary_type": EnumItemType.PRIMARY_TREASURE,
+		"secondary_type": EnumItemType.SECONDARY_ACTIVE_TREASURE,
 		"name": equip_name,
 		"quality": _quality_label_from_int(int(cfg.get("quality", 1))),
 		"sort_name": equip_name,
@@ -563,7 +655,8 @@ static func _compare_entries(a: Dictionary, b: Dictionary) -> bool:
 static func _entry_sort_order(entry: Dictionary) -> int:
 	return EnumItemType.sort_order_for_entry(
 		str(entry.get("kind", EnumRewardKind.LABEL_ITEM)),
-		str(entry.get("item_type", ""))
+		str(entry.get("primary_type", "")),
+		str(entry.get("secondary_type", ""))
 	)
 
 

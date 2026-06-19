@@ -10,6 +10,7 @@ $runner = Join-Path $PSScriptRoot "run_tests.ps1"
 
 $scripts = @(
 	"res://tests/run_battle_domain_tests.gd",
+	"res://tests/run_game_time_tests.gd",
 	"res://tests/run_simulation_tests.gd",
 	"res://tests/run_expedition_tests.gd",
 	"res://tests/run_expedition_smoke.gd",

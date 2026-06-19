@@ -26,7 +26,7 @@ const MODE_IDS := EnumCultivationMode.MODE_IDS
 @onready var _pill_picker: LoadoutBagPopup = %PillPicker
 
 var _mode_id := EnumCultivationMode.LABEL_CYCLE
-var _days := 1
+var _days := 0
 var _selected_pill_id := ""
 
 
@@ -50,7 +50,7 @@ func _refresh() -> void:
 	_sync_day_slider()
 	var preview: Dictionary = _build_preview()
 	_player_label.text = "%s · %s" % [GameState.player_name, GameState.realm_name]
-	_day_label.text = "第 %d 日" % GameState.day
+	_day_label.text = GameState.time_date_label(GameState.day)
 	_pill_select_row.visible = EnumCultivationMode.is_pill_mode(_mode_id)
 	_refresh_pill_slot(preview)
 	if not bool(preview.get("ok", false)):
@@ -75,12 +75,12 @@ func _refresh() -> void:
 	_bind_method_preview(preview)
 	_mode_description.text = _format_mode_description(mode, preview)
 	var preview_text := (
-		"闭关 %d 日\n预计修为 +%d\n第 %d 日 → 第 %d 日"
+		"闭关 %s\n预计修为 +%d\n%s → %s"
 	) % [
-		_days,
+		str(preview.get("duration_label", GameState.time_duration_label(_days))),
 		int(preview.get("estimated_cultivation", 0)),
-		int(preview.get("start_day", GameState.day)),
-		int(preview.get("end_day", GameState.day + _days)),
+		str(preview.get("start_date_label", "")),
+		str(preview.get("end_date_label", "")),
 	]
 	if int(preview.get("instability_gain", 0)) > 0:
 		var pill_id := str(preview.get("pill_id", ""))
@@ -93,7 +93,7 @@ func _refresh() -> void:
 	preview_text += "\n\n世界时间将在闭关期间正常流逝。"
 	_preview_label.text = preview_text
 	_start_button.disabled = false
-	_start_button.text = "开始闭关"
+	_start_button.text = "开始闭关（%s）" % str(preview.get("duration_label", GameState.time_duration_label(_days)))
 	_result_label.text = ""
 	_update_button_states()
 
@@ -101,11 +101,13 @@ func _refresh() -> void:
 func _sync_day_slider() -> void:
 	var max_days := maxi(1, GameState.max_cultivation_days(_mode_id, _selected_pill_id))
 	_day_slider.max_value = float(max_days)
+	if _days <= 0:
+		_days = max_days
 	_days = clampi(_days, 1, max_days)
 	if int(round(_day_slider.value)) != _days:
 		_day_slider.set_value_no_signal(float(_days))
 	_day_max_button.disabled = max_days <= 1
-	_day_count_label.text = "闭关 %d 日" % _days
+	_day_count_label.text = "闭关 %s" % GameState.time_duration_label(_days)
 
 
 func _on_day_slider_changed(value: float) -> void:
@@ -113,7 +115,7 @@ func _on_day_slider_changed(value: float) -> void:
 	if new_days == _days:
 		return
 	_days = new_days
-	_day_count_label.text = "闭关 %d 日" % _days
+	_day_count_label.text = "闭关 %s" % GameState.time_duration_label(_days)
 	_refresh()
 
 

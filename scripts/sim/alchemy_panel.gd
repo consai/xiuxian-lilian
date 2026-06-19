@@ -88,8 +88,8 @@ func _refresh() -> void:
 	var furnace_id := str(GameState.alchemy.get("equipped_furnace", ""))
 	var owned := GameState.alchemy.get("owned_furnaces", {}) as Dictionary
 	var furnace_state := owned.get(furnace_id, {}) as Dictionary
-	_status_label.text = "第 %d 日  |  炼丹术 Lv.%d（%d/%d）  |  丹炉耐久 %d" % [
-		GameState.day,
+	_status_label.text = "%s  |  炼丹术 Lv.%d（%d/%d）  |  丹炉耐久 %d" % [
+		GameState.time_date_label(GameState.day),
 		int(GameState.alchemy.get("level", 1)),
 		int(GameState.alchemy.get("xp", 0)),
 		int(GameState.alchemy.get("level", 1)) * 100,
@@ -112,7 +112,7 @@ func _refresh() -> void:
 		"当前丹方熟练度 %d/1000（品质分 %+.1f）\n成功率 %.1f%% · 上品以上 %.1f%% · 基础成丹分 %.1f\n"
 		+ "药材品质 %.2f（%+.1f） · 属性辅助 %+.1f\n"
 		+ "基础产量 %d · 多丹概率 %.1f%%（最多 +%d） · 节省药材概率 %.1f%%\n"
-		+ "预计耗时 %d 日\n\n%s"
+		+ "预计耗时 %s\n\n%s"
 	) % [
 		int(preview.get("recipe_mastery", 0)),
 		float(preview.get("mastery_score", 0.0)),
@@ -126,10 +126,10 @@ func _refresh() -> void:
 		float(preview.get("extra_pill_chance", 0.0)) * 100.0,
 		int(preview.get("max_extra_pills", 0)),
 		float(preview.get("cost_save_chance", 0.0)) * 100.0,
-		int(preview.get("days", 1)),
+		str(preview.get("duration_label", GameState.time_duration_label(int(preview.get("days", 1))))),
 		str(strategy.get("description", "")),
 	]
-	_brew_button.text = "开炉炼制（%d 日）" % int(preview.get("days", 1))
+	_brew_button.text = "开炉炼制（%s）" % str(preview.get("duration_label", GameState.time_duration_label(int(preview.get("days", 1)))))
 	_brew_button.disabled = _tutorial_brew_locked()
 
 

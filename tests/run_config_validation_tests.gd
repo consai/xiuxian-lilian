@@ -19,6 +19,7 @@ func _init() -> void:
 func _run_all() -> void:
 	_run("config validator reports no errors on boot data", _test_config_has_no_errors)
 	_run("realm balance covers simulation realms", _test_realm_balance_covers_simulation_realms)
+	_run("item categories expose primary and secondary labels", _test_item_categories)
 	_run("location service reads cached config", _test_location_service_cached)
 	_run("modular location validator rejects legacy fields", _test_modular_location_validator_rejects_legacy_fields)
 	_run("tag service aggregates modular tags", _test_tag_service_aggregates_tags)
@@ -59,6 +60,20 @@ func _test_realm_balance_covers_simulation_realms() -> void:
 	_expect_eq(str(qi.get("name", "")), "炼气", "qi realm configured")
 	var mods := RealmBalanceServiceScript.realm_flat_modifiers(2)
 	_expect_near(float(mods.get(FightAttr.HP_MAX, 0.0)), 12.0, "realm layer hp modifier")
+
+
+func _test_item_categories() -> void:
+	var cm := _config_manager()
+	var herb: ItemDef = cm.item_def_by_id("items_LingCao")
+	_expect_eq(herb.primary_type, "道具", "herb primary type")
+	_expect_eq(herb.secondary_type, "药材", "herb secondary type")
+	_expect_eq(herb.item_type, "道具(药材)", "herb full type")
+	var treasure: ItemDef = cm.item_def_by_id("items_QianKunDai")
+	_expect_eq(treasure.primary_type, "法宝", "treasure primary type")
+	_expect_eq(treasure.secondary_type, "移动法宝", "treasure secondary type")
+	var generated_book: ItemDef = cm.item_def_by_id("book_skill_wind_step")
+	_expect_eq(generated_book.primary_type, "书籍", "generated book primary type")
+	_expect_eq(generated_book.secondary_type, "技能书", "generated book secondary type")
 
 
 func _test_location_service_cached() -> void:

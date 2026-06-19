@@ -89,7 +89,10 @@ func _update_visuals(ratio: float) -> void:
 	_progress_bar.value = ratio * 100.0
 	var day_progress := ratio * float(_days)
 	var current_day := clampi(int(day_progress) + 1, 1, _days)
-	_day_label.text = "第 %d 日 / 共 %d 日" % [current_day, _days]
+	_day_label.text = "%s / 共 %s" % [
+		GameState.time_duration_label(current_day),
+		GameState.time_duration_label(_days),
+	]
 	var status_index := clampi(int(ratio * float(STATUS_TEXTS.size())), 0, STATUS_TEXTS.size() - 1)
 	_status_label.text = STATUS_TEXTS[status_index]
 	for index in _milestone_labels.size():

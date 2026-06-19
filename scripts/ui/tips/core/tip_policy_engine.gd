@@ -4,6 +4,9 @@ class_name TipPolicyEngine
 const _DEFAULT_CHANNEL_LIMITS := {
 	TipIntent.CHANNEL_BAR: 5,
 	TipIntent.CHANNEL_COMBAT_BLOCK: 2,
+	TipIntent.CHANNEL_REWARD_ITEM: 4,
+	TipIntent.CHANNEL_REWARD_GROWTH: 6,
+	TipIntent.CHANNEL_REWARD_RESOURCE: 3,
 }
 
 var _config: Dictionary = {}

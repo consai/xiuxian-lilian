@@ -83,15 +83,16 @@ func _save_service() -> Node:
 func _test_new_game_and_daily_activities() -> void:
 	var state := _state()
 	_expect_eq(state.day, 1, "new game day")
-	_expect_eq(state.cultivate(), 20, "healthy cultivate gain")
-	_expect_eq(state.day, 2, "cultivate day advance")
+	_expect_eq(state.cultivate(), 140, "healthy cultivate gain")
+	_expect_eq(state.day, 8, "cultivate advances by rule duration")
 	state.injury_days = 3
-	_expect_eq(state.cultivate(), 10, "injured cultivate gain")
-	_expect_eq(state.injury_days, 2, "non-rest injury reduction")
+	_expect_eq(state.cultivate(), 110, "injured cultivate gain")
+	_expect_eq(state.injury_days, 0, "cultivation duration clears injury")
 	state.hp = 1.0
 	state.rest()
-	_expect_near(state.hp, 100.0, "rest hp")
+	_expect_near(state.hp, FightAttr.get_attr(state.attrs, FightAttr.HP_MAX), "rest hp")
 	_expect_eq(state.injury_days, 0, "rest injury reduction")
+	state.new_game()
 	state.cultivation = state.breakthrough_at
 	_expect_true(not state.can_breakthrough(), "same major realm does not need breakthrough")
 	_expect_eq(state._auto_advance_layers(), 1, "layer auto advance to qi 2")
@@ -155,7 +156,7 @@ func _test_foundations_derive_combat_attributes() -> void:
 
 func _test_cultivation_methods() -> void:
 	var state := _state()
-	_expect_eq(state.cultivate(), 20, "starter main method enables cultivation")
+	_expect_eq(state.cultivate(), 140, "starter main method enables cultivation")
 	var before_mp := FightAttr.get_attr(state.attrs, FightAttr.MP_MAX)
 	state.cultivate()
 	_expect_gt(
@@ -262,6 +263,17 @@ func _test_learning_books() -> void:
 	var method: Dictionary = state.use_learning_book("book_method_iron_body")
 	_expect_true(bool(method.get("ok", false)), "method book learns iron skin")
 	_expect_true(state.unlocked_methods.has("method.iron_skin.1"), "iron skin unlocked")
+	state.grant_knowledge("sword.qi", 1)
+	state.grant_knowledge("sword.weapon", 2)
+	state.inventory["book_skill_sword_qi"] = 1
+	var generated_skill: Dictionary = state.use_learning_book("book_skill_sword_qi")
+	_expect_true(bool(generated_skill.get("ok", false)), "generated skill book learns sword qi")
+	_expect_true(state.unlocked_abilities.has("ability.combat.sword_qi"), "generated skill unlocked")
+	state.grant_knowledge("foundation.breathing", 1)
+	state.inventory["book_method_basic_breathing_1"] = 1
+	var generated_method: Dictionary = state.use_learning_book("book_method_basic_breathing_1")
+	_expect_true(bool(generated_method.get("ok", false)), "generated method book learns breathing method")
+	_expect_true(state.unlocked_methods.has("method.basic_breathing.1"), "generated method unlocked")
 
 
 func _test_player_auto_battle_rules() -> void:
@@ -560,7 +572,7 @@ func _test_expedition_defeat_settlement() -> void:
 	var finish: Dictionary = expedition.finish("defeated")
 	var result: Dictionary = state.settle_expedition(finish)
 	_expect_true(bool(result.get("ok", false)), "settlement ok")
-	_expect_eq(state.day, 2, "expedition consumes day")
+	_expect_eq(state.day, 31, "expedition consumes rule duration")
 	_expect_near(state.hp, 25.0, "loss hp floor")
 	_expect_near(state.mp, 12.0, "mp persisted")
 	_expect_eq(state.injury_days, 3, "loss applies three injury days")
@@ -645,7 +657,7 @@ func _test_expedition_settlement_auto_saves() -> void:
 	state.settle_expedition(finish)
 	var info: Dictionary = _save_service().slot_info(SaveService.AUTO_SAVE_SLOT)
 	_expect_true(bool(info.get("ok", false)), "expedition settlement auto-saves")
-	_expect_eq(int(info.get("day", 0)), 2, "auto save reflects settled day")
+	_expect_eq(int(info.get("day", 0)), 31, "auto save reflects settled day")
 	_expect_eq(state.active_save_slot, SaveService.AUTO_SAVE_SLOT, "active slot is auto save")
 
 

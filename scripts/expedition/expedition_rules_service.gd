@@ -2,6 +2,8 @@ class_name ExpeditionRulesService
 extends RefCounted
 
 const BATTLE_TYPES := ["battle", "elite", "boss"]
+const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
+const EnumActivityTimeScript := preload("res://scripts/enum/enum_activity_time.gd")
 
 
 static func rules() -> Dictionary:
@@ -11,8 +13,11 @@ static func rules() -> Dictionary:
 	return {}
 
 
-static func elapsed_days(days_elapsed: int) -> int:
-	var minimum := maxi(1, int(rules().get("minimum_elapsed_days", 1)))
+static func elapsed_days(days_elapsed: int, major_realm_id: String) -> int:
+	var minimum := GameTimeServiceScript.days_for_activity(
+		EnumActivityTimeScript.LABEL_EXPEDITION,
+		major_realm_id
+	)
 	return maxi(minimum, maxi(0, days_elapsed))
 
 

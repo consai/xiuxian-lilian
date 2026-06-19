@@ -37,9 +37,9 @@ func _refresh(message: String = "") -> void:
 	_realm_label.text = "%s · 修为 %d/%d" % [
 		GameState.realm_name, GameState.cultivation, GameState.breakthrough_at
 	]
-	var status := "第 %d 日  |  灵石 %d  |  气血 %.0f/%.0f  |  法力 %.0f/%.0f  |  伤势 %d 日  |  境界虚浮 %d" % [
-		GameState.day, GameState.ling_stones, GameState.hp, hp_max,
-		GameState.mp, mp_max, GameState.injury_days, GameState.cultivation_instability
+	var status := "%s  |  灵石 %d  |  气血 %.0f/%.0f  |  法力 %.0f/%.0f  |  伤势 %s  |  境界虚浮 %d" % [
+		GameState.time_date_label(GameState.day), GameState.ling_stones, GameState.hp, hp_max,
+		GameState.mp, mp_max, GameState.time_duration_label(GameState.injury_days), GameState.cultivation_instability
 	]
 	if GameState.active_save_slot > 0:
 		status += "  |  存档槽 %d" % GameState.active_save_slot
@@ -55,9 +55,9 @@ func _resolve_message(message: String) -> String:
 	if not GameState.last_expedition_summary.is_empty():
 		var summary := GameState.last_expedition_summary
 		var stats := summary.get("stats", {}) as Dictionary
-		return "上次历练：最高难度 %d，消耗 %d 日" % [
+		return "上次历练：最高难度 %d，耗时 %s" % [
 			maxi(int(stats.get("max_difficulty", 0)), int(stats.get("max_depth", 0))),
-			int(summary.get("elapsed_days", 1)),
+			str(summary.get("duration_label", GameState.time_duration_label(int(summary.get("elapsed_days", 1))))),
 		]
 	if not GameState.last_rewards.is_empty():
 		var rewards: PackedStringArray = []

@@ -71,11 +71,11 @@ func _bind_identity() -> void:
 	_cultivation_bar.max_value = float(breakthrough_at)
 	_cultivation_bar.value = float(GameState.cultivation)
 	_cultivation_value.text = "%d / %d" % [GameState.cultivation, breakthrough_at]
-	_day_label.text = "第 %d 日" % GameState.day
+	_day_label.text = GameState.time_date_label(GameState.day)
 	if GameState.injury_days <= 0:
 		_injury_label.text = "伤势：无"
 	else:
-		_injury_label.text = "伤势：%d 日" % GameState.injury_days
+		_injury_label.text = "伤势：%s" % GameState.time_duration_label(GameState.injury_days)
 	_stone_label.text = "灵石 %d" % GameState.ling_stones
 	_portrait.texture = BattleInitDataScript._resolve_icon_texture({"icon": GameState.player_icon})
 

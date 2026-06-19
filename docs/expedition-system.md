@@ -36,7 +36,7 @@ flowchart LR
 | F07 | 抉择事件 | 多选项卡片 UI，选项可触发子事件、效果或战斗 | `mode: decision` + `expedition_event_card` |
 | F08 | 战斗事件 | battle / elite / boss，弹窗选迎战或撤退 | `expedition_battle_popup` + `build_battle_init()` |
 | F09 | 战斗衔接 | 进战 source=`expedition`，战后回历练循环或战败结算 | `ExpeditionBattleFlow` |
-| F10 | 历练日数 | `days` 与事件数 `steps` 独立；结算消耗以 `days` 为准 | `estimated_elapsed_days()`、`finish()` |
+| F10 | 历练日数 | `days` 与事件数 `steps` 独立；结算耗时至少为时间规则中的普通历练时长 | `estimated_elapsed_days()`、`finish()` |
 | F11 | 事件难度 | 事件配置 `difficulty`；地点 `min_difficulty`/`max_difficulty` 控制入池；难度不随推进自动增加；结算统计 `max_difficulty` | `ExpeditionDirectorService._pool_candidates()` |
 | F27 | 推进模式 | 底栏可切换自动/手动推进；手动时每个事件完成后点「前进」才抽下一事件 | `auto_advance` + `AdvanceButton` |
 | F12 | 局内 runtime | 历练中 HP/MP/背包槽物品仅在 `runtime` 变更；战斗消耗扣背包副本，历练进行中不写存档 | `runtime` + `receive_battle_summary`；结算时 `settle_expedition()` 统一回写 |
@@ -244,7 +244,6 @@ advance_day()
 
 | 键 | 默认 | 含义 |
 |----|------|------|
-| `minimum_elapsed_days` | 1 | 结算最少天数 |
 | `event_day_chance` | 0.55 | 每日遭遇事件概率 |
 | `max_idle_days` | 4 | 连续无事件天数上限，达到后次日保底遭遇 |
 | `auto_event_advance_seconds` | 1.0 | 遭遇日之间的自动推进间隔（秒）；空窗日不适用 |
@@ -258,8 +257,8 @@ advance_day()
 
 | 区域 | 数据源 |
 |------|--------|
-| 顶栏 | 地点名、难度范围、已消耗 `days` |
-| 状态行 | 第 `days` 日 · `steps` 件事 |
+| 顶栏 | 地点名、难度范围、已消耗规则化时长 |
+| 状态行 | 过程第 `days` 日 · `steps` 件事 |
 | 气血/法力条 | `runtime` + `player_snapshot.attrs` |
 | 丹药槽 | `runtime.item_slots` + `inventory` |
 | 战利品区 | `ExpeditionState.loot` |

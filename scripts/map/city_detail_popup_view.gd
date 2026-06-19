@@ -30,7 +30,7 @@ func show_city(city_id: String, city_data: Dictionary, preview: Dictionary) -> v
 		"城市功能：%s" % services,
 	]
 	if bool(preview.get("ok", false)):
-		lines.append("路程：预计 %d 日" % int(preview.get("total_days", 0)))
+		lines.append("路程：预计 %s" % str(preview.get("duration_label", GameState.time_duration_label(int(preview.get("total_days", 0))))))
 		lines.append("路线状态：可前往")
 	elif str(preview.get("error", "")) != "":
 		lines.append("路程：%s" % str(preview.get("error", "")))

@@ -1,0 +1,60 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="2_label20"]
+
+[sub_resource type="StyleBoxFlat" id="Style_item"]
+bg_color = Color(1, 0.92549, 0.72549, 0.94)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.333333, 0.196078, 0.184314, 0.78)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0.258824, 0.145098, 0.105882, 0.22)
+shadow_size = 5
+
+[sub_resource type="StyleBoxFlat" id="Style_icon"]
+bg_color = Color(0.333333, 0.196078, 0.184314, 0.12)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="RewardTipLine" type="PanelContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 38)
+size_flags_horizontal = 3
+offset_right = 260.0
+offset_bottom = 38.0
+mouse_filter = 2
+theme = ExtResource("1_theme")
+theme_override_styles/panel = SubResource("Style_item")
+
+[node name="Content" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="IconPanel" type="PanelContainer" parent="Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(28, 28)
+theme_override_styles/panel = SubResource("Style_icon")
+
+[node name="Icon" type="TextureRect" parent="Content/IconPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(28, 28)
+stretch_mode = 5
+
+[node name="TextLabel" type="Label" parent="Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Reward"
+label_settings = ExtResource("2_label20")
+vertical_alignment = 1
+autowrap_mode = 3

@@ -110,6 +110,11 @@ func _on_clicked() -> void:
 	clicked.emit()
 
 
+func cancel_press_feedback() -> void:
+	_pressed_depth = 0
+	_play_release()
+
+
 func _play_press() -> void:
 	if not is_instance_valid(_target):
 		return

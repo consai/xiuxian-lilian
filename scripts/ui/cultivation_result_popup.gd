@@ -31,7 +31,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func show_result(result: Dictionary) -> void:
 	var days := int(result.get("days", 1))
-	_completed_days_label.text = "闭关 %d 日" % days
+	_completed_days_label.text = "闭关 %s" % str(result.get("duration_label", GameState.time_duration_label(days)))
 	_status_label.text = "周天运转完毕"
 	_flavor_label.text = _result_flavor(str(result.get("mode_id", "cycle")))
 	_result_label.text = _format_summary(result)

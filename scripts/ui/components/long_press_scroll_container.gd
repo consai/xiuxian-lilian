@@ -17,6 +17,7 @@ var _press_scroll := Vector2i.ZERO
 var _active_touch_index := -1
 var _long_press_generation := 0
 var _suppress_scroll_signal := false
+var _suppressed_controls: Array[Dictionary] = []
 
 
 func _ready() -> void:
@@ -72,8 +73,9 @@ func _handle_mouse_button(mb: InputEventMouseButton) -> void:
 			return
 		_begin_press(local, -1)
 	elif _pointer_down:
+		var was_dragging := _dragging
 		_end_press()
-		if _dragging:
+		if was_dragging:
 			get_viewport().set_input_as_handled()
 
 
@@ -84,8 +86,9 @@ func _handle_screen_touch(st: InputEventScreenTouch) -> void:
 			return
 		_begin_press(local, st.index)
 	elif st.index == _active_touch_index:
+		var was_dragging := _dragging
 		_end_press()
-		if _dragging:
+		if was_dragging:
 			get_viewport().set_input_as_handled()
 
 
@@ -108,7 +111,7 @@ func _handle_screen_drag(sd: InputEventScreenDrag) -> void:
 func _begin_press(local: Vector2, touch_index: int) -> void:
 	_pointer_down = true
 	_dragging = false
-	_armed = touch_index < 0
+	_armed = false
 	_press_local = local
 	_press_scroll = Vector2i(scroll_horizontal, scroll_vertical)
 	_active_touch_index = touch_index
@@ -140,18 +143,23 @@ func _update_drag(local: Vector2, from_touch: bool) -> void:
 	if not _can_drag_any():
 		return
 	var was_dragging := _dragging
-	_dragging = true
+	if not _dragging:
+		_dragging = true
+		_suppress_descendant_clicks()
 	_apply_scroll_from_delta(delta)
 	if not was_dragging:
 		user_scrolled.emit()
 
 
 func _end_press() -> void:
+	var was_dragging := _dragging
 	_pointer_down = false
 	_dragging = false
 	_armed = false
 	_active_touch_index = -1
 	_long_press_generation += 1
+	if was_dragging:
+		call_deferred("_restore_descendant_clicks")
 
 
 func _apply_scroll_from_delta(delta: Vector2) -> void:
@@ -203,3 +211,50 @@ func _on_bar_value_changed(_value: float) -> void:
 	if _suppress_scroll_signal or _dragging:
 		return
 	user_scrolled.emit()
+
+
+func _suppress_descendant_clicks() -> void:
+	if not _suppressed_controls.is_empty():
+		return
+	_cancel_descendant_press_feedback(self)
+	_collect_click_suppression(self)
+
+
+func _cancel_descendant_press_feedback(node: Node) -> void:
+	for child in node.get_children():
+		if child.has_method("cancel_press_feedback"):
+			child.call("cancel_press_feedback")
+		_cancel_descendant_press_feedback(child)
+
+
+func _collect_click_suppression(node: Node) -> void:
+	for child in node.get_children():
+		if child is BaseButton:
+			var button := child as BaseButton
+			_suppressed_controls.append({
+				"node": button,
+				"disabled": button.disabled,
+				"mouse_filter": button.mouse_filter,
+			})
+			button.disabled = true
+			button.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		elif child is Control and child != self:
+			var control := child as Control
+			if control.mouse_filter == Control.MOUSE_FILTER_STOP:
+				_suppressed_controls.append({
+					"node": control,
+					"mouse_filter": control.mouse_filter,
+				})
+				control.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_collect_click_suppression(child)
+
+
+func _restore_descendant_clicks() -> void:
+	for row in _suppressed_controls:
+		var node := row.get("node") as Control
+		if not is_instance_valid(node):
+			continue
+		node.mouse_filter = row.get("mouse_filter", node.mouse_filter)
+		if node is BaseButton:
+			(node as BaseButton).disabled = bool(row.get("disabled", false))
+	_suppressed_controls.clear()

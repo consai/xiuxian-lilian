@@ -45,6 +45,8 @@ func _build_catalog() -> void:
 			"id": def.id,
 			"name": def.name,
 			"type": def.item_type,
+			"primary_type": def.primary_type,
+			"secondary_type": def.secondary_type,
 			"rarity": def.rarity,
 		})
 	_catalog.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:

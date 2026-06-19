@@ -96,7 +96,7 @@ func _apply_result(result: Dictionary) -> void:
 		int(result.get("furnace_durability", 0)),
 		max_durability,
 	]
-	_days_label.text = "耗时\n%d日" % int(result.get("days", 1))
+	_days_label.text = "耗时\n%s" % str(result.get("duration_label", GameState.time_duration_label(int(result.get("days", 1)))))
 	_mastery_label.text = "%s熟练度 +%d  ·  当前 %d/1000%s" % [
 		pill_name,
 		int(result.get("mastery_gain", 0)),

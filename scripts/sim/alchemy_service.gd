@@ -8,6 +8,8 @@ const MASTERY_EXTRA_PILL_CHANCE_MAX := 0.75
 const MASTERY_SECOND_EXTRA_PILL_CHANCE_MAX := 0.30
 const MASTERY_COST_SAVE_CHANCE_MAX := 0.35
 const FAILURE_MASTERY_MULTIPLIER := 1.5
+const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
+const EnumActivityTimeScript := preload("res://scripts/enum/enum_activity_time.gd")
 
 
 static func default_state() -> Dictionary:
@@ -89,7 +91,8 @@ static func preview(
 	alchemy_state: Dictionary,
 	inventory: Dictionary,
 	foundations: Dictionary,
-	aptitudes: Dictionary
+	aptitudes: Dictionary,
+	major_realm_id: String
 ) -> Dictionary:
 	var recipe := recipe_by_id(recipe_id)
 	var strategy := strategy_by_id(strategy_id)
@@ -151,7 +154,13 @@ static func preview(
 		spread_bounds[1],
 		clampf(float(furnace.get("safety", 0.0)) + float(strategy.get("safety", 0.0)), 0.0, 1.0)
 	)
-	var days := maxi(1, int(recipe.get("base_days", 1)) + int(strategy.get("days", 0)))
+	var activity_days := GameTimeServiceScript.days_for_activity(
+		EnumActivityTimeScript.LABEL_ALCHEMY,
+		major_realm_id,
+		1.0,
+		1.0
+	)
+	var days := maxi(1, activity_days + int(strategy.get("days", 0)))
 	var product_count := maxi(1, int(round(
 		float(recipe.get("base_yield", 1))
 		* (1.0 + float(furnace.get("refinement", 0.0)) + float(strategy.get("yield", 0.0)))
@@ -179,6 +188,7 @@ static func preview(
 		"success_probability": _success_probability(probabilities),
 		"high_quality_probability": _high_quality_probability(probabilities),
 		"days": days,
+		"duration_label": GameTimeServiceScript.duration_label(days),
 		"product_count": product_count,
 		"alchemy_level": int(state.get("level", 1)),
 	}

@@ -44,7 +44,6 @@ recipes:
     name: "回气丹方"
     pill_name: "回气丹"
     difficulty: 20
-    base_days: 1
     base_yield: 3
     minimum_level: 1
     ingredients:
@@ -67,7 +66,6 @@ recipes:
     name: "回灵丹方"
     pill_name: "回灵丹"
     difficulty: 28
-    base_days: 1
     base_yield: 3
     minimum_level: 1
     ingredients:
@@ -100,7 +98,6 @@ recipes:
     name: "疗伤丹方"
     pill_name: "疗伤丹"
     difficulty: 38
-    base_days: 2
     base_yield: 2
     minimum_level: 1
     ingredients:
@@ -133,7 +130,6 @@ recipes:
     name: "聚气丹方"
     pill_name: "聚气丹"
     difficulty: 45
-    base_days: 2
     base_yield: 2
     minimum_level: 1
     ingredients:

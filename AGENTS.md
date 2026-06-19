@@ -87,3 +87,82 @@ var _cached_inventory := {}
 - 纯局部、帧内临时变量（如 UI 动画中间值）可留在节点脚本中，但不得替代 `DataStore` 保存跨场景/跨存档的数据。
 
 新增字段时：在 `DataStore._default_savedata()` 或对应 `_default_*()` 中补充默认值，并通过 `coalesce_savedata()` 等合并逻辑保证读档兼容。
+
+
+
+
+---
+description: 离散类型统一用枚举定义，集中放在 scripts/enum/ 并通过 class_name 访问
+globs: "**/*.gd"
+alwaysApply: true
+---
+
+# 枚举定义规范
+
+凡是可以做成枚举的**离散类型**（状态、分类、品质档位、筛选条件等），一律提取为枚举，统一放在 `res://scripts/enum/` 中，并通过 `class_name` 全局访问。
+
+## 文件与命名
+
+| 项 | 约定 | 示例 |
+|---|---|---|
+| 路径 | `res://scripts/enum/enum_<snake_name>.gd` | `enum_itemtype.gd` |
+| `class_name` | `Enum` + PascalCase | `EnumItemType`、`EnumQuality` |
+| 基类 | `extends RefCounted` | — |
+| 内部 `enum` | 简短名词，如 `Type`、`State` | `EnumItemType.Type` |
+
+## 推荐结构
+
+```gdscript
+class_name EnumItemType
+extends RefCounted
+
+enum Type {
+	MATERIAL,
+	ORE,
+	# ...
+}
+
+const LABEL_MATERIAL := "材料"
+
+static func label(type: Type) -> String:
+	match type:
+		Type.MATERIAL:
+			return LABEL_MATERIAL
+		_:
+			return ""
+```
+
+- 与配置表/存档字符串对应的枚举，在同文件内提供 `from_label()` / `label()` 等静态转换。
+- 颜色、排序、显示名等派生数据，用 `const` 字典或 `static func` 挂在枚举类上，不散落在业务脚本里。
+
+## 访问方式
+
+```gdscript
+# ✅ 经 class_name 直接访问（首选）
+var color := EnumQuality.get_color(quality)
+var order := EnumItemType.sort_order(EnumItemType.Type.PILL)
+
+# ✅ 仅需脚本引用常量时，可 preload 后使用
+const EnumItemTypeScript := preload("res://scripts/enum/enum_itemtype.gd")
+if item_type == EnumItemTypeScript.LABEL_PILL:
+	pass
+```
+
+## 禁止写法
+
+```gdscript
+# ❌ 在业务脚本里内联 enum，本可复用的离散类型
+enum ItemCategory { MATERIAL, PILL }
+
+# ❌ 魔法字符串/数字散落各处
+if item_type == "丹药":
+	pass
+
+# ❌ 为枚举再建平行全局单例或静态字典
+static var TYPE_LABELS := { ... }
+```
+
+## 例外
+
+- **仅单个脚本使用的 UI 局部状态**（如面板当前 Tab、一次性动画阶段）可留在该脚本内部 `enum`，不必强行抽到 `scripts/enum/`。
+- 新增枚举时，在 `scripts/enum/` 新建文件并注册 `class_name`；旧代码中的魔法值应逐步迁移，而非与新枚举并存两套约定。

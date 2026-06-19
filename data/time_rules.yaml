@@ -1,0 +1,50 @@
+schema_version: 1
+calendar:
+  days_per_month: 30
+  months_per_year: 12
+  days_per_year: 360
+major_realm_multipliers:
+  qi: 1
+  foundation: 2
+  core: 4
+  nascent: 8
+  transform: 16
+  void: 32
+  merge: 64
+  great: 128
+  tribulation: 256
+activity_base_days:
+  cultivate: 7
+  expedition: 30
+  travel_short: 3
+  travel_mid: 15
+  travel_long: 90
+  insight: 100
+  skill_basic: 30
+  skill_advanced: 180
+  alchemy: 7
+  crafting: 30
+  breakthrough: 30
+rank_multipliers:
+  first: 1
+  second: 2
+  third: 4
+  fourth: 8
+  fifth: 16
+  immortal: 32
+aptitude_multipliers:
+  heavenly_root: 0.5
+  double_root: 0.75
+  triple_root: 1
+  quad_root: 1.25
+  penta_root: 1.5
+facility_multipliers:
+  top_cave: 0.5
+  advanced_cave: 0.75
+  normal_cave: 1
+  poor_spirit: 1.5
+status_multipliers:
+  guided: 0.7
+  self_study: 1.2
+  injured: 1.5
+  heart_demon: 2

@@ -17,6 +17,9 @@ const PlayerAutoBattleServiceScript := preload("res://scripts/sim/player_auto_ba
 const BreakthroughServiceScript := preload("res://scripts/sim/breakthrough_service.gd")
 const AlchemyServiceScript := preload("res://scripts/sim/alchemy_service.gd")
 const PlayerBuildServiceScript := preload("res://scripts/sim/player_build_service.gd")
+const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
+const EnumActivityTimeScript := preload("res://scripts/enum/enum_activity_time.gd")
+const RewardTipBuilderScript := preload("res://scripts/ui/tips/core/reward_tip_builder.gd")
 
 const INSTABILITY_REDUCTION_PER_WIN := 10
 
@@ -287,8 +290,19 @@ func load_game(slot: int) -> Dictionary:
 
 
 func cultivate() -> int:
-	var result := cultivate_session(EnumCultivationMode.LABEL_CYCLE, 1)
+	var result := cultivate_session(
+		EnumCultivationMode.LABEL_CYCLE,
+		max_cultivation_days(EnumCultivationMode.LABEL_CYCLE)
+	)
 	return int(result.get("cultivation_gained", 0))
+
+
+func time_date_label(target_day: int) -> String:
+	return GameTimeServiceScript.date_label(target_day)
+
+
+func time_duration_label(days_value: int) -> String:
+	return GameTimeServiceScript.duration_label(days_value)
 
 
 func alchemy_recipes() -> Array:
@@ -307,7 +321,8 @@ func preview_alchemy(recipe_id: String, strategy_id: String = "standard", select
 		alchemy,
 		inventory,
 		foundations,
-		aptitudes
+		aptitudes,
+		major_realm_id()
 	)
 
 
@@ -374,6 +389,7 @@ func brew_alchemy_batches(
 			str(result.get("pill_name", "丹药")),
 			str(result.get("quality_summary", "")),
 		])
+	_emit_tip_intents(RewardTipBuilderScript.alchemy_result(result, "alchemy"))
 	auto_save()
 	return result
 
@@ -430,17 +446,21 @@ func _apply_alchemy_brew_result(
 
 
 func max_cultivation_days(mode_id: String = EnumCultivationMode.LABEL_CYCLE, pill_id: String = "") -> int:
+	var planned_days := GameTimeServiceScript.suggested_activity_days(
+		EnumActivityTimeScript.LABEL_CULTIVATE,
+		major_realm_id()
+	)
 	if EnumCultivationMode.is_pill_mode(mode_id):
 		var resolved_pill_id := resolve_cultivation_pill_id(pill_id)
 		if resolved_pill_id == "":
 			return 1
-		return mini(30, int(inventory.get(resolved_pill_id, 0)))
-	return 30
+		return mini(planned_days, int(inventory.get(resolved_pill_id, 0)))
+	return planned_days
 
 
 func preview_cultivation_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: int = 1, pill_id: String = "") -> Dictionary:
 	var mode := _cultivation_mode(mode_id)
-	var safe_days := clampi(days, 1, 30)
+	var safe_days := clampi(days, 1, max_cultivation_days(mode_id, pill_id))
 	var resolved_pill_id := ""
 	var pill_ids: Array = []
 	if EnumCultivationMode.is_pill_mode(mode_id):
@@ -478,14 +498,20 @@ func preview_cultivation_session(mode_id: String = EnumCultivationMode.LABEL_CYC
 		remaining_injury = maxi(0, remaining_injury - 1)
 	var main_id := str(cultivation_method_slots.get("main", ""))
 	var method := CultivationMethodServiceScript.by_id(main_id)
+	var recommended_days := max_cultivation_days(mode_id, resolved_pill_id)
 	return {
 		"ok": true,
 		"mode_id": mode_id,
 		"mode": mode.duplicate(true),
 		"days": safe_days,
+		"duration_label": GameTimeServiceScript.duration_label(safe_days),
+		"recommended_days": recommended_days,
+		"recommended_duration_label": GameTimeServiceScript.duration_label(recommended_days),
 		"estimated_cultivation": estimated_gain,
 		"start_day": day,
 		"end_day": day + safe_days,
+		"start_date_label": GameTimeServiceScript.date_label(day),
+		"end_date_label": GameTimeServiceScript.date_label(day + safe_days),
 		"method_id": main_id,
 		"method_name": str(method.get("name", "未装备主功法")),
 		"method_mastery": CultivationMethodServiceScript.method_mastery(DataStore.savedata, main_id),
@@ -549,19 +575,26 @@ func cultivate_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: 
 	for row in knowledge_summary.values():
 		knowledge_gains.append(row)
 	var gained := cultivation - cultivation_before
-	var activity_text := "闭关 %d 日：%s，修为 +%d" % [safe_days, str(mode["name"]), gained]
+	var activity_text := "闭关 %s：%s，修为 +%d" % [
+		GameTimeServiceScript.duration_label(safe_days),
+		str(mode["name"]),
+		gained,
+	]
 	if layer_advances > 0:
 		activity_text += "，提升至%s" % realm_name
 	if cultivation_instability > instability_before:
 		activity_text += "，境界虚浮 +%d" % (cultivation_instability - instability_before)
 	_append_activity(activity_text)
-	return {
+	var result := {
 		"ok": true,
 		"mode_id": mode_id,
 		"mode_name": str(mode["name"]),
 		"days": safe_days,
+		"duration_label": GameTimeServiceScript.duration_label(safe_days),
 		"start_day": int(preview.get("start_day", day - safe_days)),
 		"end_day": day,
+		"start_date_label": GameTimeServiceScript.date_label(int(preview.get("start_day", day - safe_days))),
+		"end_date_label": GameTimeServiceScript.date_label(day),
 		"cultivation_gained": gained,
 		"cultivation": cultivation,
 		"breakthrough_at": breakthrough_at,
@@ -576,6 +609,8 @@ func cultivate_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: 
 		"instability_gained": cultivation_instability - instability_before,
 		"cultivation_instability": cultivation_instability,
 	}
+	_emit_tip_intents(RewardTipBuilderScript.cultivation_result(result, "cultivation"))
+	return result
 
 
 func _cultivation_mode(mode_id: String) -> Dictionary:
@@ -662,13 +697,23 @@ func grant_cultivation(amount: int) -> Dictionary:
 	var added := maxi(0, amount)
 	if added <= 0:
 		return {"ok": false, "error": "增加量必须大于 0", "added": 0, "layer_advances": 0}
+	var realm_before := realm_name
 	cultivation += added
 	var layer_advances := _auto_advance_layers()
 	var log_text := "修为 +%d" % added
 	if layer_advances > 0:
 		log_text += "，提升至%s" % realm_name
 	_append_activity(log_text)
-	return {"ok": true, "added": added, "layer_advances": layer_advances}
+	var result := {
+		"ok": true,
+		"added": added,
+		"cultivation_gained": added,
+		"layer_advances": layer_advances,
+		"realm_before": realm_before,
+		"realm_name": realm_name,
+	}
+	_emit_tip_intents(RewardTipBuilderScript.cultivation_result(result, "grant_cultivation"))
+	return result
 
 
 ## 将修为补至当前突破门槛并尝试小境界自动提升（不推进日数）。
@@ -719,7 +764,7 @@ func advance_realm_to_index(target_index: int) -> Dictionary:
 
 ## 经 [method RewardService.apply_rewards] 发放奖励（物品、灵石等）。
 func grant_rewards(rewards: Array) -> Array:
-	return RewardServiceScript.apply_rewards(self, rewards)
+	return RewardServiceScript.apply_rewards(self, rewards, "grant_rewards")
 
 
 func can_breakthrough() -> bool:
@@ -875,14 +920,20 @@ func travel_to_city(target_city_id: String, path: Array, total_days: int) -> Dic
 		injury_days = maxi(0, injury_days - elapsed)
 	activity_log.append({
 		"day": day,
-		"text": "旅行至%s，耗时 %d 日" % [
+		"text": "旅行至%s，耗时 %s" % [
 			str(WorldMapServiceScript.city_by_id(target_city_id).get("name", target_city_id)),
-			elapsed,
+			GameTimeServiceScript.duration_label(elapsed),
 		],
 	})
 	if activity_log.size() > 30:
 		activity_log = activity_log.slice(activity_log.size() - 30)
-	return {"ok": true, "city_id": target_city_id, "elapsed_days": elapsed}
+	return {
+		"ok": true,
+		"city_id": target_city_id,
+		"elapsed_days": elapsed,
+		"duration_label": GameTimeServiceScript.duration_label(elapsed),
+		"date_label": GameTimeServiceScript.date_label(day),
+	}
 
 
 func apply_battle_player_runtime(summary: Dictionary) -> void:
@@ -968,7 +1019,7 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 			inventory[iid] = remaining
 		else:
 			inventory.erase(iid)
-	var applied_loot := RewardServiceScript.apply_rewards(self, result.get("loot", []) as Array)
+	var applied_loot := RewardServiceScript.apply_rewards(self, result.get("loot", []) as Array, "expedition_settlement")
 	last_rewards = applied_loot if not applied_loot.is_empty() else (result.get("loot", []) as Array).duplicate(true)
 	for lost_v in result.get("loot_lost", []) as Array:
 		if not lost_v is Dictionary:
@@ -1005,8 +1056,8 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 	for reward in last_rewards:
 		reward_labels.append(reward_label(reward))
 	var peak_diff := maxi(int(stats.get("max_difficulty", 0)), int(stats.get("max_depth", 0)))
-	var log_text := "第 %d 日：%s历练，最高难度 %d，胜 %d 场" % [
-		day - elapsed_days,
+	var log_text := "%s：%s历练，最高难度 %d，胜 %d 场" % [
+		GameTimeServiceScript.date_label(day - elapsed_days),
 		location_name,
 		peak_diff,
 		int(stats.get("wins", 0)),
@@ -1258,7 +1309,7 @@ func assign_treasure_item_slot(slot_index: int, item_id: String) -> Dictionary:
 	if int(inventory.get(iid, 0)) <= 0:
 		return {"ok": false, "error": "背包中没有该法宝"}
 	var def := ConfigManager.item_def_by_id(iid)
-	if def == null or def.item_type != EnumItemType.LABEL_TREASURE:
+	if def == null or not def.is_treasure():
 		return {"ok": false, "error": "该物品不是法宝"}
 	for i in treasure_slots.size():
 		if i != slot_index and str(treasure_slots[i]) == iid:
@@ -1430,6 +1481,12 @@ func _config_manager() -> Node:
 	if not loop is SceneTree:
 		return null
 	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
+
+
+func _emit_tip_intents(intents: Array) -> void:
+	if intents.is_empty() or DataEvents == null:
+		return
+	DataEvents.emit_tip_intents(intents)
 
 
 func _map_savedata() -> Dictionary:

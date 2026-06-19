@@ -279,7 +279,7 @@ func _test_manual_exit_keeps_all_loot() -> void:
 	var settled: Dictionary = game.settle_expedition(finish)
 	_expect_true(bool(settled.get("ok", false)), "settlement ok")
 	_expect_eq(int(game.inventory.get("items_LingCao", 0)), lingcao_before + 4, "loot merged into inventory")
-	_expect_eq(game.day, 2, "manual exit advances at least one day")
+	_expect_eq(game.day, 31, "manual exit advances by expedition duration")
 
 
 func _test_defeat_exit_drops_inventory_and_injury() -> void:
@@ -333,10 +333,10 @@ func _test_defeat_loot_drop_deterministic() -> void:
 
 
 func _test_elapsed_days_track_expedition_days() -> void:
-	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(0), 1, "0 days -> minimum 1")
-	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(1), 1, "1 day -> 1 day")
-	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(3), 3, "3 days -> 3 days")
-	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(6), 6, "6 days -> 6 days")
+	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(0, "qi"), 30, "0 days -> qi expedition duration")
+	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(1, "qi"), 30, "1 day -> qi expedition duration")
+	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(31, "qi"), 31, "31 days -> actual elapsed")
+	_expect_eq(ExpeditionRulesServiceScript.elapsed_days(0, "foundation"), 60, "foundation duration scales")
 
 
 func _test_quiet_days_advance_without_logs() -> void:
@@ -429,7 +429,7 @@ func _test_game_settlement_occurs_once() -> void:
 	_expect_true(bool(first.get("ok", false)), "first settlement ok")
 	_expect_true(bool(second.get("duplicate", false)), "duplicate settlement rejected")
 	_expect_eq(int(game.inventory.get("items_LingCao", 0)), lingcao_before + 2, "inventory not doubled at settlement")
-	_expect_eq(game.day, 2, "day advanced once")
+	_expect_eq(game.day, 31, "day advanced by expedition duration")
 
 
 func _test_distinct_expeditions_settlement_ids() -> void:

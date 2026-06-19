@@ -6,6 +6,7 @@ const ExpeditionEventServiceScript := preload("res://scripts/expedition/expediti
 const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const ExpeditionLogServiceScript := preload("res://scripts/expedition/expedition_log_service.gd")
+const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
 
 signal log_updated
 
@@ -515,7 +516,7 @@ func finish(exit_reason: String) -> Dictionary:
 	if not active:
 		return {"ok": false, "error": "没有可结算的历练"}
 	var reason := exit_reason
-	var elapsed_days: int = ExpeditionRulesServiceScript.elapsed_days(days)
+	var elapsed_days: int = ExpeditionRulesServiceScript.elapsed_days(days, _major_realm_id())
 	var settlement_loot := loot.duplicate(true)
 	var loot_lost: Array = []
 	if reason == "defeated":
@@ -532,6 +533,7 @@ func finish(exit_reason: String) -> Dictionary:
 		"exit_reason": reason,
 		"start_day": start_day,
 		"elapsed_days": maxi(1, elapsed_days),
+		"duration_label": GameTimeServiceScript.duration_label(maxi(1, elapsed_days)),
 		"hp": float(runtime.get("hp", 0.0)),
 		"mp": float(runtime.get("mp", 0.0)),
 		"items": _runtime_items_for_settlement(),
@@ -557,7 +559,7 @@ func reset() -> void:
 
 
 func estimated_elapsed_days() -> int:
-	return ExpeditionRulesServiceScript.elapsed_days(days)
+	return ExpeditionRulesServiceScript.elapsed_days(days, _major_realm_id())
 
 
 func should_go_to_result() -> bool:
@@ -710,10 +712,15 @@ func _copy_player_snapshot(game_state: Node) -> Dictionary:
 	return {
 		"name": str(game_state.player_name),
 		"icon": str(game_state.player_icon),
+		"major_realm_id": str(game_state.major_realm_id()) if game_state.has_method("major_realm_id") else "",
 		"attrs": (game_state.attrs as Dictionary).duplicate(true),
 		"equipped_abilities": (game_state.equipped_abilities as Array).duplicate(true),
 		"equip_slots": (game_state.equip_slots as Array).duplicate(true),
 	}
+
+
+func _major_realm_id() -> String:
+	return str(player_snapshot.get("major_realm_id", ""))
 
 
 func _restore_rng() -> void:

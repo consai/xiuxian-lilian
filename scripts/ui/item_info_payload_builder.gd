@@ -93,7 +93,12 @@ static func from_equip_id(equip_id: int) -> Dictionary:
 		"quality": rarity,
 		"meta": StringsZh.format_template(
 			StringsZh.getp("item_info.type", "类型：{value}"),
-			{"value": StringsZh.getp("item_info.type_equip", "法宝")}
+			{
+				"value": EnumItemType.full_label(
+					EnumItemType.PRIMARY_TREASURE,
+					EnumItemType.SECONDARY_ACTIVE_TREASURE
+				)
+			}
 		) + " · " + StringsZh.format_template(
 			StringsZh.getp("item_info.rarity", "品质：{value}"),
 			{"value": rarity}
@@ -236,7 +241,7 @@ static func describe_item(def: ItemDef) -> String:
 		parts.append(desc)
 	for line in format_use_effect_lines(def.use_effect):
 		parts.append(line)
-	if def.use_effect.is_empty() and def.item_type == "丹药" and def.has_fight_config():
+	if def.use_effect.is_empty() and def.is_pill() and def.has_fight_config():
 		for effect_line in HoverTipEffectFormatter.format_lines(def.fight_effect):
 			parts.append(StringsZh.format_template(
 				StringsZh.getp("item_info.use_fight_prefix", "战斗使用：{value}"),

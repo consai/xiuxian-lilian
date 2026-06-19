@@ -236,7 +236,7 @@ static func load_items() -> Array:
 	if parsed is Dictionary:
 		var d := parsed as Dictionary
 		if d.has("items") and d["items"] is Array:
-			raw = d["items"] as Array
+			raw = _expand_learning_book_items(d, d["items"] as Array)
 		else:
 			push_error("JsonLoader: item config object missing 'items' array")
 			return out
@@ -252,6 +252,175 @@ static func load_items() -> Array:
 		if it != null:
 			out.append(it)
 	return out
+
+
+static func load_item_aliases() -> Dictionary:
+	var parsed: Variant = _read_json_variant(ITEMS_PATH)
+	if not parsed is Dictionary:
+		return {}
+	var root := parsed as Dictionary
+	var aliases_v: Variant = root.get("legacy_learning_book_aliases", {})
+	if not aliases_v is Dictionary:
+		return {}
+	var out := {}
+	for from_v in (aliases_v as Dictionary).keys():
+		var from_id := config_id_to_string(from_v)
+		var to_id := config_id_to_string((aliases_v as Dictionary).get(from_v, ""))
+		if from_id == "" or to_id == "":
+			continue
+		out[from_id] = to_id
+	return out
+
+
+static func _expand_learning_book_items(root: Dictionary, base_items: Array) -> Array:
+	var expanded: Array = []
+	var existing_ids := {}
+	var existing_ability_targets := {}
+	var existing_method_targets := {}
+	for item_v in base_items:
+		if not item_v is Dictionary:
+			continue
+		var item := (item_v as Dictionary).duplicate(true)
+		expanded.append(item)
+		var item_id := config_id_to_string(item.get("id", ""))
+		if item_id != "":
+			existing_ids[item_id] = true
+		var ability_id := config_id_to_string(item.get("learn_ability_id", ""))
+		if ability_id != "":
+			existing_ability_targets[ability_id] = true
+		var method_id := config_id_to_string(item.get("learn_method_id", ""))
+		if method_id != "":
+			existing_method_targets[method_id] = true
+	var templates_v: Variant = root.get("generated_learning_books", [])
+	if not templates_v is Array:
+		return expanded
+	for template_v in templates_v as Array:
+		if not template_v is Dictionary:
+			continue
+		var template := template_v as Dictionary
+		if not bool(template.get("enabled", true)):
+			continue
+		var category := str(template.get("category", "")).strip_edges().to_lower()
+		match category:
+			"ability":
+				_append_generated_ability_books(template, expanded, existing_ids, existing_ability_targets)
+			"method":
+				_append_generated_method_books(template, expanded, existing_ids, existing_method_targets)
+			_:
+				push_warning("JsonLoader: unknown generated_learning_books category %s" % category)
+	return expanded
+
+
+static func _append_generated_ability_books(
+		template: Dictionary,
+		expanded: Array,
+		existing_ids: Dictionary,
+		existing_targets: Dictionary
+) -> void:
+	var bundle := _read_json_root_object(ABILITIES_PATH)
+	var abilities_v: Variant = bundle.get("abilities", [])
+	if not abilities_v is Array:
+		return
+	for ability_v in abilities_v as Array:
+		if not ability_v is Dictionary:
+			continue
+		var ability := ability_v as Dictionary
+		var ability_id := config_id_to_string(ability.get("id", ""))
+		if ability_id == "" or existing_targets.has(ability_id):
+			continue
+		var item_id := _generated_learning_book_id(str(template.get("id_prefix", "book_skill_")), ability_id, "ability")
+		if item_id == "" or existing_ids.has(item_id):
+			continue
+		expanded.append(_build_generated_learning_book(template, ability, "ability", item_id))
+		existing_ids[item_id] = true
+		existing_targets[ability_id] = true
+
+
+static func _append_generated_method_books(
+		template: Dictionary,
+		expanded: Array,
+		existing_ids: Dictionary,
+		existing_targets: Dictionary
+) -> void:
+	var bundle := _read_json_root_object(CULTIVATION_METHODS_PATH)
+	var methods_v: Variant = bundle.get("methods", [])
+	if not methods_v is Array:
+		return
+	for method_v in methods_v as Array:
+		if not method_v is Dictionary:
+			continue
+		var method := method_v as Dictionary
+		var method_id := config_id_to_string(method.get("id", ""))
+		if method_id == "" or existing_targets.has(method_id):
+			continue
+		var item_id := _generated_learning_book_id(str(template.get("id_prefix", "book_method_")), method_id, "method")
+		if item_id == "" or existing_ids.has(item_id):
+			continue
+		expanded.append(_build_generated_learning_book(template, method, "method", item_id))
+		existing_ids[item_id] = true
+		existing_targets[method_id] = true
+
+
+static func _build_generated_learning_book(
+		template: Dictionary,
+		source_row: Dictionary,
+		category: String,
+		item_id: String
+) -> Dictionary:
+	var rarity_id := str(source_row.get("rarity", "common")).strip_edges().to_lower()
+	var name := str(source_row.get("name", item_id)).strip_edges()
+	var values := {
+		"name": name,
+		"id": str(source_row.get("id", "")),
+		"realm": str(source_row.get("realm", "")),
+		"rarity": rarity_id,
+	}
+	var out := {
+		"id": item_id,
+		"name": StringsZh.format_template(str(template.get("name_template", "{name}")), values),
+		"type": str(template.get("secondary_type", template.get("type", "学习典籍"))),
+		"primary_type": str(template.get("primary_type", "")),
+		"secondary_type": str(template.get("secondary_type", "")),
+		"rarity": _template_lookup_string(template.get("rarity_map", {}), rarity_id, "普通"),
+		"quality": _template_lookup_int(template.get("quality_map", {}), rarity_id, 1),
+		"stackable": bool(template.get("stackable", true)),
+		"max_stack": maxi(1, int(template.get("max_stack", 9))),
+		"desc": StringsZh.format_template(
+			str(template.get("desc_template", "研读后习得{name}。")),
+			values
+		),
+		"icon": str(template.get("icon", "")),
+	}
+	if category == "ability":
+		out["learn_ability_id"] = str(source_row.get("id", ""))
+	else:
+		out["learn_method_id"] = str(source_row.get("id", ""))
+	return out
+
+
+static func _generated_learning_book_id(prefix: String, target_id: String, category: String) -> String:
+	var suffix := target_id.strip_edges()
+	if category == "ability" and suffix.begins_with("ability.combat."):
+		suffix = suffix.trim_prefix("ability.combat.")
+	elif category == "ability" and suffix.begins_with("ability."):
+		suffix = suffix.trim_prefix("ability.")
+	elif category == "method" and suffix.begins_with("method."):
+		suffix = suffix.trim_prefix("method.")
+	suffix = suffix.replace(".", "_").replace("/", "_").replace("-", "_")
+	return "%s%s" % [prefix.strip_edges(), suffix]
+
+
+static func _template_lookup_string(table_v: Variant, key: String, fallback: String) -> String:
+	if table_v is Dictionary:
+		var value: Variant = (table_v as Dictionary).get(key, fallback)
+		return str(value)
+	return fallback
+
+
+static func _template_lookup_int(table_v: Variant, key: String, fallback: int) -> int:
+	if table_v is Dictionary:
+		return int((table_v as Dictionary).get(key, fallback))
+	return fallback
 
 
 static func _sort_skill_dict_keys(a: Variant, b: Variant) -> bool:

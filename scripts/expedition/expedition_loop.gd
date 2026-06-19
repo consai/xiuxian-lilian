@@ -50,14 +50,14 @@ func _refresh_all() -> void:
 	var min_diff := maxi(1, int(location.get("min_difficulty", 1)))
 	var max_diff := int(location.get("max_difficulty", 0))
 	var diff_text := "难度 %d" % min_diff if max_diff <= 0 or max_diff == min_diff else "难度 %d-%d" % [min_diff, max_diff]
-	(%Header as Label).text = "%s · %s · 已消耗 %d 日" % [
+	(%Header as Label).text = "%s · %s · 已消耗 %s" % [
 		str(location.get("name", "")),
 		diff_text,
-		ExpeditionState.estimated_elapsed_days(),
+		GameState.time_duration_label(ExpeditionState.estimated_elapsed_days()),
 	]
 	_refresh_progress_dots()
 	_refresh_status_panel()
-	(%Step as Label).text = "第 %d 日 · %d 件事" % [ExpeditionState.days, ExpeditionState.steps]
+	(%Step as Label).text = "过程第 %d 日 · %d 件事" % [ExpeditionState.days, ExpeditionState.steps]
 	_sync_loot_items()
 	_refresh_log_display()
 	_refresh_event_presentation()

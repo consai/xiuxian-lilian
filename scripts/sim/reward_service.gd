@@ -2,6 +2,7 @@ class_name RewardService
 extends RefCounted
 
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
+const RewardTipBuilderScript := preload("res://scripts/ui/tips/core/reward_tip_builder.gd")
 
 
 static func roll_rewards(encounter: Dictionary, rng: RandomNumberGenerator = null) -> Array:
@@ -27,7 +28,7 @@ static func roll_rewards(encounter: Dictionary, rng: RandomNumberGenerator = nul
 	return merge_rewards(out)
 
 
-static func apply_rewards(game_state: Node, rewards: Array) -> Array:
+static func apply_rewards(game_state: Node, rewards: Array, source: String = "reward_service") -> Array:
 	var applied: Array = []
 	for reward_v in rewards:
 		if not reward_v is Dictionary:
@@ -65,7 +66,14 @@ static func apply_rewards(game_state: Node, rewards: Array) -> Array:
 					"id": iid,
 					"count": added,
 				})
+	_emit_reward_tips(applied, source)
 	return applied
+
+
+static func _emit_reward_tips(applied: Array, source: String) -> void:
+	if applied.is_empty() or DataEvents == null:
+		return
+	DataEvents.emit_tip_intents(RewardTipBuilderScript.from_rewards(applied, source))
 
 
 static func _weighted_pick(pool: Array, rng: RandomNumberGenerator) -> Dictionary:
