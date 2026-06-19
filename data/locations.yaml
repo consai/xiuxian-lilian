@@ -1,4 +1,4 @@
-schema_version: 2
+schema_version: 3
 locations:
   qinglan_mountain:
     name: "青岚山脉"
@@ -14,66 +14,62 @@ locations:
       - 5002
     tags:
       - "resource"
-    enemy_pools:
-      beast:
-        name: "青牙狼"
-        icon: "jueshe/sprite_003.png"
-        hp: 75
-        mp: 30
-        attrs:
-          hp_max: 75
-          mp_max: 30
-          shield: 0
-          physical_atk: 21
-          magic_atk: 22.4
-          physical_def: 16
-          magic_def: 19.2
-          spd: 92
-          accuracy: 85
-          evasion: 92
-          control_power: 45
-          control_resist: 55
-          crit: 5
-          crit_damage: 150
-        skills:
-          - 1
-          - 0
-      elite:
-        name: "铁背山罴"
-        icon: "jueshe/sprite_001.png"
-        hp: 165
-        mp: 55
-        attrs:
-          hp_max: 165
-          mp_max: 55
-          shield: 18
-          physical_atk: 31.2
-          magic_atk: 33.3
-          physical_def: 23.6
-          magic_def: 28.3
-          spd: 86
-          accuracy: 96
-          evasion: 78
-          control_power: 65
-          control_resist: 110
-          crit: 8
-          crit_damage: 155
-        skills:
-          - 3
-          - 2
-          - 0
+    monsters:
+      - "qinglan_wolf"
+      - "ironback_bear"
+    materials:
+      - id: "lingcao"
+        name: "灵草"
+        category: "herb"
+        drop_pool: "herbs"
+        item_ids:
+          - "items_LingCao"
+          - "items_LingCao_Fine"
+          - "items_LingCao_Superior"
+      - id: "lingguo"
+        name: "灵果"
+        category: "fruit"
+        drop_pool: "fruit"
+        item_ids:
+          - "items_LingGuo"
+          - "items_LingGuo_Fine"
+          - "items_LingGuo_Superior"
+      - id: "hantie"
+        name: "寒铁"
+        category: "ore"
+        drop_pool: "ore"
+        item_ids:
+          - "items_HanTie"
     drop_pools:
       herbs:
         entries:
           - kind: "item"
             id: "items_LingCao"
+            material_grade: 1
             min: 2
             max: 4
             weight: 1
+            variants:
+              - id: "items_LingCao"
+                material_grade: 1
+                weight: 6
+              - id: "items_LingCao_Fine"
+                material_grade: 2
+                weight: 3
+                conditions:
+                  - type: "difficulty_at_least"
+                    value: 3
+              - id: "items_LingCao_Superior"
+                material_grade: 3
+                weight: 1
+                conditions:
+                  - type: "difficulty_at_least"
+                    value: 5
       ore:
         entries:
           - kind: "item"
             id: "items_HanTie"
+            material_grade: 1
             min: 1
             max: 2
             weight: 3
@@ -82,30 +78,30 @@ locations:
             min: 5
             max: 15
             weight: 2
-      beast:
-        entries:
-          - kind: "item"
-            id: "items_LingCao"
-            min: 1
-            max: 3
-            weight: 5
-          - kind: "item"
-            id: "items_HuiQiDan"
-            min: 1
-            max: 1
-            weight: 2
-          - kind: "item"
-            id: "items_HuiLingDan"
-            min: 1
-            max: 1
-            weight: 2
       fruit:
         entries:
           - kind: "item"
             id: "items_LingGuo"
+            material_grade: 1
             min: 1
             max: 3
             weight: 4
+            variants:
+              - id: "items_LingGuo"
+                material_grade: 1
+                weight: 5
+              - id: "items_LingGuo_Fine"
+                material_grade: 2
+                weight: 2
+                conditions:
+                  - type: "difficulty_at_least"
+                    value: 3
+              - id: "items_LingGuo_Superior"
+                material_grade: 3
+                weight: 1
+                conditions:
+                  - type: "difficulty_at_least"
+                    value: 5
           - kind: "item"
             id: "items_LingCao"
             min: 1
@@ -140,23 +136,6 @@ locations:
             min: 6
             max: 16
             weight: 2
-      elite:
-        entries:
-          - kind: "item"
-            id: "items_YaoDan"
-            min: 1
-            max: 2
-            weight: 4
-          - kind: "item"
-            id: "items_LiaoShangDan"
-            min: 1
-            max: 2
-            weight: 3
-          - kind: "equip"
-            id: 5002
-            min: 1
-            max: 1
-            weight: 1
     event_pool:
       - "qinglan_mountain__travel"
       - "qinglan_mountain__gather_herbs"
@@ -170,6 +149,7 @@ locations:
       - "qinglan_mountain__deep_rest"
       - "qinglan_mountain__wandering_cultivator"
       - "qinglan_mountain__local_elite"
+
   wild_wolf_valley:
     name: "野狼谷"
     subtitle: "狼嚎穿谷，师父失踪线索所在"
@@ -184,131 +164,12 @@ locations:
       - 5002
     tags:
       - "story"
-    enemy_pools:
-      qinglan_wolf_enemy:
-        name: "青牙狼"
-        icon: "jueshe/sprite_003.png"
-        hp: 75
-        mp: 30
-        attrs:
-          hp_max: 75
-          mp_max: 30
-          shield: 0
-          physical_atk: 21
-          magic_atk: 22.4
-          physical_def: 16
-          magic_def: 19.2
-          spd: 92
-          accuracy: 85
-          evasion: 92
-          control_power: 45
-          control_resist: 55
-          crit: 5
-          crit_damage: 150
-        skills:
-          - 1
-          - 0
-      qinglan_serpent_enemy:
-        name: "寒潭妖蟒"
-        icon: "jueshe/sprite_001.png"
-        hp: 145
-        mp: 70
-        attrs:
-          hp_max: 145
-          mp_max: 70
-          shield: 0
-          physical_atk: 27.6
-          magic_atk: 29.4
-          physical_def: 21
-          magic_def: 25.2
-          spd: 96
-          accuracy: 98
-          evasion: 90
-          control_power: 70
-          control_resist: 75
-          crit: 8
-          crit_damage: 150
-        skills:
-          - 3
-          - 1
-          - 0
-      qinglan_boss_enemy:
-        name: "赤焰妖王"
-        icon: "jueshe/sprite_000.png"
-        hp: 240
-        mp: 100
-        attrs:
-          hp_max: 240
-          mp_max: 100
-          shield: 0
-          physical_atk: 33.6
-          magic_atk: 35.8
-          physical_def: 24
-          magic_def: 28.8
-          spd: 105
-          accuracy: 110
-          evasion: 105
-          control_power: 90
-          control_resist: 95
-          crit: 12
-          crit_damage: 165
-        skills:
-          - 3
-          - 1
-          - 2
-          - 0
-    drop_pools:
-      qinglan_wolf_drop_1:
-        entries:
-          - kind: "item"
-            id: "items_LingCao"
-            min: 1
-            max: 3
-            weight: 5
-          - kind: "item"
-            id: "items_HuiQiDan"
-            min: 1
-            max: 1
-            weight: 2
-          - kind: "item"
-            id: "items_HuiLingDan"
-            min: 1
-            max: 1
-            weight: 2
-      qinglan_serpent_drop_1:
-        entries:
-          - kind: "item"
-            id: "items_YaoDan"
-            min: 1
-            max: 2
-            weight: 4
-          - kind: "item"
-            id: "items_LiaoShangDan"
-            min: 1
-            max: 2
-            weight: 3
-          - kind: "equip"
-            id: 5002
-            min: 1
-            max: 1
-            weight: 1
-      qinglan_boss_drop_1:
-        entries:
-          - kind: "item"
-            id: "items_YaoDan"
-            min: 2
-            max: 4
-            weight: 4
-          - kind: "item"
-            id: "items_PoJingDan"
-            min: 1
-            max: 1
-            weight: 2
-          - kind: "equip"
-            id: 5003
-            min: 1
-            max: 1
-            weight: 1
+    monsters:
+      - "qinglan_wolf"
+      - "qinglan_serpent"
+      - "qinglan_boss"
+    materials: []
+    drop_pools: {}
     event_pool:
       - "qinglan_fog"
       - "qinglan_cliff"
@@ -317,6 +178,7 @@ locations:
       - "qinglan_injured_cultivator"
       - "qinglan_serpent"
       - "qinglan_boss"
+
   blackwater_marsh:
     name: "黑水沼泽"
     subtitle: "毒雾弥漫，泥沼暗藏妖兽"
@@ -331,109 +193,137 @@ locations:
       - "items_LiaoShangDan"
     tags:
       - "resource"
-    enemy_pools:
-      beast:
-        name: "毒沼蛇"
-        icon: "jueshe/sprite_001.png"
-        hp: 95
-        mp: 40
-        attrs:
-          hp_max: 95
-          mp_max: 40
-          shield: 0
-          physical_atk: 24.6
-          magic_atk: 26.2
-          physical_def: 15
-          magic_def: 18
-          spd: 98
-          accuracy: 96
-          evasion: 102
-          control_power: 55
-          control_resist: 60
-          crit: 6
-          crit_damage: 150
-        skills:
-          - 1
-          - 0
-      elite:
-        name: "腐甲鳄妖"
-        icon: "jueshe/sprite_000.png"
-        hp: 190
-        mp: 70
-        attrs:
-          hp_max: 190
-          mp_max: 70
-          shield: 25
-          physical_atk: 33.6
-          magic_atk: 35.8
-          physical_def: 25
-          magic_def: 30
-          spd: 82
-          accuracy: 100
-          evasion: 75
-          control_power: 70
-          control_resist: 120
-          crit: 8
-          crit_damage: 160
-        skills:
-          - 3
-          - 2
-          - 1
-          - 0
+    monsters:
+      - "poison_marsh_serpent"
+      - "rot_armor_crocodile"
+    materials:
+      - id: "lingcao"
+        name: "灵草"
+        category: "herb"
+        drop_pool: "herbs"
+        item_ids:
+          - "items_LingCao"
+          - "items_LingCao_Fine"
+          - "items_LingCao_Superior"
+      - id: "lingguo"
+        name: "灵果"
+        category: "fruit"
+        drop_pool: "fruit"
+        item_ids:
+          - "items_LingGuo"
+          - "items_LingGuo_Fine"
+          - "items_LingGuo_Superior"
+      - id: "xuanjin"
+        name: "玄金"
+        category: "ore"
+        drop_pool: "ore"
+        item_ids:
+          - "items_HanTie"
+          - "items_XuanJin"
     drop_pools:
       herbs:
         entries:
           - kind: "item"
             id: "items_LingCao"
+            material_grade: 1
             min: 2
             max: 4
             weight: 4
+            variants:
+              - id: "items_LingCao"
+                material_grade: 1
+                weight: 3
+              - id: "items_LingCao_Fine"
+                material_grade: 2
+                weight: 4
+              - id: "items_LingCao_Superior"
+                material_grade: 3
+                weight: 2
+                conditions:
+                  - type: "difficulty_at_least"
+                    value: 4
           - kind: "item"
             id: "items_LingGuo"
+            material_grade: 1
             min: 1
             max: 2
             weight: 2
+            variants:
+              - id: "items_LingGuo"
+                material_grade: 1
+                weight: 3
+              - id: "items_LingGuo_Fine"
+                material_grade: 2
+                weight: 3
+              - id: "items_LingGuo_Superior"
+                material_grade: 3
+                weight: 1
+                conditions:
+                  - type: "difficulty_at_least"
+                    value: 4
       ore:
         entries:
           - kind: "item"
             id: "items_HanTie"
+            material_grade: 1
             min: 1
             max: 2
             weight: 3
+            variants:
+              - id: "items_HanTie"
+                material_grade: 1
+                weight: 5
+              - id: "items_XuanJin"
+                material_grade: 3
+                weight: 2
+                conditions:
+                  - type: "difficulty_at_least"
+                    value: 4
           - kind: "currency"
             id: "ling_stones"
             min: 8
             max: 20
             weight: 2
-      beast:
-        entries:
-          - kind: "item"
-            id: "items_YaoDan"
-            min: 1
-            max: 2
-            weight: 4
-          - kind: "item"
-            id: "items_LiaoShangDan"
-            min: 1
-            max: 2
-            weight: 3
-          - kind: "item"
-            id: "items_HuiLingDan"
-            min: 1
-            max: 1
-            weight: 2
       fruit:
         entries:
           - kind: "item"
             id: "items_LingGuo"
+            material_grade: 1
             min: 1
             max: 2
             weight: 3
+            variants:
+              - id: "items_LingGuo"
+                material_grade: 1
+                weight: 3
+              - id: "items_LingGuo_Fine"
+                material_grade: 2
+                weight: 3
+              - id: "items_LingGuo_Superior"
+                material_grade: 3
+                weight: 1
+                conditions:
+                  - type: "difficulty_at_least"
+                    value: 4
           - kind: "item"
             id: "items_LingCao"
+            material_grade: 1
             min: 2
             max: 4
             weight: 2
+            variants:
+              - id: "items_LingCao"
+                material_grade: 1
+                weight: 3
+              - id: "items_LingCao_Fine"
+                material_grade: 2
+                weight: 3
+              - id: "items_LingCao_Superior"
+                material_grade: 3
+                weight: 1
+                conditions:
+                  - type: "difficulty_at_least"
+                    value: 4
       cache:
         entries:
           - kind: "currency"
@@ -463,23 +353,6 @@ locations:
             min: 1
             max: 1
             weight: 2
-      elite:
-        entries:
-          - kind: "item"
-            id: "items_YaoDan"
-            min: 2
-            max: 3
-            weight: 4
-          - kind: "item"
-            id: "items_XuanJin"
-            min: 1
-            max: 2
-            weight: 2
-          - kind: "item"
-            id: "items_PoJingDan"
-            min: 1
-            max: 1
-            weight: 1
     event_pool:
       - "blackwater_marsh__travel"
       - "blackwater_marsh__gather_herbs"

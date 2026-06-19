@@ -6,6 +6,8 @@
 
 核心配置位于 `res://data/realm_balance.json`。
 
+境界突破门槛位于 `res://data/simulation.yaml > realms[*].breakthrough_at`，按公式 `300 * 境界序号^2` 生成。该字段表示累计修为门槛，不是本层增量。
+
 | 区块 | 用途 |
 |---|---|
 | `rules` | 记录防御、命中、控制和速度的全局常数。当前运行时常数仍在 `FightAttr` / `CombatBalance` 中定义，本区块是设计基准与后续迁移入口。 |

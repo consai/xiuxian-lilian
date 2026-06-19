@@ -1,0 +1,275 @@
+schema_version: 1
+monsters:
+  qinglan_wolf:
+    name: "青牙狼"
+    species: "beast"
+    tags:
+      - "beast"
+    icon: "jueshe/sprite_003.png"
+    hp: 75
+    mp: 30
+    attrs:
+      hp_max: 75
+      mp_max: 30
+      shield: 0
+      physical_atk: 21
+      magic_atk: 22.4
+      physical_def: 16
+      magic_def: 19.2
+      spd: 92
+      accuracy: 85
+      evasion: 92
+      control_power: 45
+      control_resist: 55
+      crit: 5
+      crit_damage: 150
+    skills:
+      - 1
+      - 0
+    drops:
+      entries:
+        - kind: "item"
+          id: "items_LingCao"
+          min: 1
+          max: 3
+          weight: 5
+        - kind: "item"
+          id: "items_HuiQiDan"
+          min: 1
+          max: 1
+          weight: 2
+        - kind: "item"
+          id: "items_HuiLingDan"
+          min: 1
+          max: 1
+          weight: 2
+
+  ironback_bear:
+    name: "铁背山罴"
+    species: "elite"
+    tags:
+      - "elite"
+      - "beast"
+    icon: "jueshe/sprite_001.png"
+    hp: 165
+    mp: 55
+    attrs:
+      hp_max: 165
+      mp_max: 55
+      shield: 18
+      physical_atk: 31.2
+      magic_atk: 33.3
+      physical_def: 23.6
+      magic_def: 28.3
+      spd: 86
+      accuracy: 96
+      evasion: 78
+      control_power: 65
+      control_resist: 110
+      crit: 8
+      crit_damage: 155
+    skills:
+      - 3
+      - 2
+      - 0
+    drops:
+      entries:
+        - kind: "item"
+          id: "items_YaoDan"
+          min: 1
+          max: 2
+          weight: 4
+        - kind: "item"
+          id: "items_LiaoShangDan"
+          min: 1
+          max: 2
+          weight: 3
+        - kind: "equip"
+          id: 5002
+          min: 1
+          max: 1
+          weight: 1
+
+  qinglan_serpent:
+    name: "寒潭妖蟒"
+    species: "elite"
+    tags:
+      - "elite"
+      - "beast"
+    icon: "jueshe/sprite_001.png"
+    hp: 145
+    mp: 70
+    attrs:
+      hp_max: 145
+      mp_max: 70
+      shield: 0
+      physical_atk: 27.6
+      magic_atk: 29.4
+      physical_def: 21
+      magic_def: 25.2
+      spd: 96
+      accuracy: 98
+      evasion: 90
+      control_power: 70
+      control_resist: 75
+      crit: 8
+      crit_damage: 150
+    skills:
+      - 3
+      - 1
+      - 0
+    drops:
+      entries:
+        - kind: "item"
+          id: "items_YaoDan"
+          min: 1
+          max: 2
+          weight: 4
+        - kind: "item"
+          id: "items_LiaoShangDan"
+          min: 1
+          max: 2
+          weight: 3
+        - kind: "equip"
+          id: 5002
+          min: 1
+          max: 1
+          weight: 1
+
+  qinglan_boss:
+    name: "赤焰妖王"
+    species: "boss"
+    tags:
+      - "boss"
+      - "beast"
+    icon: "jueshe/sprite_000.png"
+    hp: 240
+    mp: 100
+    attrs:
+      hp_max: 240
+      mp_max: 100
+      shield: 0
+      physical_atk: 33.6
+      magic_atk: 35.8
+      physical_def: 24
+      magic_def: 28.8
+      spd: 105
+      accuracy: 110
+      evasion: 105
+      control_power: 90
+      control_resist: 95
+      crit: 12
+      crit_damage: 165
+    skills:
+      - 3
+      - 1
+      - 2
+      - 0
+    drops:
+      entries:
+        - kind: "item"
+          id: "items_YaoDan"
+          min: 2
+          max: 4
+          weight: 4
+        - kind: "item"
+          id: "items_PoJingDan"
+          min: 1
+          max: 1
+          weight: 2
+        - kind: "equip"
+          id: 5003
+          min: 1
+          max: 1
+          weight: 1
+
+  poison_marsh_serpent:
+    name: "毒沼蛇"
+    species: "beast"
+    tags:
+      - "beast"
+    icon: "jueshe/sprite_001.png"
+    hp: 95
+    mp: 40
+    attrs:
+      hp_max: 95
+      mp_max: 40
+      shield: 0
+      physical_atk: 24.6
+      magic_atk: 26.2
+      physical_def: 15
+      magic_def: 18
+      spd: 98
+      accuracy: 96
+      evasion: 102
+      control_power: 55
+      control_resist: 60
+      crit: 6
+      crit_damage: 150
+    skills:
+      - 1
+      - 0
+    drops:
+      entries:
+        - kind: "item"
+          id: "items_YaoDan"
+          min: 1
+          max: 2
+          weight: 4
+        - kind: "item"
+          id: "items_LiaoShangDan"
+          min: 1
+          max: 2
+          weight: 3
+        - kind: "item"
+          id: "items_HuiLingDan"
+          min: 1
+          max: 1
+          weight: 2
+
+  rot_armor_crocodile:
+    name: "腐甲鳄妖"
+    species: "elite"
+    tags:
+      - "elite"
+      - "beast"
+    icon: "jueshe/sprite_000.png"
+    hp: 190
+    mp: 70
+    attrs:
+      hp_max: 190
+      mp_max: 70
+      shield: 25
+      physical_atk: 33.6
+      magic_atk: 35.8
+      physical_def: 25
+      magic_def: 30
+      spd: 82
+      accuracy: 100
+      evasion: 75
+      control_power: 70
+      control_resist: 120
+      crit: 8
+      crit_damage: 160
+    skills:
+      - 3
+      - 2
+      - 1
+      - 0
+    drops:
+      entries:
+        - kind: "item"
+          id: "items_YaoDan"
+          min: 2
+          max: 3
+          weight: 4
+        - kind: "item"
+          id: "items_XuanJin"
+          min: 1
+          max: 2
+          weight: 2
+        - kind: "item"
+          id: "items_PoJingDan"
+          min: 1
+          max: 1
+          weight: 1

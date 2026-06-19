@@ -92,7 +92,8 @@ func _apply_intent(row: Control, intent: Dictionary, text: String) -> void:
 func _play(row: Control, intent: Dictionary) -> void:
 	row.modulate = Color(1.0, 1.0, 1.0, 0.0)
 	row.scale = Vector2(0.96, 0.96)
-	row.pivot_offset = row.size * 0.5
+	# Defer pivot_offset to next frame to ensure the row has been laid out.
+	row.set_deferred("pivot_offset", row.size * 0.5)
 	var tree := row.get_tree()
 	if tree == null:
 		return
@@ -105,6 +106,7 @@ func _play(row: Control, intent: Dictionary) -> void:
 	tw.tween_property(row, "modulate:a", 1.0, fade_in).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tw.tween_property(row, "scale", Vector2.ONE, fade_in).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tw.chain()
+	tw.set_parallel(false)
 	if hold > 0.0:
 		tw.tween_interval(hold)
 	tw.tween_property(row, "modulate:a", 0.0, fade_out).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)

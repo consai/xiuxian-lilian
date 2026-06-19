@@ -1,7 +1,7 @@
 extends Control
 class_name BuffStatusItem
 
-## 单个 Buff 图标与剩余时间展示。
+## 单个 Buff 图标与剩余时间展示。整个根区域 hover 时弹出 Buff 详情。
 
 @onready var _icon: TextureRect = %Icon
 @onready var _time_label: Label = %TimeLabel

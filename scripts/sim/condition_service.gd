@@ -23,6 +23,10 @@ static func is_met(condition: Dictionary, context: Dictionary = {}) -> bool:
 			var current := str(context.get("realm", context.get("realm_id", "")))
 			var need_realm := str(condition.get("realm", condition.get("value", "")))
 			return current == need_realm or need_realm == ""
+		"difficulty_at_least":
+			return int(context.get("difficulty", 1)) >= int(condition.get("value", condition.get("difficulty", 1)))
+		"difficulty_at_most":
+			return int(context.get("difficulty", 1)) <= int(condition.get("value", condition.get("difficulty", 1)))
 		_:
 			return false
 

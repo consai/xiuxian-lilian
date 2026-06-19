@@ -6,6 +6,8 @@ const ExpeditionEventServiceScript := preload("res://scripts/expedition/expediti
 const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const ExpeditionLogServiceScript := preload("res://scripts/expedition/expedition_log_service.gd")
+const ExpeditionMapServiceScript := preload("res://scripts/expedition/expedition_map_service.gd")
+const EnumExpeditionNodeTypeScript := preload("res://scripts/enum/enum_expedition_node_type.gd")
 const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
 
 signal log_updated
@@ -67,6 +69,24 @@ var pending_battle_rewards: Array:
 var visited_once_events: Array:
 	get: return DataStore.expedition_runtime().get("visited_once_events", []) as Array
 	set(value): DataStore.expedition_runtime()["visited_once_events"] = value
+var map_nodes: Array:
+	get: return DataStore.expedition_runtime().get("map_nodes", []) as Array
+	set(value): DataStore.expedition_runtime()["map_nodes"] = value
+var map_edges: Array:
+	get: return DataStore.expedition_runtime().get("map_edges", []) as Array
+	set(value): DataStore.expedition_runtime()["map_edges"] = value
+var current_node_id: String:
+	get: return str(DataStore.expedition_runtime().get("current_node_id", ""))
+	set(value): DataStore.expedition_runtime()["current_node_id"] = value
+var available_node_ids: Array:
+	get: return DataStore.expedition_runtime().get("available_node_ids", []) as Array
+	set(value): DataStore.expedition_runtime()["available_node_ids"] = value
+var visited_node_ids: Array:
+	get: return DataStore.expedition_runtime().get("visited_node_ids", []) as Array
+	set(value): DataStore.expedition_runtime()["visited_node_ids"] = value
+var resolved_node_events: Dictionary:
+	get: return DataStore.expedition_runtime().get("resolved_node_events", {}) as Dictionary
+	set(value): DataStore.expedition_runtime()["resolved_node_events"] = value
 var stats: Dictionary:
 	get: return DataStore.expedition_runtime().get("stats", {}) as Dictionary
 	set(value): DataStore.expedition_runtime()["stats"] = value
@@ -98,6 +118,7 @@ func start(location_id_value: String, game_state: Node, seed_override: int = -1)
 	if location.is_empty():
 		return {"ok": false, "error": "未知地点"}
 	var effective_location := location.duplicate(true)
+	effective_location["id"] = location_id_value
 	var override_v: Variant = DataStore.expedition_runtime().get("difficulty_override", {})
 	if override_v is Dictionary:
 		var override := override_v as Dictionary
@@ -122,7 +143,7 @@ func start(location_id_value: String, game_state: Node, seed_override: int = -1)
 	rng_state = _rng.state
 	active = true
 	phase = "resolving"
-	auto_advance = true
+	auto_advance = false
 	steps = 0
 	days = 0
 	days_without_event = 0
@@ -130,6 +151,18 @@ func start(location_id_value: String, game_state: Node, seed_override: int = -1)
 	current_choices = []
 	pending_decision_event = {}
 	visited_once_events = []
+	var generated_map := ExpeditionMapServiceScript.generate(effective_location, seed)
+	map_nodes = generated_map.get("nodes", []) as Array
+	map_edges = generated_map.get("edges", []) as Array
+	var start_node_id := str(generated_map.get("start_node_id", "start"))
+	current_node_id = start_node_id
+	visited_node_ids = [start_node_id]
+	available_node_ids = ExpeditionMapServiceScript.next_node_ids(
+		{"nodes": map_nodes, "edges": map_edges, "start_node_id": start_node_id},
+		start_node_id,
+		visited_node_ids
+	)
+	resolved_node_events = {}
 	event_log = []
 	stats = {
 		"steps": 0,
@@ -159,14 +192,13 @@ func advance_step() -> Dictionary:
 
 
 func advance_day() -> Dictionary:
-	var result: Dictionary = {}
-	for _i in _MAX_QUIET_DAY_CHAIN:
-		result = _advance_single_day()
-		if not bool(result.get("ok", false)):
-			return result
-		if str(result.get("mode", "")) != "pass_day":
-			return result
-	return result
+	if not active:
+		return {"ok": false, "error": "历练未进行"}
+	if phase == "battle":
+		return {"ok": false, "error": "战斗进行中"}
+	if available_node_ids.is_empty():
+		return {"ok": false, "error": "没有可前往的路线节点"}
+	return choose_map_node(str(available_node_ids[0]))
 
 
 func _advance_single_day() -> Dictionary:
@@ -200,6 +232,45 @@ func _advance_single_day() -> Dictionary:
 
 func begin_next_step() -> Dictionary:
 	return advance_day()
+
+
+func choose_map_node(node_id: String) -> Dictionary:
+	if not active:
+		return {"ok": false, "error": "历练未进行"}
+	if phase == "battle":
+		return {"ok": false, "error": "战斗进行中"}
+	if not _pending_step_event.is_empty():
+		return {"ok": false, "error": "上一步事件尚未结算"}
+	var target_id := node_id.strip_edges()
+	if target_id == "" or not available_node_ids.has(target_id):
+		return {"ok": false, "error": "当前路线不可前往"}
+	var node := ExpeditionMapServiceScript.node_by_id(map_nodes, target_id)
+	if node.is_empty():
+		return {"ok": false, "error": "未知路线节点"}
+	current_node_id = target_id
+	available_node_ids = []
+	days += 1
+	stats["days"] = days
+	_restore_rng()
+	var event := ExpeditionEventServiceScript.roll_event_for_node(
+		effective_location(),
+		node,
+		visited_once_events,
+		_rng
+	)
+	_save_rng()
+	if event.is_empty():
+		_complete_current_node()
+		return {
+			"ok": true,
+			"mode": "pass_day",
+			"node": node,
+			"feedback": "%s一带风平浪静，你继续向前。" % str(node.get("label", "此处")),
+		}
+	resolved_node_events[target_id] = str(event.get("id", ""))
+	var began := _start_event(event)
+	began["node"] = node
+	return began
 
 
 func complete_current_step() -> Dictionary:
@@ -558,8 +629,12 @@ func reset() -> void:
 	_game_state = null
 
 
-func estimated_elapsed_days() -> int:
+func planned_elapsed_days() -> int:
 	return ExpeditionRulesServiceScript.elapsed_days(days, _major_realm_id())
+
+
+func estimated_elapsed_days() -> int:
+	return maxi(0, days)
 
 
 func should_go_to_result() -> bool:
@@ -641,6 +716,7 @@ func _apply_step_after_event(
 			)
 		)
 	log_updated.emit()
+	_complete_current_node()
 
 
 func _apply_event_duration(event: Dictionary) -> void:
@@ -762,6 +838,38 @@ func _build_chronicle() -> Array:
 		var entry := entry_v as Dictionary
 		lines.append(ExpeditionLogServiceScript.format_plain(entry))
 	return lines
+
+
+func current_available_nodes() -> Array:
+	var out: Array = []
+	for node_id_v in available_node_ids:
+		var node := ExpeditionMapServiceScript.node_by_id(map_nodes, str(node_id_v))
+		if not node.is_empty():
+			out.append(node)
+	return out
+
+
+func map_snapshot() -> Dictionary:
+	return {
+		"nodes": map_nodes.duplicate(true),
+		"edges": map_edges.duplicate(true),
+		"current_node_id": current_node_id,
+		"available_node_ids": available_node_ids.duplicate(),
+		"visited_node_ids": visited_node_ids.duplicate(),
+	}
+
+
+func _complete_current_node() -> void:
+	var node_id := current_node_id.strip_edges()
+	if node_id == "":
+		return
+	if not visited_node_ids.has(node_id):
+		visited_node_ids.append(node_id)
+	available_node_ids = ExpeditionMapServiceScript.next_node_ids(
+		{"nodes": map_nodes, "edges": map_edges, "start_node_id": "start"},
+		node_id,
+		visited_node_ids
+	)
 
 
 func _rng_from_state() -> RandomNumberGenerator:

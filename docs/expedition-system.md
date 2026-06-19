@@ -6,7 +6,7 @@
 
 ## 1. 系统概述
 
-历练是洞府主循环中的**外出探索玩法**：玩家经世界地图选野外区域或地点 → 进入事件循环（日推进 + 抉择 + 战斗）→ 可随时返程或战败结算 → 回写存档（天数、气血法力、背包、世界状态、统计）。
+历练是洞府主循环中的**外出探索玩法**：玩家经世界地图选野外区域或地点 → 生成随机网状路线图 → 玩家自由选择相邻节点 → 节点解析为采集、休整、抉择或战斗事件 → 可随时返程或战败结算 → 回写存档（天数、气血法力、背包、世界状态、统计）。
 
 核心设计：**局内状态走 `DataStore.expedition_runtime()`**，结算结果经 `ExpeditionResult` 契约交给 `GameState.settle_expedition()` 持久化。
 
@@ -29,16 +29,16 @@ flowchart LR
 |---|------|------|----------|
 | F01 | 入口与互斥 | 洞府「外出历练」进世界地图；历练进行中禁止重复出发 | `cave_hub` → `SceneManager.go_world_map()`；`SceneManager` 拦截活跃历练 |
 | F02 | 地点选择与启程 | 地图弹窗展示危险度、推荐境界、预览奖励、探索深度档；确认后启程 | `world_map_controller.gd` 野外/地点弹窗 + `data/locations.json` |
-| F03 | 启程 | 校验地点、快照玩家、初始化 RNG/统计/日志 | `ExpeditionState.start()` |
-| F04 | 日推进 | 遭遇日间隔 timer；无遭遇日由 `advance_day()` 连续过天、不写日志、不等待 | `_advance_single_day()` 链式至遭遇或上限 |
-| F05 | 事件导演 | 从地点事件池按权重抽事件，考虑难度范围/链/世界/资源 | `ExpeditionDirectorService.select_next_event()` |
+| F03 | 启程 | 校验地点、快照玩家、初始化 RNG/统计/日志，并生成本局路线图 | `ExpeditionState.start()` + `ExpeditionMapService.generate()` |
+| F04 | 路线选择 | 玩家点击可达节点推进历练；不可跳层或重复访问已完成节点 | `choose_map_node()` + `current_available_nodes()` |
+| F05 | 节点事件解析 | 根据节点类型从地点事件池按权重抽事件，具体内容仍复用现有事件配置 | `ExpeditionEventService.roll_event_for_node()` |
 | F06 | 自动事件 | travel / gather / recover / hazard 即时结算 | `ExpeditionEventService.resolve_non_battle_event()` |
 | F07 | 抉择事件 | 多选项卡片 UI，选项可触发子事件、效果或战斗 | `mode: decision` + `expedition_event_card` |
 | F08 | 战斗事件 | battle / elite / boss，弹窗选迎战或撤退 | `expedition_battle_popup` + `build_battle_init()` |
 | F09 | 战斗衔接 | 进战 source=`expedition`，战后回历练循环或战败结算 | `ExpeditionBattleFlow` |
-| F10 | 历练日数 | `days` 与事件数 `steps` 独立；结算耗时至少为时间规则中的普通历练时长 | `estimated_elapsed_days()`、`finish()` |
-| F11 | 事件难度 | 事件配置 `difficulty`；地点 `min_difficulty`/`max_difficulty` 控制入池；难度不随推进自动增加；结算统计 `max_difficulty` | `ExpeditionDirectorService._pool_candidates()` |
-| F27 | 推进模式 | 底栏可切换自动/手动推进；手动时每个事件完成后点「前进」才抽下一事件 | `auto_advance` + `AdvanceButton` |
+| F10 | 历练日数 | `days` 与事件数 `steps` 独立；进行中显示实际行进日，结算耗时至少为时间规则中的普通历练时长 | `estimated_elapsed_days()`、`planned_elapsed_days()`、`finish()` |
+| F11 | 事件难度 | 事件配置 `difficulty`；节点 difficulty 随层数从地点难度范围递增；结算统计 `max_difficulty` | `ExpeditionMapService` + `candidates_for_node()` |
+| F27 | 路线图 UI | 主界面展示节点和连线；节点类型明牌，事件名进入节点后解析 | `expedition_map_node` + `MapCanvas` |
 | F12 | 局内 runtime | 历练中 HP/MP/背包槽物品仅在 `runtime` 变更；战斗消耗扣背包副本，历练进行中不写存档 | `runtime` + `receive_battle_summary`；结算时 `settle_expedition()` 统一回写 |
 | F13 | 会话战利品 | 遭遇奖励先入 `loot` 展示，结算时与背包一并写入存档 | `ExpeditionRewardService.merge_into_loot()` |
 | F14 | 事件日志 | 仅遭遇日写入 BBCode 叙事日志 | `ExpeditionLogService` + `event_log` |
@@ -73,8 +73,8 @@ flowchart LR
 
 | 模块 | 路径 | 职责 |
 |------|------|------|
-| `ExpeditionState` | `scripts/expedition/expedition_state.gd` | 历练状态机、日推进、战斗/结算编排 |
-| `ExpeditionDirectorService` | `scripts/expedition/expedition_director_service.gd` | 下一事件抽取 |
+| `ExpeditionState` | `scripts/expedition/expedition_state.gd` | 历练状态机、路线选择、战斗/结算编排 |
+| `ExpeditionMapService` | `scripts/expedition/expedition_map_service.gd` | 随机网状路线图生成、连通性与下一节点计算 |
 | `ExpeditionEventService` | `scripts/expedition/expedition_event_service.gd` | 事件查询、抉择解析、非战斗结算、敌人生成 |
 | `ExpeditionRewardService` | `scripts/expedition/expedition_reward_service.gd` | 奖励 roll、发放、战败掉物 |
 | `ExpeditionRulesService` | `scripts/expedition/expedition_rules_service.gd` | 规则表、遭遇概率、天数换算 |
@@ -127,6 +127,7 @@ flowchart LR
 ```
 active, phase, location_id, expedition_id, start_day
 auto_advance, steps, days, days_without_event, seed, rng_state
+map_nodes, map_edges, current_node_id, available_node_ids, visited_node_ids, resolved_node_events
 active_chain_id, completed_events, visited_once_events
 runtime { hp, mp, item_slots, inventory }
 loot[], event_log[], stats{}, player_snapshot{}
@@ -143,23 +144,23 @@ pending_exit_reason
 
 1. `SceneManager.start_expedition(location_id)` 预检 → `ExpeditionState.start()`  
 2. 复制 `player_snapshot`（属性、技能、装备）与 `runtime`（HP/MP/背包）  
-3. 写 departure 日志 → `go_expedition_loop()`
+3. 生成 `map_nodes` / `map_edges`，将起点标记为已访问，开放第一层可选节点
+4. 写 departure 日志 → `go_expedition_loop()`
 
-### 5.2 单日推进
+### 5.2 路线节点推进
 
 ```
-advance_day()
-  → 循环 _advance_single_day()（空窗日不等待，直接再过一日；上限 32 日/次）
-  → 单日：days++ → 按 event_day_chance 判定遭遇（连续空窗达 max_idle_days 保底）
-  → 未遭遇 → mode=pass_day（无日志，继续循环）
-  → 遭遇 → Director 抽事件
+choose_map_node(node_id)
+  → 校验 node_id 在 available_node_ids
+  → current_node_id = node_id，days++
+  → 按节点 type/difficulty 从地点 event_pool 抽一个事件
        → decision? → phase=choosing，展示 EventCards
-       → 否则 _begin_auto_event
-            → 战斗类? → phase=battle，弹 BattlePopup
-            → 否则 mode=resolving，complete_current_step 结算
+       → battle/elite/boss? → phase=battle，弹 BattlePopup
+       → gather/recover/hazard/travel → complete_current_step 结算
+  → 事件完成后标记 visited_node_ids，开放下一层 available_node_ids
 ```
 
-非战斗结算：`resolve_non_battle_event` → 应用 effects / roll rewards → `_apply_step_after_event`（`steps++`、更新 `max_difficulty`、日志、链标记）。
+非战斗结算：`resolve_non_battle_event` → 应用 effects / roll rewards → `_apply_step_after_event`（`steps++`、更新 `max_difficulty`、日志、链标记、路线推进）。
 
 公共事件由 `common_event_pool` 引用模板，并在抽取时使用地点的 `common_event_generation` 物化。生成实例 ID 为
 `common::<location_id>::<template_id>`，因此奖励、敌人和 `duration_days` 可随当前地图变化，同时战斗跨场景后仍可按 ID 恢复。
@@ -257,7 +258,7 @@ advance_day()
 
 | 区域 | 数据源 |
 |------|--------|
-| 顶栏 | 地点名、难度范围、已消耗规则化时长 |
+| 顶栏 | 地点名、难度范围、已行进时长、预计结算时长 |
 | 状态行 | 过程第 `days` 日 · `steps` 件事 |
 | 气血/法力条 | `runtime` + `player_snapshot.attrs` |
 | 丹药槽 | `runtime.item_slots` + `inventory` |

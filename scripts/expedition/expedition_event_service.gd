@@ -4,6 +4,7 @@ extends RefCounted
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
 const ExpeditionLogServiceScript := preload("res://scripts/expedition/expedition_log_service.gd")
+const EnumExpeditionNodeTypeScript := preload("res://scripts/enum/enum_expedition_node_type.gd")
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const ConditionServiceScript := preload("res://scripts/sim/condition_service.gd")
 
@@ -41,6 +42,42 @@ static func roll_next_event(
 	var candidates := _filter_candidates(location, visited_once)
 	var pick := _weighted_pick(candidates, rng)
 	return pick.duplicate(true) if not pick.is_empty() else {}
+
+
+static func roll_event_for_node(
+		location: Dictionary,
+		node: Dictionary,
+		visited_once: Array,
+		rng: RandomNumberGenerator
+) -> Dictionary:
+	var candidates := candidates_for_node(location, node, visited_once)
+	var pick := _weighted_pick(candidates, rng)
+	return pick.duplicate(true) if not pick.is_empty() else {}
+
+
+static func candidates_for_node(location: Dictionary, node: Dictionary, visited_once: Array) -> Array:
+	var type_id := str(node.get("type", EnumExpeditionNodeTypeScript.ID_TRAVEL))
+	var node_difficulty := maxi(1, int(node.get("difficulty", location.get("min_difficulty", 1))))
+	var candidates := _filter_candidates(location, visited_once)
+	var typed: Array = []
+	for event_v in candidates:
+		if not event_v is Dictionary:
+			continue
+		var event := event_v as Dictionary
+		if _event_matches_node_type(event, type_id) and maxi(1, int(event.get("difficulty", 1))) <= node_difficulty:
+			typed.append(event)
+	if typed.is_empty():
+		for event_v in candidates:
+			if not event_v is Dictionary:
+				continue
+			var event := event_v as Dictionary
+			if _event_matches_node_type(event, type_id):
+				typed.append(event)
+	if typed.is_empty():
+		for event_v in candidates:
+			if event_v is Dictionary and str((event_v as Dictionary).get("type", "")) == "travel":
+				typed.append(event_v)
+	return typed
 
 
 static func decision_options_as_choices(event: Dictionary) -> Array:
@@ -238,7 +275,7 @@ static func build_battle_enemies(event: Dictionary) -> Array:
 		return []
 	var count := _battle_enemy_count(event)
 	for i in count:
-		out.append(_scale_enemy_for_group(base, event, i, count))
+		out.append(_scale_enemy_for_difficulty_and_group(base, event, i, count))
 	return out
 
 
@@ -281,7 +318,7 @@ static func _battle_enemy_count(event: Dictionary) -> int:
 	return clampi(1 + int(floor(float(difficulty - 2) / 2.0)), 1, 4)
 
 
-static func _scale_enemy_for_group(
+static func _scale_enemy_for_difficulty_and_group(
 		base: Dictionary,
 		event: Dictionary,
 		index: int,
@@ -289,19 +326,23 @@ static func _scale_enemy_for_group(
 ) -> Dictionary:
 	var enemy := base.duplicate(true)
 	var attrs := (enemy.get("attrs", {}) as Dictionary).duplicate(true)
+	var difficulty_scale := _enemy_difficulty_scale(event)
 	var hp_scale := 1.0
 	var atk_scale := 1.0
 	if count > 1:
 		hp_scale = 0.48 if count <= 2 else 0.38
 		atk_scale = 0.58 if count <= 2 else 0.45
 	if attrs.has(FightAttr.HP_MAX):
-		attrs[FightAttr.HP_MAX] = maxf(1.0, float(attrs[FightAttr.HP_MAX]) * hp_scale)
+		attrs[FightAttr.HP_MAX] = maxf(1.0, float(attrs[FightAttr.HP_MAX]) * difficulty_scale * hp_scale)
 	for key in [FightAttr.PHYSICAL_ATK, FightAttr.MAGIC_ATK]:
 		if attrs.has(key):
-			attrs[key] = maxf(1.0, float(attrs[key]) * atk_scale)
+			attrs[key] = maxf(1.0, float(attrs[key]) * difficulty_scale * atk_scale)
+	for key in [FightAttr.PHYSICAL_DEF, FightAttr.MAGIC_DEF]:
+		if attrs.has(key):
+			attrs[key] = maxf(0.0, float(attrs[key]) * (1.0 + (difficulty_scale - 1.0) * 0.65))
 	if attrs.has(FightAttr.SPD):
 		var offset := (float(index) - float(count - 1) * 0.5) * 3.0
-		attrs[FightAttr.SPD] = maxf(1.0, float(attrs[FightAttr.SPD]) + offset)
+		attrs[FightAttr.SPD] = maxf(1.0, float(attrs[FightAttr.SPD]) * (1.0 + (difficulty_scale - 1.0) * 0.35) + offset)
 	enemy["attrs"] = attrs
 	if attrs.has(FightAttr.HP_MAX):
 		enemy["hp"] = float(attrs[FightAttr.HP_MAX])
@@ -311,6 +352,16 @@ static func _scale_enemy_for_group(
 	if count > 1:
 		enemy["name"] = "%s·%d" % [base_name, index + 1]
 	return enemy
+
+
+static func _enemy_difficulty_scale(event: Dictionary) -> float:
+	if event.has("enemy_difficulty_scale"):
+		return clampf(float(event.get("enemy_difficulty_scale", 1.0)), 0.2, 5.0)
+	var difficulty := maxi(1, int(event.get("difficulty", 1)))
+	var location := _location_by_id(str(event.get("location_id", "")))
+	var min_difficulty := maxi(1, int(location.get("min_difficulty", 1)))
+	var steps := maxi(0, difficulty - min_difficulty)
+	return clampf(1.0 + float(steps) * 0.12, 0.5, 2.5)
 
 
 static func _enemy_skill_effect_scale(event: Dictionary, atk_scale: float, count: int) -> float:
@@ -456,6 +507,31 @@ static func _filter_candidates(location: Dictionary, visited_once: Array) -> Arr
 			continue
 		out.append(event)
 	return out
+
+
+static func _event_matches_node_type(event: Dictionary, type_id: String) -> bool:
+	if type_id == EnumExpeditionNodeTypeScript.ID_DECISION:
+		return is_decision_event(event)
+	if is_decision_event(event):
+		return false
+	var event_type := str(event.get("type", "")).strip_edges()
+	match type_id:
+		EnumExpeditionNodeTypeScript.ID_GATHER:
+			return event_type == "gather" and not bool(event.get("once_per_expedition", false))
+		EnumExpeditionNodeTypeScript.ID_TREASURE:
+			return event_type == "gather"
+		EnumExpeditionNodeTypeScript.ID_RECOVER, EnumExpeditionNodeTypeScript.ID_REST:
+			return event_type == "recover"
+		EnumExpeditionNodeTypeScript.ID_HAZARD:
+			return event_type == "hazard"
+		EnumExpeditionNodeTypeScript.ID_BATTLE:
+			return event_type == "battle"
+		EnumExpeditionNodeTypeScript.ID_ELITE:
+			return event_type == "elite"
+		EnumExpeditionNodeTypeScript.ID_BOSS:
+			return event_type == "boss"
+		_:
+			return event_type == "travel"
 
 
 static func _weighted_pick(pool: Array, rng: RandomNumberGenerator) -> Dictionary:

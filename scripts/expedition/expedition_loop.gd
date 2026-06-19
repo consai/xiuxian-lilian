@@ -6,11 +6,13 @@ const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expediti
 const ItemDefScript := preload("res://scripts/core/item_def.gd")
 const ExpeditionBattlePopupView := preload("res://scripts/expedition/expedition_battle_popup_view.gd")
 const ExpeditionLogServiceScript := preload("res://scripts/expedition/expedition_log_service.gd")
-
 var _locked := false
 var _auto_chain_after_timer := false
+var _map_node_template: Button = null
 
 @onready var _auto_advance_timer: Timer = %AutoAdvanceTimer
+@onready var _map_canvas: Control = %MapCanvas
+@onready var _map_nodes: Control = %MapNodes
 @onready var _loot_items: GridContainer = %LootItems
 @onready var _loot_item_template: ItemView = (
 	_loot_items.get_child(0) as ItemView if _loot_items != null and _loot_items.get_child_count() > 0 else null
@@ -32,15 +34,14 @@ func _ready() -> void:
 	(%ExitButton as Button).pressed.connect(_on_exit_pressed)
 	(%AdvanceButton as Button).pressed.connect(_on_advance_pressed)
 	(%AutoAdvanceButton as Button).toggled.connect(_on_auto_advance_toggled)
+	_map_node_template = %MapNodeTemplate as Button
+	if _map_node_template != null:
+		_map_node_template.visible = false
 	_refresh_all()
 	if ExpeditionState.phase == "battle" and ExpeditionState.pending_battle_event_id != "":
 		var pending_event := ExpeditionEventServiceScript.by_id(ExpeditionState.pending_battle_event_id)
 		if not pending_event.is_empty():
 			_show_pending_battle_popup(pending_event)
-		elif ExpeditionState.auto_advance:
-			_schedule_auto_advance()
-	elif ExpeditionState.auto_advance:
-		_schedule_auto_advance()
 	if get_tree().root.has_meta("smoke_auto_exit") and bool(get_tree().root.get_meta("smoke_auto_exit")):
 		call_deferred("_on_exit_pressed")
 
@@ -50,14 +51,16 @@ func _refresh_all() -> void:
 	var min_diff := maxi(1, int(location.get("min_difficulty", 1)))
 	var max_diff := int(location.get("max_difficulty", 0))
 	var diff_text := "难度 %d" % min_diff if max_diff <= 0 or max_diff == min_diff else "难度 %d-%d" % [min_diff, max_diff]
-	(%Header as Label).text = "%s · %s · 已消耗 %s" % [
+	(%Header as Label).text = "%s · %s · 已行进 %s · 预计结算 %s" % [
 		str(location.get("name", "")),
 		diff_text,
 		GameState.time_duration_label(ExpeditionState.estimated_elapsed_days()),
+		GameState.time_duration_label(ExpeditionState.planned_elapsed_days()),
 	]
 	_refresh_progress_dots()
 	_refresh_status_panel()
 	(%Step as Label).text = "过程第 %d 日 · %d 件事" % [ExpeditionState.days, ExpeditionState.steps]
+	_refresh_map_display()
 	_sync_loot_items()
 	_refresh_log_display()
 	_refresh_event_presentation()
@@ -146,20 +149,17 @@ func _refresh_potion_slot(slot: Panel, item_id: String, inv: Dictionary) -> void
 
 
 func _refresh_progress_dots() -> void:
-	(%ProgressDots as Label).visible = false
+	var total := maxi(1, ExpeditionState.map_nodes.size())
+	var visited := ExpeditionState.visited_node_ids.size()
+	(%ProgressDots as Label).visible = true
+	(%ProgressDots as Label).text = "路线 %d / %d" % [visited, total]
 
 
 func _refresh_controls() -> void:
 	var exit_button := %ExitButton as Button
 	exit_button.disabled = _locked or not ExpeditionState.can_exit()
 	var advance_button := %AdvanceButton as Button
-	var awaiting_manual := (
-		not ExpeditionState.auto_advance
-		and ExpeditionState.phase == "resolving"
-		and ExpeditionState.pending_decision_event.is_empty()
-		and ExpeditionState.pending_battle_event_id == ""
-		and not ExpeditionState.should_go_to_result()
-	)
+	var awaiting_manual := false
 	advance_button.visible = awaiting_manual
 	advance_button.disabled = _locked or not awaiting_manual
 	var auto_button := %AutoAdvanceButton as Button
@@ -169,14 +169,7 @@ func _refresh_controls() -> void:
 
 
 func _continue_expedition() -> void:
-	if _locked or not _auto_advance_timer.is_stopped():
-		return
-	if ExpeditionState.phase == "battle" and ExpeditionState.pending_battle_event_id != "":
-		return
-	if ExpeditionState.phase == "choosing" and not ExpeditionState.pending_decision_event.is_empty():
-		_refresh_all()
-		return
-	_advance_auto_step()
+	_refresh_all()
 
 
 func _advance_auto_step() -> void:
@@ -199,8 +192,6 @@ func _advance_auto_step() -> void:
 func _handle_step_begin(began: Dictionary) -> void:
 	if str(began.get("mode", "")) == "pass_day":
 		_refresh_all()
-		if ExpeditionState.auto_advance:
-			call_deferred("_continue_expedition")
 		return
 	if str(began.get("mode", "")) == "decision":
 		_stop_auto_advance()
@@ -239,7 +230,6 @@ func _handle_step_result(result: Dictionary) -> void:
 		_stop_auto_advance()
 		_show_pending_battle_popup(event)
 		return
-	_schedule_auto_advance()
 	_refresh_all()
 
 
@@ -250,14 +240,7 @@ func _auto_advance_seconds() -> float:
 
 
 func _schedule_auto_advance(continue_after: bool = true) -> void:
-	if not ExpeditionState.auto_advance:
-		_refresh_controls()
-		return
-	if _auto_advance_timer == null:
-		return
-	_auto_chain_after_timer = continue_after
-	_auto_advance_timer.wait_time = _auto_advance_seconds()
-	_auto_advance_timer.start()
+	_refresh_controls()
 
 
 func _stop_auto_advance() -> void:
@@ -268,8 +251,6 @@ func _stop_auto_advance() -> void:
 
 func _on_auto_advance_timeout() -> void:
 	_refresh_controls()
-	if _auto_chain_after_timer:
-		_continue_expedition()
 
 
 func _scroll_log_to_latest(log_label: RichTextLabel) -> void:
@@ -295,7 +276,6 @@ func _on_event_chosen(event_id: String) -> void:
 	var result: Dictionary = ExpeditionState.choose_event(event_id)
 	_locked = false
 	if not bool(result.get("ok", false)):
-		_schedule_auto_advance(false)
 		_refresh_all()
 		return
 	_handle_step_result(result)
@@ -308,17 +288,11 @@ func _on_exit_pressed() -> void:
 
 
 func _on_advance_pressed() -> void:
-	if _locked or ExpeditionState.auto_advance:
-		return
-	_continue_expedition()
+	_refresh_all()
 
 
 func _on_auto_advance_toggled(enabled: bool) -> void:
-	ExpeditionState.auto_advance = enabled
-	if enabled:
-		_schedule_auto_advance()
-	else:
-		_stop_auto_advance()
+	ExpeditionState.auto_advance = false
 	_refresh_controls()
 
 
@@ -338,10 +312,6 @@ func _prepare_battle_popup() -> void:
 
 func _show_pending_battle_popup(event: Dictionary) -> void:
 	_locked = true
-	if ExpeditionState.auto_advance:
-		_refresh_controls()
-		call_deferred("_on_battle_fight_requested")
-		return
 	var popup := %BattlePopup as ExpeditionBattlePopupView
 	if popup == null:
 		_locked = false
@@ -441,3 +411,75 @@ func _make_loot_item() -> ItemView:
 
 func _apply_loot_row(view: ItemView, row: Dictionary) -> void:
 	ItemView.apply_reward_row(view, row)
+
+
+func _refresh_map_display() -> void:
+	if _map_canvas == null or _map_nodes == null:
+		return
+	var snapshot := ExpeditionState.map_snapshot()
+	var nodes := snapshot.get("nodes", []) as Array
+	var edges := snapshot.get("edges", []) as Array
+	_map_canvas.setup(nodes, edges)
+	_clear_generated_map_nodes()
+	var available := snapshot.get("available_node_ids", []) as Array
+	var visited := snapshot.get("visited_node_ids", []) as Array
+	var current := str(snapshot.get("current_node_id", ""))
+	for node_v in nodes:
+		if not node_v is Dictionary:
+			continue
+		var node := node_v as Dictionary
+		var view: Button = _make_map_node()
+		if view == null:
+			continue
+		var node_id := str(node.get("id", ""))
+		var state := "locked"
+		if node_id == current:
+			state = "current"
+		if visited.has(node_id):
+			state = "visited"
+		if available.has(node_id):
+			state = "available"
+		view.call("setup", node, state)
+		var pos: Vector2 = _map_canvas.call("node_position", node)
+		view.position = pos - view.custom_minimum_size * 0.5
+		view.visible = true
+		var callback := Callable(self, "_on_map_node_selected")
+		if not view.is_connected("node_selected", callback):
+			view.connect("node_selected", callback)
+
+
+func _clear_generated_map_nodes() -> void:
+	if _map_nodes == null:
+		return
+	for child in _map_nodes.get_children():
+		if child == _map_node_template:
+			child.visible = false
+			continue
+		child.queue_free()
+
+
+func _make_map_node() -> Button:
+	if _map_nodes == null or _map_node_template == null:
+		return null
+	var copy_v: Variant = _map_node_template.duplicate()
+	if not copy_v is Button:
+		return null
+	var copy := copy_v as Button
+	_map_nodes.add_child(copy)
+	return copy
+
+
+func _on_map_node_selected(node_id: String) -> void:
+	if _locked:
+		return
+	_locked = true
+	_refresh_controls()
+	var began: Dictionary = ExpeditionState.choose_map_node(node_id)
+	_locked = false
+	if not bool(began.get("ok", false)):
+		var feedback := str(began.get("feedback", began.get("error", ""))).strip_edges()
+		if feedback != "":
+			(%Feedback as Label).text = feedback
+		_refresh_all()
+		return
+	_handle_step_begin(began)

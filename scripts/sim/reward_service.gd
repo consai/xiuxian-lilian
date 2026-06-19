@@ -71,9 +71,19 @@ static func apply_rewards(game_state: Node, rewards: Array, source: String = "re
 
 
 static func _emit_reward_tips(applied: Array, source: String) -> void:
-	if applied.is_empty() or DataEvents == null:
+	if applied.is_empty():
 		return
-	DataEvents.emit_tip_intents(RewardTipBuilderScript.from_rewards(applied, source))
+	var bus := _data_events()
+	if bus == null or not bus.has_method("emit_tip_intents"):
+		return
+	bus.call("emit_tip_intents", RewardTipBuilderScript.from_rewards(applied, source))
+
+
+static func _data_events() -> Node:
+	var loop := Engine.get_main_loop()
+	if not loop is SceneTree:
+		return null
+	return (loop as SceneTree).root.get_node_or_null("DataEvents")
 
 
 static func _weighted_pick(pool: Array, rng: RandomNumberGenerator) -> Dictionary:

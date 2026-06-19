@@ -11,6 +11,7 @@ var _skills_by_id: Dictionary = {}
 var _equips_by_id: Dictionary = {}
 var _battle_time_limit_default: float = 200.0
 var _buff_by_id: Dictionary = {}
+var _monsters_by_id: Dictionary = {}
 var _locations_by_id: Dictionary = {}
 var _world_map_meta: Dictionary = {}
 var _cities_by_id: Dictionary = {}
@@ -39,6 +40,7 @@ func reload_all() -> void:
 	_load_skills_local()
 	_load_equips_local()
 	_load_buffs_local()
+	_load_monsters_local()
 	_load_locations_local()
 	_load_world_map_local()
 	_load_expedition_events_local()
@@ -213,24 +215,89 @@ func common_expedition_event_by_id(event_id: String) -> Dictionary:
 
 
 func location_drop_pool(location_id: String, pool_id: String) -> Dictionary:
+	var normalized_pool_id := pool_id.strip_edges()
+	if normalized_pool_id.begins_with("monster:"):
+		var monster_ref := normalized_pool_id.substr("monster:".length()).strip_edges()
+		var monster := location_enemy_pool(location_id, monster_ref)
+		return _monster_drop_pool(monster)
 	var location := location_by_id(location_id)
 	var pools_v: Variant = location.get("drop_pools", {})
 	if not pools_v is Dictionary:
 		return {}
-	var pool_v: Variant = (pools_v as Dictionary).get(pool_id.strip_edges(), {})
+	var pool_v: Variant = (pools_v as Dictionary).get(normalized_pool_id, {})
 	if pool_v is Dictionary:
 		return (pool_v as Dictionary).duplicate(true)
 	return {}
 
 
 func location_enemy_pool(location_id: String, pool_id: String) -> Dictionary:
+	return _monster_for_location_ref(location_id, pool_id)
+
+
+func location_monsters(location_id: String) -> Array:
 	var location := location_by_id(location_id)
-	var pools_v: Variant = location.get("enemy_pools", {})
-	if not pools_v is Dictionary:
+	var out: Array = []
+	for id_v in location.get("monsters", []) as Array:
+		var monster := monster_by_id(str(id_v))
+		if not monster.is_empty():
+			out.append(monster)
+	return out
+
+
+func monster_by_id(monster_id: String) -> Dictionary:
+	var mid := monster_id.strip_edges()
+	var row_v: Variant = _monsters_by_id.get(mid)
+	if not row_v is Dictionary:
 		return {}
-	var enemy_v: Variant = (pools_v as Dictionary).get(pool_id.strip_edges(), {})
-	if enemy_v is Dictionary:
-		return (enemy_v as Dictionary).duplicate(true)
+	var row := (row_v as Dictionary).duplicate(true)
+	row["id"] = mid
+	return row
+
+
+func all_monster_ids() -> Array:
+	return (_monsters_by_id.keys() as Array).duplicate()
+
+
+func location_materials(location_id: String) -> Array:
+	var location := location_by_id(location_id)
+	var out: Array = []
+	for row_v in location.get("materials", []) as Array:
+		if row_v is Dictionary:
+			out.append((row_v as Dictionary).duplicate(true))
+	return out
+
+
+func _monster_for_location_ref(location_id: String, monster_ref: String) -> Dictionary:
+	var ref := monster_ref.strip_edges()
+	if ref == "":
+		return {}
+	var location := location_by_id(location_id)
+	var monster_ids := location.get("monsters", []) as Array
+	if monster_ids.has(ref):
+		return monster_by_id(ref)
+	var direct := monster_by_id(ref)
+	if not direct.is_empty() and monster_ids.has(str(direct.get("id", ref))):
+		return direct
+	for id_v in monster_ids:
+		var monster := monster_by_id(str(id_v))
+		if monster.is_empty():
+			continue
+		if str(monster.get("species", "")).strip_edges() == ref:
+			return monster
+		for tag_v in monster.get("tags", []) as Array:
+			if str(tag_v).strip_edges() == ref:
+				return monster
+	return {}
+
+
+func _monster_drop_pool(monster: Dictionary) -> Dictionary:
+	if monster.is_empty():
+		return {}
+	var drops_v: Variant = monster.get("drops", {})
+	if drops_v is Dictionary:
+		return (drops_v as Dictionary).duplicate(true)
+	if drops_v is Array:
+		return {"entries": (drops_v as Array).duplicate(true)}
 	return {}
 
 
@@ -432,7 +499,19 @@ func _load_locations_local() -> void:
 	for key in (raw_v as Dictionary).keys():
 		var row_v: Variant = (raw_v as Dictionary)[key]
 		if row_v is Dictionary:
-			_locations_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
+				_locations_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
+
+
+func _load_monsters_local() -> void:
+	_monsters_by_id.clear()
+	var root := JsonLoader._read_json_root_object("res://data/monsters.yaml")
+	var raw_v: Variant = root.get("monsters", {})
+	if not raw_v is Dictionary:
+		return
+	for key in (raw_v as Dictionary).keys():
+		var row_v: Variant = (raw_v as Dictionary)[key]
+		if row_v is Dictionary:
+			_monsters_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
 
 
 func _load_world_map_local() -> void:

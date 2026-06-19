@@ -19,6 +19,7 @@ func _init() -> void:
 func _run_all() -> void:
 	_run("config validator reports no errors on boot data", _test_config_has_no_errors)
 	_run("realm balance covers simulation realms", _test_realm_balance_covers_simulation_realms)
+	_run("realm cultivation thresholds follow formula", _test_realm_threshold_formula)
 	_run("item categories expose primary and secondary labels", _test_item_categories)
 	_run("location service reads cached config", _test_location_service_cached)
 	_run("modular location validator rejects legacy fields", _test_modular_location_validator_rejects_legacy_fields)
@@ -60,6 +61,19 @@ func _test_realm_balance_covers_simulation_realms() -> void:
 	_expect_eq(str(qi.get("name", "")), "炼气", "qi realm configured")
 	var mods := RealmBalanceServiceScript.realm_flat_modifiers(2)
 	_expect_near(float(mods.get(FightAttr.HP_MAX, 0.0)), 12.0, "realm layer hp modifier")
+
+
+func _test_realm_threshold_formula() -> void:
+	var simulation := JsonLoader._read_json_root_object("res://data/simulation.yaml")
+	var realms := simulation.get("realms", []) as Array
+	for index in realms.size():
+		var realm := realms[index] as Dictionary
+		var order := index + 1
+		_expect_eq(
+			int(realm.get("breakthrough_at", 0)),
+			300 * order * order,
+			"%s breakthrough_at formula" % str(realm.get("id", ""))
+		)
 
 
 func _test_item_categories() -> void:

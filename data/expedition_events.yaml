@@ -120,9 +120,9 @@ events:
     conditions: []
     results:
       - type: "drop"
-        drop_pool: "qinglan_wolf_drop_1"
+        drop_pool: "monster:qinglan_wolf"
         rolls: 2
-    enemy_pool: "qinglan_wolf_enemy"
+    enemy_pool: "qinglan_wolf"
   qinglan_serpent:
     id: "qinglan_serpent"
     location_id: "wild_wolf_valley"
@@ -139,9 +139,9 @@ events:
     conditions: []
     results:
       - type: "drop"
-        drop_pool: "qinglan_serpent_drop_1"
+        drop_pool: "monster:qinglan_serpent"
         rolls: 3
-    enemy_pool: "qinglan_serpent_enemy"
+    enemy_pool: "qinglan_serpent"
   qinglan_boss:
     id: "qinglan_boss"
     location_id: "wild_wolf_valley"
@@ -158,6 +158,6 @@ events:
     conditions: []
     results:
       - type: "drop"
-        drop_pool: "qinglan_boss_drop_1"
+        drop_pool: "monster:qinglan_boss"
         rolls: 4
-    enemy_pool: "qinglan_boss_enemy"
+    enemy_pool: "qinglan_boss"

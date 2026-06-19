@@ -42,7 +42,15 @@ static func cultivation_result(result: Dictionary, source: String = "cultivation
 		out.append(growth("修为", gained, source, "cultivation"))
 	var mastery := int(result.get("mastery_gained", 0))
 	if mastery > 0:
-		out.append(growth("功法经验", mastery, source, "method_mastery"))
+		var method_id := str(result.get("method_id", ""))
+		var method_name := ""
+		if method_id != "":
+			var method_def := CultivationMethodService.by_id(method_id)
+			method_name = str(method_def.get("name", method_id))
+		if method_name.strip_edges() == "":
+			method_name = "功法"
+		var label := "%s熟练度" % method_name
+		out.append(growth(label, mastery, source, "method_mastery"))
 	for row_v in result.get("knowledge_gains", []) as Array:
 		if not row_v is Dictionary:
 			continue
@@ -50,7 +58,15 @@ static func cultivation_result(result: Dictionary, source: String = "cultivation
 		var xp := int(round(float(row.get("xp", 0.0))))
 		if xp <= 0:
 			continue
-		out.append(growth("学习经验", xp, source, str(row.get("skill_id", "knowledge"))))
+		var skill_id := str(row.get("skill_id", ""))
+		var skill_name := ""
+		if skill_id != "":
+			var skill_def := DaoTreeService.skill_by_id(skill_id)
+			skill_name = str(skill_def.get("name", skill_id))
+		if skill_name.strip_edges() == "":
+			skill_name = "知识"
+		var label := "%s经验" % skill_name
+		out.append(growth(label, xp, source, skill_id))
 	var layer_advances := int(result.get("layer_advances", 0))
 	if layer_advances > 0:
 		var realm_name := str(result.get("realm_name", "新境界")).strip_edges()

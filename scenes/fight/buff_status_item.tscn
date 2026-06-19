@@ -19,15 +19,23 @@ corner_radius_bottom_left = 4
 [node name="BuffStatusItem" type="VBoxContainer"]
 custom_minimum_size = Vector2(34, 46)
 theme_override_constants/separation = 2
+mouse_filter = 1
 script = ExtResource("1_item")
 
-[node name="IconWrap" type="PanelContainer" parent="."]
+[node name="HoverBoundary" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 0
+
+[node name="IconWrap" type="PanelContainer" parent="HoverBoundary"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(32, 32)
-mouse_filter = 0
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_icon_back")
 
-[node name="Icon" type="TextureRect" parent="IconWrap"]
+[node name="Icon" type="TextureRect" parent="HoverBoundary/IconWrap"]
 unique_name_in_owner = true
 layout_mode = 2
 custom_minimum_size = Vector2(28, 28)
@@ -35,7 +43,7 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="StacksLabel" type="Label" parent="IconWrap"]
+[node name="StacksLabel" type="Label" parent="HoverBoundary/IconWrap"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 8
@@ -47,7 +55,7 @@ theme_override_font_sizes/font_size = 11
 text = "2"
 horizontal_alignment = 2
 
-[node name="HoverTipSource" type="Node" parent="IconWrap"]
+[node name="HoverTipSource" type="Node" parent="HoverBoundary"]
 unique_name_in_owner = true
 script = ExtResource("3_hover")
 target_path = NodePath("..")

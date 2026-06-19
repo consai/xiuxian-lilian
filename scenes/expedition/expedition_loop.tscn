@@ -16,6 +16,8 @@
 [ext_resource type="Script" path="res://scripts/ui/components/long_press_scroll_container.gd" id="15_lpsc"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hp_bar.tscn" id="13_hp_bar"]
 [ext_resource type="PackedScene" path="res://scenes/ui/mp_bar.tscn" id="14_mp_bar"]
+[ext_resource type="Script" path="res://scripts/expedition/expedition_map_canvas.gd" id="16_map_canvas"]
+[ext_resource type="PackedScene" path="res://scenes/expedition/expedition_map_node.tscn" id="17_map_node"]
 
 [sub_resource type="StyleBoxFlat" id="TopPanel"]
 bg_color = Color(1, 0.94902, 0.839216, 0.94)
@@ -377,10 +379,50 @@ label_settings = ExtResource("8_small")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Panel" type="Panel" parent="." unique_id=1865097337]
+[node name="MapPanel" type="Panel" parent="." unique_id=1865097337]
 layout_mode = 0
 offset_left = 263.0
 offset_top = 118.0
+offset_right = 1019.0
+offset_bottom = 404.0
+
+[node name="MapCanvas" type="Control" parent="MapPanel"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = 16.0
+offset_right = -18.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("16_map_canvas")
+
+[node name="MapNodes" type="Control" parent="MapPanel"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = 16.0
+offset_right = -18.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MapNodeTemplate" parent="MapPanel/MapNodes" instance=ExtResource("17_map_node")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+
+[node name="Panel" type="Panel" parent="." unique_id=1646645513]
+layout_mode = 0
+offset_left = 263.0
+offset_top = 414.0
 offset_right = 1019.0
 offset_bottom = 667.0
 
@@ -390,7 +432,7 @@ layout_mode = 0
 offset_left = 37.0
 offset_top = 20.0
 offset_right = 735.0
-offset_bottom = 519.0
+offset_bottom = 224.0
 theme_override_colors/default_color = Color(0.333333, 0.196078, 0.184314, 1)
 theme_override_fonts/normal_font = ExtResource("9_font")
 theme_override_font_sizes/normal_font_size = 14
@@ -450,7 +492,7 @@ offset_left = 170.0
 offset_top = 13.0
 offset_right = 590.0
 offset_bottom = 39.0
-text = "每个事件消耗一天 · 战败随机掉落背包物品"
+text = "点击明牌节点选择路线 · 战败随机掉落背包物品"
 label_settings = ExtResource("8_small")
 horizontal_alignment = 1
 
@@ -498,6 +540,7 @@ text = "前进"
 
 [node name="AutoAdvanceButton" type="Button" parent="FooterStrip"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 0
 offset_left = 328.0
 offset_top = 10.0

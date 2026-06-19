@@ -1,6 +1,7 @@
 extends SceneTree
 
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
+const ExpeditionMapServiceScript := preload("res://scripts/expedition/expedition_map_service.gd")
 const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
@@ -15,8 +16,14 @@ func _init() -> void:
 
 func _run_all() -> void:
 	_run("start creates isolated runtime", _test_start_creates_isolated_runtime)
+	_run("expedition map is deterministic", _test_expedition_map_is_deterministic)
+	_run("expedition map is reachable", _test_expedition_map_is_reachable)
+	_run("map node choice is gated", _test_map_node_choice_is_gated)
 	_run("roll next event obeys difficulty", _test_roll_next_event_obey_difficulty)
 	_run("common events use location generation", _test_common_events_use_location_generation)
+	_run("location declares monsters and materials", _test_location_declares_monsters_and_materials)
+	_run("difficulty rolls material grade variants", _test_difficulty_rolls_material_grade_variants)
+	_run("monster drops resolve through enemy identity", _test_monster_drops_resolve_through_enemy_identity)
 	_run("early common battles stay single target", _test_early_common_battles_stay_single_target)
 	_run("group battles scale skill slots", _test_group_battles_scale_skill_slots)
 	_run("expedition modes keep event pools separate", _test_expedition_modes_keep_event_pools_separate)
@@ -30,6 +37,8 @@ func _run_all() -> void:
 	_run("defeat loot drop is deterministic", _test_defeat_loot_drop_deterministic)
 	_run("elapsed days track expedition days", _test_elapsed_days_track_expedition_days)
 	_run("quiet days advance time without logs", _test_quiet_days_advance_without_logs)
+	_run("battle node builds unchanged battle init", _test_battle_node_builds_unchanged_battle_init)
+	_run("battle win opens next map nodes", _test_battle_win_opens_next_map_nodes)
 	_run("battle win returns to expedition", _test_battle_win_returns_to_expedition)
 	_run("battle loss forces expedition result", _test_battle_loss_forces_expedition_result)
 	_run("boss battle resolves at high difficulty", _test_boss_battle_resolves_at_high_difficulty)
@@ -73,6 +82,43 @@ func _test_start_creates_isolated_runtime() -> void:
 	_expect_near(float(expedition.runtime.get("hp", 0.0)), game.hp, "runtime hp copied")
 	game.hp = 1.0
 	_expect_near(float(expedition.runtime.get("hp", 0.0)), 100.0, "runtime isolated from game")
+	_expect_true(not expedition.map_nodes.is_empty(), "start generates route map")
+	_expect_true(not expedition.available_node_ids.is_empty(), "start exposes first route choices")
+
+
+func _test_expedition_map_is_deterministic() -> void:
+	var location := LocationServiceScript.by_id("qinglan_mountain")
+	var first := ExpeditionMapServiceScript.generate(location, 9191)
+	var second := ExpeditionMapServiceScript.generate(location, 9191)
+	_expect_eq(first, second, "same seed generates same expedition map")
+
+
+func _test_expedition_map_is_reachable() -> void:
+	for location_v in LocationServiceScript.all_locations():
+		var location := location_v as Dictionary
+		var map_data := ExpeditionMapServiceScript.generate(location, 1234)
+		_expect_true(ExpeditionMapServiceScript.is_reachable_to_exit(map_data), "map reaches exit for %s" % str(location.get("id", "")))
+
+
+func _test_map_node_choice_is_gated() -> void:
+	var game := _state()
+	var expedition := _expedition()
+	expedition.start("qinglan_mountain", game, 8181)
+	var locked_node_id := ""
+	for node_v in expedition.map_nodes:
+		var node := node_v as Dictionary
+		var node_id := str(node.get("id", ""))
+		if node_id != "start" and not expedition.available_node_ids.has(node_id):
+			locked_node_id = node_id
+			break
+	_expect_true(locked_node_id != "", "found locked node")
+	var blocked: Dictionary = expedition.choose_map_node(locked_node_id)
+	_expect_true(not bool(blocked.get("ok", true)), "locked node cannot be chosen")
+	var available_id := str(expedition.available_node_ids[0])
+	var chosen: Dictionary = expedition.choose_map_node(available_id)
+	_expect_true(bool(chosen.get("ok", false)), "available node can be chosen")
+	var repeated: Dictionary = expedition.choose_map_node(available_id)
+	_expect_true(not bool(repeated.get("ok", true)), "chosen node cannot be repeated while resolving")
 
 
 func _test_roll_next_event_obey_difficulty() -> void:
@@ -116,6 +162,45 @@ func _test_common_events_use_location_generation() -> void:
 		_expect_true(not _find_event_by_template(pool, template_id).is_empty(), "rich common template generated: %s" % template_id)
 	var exchange := ExpeditionEventServiceScript.find_decision_option(traveler, "exchange")
 	_expect_true(not (exchange.get("results", []) as Array).is_empty(), "decision option references location drop pool")
+
+
+func _test_location_declares_monsters_and_materials() -> void:
+	var monsters := LocationServiceScript.monsters_for_location("blackwater_marsh")
+	var materials := LocationServiceScript.materials_for_location("blackwater_marsh")
+	_expect_true(monsters.size() >= 2, "blackwater declares available monsters")
+	_expect_true(materials.size() >= 3, "blackwater declares available materials")
+	_expect_eq(str((monsters[0] as Dictionary).get("id", "")), "poison_marsh_serpent", "map monster id resolves global monster")
+	_expect_eq(str((monsters[0] as Dictionary).get("species", "")), "beast", "resolved monster keeps species")
+	_expect_true(not ((monsters[0] as Dictionary).get("drops", {}) as Dictionary).is_empty(), "resolved monster keeps drops")
+	var found_superior_material := false
+	for material_v in materials:
+		var material := material_v as Dictionary
+		if (material.get("item_ids", []) as Array).has("items_LingCao_Superior"):
+			found_superior_material = true
+	_expect_true(found_superior_material, "map material list includes quality variants")
+
+
+func _test_difficulty_rolls_material_grade_variants() -> void:
+	var event := ExpeditionEventServiceScript.by_id("qinglan_mountain__gather_herbs")
+	event["difficulty"] = 6
+	var found_high_grade := false
+	for seed_value in range(50, 90):
+		var rewards := ExpeditionRewardServiceScript.roll_event_rewards(event, _rng(seed_value))
+		for reward_v in rewards:
+			var reward := reward_v as Dictionary
+			if int(reward.get("material_grade", 1)) >= 2:
+				found_high_grade = true
+	_expect_true(found_high_grade, "high difficulty can roll higher grade material")
+
+
+func _test_monster_drops_resolve_through_enemy_identity() -> void:
+	var event := ExpeditionEventServiceScript.by_id("blackwater_marsh__local_beast")
+	_expect_eq(str(event.get("drop_pool", "")), "monster:beast", "battle event references monster drop alias")
+	var rewards := ExpeditionRewardServiceScript.roll_event_rewards(event, _rng(515))
+	_expect_true(not rewards.is_empty(), "monster drop alias rolls rewards")
+	for reward_v in rewards:
+		var reward := reward_v as Dictionary
+		_expect_true(str(reward.get("id", "")) != "", "monster reward keeps reward id")
 
 
 func _test_early_common_battles_stay_single_target() -> void:
@@ -348,10 +433,41 @@ func _test_quiet_days_advance_without_logs() -> void:
 	var result: Dictionary = expedition.advance_day()
 	_expect_true(bool(result.get("ok", false)), "advance day ok")
 	_expect_true(int(expedition.days) > days_before, "days advanced")
-	if str(result.get("mode", "")) == "pass_day":
-		_expect_eq(expedition.event_log.size(), departure_logs, "quiet day keeps log size")
-	else:
-		_expect_true(int(expedition.days) > int(expedition.steps), "batched quiet days before event")
+	if str(result.get("mode", "")) == "resolving":
+		var completed: Dictionary = expedition.complete_current_step()
+		_expect_true(bool(completed.get("ok", false)), "node event completes")
+	_expect_true(expedition.event_log.size() >= departure_logs, "route node keeps or extends log")
+
+
+func _test_battle_node_builds_unchanged_battle_init() -> void:
+	var game := _state()
+	var expedition := _expedition()
+	expedition.start("qinglan_mountain", game, 6161)
+	var node := _first_available_node_by_type(expedition, "battle")
+	if node.is_empty():
+		node = _force_first_available_node_type(expedition, "battle")
+	var result: Dictionary = expedition.choose_map_node(str(node.get("id", "")))
+	_expect_true(bool(result.get("ok", false)), "battle route node starts")
+	if str(result.get("mode", "")) != "battle":
+		return
+	var init_data: Dictionary = expedition.build_battle_init()
+	_expect_true(BattleInitData.collect_errors(init_data).is_empty(), "battle node builds valid battle init")
+
+
+func _test_battle_win_opens_next_map_nodes() -> void:
+	var game := _state()
+	var expedition := _expedition()
+	expedition.start("qinglan_mountain", game, 6262)
+	var node := _force_first_available_node_type(expedition, "battle")
+	var result: Dictionary = expedition.choose_map_node(str(node.get("id", "")))
+	_expect_eq(str(result.get("mode", "")), "battle", "forced battle node enters battle")
+	expedition.receive_battle_summary({
+		"outcome": "win",
+		"player_runtime": {"hp": 55.0, "mp": 20.0, "items": []},
+	})
+	var settled: Dictionary = expedition.settle_pending_battle()
+	_expect_true(bool(settled.get("ok", false)), "battle node win settles")
+	_expect_true(expedition.available_node_ids.size() > 0 or str(expedition.current_node_id) == "exit", "battle win opens next route nodes")
 
 
 func _test_battle_win_returns_to_expedition() -> void:
@@ -503,6 +619,27 @@ func _first_event_from_advance_steps(expedition: Node) -> Dictionary:
 		if str(result.get("mode", "")) == "pass_day":
 			continue
 		return result.get("event", {}) as Dictionary
+	return {}
+
+
+func _first_available_node_by_type(expedition: Node, type_id: String) -> Dictionary:
+	for node_id_v in expedition.available_node_ids:
+		for node_v in expedition.map_nodes:
+			var node := node_v as Dictionary
+			if str(node.get("id", "")) == str(node_id_v) and str(node.get("type", "")) == type_id:
+				return node
+	return {}
+
+
+func _force_first_available_node_type(expedition: Node, type_id: String) -> Dictionary:
+	var node_id := str(expedition.available_node_ids[0])
+	for i in expedition.map_nodes.size():
+		var node := expedition.map_nodes[i] as Dictionary
+		if str(node.get("id", "")) == node_id:
+			node["type"] = type_id
+			node["event_filter_tags"] = [type_id]
+			expedition.map_nodes[i] = node
+			return node
 	return {}
 
 

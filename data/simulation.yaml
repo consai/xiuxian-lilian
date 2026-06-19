@@ -13,127 +13,127 @@ realms:
   - id: "qi_1"
     name: "炼气一层"
     major_realm: "qi"
-    breakthrough_at: 100
+    breakthrough_at: 300
   - id: "qi_2"
     name: "炼气二层"
     major_realm: "qi"
-    breakthrough_at: 220
+    breakthrough_at: 1200
   - id: "qi_3"
     name: "炼气三层"
     major_realm: "qi"
-    breakthrough_at: 360
+    breakthrough_at: 2700
   - id: "qi_4"
     name: "炼气四层"
     major_realm: "qi"
-    breakthrough_at: 520
+    breakthrough_at: 4800
   - id: "qi_5"
     name: "炼气五层"
     major_realm: "qi"
-    breakthrough_at: 700
+    breakthrough_at: 7500
   - id: "qi_6"
     name: "炼气六层"
     major_realm: "qi"
-    breakthrough_at: 900
+    breakthrough_at: 10800
   - id: "qi_7"
     name: "炼气七层"
     major_realm: "qi"
-    breakthrough_at: 1120
+    breakthrough_at: 14700
   - id: "qi_8"
     name: "炼气八层"
     major_realm: "qi"
-    breakthrough_at: 1360
+    breakthrough_at: 19200
   - id: "qi_9"
     name: "炼气九层"
     major_realm: "qi"
-    breakthrough_at: 1620
+    breakthrough_at: 24300
   - id: "foundation_early"
     name: "筑基初期"
     major_realm: "foundation"
-    breakthrough_at: 2000
+    breakthrough_at: 30000
   - id: "foundation_mid"
     name: "筑基中期"
     major_realm: "foundation"
-    breakthrough_at: 2600
+    breakthrough_at: 36300
   - id: "foundation_late"
     name: "筑基后期"
     major_realm: "foundation"
-    breakthrough_at: 3300
+    breakthrough_at: 43200
   - id: "core_early"
     name: "金丹初期"
     major_realm: "core"
-    breakthrough_at: 4200
+    breakthrough_at: 50700
   - id: "core_mid"
     name: "金丹中期"
     major_realm: "core"
-    breakthrough_at: 5400
+    breakthrough_at: 58800
   - id: "core_late"
     name: "金丹后期"
     major_realm: "core"
-    breakthrough_at: 6900
+    breakthrough_at: 67500
   - id: "nascent_early"
     name: "元婴初期"
     major_realm: "nascent"
-    breakthrough_at: 8800
+    breakthrough_at: 76800
   - id: "nascent_mid"
     name: "元婴中期"
     major_realm: "nascent"
-    breakthrough_at: 11200
+    breakthrough_at: 86700
   - id: "nascent_late"
     name: "元婴后期"
     major_realm: "nascent"
-    breakthrough_at: 14200
+    breakthrough_at: 97200
   - id: "transform_early"
     name: "化神初期"
     major_realm: "transform"
-    breakthrough_at: 18000
+    breakthrough_at: 108300
   - id: "transform_mid"
     name: "化神中期"
     major_realm: "transform"
-    breakthrough_at: 22800
+    breakthrough_at: 120000
   - id: "transform_late"
     name: "化神后期"
     major_realm: "transform"
-    breakthrough_at: 28800
+    breakthrough_at: 132300
   - id: "void_early"
     name: "炼虚初期"
     major_realm: "void"
-    breakthrough_at: 36500
+    breakthrough_at: 145200
   - id: "void_mid"
     name: "炼虚中期"
     major_realm: "void"
-    breakthrough_at: 46000
+    breakthrough_at: 158700
   - id: "void_late"
     name: "炼虚后期"
     major_realm: "void"
-    breakthrough_at: 58000
+    breakthrough_at: 172800
   - id: "merge_early"
     name: "合体初期"
     major_realm: "merge"
-    breakthrough_at: 73000
+    breakthrough_at: 187500
   - id: "merge_mid"
     name: "合体中期"
     major_realm: "merge"
-    breakthrough_at: 92000
+    breakthrough_at: 202800
   - id: "merge_late"
     name: "合体后期"
     major_realm: "merge"
-    breakthrough_at: 116000
+    breakthrough_at: 218700
   - id: "great_early"
     name: "大乘初期"
     major_realm: "great"
-    breakthrough_at: 146000
+    breakthrough_at: 235200
   - id: "great_mid"
     name: "大乘中期"
     major_realm: "great"
-    breakthrough_at: 184000
+    breakthrough_at: 252300
   - id: "great_late"
     name: "大乘后期"
     major_realm: "great"
-    breakthrough_at: 232000
+    breakthrough_at: 270000
   - id: "tribulation"
     name: "渡劫期"
     major_realm: "tribulation"
-    breakthrough_at: 290000
+    breakthrough_at: 288300
 initial_player:
   name: "清风剑仙"
   icon: "jueshe/sprite_002.png"
