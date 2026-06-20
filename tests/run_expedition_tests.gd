@@ -80,7 +80,7 @@ func _test_start_creates_isolated_runtime() -> void:
 	_expect_true(bool(started.get("ok", false)), "start ok")
 	_expect_true(expedition.active, "expedition active")
 	_expect_near(float(expedition.runtime.get("hp", 0.0)), game.hp, "runtime hp copied")
-	var starting_hp := game.hp
+	var starting_hp: float = game.hp
 	game.hp = 1.0
 	_expect_near(float(expedition.runtime.get("hp", 0.0)), starting_hp, "runtime isolated from game")
 	_expect_true(starting_hp >= 130.0, "starter attributes are battle ready")
@@ -391,7 +391,7 @@ func _test_defeat_exit_drops_inventory_and_injury() -> void:
 	_expect_true(loot_total < 5, "session loot reduced on defeat")
 	game.settle_expedition(finish)
 	_expect_eq(_inventory_total(game.inventory), inv_before + loot_total, "kept session loot merged on settle")
-	_expect_near(game.hp, 25.0, "defeat hp floor")
+	_expect_near(game.hp, FightAttr.get_attr(game.attrs, FightAttr.HP_MAX) * 0.25, "defeat hp floor")
 	_expect_eq(game.injury_days, 3, "defeat injury applied after elapsed reduction")
 
 

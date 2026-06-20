@@ -93,15 +93,17 @@ func _test_new_game_and_daily_activities() -> void:
 	_expect_near(state.hp, FightAttr.get_attr(state.attrs, FightAttr.HP_MAX), "rest hp")
 	_expect_eq(state.injury_days, 0, "rest injury reduction")
 	state.new_game()
+	var base_hp_max: float = FightAttr.get_attr(state.attrs, FightAttr.HP_MAX)
+	var base_body := float(state.foundations.get(CharacterStatsScript.BODY, 0.0))
 	state.cultivation = state.breakthrough_at
 	_expect_true(not state.can_breakthrough(), "same major realm does not need breakthrough")
 	_expect_eq(state._auto_advance_layers(), 1, "layer auto advance to qi 2")
 	_expect_eq(state.realm_name, "炼气二层", "auto advanced to qi layer 2")
-	_expect_near(FightAttr.get_attr(state.attrs, FightAttr.HP_MAX), 106.0, "layer advance raises hp max")
+	_expect_near(FightAttr.get_attr(state.attrs, FightAttr.HP_MAX), base_hp_max + 6.0, "layer advance raises hp max")
 	state.cultivation = state.breakthrough_at
 	_expect_eq(state._auto_advance_layers(), 1, "layer auto advance to qi 3")
 	_expect_eq(state.realm_name, "炼气三层", "auto advanced to qi layer 3")
-	_expect_near(FightAttr.get_attr(state.attrs, FightAttr.HP_MAX), 112.0, "second layer advance raises hp max")
+	_expect_near(FightAttr.get_attr(state.attrs, FightAttr.HP_MAX), base_hp_max + 12.0, "second layer advance raises hp max")
 	state.realm_index = 8
 	state._sync_realm()
 	state.cultivation = state.breakthrough_at
@@ -110,8 +112,8 @@ func _test_new_game_and_daily_activities() -> void:
 	var result: Dictionary = state.breakthrough()
 	_expect_true(bool(result.get("ok", false)), "breakthrough succeeds")
 	_expect_eq(state.realm_name, "筑基初期", "breakthrough to foundation")
-	_expect_near(float(state.foundations.get(CharacterStatsScript.BODY, 0.0)), 11.0, "breakthrough grows body")
-	_expect_near(FightAttr.get_attr(state.attrs, FightAttr.HP_MAX), 159.0, "major breakthrough raises hp max")
+	_expect_near(float(state.foundations.get(CharacterStatsScript.BODY, 0.0)), base_body + 1.0, "breakthrough grows body")
+	_expect_near(FightAttr.get_attr(state.attrs, FightAttr.HP_MAX), base_hp_max + 59.0, "major breakthrough raises hp max")
 
 
 func _grant_foundation_knowledge_gate(state: Node) -> void:
@@ -573,7 +575,7 @@ func _test_expedition_defeat_settlement() -> void:
 	var result: Dictionary = state.settle_expedition(finish)
 	_expect_true(bool(result.get("ok", false)), "settlement ok")
 	_expect_eq(state.day, 31, "expedition consumes rule duration")
-	_expect_near(state.hp, 25.0, "loss hp floor")
+	_expect_near(state.hp, FightAttr.get_attr(state.attrs, FightAttr.HP_MAX) * 0.25, "loss hp floor")
 	_expect_near(state.mp, 12.0, "mp persisted")
 	_expect_eq(state.injury_days, 3, "loss applies three injury days")
 
