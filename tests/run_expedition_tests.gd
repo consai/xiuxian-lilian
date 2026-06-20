@@ -19,11 +19,11 @@ func _run_all() -> void:
 	_run("expedition map is deterministic", _test_expedition_map_is_deterministic)
 	_run("expedition map is reachable", _test_expedition_map_is_reachable)
 	_run("map node choice is gated", _test_map_node_choice_is_gated)
-	_run("roll next event obeys difficulty", _test_roll_next_event_obey_difficulty)
+	_run("event pick ignores configured difficulty", _test_event_pick_ignores_configured_difficulty)
 	_run("common events use location generation", _test_common_events_use_location_generation)
 	_run("location declares monsters and materials", _test_location_declares_monsters_and_materials)
 	_run("difficulty rolls material grade variants", _test_difficulty_rolls_material_grade_variants)
-	_run("monster drops resolve through enemy identity", _test_monster_drops_resolve_through_enemy_identity)
+	_run("monster drops materialize from map enemy", _test_monster_drops_materialize_from_map_enemy)
 	_run("early common battles form small groups", _test_early_common_battles_form_small_groups)
 	_run("group battles scale skill slots", _test_group_battles_scale_skill_slots)
 	_run("expedition modes keep event pools separate", _test_expedition_modes_keep_event_pools_separate)
@@ -38,7 +38,10 @@ func _run_all() -> void:
 	_run("elapsed days track expedition days", _test_elapsed_days_track_expedition_days)
 	_run("quiet days advance time without logs", _test_quiet_days_advance_without_logs)
 	_run("battle node builds unchanged battle init", _test_battle_node_builds_unchanged_battle_init)
+	_run("elite and boss nodes always resolve battle", _test_elite_and_boss_nodes_always_resolve_battle)
+	_run("high difficulty battle nodes generate map enemies", _test_high_difficulty_battle_nodes_generate_map_enemies)
 	_run("battle win opens next map nodes", _test_battle_win_opens_next_map_nodes)
+	_run("reward budget scales by days and difficulty", _test_reward_budget_scales_by_days_and_difficulty)
 	_run("battle win returns to expedition", _test_battle_win_returns_to_expedition)
 	_run("battle loss forces expedition result", _test_battle_loss_forces_expedition_result)
 	_run("boss battle resolves at high difficulty", _test_boss_battle_resolves_at_high_difficulty)
@@ -123,17 +126,21 @@ func _test_map_node_choice_is_gated() -> void:
 	_expect_true(not bool(repeated.get("ok", true)), "chosen node cannot be repeated while resolving")
 
 
-func _test_roll_next_event_obey_difficulty() -> void:
+func _test_event_pick_ignores_configured_difficulty() -> void:
 	var location := LocationServiceScript.by_id("wild_wolf_valley")
 	var capped := location.duplicate(true)
 	capped["max_difficulty"] = 2
-	for _i in 20:
-		var event := ExpeditionEventServiceScript.roll_next_event(capped, [], _rng(202 + _i))
-		_expect_true(not event.is_empty(), "one rolled event within difficulty cap")
-		_expect_true(str(event.get("id", "")) != "", "rolled event has id")
-	var shallow := ExpeditionEventServiceScript.roll_next_event(capped, [], _rng(303))
-	_expect_true(str(shallow.get("id", "")) != "qinglan_boss", "boss hidden when max difficulty is 2")
-	_expect_true(str(shallow.get("id", "")) != "qinglan_serpent", "elite hidden when max difficulty is 2")
+	var boss_node := {"id": "forced_boss", "type": "boss", "difficulty": 1}
+	var candidates := ExpeditionEventServiceScript.candidates_for_node(capped, boss_node, [])
+	var has_boss := false
+	for event_v in candidates:
+		var event := event_v as Dictionary
+		if str(event.get("id", "")) == "qinglan_boss":
+			has_boss = true
+	_expect_true(has_boss, "boss event remains candidate even when current difficulty is low")
+	var rolled := ExpeditionEventServiceScript.roll_event_for_node(capped, boss_node, [], _rng(303))
+	_expect_true(not rolled.is_empty(), "rolled event materializes")
+	_expect_eq(int(rolled.get("difficulty", 0)), 1, "rolled event uses node difficulty")
 
 
 func _test_event_pick_deterministic() -> void:
@@ -158,8 +165,14 @@ func _test_common_events_use_location_generation() -> void:
 	_expect_eq(str(herbs.get("location_id", "")), "blackwater_marsh", "common event binds current location")
 	_expect_eq(str(herbs.get("drop_pool", "")), "herbs", "gather references location drop pool")
 	_expect_eq(int(beast.get("duration_days", 0)), 2, "common battle uses location duration")
-	_expect_eq(str(ExpeditionEventServiceScript.build_battle_enemy(beast).get("name", "")), "毒沼蛇", "battle resolves location enemy pool")
 	_expect_eq(ExpeditionEventServiceScript.by_id(str(beast.get("id", ""))), beast, "generated event can be restored by id")
+	var materialized_beast := ExpeditionEventServiceScript.roll_event_for_node(
+		location,
+		{"id": "battle_1", "type": "battle", "difficulty": 2},
+		[],
+		_rng(161)
+	)
+	_expect_eq(str(ExpeditionEventServiceScript.build_battle_enemy(materialized_beast).get("name", "")), "毒沼蛇", "battle resolves location enemy pool at runtime")
 	for template_id in ["gather_fruit", "hidden_cache", "harsh_terrain", "deep_rest", "wandering_cultivator", "local_elite"]:
 		_expect_true(not _find_event_by_template(pool, template_id).is_empty(), "rich common template generated: %s" % template_id)
 	var exchange := ExpeditionEventServiceScript.find_decision_option(traveler, "exchange")
@@ -195,18 +208,26 @@ func _test_difficulty_rolls_material_grade_variants() -> void:
 	_expect_true(found_high_grade, "high difficulty can roll higher grade material")
 
 
-func _test_monster_drops_resolve_through_enemy_identity() -> void:
-	var event := ExpeditionEventServiceScript.by_id("blackwater_marsh__local_beast")
-	_expect_eq(str(event.get("drop_pool", "")), "monster:beast", "battle event references monster drop alias")
+func _test_monster_drops_materialize_from_map_enemy() -> void:
+	var location := LocationServiceScript.by_id("blackwater_marsh")
+	var node := {"id": "battle_1", "type": "battle", "difficulty": 5}
+	var event := ExpeditionEventServiceScript.roll_event_for_node(location, node, [], _rng(515))
+	_expect_eq(str(event.get("drop_pool", "")), "monster:poison_marsh_serpent", "battle event materializes exact monster drop pool")
+	_expect_eq(int(event.get("difficulty", 0)), 5, "battle event keeps current node difficulty")
 	var rewards := ExpeditionRewardServiceScript.roll_event_rewards(event, _rng(515))
-	_expect_true(not rewards.is_empty(), "monster drop alias rolls rewards")
+	_expect_true(not rewards.is_empty(), "materialized monster drop rolls rewards")
 	for reward_v in rewards:
 		var reward := reward_v as Dictionary
 		_expect_true(str(reward.get("id", "")) != "", "monster reward keeps reward id")
 
 
 func _test_early_common_battles_form_small_groups() -> void:
-	var event := ExpeditionEventServiceScript.by_id("qinglan_mountain__local_beast")
+	var event := ExpeditionEventServiceScript.roll_event_for_node(
+		LocationServiceScript.by_id("qinglan_mountain"),
+		{"id": "battle_1", "type": "battle", "difficulty": 2},
+		[],
+		_rng(7070)
+	)
 	var enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
 	_expect_eq(enemies.size(), 2, "qinglan starter beast should spawn a small group")
 	var enemy := enemies[0] as Dictionary
@@ -223,8 +244,12 @@ func _test_early_common_battles_form_small_groups() -> void:
 
 
 func _test_group_battles_scale_skill_slots() -> void:
-	var event := ExpeditionEventServiceScript.by_id("qinglan_mountain__local_beast")
-	event["difficulty"] = 6
+	var event := ExpeditionEventServiceScript.roll_event_for_node(
+		LocationServiceScript.by_id("qinglan_mountain"),
+		{"id": "battle_6", "type": "battle", "difficulty": 6},
+		[],
+		_rng(7071)
+	)
 	var enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
 	_expect_eq(enemies.size(), 4, "difficulty six common battle forms a larger group")
 	for enemy_v in enemies:
@@ -456,6 +481,46 @@ func _test_battle_node_builds_unchanged_battle_init() -> void:
 	_expect_true(BattleInitData.collect_errors(init_data).is_empty(), "battle node builds valid battle init")
 
 
+func _test_elite_and_boss_nodes_always_resolve_battle() -> void:
+	for forced_type in ["elite", "boss"]:
+		var game := _state()
+		var expedition := _expedition()
+		expedition.start("qinglan_mountain", game, 6363)
+		var node := _force_first_available_node_type(expedition, forced_type)
+		var result: Dictionary = expedition.choose_map_node(str(node.get("id", "")))
+		_expect_eq(str(result.get("mode", "")), "battle", "%s node falls back to battle candidate" % forced_type)
+		var init_data: Dictionary = expedition.build_battle_init()
+		_expect_true(BattleInitData.collect_errors(init_data).is_empty(), "%s fallback battle init is valid" % forced_type)
+
+
+func _test_high_difficulty_battle_nodes_generate_map_enemies() -> void:
+	for forced_type in ["battle", "elite"]:
+		var game := _state()
+		var expedition := _expedition()
+		(root.get_node("DataStore").expedition_runtime() as Dictionary)["difficulty_override"] = {"min_difficulty": 5, "max_difficulty": 6}
+		expedition.start("qinglan_mountain", game, 6464)
+		var node := _force_first_available_node_type(expedition, forced_type, 6)
+		var result: Dictionary = expedition.choose_map_node(str(node.get("id", "")))
+		_expect_eq(str(result.get("mode", "")), "battle", "%s node enters battle at difficulty 5-6" % forced_type)
+		var event := result.get("event", {}) as Dictionary
+		_expect_true(not str(event.get("id", "")).begins_with("generated::"), "%s node uses materialized event template" % forced_type)
+		_expect_eq(str(event.get("type", "")), forced_type, "%s generated event keeps node battle type" % forced_type)
+		_expect_eq(int(event.get("difficulty", 0)), 6, "%s materialized event uses node difficulty" % forced_type)
+		_expect_true(str(event.get("drop_pool", "")).begins_with("monster:"), "%s materialized event uses monster drop pool" % forced_type)
+		_expect_true(float(event.get("enemy_difficulty_scale", 1.0)) > 1.0, "%s generated event scales enemy attrs" % forced_type)
+		var init_data: Dictionary = expedition.build_battle_init()
+		_expect_true(BattleInitData.collect_errors(init_data).is_empty(), "%s generated battle init valid" % forced_type)
+		var enemies := init_data.get("enemies", []) as Array
+		if forced_type == "battle":
+			_expect_eq(enemies.size(), 4, "difficulty six normal battle generates group size from difficulty")
+		else:
+			_expect_eq(enemies.size(), 3, "difficulty six elite battle generates elite group size from difficulty")
+		_expect_true(not enemies.is_empty(), "%s generated battle has enemies" % forced_type)
+		if not enemies.is_empty():
+			var enemy := enemies[0] as Dictionary
+			_expect_true(str(enemy.get("name", "")).strip_edges() != "", "%s generated enemy has map monster name" % forced_type)
+
+
 func _test_battle_win_opens_next_map_nodes() -> void:
 	var game := _state()
 	var expedition := _expedition()
@@ -470,6 +535,25 @@ func _test_battle_win_opens_next_map_nodes() -> void:
 	var settled: Dictionary = expedition.settle_pending_battle()
 	_expect_true(bool(settled.get("ok", false)), "battle node win settles")
 	_expect_true(expedition.available_node_ids.size() > 0 or str(expedition.current_node_id) == "exit", "battle win opens next route nodes")
+
+
+func _test_reward_budget_scales_by_days_and_difficulty() -> void:
+	var low_event := ExpeditionEventServiceScript.by_id("qinglan_mountain__gather_herbs")
+	var high_event := low_event.duplicate(true)
+	low_event["difficulty"] = 1
+	low_event["duration_days"] = 1
+	high_event["difficulty"] = 6
+	high_event["duration_days"] = 3
+	var low_budget := ExpeditionRewardServiceScript.reward_budget_value_for_event(low_event)
+	var high_budget := ExpeditionRewardServiceScript.reward_budget_value_for_event(high_event)
+	_expect_true(high_budget > low_budget, "high difficulty and longer duration increase reward budget")
+	var raw_rewards: Array = [{"kind": "item", "id": "items_LingCao", "count": 1, "material_grade": 1}]
+	var low_rewards := ExpeditionRewardServiceScript.apply_reward_budget(low_event, raw_rewards)
+	var high_rewards := ExpeditionRewardServiceScript.apply_reward_budget(high_event, raw_rewards)
+	_expect_true(
+		ExpeditionRewardServiceScript.reward_value(high_rewards) > ExpeditionRewardServiceScript.reward_value(low_rewards),
+		"reward budget scales concrete rewards"
+	)
 
 
 func _test_battle_win_returns_to_expedition() -> void:
@@ -633,13 +717,15 @@ func _first_available_node_by_type(expedition: Node, type_id: String) -> Diction
 	return {}
 
 
-func _force_first_available_node_type(expedition: Node, type_id: String) -> Dictionary:
+func _force_first_available_node_type(expedition: Node, type_id: String, difficulty: int = -1) -> Dictionary:
 	var node_id := str(expedition.available_node_ids[0])
 	for i in expedition.map_nodes.size():
 		var node := expedition.map_nodes[i] as Dictionary
 		if str(node.get("id", "")) == node_id:
 			node["type"] = type_id
 			node["event_filter_tags"] = [type_id]
+			if difficulty > 0:
+				node["difficulty"] = difficulty
 			expedition.map_nodes[i] = node
 			return node
 	return {}

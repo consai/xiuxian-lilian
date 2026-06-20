@@ -430,6 +430,12 @@ func _resolve_manual_event_choice(event_id: String) -> Dictionary:
 	if chosen.is_empty():
 		return {"ok": false, "error": "无效的事件选择"}
 	current_choices = []
+	_restore_rng()
+	var node := ExpeditionMapServiceScript.node_by_id(map_nodes, current_node_id)
+	if str(node.get("type", "")) == EnumExpeditionNodeTypeScript.ID_START:
+		node = {}
+	chosen = ExpeditionEventServiceScript.materialize_event_for_context(effective_location(), node, chosen, _rng)
+	_save_rng()
 	_begin_log_event(chosen)
 	var event_type := str(chosen.get("type", ""))
 	if ExpeditionRulesServiceScript.is_battle_type(event_type):

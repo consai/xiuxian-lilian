@@ -8,7 +8,6 @@ events:
     desc: "雾气耗散法力，需小心前行。"
     risk_text: "轻微"
     weight: 14
-    difficulty: 1
     once_per_expedition: false
     effects:
       - type: "drain_mp_percent"
@@ -29,7 +28,6 @@ events:
     desc: "碎石滚落，擦伤难免。"
     risk_text: "危险"
     weight: 10
-    difficulty: 3
     once_per_expedition: false
     effects:
       - type: "damage_hp_percent"
@@ -51,7 +49,6 @@ events:
     desc: "泥地上留着新鲜爪印，是否要追踪狼踪？"
     risk_text: "抉择"
     weight: 12
-    difficulty: 2
     once_per_expedition: false
     options:
       - id: "track"
@@ -72,7 +69,6 @@ events:
     desc: "一名散修靠在岩边喘息，向你求助。"
     risk_text: "抉择"
     weight: 9
-    difficulty: 1
     once_per_expedition: false
     options:
       - id: "help"
@@ -113,17 +109,12 @@ events:
     risk_text: "普通"
     weight: 42
     enemy_count: 2
-    difficulty: 1
     once_per_expedition: false
     effects: []
     tags:
       - "battle"
     conditions: []
-    results:
-      - type: "drop"
-        drop_pool: "monster:qinglan_wolf"
-        rolls: 2
-    enemy_pool: "qinglan_wolf"
+    results: []
   qinglan_serpent:
     id: "qinglan_serpent"
     location_id: "wild_wolf_valley"
@@ -132,17 +123,12 @@ events:
     desc: "潭底巨蟒破水而出。"
     risk_text: "精英"
     weight: 18
-    difficulty: 3
     once_per_expedition: false
     effects: []
     tags:
       - "elite"
     conditions: []
-    results:
-      - type: "drop"
-        drop_pool: "monster:qinglan_serpent"
-        rolls: 3
-    enemy_pool: "qinglan_serpent"
+    results: []
   qinglan_boss:
     id: "qinglan_boss"
     location_id: "wild_wolf_valley"
@@ -151,14 +137,9 @@ events:
     desc: "山巅妖王威压如山。"
     risk_text: "首领"
     weight: 8
-    difficulty: 6
     once_per_expedition: true
     effects: []
     tags:
       - "boss"
     conditions: []
-    results:
-      - type: "drop"
-        drop_pool: "monster:qinglan_boss"
-        rolls: 4
-    enemy_pool: "qinglan_boss"
+    results: []

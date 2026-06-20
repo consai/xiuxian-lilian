@@ -7,7 +7,6 @@ events:
     desc: "晨雾贴着山腰缓缓流动，你循着猎户留下的旧路向深山行去。"
     risk_text: "平安"
     weight: 20
-    difficulty: 1
     once_per_expedition: false
     effects: []
     outcome_text: "山路曲折，却也让你渐渐摸清了青岚山的脉络。"
@@ -26,7 +25,6 @@ events:
     desc: "湿润林地间浮着淡淡药香，几株灵草在晨露中泛起微光。"
     risk_text: "安全"
     weight: 24
-    difficulty: 1
     once_per_expedition: false
     effects: []
     success_text: "你依照药性小心采下，收得{loot}。"
@@ -50,7 +48,6 @@ events:
     desc: "风化山壁露出深色矿纹，敲击时传来清越回响。"
     risk_text: "安全"
     weight: 15
-    difficulty: 2
     once_per_expedition: false
     effects: []
     success_text: "你凿开浮石，从岩层中取出{loot}。"
@@ -74,7 +71,6 @@ events:
     desc: "石隙间涌出一线清泉，泉畔灵气澄澈，正宜吐纳。"
     risk_text: "安全"
     weight: 16
-    difficulty: 1
     once_per_expedition: false
     effects:
       - type: "restore_mp_percent"
@@ -98,7 +94,6 @@ events:
     desc: "你在背风岩洞中点起微火，借着片刻安宁处理伤势。"
     risk_text: "安全"
     weight: 12
-    difficulty: 2
     once_per_expedition: false
     effects:
       - type: "heal_hp_percent"
@@ -123,10 +118,8 @@ events:
     desc: "树影骤乱，饥饿的青牙狼循着生人气息从林间扑出。"
     risk_text: "普通"
     weight: 34
-    difficulty: 2
     once_per_expedition: false
     effects: []
-    enemy_pool: "beast"
     id: "qinglan_mountain__local_beast"
     template_id: "local_beast"
     location_id: "qinglan_mountain"
@@ -135,18 +128,13 @@ events:
       - "battle"
     conditions: []
     duration_days: 2
-    drop_pool: "monster:beast"
-    results:
-      - type: "drop"
-        drop_pool: "monster:beast"
-        rolls: 2
+    results: []
   qinglan_mountain__gather_fruit:
     type: "gather"
     name: "崖畔灵果"
     desc: "陡崖边垂下一株老藤，叶隙间隐约可见温润果光。"
     risk_text: "安全"
     weight: 12
-    difficulty: 1
     once_per_expedition: false
     effects: []
     success_text: "你避开虫蛇，摘得{loot}。"
@@ -170,7 +158,6 @@ events:
     desc: "一块松动山石后藏着简陋石龛，像是前人留下的应急物资。"
     risk_text: "机缘"
     weight: 10
-    difficulty: 2
     once_per_expedition: true
     effects: []
     success_text: "你谨慎查验四周，从藏物中取出{loot}。"
@@ -194,7 +181,6 @@ events:
     desc: "山路被落石截断，你只能踏着松动碎石攀上陡坡。"
     risk_text: "轻微"
     weight: 14
-    difficulty: 2
     once_per_expedition: false
     effects:
       - type: "drain_mp_percent"
@@ -220,7 +206,6 @@ events:
     desc: "一株古松遮住风露，你布下简易警戒，终于得以安稳休整。"
     risk_text: "休整"
     weight: 9
-    difficulty: 2
     once_per_expedition: false
     effects:
       - type: "heal_hp_percent"
@@ -249,7 +234,6 @@ events:
     desc: "一名采药散修从雾中现身，见你并无敌意，便停下脚步攀谈。"
     risk_text: "抉择"
     weight: 11
-    difficulty: 2
     once_per_expedition: false
     options:
       - id: "exchange"
@@ -286,10 +270,8 @@ events:
     desc: "低沉咆哮震落枝叶，一头铁背山罴从岩坡后缓缓逼近。"
     risk_text: "精英"
     weight: 12
-    difficulty: 4
     once_per_expedition: true
     effects: []
-    enemy_pool: "elite"
     id: "qinglan_mountain__local_elite"
     template_id: "local_elite"
     location_id: "qinglan_mountain"
@@ -298,11 +280,7 @@ events:
       - "elite"
     conditions: []
     duration_days: 3
-    drop_pool: "monster:elite"
-    results:
-      - type: "drop"
-        drop_pool: "monster:elite"
-        rolls: 3
+    results: []
   blackwater_marsh__travel:
     type: "travel"
     mode: "auto"
@@ -310,7 +288,6 @@ events:
     desc: "黑水没过脚踝，腐木在雾中若隐若现，你谨慎试探着每一步。"
     risk_text: "平安"
     weight: 20
-    difficulty: 2
     once_per_expedition: false
     effects: []
     outcome_text: "绕过几片深泥后，你终于找到一段相对坚实的旧堤。"
@@ -329,7 +306,6 @@ events:
     desc: "几簇耐毒灵草伏在枯木根部，叶脉泛着幽蓝微光。"
     risk_text: "安全"
     weight: 24
-    difficulty: 2
     once_per_expedition: false
     effects: []
     success_text: "你依照药性小心采下，收得{loot}。"
@@ -353,7 +329,6 @@ events:
     desc: "沉重矿砂聚在水湾底部，需以灵力隔开污泥方能采集。"
     risk_text: "安全"
     weight: 15
-    difficulty: 3
     once_per_expedition: false
     effects: []
     success_text: "你凿开浮石，从岩层中取出{loot}。"
@@ -377,7 +352,6 @@ events:
     desc: "一片芦洲略高于水面，清风暂时吹散了周围瘴气。"
     risk_text: "安全"
     weight: 16
-    difficulty: 2
     once_per_expedition: false
     effects:
       - type: "restore_mp_percent"
@@ -401,7 +375,6 @@ events:
     desc: "中空古木隔绝了大半毒雾，你运功逼出侵体瘴气。"
     risk_text: "安全"
     weight: 12
-    difficulty: 3
     once_per_expedition: false
     effects:
       - type: "heal_hp_percent"
@@ -426,10 +399,8 @@ events:
     desc: "水面忽然炸开，毒沼蛇拖着腥风从浑水中直扑而来。"
     risk_text: "普通"
     weight: 34
-    difficulty: 3
     once_per_expedition: false
     effects: []
-    enemy_pool: "beast"
     id: "blackwater_marsh__local_beast"
     template_id: "local_beast"
     location_id: "blackwater_marsh"
@@ -438,18 +409,13 @@ events:
       - "battle"
     conditions: []
     duration_days: 2
-    drop_pool: "monster:beast"
-    results:
-      - type: "drop"
-        drop_pool: "monster:beast"
-        rolls: 2
+    results: []
   blackwater_marsh__gather_fruit:
     type: "gather"
     name: "毒藤灵果"
     desc: "一串紫黑灵果垂在毒藤深处，果香与瘴气混在一起。"
     risk_text: "安全"
     weight: 12
-    difficulty: 3
     once_per_expedition: false
     effects: []
     success_text: "你避开虫蛇，摘得{loot}。"
@@ -473,7 +439,6 @@ events:
     desc: "半截腐朽舟身陷在淤泥中，舱内似乎还压着未被取走的行囊。"
     risk_text: "机缘"
     weight: 10
-    difficulty: 3
     once_per_expedition: true
     effects: []
     success_text: "你谨慎查验四周，从藏物中取出{loot}。"
@@ -497,7 +462,6 @@ events:
     desc: "脚下泥层骤然塌陷，你催动灵力才从吞人的泥潭中挣脱。"
     risk_text: "轻微"
     weight: 14
-    difficulty: 3
     once_per_expedition: false
     effects:
       - type: "drain_mp_percent"
@@ -523,7 +487,6 @@ events:
     desc: "你在芦荡深处寻到干燥小洲，燃起驱瘴香后轮番吐纳疗伤。"
     risk_text: "休整"
     weight: 9
-    difficulty: 3
     once_per_expedition: false
     effects:
       - type: "heal_hp_percent"
@@ -552,7 +515,6 @@ events:
     desc: "一名蒙面采毒人撑舟靠近，愿用沼泽中的消息交换补给。"
     risk_text: "抉择"
     weight: 11
-    difficulty: 3
     once_per_expedition: false
     options:
       - id: "exchange"
@@ -589,10 +551,8 @@ events:
     desc: "一截浮木忽然睁开猩红双眼，腐甲鳄妖拖着泥浪封住退路。"
     risk_text: "精英"
     weight: 12
-    difficulty: 4
     once_per_expedition: true
     effects: []
-    enemy_pool: "elite"
     id: "blackwater_marsh__local_elite"
     template_id: "local_elite"
     location_id: "blackwater_marsh"
@@ -601,8 +561,4 @@ events:
       - "elite"
     conditions: []
     duration_days: 3
-    drop_pool: "monster:elite"
-    results:
-      - type: "drop"
-        drop_pool: "monster:elite"
-        rolls: 3
+    results: []

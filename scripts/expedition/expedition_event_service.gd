@@ -10,6 +10,9 @@ const ConditionServiceScript := preload("res://scripts/sim/condition_service.gd"
 
 
 static func by_id(event_id: String) -> Dictionary:
+	var generated := _generated_event_by_id(event_id)
+	if not generated.is_empty():
+		return generated
 	var cm := _config_manager()
 	if cm != null and cm.has_method("expedition_event_by_id"):
 		var event := cm.call("expedition_event_by_id", event_id) as Dictionary
@@ -34,6 +37,15 @@ static func is_decision_event(event: Dictionary) -> bool:
 	return str(event.get("mode", "auto")).strip_edges() == "decision"
 
 
+static func materialize_event_for_context(
+		location: Dictionary,
+		node: Dictionary,
+		event: Dictionary,
+		rng: RandomNumberGenerator
+) -> Dictionary:
+	return _materialize_event_for_context(location, node, event, rng)
+
+
 static func roll_next_event(
 		location: Dictionary,
 		visited_once: Array,
@@ -41,7 +53,9 @@ static func roll_next_event(
 ) -> Dictionary:
 	var candidates := _filter_candidates(location, visited_once)
 	var pick := _weighted_pick(candidates, rng)
-	return pick.duplicate(true) if not pick.is_empty() else {}
+	if pick.is_empty():
+		return {}
+	return _materialize_event_for_context(location, {}, pick, rng)
 
 
 static func roll_event_for_node(
@@ -52,32 +66,215 @@ static func roll_event_for_node(
 ) -> Dictionary:
 	var candidates := candidates_for_node(location, node, visited_once)
 	var pick := _weighted_pick(candidates, rng)
-	return pick.duplicate(true) if not pick.is_empty() else {}
+	if not pick.is_empty():
+		return _materialize_event_for_context(location, node, pick, rng)
+	var generated := _generated_battle_event_for_node(location, node, rng)
+	if not generated.is_empty():
+		_store_generated_event(generated)
+	return generated
 
 
 static func candidates_for_node(location: Dictionary, node: Dictionary, visited_once: Array) -> Array:
 	var type_id := str(node.get("type", EnumExpeditionNodeTypeScript.ID_TRAVEL))
-	var node_difficulty := maxi(1, int(node.get("difficulty", location.get("min_difficulty", 1))))
-	var candidates := _filter_candidates(location, visited_once)
+	var candidates := _filter_candidates(location, visited_once, _event_context(location, node))
 	var typed: Array = []
+	for fallback_type in _node_type_fallbacks(type_id):
+		typed = _candidates_matching_node_type(candidates, fallback_type)
+		if not typed.is_empty():
+			return typed
+	return _candidates_matching_node_type(candidates, EnumExpeditionNodeTypeScript.ID_TRAVEL)
+
+
+static func _node_type_fallbacks(type_id: String) -> PackedStringArray:
+	match type_id:
+		EnumExpeditionNodeTypeScript.ID_BOSS:
+			return PackedStringArray([
+				EnumExpeditionNodeTypeScript.ID_BOSS,
+				EnumExpeditionNodeTypeScript.ID_ELITE,
+				EnumExpeditionNodeTypeScript.ID_BATTLE,
+			])
+		EnumExpeditionNodeTypeScript.ID_ELITE:
+			return PackedStringArray([
+				EnumExpeditionNodeTypeScript.ID_ELITE,
+				EnumExpeditionNodeTypeScript.ID_BATTLE,
+			])
+		_:
+			return PackedStringArray([type_id])
+
+
+static func _candidates_matching_node_type(
+		candidates: Array,
+		type_id: String
+) -> Array:
+	var out: Array = []
 	for event_v in candidates:
 		if not event_v is Dictionary:
 			continue
 		var event := event_v as Dictionary
-		if _event_matches_node_type(event, type_id) and maxi(1, int(event.get("difficulty", 1))) <= node_difficulty:
-			typed.append(event)
-	if typed.is_empty():
-		for event_v in candidates:
-			if not event_v is Dictionary:
-				continue
-			var event := event_v as Dictionary
-			if _event_matches_node_type(event, type_id):
-				typed.append(event)
-	if typed.is_empty():
-		for event_v in candidates:
-			if event_v is Dictionary and str((event_v as Dictionary).get("type", "")) == "travel":
-				typed.append(event_v)
-	return typed
+		if not _event_matches_node_type(event, type_id):
+			continue
+		out.append(event)
+	return out
+
+
+static func _battle_candidates(candidates: Array) -> Array:
+	var out: Array = []
+	for event_v in candidates:
+		if not event_v is Dictionary:
+			continue
+		var event := event_v as Dictionary
+		if ExpeditionRulesServiceScript.is_battle_type(str(event.get("type", ""))):
+			out.append(event)
+	return out
+
+
+static func _generated_battle_event_for_node(
+		location: Dictionary,
+		node: Dictionary,
+		rng: RandomNumberGenerator
+) -> Dictionary:
+	var type_id := str(node.get("type", ""))
+	if type_id not in [
+		EnumExpeditionNodeTypeScript.ID_BATTLE,
+		EnumExpeditionNodeTypeScript.ID_ELITE,
+		EnumExpeditionNodeTypeScript.ID_BOSS,
+	]:
+		return {}
+	var monster := _pick_location_monster_for_node(location, type_id, rng)
+	if monster.is_empty():
+		return {}
+	var monster_id := str(monster.get("id", "")).strip_edges()
+	if monster_id == "":
+		return {}
+	var difficulty := maxi(1, int(node.get("difficulty", location.get("min_difficulty", 1))))
+	var event_type := "battle"
+	if type_id == EnumExpeditionNodeTypeScript.ID_ELITE:
+		event_type = "elite"
+	elif type_id == EnumExpeditionNodeTypeScript.ID_BOSS:
+		event_type = "boss"
+	var location_id := str(location.get("id", location.get("location_id", ""))).strip_edges()
+	var node_id := str(node.get("id", "node")).strip_edges()
+	var event_id := "generated::%s::%s::%s::%s" % [location_id, node_id, event_type, monster_id]
+	return {
+		"id": event_id,
+		"location_id": location_id,
+		"type": event_type,
+		"mode": "auto",
+		"name": _generated_battle_name(event_type, monster),
+		"desc": _generated_battle_desc(event_type, monster),
+		"risk_text": str(node.get("risk_text", EnumExpeditionNodeTypeScript.label(type_id))),
+		"weight": 1,
+		"difficulty": difficulty,
+		"enemy_pool": monster_id,
+		"drop_pool": "monster:%s" % monster_id,
+		"duration_days": 3 if event_type == "boss" else 2,
+		"enemy_difficulty_scale": clampf(1.0 + float(difficulty - 1) * 0.12, 0.5, 2.5),
+		"once_per_expedition": false,
+		"tags": ["generated", event_type, "battle"],
+		"conditions": [],
+		"results": [{
+			"type": "drop",
+			"drop_pool": "monster:%s" % monster_id,
+			"rolls": 4 if event_type == "boss" else (3 if event_type == "elite" else 2),
+		}],
+	}
+
+
+static func _materialize_event_for_context(
+		location: Dictionary,
+		node: Dictionary,
+		event: Dictionary,
+		rng: RandomNumberGenerator
+) -> Dictionary:
+	var current := event.duplicate(true)
+	var context := _event_context(location, node)
+	current["difficulty"] = int(context.get("difficulty", 1))
+	current["location_id"] = str(context.get("location_id", current.get("location_id", "")))
+	if ExpeditionRulesServiceScript.is_battle_type(str(current.get("type", ""))):
+		current = _materialize_battle_event(location, node, current, rng)
+	if not current.is_empty() and str(current.get("id", "")).strip_edges() != "":
+		_store_generated_event(current)
+	return current
+
+
+static func _materialize_battle_event(
+		location: Dictionary,
+		node: Dictionary,
+		event: Dictionary,
+		rng: RandomNumberGenerator
+) -> Dictionary:
+	var type_id := str(node.get("type", EnumExpeditionNodeTypeScript.from_event(event)))
+	var monster := _pick_location_monster_for_node(location, type_id, rng)
+	if monster.is_empty():
+		return event
+	var monster_id := str(monster.get("id", "")).strip_edges()
+	if monster_id == "":
+		return event
+	var difficulty := maxi(1, int(event.get("difficulty", node.get("difficulty", location.get("min_difficulty", 1)))))
+	var event_type := str(event.get("type", "battle")).strip_edges()
+	var current := event.duplicate(true)
+	current["enemy_pool"] = monster_id
+	current["drop_pool"] = "monster:%s" % monster_id
+	current["enemy_difficulty_scale"] = clampf(1.0 + float(difficulty - 1) * 0.12, 0.5, 2.5)
+	if not current.has("duration_days"):
+		current["duration_days"] = 3 if event_type == "boss" else 2
+	var default_rolls := 4 if event_type == "boss" else (3 if event_type == "elite" else 2)
+	current["results"] = [{
+		"type": "drop",
+		"drop_pool": "monster:%s" % monster_id,
+		"rolls": int(current.get("reward_rolls", default_rolls)),
+	}]
+	return current
+
+
+static func _pick_location_monster_for_node(location: Dictionary, type_id: String, rng: RandomNumberGenerator) -> Dictionary:
+	var monsters := _location_monsters(str(location.get("id", location.get("location_id", ""))))
+	if monsters.is_empty():
+		return {}
+	var preferred: Array = []
+	for monster_v in monsters:
+		if not monster_v is Dictionary:
+			continue
+		var monster := monster_v as Dictionary
+		if _monster_matches_node_type(monster, type_id):
+			preferred.append(monster)
+	if preferred.is_empty():
+		preferred = monsters
+	return (preferred[rng.randi_range(0, preferred.size() - 1)] as Dictionary).duplicate(true)
+
+
+static func _monster_matches_node_type(monster: Dictionary, type_id: String) -> bool:
+	var species := str(monster.get("species", "")).strip_edges()
+	var tags := monster.get("tags", []) as Array
+	match type_id:
+		EnumExpeditionNodeTypeScript.ID_BOSS:
+			return species == "boss" or tags.has("boss")
+		EnumExpeditionNodeTypeScript.ID_ELITE:
+			return species == "elite" or tags.has("elite")
+		_:
+			return species not in ["elite", "boss"] and not tags.has("elite") and not tags.has("boss")
+
+
+static func _generated_battle_name(event_type: String, monster: Dictionary) -> String:
+	var monster_name := str(monster.get("name", "妖兽")).strip_edges()
+	match event_type:
+		"boss":
+			return "%s现身" % monster_name
+		"elite":
+			return "%s拦路" % monster_name
+		_:
+			return "%s群袭" % monster_name
+
+
+static func _generated_battle_desc(event_type: String, monster: Dictionary) -> String:
+	var monster_name := str(monster.get("name", "妖兽")).strip_edges()
+	match event_type:
+		"boss":
+			return "深处妖气翻涌，%s踏碎山石而来。" % monster_name
+		"elite":
+			return "山林忽然沉寂，%s循着你的气息逼近。" % monster_name
+		_:
+			return "草木摇动，%s自林间扑出，拦住去路。" % monster_name
 
 
 static func decision_options_as_choices(event: Dictionary) -> Array:
@@ -145,6 +342,9 @@ static func resolve_decision_option(
 			return {"ok": false, "error": "抉择引用了未知事件"}
 		var event_type := str(triggered.get("type", ""))
 		if ExpeditionRulesServiceScript.is_battle_type(event_type):
+			var location := _location_by_id(str(parent_event.get("location_id", "")))
+			if not location.is_empty():
+				triggered = _materialize_event_for_context(location, {}, _inherit_parent_difficulty(triggered, parent_event), rng)
 			var choice_text := str(option.get("desc", option.get("label", ""))).strip_edges()
 			var enemy_name := str((triggered.get("enemy", {}) as Dictionary).get("name", triggered.get("name", "强敌")))
 			var encounter := "%s——%s拦住了去路！" % [choice_text, enemy_name]
@@ -177,6 +377,9 @@ static func resolve_decision_option(
 	var rewards := ExpeditionRewardServiceScript.roll_event_rewards(
 		{
 			"location_id": str(parent_event.get("location_id", "")),
+			"type": str(parent_event.get("type", "decision")),
+			"difficulty": maxi(1, int(parent_event.get("difficulty", 1))),
+			"duration_days": maxi(1, int(parent_event.get("duration_days", 1))),
 			"results": option.get("results", []),
 			"drop_pool": str(option.get("drop_pool", "")),
 		},
@@ -489,24 +692,35 @@ static func _join_feedback(prefix: String, body: String) -> String:
 	return "%s：%s" % [lead, tail]
 
 
-static func _filter_candidates(location: Dictionary, visited_once: Array) -> Array:
-	var min_difficulty := maxi(1, int(location.get("min_difficulty", 1)))
-	var max_difficulty := int(location.get("max_difficulty", 0))
+static func _filter_candidates(location: Dictionary, visited_once: Array, context: Dictionary = {}) -> Array:
+	if context.is_empty():
+		context = _event_context(location, {})
 	var out: Array = []
 	for event_v in event_pool_for_location(location):
 		var event := event_v as Dictionary
 		var event_id := str(event.get("id", ""))
 		if bool(event.get("once_per_expedition", false)) and visited_once.has(event_id):
 			continue
-		if not ConditionServiceScript.all_met(event.get("conditions", []) as Array, {"location": location}):
-			continue
-		var event_difficulty := maxi(1, int(event.get("difficulty", 1)))
-		if event_difficulty < min_difficulty:
-			continue
-		if max_difficulty > 0 and event_difficulty > max_difficulty:
+		var check_context := context.duplicate(true)
+		check_context["location"] = location
+		if not ConditionServiceScript.all_met(event.get("conditions", []) as Array, check_context):
 			continue
 		out.append(event)
 	return out
+
+
+static func _event_context(location: Dictionary, node: Dictionary) -> Dictionary:
+	var difficulty := int(node.get("difficulty", location.get("min_difficulty", 1)))
+	return {
+		"difficulty": maxi(1, difficulty),
+		"location_id": str(location.get("id", location.get("location_id", ""))),
+	}
+
+
+static func _inherit_parent_difficulty(event: Dictionary, parent_event: Dictionary) -> Dictionary:
+	var current := event.duplicate(true)
+	current["difficulty"] = maxi(1, int(parent_event.get("difficulty", current.get("difficulty", 1))))
+	return current
 
 
 static func _event_matches_node_type(event: Dictionary, type_id: String) -> bool:
@@ -557,6 +771,49 @@ static func _config_manager() -> Node:
 	if not loop is SceneTree:
 		return null
 	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
+
+
+static func _generated_event_by_id(event_id: String) -> Dictionary:
+	var loop := Engine.get_main_loop()
+	if not loop is SceneTree:
+		return {}
+	var data_store := (loop as SceneTree).root.get_node_or_null("DataStore")
+	if data_store == null or not data_store.has_method("expedition_runtime"):
+		return {}
+	var runtime := data_store.call("expedition_runtime") as Dictionary
+	var generated_v: Variant = runtime.get("generated_events", {})
+	if not generated_v is Dictionary:
+		return {}
+	var event_v: Variant = (generated_v as Dictionary).get(event_id, {})
+	if event_v is Dictionary:
+		return (event_v as Dictionary).duplicate(true)
+	return {}
+
+
+static func _store_generated_event(event: Dictionary) -> void:
+	var event_id := str(event.get("id", "")).strip_edges()
+	if event_id == "":
+		return
+	var loop := Engine.get_main_loop()
+	if not loop is SceneTree:
+		return
+	var data_store := (loop as SceneTree).root.get_node_or_null("DataStore")
+	if data_store == null or not data_store.has_method("expedition_runtime"):
+		return
+	var runtime := data_store.call("expedition_runtime") as Dictionary
+	if not bool(runtime.get("active", false)):
+		return
+	var generated_v: Variant = runtime.get("generated_events", {})
+	var generated := generated_v as Dictionary if generated_v is Dictionary else {}
+	generated[event_id] = event.duplicate(true)
+	runtime["generated_events"] = generated
+
+
+static func _location_monsters(location_id: String) -> Array:
+	var cm := _config_manager()
+	if cm != null and cm.has_method("location_monsters"):
+		return cm.call("location_monsters", location_id) as Array
+	return []
 
 
 static func _location_by_id(location_id: String) -> Dictionary:

@@ -13,3 +13,25 @@ defeat_injury_days: 3
 defeat_hp_floor_ratio: 0.25
 choice_count: 3
 auto_event_advance_seconds: 1
+reward_budget:
+  enabled: true
+  daily_base_value: 12
+  difficulty_growth: 0.22
+  min_scale: 0.5
+  max_scale: 3.0
+  event_type_multipliers:
+    travel: 0.0
+    gather: 1.0
+    recover: 0.0
+    hazard: 0.0
+    battle: 1.25
+    elite: 1.8
+    boss: 3.0
+  unit_values:
+    currency: 1
+    item: 10
+    equip: 120
+  material_grade_multipliers:
+    "1": 1.0
+    "2": 2.2
+    "3": 4.5

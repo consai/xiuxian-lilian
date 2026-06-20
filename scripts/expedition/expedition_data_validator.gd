@@ -160,7 +160,7 @@ static func _validate_event(
 ) -> PackedStringArray:
 	var errors: PackedStringArray = []
 	var event_id := str(event.get("id", ""))
-	for old_key in ["reward_pool", "rewards", "reward_rolls", "scope"]:
+	for old_key in ["difficulty", "reward_pool", "rewards", "reward_rolls", "scope"]:
 		if event.has(old_key):
 			errors.append("事件 %s 使用了旧字段 %s" % [event_id, old_key])
 	if str(event.get("location_id", "")) != location_id:
@@ -171,25 +171,15 @@ static func _validate_event(
 		errors.append("事件 %s conditions 必须是数组" % event_id)
 	if not event.get("results") is Array:
 		errors.append("事件 %s results 必须是数组" % event_id)
-	var min_difficulty := maxi(1, int(location.get("min_difficulty", 1)))
-	var max_difficulty := int(location.get("max_difficulty", 0))
-	var event_difficulty := maxi(1, int(event.get("difficulty", 0)))
-	if int(event.get("difficulty", 0)) < 1:
-		errors.append("事件 %s 缺少有效 difficulty" % event_id)
-	elif max_difficulty > 0 and event_difficulty > max_difficulty:
-		errors.append("事件 %s 难度 %d 超出地点 %s 上限 %d" % [event_id, event_difficulty, location_id, max_difficulty])
-	elif event_difficulty < min_difficulty:
-		errors.append("事件 %s 难度 %d 低于地点 %s 下限 %d" % [event_id, event_difficulty, location_id, min_difficulty])
 	if ExpeditionEventServiceScript.is_decision_event(event):
 		errors.append_array(_validate_decision_event(event, event_id, location))
 	if ExpeditionRulesServiceScript.is_battle_type(str(event.get("type", ""))):
-		var enemy_pool := str(event.get("enemy_pool", "")).strip_edges()
-		if enemy_pool == "":
-			errors.append("战斗事件 %s 缺少 enemy_pool" % event_id)
-		elif _location_enemy(location_id, enemy_pool).is_empty():
-			errors.append("战斗事件 %s 在地点 %s 无法解析怪物 %s" % [event_id, location_id, enemy_pool])
-		errors.append_array(_validate_v1_enemy_attrs(event, event_id))
-		for msg in BattleInitData.collect_errors(_build_sample_battle_init(event, game_state)):
+		var sample_event := event.duplicate(true)
+		sample_event["difficulty"] = maxi(1, int(location.get("min_difficulty", 1)))
+		sample_event["enemy_pool"] = _sample_monster_ref(location, str(event.get("type", "")))
+		sample_event["results"] = [{"type": "drop", "drop_pool": "monster:%s" % str(sample_event.get("enemy_pool", "")), "rolls": 1}]
+		errors.append_array(_validate_v1_enemy_attrs(sample_event, event_id))
+		for msg in BattleInitData.collect_errors(_build_sample_battle_init(sample_event, game_state)):
 			errors.append("事件 %s: %s" % [event_id, msg])
 	for result_v in event.get("results", []) as Array:
 		if result_v is Dictionary:
@@ -272,6 +262,27 @@ static func _build_sample_battle_init(event: Dictionary, game_state: Node) -> Di
 		"enemies": ExpeditionEventServiceScript.build_battle_enemies(event),
 		"battle_time_limit": 200.0,
 	}
+
+
+static func _sample_monster_ref(location: Dictionary, event_type: String) -> String:
+	var want_elite := event_type == "elite"
+	var want_boss := event_type == "boss"
+	for monster_id_v in location.get("monsters", []) as Array:
+		var monster_id := str(monster_id_v).strip_edges()
+		var monster := _monster_by_id(monster_id)
+		var species := str(monster.get("species", "")).strip_edges()
+		var tags := monster.get("tags", []) as Array
+		if want_boss and (species == "boss" or tags.has("boss")):
+			return monster_id
+		if want_elite and (species == "elite" or tags.has("elite")):
+			return monster_id
+		if not want_elite and not want_boss and species not in ["elite", "boss"] and not tags.has("elite") and not tags.has("boss"):
+			return monster_id
+	for monster_id_v in location.get("monsters", []) as Array:
+		var monster_id := str(monster_id_v).strip_edges()
+		if monster_id != "":
+			return monster_id
+	return ""
 
 
 static func _validate_reward(reward: Dictionary, label: String) -> PackedStringArray:

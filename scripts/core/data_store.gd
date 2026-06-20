@@ -532,6 +532,7 @@ func _default_expedition() -> Dictionary:
 		"available_node_ids": [],
 		"visited_node_ids": [],
 		"resolved_node_events": {},
+		"generated_events": {},
 		"stats": {},
 		"event_log": [],
 		"player_snapshot": {},

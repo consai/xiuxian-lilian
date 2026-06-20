@@ -28,7 +28,7 @@ flowchart LR
 | # | 功能 | 简述 | 实现要点 |
 |---|------|------|----------|
 | F01 | 入口与互斥 | 洞府「外出历练」进世界地图；历练进行中禁止重复出发 | `cave_hub` → `SceneManager.go_world_map()`；`SceneManager` 拦截活跃历练 |
-| F02 | 地点选择与启程 | 地图弹窗展示危险度、推荐境界、预览奖励、探索深度档；确认后启程 | `world_map_controller.gd` 野外/地点弹窗 + `data/locations.json` |
+| F02 | 地点选择与启程 | 地图弹窗展示危险度、推荐境界、预览奖励、探索深度档；确认后启程 | `world_map_controller.gd` 野外/地点弹窗 + `data/locations.yaml` |
 | F03 | 启程 | 校验地点、快照玩家、初始化 RNG/统计/日志，并生成本局路线图 | `ExpeditionState.start()` + `ExpeditionMapService.generate()` |
 | F04 | 路线选择 | 玩家点击可达节点推进历练；不可跳层或重复访问已完成节点 | `choose_map_node()` + `current_available_nodes()` |
 | F05 | 节点事件解析 | 根据节点类型从地点事件池按权重抽事件，具体内容仍复用现有事件配置 | `ExpeditionEventService.roll_event_for_node()` |
@@ -37,7 +37,7 @@ flowchart LR
 | F08 | 战斗事件 | battle / elite / boss，弹窗选迎战或撤退 | `expedition_battle_popup` + `build_battle_init()` |
 | F09 | 战斗衔接 | 进战 source=`expedition`，战后回历练循环或战败结算 | `ExpeditionBattleFlow` |
 | F10 | 历练日数 | `days` 与事件数 `steps` 独立；进行中显示实际行进日，结算耗时至少为时间规则中的普通历练时长 | `estimated_elapsed_days()`、`planned_elapsed_days()`、`finish()` |
-| F11 | 事件难度 | 事件配置 `difficulty`；节点 difficulty 随层数从地点难度范围递增；结算统计 `max_difficulty` | `ExpeditionMapService` + `candidates_for_node()` |
+| F11 | 运行时难度 | 事件配置不再写 `difficulty`；节点 difficulty 随层数从地点难度范围递增，抽中事件后注入运行时事件；结算统计 `max_difficulty` | `ExpeditionMapService` + `ExpeditionEventService.materialize_event_for_context()` |
 | F27 | 路线图 UI | 主界面展示节点和连线；节点类型明牌，事件名进入节点后解析 | `expedition_map_node` + `MapCanvas` |
 | F12 | 局内 runtime | 历练中 HP/MP/背包槽物品仅在 `runtime` 变更；战斗消耗扣背包副本，历练进行中不写存档 | `runtime` + `receive_battle_summary`；结算时 `settle_expedition()` 统一回写 |
 | F13 | 会话战利品 | 遭遇奖励先入 `loot` 展示，结算时与背包一并写入存档 | `ExpeditionRewardService.merge_into_loot()` |
@@ -89,17 +89,12 @@ flowchart LR
 
 | 文件 | 内容 |
 |------|------|
-| `data/locations.json` | 地点元数据、难度、公共/地图事件池，以及公共事件的地图级奖励、敌人、耗时生成参数 |
-| `data/expedition_common_events.json` | 可跨地图复用的公共事件模板（赶路、采集、恢复、普通战斗等） |
-| `data/expedition_events.json` | 与地图绑定的大多数唯一事件（抉择、事件链、精英、首领、世界效果等） |
-| `data/expedition_rules.json` | 全局规则（遭遇概率、战败惩罚、自动推进间隔等） |
+| `data/locations.yaml` | 地点元数据、难度范围、`event_pool`、地图材料池、地图怪物池与掉落池 |
+| `data/expedition_common_events.yaml` | 已绑定地点的通用事件模板（赶路、采集、恢复、普通战斗等） |
+| `data/expedition_events.yaml` | 与地图绑定的唯一事件（抉择、剧情战斗、精英、首领等） |
+| `data/expedition_rules.yaml` | 全局规则（遭遇概率、战败惩罚、自动推进间隔、奖励预算等） |
 
-地点通过 `expedition_mode` 软分型：
-
-| mode | 用途 | 事件池规则 |
-|------|------|------------|
-| `resource` | 刷材料地图 | 只配置 `common_event_pool` 与 `common_event_generation`，`map_event_pool` 必须为空 |
-| `story` | 剧情/事件地图 | 只配置 `map_event_pool`，`common_event_pool` 必须为空 |
+地点统一通过 `event_pool` 引用事件。资源地图通常引用 `expedition_common_events.yaml` 中的地点模板；剧情地图可以引用 `expedition_events.yaml` 中的专属事件。
 
 ---
 
@@ -133,6 +128,7 @@ runtime { hp, mp, item_slots, inventory }
 loot[], event_log[], stats{}, player_snapshot{}
 pending_decision_event, current_choices, current_event_id
 pending_battle_event_id, pending_battle_summary, pending_battle_rewards
+generated_events
 pending_exit_reason
 ```
 
@@ -153,7 +149,8 @@ pending_exit_reason
 choose_map_node(node_id)
   → 校验 node_id 在 available_node_ids
   → current_node_id = node_id，days++
-  → 按节点 type/difficulty 从地点 event_pool 抽一个事件
+  → 按节点 type 从地点 event_pool 全随机抽一个事件
+  → 将节点 difficulty 和地点信息注入运行时事件
        → decision? → phase=choosing，展示 EventCards
        → battle/elite/boss? → phase=battle，弹 BattlePopup
        → gather/recover/hazard/travel → complete_current_step 结算
@@ -162,10 +159,7 @@ choose_map_node(node_id)
 
 非战斗结算：`resolve_non_battle_event` → 应用 effects / roll rewards → `_apply_step_after_event`（`steps++`、更新 `max_difficulty`、日志、链标记、路线推进）。
 
-公共事件由 `common_event_pool` 引用模板，并在抽取时使用地点的 `common_event_generation` 物化。生成实例 ID 为
-`common::<location_id>::<template_id>`，因此奖励、敌人和 `duration_days` 可随当前地图变化，同时战斗跨场景后仍可按 ID 恢复。
-
-公共事件只服务 `resource` 地图，用于材料、普通战斗、恢复和地形消耗循环；`story` 地图不使用公共模板，只从 `map_event_pool` 抽取地图专属剧情、抉择、战斗和事件链。
+事件模板只描述“发生什么”。`roll_event_for_node()` 抽中模板后会生成运行时事件：非战斗事件继承当前节点难度用于奖励预算；战斗事件还会按地点 `monsters` 和节点类型补齐 `enemy_pool`、`monster:<id>` 掉落池、敌人数与属性缩放，并写入 `generated_events` 供跨战斗场景按 ID 恢复。
 
 ### 5.3 战斗
 
@@ -199,10 +193,11 @@ choose_map_node(node_id)
 
 ### 6.2 难度
 
-- 事件 `difficulty`：该事件的固定难度值（默认 1）  
-- 地点 `min_difficulty` / `max_difficulty`：本地点历练可抽取的事件难度范围（`max_difficulty` 为 0 表示无上限）  
-- 难度不随事件完成自动增加；导演仅按地点范围与事件 `difficulty` 过滤入池  
-- 精英、首领通过独立事件配置与更高 `difficulty` 区分，运行时不对属性或奖励做倍率
+- 事件配置不再写 `difficulty`，事件不会因自身难度被过滤。
+- 地点 `min_difficulty` / `max_difficulty` 只决定路线节点难度范围。
+- 节点 `difficulty` 随路线层数递增；事件抽中后写入运行时事件，并参与奖励预算、材料变体条件、怪物数量和怪物属性缩放。
+- 普通/精英/首领战斗节点优先匹配同类事件模板；若没有同类模板，再按当前地点 `monsters` 动态生成兜底战斗事件。
+- 战斗按节点类型选择地图怪物：普通避开 elite/boss，精英优先 `species/tag=elite`，首领优先 `species/tag=boss`；怪物掉落池也在运行时物化为 `monster:<monster_id>`。
 
 ### 6.3 抉择选项
 
@@ -225,9 +220,10 @@ choose_map_node(node_id)
 
 ### 6.5 奖励 `rewards`
 
-- 加权池 + `reward_rolls` 次抽取  
-- `min`/`max` 随机决定数量  
-- 种类：`item` / `currency` / `equip`（经 `RewardService` 合并）
+- 事件/掉落池只决定“掉什么”：加权池、变体、`rolls` 与 `min`/`max` 仍在地点和事件配置中维护
+- `ExpeditionRewardService` 决定“掉多少”：按 `reward_budget.daily_base_value × duration_days × difficulty_multiplier × event_type_multiplier` 计算本事件目标收益值
+- 掉落后按 `unit_values` 与 `material_grade_multipliers` 估算当前奖励价值，并在 `min_scale` / `max_scale` 范围内归一化数量
+- 种类：`item` / `currency` / `equip`（经 `RewardService` 合并）；装备默认不放大数量，只参与价值估算
 
 ### 6.6 事件链（以青岚山为例）
 
@@ -241,7 +237,7 @@ choose_map_node(node_id)
 
 ---
 
-## 7. 规则参数（`expedition_rules.json`）
+## 7. 规则参数（`expedition_rules.yaml`）
 
 | 键 | 默认 | 含义 |
 |----|------|------|
@@ -251,6 +247,10 @@ choose_map_node(node_id)
 | `defeat_hp_floor_ratio` | 0.25 | 战败后气血下限（相对 max） |
 | `defeat_injury_days` | 3 | 战败伤势天数 |
 | `defeat_inventory_drop_*` | 见 JSON | 战败随机丢失背包堆数与比例 |
+| `reward_budget.daily_base_value` | 12 | 每日历练基础收益值，用于工业化调节平均产出 |
+| `reward_budget.difficulty_growth` | 0.22 | 每点难度带来的收益值增长 |
+| `reward_budget.event_type_multipliers` | 见 YAML | 采集、普通战斗、精英、首领等奖励倍率 |
+| `reward_budget.unit_values` | 见 YAML | 货币、道具、装备的价值估算 |
 
 ---
 
@@ -309,4 +309,5 @@ choose_map_node(node_id)
 | 2026-06-10 | 深度改为难度：事件 `difficulty`、地点难度范围，取消 `depth` 自动递增 |
 | 2026-06-10 | 新增自动/手动推进切换与「前进」按钮 |
 | 2026-06-11 | 移除独立地点选择场景；历练入口改经世界地图弹窗与 `start_expedition` |
-| 2026-06-16 | 地点新增 `expedition_mode`：材料地图只用公共事件，剧情地图只用地图专属事件 |
+| 2026-06-16 | 地点按资源/剧情用途拆分事件池（后续统一为 `event_pool` 引用） |
+| 2026-06-20 | 事件移除固定 `difficulty` 和固定战斗怪物；事件全随机抽取，按当前地图与节点难度运行时物化奖励、怪物和怪物掉落 |
