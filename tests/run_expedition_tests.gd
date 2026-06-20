@@ -24,7 +24,7 @@ func _run_all() -> void:
 	_run("location declares monsters and materials", _test_location_declares_monsters_and_materials)
 	_run("difficulty rolls material grade variants", _test_difficulty_rolls_material_grade_variants)
 	_run("monster drops resolve through enemy identity", _test_monster_drops_resolve_through_enemy_identity)
-	_run("early common battles stay single target", _test_early_common_battles_stay_single_target)
+	_run("early common battles form small groups", _test_early_common_battles_form_small_groups)
 	_run("group battles scale skill slots", _test_group_battles_scale_skill_slots)
 	_run("expedition modes keep event pools separate", _test_expedition_modes_keep_event_pools_separate)
 	_run("common event duration advances days", _test_common_event_duration_advances_days)
@@ -80,8 +80,10 @@ func _test_start_creates_isolated_runtime() -> void:
 	_expect_true(bool(started.get("ok", false)), "start ok")
 	_expect_true(expedition.active, "expedition active")
 	_expect_near(float(expedition.runtime.get("hp", 0.0)), game.hp, "runtime hp copied")
+	var starting_hp := game.hp
 	game.hp = 1.0
-	_expect_near(float(expedition.runtime.get("hp", 0.0)), 100.0, "runtime isolated from game")
+	_expect_near(float(expedition.runtime.get("hp", 0.0)), starting_hp, "runtime isolated from game")
+	_expect_true(starting_hp >= 130.0, "starter attributes are battle ready")
 	_expect_true(not expedition.map_nodes.is_empty(), "start generates route map")
 	_expect_true(not expedition.available_node_ids.is_empty(), "start exposes first route choices")
 
@@ -203,20 +205,20 @@ func _test_monster_drops_resolve_through_enemy_identity() -> void:
 		_expect_true(str(reward.get("id", "")) != "", "monster reward keeps reward id")
 
 
-func _test_early_common_battles_stay_single_target() -> void:
+func _test_early_common_battles_form_small_groups() -> void:
 	var event := ExpeditionEventServiceScript.by_id("qinglan_mountain__local_beast")
 	var enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
-	_expect_eq(enemies.size(), 1, "qinglan starter beast should not spawn a pack")
+	_expect_eq(enemies.size(), 2, "qinglan starter beast should spawn a small group")
 	var enemy := enemies[0] as Dictionary
-	_expect_true(float(enemy.get("hp", 0.0)) >= 50.0, "single starter enemy keeps readable hp")
-	_expect_true(not str(enemy.get("name", "")).contains("·"), "single starter enemy keeps base name")
+	_expect_true(float(enemy.get("hp", 0.0)) >= 40.0, "starter group enemy keeps readable hp")
+	_expect_true(str(enemy.get("name", "")).contains("·"), "starter group enemy gets numbered name")
 	var slots := enemy.get("skills", []) as Array
 	for slot_v in slots:
 		var slot := slot_v as Dictionary
 		if int(slot.get("id", -1)) > 0:
 			_expect_true(
-				float(slot.get("effect_value_scale", 1.0)) <= 0.4,
-				"starter enemy skill fixed effects are toned down"
+				float(slot.get("effect_value_scale", 1.0)) <= 0.42,
+				"starter group skill fixed effects are toned down"
 			)
 
 
@@ -224,7 +226,7 @@ func _test_group_battles_scale_skill_slots() -> void:
 	var event := ExpeditionEventServiceScript.by_id("qinglan_mountain__local_beast")
 	event["difficulty"] = 6
 	var enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
-	_expect_eq(enemies.size(), 3, "difficulty six common battle forms a small group")
+	_expect_eq(enemies.size(), 4, "difficulty six common battle forms a larger group")
 	for enemy_v in enemies:
 		var enemy := enemy_v as Dictionary
 		var slots := enemy.get("skills", []) as Array

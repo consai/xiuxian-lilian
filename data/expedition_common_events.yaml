@@ -6,7 +6,7 @@ events:
     name: "穿行青岚"
     desc: "晨雾贴着山腰缓缓流动，你循着猎户留下的旧路向深山行去。"
     risk_text: "平安"
-    weight: 26
+    weight: 20
     difficulty: 1
     once_per_expedition: false
     effects: []
@@ -25,7 +25,7 @@ events:
     name: "雾林寻药"
     desc: "湿润林地间浮着淡淡药香，几株灵草在晨露中泛起微光。"
     risk_text: "安全"
-    weight: 30
+    weight: 24
     difficulty: 1
     once_per_expedition: false
     effects: []
@@ -49,7 +49,7 @@ events:
     name: "山壁寻铁"
     desc: "风化山壁露出深色矿纹，敲击时传来清越回响。"
     risk_text: "安全"
-    weight: 18
+    weight: 15
     difficulty: 2
     once_per_expedition: false
     effects: []
@@ -73,7 +73,7 @@ events:
     name: "灵泉纳气"
     desc: "石隙间涌出一线清泉，泉畔灵气澄澈，正宜吐纳。"
     risk_text: "安全"
-    weight: 22
+    weight: 16
     difficulty: 1
     once_per_expedition: false
     effects:
@@ -97,7 +97,7 @@ events:
     name: "岩洞疗伤"
     desc: "你在背风岩洞中点起微火，借着片刻安宁处理伤势。"
     risk_text: "安全"
-    weight: 16
+    weight: 12
     difficulty: 2
     once_per_expedition: false
     effects:
@@ -122,7 +122,7 @@ events:
     name: "林间兽袭"
     desc: "树影骤乱，饥饿的青牙狼循着生人气息从林间扑出。"
     risk_text: "普通"
-    weight: 20
+    weight: 34
     difficulty: 2
     once_per_expedition: false
     effects: []
@@ -145,7 +145,7 @@ events:
     name: "崖畔灵果"
     desc: "陡崖边垂下一株老藤，叶隙间隐约可见温润果光。"
     risk_text: "安全"
-    weight: 15
+    weight: 12
     difficulty: 1
     once_per_expedition: false
     effects: []
@@ -285,7 +285,7 @@ events:
     name: "山罴拦路"
     desc: "低沉咆哮震落枝叶，一头铁背山罴从岩坡后缓缓逼近。"
     risk_text: "精英"
-    weight: 7
+    weight: 12
     difficulty: 4
     once_per_expedition: true
     effects: []
@@ -309,7 +309,7 @@ events:
     name: "涉过黑水"
     desc: "黑水没过脚踝，腐木在雾中若隐若现，你谨慎试探着每一步。"
     risk_text: "平安"
-    weight: 26
+    weight: 20
     difficulty: 2
     once_per_expedition: false
     effects: []
@@ -328,7 +328,7 @@ events:
     name: "瘴中寻药"
     desc: "几簇耐毒灵草伏在枯木根部，叶脉泛着幽蓝微光。"
     risk_text: "安全"
-    weight: 30
+    weight: 24
     difficulty: 2
     once_per_expedition: false
     effects: []
@@ -352,7 +352,7 @@ events:
     name: "淤底淘金"
     desc: "沉重矿砂聚在水湾底部，需以灵力隔开污泥方能采集。"
     risk_text: "安全"
-    weight: 18
+    weight: 15
     difficulty: 3
     once_per_expedition: false
     effects: []
@@ -376,7 +376,7 @@ events:
     name: "芦洲调息"
     desc: "一片芦洲略高于水面，清风暂时吹散了周围瘴气。"
     risk_text: "安全"
-    weight: 22
+    weight: 16
     difficulty: 2
     once_per_expedition: false
     effects:
@@ -400,7 +400,7 @@ events:
     name: "枯木避毒"
     desc: "中空古木隔绝了大半毒雾，你运功逼出侵体瘴气。"
     risk_text: "安全"
-    weight: 16
+    weight: 12
     difficulty: 3
     once_per_expedition: false
     effects:
@@ -425,7 +425,7 @@ events:
     name: "毒蛇破水"
     desc: "水面忽然炸开，毒沼蛇拖着腥风从浑水中直扑而来。"
     risk_text: "普通"
-    weight: 20
+    weight: 34
     difficulty: 3
     once_per_expedition: false
     effects: []
@@ -448,7 +448,7 @@ events:
     name: "毒藤灵果"
     desc: "一串紫黑灵果垂在毒藤深处，果香与瘴气混在一起。"
     risk_text: "安全"
-    weight: 15
+    weight: 12
     difficulty: 3
     once_per_expedition: false
     effects: []
@@ -588,7 +588,7 @@ events:
     name: "鳄妖潜伏"
     desc: "一截浮木忽然睁开猩红双眼，腐甲鳄妖拖着泥浪封住退路。"
     risk_text: "精英"
-    weight: 7
+    weight: 12
     difficulty: 4
     once_per_expedition: true
     effects: []

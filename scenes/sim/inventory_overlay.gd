@@ -2,8 +2,8 @@ extends TextureRect
 
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
 
-@onready var _bag_left: BagBaseView = $BagLeft
-@onready var _bag_right: BagBaseView = $BagRight
+@onready var _bag_left: BagBaseView = %BagLeft
+@onready var _bag_right: BagBaseView = %BagRight
 @onready var _save_all_button: Button = %SaveAll
 @onready var _withdraw_all_button: Button = %WithdrawAll
 @onready var _close_button: TextureButton = %btn_close

@@ -314,8 +314,8 @@ static func _battle_enemy_count(event: Dictionary) -> int:
 		return 1
 	var difficulty := maxi(1, int(event.get("difficulty", 1)))
 	if event_type == "elite":
-		return clampi(1 + int(floor(float(difficulty - 3) / 2.0)), 1, 3)
-	return clampi(1 + int(floor(float(difficulty - 2) / 2.0)), 1, 4)
+		return clampi(1 + int(floor(float(difficulty - 2) / 2.0)), 1, 3)
+	return clampi(1 + int(floor(float(difficulty) / 2.0)), 1, 4)
 
 
 static func _scale_enemy_for_difficulty_and_group(
@@ -330,8 +330,8 @@ static func _scale_enemy_for_difficulty_and_group(
 	var hp_scale := 1.0
 	var atk_scale := 1.0
 	if count > 1:
-		hp_scale = 0.48 if count <= 2 else 0.38
-		atk_scale = 0.58 if count <= 2 else 0.45
+		hp_scale = 0.55 if count <= 2 else 0.35
+		atk_scale = 0.42 if count <= 2 else 0.30
 	if attrs.has(FightAttr.HP_MAX):
 		attrs[FightAttr.HP_MAX] = maxf(1.0, float(attrs[FightAttr.HP_MAX]) * difficulty_scale * hp_scale)
 	for key in [FightAttr.PHYSICAL_ATK, FightAttr.MAGIC_ATK]:

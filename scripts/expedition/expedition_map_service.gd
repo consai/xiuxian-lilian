@@ -133,9 +133,9 @@ static func _pick_node_type(available_types: Array, layer: int, rng: RandomNumbe
 static func _type_weight(type_id: String) -> int:
 	match type_id:
 		EnumExpeditionNodeTypeScript.ID_GATHER:
-			return 7
-		EnumExpeditionNodeTypeScript.ID_BATTLE:
 			return 5
+		EnumExpeditionNodeTypeScript.ID_BATTLE:
+			return 9
 		EnumExpeditionNodeTypeScript.ID_RECOVER:
 			return 4
 		EnumExpeditionNodeTypeScript.ID_TRAVEL:
@@ -147,9 +147,9 @@ static func _type_weight(type_id: String) -> int:
 		EnumExpeditionNodeTypeScript.ID_TREASURE:
 			return 2
 		EnumExpeditionNodeTypeScript.ID_ELITE:
-			return 2
+			return 3
 		EnumExpeditionNodeTypeScript.ID_BOSS:
-			return 1
+			return 2
 		_:
 			return 1
 

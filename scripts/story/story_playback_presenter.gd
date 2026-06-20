@@ -9,18 +9,30 @@ signal advance_requested
 signal choice_requested(choice_id: String)
 signal skip_requested
 
-@onready var _background: ColorRect = $Background
-@onready var _guide_mask: Control = $GuideMask
-@onready var _advance_overlay: ColorRect = $AdvanceOverlay
-@onready var _focus_ring: Control = $FocusRing
-@onready var _focus_prompt: Control = $FocusPrompt
-@onready var _dialogue: Control = $DialoguePanel
-@onready var _dialogue_label: Label = $DialoguePanel/DialogueLabel
-@onready var _continue_indicator: Control = $DialoguePanel/ContinueIndicator
-@onready var _choice_panel: Control = $ChoicePanel
-@onready var _choices: VBoxContainer = $ChoicePanel/Choices
-@onready var _choice_template: Button = $ChoicePanel/Choices/ChoiceA
-@onready var _choice_template_b: Button = $ChoicePanel/Choices/ChoiceB
+@onready var _background: ColorRect = %Background
+@onready var _guide_mask: Control = %GuideMask
+@onready var _advance_overlay: ColorRect = %AdvanceOverlay
+@onready var _focus_ring: Control = %FocusRing
+@onready var _focus_prompt: Control = %FocusPrompt
+@onready var _dialogue: Control = %DialoguePanel
+@onready var _choice_panel: Control = %ChoicePanel
+@onready var _history_panel: Control = %HistoryPanel
+@onready var _skip_confirm: Control = %SkipConfirm
+@onready var _chapter_card: Control = %ChapterCard
+@onready var _end_card: Control = %EndCard
+@onready var _skip_button: Button = %SkipButton
+@onready var _auto_button: Button = %AutoButton
+@onready var _history_button: Button = %HistoryButton
+@onready var _dialogue_label: Label = _dialogue.get_node("DialogueLabel")
+@onready var _continue_indicator: Control = _dialogue.get_node("ContinueIndicator")
+@onready var _speaker_label: Label = _dialogue.get_node("NamePlate/SpeakerLabel")
+@onready var _portrait_back: Control = _dialogue.get_node("PortraitBack")
+@onready var _name_plate: Control = _dialogue.get_node("NamePlate")
+@onready var _choices: VBoxContainer = _choice_panel.get_node("Choices")
+@onready var _choice_template: Button = _choice_panel.get_node("Choices/ChoiceA")
+@onready var _choice_template_b: Button = _choice_panel.get_node("Choices/ChoiceB")
+@onready var _choice_prompt_label: Label = _choice_panel.get_node("PromptBack/PromptLabel")
+@onready var _focus_prompt_label: Label = _focus_prompt.get_node("Label")
 
 var _choice_buttons: Array[Button] = []
 var _focus_target := ""
@@ -32,13 +44,13 @@ var _advance_block_timer := 0.0
 
 func _ready() -> void:
 	_advance_overlay.gui_input.connect(_on_advance_input)
-	$StoryControls/SkipButton.pressed.connect(func() -> void: skip_requested.emit())
-	$StoryControls/AutoButton.visible = false
-	$StoryControls/HistoryButton.visible = false
-	$HistoryPanel.visible = false
-	$SkipConfirm.visible = false
-	$ChapterCard.visible = false
-	$EndCard.visible = false
+	_skip_button.pressed.connect(func() -> void: skip_requested.emit())
+	_auto_button.visible = false
+	_history_button.visible = false
+	_history_panel.visible = false
+	_skip_confirm.visible = false
+	_chapter_card.visible = false
+	_end_card.visible = false
 	_choice_template.visible = false
 	_choice_template_b.visible = false
 	_continue_indicator.visible = false
@@ -60,19 +72,19 @@ func show_frame(frame: Dictionary) -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	if _dialogue.visible:
 		_apply_line_style(frame)
-		($DialoguePanel/NamePlate/SpeakerLabel as Label).text = str(frame.get("speaker", ""))
+		_speaker_label.text = str(frame.get("speaker", ""))
 		_start_typewriter(str(frame.get("text", "")))
 	if _choice_panel.visible:
 		_reset_typewriter()
-		($ChoicePanel/PromptBack/PromptLabel as Label).text = str(frame.get("prompt", "请选择"))
+		_choice_prompt_label.text = str(frame.get("prompt", "请选择"))
 		_bind_choices(frame.get("choices", []) as Array)
 
 
 func _apply_line_style(frame: Dictionary) -> void:
 	var meta := frame.get("meta", {}) as Dictionary
 	var narration := bool(meta.get("narration", false))
-	$DialoguePanel/PortraitBack.visible = not narration
-	$DialoguePanel/NamePlate.visible = not narration
+	_portrait_back.visible = not narration
+	_name_plate.visible = not narration
 	var label := _dialogue_label
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	if narration:
@@ -97,7 +109,7 @@ func show_guide(target: String, reason: String) -> void:
 	_guide_mask.set_active(true)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_focus_target = target
-	_focus_prompt.get_node("Label").text = reason
+	_focus_prompt_label.text = reason
 	_focus_prompt.visible = reason.strip_edges() != ""
 	_update_focus()
 
@@ -207,7 +219,7 @@ func _update_focus() -> void:
 		_focus_prompt.position = Vector2(540, 96)
 		return
 	_guide_mask.set_active(true)
-	_focus_prompt.visible = _focus_prompt.get_node("Label").text.strip_edges() != ""
+	_focus_prompt.visible = _focus_prompt_label.text.strip_edges() != ""
 	var rect := target.get_global_rect()
 	_guide_mask.set_hole(rect)
 	_focus_ring.visible = true

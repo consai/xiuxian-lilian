@@ -6,6 +6,16 @@ extends Control
 @onready var _inventory_overlay: Control = %InventoryOverlay
 @onready var _save_slots_overlay: Control = %SaveSlotsOverlay
 @onready var _breakthrough_button: TextureButton = %BreakthroughButton
+@onready var _furnace_button: TextureButton = %FurnaceButton
+@onready var _storage_button: TextureButton = %StorageButton
+@onready var _cultivate_object_button: TextureButton = %CultivateObjectButton
+@onready var _rest_button: TextureButton = %RestButton
+@onready var _expedition_object_button: TextureButton = %ExpeditionObjectButton
+@onready var _backpack_button: TextureButton = %BackpackButton
+@onready var _cultivate_button: TextureButton = %CultivateButton
+@onready var _expedition_button: TextureButton = %ExpeditionButton
+@onready var _attributes_button: TextureButton = %btnattrs
+@onready var _save_button: Button = %SaveButton
 
 
 func _ready() -> void:
@@ -17,17 +27,17 @@ func _ready() -> void:
 
 
 func _connect_actions() -> void:
-	$FurnaceButton.pressed.connect(_on_alchemy)
-	$StorageButton.pressed.connect(_toggle_inventory)
-	$CultivateObjectButton.pressed.connect(_on_cultivate)
-	$RestButton.pressed.connect(_on_rest)
-	$ExpeditionObjectButton.pressed.connect(_on_encounter)
-	$BackpackButton.pressed.connect(_on_backpack)
-	$BottomActions/CultivateButton.pressed.connect(_on_cultivate)
-	$BottomActions/BreakthroughButton.pressed.connect(_on_breakthrough)
-	$BottomActions/ExpeditionButton.pressed.connect(_on_encounter)
-	$BottomActions/btnattrs.pressed.connect(_on_character_attributes)
-	%SaveButton.pressed.connect(_toggle_save_slots)
+	_furnace_button.pressed.connect(_on_alchemy)
+	_storage_button.pressed.connect(_toggle_inventory)
+	_cultivate_object_button.pressed.connect(_on_cultivate)
+	_rest_button.pressed.connect(_on_rest)
+	_expedition_object_button.pressed.connect(_on_encounter)
+	_backpack_button.pressed.connect(_on_backpack)
+	_cultivate_button.pressed.connect(_on_cultivate)
+	_breakthrough_button.pressed.connect(_on_breakthrough)
+	_expedition_button.pressed.connect(_on_encounter)
+	_attributes_button.pressed.connect(_on_character_attributes)
+	_save_button.pressed.connect(_toggle_save_slots)
 	_save_slots_overlay.closed.connect(_on_save_slots_closed)
 
 

@@ -36,6 +36,7 @@ theme = ExtResource("1_theme")
 script = ExtResource("14_presenter")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1540449560]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -46,8 +47,10 @@ mouse_filter = 2
 color = Color(0.03137255, 0.03137255, 0.03137255, 0.62)
 
 [node name="GuideMask" parent="." unique_id=1920096844 instance=ExtResource("8_guide_mask")]
+unique_name_in_owner = true
 
 [node name="FocusRing" parent="." unique_id=1214565169 instance=ExtResource("8_focus_ring")]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 583.0
 offset_top = 397.0
@@ -55,6 +58,7 @@ offset_right = 731.0
 offset_bottom = 525.0
 
 [node name="FocusPrompt" parent="." unique_id=837878454 instance=ExtResource("6_prompt")]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 557.0
 offset_top = 530.0
@@ -62,6 +66,7 @@ offset_right = 757.0
 offset_bottom = 582.0
 
 [node name="DialoguePanel" parent="." unique_id=2145702004 instance=ExtResource("7_dialogue")]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -75,6 +80,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="AdvanceOverlay" type="ColorRect" parent="."]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -98,13 +104,16 @@ grow_horizontal = 0
 theme_override_constants/separation = 10
 
 [node name="AutoButton" parent="StoryControls" unique_id=238612601 instance=ExtResource("4_control")]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="SkipButton" parent="StoryControls" unique_id=725480136 instance=ExtResource("4_control")]
+unique_name_in_owner = true
 layout_mode = 2
 text = "跳过"
 
 [node name="HistoryButton" parent="StoryControls" unique_id=2029828821 instance=ExtResource("4_control")]
+unique_name_in_owner = true
 layout_mode = 2
 text = "回顾"
 
@@ -119,6 +128,7 @@ grow_vertical = 2
 color = Color(0.180392, 0.137255, 0.0901961, 0.42)
 
 [node name="ChoicePanel" parent="." unique_id=309864618 instance=ExtResource("9_choice_panel")]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 866.0
 offset_top = 260.0
@@ -129,6 +139,7 @@ offset_bottom = 474.0
 theme_override_styles/normal = SubResource("Style_selected")
 
 [node name="HistoryPanel" parent="." unique_id=1116970821 instance=ExtResource("10_history")]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -144,6 +155,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="SkipConfirm" parent="." unique_id=576434688 instance=ExtResource("11_skip")]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -159,6 +171,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="ChapterCard" parent="." unique_id=1221375642 instance=ExtResource("12_chapter")]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -174,6 +187,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="EndCard" parent="." unique_id=1957407053 instance=ExtResource("13_end")]
+unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = 8

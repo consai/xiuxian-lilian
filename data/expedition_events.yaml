@@ -7,7 +7,7 @@ events:
     name: "迷障浓雾"
     desc: "雾气耗散法力，需小心前行。"
     risk_text: "轻微"
-    weight: 20
+    weight: 14
     difficulty: 1
     once_per_expedition: false
     effects:
@@ -28,7 +28,7 @@ events:
     name: "断崖滑坠"
     desc: "碎石滚落，擦伤难免。"
     risk_text: "危险"
-    weight: 14
+    weight: 10
     difficulty: 3
     once_per_expedition: false
     effects:
@@ -50,7 +50,7 @@ events:
     name: "狼踪再现"
     desc: "泥地上留着新鲜爪印，是否要追踪狼踪？"
     risk_text: "抉择"
-    weight: 14
+    weight: 12
     difficulty: 2
     once_per_expedition: false
     options:
@@ -71,7 +71,7 @@ events:
     name: "遇伤修士"
     desc: "一名散修靠在岩边喘息，向你求助。"
     risk_text: "抉择"
-    weight: 12
+    weight: 9
     difficulty: 1
     once_per_expedition: false
     options:
@@ -111,7 +111,8 @@ events:
     name: "青牙狼袭"
     desc: "狼群自林间扑出。"
     risk_text: "普通"
-    weight: 24
+    weight: 42
+    enemy_count: 2
     difficulty: 1
     once_per_expedition: false
     effects: []
@@ -130,7 +131,7 @@ events:
     name: "寒潭妖蟒"
     desc: "潭底巨蟒破水而出。"
     risk_text: "精英"
-    weight: 12
+    weight: 18
     difficulty: 3
     once_per_expedition: false
     effects: []
@@ -149,7 +150,7 @@ events:
     name: "赤焰妖王"
     desc: "山巅妖王威压如山。"
     risk_text: "首领"
-    weight: 6
+    weight: 8
     difficulty: 6
     once_per_expedition: true
     effects: []

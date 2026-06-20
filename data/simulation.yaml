@@ -138,10 +138,10 @@ initial_player:
   name: "清风剑仙"
   icon: "jueshe/sprite_002.png"
   foundations:
-    body: 10
-    spirit: 10
-    sense: 10
-    agility: 10
+    body: 16
+    spirit: 16
+    sense: 14
+    agility: 14
   aptitudes:
     comprehension: 12
     fortune: 10
