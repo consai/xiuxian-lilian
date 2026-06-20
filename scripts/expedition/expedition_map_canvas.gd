@@ -14,6 +14,11 @@ func setup(nodes: Array, edges: Array) -> void:
 	queue_redraw()
 
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED:
+		queue_redraw()
+
+
 func node_position(node: Dictionary) -> Vector2:
 	var max_layer := 1
 	var max_lane_by_layer := {}

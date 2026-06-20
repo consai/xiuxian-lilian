@@ -1,6 +1,6 @@
 extends Control
 
-## GM 道具发放面板：模糊搜索配置表道具并经 GameState.grant_rewards 发放。
+## GM 奖励发放面板：模糊搜索配置表道具 / 法宝并经 GameState.grant_rewards 发放。
 
 const GmItemSearchScript := preload("res://scripts/ui/gm_item_search.gd")
 
@@ -42,6 +42,7 @@ func _build_catalog() -> void:
 			continue
 		var def := def_v as ItemDef
 		_catalog.append({
+			"kind": EnumRewardKind.LABEL_ITEM,
 			"id": def.id,
 			"name": def.name,
 			"type": def.item_type,
@@ -49,7 +50,25 @@ func _build_catalog() -> void:
 			"secondary_type": def.secondary_type,
 			"rarity": def.rarity,
 		})
+	for equip_id_v in ConfigManager.all_equip_ids():
+		var equip_id := int(equip_id_v)
+		var equip := ConfigManager.equip_by_id(equip_id)
+		if equip.is_empty():
+			continue
+		_catalog.append({
+			"kind": EnumRewardKind.LABEL_EQUIP,
+			"id": equip_id,
+			"name": str(equip.get("name", "法宝")),
+			"type": "法宝",
+			"primary_type": "法宝",
+			"secondary_type": "战斗法宝",
+			"rarity": "品质%d" % int(equip.get("quality", 1)),
+		})
 	_catalog.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		var kind_order_a := 0 if str(a.get("kind", "")) == EnumRewardKind.LABEL_ITEM else 1
+		var kind_order_b := 0 if str(b.get("kind", "")) == EnumRewardKind.LABEL_ITEM else 1
+		if kind_order_a != kind_order_b:
+			return kind_order_a < kind_order_b
 		return str(a.get("name", "")) < str(b.get("name", ""))
 	)
 
@@ -69,8 +88,10 @@ func _rebuild_result_list() -> void:
 		if not row_v is Dictionary:
 			continue
 		var row := row_v as Dictionary
-		var item_id := str(row.get("id", ""))
-		var label := "%s · %s" % [str(row.get("name", item_id)), item_id]
+		var reward_id := str(row.get("id", ""))
+		var kind := str(row.get("kind", EnumRewardKind.LABEL_ITEM))
+		var kind_label := "法宝" if kind == EnumRewardKind.LABEL_EQUIP else "道具"
+		var label := "%s · %s · %s" % [kind_label, str(row.get("name", reward_id)), reward_id]
 		var meta_parts: PackedStringArray = []
 		var item_type := str(row.get("type", ""))
 		var rarity := str(row.get("rarity", ""))
@@ -81,25 +102,31 @@ func _rebuild_result_list() -> void:
 		if not meta_parts.is_empty():
 			label += " · " + " / ".join(meta_parts)
 		var index := _result_list.add_item(label)
-		_result_list.set_item_metadata(index, item_id)
+		_result_list.set_item_metadata(index, {
+			"kind": kind,
+			"id": row.get("id", ""),
+		})
 	if _result_list.item_count > 0:
 		_result_list.select(0)
 
 
-func _selected_item_id() -> String:
+func _selected_entry() -> Dictionary:
 	var selected := _result_list.get_selected_items()
 	if selected.is_empty():
-		return ""
+		return {}
 	var index := int(selected[0])
-	return str(_result_list.get_item_metadata(index))
+	var meta_v: Variant = _result_list.get_item_metadata(index)
+	if meta_v is Dictionary:
+		return (meta_v as Dictionary).duplicate(true)
+	return {}
 
 
 func _grant_selected() -> void:
-	var item_id := _selected_item_id()
-	if item_id == "":
-		_flash("请先选择道具")
+	var entry := _selected_entry()
+	if entry.is_empty():
+		_flash("请先选择道具或法宝")
 		return
-	_grant_item(item_id, int(_count_input.value))
+	_grant_entry(entry, int(_count_input.value))
 
 
 func _grant_all_visible() -> void:
@@ -111,23 +138,34 @@ func _grant_all_visible() -> void:
 	for row_v in _filtered:
 		if not row_v is Dictionary:
 			continue
-		if _grant_item(str((row_v as Dictionary).get("id", "")), count, false):
+		var row := row_v as Dictionary
+		if _grant_entry({"kind": row.get("kind", EnumRewardKind.LABEL_ITEM), "id": row.get("id", "")}, count, false):
 			granted += 1
-	_flash("已向背包发放可见列表中的 %d 种道具（各 x%d）" % [granted, count])
+	_flash("已发放可见列表中的 %d 种奖励（道具各 x%d，法宝各 x1）" % [granted, count])
 
 
-func _grant_item(item_id: String, count: int, announce_single: bool = true) -> bool:
+func _grant_entry(entry: Dictionary, count: int, announce_single: bool = true) -> bool:
+	var kind := str(entry.get("kind", EnumRewardKind.LABEL_ITEM))
+	var reward_id: Variant = int(entry.get("id", -1)) if kind == EnumRewardKind.LABEL_EQUIP else str(entry.get("id", ""))
+	var reward_count := 1 if kind == EnumRewardKind.LABEL_EQUIP else count
 	var applied: Array = GameState.grant_rewards([
-		{"kind": "item", "id": item_id, "count": count},
+		{"kind": kind, "id": reward_id, "count": reward_count},
 	])
 	if applied.is_empty():
 		if announce_single:
-			_flash("发放失败：未知道具或已达堆叠上限（%s）" % item_id)
+			_flash("发放失败：未知奖励或已达上限（%s）" % str(reward_id))
 		return false
+	DataEvents.emit_inventory_changed()
 	if announce_single:
 		var row := applied[0] as Dictionary
-		var display_name := ConfigManager.get_item_display_name(str(row.get("id", item_id)))
-		_flash("已获得 %s x%d" % [display_name, int(row.get("count", 0))])
+		if str(row.get("kind", kind)) == EnumRewardKind.LABEL_EQUIP:
+			var equip := ConfigManager.equip_by_id(int(row.get("id", -1)))
+			_flash("已获得法宝 %s" % str(equip.get("name", "法宝")))
+		elif str(row.get("kind", kind)) == EnumRewardKind.LABEL_CURRENCY:
+			_flash("已获得灵石 x%d" % int(row.get("count", 0)))
+		else:
+			var display_name := ConfigManager.get_item_display_name(str(row.get("id", reward_id)))
+			_flash("已获得 %s x%d" % [display_name, int(row.get("count", 0))])
 	return true
 
 

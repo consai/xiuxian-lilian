@@ -61,7 +61,7 @@ offset_left = 24.0
 offset_top = 12.0
 offset_right = 792.0
 offset_bottom = 48.0
-text = "GM · 添加道具"
+text = "GM · 添加道具 / 法宝"
 label_settings = ExtResource("4_title")
 horizontal_alignment = 1
 
@@ -83,7 +83,7 @@ offset_left = 24.0
 offset_top = 56.0
 offset_right = 792.0
 offset_bottom = 92.0
-placeholder_text = "模糊搜索：名称、ID、类型、稀有度（多关键词用空格分隔）"
+placeholder_text = "模糊搜索：名称、ID、类型、稀有度 / 品质（多关键词用空格分隔）"
 
 [node name="ResultList" type="ItemList" parent="Panel"]
 unique_name_in_owner = true
@@ -130,7 +130,7 @@ offset_left = 24.0
 offset_top = 552.0
 offset_right = 792.0
 offset_bottom = 572.0
-text = "双击条目快速发放；Esc 关闭"
+text = "双击条目快速发放；道具按数量发放，法宝每次发放 1 件；Esc 关闭"
 label_settings = ExtResource("6_small")
 
 [node name="MessageLabel" type="Label" parent="Panel"]

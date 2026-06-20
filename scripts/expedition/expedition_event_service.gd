@@ -483,36 +483,14 @@ static func build_battle_enemies(event: Dictionary) -> Array:
 
 
 static func build_enemy_formation(event: Dictionary, enemies: Array) -> Dictionary:
-	var waves := _enemy_waves_for_event(event, enemies.size())
-	if waves.is_empty():
+	if enemies.is_empty():
 		return {}
 	return {
-		"mode": "waves",
+		"mode": "columns",
 		"columns": 3,
 		"rows": 5,
 		"active_columns": 1,
-		"waves": waves,
 	}
-
-
-static func _enemy_waves_for_event(event: Dictionary, enemy_count: int) -> Array:
-	var waves: Array = []
-	if enemy_count <= 0:
-		return waves
-	var event_type := str(event.get("type", "")).strip_edges()
-	if event_type in ["elite", "boss"]:
-		for i in enemy_count:
-			waves.append([i])
-		return waves
-	var row: Array = []
-	for i in enemy_count:
-		row.append(i)
-		if row.size() >= 3:
-			waves.append(row)
-			row = []
-	if not row.is_empty():
-		waves.append(row)
-	return waves
 
 
 static func _normalize_battle_enemy(enemy_src: Dictionary) -> Dictionary:

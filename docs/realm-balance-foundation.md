@@ -4,7 +4,9 @@
 
 ## 配置入口
 
-核心配置位于 `res://data/realm_balance.json`。
+核心配置位于 `res://data/realm_balance.yaml`。
+
+人物 `Lv1-Lv90` 基础属性成长、大境界质变和怪物换算基准见 `res://docs/player-base-attribute-progression.md`；机器可读配置位于 `player_level_curve` 与 `monster_design_baseline`。
 
 境界突破门槛位于 `res://data/simulation.yaml > realms[*].breakthrough_at`，按公式 `300 * 境界序号^2` 生成。该字段表示累计修为门槛，不是本层增量。
 
@@ -12,6 +14,8 @@
 |---|---|
 | `rules` | 记录防御、命中、控制和速度的全局常数。当前运行时常数仍在 `FightAttr` / `CombatBalance` 中定义，本区块是设计基准与后续迁移入口。 |
 | `major_realms` | 大境界顺序、内容系数与普通/精英/Boss 战目标时长。 |
+| `player_level_curve` | 人物内容等级、每级根基成长、大境界脉冲和标准面板生成规则。 |
+| `monster_design_baseline` | 怪物以标准玩家为母板时的强度换算、模板系数与 Boss 预算约束。 |
 | `combat_attribute_formula` | 四维根基推导战斗面板的公式。 |
 | `realm_flat_per_layer` | 每提升一个小境界给的固定面板加成。 |
 | `standard_players` | 自动化平衡测试使用的标准玩家快照。 |

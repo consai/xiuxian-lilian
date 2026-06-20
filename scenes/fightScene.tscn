@@ -16,7 +16,6 @@
 [ext_resource type="Texture2D" uid="uid://d3k3cbpmvev6h" path="res://assets/art/jueshe/sprite_003.png" id="11_fax1c"]
 [ext_resource type="LabelSettings" uid="uid://bjruoad7rxryl" path="res://ui/ziti_new/25.tres" id="11_kccqe"]
 [ext_resource type="PackedScene" uid="uid://jcty6ipi0vb2" path="res://scenes/items/skill.tscn" id="12_s4dxh"]
-[ext_resource type="Texture2D" uid="uid://cf8g208mj4li2" path="res://assets/art/jueshe/sprite_000.png" id="14_brar2"]
 [ext_resource type="Texture2D" uid="uid://b1ct8d33ujqhh" path="res://assets/art/jueshe/sprite_001.png" id="15_6irjl"]
 [ext_resource type="Texture2D" uid="uid://bx7npswbxtpka" path="res://assets/art/ui_new/shanghai.png" id="15_748tr"]
 [ext_resource type="LabelSettings" uid="uid://dknyivqhm6bby" path="res://ui/ziti_new/13.tres" id="16_3s5lo"]
@@ -29,7 +28,7 @@
 [ext_resource type="PackedScene" uid="uid://do06os1xqkp8m" path="res://scenes/fight/battle_result_overlay.tscn" id="26_resultoverlay"]
 [ext_resource type="PackedScene" uid="uid://bwekah2swk2g3" path="res://scenes/fight/interval_track_view.tscn" id="27_interval"]
 [ext_resource type="PackedScene" path="res://scenes/fight/buff_status_bar.tscn" id="28_buffbar"]
-[ext_resource type="Script" path="res://scripts/ui/components/long_press_scroll_container.gd" id="29_lpsc"]
+[ext_resource type="Script" uid="uid://dxe5p5sw8ftc0" path="res://scripts/ui/components/long_press_scroll_container.gd" id="29_lpsc"]
 [ext_resource type="PackedScene" uid="uid://cacywilhlbfpq" path="res://scenes/fight/enemy_formation_slot.tscn" id="30_enemy_slot"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_beab3"]
@@ -646,10 +645,10 @@ vertical_alignment = 1
 [node name="BattleLogPanel" type="Panel" parent="." unique_id=1331554018]
 unique_name_in_owner = true
 layout_mode = 1
-offset_left = 196.0
-offset_top = 462.0
-offset_right = 532.0
-offset_bottom = 594.0
+offset_left = 8.0
+offset_top = 261.0
+offset_right = 164.0
+offset_bottom = 560.0
 theme = SubResource("Theme_rbqh8")
 theme_override_styles/panel = SubResource("StyleLogCard")
 script = ExtResource("18_battlelog")

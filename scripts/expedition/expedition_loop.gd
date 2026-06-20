@@ -10,6 +10,7 @@ const ExpeditionMapServiceScript := preload("res://scripts/expedition/expedition
 var _locked := false
 var _auto_chain_after_timer := false
 var _map_node_template: Button = null
+var _map_refresh_pending := false
 
 @onready var _auto_advance_timer: Timer = %AutoAdvanceTimer
 @onready var _map_scroll: ScrollContainer = %MapScroll
@@ -45,11 +46,18 @@ func _ready() -> void:
 	(%LogCloseButton as Button).pressed.connect(_hide_info_popups)
 	if not resized.is_connected(_on_resized):
 		resized.connect(_on_resized)
+	if not _map_world.resized.is_connected(_queue_map_refresh_after_layout):
+		_map_world.resized.connect(_queue_map_refresh_after_layout)
+	if not _map_canvas.resized.is_connected(_queue_map_refresh_after_layout):
+		_map_canvas.resized.connect(_queue_map_refresh_after_layout)
+	if not _map_nodes.resized.is_connected(_queue_map_refresh_after_layout):
+		_map_nodes.resized.connect(_queue_map_refresh_after_layout)
 	_map_node_template = %MapNodeTemplate as Button
 	if _map_node_template != null:
 		_map_node_template.visible = false
 	_resize_map_world()
 	_refresh_all()
+	_queue_map_refresh_after_layout()
 	if ExpeditionState.phase == "battle" and ExpeditionState.pending_battle_event_id != "":
 		var pending_event := ExpeditionEventServiceScript.by_id(ExpeditionState.pending_battle_event_id)
 		if not pending_event.is_empty():
@@ -416,6 +424,20 @@ func _resize_map_world() -> void:
 
 
 func _on_resized() -> void:
+	_resize_map_world()
+	_queue_map_refresh_after_layout()
+
+
+func _queue_map_refresh_after_layout() -> void:
+	if _map_refresh_pending:
+		return
+	_map_refresh_pending = true
+	call_deferred("_refresh_map_after_layout")
+
+
+func _refresh_map_after_layout() -> void:
+	await get_tree().process_frame
+	_map_refresh_pending = false
 	_resize_map_world()
 	_refresh_map_display()
 

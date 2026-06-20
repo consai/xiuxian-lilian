@@ -9,6 +9,94 @@ rules:
     base_seconds: 1.2
     min_seconds: 0.3
     max_seconds: 12
+player_level_curve:
+  max_level: 90
+  major_realm_starts:
+    - level: 1
+      id: "qi"
+      name: "炼气"
+    - level: 10
+      id: "foundation"
+      name: "筑基"
+    - level: 20
+      id: "core"
+      name: "金丹"
+    - level: 30
+      id: "nascent"
+      name: "元婴"
+    - level: 40
+      id: "transform"
+      name: "化神"
+    - level: 50
+      id: "void"
+      name: "炼虚"
+    - level: 60
+      id: "merge"
+      name: "合体"
+    - level: 70
+      id: "great"
+      name: "大乘"
+    - level: 80
+      id: "tribulation"
+      name: "渡劫"
+  baseline_foundations:
+    base: 10
+    per_level_all: 0.55
+    major_realm_pulse: 2.5
+    formula: "foundation_avg = 10 + 0.55 * (level - 1) + 2.5 * major_realm_index"
+  level_gain_packet:
+    foundation_points_per_level: 4
+    point_value: 0.5
+    resonance_all_foundations: 0.05
+    expected_avg_gain_per_foundation: 0.55
+  major_breakthrough_pulse:
+    foundation_avg_gain: 2.5
+    combat_power_jump_target:
+      min: 0.15
+      max: 0.25
+    qualitative_unlocks:
+      - "new_mechanic"
+      - "new_content_band"
+      - "build_slot_or_resource_upgrade"
+  content_level_formula:
+    realm_flat_index: "level - 1"
+    combat_attrs: "CharacterStats.build_combat_attrs(foundations, CharacterStats.realm_flat_modifiers(level - 1))"
+monster_design_baseline:
+  source: "player_level_curve"
+  standard_player: "按目标等级生成标准玩家面板，再乘遭遇强度带与怪物模板修正"
+  player_reference_power: 100
+  stat_budget_share:
+    normal: 1
+    elite: 0.8
+    boss: 0.6
+  role_templates:
+    striker:
+      hp: 0.85
+      attack: 1.18
+      defense: 0.85
+      speed: 1.05
+    guardian:
+      hp: 1.25
+      attack: 0.9
+      defense: 1.2
+      speed: 0.85
+    skirmisher:
+      hp: 0.75
+      attack: 0.95
+      defense: 0.8
+      speed: 1.25
+    controller:
+      hp: 0.9
+      attack: 0.8
+      defense: 0.95
+      speed: 1
+      control_power: 1.25
+    summoner:
+      hp: 0.8
+      attack: 0.75
+      defense: 0.85
+      speed: 0.95
+      mechanic_budget: 1.35
 major_realms:
   - id: "qi"
     name: "炼气"

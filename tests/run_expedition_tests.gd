@@ -556,13 +556,14 @@ func _test_high_difficulty_battle_nodes_generate_map_enemies() -> void:
 		_expect_true(BattleInitData.collect_errors(init_data).is_empty(), "%s generated battle init valid" % forced_type)
 		var enemies := init_data.get("enemies", []) as Array
 		var formation := init_data.get("enemy_formation", {}) as Dictionary
-		_expect_eq(str(formation.get("mode", "")), "waves", "%s generated battle uses wave formation" % forced_type)
+		_expect_eq(str(formation.get("mode", "")), "columns", "%s generated battle uses column formation" % forced_type)
+		_expect_eq(int(formation.get("columns", 0)), 3, "%s generated battle has three formation columns" % forced_type)
+		_expect_eq(int(formation.get("rows", 0)), 5, "%s generated battle has five formation rows" % forced_type)
+		_expect_eq(int(formation.get("active_columns", 0)), 1, "%s generated battle only activates front column" % forced_type)
 		if forced_type == "battle":
 			_expect_eq(enemies.size(), 4, "difficulty six normal battle generates group size from difficulty")
-			_expect_eq((formation.get("waves", []) as Array).size(), 2, "normal group is split into rows")
 		else:
 			_expect_eq(enemies.size(), 3, "difficulty six elite battle generates elite group size from difficulty")
-			_expect_eq((formation.get("waves", []) as Array).size(), 3, "elite enemies each stand alone row")
 		_expect_true(not enemies.is_empty(), "%s generated battle has enemies" % forced_type)
 		if not enemies.is_empty():
 			var enemy := enemies[0] as Dictionary
