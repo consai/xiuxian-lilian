@@ -37,7 +37,11 @@ func refresh() -> void:
 
 func _build_catalog() -> void:
 	_catalog.clear()
-	for def_v in ConfigManager.items():
+	var cm := _config_manager()
+	if cm == null:
+		return
+	var item_rows := cm.call("items") as Array
+	for def_v in item_rows:
 		if not def_v is ItemDef:
 			continue
 		var def := def_v as ItemDef
@@ -50,9 +54,10 @@ func _build_catalog() -> void:
 			"secondary_type": def.secondary_type,
 			"rarity": def.rarity,
 		})
-	for equip_id_v in ConfigManager.all_equip_ids():
+	var equip_ids := cm.call("all_equip_ids") as Array
+	for equip_id_v in equip_ids:
 		var equip_id := int(equip_id_v)
-		var equip := ConfigManager.equip_by_id(equip_id)
+		var equip := cm.call("equip_by_id", equip_id) as Dictionary
 		if equip.is_empty():
 			continue
 		_catalog.append({
@@ -65,8 +70,8 @@ func _build_catalog() -> void:
 			"rarity": "品质%d" % int(equip.get("quality", 1)),
 		})
 	_catalog.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
-		var kind_order_a := 0 if str(a.get("kind", "")) == EnumRewardKind.LABEL_ITEM else 1
-		var kind_order_b := 0 if str(b.get("kind", "")) == EnumRewardKind.LABEL_ITEM else 1
+		var kind_order_a := 0 if str(a.get("kind", "")) == EnumRewardKind.LABEL_EQUIP else 1
+		var kind_order_b := 0 if str(b.get("kind", "")) == EnumRewardKind.LABEL_EQUIP else 1
 		if kind_order_a != kind_order_b:
 			return kind_order_a < kind_order_b
 		return str(a.get("name", "")) < str(b.get("name", ""))
@@ -145,26 +150,38 @@ func _grant_all_visible() -> void:
 
 
 func _grant_entry(entry: Dictionary, count: int, announce_single: bool = true) -> bool:
+	var game_state := _game_state()
+	if game_state == null:
+		if announce_single:
+			_flash("发放失败：GameState 未初始化")
+		return false
 	var kind := str(entry.get("kind", EnumRewardKind.LABEL_ITEM))
 	var reward_id: Variant = int(entry.get("id", -1)) if kind == EnumRewardKind.LABEL_EQUIP else str(entry.get("id", ""))
 	var reward_count := 1 if kind == EnumRewardKind.LABEL_EQUIP else count
-	var applied: Array = GameState.grant_rewards([
+	var applied: Array = game_state.call("grant_rewards", [
 		{"kind": kind, "id": reward_id, "count": reward_count},
-	])
+	]) as Array
 	if applied.is_empty():
 		if announce_single:
 			_flash("发放失败：未知奖励或已达上限（%s）" % str(reward_id))
 		return false
-	DataEvents.emit_inventory_changed()
+	var data_events := _data_events()
+	if data_events != null and data_events.has_method("emit_inventory_changed"):
+		data_events.call("emit_inventory_changed")
 	if announce_single:
+		var cm := _config_manager()
 		var row := applied[0] as Dictionary
 		if str(row.get("kind", kind)) == EnumRewardKind.LABEL_EQUIP:
-			var equip := ConfigManager.equip_by_id(int(row.get("id", -1)))
+			var equip := {}
+			if cm != null:
+				equip = cm.call("equip_by_id", int(row.get("id", -1))) as Dictionary
 			_flash("已获得法宝 %s" % str(equip.get("name", "法宝")))
 		elif str(row.get("kind", kind)) == EnumRewardKind.LABEL_CURRENCY:
 			_flash("已获得灵石 x%d" % int(row.get("count", 0)))
 		else:
-			var display_name := ConfigManager.get_item_display_name(str(row.get("id", reward_id)))
+			var display_name := str(row.get("id", reward_id))
+			if cm != null and cm.has_method("get_item_display_name"):
+				display_name = str(cm.call("get_item_display_name", display_name))
 			_flash("已获得 %s x%d" % [display_name, int(row.get("count", 0))])
 	return true
 
@@ -176,3 +193,24 @@ func _flash(message: String) -> void:
 func _on_close_pressed() -> void:
 	visible = false
 	closed.emit()
+
+
+func _config_manager() -> Node:
+	var loop := Engine.get_main_loop()
+	if not loop is SceneTree:
+		return null
+	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
+
+
+func _game_state() -> Node:
+	var loop := Engine.get_main_loop()
+	if not loop is SceneTree:
+		return null
+	return (loop as SceneTree).root.get_node_or_null("GameState")
+
+
+func _data_events() -> Node:
+	var loop := Engine.get_main_loop()
+	if not loop is SceneTree:
+		return null
+	return (loop as SceneTree).root.get_node_or_null("DataEvents")

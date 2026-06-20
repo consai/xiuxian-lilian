@@ -16,6 +16,10 @@ const _SHIELD_ICON := preload("res://assets/art/ui_new/hudun_icon.png")
 @onready var _buff_status: BuffStatusBar = %BuffStatusBar
 
 
+func actor_sprite() -> Sprite2D:
+	return sprite
+
+
 func apply_slot(
 		row_data: Dictionary,
 		unit: FightObj,

@@ -204,6 +204,8 @@ skills:
     prereqs:
       - id: "foundation.meridians"
         level: 4
+      - id: "foundation.control"
+        level: 4
     description: "将散乱修为固化为可持续成长的道基。"
     usageDomains:
       - "cultivation_method"
@@ -217,6 +219,8 @@ skills:
     prereqs:
       - id: "foundation.dao_base"
         level: 4
+      - id: "spirit.inner_demon"
+        level: 2
     description: "平衡精气神并凝聚金丹。"
     usageDomains:
       - "cultivation_method"
@@ -230,6 +234,8 @@ skills:
     prereqs:
       - id: "foundation.core_theory"
         level: 4
+      - id: "spirit.soul"
+        level: 3
     description: "令金丹孕化为第二生命核心。"
     usageDomains:
       - "cultivation_method"
@@ -244,6 +250,8 @@ skills:
     prereqs:
       - id: "foundation.nascent_theory"
         level: 4
+      - id: "spirit.split"
+        level: 4
     description: "让元神与天地法理发生共鸣。"
     usageDomains:
       - "cultivation_method"
@@ -256,6 +264,8 @@ skills:
     maxLevel: 5
     prereqs:
       - id: "foundation.spirit_theory"
+        level: 4
+      - id: "formation.teleport"
         level: 4
     description: "理解虚实转换与空间存续。"
     usageDomains:
@@ -270,6 +280,8 @@ skills:
     prereqs:
       - id: "foundation.void_theory"
         level: 4
+      - id: "body.unity"
+        level: 3
     description: "统合肉身、元神、法相与洞天。"
     usageDomains:
       - "cultivation_method"
@@ -283,6 +295,8 @@ skills:
     prereqs:
       - id: "foundation.integration_theory"
         level: 4
+      - id: "heaven.law_seed"
+        level: 3
     description: "将所修大道凝为完整道果。"
     usageDomains:
       - "cultivation_method"
@@ -296,6 +310,8 @@ skills:
     prereqs:
       - id: "foundation.mahayana_theory"
         level: 5
+      - id: "heaven.tribulation"
+        level: 4
     description: "准备渡过天劫并完成生命层次跃迁。"
     usageDomains:
       - "cultivation_method"
@@ -321,6 +337,8 @@ skills:
     prereqs:
       - id: "cultivation.qi_sense"
         level: 3
+      - id: "foundation.meridians"
+        level: 2
     description: "建立稳定灵力循环。"
     usageDomains:
       - "cultivation_method"
@@ -346,6 +364,8 @@ skills:
     prereqs:
       - id: "cultivation.cycle"
         level: 5
+      - id: "foundation.dao_base"
+        level: 2
     description: "贯通主要经脉并扩大储量。"
     usageDomains:
       - "cultivation_method"
@@ -358,6 +378,8 @@ skills:
     prereqs:
       - id: "cultivation.purity"
         level: 4
+      - id: "cultivation.great_cycle"
+        level: 3
     description: "将灵力压缩为高密度真元。"
     usageDomains:
       - "cultivation_method"
@@ -370,6 +392,8 @@ skills:
     prereqs:
       - id: "cultivation.liquid_mana"
         level: 5
+      - id: "foundation.core_theory"
+        level: 2
     description: "驱动金丹并供给炼制与战斗。"
     usageDomains:
       - "cultivation_method"
@@ -383,6 +407,8 @@ skills:
     prereqs:
       - id: "cultivation.core_fire"
         level: 4
+      - id: "foundation.nascent_theory"
+        level: 2
     description: "让元婴独立吐纳并维持本体。"
     usageDomains:
       - "cultivation_method"
@@ -395,6 +421,8 @@ skills:
     prereqs:
       - id: "cultivation.nascent_cycle"
         level: 4
+      - id: "spell.resonance"
+        level: 3
     description: "借天地灵机替代部分自身消耗。"
     usageDomains:
       - "cultivation_method"
@@ -407,6 +435,8 @@ skills:
     prereqs:
       - id: "cultivation.heaven_cycle"
         level: 4
+      - id: "foundation.void_theory"
+        level: 2
     description: "从虚空乱流中提炼可用力量。"
     usageDomains:
       - "cultivation_method"
@@ -419,6 +449,8 @@ skills:
     prereqs:
       - id: "cultivation.void_furnace"
         level: 4
+      - id: "foundation.integration_theory"
+        level: 3
     description: "形成近乎闭合的法力生态。"
     usageDomains:
       - "cultivation_method"
@@ -431,6 +463,8 @@ skills:
     prereqs:
       - id: "cultivation.endless"
         level: 5
+      - id: "foundation.mahayana_theory"
+        level: 3
     description: "以道果驱动全部功法。"
     usageDomains:
       - "cultivation_method"
@@ -443,6 +477,8 @@ skills:
     prereqs:
       - id: "cultivation.dao_engine"
         level: 5
+      - id: "foundation.ascension"
+        level: 2
     description: "承载并转化劫后仙灵之气。"
     usageDomains:
       - "cultivation_method"
@@ -468,6 +504,8 @@ skills:
     prereqs:
       - id: "body.tempering"
         level: 3
+      - id: "foundation.meridians"
+        level: 2
     description: "强化骨骼、筋膜和爆发力。"
     usageDomains:
       - "cultivation_method"
@@ -480,6 +518,8 @@ skills:
     maxLevel: 5
     prereqs:
       - id: "body.tempering"
+        level: 2
+      - id: "cultivation.cycle"
         level: 2
     description: "加速伤势与疲劳恢复。"
     usageDomains:
@@ -494,6 +534,8 @@ skills:
     prereqs:
       - id: "body.bone"
         level: 4
+      - id: "foundation.dao_base"
+        level: 2
     description: "让肉身具备抗灵力侵蚀能力。"
     usageDomains:
       - "cultivation_method"
@@ -507,6 +549,8 @@ skills:
     prereqs:
       - id: "body.jade"
         level: 4
+      - id: "alchemy.blood"
+        level: 2
     description: "激活、辨识并驾驭血脉特性。"
     usageDomains:
       - "cultivation_method"
@@ -519,6 +563,8 @@ skills:
     prereqs:
       - id: "body.bloodline"
         level: 4
+      - id: "body.recovery"
+        level: 5
     description: "从重创中高速再生。"
     usageDomains:
       - "cultivation_method"
@@ -532,6 +578,8 @@ skills:
     prereqs:
       - id: "body.regeneration"
         level: 3
+      - id: "foundation.spirit_theory"
+        level: 2
     description: "以神魂法理放大肉身。"
     usageDomains:
       - "cultivation_method"
@@ -545,6 +593,8 @@ skills:
     prereqs:
       - id: "body.dharma_form"
         level: 4
+      - id: "foundation.void_theory"
+        level: 2
     description: "抵御空间乱流和虚实撕裂。"
     usageDomains:
       - "cultivation_method"
@@ -558,6 +608,8 @@ skills:
     prereqs:
       - id: "body.void_body"
         level: 4
+      - id: "spirit.primordial"
+        level: 4
     description: "消除肉身、法力与元神间的损耗。"
     usageDomains:
       - "cultivation_method"
@@ -570,6 +622,8 @@ skills:
     prereqs:
       - id: "body.unity"
         level: 5
+      - id: "foundation.mahayana_theory"
+        level: 3
     description: "以道果维系肉身不灭性。"
     usageDomains:
       - "cultivation_method"
@@ -582,6 +636,8 @@ skills:
     prereqs:
       - id: "body.indestructible"
         level: 5
+      - id: "heaven.thunder_body"
+        level: 4
     description: "利用劫雷完成最终淬体。"
     usageDomains:
       - "cultivation_method"
@@ -607,6 +663,8 @@ skills:
     prereqs:
       - id: "spirit.meditation"
         level: 3
+      - id: "foundation.control"
+        level: 2
     description: "在感官外探查与操控。"
     usageDomains:
       - "cultivation_method"
@@ -620,6 +678,8 @@ skills:
     prereqs:
       - id: "spirit.meditation"
         level: 4
+      - id: "foundation.dao_base"
+        level: 2
     description: "识别执念、幻境与精神污染。"
     usageDomains:
       - "cultivation_method"
@@ -633,6 +693,8 @@ skills:
     prereqs:
       - id: "spirit.sense"
         level: 5
+      - id: "spirit.inner_demon"
+        level: 3
     description: "抵御搜魂、夺舍和魂伤。"
     usageDomains:
       - "cultivation_method"
@@ -646,6 +708,8 @@ skills:
     prereqs:
       - id: "spirit.soul"
         level: 4
+      - id: "foundation.nascent_theory"
+        level: 2
     description: "并行操控法器、术法或化身。"
     usageDomains:
       - "cultivation_method"
@@ -659,6 +723,8 @@ skills:
     prereqs:
       - id: "spirit.split"
         level: 4
+      - id: "foundation.spirit_theory"
+        level: 2
     description: "令元神脱离肉身独立行动。"
     usageDomains:
       - "cultivation_method"
@@ -672,6 +738,8 @@ skills:
     prereqs:
       - id: "spirit.inner_demon"
         level: 5
+      - id: "spirit.primordial"
+        level: 2
     description: "进入、塑造并防御梦境。"
     usageDomains:
       - "cultivation_method"
@@ -685,6 +753,8 @@ skills:
     prereqs:
       - id: "spirit.primordial"
         level: 4
+      - id: "foundation.void_theory"
+        level: 2
     description: "让神念跨越虚实并高速演算。"
     usageDomains:
       - "cultivation_method"
@@ -698,6 +768,8 @@ skills:
     prereqs:
       - id: "spirit.void_thought"
         level: 4
+      - id: "body.unity"
+        level: 3
     description: "统一分神、化身与本我。"
     usageDomains:
       - "cultivation_method"
@@ -710,6 +782,8 @@ skills:
     prereqs:
       - id: "spirit.myriad"
         level: 5
+      - id: "heaven.causality"
+        level: 3
     description: "在大道冲击与因果反噬中保持自我。"
     usageDomains:
       - "cultivation_method"
@@ -723,6 +797,8 @@ skills:
     prereqs:
       - id: "spirit.dao_heart"
         level: 5
+      - id: "heaven.tribulation"
+        level: 4
     description: "主动面对并渡过最终心劫。"
     usageDomains:
       - "cultivation_method"
@@ -748,6 +824,8 @@ skills:
     prereqs:
       - id: "spell.elements"
         level: 2
+      - id: "foundation.control"
+        level: 3
     description: "施展稳定的远程基础术法。"
     usageDomains:
       - "cultivation_method"
@@ -774,6 +852,8 @@ skills:
     prereqs:
       - id: "spell.elements"
         level: 4
+      - id: "foundation.dao_base"
+        level: 2
     description: "组合并转换五行术法。"
     usageDomains:
       - "cultivation_method"
@@ -787,6 +867,8 @@ skills:
     prereqs:
       - id: "spell.five_phase"
         level: 4
+      - id: "cultivation.core_fire"
+        level: 2
     description: "驾驭高爆发且克邪的雷霆。"
     usageDomains:
       - "cultivation_method"
@@ -800,6 +882,8 @@ skills:
     prereqs:
       - id: "spell.five_phase"
         level: 5
+      - id: "foundation.nascent_theory"
+        level: 2
     description: "借环境放大或改变术法。"
     usageDomains:
       - "cultivation_method"
@@ -812,6 +896,8 @@ skills:
     prereqs:
       - id: "spell.resonance"
         level: 4
+      - id: "foundation.spirit_theory"
+        level: 3
     description: "持续改写一定范围内的术法规则。"
     usageDomains:
       - "cultivation_method"
@@ -825,6 +911,8 @@ skills:
     prereqs:
       - id: "spell.domain"
         level: 4
+      - id: "formation.space"
+        level: 3
     description: "切割空间、放逐或跨越阻隔。"
     usageDomains:
       - "cultivation_method"
@@ -838,6 +926,8 @@ skills:
     prereqs:
       - id: "spell.void"
         level: 4
+      - id: "talisman.true_name"
+        level: 3
     description: "以自身法则短暂覆盖现实。"
     usageDomains:
       - "cultivation_method"
@@ -851,6 +941,8 @@ skills:
     prereqs:
       - id: "spell.law"
         level: 5
+      - id: "formation.cave_heaven"
+        level: 4
     description: "展开自有小天地压制敌手。"
     usageDomains:
       - "cultivation_method"
@@ -864,6 +956,8 @@ skills:
     prereqs:
       - id: "spell.world"
         level: 5
+      - id: "heaven.tribulation"
+        level: 4
     description: "将劫数引入攻击性神通。"
     usageDomains:
       - "cultivation_method"
@@ -890,6 +984,8 @@ skills:
     prereqs:
       - id: "sword.weapon"
         level: 3
+      - id: "foundation.control"
+        level: 3
     description: "远程御器并释放剑气。"
     usageDomains:
       - "cultivation_method"
@@ -903,6 +999,8 @@ skills:
     prereqs:
       - id: "sword.weapon"
         level: 5
+      - id: "spirit.meditation"
+        level: 3
     description: "形成个人战斗意志。"
     usageDomains:
       - "cultivation_method"
@@ -915,6 +1013,8 @@ skills:
     prereqs:
       - id: "sword.qi"
         level: 4
+      - id: "formation.array"
+        level: 2
     description: "同时控制多柄飞剑构阵。"
     usageDomains:
       - "cultivation_method"
@@ -928,6 +1028,8 @@ skills:
     prereqs:
       - id: "sword.intent"
         level: 5
+      - id: "spirit.soul"
+        level: 3
     description: "减少招式迟疑并看破破绽。"
     usageDomains:
       - "cultivation_method"
@@ -941,6 +1043,8 @@ skills:
     prereqs:
       - id: "sword.heart"
         level: 4
+      - id: "foundation.spirit_theory"
+        level: 2
     description: "以兵意控制战场空间。"
     usageDomains:
       - "cultivation_method"
@@ -954,6 +1058,8 @@ skills:
     prereqs:
       - id: "sword.domain"
         level: 4
+      - id: "spell.void"
+        level: 2
     description: "攻击空间结构与无形目标。"
     usageDomains:
       - "cultivation_method"
@@ -967,6 +1073,8 @@ skills:
     prereqs:
       - id: "sword.void_cut"
         level: 4
+      - id: "artifact.life_bound"
+        level: 3
     description: "让本命兵器成为自身延伸。"
     usageDomains:
       - "cultivation_method"
@@ -980,6 +1088,8 @@ skills:
     prereqs:
       - id: "sword.unity"
         level: 5
+      - id: "foundation.mahayana_theory"
+        level: 3
     description: "以一条完整兵道统合杀伐。"
     usageDomains:
       - "cultivation_method"
@@ -993,6 +1103,8 @@ skills:
     prereqs:
       - id: "sword.dao"
         level: 5
+      - id: "heaven.law_mastery"
+        level: 3
     description: "以道果发出足以破劫的极致一击。"
     usageDomains:
       - "cultivation_method"
@@ -1020,6 +1132,8 @@ skills:
     prereqs:
       - id: "artifact.materials"
         level: 3
+      - id: "foundation.control"
+        level: 2
     description: "制造凡器与低阶法器胚胎。"
     usageDomains:
       - "cultivation_method"
@@ -1034,6 +1148,8 @@ skills:
     prereqs:
       - id: "artifact.smelting"
         level: 4
+      - id: "formation.runes"
+        level: 2
     description: "将功能阵纹稳定刻入器物。"
     usageDomains:
       - "cultivation_method"
@@ -1047,6 +1163,8 @@ skills:
     prereqs:
       - id: "artifact.inscription"
         level: 4
+      - id: "cultivation.core_fire"
+        level: 3
     description: "炼制可成长的法宝。"
     usageDomains:
       - "cultivation_method"
@@ -1059,6 +1177,8 @@ skills:
     maxLevel: 5
     prereqs:
       - id: "artifact.inscription"
+        level: 3
+      - id: "spirit.sense"
         level: 3
     description: "制造并控制自主机关。"
     usageDomains:
@@ -1073,6 +1193,8 @@ skills:
     prereqs:
       - id: "artifact.treasure"
         level: 4
+      - id: "spirit.soul"
+        level: 3
     description: "让法宝与性命交修、同步成长。"
     usageDomains:
       - "cultivation_method"
@@ -1087,6 +1209,8 @@ skills:
     prereqs:
       - id: "artifact.life_bound"
         level: 4
+      - id: "spirit.split"
+        level: 3
     description: "赋予高阶法宝人格与自主性。"
     usageDomains:
       - "cultivation_method"
@@ -1100,6 +1224,8 @@ skills:
     prereqs:
       - id: "artifact.spirit"
         level: 3
+      - id: "formation.space"
+        level: 4
     description: "建造可穿行虚空的大型载具。"
     usageDomains:
       - "cultivation_method"
@@ -1113,6 +1239,8 @@ skills:
     prereqs:
       - id: "artifact.spirit"
         level: 5
+      - id: "heaven.law_seed"
+        level: 3
     description: "让器物承载独立法则。"
     usageDomains:
       - "cultivation_method"
@@ -1126,6 +1254,8 @@ skills:
     prereqs:
       - id: "artifact.dao_weapon"
         level: 5
+      - id: "formation.cave_heaven"
+        level: 4
     description: "炼制承载世界的重器。"
     usageDomains:
       - "cultivation_method"
@@ -1139,6 +1269,8 @@ skills:
     prereqs:
       - id: "artifact.world_treasure"
         level: 5
+      - id: "heaven.tribulation"
+        level: 4
     description: "以天劫完成法宝的仙器蜕变。"
     usageDomains:
       - "cultivation_method"
@@ -1166,6 +1298,8 @@ skills:
     prereqs:
       - id: "alchemy.herbs"
         level: 3
+      - id: "foundation.meridians"
+        level: 2
     description: "诊断并治疗常见伤病。"
     usageDomains:
       - "cultivation_method"
@@ -1179,6 +1313,8 @@ skills:
     prereqs:
       - id: "alchemy.herbs"
         level: 4
+      - id: "foundation.control"
+        level: 3
     description: "炼制基础丹药并控制丹毒。"
     usageDomains:
       - "cultivation_method"
@@ -1193,6 +1329,8 @@ skills:
     prereqs:
       - id: "alchemy.medicine"
         level: 4
+      - id: "alchemy.herbs"
+        level: 4
     description: "制作、识别并解除毒素。"
     usageDomains:
       - "cultivation_method"
@@ -1206,6 +1344,8 @@ skills:
     prereqs:
       - id: "alchemy.furnace"
         level: 3
+      - id: "alchemy.medicine"
+        level: 4
     description: "处理妖兽、血脉与炼体药材。"
     usageDomains:
       - "cultivation_method"
@@ -1219,6 +1359,8 @@ skills:
     prereqs:
       - id: "alchemy.furnace"
         level: 5
+      - id: "spirit.soul"
+        level: 3
     description: "治疗魂伤并滋养元婴。"
     usageDomains:
       - "cultivation_method"
@@ -1232,6 +1374,8 @@ skills:
     prereqs:
       - id: "alchemy.soul"
         level: 4
+      - id: "body.regeneration"
+        level: 3
     description: "重塑器官、根骨与生命状态。"
     usageDomains:
       - "cultivation_method"
@@ -1244,6 +1388,8 @@ skills:
     maxLevel: 5
     prereqs:
       - id: "alchemy.life"
+        level: 3
+      - id: "world.void_survival"
         level: 3
     description: "培育并使用虚空生态药材。"
     usageDomains:
@@ -1258,6 +1404,8 @@ skills:
     prereqs:
       - id: "alchemy.life"
         level: 5
+      - id: "heaven.law_seed"
+        level: 3
     description: "将法则片段炼入丹药。"
     usageDomains:
       - "cultivation_method"
@@ -1271,6 +1419,8 @@ skills:
     prereqs:
       - id: "alchemy.dao_pill"
         level: 5
+      - id: "heaven.causality"
+        level: 4
     description: "在因果允许时挽回濒灭生命。"
     usageDomains:
       - "cultivation_method"
@@ -1284,6 +1434,8 @@ skills:
     prereqs:
       - id: "alchemy.resurrection"
         level: 5
+      - id: "heaven.tribulation"
+        level: 3
     description: "炼制辅助渡劫与仙灵转化的顶阶丹药。"
     usageDomains:
       - "cultivation_method"
@@ -1296,6 +1448,8 @@ skills:
     maxLevel: 5
     prereqs:
       - id: "foundation.literacy"
+        level: 2
+      - id: "foundation.control"
         level: 2
     description: "读取和绘制基础阵纹。"
     usageDomains:
@@ -1326,6 +1480,8 @@ skills:
     prereqs:
       - id: "formation.array"
         level: 4
+      - id: "foundation.dao_base"
+        level: 2
     description: "设计多节点防御阵。"
     usageDomains:
       - "cultivation_method"
@@ -1339,6 +1495,8 @@ skills:
     prereqs:
       - id: "formation.runes"
         level: 5
+      - id: "spirit.sense"
+        level: 4
     description: "分析、绕过或重写禁制。"
     usageDomains:
       - "cultivation_method"
@@ -1352,6 +1510,8 @@ skills:
     prereqs:
       - id: "formation.defense"
         level: 4
+      - id: "formation.restriction"
+        level: 3
     description: "建立坐标锚点与稳定传送。"
     usageDomains:
       - "cultivation_method"
@@ -1364,6 +1524,8 @@ skills:
     maxLevel: 5
     prereqs:
       - id: "formation.teleport"
+        level: 3
+      - id: "spell.domain"
         level: 3
     description: "将领域固化为持续阵法。"
     usageDomains:
@@ -1378,6 +1540,8 @@ skills:
     prereqs:
       - id: "formation.teleport"
         level: 5
+      - id: "foundation.void_theory"
+        level: 2
     description: "折叠、封锁和稳定空间。"
     usageDomains:
       - "cultivation_method"
@@ -1391,6 +1555,8 @@ skills:
     prereqs:
       - id: "formation.space"
         level: 4
+      - id: "spell.law"
+        level: 3
     description: "构筑可成长的独立小世界。"
     usageDomains:
       - "cultivation_method"
@@ -1405,6 +1571,8 @@ skills:
     prereqs:
       - id: "formation.cave_heaven"
         level: 5
+      - id: "heaven.astrology"
+        level: 4
     description: "借星辰级能量驱动巨型阵法。"
     usageDomains:
       - "cultivation_method"
@@ -1418,6 +1586,8 @@ skills:
     prereqs:
       - id: "formation.star"
         level: 5
+      - id: "heaven.tribulation"
+        level: 4
     description: "分流、约束并利用天劫。"
     usageDomains:
       - "cultivation_method"
@@ -1430,6 +1600,8 @@ skills:
     maxLevel: 5
     prereqs:
       - id: "foundation.literacy"
+        level: 2
+      - id: "foundation.control"
         level: 2
     description: "把简单术式封入载体。"
     usageDomains:
@@ -1459,6 +1631,8 @@ skills:
     prereqs:
       - id: "talisman.script"
         level: 4
+      - id: "spirit.sense"
+        level: 2
     description: "封锁力量、物件或行动。"
     usageDomains:
       - "cultivation_method"
@@ -1474,6 +1648,8 @@ skills:
     prereqs:
       - id: "talisman.seal"
         level: 3
+      - id: "spirit.inner_demon"
+        level: 3
     description: "施加并解除持续性咒法。"
     usageDomains:
       - "cultivation_method"
@@ -1488,6 +1664,8 @@ skills:
     prereqs:
       - id: "talisman.seal"
         level: 5
+      - id: "spirit.soul"
+        level: 4
     description: "建立可验证的灵魂契约。"
     usageDomains:
       - "cultivation_method"
@@ -1502,6 +1680,8 @@ skills:
     prereqs:
       - id: "talisman.soul_seal"
         level: 3
+      - id: "spell.resonance"
+        level: 4
     description: "借天地认可强制执行命令。"
     usageDomains:
       - "cultivation_method"
@@ -1516,6 +1696,8 @@ skills:
     prereqs:
       - id: "talisman.command"
         level: 4
+      - id: "spirit.void_thought"
+        level: 3
     description: "通过真名定位和影响目标本质。"
     usageDomains:
       - "cultivation_method"
@@ -1530,6 +1712,8 @@ skills:
     prereqs:
       - id: "talisman.true_name"
         level: 4
+      - id: "heaven.causality"
+        level: 3
     description: "封锁事件结果或因果联系。"
     usageDomains:
       - "cultivation_method"
@@ -1543,6 +1727,8 @@ skills:
     prereqs:
       - id: "talisman.causality_seal"
         level: 5
+      - id: "heaven.law_mastery"
+        level: 3
     description: "以自身道果颁布局部天则。"
     usageDomains:
       - "cultivation_method"
@@ -1556,6 +1742,8 @@ skills:
     prereqs:
       - id: "talisman.heaven_decree"
         level: 5
+      - id: "heaven.tribulation"
+        level: 4
     description: "短暂调整劫数的对象与表现。"
     usageDomains:
       - "cultivation_method"
@@ -1596,6 +1784,8 @@ skills:
     prereqs:
       - id: "world.survival"
         level: 2
+      - id: "world.appraisal"
+        level: 2
     description: "安全、高效地收集资源。"
     usageDomains:
       - "cultivation_method"
@@ -1624,6 +1814,8 @@ skills:
     prereqs:
       - id: "world.survival"
         level: 4
+      - id: "spirit.sense"
+        level: 2
     description: "理解、驯养和指挥灵兽。"
     usageDomains:
       - "cultivation_method"
@@ -1638,6 +1830,8 @@ skills:
     prereqs:
       - id: "world.gathering"
         level: 4
+      - id: "formation.array"
+        level: 3
     description: "寻找灵脉、遗迹和地势节点。"
     usageDomains:
       - "cultivation_method"
@@ -1652,6 +1846,8 @@ skills:
     prereqs:
       - id: "world.geomancy"
         level: 4
+      - id: "spell.resonance"
+        level: 2
     description: "预判天象、兽潮和灵气变化。"
     usageDomains:
       - "cultivation_method"
@@ -1665,6 +1861,8 @@ skills:
     prereqs:
       - id: "world.weather"
         level: 4
+      - id: "formation.teleport"
+        level: 3
     description: "跨越危险界域并建立路线。"
     usageDomains:
       - "cultivation_method"
@@ -1678,6 +1876,8 @@ skills:
     prereqs:
       - id: "world.realm_travel"
         level: 4
+      - id: "body.void_body"
+        level: 2
     description: "在虚空、绝灵区和破碎世界存续。"
     usageDomains:
       - "cultivation_method"
@@ -1692,6 +1892,8 @@ skills:
     prereqs:
       - id: "world.trade"
         level: 5
+      - id: "world.realm_travel"
+        level: 4
     description: "经营跨界势力、知识和资源网络。"
     usageDomains:
       - "cultivation_method"
@@ -1706,6 +1908,8 @@ skills:
     prereqs:
       - id: "world.civilization"
         level: 5
+      - id: "formation.cave_heaven"
+        level: 4
     description: "调节一方世界的生态与修真文明。"
     usageDomains:
       - "cultivation_method"
@@ -1718,6 +1922,8 @@ skills:
     maxLevel: 5
     prereqs:
       - id: "world.world_shepherd"
+        level: 5
+      - id: "heaven.astrology"
         level: 5
     description: "定位并维护跨越天劫后的航路。"
     usageDomains:
@@ -1732,6 +1938,8 @@ skills:
     prereqs:
       - id: "spirit.meditation"
         level: 2
+      - id: "world.survival"
+        level: 2
     description: "感知模糊危险征兆。"
     usageDomains:
       - "cultivation_method"
@@ -1743,6 +1951,8 @@ skills:
     maxLevel: 5
     prereqs:
       - id: "heaven.omen"
+        level: 3
+      - id: "world.gathering"
         level: 3
     description: "计算天时与大型仪式窗口。"
     usageDomains:
@@ -1757,6 +1967,8 @@ skills:
     prereqs:
       - id: "heaven.omen"
         level: 5
+      - id: "spirit.inner_demon"
+        level: 4
     description: "辨识行为产生的长期天道反馈。"
     usageDomains:
       - "cultivation_method"
@@ -1768,6 +1980,8 @@ skills:
     maxLevel: 5
     prereqs:
       - id: "heaven.karma"
+        level: 4
+      - id: "spirit.soul"
         level: 4
     description: "观察可能性与关键命运节点。"
     usageDomains:
@@ -1781,6 +1995,8 @@ skills:
     prereqs:
       - id: "heaven.fate"
         level: 4
+      - id: "foundation.spirit_theory"
+        level: 3
     description: "追踪、建立或切断有限因果。"
     usageDomains:
       - "cultivation_method"
@@ -1794,6 +2010,8 @@ skills:
     prereqs:
       - id: "heaven.causality"
         level: 4
+      - id: "foundation.void_theory"
+        level: 3
     description: "领悟并培育一条个人法则。"
     usageDomains:
       - "cultivation_method"
@@ -1807,6 +2025,8 @@ skills:
     prereqs:
       - id: "heaven.law_seed"
         level: 5
+      - id: "foundation.integration_theory"
+        level: 3
     description: "稳定调用并对抗同类法则。"
     usageDomains:
       - "cultivation_method"
@@ -1820,6 +2040,8 @@ skills:
     prereqs:
       - id: "heaven.law_mastery"
         level: 5
+      - id: "foundation.mahayana_theory"
+        level: 4
     description: "令法则、经历与自我凝为道果。"
     usageDomains:
       - "cultivation_method"
@@ -1833,6 +2055,8 @@ skills:
     prereqs:
       - id: "spell.thunder"
         level: 5
+      - id: "body.indestructible"
+        level: 3
     description: "逐步适应劫雷、天火与法则冲击。"
     usageDomains:
       - "cultivation_method"
@@ -1846,6 +2070,8 @@ skills:
     prereqs:
       - id: "heaven.dao_fruit"
         level: 5
+      - id: "heaven.thunder_body"
+        level: 4
     description: "推演自身天劫构成并制定应劫方案。"
     usageDomains:
       - "cultivation_method"

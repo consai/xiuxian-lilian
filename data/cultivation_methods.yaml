@@ -301,7 +301,7 @@ methods:
         base: 80
         knowledgeScales:
           - "cultivation.cycle"
-        masteryGrowth: 20
+        knowledgeGrowth: 20
         operation: "add_flat"
         stackGroup: "max_mana"
         stackPolicy: "highest"
@@ -316,7 +316,7 @@ methods:
         base: 0.08
         knowledgeScales:
           - "foundation.breathing"
-        masteryGrowth: 0.015
+        knowledgeGrowth: 0.015
         operation: "add_percent"
         stackGroup: "mana_regen"
         stackPolicy: "highest"
@@ -330,7 +330,7 @@ methods:
           displayPriority: 2
       - effectId: "cultivation_speed"
         base: 0.06
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         knowledgeScales:
           - "foundation.breathing"
         operation: "add_percent"
@@ -346,10 +346,11 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "foundation.breathing"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "通用周天与稳健突破"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.hunyuan.2"
@@ -386,7 +387,7 @@ methods:
         base: 160
         knowledgeScales:
           - "cultivation.great_cycle"
-        masteryGrowth: 35
+        knowledgeGrowth: 35
         operation: "add_flat"
         stackGroup: "max_mana"
         stackPolicy: "highest"
@@ -401,7 +402,7 @@ methods:
         base: 0.12
         knowledgeScales:
           - "foundation.dao_base"
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "cultivation_stability"
         stackPolicy: "highest"
@@ -415,7 +416,7 @@ methods:
           displayPriority: 2
       - effectId: "deviation_resistance"
         base: 0.12
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         knowledgeScales:
           - "foundation.dao_base"
         operation: "add_percent"
@@ -432,13 +433,14 @@ methods:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "foundation.breathing"
+        - skillId: "foundation.dao_base"
           level: 1
+        - skillId: "cultivation.great_cycle"
+          level: 2
     recommendedProgression:
       predecessorId: "method.hunyuan.1"
       predecessorMastery: 0.8
-    tags:
-      - "通用周天与稳健突破"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.hunyuan.3"
@@ -475,7 +477,7 @@ methods:
         base: 280
         knowledgeScales:
           - "cultivation.liquid_mana"
-        masteryGrowth: 55
+        knowledgeGrowth: 55
         operation: "add_flat"
         stackGroup: "max_mana"
         stackPolicy: "highest"
@@ -490,7 +492,7 @@ methods:
         base: 0.08
         knowledgeScales:
           - "foundation.core_theory"
-        masteryGrowth: 0.015
+        knowledgeGrowth: 0.015
         operation: "add_percent"
         stackGroup: "all_spell_efficiency"
         stackPolicy: "highest"
@@ -504,7 +506,7 @@ methods:
           displayPriority: 2
       - effectId: "breakthrough_success"
         base: 0.08
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         knowledgeScales:
           - "foundation.core_theory"
         operation: "add_percent"
@@ -521,13 +523,14 @@ methods:
     learningRequirements:
       realm: "core"
       knowledge:
-        - skillId: "foundation.breathing"
+        - skillId: "foundation.core_theory"
+          level: 1
+        - skillId: "cultivation.core_fire"
           level: 1
     recommendedProgression:
       predecessorId: "method.hunyuan.2"
       predecessorMastery: 0.8
-    tags:
-      - "通用周天与稳健突破"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.hunyuan.4"
@@ -564,7 +567,7 @@ methods:
         base: 430
         knowledgeScales:
           - "cultivation.nascent_cycle"
-        masteryGrowth: 75
+        knowledgeGrowth: 75
         operation: "add_flat"
         stackGroup: "max_mana"
         stackPolicy: "highest"
@@ -579,7 +582,7 @@ methods:
         base: 0.06
         knowledgeScales:
           - "spirit.split"
-        masteryGrowth: 0.012
+        knowledgeGrowth: 0.012
         operation: "add_percent"
         stackGroup: "parallel_action_efficiency"
         stackPolicy: "highest"
@@ -593,7 +596,7 @@ methods:
           displayPriority: 2
       - effectId: "mana_control"
         base: 0.14
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         knowledgeScales:
           - "foundation.nascent_theory"
         operation: "add_percent"
@@ -610,13 +613,14 @@ methods:
     learningRequirements:
       realm: "nascent"
       knowledge:
-        - skillId: "foundation.breathing"
+        - skillId: "foundation.nascent_theory"
           level: 1
+        - skillId: "cultivation.nascent_cycle"
+          level: 2
     recommendedProgression:
       predecessorId: "method.hunyuan.3"
       predecessorMastery: 0.8
-    tags:
-      - "通用周天与稳健突破"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.hunyuan.5"
@@ -653,7 +657,7 @@ methods:
         base: 0.22
         knowledgeScales:
           - "cultivation.heaven_cycle"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "mana_regen"
         stackPolicy: "highest"
@@ -669,7 +673,7 @@ methods:
         base: 0.1
         knowledgeScales:
           - "foundation.spirit_theory"
-        masteryGrowth: 0.018
+        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "domain_resistance"
         stackPolicy: "add_capped"
@@ -683,7 +687,7 @@ methods:
           displayPriority: 2
       - effectId: "ambient_qi_absorption"
         base: 0.18
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         knowledgeScales:
           - "foundation.spirit_theory"
         operation: "add_percent"
@@ -700,13 +704,14 @@ methods:
     learningRequirements:
       realm: "transform"
       knowledge:
-        - skillId: "foundation.breathing"
+        - skillId: "foundation.spirit_theory"
           level: 1
+        - skillId: "cultivation.heaven_cycle"
+          level: 2
     recommendedProgression:
       predecessorId: "method.hunyuan.4"
       predecessorMastery: 0.8
-    tags:
-      - "通用周天与稳健突破"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.hunyuan.6"
@@ -743,7 +748,7 @@ methods:
         base: 0.2
         knowledgeScales:
           - "body.void_body"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "void_resistance"
         stackPolicy: "add_capped"
@@ -759,7 +764,7 @@ methods:
         base: 0.12
         knowledgeScales:
           - "cultivation.void_furnace"
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "resource_conversion"
         stackPolicy: "highest"
@@ -773,7 +778,7 @@ methods:
           displayPriority: 2
       - effectId: "hostile_energy_conversion"
         base: 0.16
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         knowledgeScales:
           - "foundation.void_theory"
         operation: "add_percent"
@@ -790,13 +795,14 @@ methods:
     learningRequirements:
       realm: "void"
       knowledge:
-        - skillId: "foundation.breathing"
+        - skillId: "foundation.void_theory"
           level: 1
+        - skillId: "cultivation.void_furnace"
+          level: 2
     recommendedProgression:
       predecessorId: "method.hunyuan.5"
       predecessorMastery: 0.8
-    tags:
-      - "通用周天与稳健突破"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.hunyuan.7"
@@ -833,7 +839,7 @@ methods:
         base: 760
         knowledgeScales:
           - "cultivation.endless"
-        masteryGrowth: 120
+        knowledgeGrowth: 120
         operation: "add_flat"
         stackGroup: "max_mana"
         stackPolicy: "highest"
@@ -848,7 +854,7 @@ methods:
         base: 0.12
         knowledgeScales:
           - "body.unity"
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "all_efficiency"
         stackPolicy: "highest"
@@ -862,7 +868,7 @@ methods:
           displayPriority: 2
       - effectId: "sustained_cast_efficiency"
         base: 0.22
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "foundation.integration_theory"
         operation: "add_percent"
@@ -879,13 +885,14 @@ methods:
     learningRequirements:
       realm: "merge"
       knowledge:
-        - skillId: "foundation.breathing"
-          level: 1
+        - skillId: "foundation.integration_theory"
+          level: 2
+        - skillId: "cultivation.endless"
+          level: 2
     recommendedProgression:
       predecessorId: "method.hunyuan.6"
       predecessorMastery: 0.8
-    tags:
-      - "通用周天与稳健突破"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.hunyuan.8"
@@ -922,7 +929,7 @@ methods:
         base: 0.2
         knowledgeScales:
           - "heaven.dao_fruit"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "all_efficiency"
         stackPolicy: "highest"
@@ -938,7 +945,7 @@ methods:
         base: 0.16
         knowledgeScales:
           - "foundation.mahayana_theory"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "law_resistance"
         stackPolicy: "add_capped"
@@ -952,7 +959,7 @@ methods:
           displayPriority: 2
       - effectId: "law_compatibility"
         base: 0.2
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "foundation.mahayana_theory"
         operation: "add_percent"
@@ -969,13 +976,14 @@ methods:
     learningRequirements:
       realm: "great"
       knowledge:
-        - skillId: "foundation.breathing"
-          level: 1
+        - skillId: "foundation.mahayana_theory"
+          level: 2
+        - skillId: "cultivation.dao_engine"
+          level: 2
     recommendedProgression:
       predecessorId: "method.hunyuan.7"
       predecessorMastery: 0.8
-    tags:
-      - "通用周天与稳健突破"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.hunyuan.9"
@@ -1012,7 +1020,7 @@ methods:
         base: 0.24
         knowledgeScales:
           - "heaven.tribulation"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "tribulation_resistance"
         stackPolicy: "add_capped"
@@ -1028,7 +1036,7 @@ methods:
         base: 0.22
         knowledgeScales:
           - "cultivation.immortal_qi"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "immortal_qi_conversion"
         stackPolicy: "highest"
@@ -1042,7 +1050,7 @@ methods:
           displayPriority: 2
       - effectId: "ascension_stability"
         base: 0.24
-        masteryGrowth: 0.07
+        knowledgeGrowth: 0.07
         knowledgeScales:
           - "foundation.ascension"
         operation: "add_percent"
@@ -1059,13 +1067,14 @@ methods:
     learningRequirements:
       realm: "tribulation"
       knowledge:
-        - skillId: "foundation.breathing"
-          level: 1
+        - skillId: "foundation.ascension"
+          level: 2
+        - skillId: "cultivation.immortal_qi"
+          level: 2
     recommendedProgression:
       predecessorId: "method.hunyuan.8"
       predecessorMastery: 0.8
-    tags:
-      - "通用周天与稳健突破"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.changsheng.1"
@@ -1102,7 +1111,7 @@ methods:
         base: 0.1
         knowledgeScales:
           - "body.recovery"
-        masteryGrowth: 0.018
+        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "health_regen"
         stackPolicy: "highest"
@@ -1118,7 +1127,7 @@ methods:
         base: 0.08
         knowledgeScales:
           - "alchemy.herbs"
-        masteryGrowth: 0.015
+        knowledgeGrowth: 0.015
         operation: "add_percent"
         stackGroup: "herb_yield"
         stackPolicy: "highest"
@@ -1132,7 +1141,7 @@ methods:
           displayPriority: 2
       - effectId: "injury_recovery"
         base: 0.1
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         knowledgeScales:
           - "body.recovery"
         operation: "add_percent"
@@ -1148,10 +1157,11 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "body.recovery"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "恢复、丹医与生命造化"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.changsheng.2"
@@ -1188,7 +1198,7 @@ methods:
         base: 140
         knowledgeScales:
           - "body.jade"
-        masteryGrowth: 30
+        knowledgeGrowth: 30
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -1203,7 +1213,7 @@ methods:
         base: 0.1
         knowledgeScales:
           - "alchemy.furnace"
-        masteryGrowth: 0.018
+        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "healing_power"
         stackPolicy: "highest"
@@ -1217,7 +1227,7 @@ methods:
           displayPriority: 2
       - effectId: "medicine_efficiency"
         base: 0.14
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         knowledgeScales:
           - "foundation.dao_base"
         operation: "add_percent"
@@ -1234,13 +1244,14 @@ methods:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "foundation.breathing"
+        - skillId: "foundation.dao_base"
+          level: 1
+        - skillId: "alchemy.furnace"
           level: 1
     recommendedProgression:
       predecessorId: "method.changsheng.1"
       predecessorMastery: 0.8
-    tags:
-      - "恢复、丹医与生命造化"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.changsheng.3"
@@ -1277,7 +1288,7 @@ methods:
         base: 0.18
         knowledgeScales:
           - "alchemy.blood"
-        masteryGrowth: 0.022
+        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "healing_power"
         stackPolicy: "highest"
@@ -1293,7 +1304,7 @@ methods:
         base: 0.12
         knowledgeScales:
           - "body.bloodline"
-        masteryGrowth: 0.018
+        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "poison_resistance"
         stackPolicy: "add_capped"
@@ -1307,7 +1318,7 @@ methods:
           displayPriority: 2
       - effectId: "bloodline_stability"
         base: 0.16
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         knowledgeScales:
           - "foundation.core_theory"
         operation: "add_percent"
@@ -1324,13 +1335,14 @@ methods:
     learningRequirements:
       realm: "core"
       knowledge:
-        - skillId: "foundation.breathing"
+        - skillId: "foundation.core_theory"
           level: 1
+        - skillId: "alchemy.blood"
+          level: 2
     recommendedProgression:
       predecessorId: "method.changsheng.2"
       predecessorMastery: 0.8
-    tags:
-      - "恢复、丹医与生命造化"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.changsheng.4"
@@ -1367,7 +1379,7 @@ methods:
         base: 0.18
         knowledgeScales:
           - "alchemy.soul"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "soul_recovery"
         stackPolicy: "highest"
@@ -1383,7 +1395,7 @@ methods:
         base: 0.24
         knowledgeScales:
           - "body.regeneration"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "health_regen"
         stackPolicy: "highest"
@@ -1397,7 +1409,7 @@ methods:
           displayPriority: 2
       - effectId: "soul_healing"
         base: 0.18
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         knowledgeScales:
           - "alchemy.soul"
         operation: "add_percent"
@@ -1414,13 +1426,14 @@ methods:
     learningRequirements:
       realm: "nascent"
       knowledge:
-        - skillId: "alchemy.herbs"
+        - skillId: "alchemy.soul"
+          level: 2
+        - skillId: "spirit.soul"
           level: 1
     recommendedProgression:
       predecessorId: "method.changsheng.3"
       predecessorMastery: 0.8
-    tags:
-      - "恢复、丹医与生命造化"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.changsheng.5"
@@ -1457,7 +1470,7 @@ methods:
         base: 0.3
         knowledgeScales:
           - "alchemy.life"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "healing_power"
         stackPolicy: "highest"
@@ -1473,7 +1486,7 @@ methods:
         base: 0.16
         knowledgeScales:
           - "spell.domain"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "healing_domain"
         stackPolicy: "highest"
@@ -1487,7 +1500,7 @@ methods:
           displayPriority: 2
       - effectId: "ally_healing"
         base: 0.22
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "alchemy.life"
         operation: "add_percent"
@@ -1504,13 +1517,14 @@ methods:
     learningRequirements:
       realm: "transform"
       knowledge:
-        - skillId: "alchemy.herbs"
+        - skillId: "alchemy.life"
+          level: 2
+        - skillId: "body.dharma_form"
           level: 1
     recommendedProgression:
       predecessorId: "method.changsheng.4"
       predecessorMastery: 0.8
-    tags:
-      - "恢复、丹医与生命造化"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.changsheng.6"
@@ -1547,7 +1561,7 @@ methods:
         base: 0.24
         knowledgeScales:
           - "world.void_survival"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "void_survival"
         stackPolicy: "highest"
@@ -1563,7 +1577,7 @@ methods:
         base: 0.18
         knowledgeScales:
           - "alchemy.void_herb"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "rare_herb_yield"
         stackPolicy: "highest"
@@ -1577,7 +1591,7 @@ methods:
           displayPriority: 2
       - effectId: "void_herb_growth"
         base: 0.2
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "alchemy.void_herb"
         operation: "add_percent"
@@ -1594,13 +1608,14 @@ methods:
     learningRequirements:
       realm: "void"
       knowledge:
-        - skillId: "alchemy.herbs"
+        - skillId: "alchemy.void_herb"
+          level: 2
+        - skillId: "world.void_survival"
           level: 1
     recommendedProgression:
       predecessorId: "method.changsheng.5"
       predecessorMastery: 0.8
-    tags:
-      - "恢复、丹医与生命造化"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.changsheng.7"
@@ -1637,7 +1652,7 @@ methods:
         base: 0.24
         knowledgeScales:
           - "alchemy.dao_pill"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "pill_quality"
         stackPolicy: "highest"
@@ -1653,7 +1668,7 @@ methods:
         base: 520
         knowledgeScales:
           - "body.unity"
-        masteryGrowth: 85
+        knowledgeGrowth: 85
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -1666,7 +1681,7 @@ methods:
           displayPriority: 2
       - effectId: "alchemy_success"
         base: 0.24
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "alchemy.dao_pill"
         operation: "add_percent"
@@ -1683,13 +1698,14 @@ methods:
     learningRequirements:
       realm: "merge"
       knowledge:
-        - skillId: "alchemy.herbs"
+        - skillId: "alchemy.dao_pill"
+          level: 2
+        - skillId: "heaven.law_seed"
           level: 1
     recommendedProgression:
       predecessorId: "method.changsheng.6"
       predecessorMastery: 0.8
-    tags:
-      - "恢复、丹医与生命造化"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.changsheng.8"
@@ -1726,7 +1742,7 @@ methods:
         base: 0.12
         knowledgeScales:
           - "alchemy.resurrection"
-        masteryGrowth: 0.018
+        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "fatal_recovery_chance"
         stackPolicy: "add_capped"
@@ -1742,7 +1758,7 @@ methods:
         base: 0.22
         knowledgeScales:
           - "heaven.causality"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "lifespan_efficiency"
         stackPolicy: "highest"
@@ -1756,7 +1772,7 @@ methods:
           displayPriority: 2
       - effectId: "resurrection_cost_reduction"
         base: 0.22
-        masteryGrowth: 0.07
+        knowledgeGrowth: 0.07
         knowledgeScales:
           - "alchemy.resurrection"
         operation: "add_percent"
@@ -1773,13 +1789,14 @@ methods:
     learningRequirements:
       realm: "great"
       knowledge:
-        - skillId: "alchemy.herbs"
-          level: 1
+        - skillId: "alchemy.resurrection"
+          level: 2
+        - skillId: "heaven.causality"
+          level: 2
     recommendedProgression:
       predecessorId: "method.changsheng.7"
       predecessorMastery: 0.8
-    tags:
-      - "恢复、丹医与生命造化"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.changsheng.9"
@@ -1816,7 +1833,7 @@ methods:
         base: 0.28
         knowledgeScales:
           - "alchemy.ascension_pill"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "tribulation_recovery"
         stackPolicy: "highest"
@@ -1832,7 +1849,7 @@ methods:
         base: 0.14
         knowledgeScales:
           - "heaven.tribulation"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "tribulation_resistance"
         stackPolicy: "add_capped"
@@ -1846,7 +1863,7 @@ methods:
           displayPriority: 2
       - effectId: "pill_tribulation_resistance"
         base: 0.28
-        masteryGrowth: 0.08
+        knowledgeGrowth: 0.08
         knowledgeScales:
           - "alchemy.ascension_pill"
         operation: "add_percent"
@@ -1863,13 +1880,14 @@ methods:
     learningRequirements:
       realm: "tribulation"
       knowledge:
-        - skillId: "alchemy.herbs"
-          level: 1
+        - skillId: "alchemy.ascension_pill"
+          level: 2
+        - skillId: "heaven.tribulation"
+          level: 2
     recommendedProgression:
       predecessorId: "method.changsheng.8"
       predecessorMastery: 0.8
-    tags:
-      - "恢复、丹医与生命造化"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taixu_sword.1"
@@ -1906,7 +1924,7 @@ methods:
         base: 0.12
         knowledgeScales:
           - "sword.qi"
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "sword_damage"
         stackPolicy: "highest"
@@ -1922,7 +1940,7 @@ methods:
         base: 0.1
         knowledgeScales:
           - "foundation.control"
-        masteryGrowth: 0.018
+        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "sword_control"
         stackPolicy: "highest"
@@ -1936,7 +1954,7 @@ methods:
           displayPriority: 2
       - effectId: "sword_attack_speed"
         base: 0.08
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         knowledgeScales:
           - "sword.weapon"
         operation: "add_percent"
@@ -1952,10 +1970,11 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "sword.weapon"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "御剑、剑域与破法杀伐"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taixu_sword.2"
@@ -1992,7 +2011,7 @@ methods:
         base: 0.08
         knowledgeScales:
           - "sword.intent"
-        masteryGrowth: 0.014
+        knowledgeGrowth: 0.014
         operation: "add_percent"
         stackGroup: "critical_chance"
         stackPolicy: "add_capped"
@@ -2008,7 +2027,7 @@ methods:
         base: 0.18
         knowledgeScales:
           - "foundation.dao_base"
-        masteryGrowth: 0.022
+        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "sword_damage"
         stackPolicy: "highest"
@@ -2022,7 +2041,7 @@ methods:
           displayPriority: 2
       - effectId: "sword_intent_power"
         base: 0.14
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         knowledgeScales:
           - "sword.intent"
         operation: "add_percent"
@@ -2039,13 +2058,14 @@ methods:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "sword.weapon"
+        - skillId: "sword.intent"
+          level: 2
+        - skillId: "foundation.dao_base"
           level: 1
     recommendedProgression:
       predecessorId: "method.taixu_sword.1"
       predecessorMastery: 0.8
-    tags:
-      - "御剑、剑域与破法杀伐"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taixu_sword.3"
@@ -2082,7 +2102,7 @@ methods:
         base: 2
         knowledgeScales:
           - "sword.formation"
-        masteryGrowth: 1
+        knowledgeGrowth: 1
         operation: "add_flat"
         stackGroup: "multi_sword_count"
         stackPolicy: "highest"
@@ -2097,7 +2117,7 @@ methods:
         base: 0.14
         knowledgeScales:
           - "formation.array"
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "formation_damage"
         stackPolicy: "highest"
@@ -2111,7 +2131,7 @@ methods:
           displayPriority: 2
       - effectId: "sword_formation_control"
         base: 0.16
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         knowledgeScales:
           - "sword.formation"
         operation: "add_percent"
@@ -2128,13 +2148,14 @@ methods:
     learningRequirements:
       realm: "core"
       knowledge:
-        - skillId: "sword.weapon"
+        - skillId: "sword.formation"
+          level: 2
+        - skillId: "formation.array"
           level: 1
     recommendedProgression:
       predecessorId: "method.taixu_sword.2"
       predecessorMastery: 0.8
-    tags:
-      - "御剑、剑域与破法杀伐"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taixu_sword.4"
@@ -2171,7 +2192,7 @@ methods:
         base: 0.16
         knowledgeScales:
           - "sword.heart"
-        masteryGrowth: 0.022
+        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "armor_pierce"
         stackPolicy: "highest"
@@ -2187,7 +2208,7 @@ methods:
         base: 0.2
         knowledgeScales:
           - "spirit.soul"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "remote_control_range"
         stackPolicy: "highest"
@@ -2201,7 +2222,7 @@ methods:
           displayPriority: 2
       - effectId: "weakness_detection"
         base: 0.18
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         knowledgeScales:
           - "sword.heart"
         operation: "add_percent"
@@ -2218,13 +2239,14 @@ methods:
     learningRequirements:
       realm: "nascent"
       knowledge:
-        - skillId: "sword.weapon"
+        - skillId: "sword.heart"
+          level: 2
+        - skillId: "spirit.soul"
           level: 1
     recommendedProgression:
       predecessorId: "method.taixu_sword.3"
       predecessorMastery: 0.8
-    tags:
-      - "御剑、剑域与破法杀伐"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taixu_sword.5"
@@ -2261,7 +2283,7 @@ methods:
         base: 0.24
         knowledgeScales:
           - "sword.domain"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "sword_domain"
         stackPolicy: "highest"
@@ -2277,7 +2299,7 @@ methods:
         base: 0.12
         knowledgeScales:
           - "spell.domain"
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "spell_suppression"
         stackPolicy: "highest"
@@ -2291,7 +2313,7 @@ methods:
           displayPriority: 2
       - effectId: "domain_range"
         base: 0.2
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "sword.domain"
         operation: "add_percent"
@@ -2308,13 +2330,14 @@ methods:
     learningRequirements:
       realm: "transform"
       knowledge:
-        - skillId: "sword.weapon"
+        - skillId: "sword.domain"
+          level: 2
+        - skillId: "spell.domain"
           level: 1
     recommendedProgression:
       predecessorId: "method.taixu_sword.4"
       predecessorMastery: 0.8
-    tags:
-      - "御剑、剑域与破法杀伐"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taixu_sword.6"
@@ -2351,7 +2374,7 @@ methods:
         base: 0.22
         knowledgeScales:
           - "sword.void_cut"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "space_pierce"
         stackPolicy: "highest"
@@ -2367,7 +2390,7 @@ methods:
         base: 0.34
         knowledgeScales:
           - "spell.void"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "sword_damage"
         stackPolicy: "highest"
@@ -2381,7 +2404,7 @@ methods:
           displayPriority: 2
       - effectId: "void_target_accuracy"
         base: 0.22
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "sword.void_cut"
         operation: "add_percent"
@@ -2398,13 +2421,14 @@ methods:
     learningRequirements:
       realm: "void"
       knowledge:
-        - skillId: "sword.weapon"
+        - skillId: "sword.void_cut"
+          level: 2
+        - skillId: "spell.void"
           level: 1
     recommendedProgression:
       predecessorId: "method.taixu_sword.5"
       predecessorMastery: 0.8
-    tags:
-      - "御剑、剑域与破法杀伐"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taixu_sword.7"
@@ -2441,7 +2465,7 @@ methods:
         base: 0.42
         knowledgeScales:
           - "sword.unity"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "sword_damage"
         stackPolicy: "highest"
@@ -2457,7 +2481,7 @@ methods:
         base: 0.3
         knowledgeScales:
           - "artifact.life_bound"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "weapon_loss_resistance"
         stackPolicy: "add_capped"
@@ -2471,7 +2495,7 @@ methods:
           displayPriority: 2
       - effectId: "life_bound_sync"
         base: 0.25
-        masteryGrowth: 0.07
+        knowledgeGrowth: 0.07
         knowledgeScales:
           - "sword.unity"
         operation: "add_percent"
@@ -2488,13 +2512,14 @@ methods:
     learningRequirements:
       realm: "merge"
       knowledge:
-        - skillId: "sword.weapon"
+        - skillId: "sword.unity"
+          level: 2
+        - skillId: "artifact.life_bound"
           level: 1
     recommendedProgression:
       predecessorId: "method.taixu_sword.6"
       predecessorMastery: 0.8
-    tags:
-      - "御剑、剑域与破法杀伐"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taixu_sword.8"
@@ -2531,7 +2556,7 @@ methods:
         base: 0.26
         knowledgeScales:
           - "sword.dao"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "law_pierce"
         stackPolicy: "highest"
@@ -2547,7 +2572,7 @@ methods:
         base: 0.56
         knowledgeScales:
           - "heaven.dao_fruit"
-        masteryGrowth: 0.045
+        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "sword_damage"
         stackPolicy: "highest"
@@ -2561,7 +2586,7 @@ methods:
           displayPriority: 2
       - effectId: "dao_sword_power"
         base: 0.28
-        masteryGrowth: 0.08
+        knowledgeGrowth: 0.08
         knowledgeScales:
           - "sword.dao"
         operation: "add_percent"
@@ -2578,13 +2603,14 @@ methods:
     learningRequirements:
       realm: "great"
       knowledge:
-        - skillId: "sword.weapon"
+        - skillId: "sword.dao"
+          level: 2
+        - skillId: "heaven.dao_fruit"
           level: 1
     recommendedProgression:
       predecessorId: "method.taixu_sword.7"
       predecessorMastery: 0.8
-    tags:
-      - "御剑、剑域与破法杀伐"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taixu_sword.9"
@@ -2621,7 +2647,7 @@ methods:
         base: 0.4
         knowledgeScales:
           - "sword.heaven_cut"
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         operation: "add_percent"
         stackGroup: "tribulation_damage"
         stackPolicy: "highest"
@@ -2637,7 +2663,7 @@ methods:
         base: 0.38
         knowledgeScales:
           - "heaven.law_mastery"
-        masteryGrowth: 0.045
+        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "law_pierce"
         stackPolicy: "highest"
@@ -2651,7 +2677,7 @@ methods:
           displayPriority: 2
       - effectId: "tribulation_sever"
         base: 0.32
-        masteryGrowth: 0.09
+        knowledgeGrowth: 0.09
         knowledgeScales:
           - "sword.heaven_cut"
         operation: "add_percent"
@@ -2668,13 +2694,14 @@ methods:
     learningRequirements:
       realm: "tribulation"
       knowledge:
-        - skillId: "sword.weapon"
-          level: 1
+        - skillId: "sword.heaven_cut"
+          level: 2
+        - skillId: "heaven.law_mastery"
+          level: 2
     recommendedProgression:
       predecessorId: "method.taixu_sword.8"
       predecessorMastery: 0.8
-    tags:
-      - "御剑、剑域与破法杀伐"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.vajra.1"
@@ -2711,7 +2738,7 @@ methods:
         base: 120
         knowledgeScales:
           - "body.tempering"
-        masteryGrowth: 25
+        knowledgeGrowth: 25
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -2726,7 +2753,7 @@ methods:
         base: 0.08
         knowledgeScales:
           - "body.bone"
-        masteryGrowth: 0.015
+        knowledgeGrowth: 0.015
         operation: "add_percent"
         stackGroup: "physical_resistance"
         stackPolicy: "add_capped"
@@ -2740,7 +2767,7 @@ methods:
           displayPriority: 2
       - effectId: "stamina"
         base: 0.1
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         knowledgeScales:
           - "body.tempering"
         operation: "add_percent"
@@ -2756,10 +2783,11 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "body.tempering"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "炼体、生存与正面承伤"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.vajra.2"
@@ -2796,7 +2824,7 @@ methods:
         base: 240
         knowledgeScales:
           - "body.jade"
-        masteryGrowth: 45
+        knowledgeGrowth: 45
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -2811,7 +2839,7 @@ methods:
         base: 0.1
         knowledgeScales:
           - "foundation.dao_base"
-        masteryGrowth: 0.018
+        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "spiritual_resistance"
         stackPolicy: "add_capped"
@@ -2825,7 +2853,7 @@ methods:
           displayPriority: 2
       - effectId: "stagger_resistance"
         base: 0.14
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         knowledgeScales:
           - "body.jade"
         operation: "add_percent"
@@ -2842,13 +2870,14 @@ methods:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "body.tempering"
+        - skillId: "body.jade"
+          level: 2
+        - skillId: "foundation.dao_base"
           level: 1
     recommendedProgression:
       predecessorId: "method.vajra.1"
       predecessorMastery: 0.8
-    tags:
-      - "炼体、生存与正面承伤"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.vajra.3"
@@ -2885,7 +2914,7 @@ methods:
         base: 380
         knowledgeScales:
           - "body.bloodline"
-        masteryGrowth: 65
+        knowledgeGrowth: 65
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -2900,7 +2929,7 @@ methods:
         base: 0.15
         knowledgeScales:
           - "alchemy.blood"
-        masteryGrowth: 0.022
+        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "melee_damage"
         stackPolicy: "highest"
@@ -2914,7 +2943,7 @@ methods:
           displayPriority: 2
       - effectId: "bloodline_output"
         base: 0.16
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         knowledgeScales:
           - "body.bloodline"
         operation: "add_percent"
@@ -2931,13 +2960,14 @@ methods:
     learningRequirements:
       realm: "core"
       knowledge:
-        - skillId: "body.tempering"
+        - skillId: "body.bloodline"
+          level: 2
+        - skillId: "alchemy.blood"
           level: 1
     recommendedProgression:
       predecessorId: "method.vajra.2"
       predecessorMastery: 0.8
-    tags:
-      - "炼体、生存与正面承伤"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.vajra.4"
@@ -2974,7 +3004,7 @@ methods:
         base: 0.22
         knowledgeScales:
           - "body.regeneration"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "health_regen"
         stackPolicy: "highest"
@@ -2990,7 +3020,7 @@ methods:
         base: 0.1
         knowledgeScales:
           - "spirit.soul"
-        masteryGrowth: 0.018
+        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "fatal_resistance"
         stackPolicy: "add_capped"
@@ -3004,7 +3034,7 @@ methods:
           displayPriority: 2
       - effectId: "regeneration_speed"
         base: 0.18
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         knowledgeScales:
           - "body.regeneration"
         operation: "add_percent"
@@ -3021,13 +3051,14 @@ methods:
     learningRequirements:
       realm: "nascent"
       knowledge:
-        - skillId: "body.tempering"
+        - skillId: "body.regeneration"
+          level: 2
+        - skillId: "spirit.soul"
           level: 1
     recommendedProgression:
       predecessorId: "method.vajra.3"
       predecessorMastery: 0.8
-    tags:
-      - "炼体、生存与正面承伤"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.vajra.5"
@@ -3064,7 +3095,7 @@ methods:
         base: 0.3
         knowledgeScales:
           - "body.dharma_form"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "melee_damage"
         stackPolicy: "highest"
@@ -3080,7 +3111,7 @@ methods:
         base: 620
         knowledgeScales:
           - "foundation.spirit_theory"
-        masteryGrowth: 90
+        knowledgeGrowth: 90
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -3093,7 +3124,7 @@ methods:
           displayPriority: 2
       - effectId: "dharma_form_power"
         base: 0.22
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "body.dharma_form"
         operation: "add_percent"
@@ -3110,13 +3141,14 @@ methods:
     learningRequirements:
       realm: "transform"
       knowledge:
-        - skillId: "body.tempering"
+        - skillId: "body.dharma_form"
+          level: 2
+        - skillId: "foundation.spirit_theory"
           level: 1
     recommendedProgression:
       predecessorId: "method.vajra.4"
       predecessorMastery: 0.8
-    tags:
-      - "炼体、生存与正面承伤"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.vajra.6"
@@ -3153,7 +3185,7 @@ methods:
         base: 0.3
         knowledgeScales:
           - "body.void_body"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "void_resistance"
         stackPolicy: "add_capped"
@@ -3169,7 +3201,7 @@ methods:
         base: 800
         knowledgeScales:
           - "world.void_survival"
-        masteryGrowth: 110
+        knowledgeGrowth: 110
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -3182,7 +3214,7 @@ methods:
           displayPriority: 2
       - effectId: "void_mobility"
         base: 0.2
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "body.void_body"
         operation: "add_percent"
@@ -3199,13 +3231,14 @@ methods:
     learningRequirements:
       realm: "void"
       knowledge:
-        - skillId: "body.tempering"
+        - skillId: "body.void_body"
+          level: 2
+        - skillId: "foundation.void_theory"
           level: 1
     recommendedProgression:
       predecessorId: "method.vajra.5"
       predecessorMastery: 0.8
-    tags:
-      - "炼体、生存与正面承伤"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.vajra.7"
@@ -3242,7 +3275,7 @@ methods:
         base: 0.18
         knowledgeScales:
           - "body.unity"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "all_resistance"
         stackPolicy: "add_capped"
@@ -3258,7 +3291,7 @@ methods:
         base: 0.38
         knowledgeScales:
           - "spirit.myriad"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "melee_damage"
         stackPolicy: "highest"
@@ -3272,7 +3305,7 @@ methods:
           displayPriority: 2
       - effectId: "body_energy_efficiency"
         base: 0.24
-        masteryGrowth: 0.07
+        knowledgeGrowth: 0.07
         knowledgeScales:
           - "body.unity"
         operation: "add_percent"
@@ -3289,13 +3322,14 @@ methods:
     learningRequirements:
       realm: "merge"
       knowledge:
-        - skillId: "body.tempering"
+        - skillId: "body.unity"
+          level: 2
+        - skillId: "foundation.integration_theory"
           level: 1
     recommendedProgression:
       predecessorId: "method.vajra.6"
       predecessorMastery: 0.8
-    tags:
-      - "炼体、生存与正面承伤"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.vajra.8"
@@ -3332,7 +3366,7 @@ methods:
         base: 0.25
         knowledgeScales:
           - "body.indestructible"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "fatal_resistance"
         stackPolicy: "add_capped"
@@ -3348,7 +3382,7 @@ methods:
         base: 1250
         knowledgeScales:
           - "heaven.dao_fruit"
-        masteryGrowth: 150
+        knowledgeGrowth: 150
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -3361,7 +3395,7 @@ methods:
           displayPriority: 2
       - effectId: "immortal_recovery"
         base: 0.26
-        masteryGrowth: 0.08
+        knowledgeGrowth: 0.08
         knowledgeScales:
           - "body.indestructible"
         operation: "add_percent"
@@ -3378,13 +3412,14 @@ methods:
     learningRequirements:
       realm: "great"
       knowledge:
-        - skillId: "body.tempering"
+        - skillId: "body.indestructible"
+          level: 2
+        - skillId: "heaven.dao_fruit"
           level: 1
     recommendedProgression:
       predecessorId: "method.vajra.7"
       predecessorMastery: 0.8
-    tags:
-      - "炼体、生存与正面承伤"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.vajra.9"
@@ -3421,7 +3456,7 @@ methods:
         base: 0.4
         knowledgeScales:
           - "body.tribulation_body"
-        masteryGrowth: 0.045
+        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "tribulation_resistance"
         stackPolicy: "add_capped"
@@ -3437,7 +3472,7 @@ methods:
         base: 0.28
         knowledgeScales:
           - "heaven.thunder_body"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "all_resistance"
         stackPolicy: "add_capped"
@@ -3451,7 +3486,7 @@ methods:
           displayPriority: 2
       - effectId: "tribulation_energy_absorption"
         base: 0.3
-        masteryGrowth: 0.09
+        knowledgeGrowth: 0.09
         knowledgeScales:
           - "body.tribulation_body"
         operation: "add_percent"
@@ -3468,13 +3503,14 @@ methods:
     learningRequirements:
       realm: "tribulation"
       knowledge:
-        - skillId: "body.tempering"
-          level: 1
+        - skillId: "body.tribulation_body"
+          level: 2
+        - skillId: "heaven.thunder_body"
+          level: 2
     recommendedProgression:
       predecessorId: "method.vajra.8"
       predecessorMastery: 0.8
-    tags:
-      - "炼体、生存与正面承伤"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taiyin.1"
@@ -3511,7 +3547,7 @@ methods:
         base: 0.12
         knowledgeScales:
           - "spirit.sense"
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "spirit_power"
         stackPolicy: "highest"
@@ -3527,7 +3563,7 @@ methods:
         base: 0.1
         knowledgeScales:
           - "spirit.meditation"
-        masteryGrowth: 0.018
+        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "mental_resistance"
         stackPolicy: "add_capped"
@@ -3541,7 +3577,7 @@ methods:
           displayPriority: 2
       - effectId: "spirit_sense_range"
         base: 0.1
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         knowledgeScales:
           - "spirit.meditation"
         operation: "add_percent"
@@ -3557,10 +3593,11 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "spirit.meditation"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "神魂、心防与咒法"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taiyin.2"
@@ -3597,7 +3634,7 @@ methods:
         base: 0.2
         knowledgeScales:
           - "spirit.inner_demon"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "mental_resistance"
         stackPolicy: "add_capped"
@@ -3613,7 +3650,7 @@ methods:
         base: 0.1
         knowledgeScales:
           - "talisman.seal"
-        masteryGrowth: 0.018
+        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "seal_power"
         stackPolicy: "highest"
@@ -3627,7 +3664,7 @@ methods:
           displayPriority: 2
       - effectId: "inner_demon_resistance"
         base: 0.14
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         knowledgeScales:
           - "spirit.inner_demon"
         operation: "add_percent"
@@ -3644,13 +3681,14 @@ methods:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "spirit.meditation"
+        - skillId: "spirit.inner_demon"
+          level: 2
+        - skillId: "talisman.seal"
           level: 1
     recommendedProgression:
       predecessorId: "method.taiyin.1"
       predecessorMastery: 0.8
-    tags:
-      - "神魂、心防与咒法"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taiyin.3"
@@ -3687,7 +3725,7 @@ methods:
         base: 0.24
         knowledgeScales:
           - "spirit.soul"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "soul_resistance"
         stackPolicy: "add_capped"
@@ -3703,7 +3741,7 @@ methods:
         base: 0.12
         knowledgeScales:
           - "talisman.curse"
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "curse_power"
         stackPolicy: "highest"
@@ -3717,7 +3755,7 @@ methods:
           displayPriority: 2
       - effectId: "curse_resistance"
         base: 0.16
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         knowledgeScales:
           - "spirit.soul"
         operation: "add_percent"
@@ -3734,13 +3772,14 @@ methods:
     learningRequirements:
       realm: "core"
       knowledge:
-        - skillId: "spirit.meditation"
+        - skillId: "spirit.soul"
+          level: 2
+        - skillId: "talisman.curse"
           level: 1
     recommendedProgression:
       predecessorId: "method.taiyin.2"
       predecessorMastery: 0.8
-    tags:
-      - "神魂、心防与咒法"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taiyin.4"
@@ -3777,7 +3816,7 @@ methods:
         base: 0.18
         knowledgeScales:
           - "spirit.split"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "parallel_action_efficiency"
         stackPolicy: "highest"
@@ -3793,7 +3832,7 @@ methods:
         base: 0.14
         knowledgeScales:
           - "talisman.soul_seal"
-        masteryGrowth: 0.022
+        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "contract_power"
         stackPolicy: "highest"
@@ -3807,7 +3846,7 @@ methods:
           displayPriority: 2
       - effectId: "split_mind_capacity"
         base: 1
-        masteryGrowth: 1
+        knowledgeGrowth: 1
         knowledgeScales:
           - "spirit.split"
         operation: "add_flat"
@@ -3823,13 +3862,14 @@ methods:
     learningRequirements:
       realm: "nascent"
       knowledge:
-        - skillId: "spirit.meditation"
+        - skillId: "spirit.split"
+          level: 2
+        - skillId: "talisman.soul_seal"
           level: 1
     recommendedProgression:
       predecessorId: "method.taiyin.3"
       predecessorMastery: 0.8
-    tags:
-      - "神魂、心防与咒法"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taiyin.5"
@@ -3866,7 +3906,7 @@ methods:
         base: 0.3
         knowledgeScales:
           - "spirit.primordial"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "spirit_power"
         stackPolicy: "highest"
@@ -3882,7 +3922,7 @@ methods:
         base: 0.2
         knowledgeScales:
           - "spirit.dream"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "dream_power"
         stackPolicy: "highest"
@@ -3896,7 +3936,7 @@ methods:
           displayPriority: 2
       - effectId: "dream_infiltration"
         base: 0.22
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "spirit.primordial"
         operation: "add_percent"
@@ -3913,13 +3953,14 @@ methods:
     learningRequirements:
       realm: "transform"
       knowledge:
-        - skillId: "spirit.meditation"
-          level: 1
+        - skillId: "spirit.primordial"
+          level: 2
+        - skillId: "spirit.dream"
+          level: 2
     recommendedProgression:
       predecessorId: "method.taiyin.4"
       predecessorMastery: 0.8
-    tags:
-      - "神魂、心防与咒法"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taiyin.6"
@@ -3956,7 +3997,7 @@ methods:
         base: 0.42
         knowledgeScales:
           - "spirit.void_thought"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "spirit_power"
         stackPolicy: "highest"
@@ -3972,7 +4013,7 @@ methods:
         base: 0.2
         knowledgeScales:
           - "talisman.true_name"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "true_name_power"
         stackPolicy: "highest"
@@ -3986,7 +4027,7 @@ methods:
           displayPriority: 2
       - effectId: "true_name_accuracy"
         base: 0.22
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "spirit.void_thought"
         operation: "add_percent"
@@ -4003,13 +4044,14 @@ methods:
     learningRequirements:
       realm: "void"
       knowledge:
-        - skillId: "spirit.meditation"
+        - skillId: "spirit.void_thought"
+          level: 2
+        - skillId: "talisman.true_name"
           level: 1
     recommendedProgression:
       predecessorId: "method.taiyin.5"
       predecessorMastery: 0.8
-    tags:
-      - "神魂、心防与咒法"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taiyin.7"
@@ -4046,7 +4088,7 @@ methods:
         base: 0.36
         knowledgeScales:
           - "spirit.myriad"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "mental_resistance"
         stackPolicy: "add_capped"
@@ -4062,7 +4104,7 @@ methods:
         base: 0.2
         knowledgeScales:
           - "heaven.causality"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "causality_resistance"
         stackPolicy: "add_capped"
@@ -4076,7 +4118,7 @@ methods:
           displayPriority: 2
       - effectId: "causality_detection"
         base: 0.24
-        masteryGrowth: 0.07
+        knowledgeGrowth: 0.07
         knowledgeScales:
           - "spirit.myriad"
         operation: "add_percent"
@@ -4093,13 +4135,14 @@ methods:
     learningRequirements:
       realm: "merge"
       knowledge:
-        - skillId: "spirit.meditation"
+        - skillId: "spirit.myriad"
+          level: 2
+        - skillId: "talisman.causality_seal"
           level: 1
     recommendedProgression:
       predecessorId: "method.taiyin.6"
       predecessorMastery: 0.8
-    tags:
-      - "神魂、心防与咒法"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taiyin.8"
@@ -4136,7 +4179,7 @@ methods:
         base: 0.5
         knowledgeScales:
           - "spirit.dao_heart"
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         operation: "add_percent"
         stackGroup: "mental_resistance"
         stackPolicy: "add_capped"
@@ -4152,7 +4195,7 @@ methods:
         base: 0.26
         knowledgeScales:
           - "talisman.heaven_decree"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "decree_power"
         stackPolicy: "highest"
@@ -4166,7 +4209,7 @@ methods:
           displayPriority: 2
       - effectId: "dao_heart_stability"
         base: 0.28
-        masteryGrowth: 0.08
+        knowledgeGrowth: 0.08
         knowledgeScales:
           - "spirit.dao_heart"
         operation: "add_percent"
@@ -4183,13 +4226,14 @@ methods:
     learningRequirements:
       realm: "great"
       knowledge:
-        - skillId: "spirit.meditation"
+        - skillId: "spirit.dao_heart"
+          level: 2
+        - skillId: "talisman.heaven_decree"
           level: 1
     recommendedProgression:
       predecessorId: "method.taiyin.7"
       predecessorMastery: 0.8
-    tags:
-      - "神魂、心防与咒法"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.taiyin.9"
@@ -4226,7 +4270,7 @@ methods:
         base: 0.5
         knowledgeScales:
           - "spirit.tribulation_mind"
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         operation: "add_percent"
         stackGroup: "heart_tribulation_resistance"
         stackPolicy: "add_capped"
@@ -4242,7 +4286,7 @@ methods:
         base: 0.22
         knowledgeScales:
           - "talisman.tribulation_edict"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "tribulation_control"
         stackPolicy: "highest"
@@ -4256,7 +4300,7 @@ methods:
           displayPriority: 2
       - effectId: "heart_tribulation_insight"
         base: 0.32
-        masteryGrowth: 0.09
+        knowledgeGrowth: 0.09
         knowledgeScales:
           - "spirit.tribulation_mind"
         operation: "add_percent"
@@ -4273,13 +4317,14 @@ methods:
     learningRequirements:
       realm: "tribulation"
       knowledge:
-        - skillId: "spirit.meditation"
+        - skillId: "spirit.tribulation_mind"
+          level: 2
+        - skillId: "talisman.tribulation_edict"
           level: 1
     recommendedProgression:
       predecessorId: "method.taiyin.8"
       predecessorMastery: 0.8
-    tags:
-      - "神魂、心防与咒法"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.leihuo.1"
@@ -4316,7 +4361,7 @@ methods:
         base: 0.14
         knowledgeScales:
           - "spell.projectile"
-        masteryGrowth: 0.022
+        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "spell_damage"
         stackPolicy: "highest"
@@ -4332,7 +4377,7 @@ methods:
         base: 0.1
         knowledgeScales:
           - "spell.elements"
-        masteryGrowth: 0.018
+        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "element_control"
         stackPolicy: "highest"
@@ -4346,7 +4391,7 @@ methods:
           displayPriority: 2
       - effectId: "cast_speed"
         base: 0.08
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         knowledgeScales:
           - "spell.elements"
         operation: "add_percent"
@@ -4362,10 +4407,11 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "spell.elements"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "五行雷法与爆发神通"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.leihuo.2"
@@ -4402,7 +4448,7 @@ methods:
         base: 0.22
         knowledgeScales:
           - "spell.five_phase"
-        masteryGrowth: 0.028
+        knowledgeGrowth: 0.028
         operation: "add_percent"
         stackGroup: "spell_damage"
         stackPolicy: "highest"
@@ -4418,7 +4464,7 @@ methods:
         base: 0.1
         knowledgeScales:
           - "cultivation.purity"
-        masteryGrowth: 0.018
+        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "mana_efficiency"
         stackPolicy: "highest"
@@ -4432,7 +4478,7 @@ methods:
           displayPriority: 2
       - effectId: "element_conversion"
         base: 0.14
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         knowledgeScales:
           - "spell.five_phase"
         operation: "add_percent"
@@ -4449,13 +4495,14 @@ methods:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "spell.elements"
+        - skillId: "spell.five_phase"
+          level: 2
+        - skillId: "foundation.dao_base"
           level: 1
     recommendedProgression:
       predecessorId: "method.leihuo.1"
       predecessorMastery: 0.8
-    tags:
-      - "五行雷法与爆发神通"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.leihuo.3"
@@ -4492,7 +4539,7 @@ methods:
         base: 0.3
         knowledgeScales:
           - "spell.thunder"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "thunder_damage"
         stackPolicy: "highest"
@@ -4508,7 +4555,7 @@ methods:
         base: 0.16
         knowledgeScales:
           - "cultivation.core_fire"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "evil_bane"
         stackPolicy: "highest"
@@ -4522,7 +4569,7 @@ methods:
           displayPriority: 2
       - effectId: "lightning_chain_count"
         base: 1
-        masteryGrowth: 1
+        knowledgeGrowth: 1
         knowledgeScales:
           - "spell.thunder"
         operation: "add_flat"
@@ -4538,13 +4585,14 @@ methods:
     learningRequirements:
       realm: "core"
       knowledge:
-        - skillId: "spell.elements"
-          level: 1
+        - skillId: "spell.thunder"
+          level: 2
+        - skillId: "cultivation.core_fire"
+          level: 2
     recommendedProgression:
       predecessorId: "method.leihuo.2"
       predecessorMastery: 0.8
-    tags:
-      - "五行雷法与爆发神通"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.leihuo.4"
@@ -4581,7 +4629,7 @@ methods:
         base: 0.34
         knowledgeScales:
           - "spell.resonance"
-        masteryGrowth: 0.038
+        knowledgeGrowth: 0.038
         operation: "add_percent"
         stackGroup: "spell_damage"
         stackPolicy: "highest"
@@ -4597,7 +4645,7 @@ methods:
         base: 0.12
         knowledgeScales:
           - "world.weather"
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "weather_control"
         stackPolicy: "highest"
@@ -4611,7 +4659,7 @@ methods:
           displayPriority: 2
       - effectId: "environment_spell_bonus"
         base: 0.18
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         knowledgeScales:
           - "spell.resonance"
         operation: "add_percent"
@@ -4628,13 +4676,14 @@ methods:
     learningRequirements:
       realm: "nascent"
       knowledge:
-        - skillId: "spell.elements"
+        - skillId: "spell.resonance"
+          level: 2
+        - skillId: "cultivation.nascent_cycle"
           level: 1
     recommendedProgression:
       predecessorId: "method.leihuo.3"
       predecessorMastery: 0.8
-    tags:
-      - "五行雷法与爆发神通"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.leihuo.5"
@@ -4671,7 +4720,7 @@ methods:
         base: 0.3
         knowledgeScales:
           - "spell.domain"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "spell_domain"
         stackPolicy: "highest"
@@ -4687,7 +4736,7 @@ methods:
         base: 0.4
         knowledgeScales:
           - "foundation.spirit_theory"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "thunder_damage"
         stackPolicy: "highest"
@@ -4701,7 +4750,7 @@ methods:
           displayPriority: 2
       - effectId: "domain_damage"
         base: 0.22
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "spell.domain"
         operation: "add_percent"
@@ -4718,13 +4767,14 @@ methods:
     learningRequirements:
       realm: "transform"
       knowledge:
-        - skillId: "spell.elements"
+        - skillId: "spell.domain"
+          level: 2
+        - skillId: "foundation.spirit_theory"
           level: 1
     recommendedProgression:
       predecessorId: "method.leihuo.4"
       predecessorMastery: 0.8
-    tags:
-      - "五行雷法与爆发神通"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.leihuo.6"
@@ -4761,7 +4811,7 @@ methods:
         base: 0.2
         knowledgeScales:
           - "spell.void"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "space_pierce"
         stackPolicy: "highest"
@@ -4777,7 +4827,7 @@ methods:
         base: 0.5
         knowledgeScales:
           - "talisman.true_name"
-        masteryGrowth: 0.045
+        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "spell_damage"
         stackPolicy: "highest"
@@ -4791,7 +4841,7 @@ methods:
           displayPriority: 2
       - effectId: "void_spell_accuracy"
         base: 0.22
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "spell.void"
         operation: "add_percent"
@@ -4808,13 +4858,14 @@ methods:
     learningRequirements:
       realm: "void"
       knowledge:
-        - skillId: "spell.elements"
+        - skillId: "spell.void"
+          level: 2
+        - skillId: "foundation.void_theory"
           level: 1
     recommendedProgression:
       predecessorId: "method.leihuo.5"
       predecessorMastery: 0.8
-    tags:
-      - "五行雷法与爆发神通"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.leihuo.7"
@@ -4851,7 +4902,7 @@ methods:
         base: 0.32
         knowledgeScales:
           - "spell.law"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "law_spell_power"
         stackPolicy: "highest"
@@ -4867,7 +4918,7 @@ methods:
         base: 0.58
         knowledgeScales:
           - "heaven.law_seed"
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         operation: "add_percent"
         stackGroup: "thunder_damage"
         stackPolicy: "highest"
@@ -4881,7 +4932,7 @@ methods:
           displayPriority: 2
       - effectId: "law_spell_efficiency"
         base: 0.25
-        masteryGrowth: 0.07
+        knowledgeGrowth: 0.07
         knowledgeScales:
           - "spell.law"
         operation: "add_percent"
@@ -4898,13 +4949,14 @@ methods:
     learningRequirements:
       realm: "merge"
       knowledge:
-        - skillId: "spell.elements"
-          level: 1
+        - skillId: "spell.law"
+          level: 2
+        - skillId: "heaven.law_seed"
+          level: 2
     recommendedProgression:
       predecessorId: "method.leihuo.6"
       predecessorMastery: 0.8
-    tags:
-      - "五行雷法与爆发神通"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.leihuo.8"
@@ -4941,7 +4993,7 @@ methods:
         base: 0.4
         knowledgeScales:
           - "spell.world"
-        masteryGrowth: 0.045
+        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "world_spell_power"
         stackPolicy: "highest"
@@ -4957,7 +5009,7 @@ methods:
         base: 0.42
         knowledgeScales:
           - "formation.cave_heaven"
-        masteryGrowth: 0.045
+        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "spell_domain"
         stackPolicy: "highest"
@@ -4971,7 +5023,7 @@ methods:
           displayPriority: 2
       - effectId: "world_spell_duration"
         base: 0.28
-        masteryGrowth: 0.08
+        knowledgeGrowth: 0.08
         knowledgeScales:
           - "spell.world"
         operation: "add_percent"
@@ -4988,13 +5040,14 @@ methods:
     learningRequirements:
       realm: "great"
       knowledge:
-        - skillId: "spell.elements"
+        - skillId: "spell.world"
+          level: 2
+        - skillId: "heaven.law_mastery"
           level: 1
     recommendedProgression:
       predecessorId: "method.leihuo.7"
       predecessorMastery: 0.8
-    tags:
-      - "五行雷法与爆发神通"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.leihuo.9"
@@ -5031,7 +5084,7 @@ methods:
         base: 0.55
         knowledgeScales:
           - "spell.cataclysm"
-        masteryGrowth: 0.055
+        knowledgeGrowth: 0.055
         operation: "add_percent"
         stackGroup: "tribulation_damage"
         stackPolicy: "highest"
@@ -5047,7 +5100,7 @@ methods:
         base: 0.2
         knowledgeScales:
           - "heaven.thunder_body"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "tribulation_resistance"
         stackPolicy: "add_capped"
@@ -5061,7 +5114,7 @@ methods:
           displayPriority: 2
       - effectId: "tribulation_energy_absorption"
         base: 0.3
-        masteryGrowth: 0.09
+        knowledgeGrowth: 0.09
         knowledgeScales:
           - "spell.cataclysm"
         operation: "add_percent"
@@ -5078,13 +5131,14 @@ methods:
     learningRequirements:
       realm: "tribulation"
       knowledge:
-        - skillId: "spell.elements"
-          level: 1
+        - skillId: "spell.cataclysm"
+          level: 2
+        - skillId: "heaven.tribulation"
+          level: 2
     recommendedProgression:
       predecessorId: "method.leihuo.8"
       predecessorMastery: 0.8
-    tags:
-      - "五行雷法与爆发神通"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.zhoutian_craft.1"
@@ -5121,7 +5175,7 @@ methods:
         base: 0.1
         knowledgeScales:
           - "artifact.smelting"
-        masteryGrowth: 0.018
+        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "craft_quality"
         stackPolicy: "highest"
@@ -5137,7 +5191,7 @@ methods:
         base: 0.08
         knowledgeScales:
           - "formation.runes"
-        masteryGrowth: 0.015
+        knowledgeGrowth: 0.015
         operation: "add_percent"
         stackGroup: "formation_power"
         stackPolicy: "highest"
@@ -5151,7 +5205,7 @@ methods:
           displayPriority: 2
       - effectId: "material_efficiency"
         base: 0.1
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         knowledgeScales:
           - "formation.runes"
         operation: "add_percent"
@@ -5167,10 +5221,11 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "formation.runes"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "阵法、炼器与洞天工程"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.zhoutian_craft.2"
@@ -5207,7 +5262,7 @@ methods:
         base: 0.18
         knowledgeScales:
           - "artifact.inscription"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "craft_quality"
         stackPolicy: "highest"
@@ -5223,7 +5278,7 @@ methods:
         base: 0.16
         knowledgeScales:
           - "formation.defense"
-        masteryGrowth: 0.022
+        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "formation_power"
         stackPolicy: "highest"
@@ -5237,7 +5292,7 @@ methods:
           displayPriority: 2
       - effectId: "inscription_success"
         base: 0.14
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         knowledgeScales:
           - "artifact.inscription"
         operation: "add_percent"
@@ -5254,13 +5309,14 @@ methods:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "artifact.materials"
+        - skillId: "artifact.inscription"
+          level: 2
+        - skillId: "formation.defense"
           level: 1
     recommendedProgression:
       predecessorId: "method.zhoutian_craft.1"
       predecessorMastery: 0.8
-    tags:
-      - "阵法、炼器与洞天工程"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.zhoutian_craft.3"
@@ -5297,7 +5353,7 @@ methods:
         base: 0.22
         knowledgeScales:
           - "artifact.treasure"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "artifact_power"
         stackPolicy: "highest"
@@ -5313,7 +5369,7 @@ methods:
         base: 0.16
         knowledgeScales:
           - "artifact.puppet"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "puppet_power"
         stackPolicy: "highest"
@@ -5327,7 +5383,7 @@ methods:
           displayPriority: 2
       - effectId: "puppet_capacity"
         base: 1
-        masteryGrowth: 1
+        knowledgeGrowth: 1
         knowledgeScales:
           - "artifact.treasure"
         operation: "add_flat"
@@ -5343,13 +5399,14 @@ methods:
     learningRequirements:
       realm: "core"
       knowledge:
-        - skillId: "artifact.materials"
+        - skillId: "artifact.treasure"
+          level: 2
+        - skillId: "artifact.puppet"
           level: 1
     recommendedProgression:
       predecessorId: "method.zhoutian_craft.2"
       predecessorMastery: 0.8
-    tags:
-      - "阵法、炼器与洞天工程"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.zhoutian_craft.4"
@@ -5386,7 +5443,7 @@ methods:
         base: 0.3
         knowledgeScales:
           - "artifact.life_bound"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "artifact_power"
         stackPolicy: "highest"
@@ -5402,7 +5459,7 @@ methods:
         base: 0.2
         knowledgeScales:
           - "formation.teleport"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "teleport_stability"
         stackPolicy: "highest"
@@ -5416,7 +5473,7 @@ methods:
           displayPriority: 2
       - effectId: "life_bound_sync"
         base: 0.18
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         knowledgeScales:
           - "artifact.life_bound"
         operation: "add_percent"
@@ -5433,13 +5490,14 @@ methods:
     learningRequirements:
       realm: "nascent"
       knowledge:
-        - skillId: "artifact.materials"
-          level: 1
+        - skillId: "artifact.life_bound"
+          level: 2
+        - skillId: "formation.teleport"
+          level: 2
     recommendedProgression:
       predecessorId: "method.zhoutian_craft.3"
       predecessorMastery: 0.8
-    tags:
-      - "阵法、炼器与洞天工程"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.zhoutian_craft.5"
@@ -5476,7 +5534,7 @@ methods:
         base: 0.38
         knowledgeScales:
           - "artifact.spirit"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "artifact_power"
         stackPolicy: "highest"
@@ -5492,7 +5550,7 @@ methods:
         base: 0.3
         knowledgeScales:
           - "formation.domain"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "formation_power"
         stackPolicy: "highest"
@@ -5506,7 +5564,7 @@ methods:
           displayPriority: 2
       - effectId: "artifact_autonomy"
         base: 0.22
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "artifact.spirit"
         operation: "add_percent"
@@ -5523,13 +5581,14 @@ methods:
     learningRequirements:
       realm: "transform"
       knowledge:
-        - skillId: "artifact.materials"
-          level: 1
+        - skillId: "artifact.spirit"
+          level: 2
+        - skillId: "formation.domain"
+          level: 2
     recommendedProgression:
       predecessorId: "method.zhoutian_craft.4"
       predecessorMastery: 0.8
-    tags:
-      - "阵法、炼器与洞天工程"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.zhoutian_craft.6"
@@ -5566,7 +5625,7 @@ methods:
         base: 0.32
         knowledgeScales:
           - "artifact.void_ship"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "ship_performance"
         stackPolicy: "highest"
@@ -5582,7 +5641,7 @@ methods:
         base: 0.26
         knowledgeScales:
           - "formation.space"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "space_stability"
         stackPolicy: "highest"
@@ -5596,7 +5655,7 @@ methods:
           displayPriority: 2
       - effectId: "void_ship_range"
         base: 0.22
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "artifact.void_ship"
         operation: "add_percent"
@@ -5613,13 +5672,14 @@ methods:
     learningRequirements:
       realm: "void"
       knowledge:
-        - skillId: "artifact.materials"
-          level: 1
+        - skillId: "artifact.void_ship"
+          level: 2
+        - skillId: "formation.space"
+          level: 2
     recommendedProgression:
       predecessorId: "method.zhoutian_craft.5"
       predecessorMastery: 0.8
-    tags:
-      - "阵法、炼器与洞天工程"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.zhoutian_craft.7"
@@ -5656,7 +5716,7 @@ methods:
         base: 0.5
         knowledgeScales:
           - "artifact.dao_weapon"
-        masteryGrowth: 0.045
+        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "artifact_power"
         stackPolicy: "highest"
@@ -5672,7 +5732,7 @@ methods:
         base: 0.25
         knowledgeScales:
           - "formation.cave_heaven"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "cave_heaven_growth"
         stackPolicy: "highest"
@@ -5686,7 +5746,7 @@ methods:
           displayPriority: 2
       - effectId: "dao_artifact_stability"
         base: 0.25
-        masteryGrowth: 0.07
+        knowledgeGrowth: 0.07
         knowledgeScales:
           - "artifact.dao_weapon"
         operation: "add_percent"
@@ -5703,13 +5763,14 @@ methods:
     learningRequirements:
       realm: "merge"
       knowledge:
-        - skillId: "artifact.materials"
-          level: 1
+        - skillId: "artifact.dao_weapon"
+          level: 2
+        - skillId: "formation.cave_heaven"
+          level: 2
     recommendedProgression:
       predecessorId: "method.zhoutian_craft.6"
       predecessorMastery: 0.8
-    tags:
-      - "阵法、炼器与洞天工程"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.zhoutian_craft.8"
@@ -5746,7 +5807,7 @@ methods:
         base: 0.45
         knowledgeScales:
           - "artifact.world_treasure"
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         operation: "add_percent"
         stackGroup: "world_artifact_power"
         stackPolicy: "highest"
@@ -5762,7 +5823,7 @@ methods:
         base: 0.46
         knowledgeScales:
           - "formation.star"
-        masteryGrowth: 0.045
+        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "formation_power"
         stackPolicy: "highest"
@@ -5776,7 +5837,7 @@ methods:
           displayPriority: 2
       - effectId: "star_array_output"
         base: 0.28
-        masteryGrowth: 0.08
+        knowledgeGrowth: 0.08
         knowledgeScales:
           - "artifact.world_treasure"
         operation: "add_percent"
@@ -5793,13 +5854,14 @@ methods:
     learningRequirements:
       realm: "great"
       knowledge:
-        - skillId: "artifact.materials"
-          level: 1
+        - skillId: "artifact.world_treasure"
+          level: 2
+        - skillId: "formation.star"
+          level: 2
     recommendedProgression:
       predecessorId: "method.zhoutian_craft.7"
       predecessorMastery: 0.8
-    tags:
-      - "阵法、炼器与洞天工程"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.zhoutian_craft.9"
@@ -5836,7 +5898,7 @@ methods:
         base: 0.55
         knowledgeScales:
           - "artifact.immortal"
-        masteryGrowth: 0.055
+        knowledgeGrowth: 0.055
         operation: "add_percent"
         stackGroup: "immortal_artifact_power"
         stackPolicy: "highest"
@@ -5852,7 +5914,7 @@ methods:
         base: 0.36
         knowledgeScales:
           - "formation.tribulation"
-        masteryGrowth: 0.045
+        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "tribulation_control"
         stackPolicy: "highest"
@@ -5866,7 +5928,7 @@ methods:
           displayPriority: 2
       - effectId: "artifact_tribulation_success"
         base: 0.3
-        masteryGrowth: 0.09
+        knowledgeGrowth: 0.09
         knowledgeScales:
           - "artifact.immortal"
         operation: "add_percent"
@@ -5883,13 +5945,14 @@ methods:
     learningRequirements:
       realm: "tribulation"
       knowledge:
-        - skillId: "artifact.materials"
-          level: 1
+        - skillId: "artifact.immortal"
+          level: 2
+        - skillId: "formation.tribulation"
+          level: 2
     recommendedProgression:
       predecessorId: "method.zhoutian_craft.8"
       predecessorMastery: 0.8
-    tags:
-      - "阵法、炼器与洞天工程"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.wanxiang.1"
@@ -5926,7 +5989,7 @@ methods:
         base: 0.12
         knowledgeScales:
           - "world.gathering"
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "gather_yield"
         stackPolicy: "highest"
@@ -5942,7 +6005,7 @@ methods:
         base: 0.08
         knowledgeScales:
           - "world.survival"
-        masteryGrowth: 0.015
+        knowledgeGrowth: 0.015
         operation: "add_percent"
         stackGroup: "exploration_safety"
         stackPolicy: "highest"
@@ -5956,7 +6019,7 @@ methods:
           displayPriority: 2
       - effectId: "gather_speed"
         base: 0.1
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         knowledgeScales:
           - "world.survival"
         operation: "add_percent"
@@ -5972,10 +6035,11 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "world.survival"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "探索、御兽与世界经营"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.wanxiang.2"
@@ -6012,7 +6076,7 @@ methods:
         base: 0.12
         knowledgeScales:
           - "world.trade"
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "trade_profit"
         stackPolicy: "highest"
@@ -6028,7 +6092,7 @@ methods:
         base: 0.16
         knowledgeScales:
           - "world.beast"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "beast_power"
         stackPolicy: "highest"
@@ -6042,7 +6106,7 @@ methods:
           displayPriority: 2
       - effectId: "beast_contract_capacity"
         base: 1
-        masteryGrowth: 1
+        knowledgeGrowth: 1
         knowledgeScales:
           - "world.trade"
         operation: "add_flat"
@@ -6058,13 +6122,14 @@ methods:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "world.survival"
-          level: 1
+        - skillId: "world.trade"
+          level: 2
+        - skillId: "world.beast"
+          level: 2
     recommendedProgression:
       predecessorId: "method.wanxiang.1"
       predecessorMastery: 0.8
-    tags:
-      - "探索、御兽与世界经营"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.wanxiang.3"
@@ -6101,7 +6166,7 @@ methods:
         base: 0.16
         knowledgeScales:
           - "world.geomancy"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "rare_find_chance"
         stackPolicy: "add_capped"
@@ -6117,7 +6182,7 @@ methods:
         base: 0.14
         knowledgeScales:
           - "alchemy.blood"
-        masteryGrowth: 0.022
+        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "beast_growth"
         stackPolicy: "highest"
@@ -6131,7 +6196,7 @@ methods:
           displayPriority: 2
       - effectId: "spirit_vein_detection"
         base: 0.16
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         knowledgeScales:
           - "world.geomancy"
         operation: "add_percent"
@@ -6148,13 +6213,14 @@ methods:
     learningRequirements:
       realm: "core"
       knowledge:
-        - skillId: "world.survival"
+        - skillId: "world.geomancy"
+          level: 2
+        - skillId: "formation.array"
           level: 1
     recommendedProgression:
       predecessorId: "method.wanxiang.2"
       predecessorMastery: 0.8
-    tags:
-      - "探索、御兽与世界经营"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.wanxiang.4"
@@ -6191,7 +6257,7 @@ methods:
         base: 0.22
         knowledgeScales:
           - "world.weather"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "exploration_safety"
         stackPolicy: "highest"
@@ -6207,7 +6273,7 @@ methods:
         base: 0.2
         knowledgeScales:
           - "heaven.fate"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "rare_find_chance"
         stackPolicy: "add_capped"
@@ -6221,7 +6287,7 @@ methods:
           displayPriority: 2
       - effectId: "weather_warning"
         base: 0.18
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         knowledgeScales:
           - "world.weather"
         operation: "add_percent"
@@ -6238,13 +6304,14 @@ methods:
     learningRequirements:
       realm: "nascent"
       knowledge:
-        - skillId: "world.survival"
+        - skillId: "world.weather"
+          level: 2
+        - skillId: "formation.teleport"
           level: 1
     recommendedProgression:
       predecessorId: "method.wanxiang.3"
       predecessorMastery: 0.8
-    tags:
-      - "探索、御兽与世界经营"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.wanxiang.5"
@@ -6281,7 +6348,7 @@ methods:
         base: 0.3
         knowledgeScales:
           - "world.realm_travel"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "travel_efficiency"
         stackPolicy: "highest"
@@ -6297,7 +6364,7 @@ methods:
         base: 0.18
         knowledgeScales:
           - "spirit.split"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "expedition_capacity"
         stackPolicy: "highest"
@@ -6311,7 +6378,7 @@ methods:
           displayPriority: 2
       - effectId: "route_discovery"
         base: 0.22
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "world.realm_travel"
         operation: "add_percent"
@@ -6328,13 +6395,14 @@ methods:
     learningRequirements:
       realm: "transform"
       knowledge:
-        - skillId: "world.survival"
+        - skillId: "world.realm_travel"
+          level: 2
+        - skillId: "spirit.split"
           level: 1
     recommendedProgression:
       predecessorId: "method.wanxiang.4"
       predecessorMastery: 0.8
-    tags:
-      - "探索、御兽与世界经营"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.wanxiang.6"
@@ -6371,7 +6439,7 @@ methods:
         base: 0.34
         knowledgeScales:
           - "world.void_survival"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "void_survival"
         stackPolicy: "highest"
@@ -6387,7 +6455,7 @@ methods:
         base: 0.16
         knowledgeScales:
           - "artifact.void_ship"
-        masteryGrowth: 0.025
+        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "ship_performance"
         stackPolicy: "highest"
@@ -6401,7 +6469,7 @@ methods:
           displayPriority: 2
       - effectId: "void_route_safety"
         base: 0.22
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "world.void_survival"
         operation: "add_percent"
@@ -6418,13 +6486,14 @@ methods:
     learningRequirements:
       realm: "void"
       knowledge:
-        - skillId: "world.survival"
+        - skillId: "world.void_survival"
+          level: 2
+        - skillId: "artifact.void_ship"
           level: 1
     recommendedProgression:
       predecessorId: "method.wanxiang.5"
       predecessorMastery: 0.8
-    tags:
-      - "探索、御兽与世界经营"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.wanxiang.7"
@@ -6461,7 +6530,7 @@ methods:
         base: 0.28
         knowledgeScales:
           - "world.civilization"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "settlement_output"
         stackPolicy: "highest"
@@ -6477,7 +6546,7 @@ methods:
         base: 0.24
         knowledgeScales:
           - "heaven.causality"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "trade_profit"
         stackPolicy: "highest"
@@ -6491,7 +6560,7 @@ methods:
           displayPriority: 2
       - effectId: "governance_efficiency"
         base: 0.25
-        masteryGrowth: 0.07
+        knowledgeGrowth: 0.07
         knowledgeScales:
           - "world.civilization"
         operation: "add_percent"
@@ -6508,13 +6577,14 @@ methods:
     learningRequirements:
       realm: "merge"
       knowledge:
-        - skillId: "world.survival"
+        - skillId: "world.civilization"
+          level: 2
+        - skillId: "foundation.integration_theory"
           level: 1
     recommendedProgression:
       predecessorId: "method.wanxiang.6"
       predecessorMastery: 0.8
-    tags:
-      - "探索、御兽与世界经营"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.wanxiang.8"
@@ -6551,7 +6621,7 @@ methods:
         base: 0.34
         knowledgeScales:
           - "world.world_shepherd"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "world_growth"
         stackPolicy: "highest"
@@ -6567,7 +6637,7 @@ methods:
         base: 0.36
         knowledgeScales:
           - "formation.cave_heaven"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "settlement_output"
         stackPolicy: "highest"
@@ -6581,7 +6651,7 @@ methods:
           displayPriority: 2
       - effectId: "world_ecology_stability"
         base: 0.28
-        masteryGrowth: 0.08
+        knowledgeGrowth: 0.08
         knowledgeScales:
           - "world.world_shepherd"
         operation: "add_percent"
@@ -6598,13 +6668,14 @@ methods:
     learningRequirements:
       realm: "great"
       knowledge:
-        - skillId: "world.survival"
-          level: 1
+        - skillId: "world.world_shepherd"
+          level: 2
+        - skillId: "formation.cave_heaven"
+          level: 2
     recommendedProgression:
       predecessorId: "method.wanxiang.7"
       predecessorMastery: 0.8
-    tags:
-      - "探索、御兽与世界经营"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.wanxiang.9"
@@ -6641,7 +6712,7 @@ methods:
         base: 0.45
         knowledgeScales:
           - "world.ascension_route"
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         operation: "add_percent"
         stackGroup: "ascension_route_stability"
         stackPolicy: "highest"
@@ -6657,7 +6728,7 @@ methods:
         base: 0.35
         knowledgeScales:
           - "heaven.astrology"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "expedition_capacity"
         stackPolicy: "highest"
@@ -6671,7 +6742,7 @@ methods:
           displayPriority: 2
       - effectId: "ascension_route_capacity"
         base: 1
-        masteryGrowth: 1
+        knowledgeGrowth: 1
         knowledgeScales:
           - "world.ascension_route"
         operation: "add_flat"
@@ -6687,13 +6758,14 @@ methods:
     learningRequirements:
       realm: "tribulation"
       knowledge:
-        - skillId: "world.survival"
+        - skillId: "world.ascension_route"
+          level: 2
+        - skillId: "foundation.ascension"
           level: 1
     recommendedProgression:
       predecessorId: "method.wanxiang.8"
       predecessorMastery: 0.8
-    tags:
-      - "探索、御兽与世界经营"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.jiuji.1"
@@ -6730,7 +6802,7 @@ methods:
         base: 0.18
         knowledgeScales:
           - "heaven.causality"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "tribulation_forecast"
         stackPolicy: "highest"
@@ -6746,7 +6818,7 @@ methods:
         base: 0.12
         knowledgeScales:
           - "heaven.fate"
-        masteryGrowth: 0.022
+        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "karma_resistance"
         stackPolicy: "add_capped"
@@ -6760,7 +6832,7 @@ methods:
           displayPriority: 2
       - effectId: "tribulation_warning_time"
         base: 0.18
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         knowledgeScales:
           - "heaven.causality"
         operation: "add_percent"
@@ -6777,11 +6849,10 @@ methods:
     learningRequirements:
       realm: "transform"
       knowledge:
-        - skillId: "heaven.omen"
+        - skillId: "heaven.causality"
           level: 1
     recommendedProgression: null
-    tags:
-      - "劫数推演与终局飞升"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.jiuji.2"
@@ -6818,7 +6889,7 @@ methods:
         base: 0.2
         knowledgeScales:
           - "heaven.law_seed"
-        masteryGrowth: 0.03
+        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "law_resistance"
         stackPolicy: "add_capped"
@@ -6834,7 +6905,7 @@ methods:
         base: 0.28
         knowledgeScales:
           - "spirit.void_thought"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "tribulation_forecast"
         stackPolicy: "highest"
@@ -6848,7 +6919,7 @@ methods:
           displayPriority: 2
       - effectId: "law_seed_growth"
         base: 0.22
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "heaven.law_seed"
         operation: "add_percent"
@@ -6865,13 +6936,14 @@ methods:
     learningRequirements:
       realm: "void"
       knowledge:
-        - skillId: "heaven.omen"
-          level: 1
+        - skillId: "heaven.law_seed"
+          level: 2
+        - skillId: "foundation.void_theory"
+          level: 2
     recommendedProgression:
       predecessorId: "method.jiuji.1"
       predecessorMastery: 0.8
-    tags:
-      - "劫数推演与终局飞升"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.jiuji.3"
@@ -6908,7 +6980,7 @@ methods:
         base: 0.34
         knowledgeScales:
           - "heaven.law_mastery"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "law_resistance"
         stackPolicy: "add_capped"
@@ -6924,7 +6996,7 @@ methods:
         base: 0.18
         knowledgeScales:
           - "talisman.causality_seal"
-        masteryGrowth: 0.028
+        knowledgeGrowth: 0.028
         operation: "add_percent"
         stackGroup: "tribulation_control"
         stackPolicy: "highest"
@@ -6938,7 +7010,7 @@ methods:
           displayPriority: 2
       - effectId: "tribulation_plan_slots"
         base: 1
-        masteryGrowth: 1
+        knowledgeGrowth: 1
         knowledgeScales:
           - "heaven.law_mastery"
         operation: "add_flat"
@@ -6954,13 +7026,14 @@ methods:
     learningRequirements:
       realm: "merge"
       knowledge:
-        - skillId: "heaven.omen"
-          level: 1
+        - skillId: "heaven.law_mastery"
+          level: 2
+        - skillId: "foundation.integration_theory"
+          level: 2
     recommendedProgression:
       predecessorId: "method.jiuji.2"
       predecessorMastery: 0.8
-    tags:
-      - "劫数推演与终局飞升"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.jiuji.4"
@@ -6997,7 +7070,7 @@ methods:
         base: 0.32
         knowledgeScales:
           - "heaven.thunder_body"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "tribulation_resistance"
         stackPolicy: "add_capped"
@@ -7013,7 +7086,7 @@ methods:
         base: 0.3
         knowledgeScales:
           - "spirit.dao_heart"
-        masteryGrowth: 0.04
+        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "heart_tribulation_resistance"
         stackPolicy: "add_capped"
@@ -7027,7 +7100,7 @@ methods:
           displayPriority: 2
       - effectId: "tribulation_resource_efficiency"
         base: 0.28
-        masteryGrowth: 0.08
+        knowledgeGrowth: 0.08
         knowledgeScales:
           - "heaven.dao_fruit"
         operation: "add_percent"
@@ -7044,13 +7117,14 @@ methods:
     learningRequirements:
       realm: "great"
       knowledge:
-        - skillId: "heaven.omen"
-          level: 1
+        - skillId: "heaven.dao_fruit"
+          level: 2
+        - skillId: "heaven.thunder_body"
+          level: 2
     recommendedProgression:
       predecessorId: "method.jiuji.3"
       predecessorMastery: 0.8
-    tags:
-      - "劫数推演与终局飞升"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.jiuji.5"
@@ -7087,7 +7161,7 @@ methods:
         base: 0.5
         knowledgeScales:
           - "heaven.tribulation"
-        masteryGrowth: 0.05
+        knowledgeGrowth: 0.05
         operation: "add_percent"
         stackGroup: "tribulation_resistance"
         stackPolicy: "add_capped"
@@ -7103,7 +7177,7 @@ methods:
         base: 0.24
         knowledgeScales:
           - "heaven.ascendant"
-        masteryGrowth: 0.035
+        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "ascension_success"
         stackPolicy: "add_capped"
@@ -7117,7 +7191,7 @@ methods:
           displayPriority: 2
       - effectId: "ascension_failure_protection"
         base: 0.2
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "heaven.tribulation"
         operation: "add_percent"
@@ -7134,13 +7208,14 @@ methods:
     learningRequirements:
       realm: "tribulation"
       knowledge:
-        - skillId: "heaven.omen"
-          level: 1
+        - skillId: "heaven.tribulation"
+          level: 2
+        - skillId: "heaven.ascendant"
+          level: 2
     recommendedProgression:
       predecessorId: "method.jiuji.4"
       predecessorMastery: 0.8
-    tags:
-      - "劫数推演与终局飞升"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.basic_breathing.1"
@@ -7167,7 +7242,7 @@ methods:
         base: 35
         knowledgeScales:
           - "foundation.breathing"
-        masteryGrowth: 0
+        knowledgeGrowth: 0
         operation: "add_flat"
         stackGroup: "max_mana"
         stackPolicy: "highest"
@@ -7180,7 +7255,7 @@ methods:
           displayPriority: 1
       - effectId: "cultivation_speed"
         base: 0.04
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         knowledgeScales:
           - "foundation.breathing"
         operation: "add_percent"
@@ -7196,10 +7271,11 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "foundation.breathing"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "单知识入门与快速补课"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.small_cycle.1"
@@ -7226,7 +7302,7 @@ methods:
         base: 0.05
         knowledgeScales:
           - "cultivation.cycle"
-        masteryGrowth: 0
+        knowledgeGrowth: 0
         operation: "add_percent"
         stackGroup: "mana_regen"
         stackPolicy: "highest"
@@ -7240,7 +7316,7 @@ methods:
           displayPriority: 1
       - effectId: "mana_control"
         base: 0.05
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         knowledgeScales:
           - "cultivation.cycle"
         operation: "add_percent"
@@ -7256,10 +7332,11 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "cultivation.cycle"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "单知识入门与快速补课"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.iron_skin.1"
@@ -7286,7 +7363,7 @@ methods:
         base: 0.05
         knowledgeScales:
           - "body.tempering"
-        masteryGrowth: 0
+        knowledgeGrowth: 0
         operation: "add_percent"
         stackGroup: "physical_resistance"
         stackPolicy: "add_capped"
@@ -7300,7 +7377,7 @@ methods:
           displayPriority: 1
       - effectId: "stagger_resistance"
         base: 0.06
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         knowledgeScales:
           - "body.tempering"
         operation: "add_percent"
@@ -7316,10 +7393,11 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "body.tempering"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "单知识入门与快速补课"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.clear_mind.1"
@@ -7346,7 +7424,7 @@ methods:
         base: 0.06
         knowledgeScales:
           - "spirit.meditation"
-        masteryGrowth: 0
+        knowledgeGrowth: 0
         operation: "add_percent"
         stackGroup: "mental_resistance"
         stackPolicy: "add_capped"
@@ -7360,7 +7438,7 @@ methods:
           displayPriority: 1
       - effectId: "inner_demon_resistance"
         base: 0.06
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         knowledgeScales:
           - "spirit.meditation"
         operation: "add_percent"
@@ -7376,10 +7454,11 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "spirit.meditation"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "单知识入门与快速补课"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.sword_control.1"
@@ -7406,7 +7485,7 @@ methods:
         base: 0.08
         knowledgeScales:
           - "sword.qi"
-        masteryGrowth: 0
+        knowledgeGrowth: 0
         operation: "add_percent"
         stackGroup: "sword_damage"
         stackPolicy: "highest"
@@ -7420,7 +7499,7 @@ methods:
           displayPriority: 1
       - effectId: "sword_control"
         base: 0.06
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         knowledgeScales:
           - "sword.qi"
         operation: "add_percent"
@@ -7436,10 +7515,11 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "sword.qi"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "单知识入门与快速补课"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.herb_manual.1"
@@ -7466,7 +7546,7 @@ methods:
         base: 0.08
         knowledgeScales:
           - "alchemy.herbs"
-        masteryGrowth: 0
+        knowledgeGrowth: 0
         operation: "add_percent"
         stackGroup: "herb_yield"
         stackPolicy: "highest"
@@ -7480,7 +7560,7 @@ methods:
           displayPriority: 1
       - effectId: "gather_speed"
         base: 0.06
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         knowledgeScales:
           - "alchemy.herbs"
         operation: "add_percent"
@@ -7496,10 +7576,11 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "alchemy.herbs"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "单知识入门与快速补课"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.rune_manual.1"
@@ -7526,7 +7607,7 @@ methods:
         base: 0.06
         knowledgeScales:
           - "formation.runes"
-        masteryGrowth: 0
+        knowledgeGrowth: 0
         operation: "add_percent"
         stackGroup: "formation_power"
         stackPolicy: "highest"
@@ -7540,7 +7621,7 @@ methods:
           displayPriority: 1
       - effectId: "inscription_success"
         base: 0.06
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         knowledgeScales:
           - "formation.runes"
         operation: "add_percent"
@@ -7556,10 +7637,11 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "formation.runes"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "单知识入门与快速补课"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.appraisal_manual.1"
@@ -7586,7 +7668,7 @@ methods:
         base: 0.05
         knowledgeScales:
           - "world.appraisal"
-        masteryGrowth: 0
+        knowledgeGrowth: 0
         operation: "add_percent"
         stackGroup: "rare_find_chance"
         stackPolicy: "add_capped"
@@ -7600,7 +7682,7 @@ methods:
           displayPriority: 1
       - effectId: "appraisal_accuracy"
         base: 0.08
-        masteryGrowth: 0.02
+        knowledgeGrowth: 0.02
         knowledgeScales:
           - "world.appraisal"
         operation: "add_percent"
@@ -7616,10 +7698,11 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge: []
+      knowledge:
+        - skillId: "world.appraisal"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "单知识入门与快速补课"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.blood_burst.1"
@@ -7654,7 +7737,7 @@ methods:
     effects:
       - effectId: "melee_damage"
         base: 0.38
-        masteryGrowth: 0.12
+        knowledgeGrowth: 0.12
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "melee_damage"
@@ -7669,7 +7752,7 @@ methods:
           displayPriority: 1
       - effectId: "health_cost"
         base: 0.12
-        masteryGrowth: 0.08
+        knowledgeGrowth: 0.08
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "health_cost"
@@ -7684,7 +7767,7 @@ methods:
           displayPriority: 2
       - effectId: "low_health_damage"
         base: 0.3
-        masteryGrowth: 0.1
+        knowledgeGrowth: 0.1
         knowledgeScales:
           - "body.bloodline"
         operation: "add_percent"
@@ -7701,11 +7784,12 @@ methods:
     learningRequirements:
       realm: "core"
       knowledge:
-        - skillId: "body.tempering"
+        - skillId: "body.bloodline"
+          level: 1
+        - skillId: "body.recovery"
           level: 1
     recommendedProgression: null
-    tags:
-      - "旁门爆发，以伤换攻"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.escape_art.1"
@@ -7740,7 +7824,7 @@ methods:
     effects:
       - effectId: "travel_efficiency"
         base: 0.28
-        masteryGrowth: 0.1
+        knowledgeGrowth: 0.1
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "travel_efficiency"
@@ -7755,7 +7839,7 @@ methods:
           displayPriority: 1
       - effectId: "escape_success"
         base: 0.2
-        masteryGrowth: 0.1
+        knowledgeGrowth: 0.1
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "escape_success"
@@ -7770,7 +7854,7 @@ methods:
           displayPriority: 2
       - effectId: "evasion"
         base: 0.18
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "spell.escape"
         operation: "add_percent"
@@ -7787,11 +7871,12 @@ methods:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "spell.elements"
+        - skillId: "spell.escape"
+          level: 1
+        - skillId: "cultivation.cycle"
           level: 1
     recommendedProgression: null
-    tags:
-      - "专精遁法与脱离"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.poison_codex.1"
@@ -7826,7 +7911,7 @@ methods:
     effects:
       - effectId: "poison_power"
         base: 0.32
-        masteryGrowth: 0.12
+        knowledgeGrowth: 0.12
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "poison_power"
@@ -7841,7 +7926,7 @@ methods:
           displayPriority: 1
       - effectId: "poison_resistance"
         base: 0.24
-        masteryGrowth: 0.1
+        knowledgeGrowth: 0.1
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "poison_resistance"
@@ -7856,7 +7941,7 @@ methods:
           displayPriority: 2
       - effectId: "poison_duration"
         base: 0.2
-        masteryGrowth: 0.08
+        knowledgeGrowth: 0.08
         knowledgeScales:
           - "alchemy.poison"
         operation: "add_percent"
@@ -7873,11 +7958,12 @@ methods:
     learningRequirements:
       realm: "core"
       knowledge:
-        - skillId: "alchemy.herbs"
+        - skillId: "alchemy.poison"
+          level: 1
+        - skillId: "alchemy.medicine"
           level: 1
     recommendedProgression: null
-    tags:
-      - "毒理、炼毒与解毒"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.fate_gaze.1"
@@ -7912,7 +7998,7 @@ methods:
     effects:
       - effectId: "rare_find_chance"
         base: 0.18
-        masteryGrowth: 0.08
+        knowledgeGrowth: 0.08
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "rare_find_chance"
@@ -7927,7 +8013,7 @@ methods:
           displayPriority: 1
       - effectId: "exploration_safety"
         base: 0.16
-        masteryGrowth: 0.08
+        knowledgeGrowth: 0.08
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "exploration_safety"
@@ -7942,7 +8028,7 @@ methods:
           displayPriority: 2
       - effectId: "danger_warning"
         base: 0.18
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "heaven.omen"
         operation: "add_percent"
@@ -7961,9 +8047,10 @@ methods:
       knowledge:
         - skillId: "heaven.omen"
           level: 1
+        - skillId: "heaven.astrology"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "趋吉避凶与天机探索"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.talisman_archive.1"
@@ -7998,7 +8085,7 @@ methods:
     effects:
       - effectId: "talisman_capacity"
         base: 3
-        masteryGrowth: 2
+        knowledgeGrowth: 2
         knowledgeScales: []
         operation: "add_flat"
         stackGroup: "talisman_capacity"
@@ -8013,7 +8100,7 @@ methods:
           displayPriority: 1
       - effectId: "activation_speed"
         base: 0.24
-        masteryGrowth: 0.1
+        knowledgeGrowth: 0.1
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "activation_speed"
@@ -8028,7 +8115,7 @@ methods:
           displayPriority: 2
       - effectId: "talisman_cost_efficiency"
         base: 0.18
-        masteryGrowth: 0.06
+        knowledgeGrowth: 0.06
         knowledgeScales:
           - "talisman.script"
         operation: "add_percent"
@@ -8047,9 +8134,10 @@ methods:
       knowledge:
         - skillId: "talisman.script"
           level: 1
+        - skillId: "talisman.activation"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "符箓储备与快速激发"
+    tags: []
     passive_rules: []
     synergy_rules: []
   - id: "method.heavy_sword.1"
@@ -8084,7 +8172,7 @@ methods:
     effects:
       - effectId: "melee_damage"
         base: 0.3
-        masteryGrowth: 0.12
+        knowledgeGrowth: 0.12
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "melee_damage"
@@ -8099,7 +8187,7 @@ methods:
           displayPriority: 1
       - effectId: "armor_pierce"
         base: 0.18
-        masteryGrowth: 0.08
+        knowledgeGrowth: 0.08
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "armor_pierce"
@@ -8114,7 +8202,7 @@ methods:
           displayPriority: 2
       - effectId: "stagger_power"
         base: 0.24
-        masteryGrowth: 0.08
+        knowledgeGrowth: 0.08
         knowledgeScales:
           - "sword.weapon"
         operation: "add_percent"
@@ -8133,9 +8221,10 @@ methods:
       knowledge:
         - skillId: "sword.weapon"
           level: 1
+        - skillId: "body.bone"
+          level: 1
     recommendedProgression: null
-    tags:
-      - "低阶高专精重剑流派"
+    tags: []
     passive_rules: []
     synergy_rules: []
 effectCatalog:

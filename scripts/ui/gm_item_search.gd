@@ -4,7 +4,7 @@ extends RefCounted
 ## GM 道具模糊搜索：支持名称 / ID / 类型 / 稀有度的子序列匹配与关键词组合。
 
 
-static func filter_entries(catalog: Array, query: String, limit: int = 100) -> Array:
+static func filter_entries(catalog: Array, query: String, limit: int = 200) -> Array:
 	var trimmed := query.strip_edges()
 	if trimmed == "":
 		return catalog.slice(0, mini(limit, catalog.size()))
@@ -26,7 +26,8 @@ static func filter_entries(catalog: Array, query: String, limit: int = 100) -> A
 
 
 static func _entry_score(query: String, entry: Dictionary) -> int:
-	var haystack := "%s %s %s %s" % [
+	var haystack := "%s %s %s %s %s %s" % [
+		str(entry.get("kind", "")),
 		str(entry.get("name", "")),
 		str(entry.get("id", "")),
 		str(entry.get("type", "")),
@@ -37,14 +38,16 @@ static func _entry_score(query: String, entry: Dictionary) -> int:
 
 
 static func _score_text(query: String, text: String) -> int:
-	var tokens := query.split(" ", false)
+	var normalized_query := query.to_lower()
+	var normalized_text := text.to_lower()
+	var tokens := normalized_query.split(" ", false)
 	var total := 0
 	var matched_tokens := 0
 	for token_v in tokens:
 		var token := str(token_v).strip_edges()
 		if token == "":
 			continue
-		var token_score := _fuzzy_score_single(token, text)
+		var token_score := _fuzzy_score_single(token, normalized_text)
 		if token_score < 0:
 			return -1
 		total += token_score
@@ -76,13 +79,13 @@ static func _subsequence_score(query: String, text: String) -> int:
 	for i in range(text.length()):
 		if qi >= query.length():
 			break
-		if text[i] == query[qi]:
+		if text.substr(i, 1) == query.substr(qi, 1):
 			if last_pos == i - 1:
 				run += 1
 			else:
 				run = 1
 			score += run * 8
-			if i == 0 or (i > 0 and text[i - 1] in [" ", "_", "·"]):
+			if i == 0 or (i > 0 and text.substr(i - 1, 1) in [" ", "_", "·"]):
 				score += 12
 			last_pos = i
 			qi += 1

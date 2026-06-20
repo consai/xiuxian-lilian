@@ -190,7 +190,7 @@ func _apply_player_slot(ctx: FightSceneContext, row: Dictionary) -> void:
 	var dead := unit.hp <= 0.0
 	slot.apply_slot(row, unit, {}, true, dead)
 	if _refs.vfx != null:
-		_refs.vfx.ensure_actor_registered(FightSceneContext.UNIT_PLAYER, slot)
+		_ensure_vfx_actor(FightSceneContext.UNIT_PLAYER, _slot_actor_node(slot))
 
 
 func collect_enemy_formation_slots() -> void:
@@ -247,14 +247,15 @@ func _apply_enemy_slot_node(ctx: FightSceneContext, node: Node2D, slot: Dictiona
 	if node.has_method("apply_slot"):
 		node.call("apply_slot", row_data, unit, intent_row, active, dead)
 	var actor_id := str(slot.get("actor_id", ""))
+	var actor_node := _slot_actor_node(node)
 	if actor_id != "":
-		_enemy_actor_nodes[actor_id] = node
+		_enemy_actor_nodes[actor_id] = actor_node
 		if _refs.vfx != null:
-			_refs.vfx.ensure_actor_registered(actor_id, node)
+			_ensure_vfx_actor(actor_id, actor_node)
 	if bool(slot.get("current", false)):
-		_enemy_actor_nodes[FightSceneContext.UNIT_ENEMY] = node
+		_enemy_actor_nodes[FightSceneContext.UNIT_ENEMY] = actor_node
 		if _refs.vfx != null:
-			_refs.vfx.ensure_actor_registered(FightSceneContext.UNIT_ENEMY, node)
+			_ensure_vfx_actor(FightSceneContext.UNIT_ENEMY, actor_node)
 
 
 func _resolve_enemy_intent_row(ctx: FightSceneContext, enemy_index: int) -> Dictionary:
@@ -484,12 +485,12 @@ func register_battle_actors(ctx: FightSceneContext) -> void:
 		push_warning("FightScene: 玩家战斗精灵未就绪，延后注册 VFX 角色")
 		ctx.scene.call_deferred("_deferred_register_vfx_actors")
 		return
-	_refs.vfx.register_actor(FightSceneContext.UNIT_PLAYER, _refs.sprite_left)
+	_register_vfx_actor(FightSceneContext.UNIT_PLAYER, _slot_actor_node(_refs.sprite_left))
 	var enemy_node := _actor_node_for_unit(FightSceneContext.UNIT_ENEMY)
 	if is_instance_valid(enemy_node):
-		_refs.vfx.register_actor(FightSceneContext.UNIT_ENEMY, enemy_node)
+		_register_vfx_actor(FightSceneContext.UNIT_ENEMY, enemy_node)
 	elif is_instance_valid(_refs.sprite_right):
-		_refs.vfx.register_actor(FightSceneContext.UNIT_ENEMY, _refs.sprite_right)
+		_register_vfx_actor(FightSceneContext.UNIT_ENEMY, _refs.sprite_right)
 	_refs.vfx.refresh_all_actors()
 	BattleDebugLog.write("场景", "VFX 角色注册完成", {
 		"玩家": sprite_vfx_snapshot(FightSceneContext.UNIT_PLAYER),
@@ -501,16 +502,16 @@ func ensure_vfx_actors_for_combat() -> void:
 	if _refs.vfx == null:
 		return
 	if is_instance_valid(_refs.sprite_left):
-		_refs.vfx.ensure_actor_registered(FightSceneContext.UNIT_PLAYER, _refs.sprite_left)
+		_ensure_vfx_actor(FightSceneContext.UNIT_PLAYER, _slot_actor_node(_refs.sprite_left))
 	for actor_id in _enemy_actor_nodes.keys():
 		var actor_node := _enemy_actor_nodes[actor_id] as Node2D
 		if is_instance_valid(actor_node):
-			_refs.vfx.ensure_actor_registered(str(actor_id), actor_node)
+			_ensure_vfx_actor(str(actor_id), actor_node)
 	var enemy_node := _actor_node_for_unit(FightSceneContext.UNIT_ENEMY)
 	if is_instance_valid(enemy_node):
-		_refs.vfx.ensure_actor_registered(FightSceneContext.UNIT_ENEMY, enemy_node)
+		_ensure_vfx_actor(FightSceneContext.UNIT_ENEMY, enemy_node)
 	elif is_instance_valid(_refs.sprite_right):
-		_refs.vfx.ensure_actor_registered(FightSceneContext.UNIT_ENEMY, _refs.sprite_right)
+		_ensure_vfx_actor(FightSceneContext.UNIT_ENEMY, _refs.sprite_right)
 
 
 func sprite_vfx_snapshot(unit_id: String) -> Dictionary:
@@ -538,7 +539,7 @@ func unit_screen_pos(ctx: FightSceneContext, unit_id: String) -> Vector2:
 
 func _actor_node_for_unit(unit_id: String) -> Node2D:
 	if unit_id == FightSceneContext.UNIT_PLAYER:
-		return _refs.sprite_left
+		return _slot_actor_node(_refs.sprite_left)
 	if _enemy_actor_nodes.has(unit_id):
 		var node := _enemy_actor_nodes[unit_id] as Node2D
 		if is_instance_valid(node):
@@ -548,6 +549,36 @@ func _actor_node_for_unit(unit_id: String) -> Node2D:
 		if is_instance_valid(enemy_node):
 			return enemy_node
 	return _refs.sprite_right
+
+
+func _slot_actor_node(slot: Node2D) -> Node2D:
+	if not is_instance_valid(slot):
+		return null
+	if slot.has_method("actor_sprite"):
+		var actor_v: Variant = slot.call("actor_sprite")
+		if actor_v is Node2D and is_instance_valid(actor_v):
+			return actor_v as Node2D
+	return slot
+
+
+func _register_vfx_actor(unit_id: String, actor: Node2D) -> void:
+	if _refs.vfx == null or not is_instance_valid(actor):
+		return
+	_refs.vfx.register_actor(unit_id, actor, _vfx_settings_for_actor(actor))
+
+
+func _ensure_vfx_actor(unit_id: String, actor: Node2D) -> void:
+	if _refs.vfx == null or not is_instance_valid(actor):
+		return
+	_refs.vfx.ensure_actor_registered(unit_id, actor, _vfx_settings_for_actor(actor))
+
+
+func _vfx_settings_for_actor(actor: Node2D) -> CombatVfxSettings:
+	if _refs.vfx == null or _refs.vfx.settings == null or not is_instance_valid(actor):
+		return null
+	var settings := _refs.vfx.settings.duplicate() as CombatVfxSettings
+	settings.actor_base_scale = maxf(0.01, maxf(absf(actor.scale.x), absf(actor.scale.y)))
+	return settings
 
 
 func sync_auto_battle_ui(ctx: FightSceneContext) -> void:

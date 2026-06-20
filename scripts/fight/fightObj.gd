@@ -884,7 +884,7 @@ func _apply_effects_with_routing(cfg: Dictionary, default_target: FightObj = nul
 						eff.get("modifiers", {}) as Dictionary,
 						eff.get("percent_modifiers", {}) as Dictionary
 				):
-					buff_names.append(str(eff.get("name", mod_id)))
+					buff_names.append(_runtime_buff_display_name(eff, mod_id))
 			"control":
 				if target == null:
 					continue
@@ -899,7 +899,7 @@ func _apply_effects_with_routing(cfg: Dictionary, default_target: FightObj = nul
 						{},
 						{FightAttr.SPD: -0.95}
 				):
-					buff_names.append(str(eff.get("name", control_id)))
+					buff_names.append(target._runtime_buff_display_name(eff, control_id))
 	report["buff_names"] = buff_names
 	return report
 
@@ -977,6 +977,13 @@ func _buff_display_name(buff_id: String) -> String:
 	if def.is_empty():
 		return buff_id
 	return str(def.get("name", buff_id)).strip_edges()
+
+
+func _runtime_buff_display_name(effect: Dictionary, buff_id: String) -> String:
+	var name := _buff_display_name(buff_id)
+	if name != buff_id:
+		return name
+	return str(effect.get("name", buff_id)).strip_edges()
 
 
 func _resolve_effect_target(eff: Dictionary, eff_type: String, default_target: FightObj) -> FightObj:
