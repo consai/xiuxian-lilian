@@ -4,9 +4,10 @@ extends RefCounted
 const EnumExpeditionNodeTypeScript := preload("res://scripts/enum/enum_expedition_node_type.gd")
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 
-const DEFAULT_MIDDLE_LAYERS := 5
-const MIN_LANES := 2
-const MAX_LANES := 4
+const DEFAULT_MIDDLE_LAYERS := 8
+const ROUTE_LANE_COUNT := 3
+const MIN_ROUTE_CROSSES := 2
+const MAX_ROUTE_CROSSES := 3
 
 
 static func generate(location: Dictionary, seed_value: int) -> Dictionary:
@@ -18,21 +19,21 @@ static func generate(location: Dictionary, seed_value: int) -> Dictionary:
 	nodes.append(start_node)
 	var previous_layer_ids: Array = [str(start_node.get("id", ""))]
 	var available_types := _available_node_types(location)
+	var cross_layers := _pick_cross_layers(rng)
 	for layer in range(1, DEFAULT_MIDDLE_LAYERS + 1):
-		var lane_count := rng.randi_range(MIN_LANES, MAX_LANES)
 		var layer_ids: Array = []
-		for lane in lane_count:
+		for lane in ROUTE_LANE_COUNT:
 			var type_id := _pick_node_type(available_types, layer, rng)
 			var difficulty := _difficulty_for_layer(location, layer)
 			var node_id := "node_%d_%d" % [layer, lane]
 			nodes.append(_make_node(node_id, layer, lane, type_id, difficulty, _risk_for(type_id)))
 			layer_ids.append(node_id)
-		edges.append_array(_connect_layers(previous_layer_ids, layer_ids, rng))
+		edges.append_array(_connect_layers(previous_layer_ids, layer_ids, cross_layers.has(layer - 1), rng))
 		previous_layer_ids = layer_ids
-	var exit_type := EnumExpeditionNodeTypeScript.ID_BOSS if available_types.has(EnumExpeditionNodeTypeScript.ID_BOSS) else EnumExpeditionNodeTypeScript.ID_TREASURE
+	var exit_type := EnumExpeditionNodeTypeScript.ID_BOSS
 	var exit_node := _make_node("exit", DEFAULT_MIDDLE_LAYERS + 1, 0, exit_type, _difficulty_for_layer(location, DEFAULT_MIDDLE_LAYERS + 1), _risk_for(exit_type))
 	nodes.append(exit_node)
-	edges.append_array(_connect_layers(previous_layer_ids, [str(exit_node.get("id", ""))], rng))
+	edges.append_array(_connect_layers(previous_layer_ids, [str(exit_node.get("id", ""))], false, rng))
 	return {
 		"nodes": nodes,
 		"edges": edges,
@@ -54,6 +55,30 @@ static func next_node_ids(map_data: Dictionary, current_node_id: String, visited
 		var to_id := str(edge.get("to", ""))
 		if to_id != "" and not visited_lookup.has(to_id) and not out.has(to_id):
 			out.append(to_id)
+	return out
+
+
+static func _pick_cross_layers(rng: RandomNumberGenerator) -> Array:
+	var candidate_layers: Array = []
+	for layer in range(1, DEFAULT_MIDDLE_LAYERS):
+		candidate_layers.append(layer)
+	var target_count := rng.randi_range(MIN_ROUTE_CROSSES, MAX_ROUTE_CROSSES)
+	var out: Array = []
+	while not candidate_layers.is_empty() and out.size() < target_count:
+		var picked_index := rng.randi_range(0, candidate_layers.size() - 1)
+		var layer := int(candidate_layers[picked_index])
+		candidate_layers.remove_at(picked_index)
+		var too_close := false
+		for chosen_v in out:
+			if absi(layer - int(chosen_v)) <= 1:
+				too_close = true
+				break
+		if too_close:
+			continue
+		out.append(layer)
+		if out.size() >= target_count:
+			break
+	out.sort()
 	return out
 
 
@@ -190,26 +215,27 @@ static func _event_filter_tags(type_id: String) -> Array:
 	return Array(EnumExpeditionNodeTypeScript.event_types_for(type_id))
 
 
-static func _connect_layers(from_ids: Array, to_ids: Array, rng: RandomNumberGenerator) -> Array:
+static func _connect_layers(from_ids: Array, to_ids: Array, can_cross: bool, rng: RandomNumberGenerator) -> Array:
 	var edges: Array = []
-	var incoming := {}
-	for from_v in from_ids:
-		var from_id := str(from_v)
-		var connection_count := mini(to_ids.size(), rng.randi_range(1, 2))
-		var used: Array = []
-		for _i in connection_count:
-			var to_id := str(to_ids[rng.randi_range(0, to_ids.size() - 1)])
-			if used.has(to_id):
-				continue
-			used.append(to_id)
-			incoming[to_id] = true
-			edges.append({"from": from_id, "to": to_id})
-	for to_v in to_ids:
-		var to_id := str(to_v)
-		if incoming.has(to_id):
-			continue
-		var from_id := str(from_ids[rng.randi_range(0, from_ids.size() - 1)])
-		edges.append({"from": from_id, "to": to_id})
+	if from_ids.size() == 1:
+		var from_id := str(from_ids[0])
+		for to_v in to_ids:
+			edges.append({"from": from_id, "to": str(to_v)})
+		return edges
+	if to_ids.size() == 1:
+		var to_id := str(to_ids[0])
+		for from_v in from_ids:
+			edges.append({"from": str(from_v), "to": to_id})
+		return edges
+	var lane_count := mini(from_ids.size(), to_ids.size())
+	for lane in lane_count:
+		edges.append({"from": str(from_ids[lane]), "to": str(to_ids[lane])})
+	if not can_cross:
+		return edges
+	var first_cross_lane := rng.randi_range(0, maxi(0, lane_count - 2))
+	var second_cross_lane := first_cross_lane + 1
+	edges.append({"from": str(from_ids[first_cross_lane]), "to": str(to_ids[second_cross_lane])})
+	edges.append({"from": str(from_ids[second_cross_lane]), "to": str(to_ids[first_cross_lane])})
 	return edges
 
 

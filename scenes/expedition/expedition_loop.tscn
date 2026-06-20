@@ -117,9 +117,9 @@ color = Color(0.470588, 0.647059, 0.552941, 0.13)
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_left = 295.0
+offset_left = 230.0
 offset_top = 20.0
-offset_right = -295.0
+offset_right = -370.0
 offset_bottom = 92.0
 grow_horizontal = 2
 theme_override_styles/panel = SubResource("TopPanel")
@@ -169,23 +169,89 @@ grow_horizontal = 2
 label_settings = ExtResource("7_body")
 horizontal_alignment = 1
 
-[node name="StatusPanel" type="Panel" parent="." unique_id=2054035168]
+[node name="HudStatusPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 24.0
+offset_top = 20.0
+offset_right = 220.0
+offset_bottom = 102.0
+z_index = 15
+theme_override_styles/panel = SubResource("TopPanel")
+
+[node name="HudHpLabel" type="Label" parent="HudStatusPanel"]
+unique_name_in_owner = true
 layout_mode = 0
-offset_left = 20.0
-offset_top = 112.0
-offset_right = 250.0
-offset_bottom = 668.0
+offset_left = 14.0
+offset_top = 10.0
+offset_right = 180.0
+offset_bottom = 31.0
+text = "气血  76 / 100"
+label_settings = ExtResource("8_small")
+
+[node name="HudHpBar" parent="HudStatusPanel" instance=ExtResource("13_hp_bar")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 14.0
+offset_top = 34.0
+offset_right = 182.0
+offset_bottom = 48.0
+value = 76.0
+
+[node name="HudMpLabel" type="Label" parent="HudStatusPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 14.0
+offset_top = 52.0
+offset_right = 180.0
+offset_bottom = 73.0
+text = "法力  48 / 100"
+label_settings = ExtResource("8_small")
+
+[node name="HudMpBar" parent="HudStatusPanel" instance=ExtResource("14_mp_bar")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 14.0
+offset_top = 72.0
+offset_right = 182.0
+offset_bottom = 86.0
+value = 48.0
+
+[node name="StatusPanel" type="Panel" parent="." unique_id=2054035168]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -342.0
+offset_top = 96.0
+offset_right = -24.0
+offset_bottom = 640.0
+grow_horizontal = 0
+z_index = 30
 theme_override_styles/panel = SubResource("SidePanel")
 
 [node name="Title" type="Label" parent="StatusPanel" unique_id=1179553948]
 layout_mode = 0
 offset_left = 12.0
 offset_top = 14.0
-offset_right = 218.0
+offset_right = 270.0
 offset_bottom = 46.0
 text = "当前状态"
 label_settings = ExtResource("6_section")
 horizontal_alignment = 1
+
+[node name="StatusCloseButton" type="Button" parent="StatusPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 270.0
+offset_top = 12.0
+offset_right = 304.0
+offset_bottom = 46.0
+theme_override_fonts/font = ExtResource("9_font")
+theme_override_font_sizes/font_size = 16
+text = "×"
 
 [node name="HpLabel" type="Label" parent="StatusPanel" unique_id=1564474041]
 unique_name_in_owner = true
@@ -322,34 +388,48 @@ text = "气血 76/100
 fit_content = true
 
 [node name="LootPanel" type="Panel" parent="." unique_id=167025799]
+unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -250.0
-offset_top = 112.0
-offset_right = -20.0
-offset_bottom = 668.0
+offset_left = -342.0
+offset_top = 96.0
+offset_right = -24.0
+offset_bottom = 640.0
 grow_horizontal = 0
+z_index = 30
 theme_override_styles/panel = SubResource("SidePanel")
 
 [node name="LootTitle" type="Label" parent="LootPanel" unique_id=409112413]
 layout_mode = 0
 offset_left = 12.0
 offset_top = 14.0
-offset_right = 218.0
+offset_right = 270.0
 offset_bottom = 46.0
 text = "本次战利品"
 label_settings = ExtResource("6_section")
 horizontal_alignment = 1
+
+[node name="LootCloseButton" type="Button" parent="LootPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 270.0
+offset_top = 12.0
+offset_right = 304.0
+offset_bottom = 46.0
+theme_override_fonts/font = ExtResource("9_font")
+theme_override_font_sizes/font_size = 16
+text = "×"
 
 [node name="LootScroll" type="ScrollContainer" parent="LootPanel" unique_id=1794296810]
 script = ExtResource("15_lpsc")
 layout_mode = 0
 offset_left = 14.0
 offset_top = 53.0
-offset_right = 250.25
-offset_bottom = 623.58826
+offset_right = 316.0
+offset_bottom = 520.0
 scale = Vector2(0.85, 0.85)
 
 [node name="LootItems" type="GridContainer" parent="LootPanel/LootScroll" unique_id=1136600923]
@@ -380,13 +460,38 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="MapPanel" type="Panel" parent="." unique_id=1865097337]
-layout_mode = 0
-offset_left = 263.0
-offset_top = 118.0
-offset_right = 1019.0
-offset_bottom = 404.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 112.0
+offset_right = -20.0
+offset_bottom = -118.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="MapCanvas" type="Control" parent="MapPanel"]
+[node name="MapScroll" type="ScrollContainer" parent="MapPanel"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 1
+vertical_scroll_mode = 0
+
+[node name="MapWorld" type="Control" parent="MapPanel/MapScroll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(1780, 500)
+layout_mode = 2
+
+[node name="MapCanvas" type="Control" parent="MapPanel/MapScroll/MapWorld"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -401,7 +506,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("16_map_canvas")
 
-[node name="MapNodes" type="Control" parent="MapPanel"]
+[node name="MapNodes" type="Control" parent="MapPanel/MapScroll/MapWorld"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -414,25 +519,54 @@ offset_bottom = -16.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MapNodeTemplate" parent="MapPanel/MapNodes" instance=ExtResource("17_map_node")]
+[node name="MapNodeTemplate" parent="MapPanel/MapScroll/MapWorld/MapNodes" instance=ExtResource("17_map_node")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
 
-[node name="Panel" type="Panel" parent="." unique_id=1646645513]
-layout_mode = 0
-offset_left = 263.0
-offset_top = 414.0
-offset_right = 1019.0
-offset_bottom = 667.0
+[node name="LogPanel" type="Panel" parent="." unique_id=1646645513]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -442.0
+offset_top = 96.0
+offset_right = -24.0
+offset_bottom = 640.0
+grow_horizontal = 0
+z_index = 30
+theme_override_styles/panel = SubResource("SidePanel")
 
-[node name="Log" type="RichTextLabel" parent="Panel" unique_id=1566093167]
+[node name="LogTitle" type="Label" parent="LogPanel"]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 14.0
+offset_right = 368.0
+offset_bottom = 46.0
+text = "历练日志"
+label_settings = ExtResource("6_section")
+horizontal_alignment = 1
+
+[node name="LogCloseButton" type="Button" parent="LogPanel"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 37.0
-offset_top = 20.0
-offset_right = 735.0
-offset_bottom = 224.0
+offset_left = 370.0
+offset_top = 12.0
+offset_right = 404.0
+offset_bottom = 46.0
+theme_override_fonts/font = ExtResource("9_font")
+theme_override_font_sizes/font_size = 16
+text = "×"
+
+[node name="Log" type="RichTextLabel" parent="LogPanel" unique_id=1566093167]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 22.0
+offset_top = 58.0
+offset_right = 396.0
+offset_bottom = 520.0
 theme_override_colors/default_color = Color(0.333333, 0.196078, 0.184314, 1)
 theme_override_fonts/normal_font = ExtResource("9_font")
 theme_override_font_sizes/normal_font_size = 14
@@ -442,6 +576,53 @@ text = "[color=#8a7568]启程[/color]
 踏入青岚山脉，林深雾重，灵草与妖兽并存
 [color=#6a5048]你整理行装，握紧法器，正式踏上历练之路。[/color]"
 scroll_following = true
+
+[node name="InfoDock" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -344.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 72.0
+grow_horizontal = 0
+z_index = 35
+theme_override_constants/separation = 8
+alignment = 2
+
+[node name="StatusToggleButton" type="Button" parent="InfoDock"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(88, 44)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_font")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("ExitNormal")
+theme_override_styles/pressed = SubResource("ExitNormal")
+theme_override_styles/hover = SubResource("ExitNormal")
+text = "状态"
+
+[node name="LootToggleButton" type="Button" parent="InfoDock"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(98, 44)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_font")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("ExitNormal")
+theme_override_styles/pressed = SubResource("ExitNormal")
+theme_override_styles/hover = SubResource("ExitNormal")
+text = "战利品"
+
+[node name="LogToggleButton" type="Button" parent="InfoDock"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(88, 44)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_font")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("ExitNormal")
+theme_override_styles/pressed = SubResource("ExitNormal")
+theme_override_styles/hover = SubResource("ExitNormal")
+text = "日志"
 
 [node name="EventCards" type="HBoxContainer" parent="." unique_id=2106621442]
 unique_name_in_owner = true
@@ -478,9 +659,9 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 260.0
+offset_left = 160.0
 offset_top = -106.0
-offset_right = -260.0
+offset_right = -160.0
 offset_bottom = -22.0
 grow_horizontal = 2
 grow_vertical = 0
@@ -490,18 +671,18 @@ theme_override_styles/panel = SubResource("BottomStrip")
 layout_mode = 0
 offset_left = 170.0
 offset_top = 13.0
-offset_right = 590.0
+offset_right = 682.0
 offset_bottom = 39.0
-text = "点击明牌节点选择路线 · 战败随机掉落背包物品"
+text = "地图可左右拖动 · 点击明牌节点选择路线 · 信息按钮可随时查看详情"
 label_settings = ExtResource("8_small")
 horizontal_alignment = 1
 
 [node name="Step" type="Label" parent="FooterStrip" unique_id=793390105]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 590.0
+offset_left = 690.0
 offset_top = 13.0
-offset_right = 750.0
+offset_right = 850.0
 offset_bottom = 39.0
 text = "当前第 4 步"
 label_settings = ExtResource("8_small")

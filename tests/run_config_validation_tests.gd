@@ -23,6 +23,7 @@ func _run_all() -> void:
 	_run("item categories expose primary and secondary labels", _test_item_categories)
 	_run("location service reads cached config", _test_location_service_cached)
 	_run("modular location validator rejects legacy fields", _test_modular_location_validator_rejects_legacy_fields)
+	_run("runtime event cache does not pollute config validation", _test_runtime_event_cache_does_not_pollute_config_validation)
 	_run("tag service aggregates modular tags", _test_tag_service_aggregates_tags)
 	_run("drop pool service rolls deterministic rewards", _test_drop_pool_service_deterministic)
 	if _failures.is_empty():
@@ -113,6 +114,27 @@ func _test_modular_location_validator_rejects_legacy_fields() -> void:
 	_expect_true(_has_error_containing(errors, "旧字段 common_event_generation"), "rejects generation")
 	_expect_true(_has_error_containing(errors, "旧字段 common_event_pool"), "rejects common pool")
 	_expect_true(_has_error_containing(errors, "旧字段 map_event_pool"), "rejects map pool")
+
+
+func _test_runtime_event_cache_does_not_pollute_config_validation() -> void:
+	var data_store := root.get_node("DataStore")
+	var runtime := data_store.expedition_runtime() as Dictionary
+	runtime["active"] = true
+	runtime["generated_events"] = {
+		"qinglan_wolf": {
+			"id": "qinglan_wolf",
+			"location_id": "qinglan_mountain",
+			"type": "battle",
+			"difficulty": 6,
+			"tags": ["battle"],
+			"conditions": [],
+			"results": [],
+		},
+	}
+	var errors: PackedStringArray = ConfigValidatorScript.collect_all_errors(_config_manager(), root.get_node("GameState"))
+	data_store.reset_expedition_runtime()
+	_expect_true(not _has_error_containing(errors, "qinglan_wolf 使用了旧字段 difficulty"), "runtime difficulty does not pollute static validation")
+	_expect_true(not _has_error_containing(errors, "qinglan_wolf 的 location_id"), "runtime location does not pollute static validation")
 
 
 func _test_tag_service_aggregates_tags() -> void:

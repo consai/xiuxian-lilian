@@ -62,11 +62,7 @@ abilities:
         scalingMode: "positive"
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "spell.projectile"
-          level: 1
-        - skillId: "foundation.control"
-          level: 1
+      knowledge: []
     trigger:
       mode: "active"
       target: "enemy"
@@ -121,11 +117,7 @@ abilities:
         clampMax: 0.6
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "spell.escape"
-          level: 1
-        - skillId: "cultivation.cycle"
-          level: 1
+      knowledge: []
     trigger:
       mode: "active"
       target: "position"
@@ -181,11 +173,7 @@ abilities:
         clampMax: 0.7
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "sword.qi"
-          level: 1
-        - skillId: "sword.weapon"
-          level: 2
+      knowledge: []
     trigger:
       mode: "active"
       target: "enemy"
@@ -242,10 +230,8 @@ abilities:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "body.bone"
-          level: 2
-        - skillId: "body.recovery"
-          level: 2
+        - skillId: "body.tempering"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -302,10 +288,8 @@ abilities:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "spell.five_phase"
-          level: 2
         - skillId: "spell.elements"
-          level: 3
+          level: 1
     trigger:
       mode: "active"
       target: "area"
@@ -362,10 +346,8 @@ abilities:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "talisman.seal"
-          level: 2
-        - skillId: "spirit.sense"
-          level: 2
+        - skillId: "talisman.script"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -422,10 +404,8 @@ abilities:
     learningRequirements:
       realm: "core"
       knowledge:
-        - skillId: "spell.thunder"
-          level: 2
-        - skillId: "cultivation.core_fire"
-          level: 2
+        - skillId: "spell.elements"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -484,12 +464,8 @@ abilities:
     learningRequirements:
       realm: "core"
       knowledge:
-        - skillId: "sword.formation"
-          level: 2
-        - skillId: "formation.array"
-          level: 2
-        - skillId: "spirit.sense"
-          level: 3
+        - skillId: "sword.weapon"
+          level: 1
     trigger:
       mode: "active"
       target: "area"
@@ -546,9 +522,7 @@ abilities:
     learningRequirements:
       realm: "core"
       knowledge:
-        - skillId: "spirit.soul"
-          level: 2
-        - skillId: "talisman.curse"
+        - skillId: "spirit.meditation"
           level: 1
     trigger:
       mode: "active"
@@ -604,10 +578,8 @@ abilities:
     learningRequirements:
       realm: "transform"
       knowledge:
-        - skillId: "body.dharma_form"
-          level: 2
-        - skillId: "spell.domain"
-          level: 2
+        - skillId: "body.tempering"
+          level: 1
     trigger:
       mode: "active"
       target: "area"
@@ -662,10 +634,8 @@ abilities:
     learningRequirements:
       realm: "transform"
       knowledge:
-        - skillId: "spirit.dream"
-          level: 2
-        - skillId: "spirit.inner_demon"
-          level: 3
+        - skillId: "spirit.meditation"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -722,10 +692,8 @@ abilities:
     learningRequirements:
       realm: "void"
       knowledge:
-        - skillId: "sword.void_cut"
-          level: 2
-        - skillId: "spell.void"
-          level: 2
+        - skillId: "sword.weapon"
+          level: 1
     trigger:
       mode: "active"
       target: "line"
@@ -784,10 +752,8 @@ abilities:
     learningRequirements:
       realm: "void"
       knowledge:
-        - skillId: "talisman.true_name"
-          level: 2
-        - skillId: "spirit.void_thought"
-          level: 2
+        - skillId: "talisman.script"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -848,12 +814,8 @@ abilities:
     learningRequirements:
       realm: "merge"
       knowledge:
-        - skillId: "spell.law"
-          level: 2
-        - skillId: "talisman.command"
-          level: 3
-        - skillId: "heaven.law_seed"
-          level: 2
+        - skillId: "spell.elements"
+          level: 1
     trigger:
       mode: "active"
       target: "area"
@@ -914,12 +876,8 @@ abilities:
     learningRequirements:
       realm: "tribulation"
       knowledge:
-        - skillId: "sword.heaven_cut"
-          level: 3
-        - skillId: "sword.dao"
-          level: 4
-        - skillId: "heaven.law_mastery"
-          level: 3
+        - skillId: "sword.weapon"
+          level: 1
     trigger:
       mode: "active"
       target: "line"
@@ -980,12 +938,8 @@ abilities:
     learningRequirements:
       realm: "tribulation"
       knowledge:
-        - skillId: "spell.cataclysm"
-          level: 3
-        - skillId: "heaven.tribulation"
-          level: 3
-        - skillId: "spell.world"
-          level: 3
+        - skillId: "spell.elements"
+          level: 1
     trigger:
       mode: "active"
       target: "area"
@@ -1028,11 +982,7 @@ abilities:
         knowledgeGrowth: 0.025
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "body.bone"
-          level: 1
-        - skillId: "body.tempering"
-          level: 2
+      knowledge: []
     trigger:
       mode: "active"
       target: "enemy"
@@ -1086,10 +1036,8 @@ abilities:
     learningRequirements:
       realm: "nascent"
       knowledge:
-        - skillId: "sword.heart"
-          level: 2
-        - skillId: "spirit.soul"
-          level: 2
+        - skillId: "sword.weapon"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -1133,10 +1081,8 @@ abilities:
     learningRequirements:
       realm: "core"
       knowledge:
-        - skillId: "spirit.soul"
-          level: 2
-        - skillId: "spirit.inner_demon"
-          level: 2
+        - skillId: "spirit.meditation"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -1190,10 +1136,8 @@ abilities:
     learningRequirements:
       realm: "nascent"
       knowledge:
-        - skillId: "body.regeneration"
-          level: 2
-        - skillId: "body.recovery"
-          level: 4
+        - skillId: "body.tempering"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -1247,10 +1191,8 @@ abilities:
     learningRequirements:
       realm: "merge"
       knowledge:
-        - skillId: "sword.unity"
-          level: 2
-        - skillId: "artifact.life_bound"
-          level: 3
+        - skillId: "sword.weapon"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -1304,10 +1246,8 @@ abilities:
     learningRequirements:
       realm: "great"
       knowledge:
-        - skillId: "spirit.dao_heart"
-          level: 3
-        - skillId: "heaven.causality"
-          level: 3
+        - skillId: "spirit.meditation"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -1361,10 +1301,8 @@ abilities:
     learningRequirements:
       realm: "tribulation"
       knowledge:
-        - skillId: "body.tribulation_body"
-          level: 3
-        - skillId: "heaven.thunder_body"
-          level: 4
+        - skillId: "body.tempering"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -1422,10 +1360,8 @@ abilities:
     learningRequirements:
       realm: "transform"
       knowledge:
-        - skillId: "sword.domain"
-          level: 2
-        - skillId: "spell.domain"
-          level: 2
+        - skillId: "sword.weapon"
+          level: 1
     trigger:
       mode: "upkeep"
       target: "area"
@@ -1483,10 +1419,8 @@ abilities:
     learningRequirements:
       realm: "transform"
       knowledge:
-        - skillId: "spell.domain"
-          level: 2
-        - skillId: "spell.thunder"
-          level: 4
+        - skillId: "spell.elements"
+          level: 1
     trigger:
       mode: "upkeep"
       target: "area"
@@ -1544,10 +1478,8 @@ abilities:
     learningRequirements:
       realm: "transform"
       knowledge:
-        - skillId: "body.dharma_form"
-          level: 2
-        - skillId: "body.jade"
-          level: 4
+        - skillId: "body.tempering"
+          level: 1
     trigger:
       mode: "upkeep"
       target: "enemy"
@@ -1605,10 +1537,8 @@ abilities:
     learningRequirements:
       realm: "transform"
       knowledge:
-        - skillId: "spirit.primordial"
-          level: 2
-        - skillId: "spirit.split"
-          level: 3
+        - skillId: "spirit.meditation"
+          level: 1
     trigger:
       mode: "upkeep"
       target: "enemy"
@@ -1666,10 +1596,8 @@ abilities:
     learningRequirements:
       realm: "merge"
       knowledge:
-        - skillId: "heaven.law_mastery"
-          level: 2
-        - skillId: "spell.law"
-          level: 3
+        - skillId: "heaven.omen"
+          level: 1
     trigger:
       mode: "upkeep"
       target: "area"
@@ -1706,11 +1634,7 @@ abilities:
         knowledgeGrowth: 0.025
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "cultivation.qi_sense"
-          level: 1
-        - skillId: "foundation.breathing"
-          level: 2
+      knowledge: []
     trigger:
       mode: "active"
       target: "enemy"
@@ -1744,9 +1668,7 @@ abilities:
         knowledgeGrowth: 0.06
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "foundation.meridians"
-          level: 1
+      knowledge: []
     trigger:
       mode: "active"
       target: "enemy"
@@ -1783,11 +1705,7 @@ abilities:
         knowledgeGrowth: 0.06
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "world.appraisal"
-          level: 1
-        - skillId: "foundation.literacy"
-          level: 2
+      knowledge: []
     trigger:
       mode: "active"
       target: "enemy"
@@ -1824,11 +1742,7 @@ abilities:
         knowledgeGrowth: 0.05
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "alchemy.herbs"
-          level: 1
-        - skillId: "world.gathering"
-          level: 1
+      knowledge: []
     trigger:
       mode: "active"
       target: "enemy"
@@ -1876,10 +1790,8 @@ abilities:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "artifact.smelting"
-          level: 2
         - skillId: "artifact.materials"
-          level: 3
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -1927,10 +1839,8 @@ abilities:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "alchemy.furnace"
-          level: 2
         - skillId: "alchemy.herbs"
-          level: 3
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -1978,10 +1888,8 @@ abilities:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "formation.array"
-          level: 2
         - skillId: "formation.runes"
-          level: 3
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -2030,9 +1938,7 @@ abilities:
       realm: "foundation"
       knowledge:
         - skillId: "talisman.script"
-          level: 3
-        - skillId: "talisman.activation"
-          level: 3
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -2078,10 +1984,8 @@ abilities:
     learningRequirements:
       realm: "foundation"
       knowledge:
-        - skillId: "world.beast"
-          level: 2
-        - skillId: "talisman.seal"
-          level: 2
+        - skillId: "world.survival"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -2129,10 +2033,8 @@ abilities:
     learningRequirements:
       realm: "core"
       knowledge:
-        - skillId: "world.geomancy"
-          level: 2
-        - skillId: "formation.array"
-          level: 3
+        - skillId: "world.survival"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -2180,10 +2082,8 @@ abilities:
     learningRequirements:
       realm: "void"
       knowledge:
-        - skillId: "world.void_survival"
-          level: 2
-        - skillId: "body.void_body"
-          level: 2
+        - skillId: "world.survival"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -2231,10 +2131,8 @@ abilities:
     learningRequirements:
       realm: "merge"
       knowledge:
-        - skillId: "world.civilization"
-          level: 2
-        - skillId: "world.trade"
-          level: 4
+        - skillId: "world.survival"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -2282,10 +2180,8 @@ abilities:
     learningRequirements:
       realm: "tribulation"
       knowledge:
-        - skillId: "heaven.tribulation"
-          level: 3
-        - skillId: "heaven.astrology"
-          level: 4
+        - skillId: "heaven.omen"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -2346,12 +2242,8 @@ abilities:
     learningRequirements:
       realm: "nascent"
       knowledge:
-        - skillId: "foundation.nascent_theory"
-          level: 2
-        - skillId: "spirit.split"
-          level: 2
-        - skillId: "sword.qi"
-          level: 4
+        - skillId: "foundation.breathing"
+          level: 1
     trigger:
       mode: "active"
       target: "enemy"
@@ -2408,10 +2300,8 @@ abilities:
     learningRequirements:
       realm: "nascent"
       knowledge:
-        - skillId: "talisman.soul_seal"
-          level: 2
-        - skillId: "spirit.split"
-          level: 2
+        - skillId: "talisman.script"
+          level: 1
     trigger:
       mode: "active"
       target: "controlled_entity"
@@ -2472,12 +2362,8 @@ abilities:
     learningRequirements:
       realm: "great"
       knowledge:
-        - skillId: "sword.dao"
-          level: 3
-        - skillId: "spell.world"
-          level: 2
-        - skillId: "heaven.dao_fruit"
-          level: 3
+        - skillId: "sword.weapon"
+          level: 1
     trigger:
       mode: "active"
       target: "area"
@@ -2538,12 +2424,8 @@ abilities:
     learningRequirements:
       realm: "great"
       knowledge:
-        - skillId: "spell.world"
-          level: 3
-        - skillId: "formation.cave_heaven"
-          level: 3
-        - skillId: "heaven.law_mastery"
-          level: 2
+        - skillId: "spell.elements"
+          level: 1
     trigger:
       mode: "active"
       target: "area"

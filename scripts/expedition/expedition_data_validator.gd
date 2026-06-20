@@ -15,7 +15,7 @@ static func collect_errors(game_state: Node = null) -> PackedStringArray:
 		errors.append_array(_validate_location(location, location_id))
 		for event_id_v in location.get("event_pool", []) as Array:
 			var event_id := str(event_id_v)
-			var event := ExpeditionEventServiceScript.by_id(event_id)
+			var event := _static_event_by_id(event_id)
 			if event.is_empty():
 				errors.append("地点 %s 引用了不存在的事件 %s" % [location_id, event_id])
 				continue
@@ -68,7 +68,7 @@ static func _validate_location_node_support(location: Dictionary, location_id: S
 	var errors: PackedStringArray = []
 	var supported_types := {}
 	for event_id_v in location.get("event_pool", []) as Array:
-		var event := ExpeditionEventServiceScript.by_id(str(event_id_v))
+		var event := _static_event_by_id(str(event_id_v))
 		if event.is_empty():
 			continue
 		var event_type := str(event.get("type", "")).strip_edges()
@@ -324,7 +324,7 @@ static func _validate_decision_event(event: Dictionary, event_id: String, locati
 			errors.append("抉择事件 %s 的 option id 重复: %s" % [event_id, oid])
 		option_ids[oid] = true
 		var trigger_id := str(option.get("trigger_event", "")).strip_edges()
-		if trigger_id != "" and ExpeditionEventServiceScript.by_id(trigger_id).is_empty():
+		if trigger_id != "" and _static_event_by_id(trigger_id).is_empty():
 			errors.append("抉择事件 %s 引用了未知 trigger_event %s" % [event_id, trigger_id])
 		for result_v in option.get("results", []) as Array:
 			if result_v is Dictionary:
@@ -337,6 +337,21 @@ static func _config_manager() -> Node:
 	if not loop is SceneTree:
 		return null
 	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
+
+
+static func _static_event_by_id(event_id: String) -> Dictionary:
+	var cm := _config_manager()
+	if cm == null:
+		return ExpeditionEventServiceScript.by_id(event_id)
+	if cm.has_method("expedition_event_by_id"):
+		var event := cm.call("expedition_event_by_id", event_id) as Dictionary
+		if not event.is_empty():
+			return event
+	if cm.has_method("common_expedition_event_by_id"):
+		var common := cm.call("common_expedition_event_by_id", event_id) as Dictionary
+		if not common.is_empty():
+			return common
+	return ExpeditionEventServiceScript.by_id(event_id)
 
 
 static func _monster_by_id(monster_id: String) -> Dictionary:

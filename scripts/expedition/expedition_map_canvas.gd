@@ -1,6 +1,9 @@
 class_name ExpeditionMapCanvas
 extends Control
 
+const NODE_X_MARGIN := 104.0
+const NODE_Y_MARGIN := 78.0
+
 var _nodes: Array = []
 var _edges: Array = []
 
@@ -25,10 +28,10 @@ func node_position(node: Dictionary) -> Vector2:
 	var layer := int(node.get("layer", 0))
 	var lane := int(node.get("lane", 0))
 	var max_lane := int(max_lane_by_layer.get(layer, 0))
-	var x := lerpf(56.0, maxf(56.0, size.x - 56.0), float(layer) / float(maxi(1, max_layer)))
+	var x := lerpf(NODE_X_MARGIN, maxf(NODE_X_MARGIN, size.x - NODE_X_MARGIN), float(layer) / float(maxi(1, max_layer)))
 	var y := size.y * 0.5
 	if max_lane > 0:
-		y = lerpf(54.0, maxf(54.0, size.y - 54.0), float(lane) / float(max_lane))
+		y = lerpf(NODE_Y_MARGIN, maxf(NODE_Y_MARGIN, size.y - NODE_Y_MARGIN), float(lane) / float(max_lane))
 	return Vector2(x, y)
 
 

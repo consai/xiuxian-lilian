@@ -1,15 +1,68 @@
-[gd_scene load_steps=3 format=3 uid="uid://expedition_map_node"]
+[gd_scene load_steps=7 format=3 uid="uid://expedition_map_node"]
 
 [ext_resource type="Script" path="res://scripts/expedition/expedition_map_node_view.gd" id="1_script"]
 [ext_resource type="FontFile" uid="uid://btkp4vukwqrul" path="res://assets/art/AlimamaDaoLiTi.ttf" id="2_font"]
+
+[sub_resource type="StyleBoxFlat" id="NodeNormal"]
+bg_color = Color(0.768627, 0.694118, 0.560784, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.572549, 0.486275, 0.372549, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="NodeHover"]
+bg_color = Color(0.956863, 0.843137, 0.501961, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.466667, 0.317647, 0.188235, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="NodePressed"]
+bg_color = Color(0.890196, 0.741176, 0.376471, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.466667, 0.317647, 0.188235, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="NodeDisabled"]
+bg_color = Color(0.729412, 0.670588, 0.54902, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.572549, 0.486275, 0.372549, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [node name="ExpeditionMapNode" type="Button"]
 custom_minimum_size = Vector2(82, 58)
 offset_right = 82.0
 offset_bottom = 58.0
 theme_override_colors/font_color = Color(0.243137, 0.141176, 0.105882, 1)
+theme_override_colors/font_disabled_color = Color(0.439216, 0.364706, 0.270588, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("NodeNormal")
+theme_override_styles/hover = SubResource("NodeHover")
+theme_override_styles/pressed = SubResource("NodePressed")
+theme_override_styles/disabled = SubResource("NodeDisabled")
 text = "采集
 安全"
 script = ExtResource("1_script")

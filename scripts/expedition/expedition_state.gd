@@ -470,10 +470,12 @@ func build_battle_init() -> Dictionary:
 		return {}
 	var enemy := ExpeditionEventServiceScript.build_battle_enemy(event)
 	var enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
+	var enemy_formation := ExpeditionEventServiceScript.build_enemy_formation(event, enemies)
 	var init_data := {
 		"player": player,
 		"enemy": enemy,
 		"enemies": enemies,
+		"enemy_formation": enemy_formation,
 		"battle_time_limit": 200.0,
 		"auto_battle": {"player": bool(_game_state.auto_battle_enabled), "enemy": true},
 		"spd_jitter_ratio": 0.0,

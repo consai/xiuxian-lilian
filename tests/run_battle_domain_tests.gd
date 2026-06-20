@@ -32,6 +32,7 @@ func _init() -> void:
 	_run("enemy formation defaults to five rows and centers small groups", _test_enemy_formation_centers_small_groups)
 	_run("enemy formation only advances active column", _test_enemy_formation_only_advances_active_column)
 	_run("enemy formation compacts rows and reserves", _test_enemy_formation_compacts_rows_and_reserves)
+	_run("enemy wave formation advances after current row dies", _test_enemy_wave_formation_advances_after_current_row_dies)
 	_run("cultivation method restores mp every two seconds", _test_method_mp_recovery)
 	_run("skill damage supports pierce and vulnerability", _test_pierce_and_vulnerability)
 	_run("runtime modifier expires cleanly", _test_runtime_modifier_expires)
@@ -401,6 +402,40 @@ func _test_enemy_formation_compacts_rows_and_reserves() -> void:
 	_expect_eq(int((slots[8] as Dictionary).get("enemy_index", -1)), 12, "reserve should fill row 0 back slot")
 	_expect_true(domain.enemy == enemies[4], "legacy enemy pointer should follow new front target")
 	_expect_near(float(domain.interval_elapsed_enemies[4]), 0.0, "replacement keeps own progress")
+
+
+func _test_enemy_wave_formation_advances_after_current_row_dies() -> void:
+	var player := _make_unit(100.0, 100.0)
+	var enemies: Array = []
+	for i in 4:
+		enemies.append(_make_unit(100.0, 100.0))
+	var domain := BattleDomainServiceScript.new()
+	domain.start_battle_many(player, enemies, {}, 200.0, {}, {}, {
+		"mode": "waves",
+		"columns": 3,
+		"rows": 5,
+		"active_columns": 1,
+		"waves": [[0, 1], [2], [3]],
+	})
+
+	_expect_eq(str(domain.get_formation_snapshot().get("mode", "")), "waves", "wave mode active")
+	_expect_eq(domain.tick_advancing(0.5), "", "half tick should not ready")
+	_expect_true(float(domain.interval_elapsed_enemies[0]) > 0.0, "front row enemy 0 advances")
+	_expect_true(float(domain.interval_elapsed_enemies[1]) > 0.0, "front row enemy 1 advances")
+	_expect_near(float(domain.interval_elapsed_enemies[2]), 0.0, "next row enemy waits")
+	_expect_near(float(domain.interval_elapsed_enemies[3]), 0.0, "later row enemy waits")
+
+	(enemies[0] as FightObj).change_hp(-999.0)
+	_expect_eq(domain.check_end_after_resolve(), "", "battle continues while one front row enemy lives")
+	_expect_eq(domain.active_enemy_index, 1, "same row remains active")
+	_expect_near(float(domain.interval_elapsed_enemies[2]), 0.0, "next row still waits before row clear")
+
+	(enemies[1] as FightObj).change_hp(-999.0)
+	_expect_eq(domain.check_end_after_resolve(), "", "battle continues with next wave")
+	_expect_eq(domain.active_enemy_index, 2, "next row advances after current row dies")
+	var formation := domain.get_formation_snapshot()
+	_expect_eq(int(formation.get("current_wave", -1)), 1, "current wave index advances")
+	_expect_true(domain.enemy == enemies[2], "legacy enemy pointer follows next wave")
 
 
 func _test_method_mp_recovery() -> void:

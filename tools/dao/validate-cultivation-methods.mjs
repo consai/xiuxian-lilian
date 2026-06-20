@@ -109,7 +109,9 @@ for (const method of config.methods) {
   if (method.nextMethodId && !methods.has(method.nextMethodId)) errors.push(`${method.id}: 缺少后层 ${method.nextMethodId}`);
 
   if (method.learningRequirements?.realm !== method.realm) errors.push(`${method.id}: 学习境界门槛与功法境界不一致`);
-  for (const req of method.learningRequirements?.knowledge ?? []) {
+  const learningKnowledge = method.learningRequirements?.knowledge ?? [];
+  if (learningKnowledge.length > 2) errors.push(`${method.id}: 除境界外学习门槛最多 2 个`);
+  for (const req of learningKnowledge) {
     const skill = skills.get(req.skillId);
     if (!skill) errors.push(`${method.id}: 学习要求引用未知知识 ${req.skillId}`);
     else if (req.level < 1 || req.level > 2) errors.push(`${method.id}: 基础学习门槛过高 ${req.skillId}:${req.level}`);

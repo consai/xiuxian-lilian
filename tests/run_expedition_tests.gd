@@ -18,6 +18,8 @@ func _run_all() -> void:
 	_run("start creates isolated runtime", _test_start_creates_isolated_runtime)
 	_run("expedition map is deterministic", _test_expedition_map_is_deterministic)
 	_run("expedition map is reachable", _test_expedition_map_is_reachable)
+	_run("expedition map is longer and ends with boss", _test_expedition_map_is_longer_and_ends_with_boss)
+	_run("expedition map has three lanes and limited crosses", _test_expedition_map_has_three_lanes_and_limited_crosses)
 	_run("map node choice is gated", _test_map_node_choice_is_gated)
 	_run("event pick ignores configured difficulty", _test_event_pick_ignores_configured_difficulty)
 	_run("common events use location generation", _test_common_events_use_location_generation)
@@ -103,6 +105,48 @@ func _test_expedition_map_is_reachable() -> void:
 		var location := location_v as Dictionary
 		var map_data := ExpeditionMapServiceScript.generate(location, 1234)
 		_expect_true(ExpeditionMapServiceScript.is_reachable_to_exit(map_data), "map reaches exit for %s" % str(location.get("id", "")))
+
+
+func _test_expedition_map_is_longer_and_ends_with_boss() -> void:
+	var location := LocationServiceScript.by_id("qinglan_mountain")
+	var map_data := ExpeditionMapServiceScript.generate(location, 5252)
+	var exit_node := ExpeditionMapServiceScript.node_by_id(map_data.get("nodes", []) as Array, "exit")
+	_expect_eq(str(exit_node.get("type", "")), "boss", "exit node is always boss")
+	_expect_true(int(exit_node.get("layer", 0)) >= 9, "route has at least eight middle layers before boss")
+
+
+func _test_expedition_map_has_three_lanes_and_limited_crosses() -> void:
+	var location := LocationServiceScript.by_id("qinglan_mountain")
+	for seed_value in [101, 202, 303, 404]:
+		var map_data := ExpeditionMapServiceScript.generate(location, seed_value)
+		var node_count_by_layer := {}
+		var nodes_by_id := {}
+		for node_v in map_data.get("nodes", []) as Array:
+			var node := node_v as Dictionary
+			nodes_by_id[str(node.get("id", ""))] = node
+			var layer := int(node.get("layer", 0))
+			if layer <= 0 or str(node.get("id", "")) == "exit":
+				continue
+			node_count_by_layer[layer] = int(node_count_by_layer.get(layer, 0)) + 1
+		_expect_eq(node_count_by_layer.size(), 8, "route keeps eight middle layers")
+		for count_v in node_count_by_layer.values():
+			_expect_eq(int(count_v), 3, "each route layer has three lanes")
+		var outgoing_count_by_node := {}
+		for edge_v in map_data.get("edges", []) as Array:
+			var edge := edge_v as Dictionary
+			var from_id := str(edge.get("from", ""))
+			outgoing_count_by_node[from_id] = int(outgoing_count_by_node.get(from_id, 0)) + 1
+		var cross_layers := {}
+		for from_id in outgoing_count_by_node.keys():
+			if not nodes_by_id.has(from_id):
+				continue
+			var node := nodes_by_id[from_id] as Dictionary
+			var layer := int(node.get("layer", 0))
+			if layer <= 0:
+				continue
+			if int(outgoing_count_by_node.get(from_id, 0)) > 1:
+				cross_layers[layer] = true
+		_expect_true(cross_layers.size() >= 2 and cross_layers.size() <= 3, "route has two or three crossing opportunities")
 
 
 func _test_map_node_choice_is_gated() -> void:
@@ -511,10 +555,14 @@ func _test_high_difficulty_battle_nodes_generate_map_enemies() -> void:
 		var init_data: Dictionary = expedition.build_battle_init()
 		_expect_true(BattleInitData.collect_errors(init_data).is_empty(), "%s generated battle init valid" % forced_type)
 		var enemies := init_data.get("enemies", []) as Array
+		var formation := init_data.get("enemy_formation", {}) as Dictionary
+		_expect_eq(str(formation.get("mode", "")), "waves", "%s generated battle uses wave formation" % forced_type)
 		if forced_type == "battle":
 			_expect_eq(enemies.size(), 4, "difficulty six normal battle generates group size from difficulty")
+			_expect_eq((formation.get("waves", []) as Array).size(), 2, "normal group is split into rows")
 		else:
 			_expect_eq(enemies.size(), 3, "difficulty six elite battle generates elite group size from difficulty")
+			_expect_eq((formation.get("waves", []) as Array).size(), 3, "elite enemies each stand alone row")
 		_expect_true(not enemies.is_empty(), "%s generated battle has enemies" % forced_type)
 		if not enemies.is_empty():
 			var enemy := enemies[0] as Dictionary

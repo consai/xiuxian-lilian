@@ -47,7 +47,7 @@ func _ready() -> void:
 		if take_mouse_if_ignored and _target.mouse_filter == Control.MOUSE_FILTER_IGNORE:
 			_target.mouse_filter = Control.MOUSE_FILTER_STOP
 		_target.gui_input.connect(_on_gui_input)
-
+	_target.mouse_exited.connect(_on_mouse_exited)
 
 func _exit_tree() -> void:
 	_kill_tween()
@@ -104,7 +104,10 @@ func _on_gui_input(event: InputEvent) -> void:
 			if _pressed_depth == 0:
 				_play_release()
 				clicked.emit()
+	# 鼠标离开区域, 清空按下深度
 
+func _on_mouse_exited() -> void:
+	cancel_press_feedback()
 
 func _on_clicked() -> void:
 	clicked.emit()

@@ -28,14 +28,20 @@ for (const ability of config.abilities) {
   if ("learnedFromBookId" in ability) errors.push(`${ability.id}: 不得包含外部学习物品引用`);
   if (!config.rules.types.includes(ability.type)) errors.push(`${ability.id}: 未知技能类型 ${ability.type}`);
   if (ability.learningRequirements?.realm !== ability.realm) errors.push(`${ability.id}: 学习境界不一致`);
-  if (!ability.knowledgeScaling?.knowledge?.length) errors.push(`${ability.id}: 没有需求知识`);
+  const learningKnowledge = ability.learningRequirements?.knowledge ?? [];
+  if (learningKnowledge.length > 2) errors.push(`${ability.id}: 除境界外学习门槛最多 2 个`);
+  if (!ability.knowledgeScaling?.knowledge?.length) errors.push(`${ability.id}: 没有成长知识`);
   for (const req of ability.knowledgeScaling?.knowledge ?? []) {
     const source = knowledge.get(req.skillId);
     if (!source) errors.push(`${ability.id}: 未知知识 ${req.skillId}`);
     else if (realmOrder.get(source.realm) > realmOrder.get(ability.realm)) errors.push(`${ability.id}: 引用了高于技能境界的知识 ${req.skillId}`);
     if (req.requiredLevel < 1 || req.requiredLevel >= 5) errors.push(`${ability.id}: 知识门槛必须在 1..4 ${req.skillId}`);
-    const gate = ability.learningRequirements?.knowledge?.find((item) => item.skillId === req.skillId);
-    if (!gate || gate.level !== req.requiredLevel) errors.push(`${ability.id}: 学习门槛与知识缩放要求不一致 ${req.skillId}`);
+  }
+  for (const gate of learningKnowledge) {
+    const source = knowledge.get(gate.skillId);
+    if (!source) errors.push(`${ability.id}: 学习门槛引用未知知识 ${gate.skillId}`);
+    else if (realmOrder.get(source.realm) > realmOrder.get(ability.realm)) errors.push(`${ability.id}: 学习门槛引用了高于技能境界的知识 ${gate.skillId}`);
+    if (gate.level < 1 || gate.level >= 5) errors.push(`${ability.id}: 学习门槛等级必须在 1..4 ${gate.skillId}`);
   }
   for (const effect of ability.effects ?? []) {
     if ("masteryGrowth" in effect) errors.push(`${ability.id}: 禁止使用 masteryGrowth ${effect.effectId}`);

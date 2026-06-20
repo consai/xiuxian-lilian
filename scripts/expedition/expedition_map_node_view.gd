@@ -24,7 +24,7 @@ func setup(node: Dictionary, state: String) -> void:
 		"current":
 			modulate = Color(0.98, 0.76, 0.42, 1.0)
 		_:
-			modulate = Color(0.72, 0.68, 0.62, 0.72)
+			modulate = Color(0.82, 0.78, 0.70, 1.0)
 
 
 func _ready() -> void:

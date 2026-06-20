@@ -26,6 +26,7 @@ for (const skill of skills) {
   if (!domainIds.has(skill.domain)) errors.push(`${skill.id}: 未知大道 ${skill.domain}`);
   if (!realmIds.has(skill.realm)) errors.push(`${skill.id}: 未知境界 ${skill.realm}`);
   if (skill.rank < 1 || skill.maxLevel !== config.training.maxLevel) errors.push(`${skill.id}: 训练倍率或等级上限非法`);
+  if (skill.prereqs.length > 2) errors.push(`${skill.id}: 除境界外前置最多 2 个`);
   for (const req of skill.prereqs) {
     const parent = skillById.get(req.id);
     if (!parent) errors.push(`${skill.id}: 缺少前置 ${req.id}`);

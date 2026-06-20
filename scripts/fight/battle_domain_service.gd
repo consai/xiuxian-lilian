@@ -12,6 +12,8 @@ const SIGNAL_ENEMY_DEAD := "enemy_dead"
 const DEFAULT_FORMATION_COLUMNS := 3
 const DEFAULT_FORMATION_ROWS := 5
 const DEFAULT_ACTIVE_COLUMNS := 1
+const FORMATION_MODE_COLUMNS := "columns"
+const FORMATION_MODE_WAVES := "waves"
 
 var state: EnumBattleState.State = EnumBattleState.State.ADVANCING
 var paused_side: String = ""
@@ -31,8 +33,11 @@ var acting_enemy_slot: int = -1
 var formation_columns: int = DEFAULT_FORMATION_COLUMNS
 var formation_rows: int = DEFAULT_FORMATION_ROWS
 var active_columns: int = DEFAULT_ACTIVE_COLUMNS
+var formation_mode: String = FORMATION_MODE_COLUMNS
 var enemy_formation_slots: Array = []
 var enemy_reserve_indices: Array = []
+var enemy_waves: Array = []
+var active_wave_index: int = 0
 var skill_cfg: Dictionary = {}
 var item_cfg: Dictionary = {}
 var equip_cfg: Dictionary = {}
@@ -670,9 +675,33 @@ func _sync_legacy_enemy_interval() -> void:
 
 
 func _apply_formation_config(cfg: Dictionary) -> void:
+	formation_mode = str(cfg.get("mode", FORMATION_MODE_COLUMNS)).strip_edges()
+	if formation_mode == "":
+		formation_mode = FORMATION_MODE_COLUMNS
 	formation_columns = clampi(int(cfg.get("columns", DEFAULT_FORMATION_COLUMNS)), 1, 6)
 	formation_rows = clampi(int(cfg.get("rows", DEFAULT_FORMATION_ROWS)), 1, 8)
 	active_columns = clampi(int(cfg.get("active_columns", DEFAULT_ACTIVE_COLUMNS)), 1, formation_columns)
+	enemy_waves = _normalize_enemy_waves(cfg.get("waves", []))
+	active_wave_index = 0
+	if formation_mode == FORMATION_MODE_WAVES and enemy_waves.is_empty():
+		formation_mode = FORMATION_MODE_COLUMNS
+
+
+func _normalize_enemy_waves(raw: Variant) -> Array:
+	var waves: Array = []
+	if not raw is Array:
+		return waves
+	for wave_v in raw as Array:
+		if not wave_v is Array:
+			continue
+		var wave: Array = []
+		for idx_v in wave_v as Array:
+			var idx := int(idx_v)
+			if idx >= 0 and not wave.has(idx):
+				wave.append(idx)
+		if not wave.is_empty():
+			waves.append(wave)
+	return waves
 
 
 func _formation_capacity() -> int:
@@ -697,6 +726,9 @@ func _rebuild_formation_slots() -> void:
 	var cap := _formation_capacity()
 	for i in cap:
 		enemy_formation_slots.append(-1)
+	if formation_mode == FORMATION_MODE_WAVES:
+		_rebuild_wave_formation_slots()
+		return
 	if formation_rows == DEFAULT_FORMATION_ROWS and enemies.size() <= formation_rows:
 		var centered_rows := _centered_row_order()
 		for i in enemies.size():
@@ -709,7 +741,34 @@ func _rebuild_formation_slots() -> void:
 		enemy_reserve_indices.append(i)
 
 
+func _rebuild_wave_formation_slots() -> void:
+	for slot in enemy_formation_slots.size():
+		enemy_formation_slots[slot] = -1
+	enemy_reserve_indices.clear()
+	active_wave_index = _first_alive_wave_index(active_wave_index)
+	var active_wave := _current_wave()
+	var rows := _centered_row_order()
+	for i in mini(active_wave.size(), rows.size()):
+		var idx := int(active_wave[i])
+		var unit := _enemy_at(idx)
+		if unit != null and not unit.is_dead():
+			var row := int(rows[i])
+			enemy_formation_slots[_slot_index(0, row)] = idx
+	for wave_i in enemy_waves.size():
+		var wave := enemy_waves[wave_i] as Array
+		for idx_v in wave:
+			var idx := int(idx_v)
+			if active_wave.has(idx):
+				continue
+			var unit := _enemy_at(idx)
+			if unit != null and not unit.is_dead() and not enemy_reserve_indices.has(idx):
+				enemy_reserve_indices.append(idx)
+
+
 func _compact_formation() -> void:
+	if formation_mode == FORMATION_MODE_WAVES:
+		_compact_wave_formation()
+		return
 	for i in range(enemy_reserve_indices.size() - 1, -1, -1):
 		var reserve_idx := int(enemy_reserve_indices[i])
 		var reserve_unit := _enemy_at(reserve_idx)
@@ -742,6 +801,36 @@ func _compact_formation() -> void:
 	_sync_legacy_enemy_interval()
 
 
+func _compact_wave_formation() -> void:
+	active_wave_index = _first_alive_wave_index(active_wave_index)
+	_rebuild_wave_formation_slots()
+	active_enemy_index = _first_active_enemy_index()
+	active_enemy_slot = _slot_for_enemy_index(active_enemy_index)
+	enemy = _enemy_at(active_enemy_index)
+	_sync_legacy_enemy_interval()
+
+
+func _current_wave() -> Array:
+	if active_wave_index < 0 or active_wave_index >= enemy_waves.size():
+		return []
+	return (enemy_waves[active_wave_index] as Array).duplicate()
+
+
+func _first_alive_wave_index(start_index: int) -> int:
+	for wave_i in range(maxi(0, start_index), enemy_waves.size()):
+		if _wave_has_alive(enemy_waves[wave_i] as Array):
+			return wave_i
+	return enemy_waves.size()
+
+
+func _wave_has_alive(wave: Array) -> bool:
+	for idx_v in wave:
+		var unit := _enemy_at(int(idx_v))
+		if unit != null and not unit.is_dead():
+			return true
+	return false
+
+
 func _pop_next_reserve_alive() -> int:
 	while not enemy_reserve_indices.is_empty():
 		var idx := int(enemy_reserve_indices.pop_front())
@@ -752,6 +841,14 @@ func _pop_next_reserve_alive() -> int:
 
 
 func _active_enemy_indices() -> Array:
+	if formation_mode == FORMATION_MODE_WAVES:
+		var wave_active: Array = []
+		for idx_v in _current_wave():
+			var idx := int(idx_v)
+			var unit := _enemy_at(idx)
+			if unit != null and not unit.is_dead():
+				wave_active.append(idx)
+		return wave_active
 	var out: Array = []
 	var rows := _active_row_order()
 	for col in active_columns:
@@ -770,6 +867,8 @@ func _active_enemy_indices() -> Array:
 func _is_active_enemy_index(index: int) -> bool:
 	if index < 0:
 		return false
+	if formation_mode == FORMATION_MODE_WAVES:
+		return _current_wave().has(index)
 	var rows := _active_row_order()
 	for col in active_columns:
 		for row_v in rows:
@@ -840,7 +939,7 @@ func get_formation_snapshot() -> Dictionary:
 			"actor_id": actor_id_for_enemy_index(idx),
 			"column": _slot_column(slot),
 			"row": _slot_row(slot),
-			"active": _slot_column(slot) < active_columns,
+			"active": _is_active_enemy_index(idx),
 			"current": idx == active_enemy_index,
 			"hp": unit.hp,
 			"hp_max": unit.get_hp_max(),
@@ -855,6 +954,8 @@ func get_formation_snapshot() -> Dictionary:
 		"columns": formation_columns,
 		"rows": formation_rows,
 		"active_columns": active_columns,
+		"mode": formation_mode,
+		"current_wave": active_wave_index,
 		"slots": slots,
 		"reserve_count": enemy_reserve_indices.size(),
 	}

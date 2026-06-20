@@ -6,11 +6,14 @@ const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expediti
 const ItemDefScript := preload("res://scripts/core/item_def.gd")
 const ExpeditionBattlePopupView := preload("res://scripts/expedition/expedition_battle_popup_view.gd")
 const ExpeditionLogServiceScript := preload("res://scripts/expedition/expedition_log_service.gd")
+const ExpeditionMapServiceScript := preload("res://scripts/expedition/expedition_map_service.gd")
 var _locked := false
 var _auto_chain_after_timer := false
 var _map_node_template: Button = null
 
 @onready var _auto_advance_timer: Timer = %AutoAdvanceTimer
+@onready var _map_scroll: ScrollContainer = %MapScroll
+@onready var _map_world: Control = %MapWorld
 @onready var _map_canvas: Control = %MapCanvas
 @onready var _map_nodes: Control = %MapNodes
 @onready var _loot_items: GridContainer = %LootItems
@@ -34,9 +37,18 @@ func _ready() -> void:
 	(%ExitButton as Button).pressed.connect(_on_exit_pressed)
 	(%AdvanceButton as Button).pressed.connect(_on_advance_pressed)
 	(%AutoAdvanceButton as Button).toggled.connect(_on_auto_advance_toggled)
+	(%StatusToggleButton as Button).pressed.connect(_on_info_toggle_pressed.bind("status"))
+	(%LootToggleButton as Button).pressed.connect(_on_info_toggle_pressed.bind("loot"))
+	(%LogToggleButton as Button).pressed.connect(_on_info_toggle_pressed.bind("log"))
+	(%StatusCloseButton as Button).pressed.connect(_hide_info_popups)
+	(%LootCloseButton as Button).pressed.connect(_hide_info_popups)
+	(%LogCloseButton as Button).pressed.connect(_hide_info_popups)
+	if not resized.is_connected(_on_resized):
+		resized.connect(_on_resized)
 	_map_node_template = %MapNodeTemplate as Button
 	if _map_node_template != null:
 		_map_node_template.visible = false
+	_resize_map_world()
 	_refresh_all()
 	if ExpeditionState.phase == "battle" and ExpeditionState.pending_battle_event_id != "":
 		var pending_event := ExpeditionEventServiceScript.by_id(ExpeditionState.pending_battle_event_id)
@@ -65,6 +77,7 @@ func _refresh_all() -> void:
 	_refresh_log_display()
 	_refresh_event_presentation()
 	_refresh_controls()
+	_refresh_info_buttons()
 
 
 func _refresh_log_display() -> void:
@@ -101,13 +114,21 @@ func _refresh_status_panel() -> void:
 	var mp := float(ExpeditionState.runtime.get("mp", 0.0))
 	var mp_max := maxf(1.0, float(attrs.get(FightAttr.MP_MAX, 100.0)))
 	(%HpLabel as Label).text = "气血  %.0f / %.0f" % [hp, hp_max]
+	(%HudHpLabel as Label).text = "气血  %.0f / %.0f" % [hp, hp_max]
 	var hp_bar := %HpBar as ProgressBar
 	hp_bar.max_value = hp_max
 	hp_bar.value = clampf(hp, 0.0, hp_max)
+	var hud_hp_bar := %HudHpBar as ProgressBar
+	hud_hp_bar.max_value = hp_max
+	hud_hp_bar.value = clampf(hp, 0.0, hp_max)
 	(%MpLabel as Label).text = "法力  %.0f / %.0f" % [mp, mp_max]
+	(%HudMpLabel as Label).text = "法力  %.0f / %.0f" % [mp, mp_max]
 	var mp_bar := %MpBar as ProgressBar
 	mp_bar.max_value = mp_max
 	mp_bar.value = clampf(mp, 0.0, mp_max)
+	var hud_mp_bar := %HudMpBar as ProgressBar
+	hud_mp_bar.max_value = mp_max
+	hud_mp_bar.value = clampf(mp, 0.0, mp_max)
 	var inv := ExpeditionState.runtime.get("inventory", {}) as Dictionary
 	var slots := ExpeditionState.runtime.get("item_slots", []) as Array
 	_refresh_potion_slot(%PotionSlot1 as Panel, str(slots[0]) if slots.size() > 0 else "", inv)
@@ -151,8 +172,14 @@ func _refresh_potion_slot(slot: Panel, item_id: String, inv: Dictionary) -> void
 func _refresh_progress_dots() -> void:
 	var total := maxi(1, ExpeditionState.map_nodes.size())
 	var visited := ExpeditionState.visited_node_ids.size()
+	var switches := _route_switch_summary()
 	(%ProgressDots as Label).visible = true
-	(%ProgressDots as Label).text = "路线 %d / %d" % [visited, total]
+	(%ProgressDots as Label).text = "路线 %d / %d · 改线 %d / %d" % [
+		visited,
+		total,
+		int(switches.get("remaining", 0)),
+		int(switches.get("total", 0)),
+	]
 
 
 func _refresh_controls() -> void:
@@ -166,6 +193,15 @@ func _refresh_controls() -> void:
 	if auto_button.button_pressed != ExpeditionState.auto_advance:
 		auto_button.set_pressed_no_signal(ExpeditionState.auto_advance)
 	auto_button.disabled = _locked
+
+
+func _refresh_info_buttons() -> void:
+	var loot_count := 0
+	for reward_v in ExpeditionState.loot:
+		if reward_v is Dictionary:
+			loot_count += 1
+	(%LootToggleButton as Button).text = "战利品 %d" % loot_count
+	(%LogToggleButton as Button).text = "日志 %d" % ExpeditionState.event_log.size()
 
 
 func _continue_expedition() -> void:
@@ -294,6 +330,94 @@ func _on_advance_pressed() -> void:
 func _on_auto_advance_toggled(enabled: bool) -> void:
 	ExpeditionState.auto_advance = false
 	_refresh_controls()
+
+
+func _on_info_toggle_pressed(panel_id: String) -> void:
+	var panel := _info_panel(panel_id)
+	if panel == null:
+		return
+	var will_show := not panel.visible
+	_hide_info_popups()
+	panel.visible = will_show
+	if will_show and panel_id == "log":
+		_scroll_log_to_latest(%Log as RichTextLabel)
+
+
+func _hide_info_popups() -> void:
+	for panel in [%StatusPanel, %LootPanel, %LogPanel]:
+		var control := panel as Control
+		if control != null:
+			control.visible = false
+
+
+func _info_panel(panel_id: String) -> Control:
+	match panel_id:
+		"status":
+			return %StatusPanel as Control
+		"loot":
+			return %LootPanel as Control
+		"log":
+			return %LogPanel as Control
+		_:
+			return null
+
+
+func _route_switch_summary() -> Dictionary:
+	var nodes_by_id := {}
+	var current_layer := 0
+	var current_node := ExpeditionMapServiceScript.node_by_id(ExpeditionState.map_nodes, ExpeditionState.current_node_id)
+	if not current_node.is_empty():
+		current_layer = int(current_node.get("layer", 0))
+	for node_v in ExpeditionState.map_nodes:
+		if not node_v is Dictionary:
+			continue
+		var node := node_v as Dictionary
+		nodes_by_id[str(node.get("id", ""))] = node
+	var outgoing_count_by_node := {}
+	for edge_v in ExpeditionState.map_edges:
+		if not edge_v is Dictionary:
+			continue
+		var edge := edge_v as Dictionary
+		var from_id := str(edge.get("from", ""))
+		outgoing_count_by_node[from_id] = int(outgoing_count_by_node.get(from_id, 0)) + 1
+	var switch_layers := {}
+	for from_id in outgoing_count_by_node.keys():
+		if int(outgoing_count_by_node.get(from_id, 0)) <= 1:
+			continue
+		if not nodes_by_id.has(from_id):
+			continue
+		var node := nodes_by_id[from_id] as Dictionary
+		var layer := int(node.get("layer", 0))
+		if layer <= 0:
+			continue
+		switch_layers[layer] = true
+	var total := 0
+	var remaining := 0
+	for layer_v in switch_layers.keys():
+		total += 1
+		if int(layer_v) >= current_layer:
+			remaining += 1
+	return {"total": total, "remaining": remaining}
+
+
+func _resize_map_world() -> void:
+	if _map_world == null:
+		return
+	var viewport_size := get_viewport_rect().size
+	var target_width := maxf(1500.0, viewport_size.x * 1.55)
+	var target_height := maxf(500.0, viewport_size.y - 260.0)
+	_map_world.custom_minimum_size = Vector2(target_width, target_height)
+	if _map_scroll != null:
+		_map_scroll.scroll_horizontal = clampi(
+			_map_scroll.scroll_horizontal,
+			0,
+			maxi(0, int(target_width - _map_scroll.size.x))
+		)
+
+
+func _on_resized() -> void:
+	_resize_map_world()
+	_refresh_map_display()
 
 
 func _fallback_hub() -> void:
