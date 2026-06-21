@@ -6,6 +6,7 @@ const WorldMapDataValidatorScript := preload("res://scripts/map/world_map_data_v
 const SceneManagerScript := preload("res://scripts/core/scene_manager.gd")
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+const KnowledgeEffectServiceScript := preload("res://scripts/dao/knowledge_effect_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 const RealmBalanceServiceScript := preload("res://scripts/sim/realm_balance_service.gd")
 
@@ -22,6 +23,7 @@ static func collect_all_errors(config_manager: Node, game_state: Node = null) ->
 	errors.append_array(_validate_location_preview_rewards(config_manager))
 	errors.append_array(_validate_v1_abilities())
 	errors.append_array(_validate_method_stack_policies())
+	errors.append_array(KnowledgeEffectServiceScript.collect_config_errors())
 	errors.append_array(_validate_learning_book_coverage(config_manager))
 	errors.append_array(_validate_item_alias_targets(config_manager))
 	errors.append_array(ExpeditionDataValidatorScript.collect_errors(game_state))

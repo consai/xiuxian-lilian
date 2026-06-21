@@ -1,10 +1,12 @@
-[gd_scene load_steps=10 format=3 uid="uid://expedition_event_card"]
+[gd_scene load_steps=11 format=3 uid="uid://expedition_event_card"]
 
 [ext_resource type="Script" path="res://scripts/expedition/expedition_event_card.gd" id="1"]
 [ext_resource type="Theme" path="res://ui/theme_tuhuang.tres" id="2"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="3_title"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/13.tres" id="4_detail"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/16.tres" id="5_body"]
+
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="6_auto"]
 
 [sub_resource type="StyleBoxFlat" id="CardNormal"]
 bg_color = Color(1, 0.94902, 0.839216, 0.98)
@@ -78,6 +80,10 @@ theme_override_styles/hover = SubResource("CardHover")
 theme_override_styles/pressed = SubResource("CardHover")
 theme_override_styles/focus = SubResource("CardHover")
 script = ExtResource("1")
+
+
+[node name="PressScaleFeedback" type="Node" parent="EventCard"]
+script = ExtResource("6_auto")
 
 [node name="Content" type="MarginContainer" parent="."]
 layout_mode = 1

@@ -8,8 +8,25 @@ metadata:
   effectTypeCount: 175
 rules:
   knowledgeTreeConfigId: "dao_tree"
-  learningPolicy: "knowledge_threshold_only"
+  learningPolicy: "realm_only_for_ordinary_knowledge_threshold_for_special"
   methodMasteryMax: 1
+  methodMasteryLeveling:
+    maxLevel: 5
+    storagePolicy: "savedata.method_mastery stores total progress 0..1 until runtime migration"
+    levelFormula: "level = min(5, floor(total_progress * 5) + 1)"
+    currentLevelProgressFormula: "fract(total_progress * 5)"
+    levelNames:
+      - "初学"
+      - "熟习"
+      - "小成"
+      - "大成"
+      - "圆满"
+    milestonePolicy:
+      level1: "unlock_base_effects"
+      level2: "improve_core_values"
+      level3: "unlock_first_style_rule"
+      level4: "improve_ability_synergy"
+      level5: "unlock_signature_rule"
   masteryBonusMax: 0.5
   blockedKnowledgeXpPolicy: "discard"
   knowledgeExperience:
@@ -43,6 +60,16 @@ rules:
       inheritPreviousEffects: false
       mergePolicy: "current_method_only"
       note: "高层功法只激活当前层效果，旧层效果需切回旧功法或由当前层显式重申。"
+  learningKnowledgeGatePolicy:
+    ordinaryRarities:
+      - "common"
+      - "uncommon"
+    ordinaryPolicy: "realm_only_no_knowledge_requirements"
+    firstLayerPolicy: "realm_only_no_knowledge_requirements"
+    specialPolicy: "rare_or_above_tier_2_plus_may_require_knowledge"
+    maxKnowledgeRequirements: 2
+    maxRequirementLevel: 2
+    note: "知识仍决定功法效果反哺和可修上限；学习普通功法不被知识卡住。"
 effectDefinitions:
   activation: "active_method"
   defaultOperation: "add_percent"
@@ -346,9 +373,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "foundation.breathing"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -1157,9 +1182,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "body.recovery"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -1970,9 +1993,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "sword.weapon"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -2783,9 +2804,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "body.tempering"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -3593,9 +3612,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "spirit.meditation"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -4407,9 +4424,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "spell.elements"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -5221,9 +5236,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "formation.runes"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -6035,9 +6048,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "world.survival"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -6121,11 +6132,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "foundation"
-      knowledge:
-        - skillId: "world.trade"
-          level: 2
-        - skillId: "world.beast"
-          level: 2
+      knowledge: []
     recommendedProgression:
       predecessorId: "method.wanxiang.1"
       predecessorMastery: 0.8
@@ -6212,11 +6219,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "core"
-      knowledge:
-        - skillId: "world.geomancy"
-          level: 2
-        - skillId: "formation.array"
-          level: 1
+      knowledge: []
     recommendedProgression:
       predecessorId: "method.wanxiang.2"
       predecessorMastery: 0.8
@@ -6303,11 +6306,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "nascent"
-      knowledge:
-        - skillId: "world.weather"
-          level: 2
-        - skillId: "formation.teleport"
-          level: 1
+      knowledge: []
     recommendedProgression:
       predecessorId: "method.wanxiang.3"
       predecessorMastery: 0.8
@@ -6394,11 +6393,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "transform"
-      knowledge:
-        - skillId: "world.realm_travel"
-          level: 2
-        - skillId: "spirit.split"
-          level: 1
+      knowledge: []
     recommendedProgression:
       predecessorId: "method.wanxiang.4"
       predecessorMastery: 0.8
@@ -6485,11 +6480,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "void"
-      knowledge:
-        - skillId: "world.void_survival"
-          level: 2
-        - skillId: "artifact.void_ship"
-          level: 1
+      knowledge: []
     recommendedProgression:
       predecessorId: "method.wanxiang.5"
       predecessorMastery: 0.8
@@ -6576,11 +6567,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "merge"
-      knowledge:
-        - skillId: "world.civilization"
-          level: 2
-        - skillId: "foundation.integration_theory"
-          level: 1
+      knowledge: []
     recommendedProgression:
       predecessorId: "method.wanxiang.6"
       predecessorMastery: 0.8
@@ -6667,11 +6654,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "great"
-      knowledge:
-        - skillId: "world.world_shepherd"
-          level: 2
-        - skillId: "formation.cave_heaven"
-          level: 2
+      knowledge: []
     recommendedProgression:
       predecessorId: "method.wanxiang.7"
       predecessorMastery: 0.8
@@ -6757,11 +6740,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "tribulation"
-      knowledge:
-        - skillId: "world.ascension_route"
-          level: 2
-        - skillId: "foundation.ascension"
-          level: 1
+      knowledge: []
     recommendedProgression:
       predecessorId: "method.wanxiang.8"
       predecessorMastery: 0.8
@@ -6848,9 +6827,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "transform"
-      knowledge:
-        - skillId: "heaven.causality"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -7271,9 +7248,7 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "foundation.breathing"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -7332,9 +7307,7 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "cultivation.cycle"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -7393,9 +7366,7 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "body.tempering"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -7454,9 +7425,7 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "spirit.meditation"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -7515,9 +7484,7 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "sword.qi"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -7576,9 +7543,7 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "alchemy.herbs"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -7637,9 +7602,7 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "formation.runes"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -7698,9 +7661,7 @@ methods:
           displayPriority: 2
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "world.appraisal"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -7783,11 +7744,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "core"
-      knowledge:
-        - skillId: "body.bloodline"
-          level: 1
-        - skillId: "body.recovery"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -7870,11 +7827,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "foundation"
-      knowledge:
-        - skillId: "spell.escape"
-          level: 1
-        - skillId: "cultivation.cycle"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -7957,11 +7910,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "core"
-      knowledge:
-        - skillId: "alchemy.poison"
-          level: 1
-        - skillId: "alchemy.medicine"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -8044,11 +7993,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "foundation"
-      knowledge:
-        - skillId: "heaven.omen"
-          level: 1
-        - skillId: "heaven.astrology"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -8131,11 +8076,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "core"
-      knowledge:
-        - skillId: "talisman.script"
-          level: 1
-        - skillId: "talisman.activation"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []
@@ -8218,11 +8159,7 @@ methods:
           displayPriority: 3
     learningRequirements:
       realm: "foundation"
-      knowledge:
-        - skillId: "sword.weapon"
-          level: 1
-        - skillId: "body.bone"
-          level: 1
+      knowledge: []
     recommendedProgression: null
     tags: []
     passive_rules: []

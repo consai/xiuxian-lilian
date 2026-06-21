@@ -24,6 +24,8 @@
 [ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="24_small"]
 [ext_resource type="Script" uid="uid://bnplqcaqy5rg8" path="res://scripts/ui/character_attributes_panel.gd" id="25_script"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="26_auto"]
+
 [sub_resource type="StyleBoxFlat" id="MainPanel"]
 bg_color = Color(1, 0.945, 0.835, 0.985)
 border_width_left = 5
@@ -162,6 +164,7 @@ vertical_alignment = 1
 
 [node name="CloseButton" type="TextureButton" parent="Panel" unique_id=1118663398]
 unique_name_in_owner = true
+script = ExtResource("26_auto")
 layout_mode = 0
 offset_left = 920.0
 offset_top = -15.0
@@ -170,6 +173,7 @@ offset_bottom = 59.0
 texture_normal = ExtResource("3_close")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="IdentityCard" type="Panel" parent="Panel" unique_id=643209460]
 layout_mode = 0
@@ -636,6 +640,7 @@ offset_bottom = 572.0
 
 [node name="AttributesTab" type="TextureButton" parent="Panel" unique_id=2127763751]
 unique_name_in_owner = true
+script = ExtResource("26_auto")
 layout_mode = 0
 offset_left = 38.0
 offset_top = 588.0
@@ -644,6 +649,7 @@ offset_bottom = 648.0
 texture_normal = ExtResource("19_green")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="Label" type="Label" parent="Panel/AttributesTab" unique_id=674680492]
 layout_mode = 1
@@ -659,6 +665,7 @@ vertical_alignment = 1
 
 [node name="ExperienceTab" type="TextureButton" parent="Panel" unique_id=1695047519]
 unique_name_in_owner = true
+script = ExtResource("26_auto")
 layout_mode = 0
 offset_left = 180.0
 offset_top = 588.0
@@ -667,6 +674,7 @@ offset_bottom = 648.0
 texture_normal = ExtResource("20_button")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="Label" type="Label" parent="Panel/ExperienceTab" unique_id=767244718]
 layout_mode = 1
@@ -682,6 +690,7 @@ vertical_alignment = 1
 
 [node name="StatisticsTab" type="TextureButton" parent="Panel" unique_id=360336285]
 unique_name_in_owner = true
+script = ExtResource("26_auto")
 layout_mode = 0
 offset_left = 322.0
 offset_top = 588.0
@@ -690,6 +699,7 @@ offset_bottom = 648.0
 texture_normal = ExtResource("20_button")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="Label" type="Label" parent="Panel/StatisticsTab" unique_id=755677016]
 layout_mode = 1
@@ -705,6 +715,7 @@ vertical_alignment = 1
 
 [node name="LoadoutTab" type="TextureButton" parent="Panel"]
 unique_name_in_owner = true
+script = ExtResource("26_auto")
 layout_mode = 0
 offset_left = 464.0
 offset_top = 588.0
@@ -713,6 +724,7 @@ offset_bottom = 648.0
 texture_normal = ExtResource("20_button")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="Label" type="Label" parent="Panel/LoadoutTab"]
 layout_mode = 1
@@ -726,9 +738,34 @@ label_settings = ExtResource("22_h2")
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="MasteredArtsTab" type="TextureButton" parent="Panel"]
+unique_name_in_owner = true
+script = ExtResource("26_auto")
+layout_mode = 0
+offset_left = 606.0
+offset_top = 588.0
+offset_right = 736.0
+offset_bottom = 648.0
+texture_normal = ExtResource("20_button")
+ignore_texture_size = true
+stretch_mode = 5
+
+
+[node name="Label" type="Label" parent="Panel/MasteredArtsTab"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "功法技能"
+label_settings = ExtResource("22_h2")
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Biography" type="Panel" parent="Panel" unique_id=1938137326]
 layout_mode = 0
-offset_left = 610.0
+offset_left = 748.0
 offset_top = 588.0
 offset_right = 944.0
 offset_bottom = 648.0

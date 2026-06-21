@@ -19,6 +19,8 @@
 [ext_resource type="Script" path="res://scripts/expedition/expedition_map_canvas.gd" id="16_map_canvas"]
 [ext_resource type="PackedScene" path="res://scenes/expedition/expedition_map_node.tscn" id="17_map_node"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="18_auto"]
+
 [sub_resource type="StyleBoxFlat" id="TopPanel"]
 bg_color = Color(1, 0.94902, 0.839216, 0.94)
 border_width_left = 3
@@ -244,6 +246,7 @@ horizontal_alignment = 1
 
 [node name="StatusCloseButton" type="Button" parent="StatusPanel"]
 unique_name_in_owner = true
+script = ExtResource("18_auto")
 layout_mode = 0
 offset_left = 270.0
 offset_top = 12.0
@@ -252,6 +255,7 @@ offset_bottom = 46.0
 theme_override_fonts/font = ExtResource("9_font")
 theme_override_font_sizes/font_size = 16
 text = "×"
+
 
 [node name="HpLabel" type="Label" parent="StatusPanel" unique_id=1564474041]
 unique_name_in_owner = true
@@ -414,6 +418,7 @@ horizontal_alignment = 1
 
 [node name="LootCloseButton" type="Button" parent="LootPanel"]
 unique_name_in_owner = true
+script = ExtResource("18_auto")
 layout_mode = 0
 offset_left = 270.0
 offset_top = 12.0
@@ -422,6 +427,7 @@ offset_bottom = 46.0
 theme_override_fonts/font = ExtResource("9_font")
 theme_override_font_sizes/font_size = 16
 text = "×"
+
 
 [node name="LootScroll" type="ScrollContainer" parent="LootPanel" unique_id=1794296810]
 script = ExtResource("15_lpsc")
@@ -473,6 +479,7 @@ grow_vertical = 2
 
 [node name="MapScroll" type="ScrollContainer" parent="MapPanel"]
 unique_name_in_owner = true
+script = ExtResource("15_lpsc")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -485,6 +492,7 @@ grow_horizontal = 2
 grow_vertical = 2
 horizontal_scroll_mode = 1
 vertical_scroll_mode = 0
+
 
 [node name="MapWorld" type="Control" parent="MapPanel/MapScroll"]
 unique_name_in_owner = true
@@ -551,6 +559,7 @@ horizontal_alignment = 1
 
 [node name="LogCloseButton" type="Button" parent="LogPanel"]
 unique_name_in_owner = true
+script = ExtResource("18_auto")
 layout_mode = 0
 offset_left = 370.0
 offset_top = 12.0
@@ -559,6 +568,7 @@ offset_bottom = 46.0
 theme_override_fonts/font = ExtResource("9_font")
 theme_override_font_sizes/font_size = 16
 text = "×"
+
 
 [node name="Log" type="RichTextLabel" parent="LogPanel" unique_id=1566093167]
 unique_name_in_owner = true
@@ -593,6 +603,7 @@ alignment = 2
 
 [node name="StatusToggleButton" type="Button" parent="InfoDock"]
 unique_name_in_owner = true
+script = ExtResource("18_auto")
 custom_minimum_size = Vector2(88, 44)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("9_font")
@@ -602,8 +613,10 @@ theme_override_styles/pressed = SubResource("ExitNormal")
 theme_override_styles/hover = SubResource("ExitNormal")
 text = "状态"
 
+
 [node name="LootToggleButton" type="Button" parent="InfoDock"]
 unique_name_in_owner = true
+script = ExtResource("18_auto")
 custom_minimum_size = Vector2(98, 44)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("9_font")
@@ -613,8 +626,10 @@ theme_override_styles/pressed = SubResource("ExitNormal")
 theme_override_styles/hover = SubResource("ExitNormal")
 text = "战利品"
 
+
 [node name="LogToggleButton" type="Button" parent="InfoDock"]
 unique_name_in_owner = true
+script = ExtResource("18_auto")
 custom_minimum_size = Vector2(88, 44)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("9_font")
@@ -623,6 +638,7 @@ theme_override_styles/normal = SubResource("ExitNormal")
 theme_override_styles/pressed = SubResource("ExitNormal")
 theme_override_styles/hover = SubResource("ExitNormal")
 text = "日志"
+
 
 [node name="EventCards" type="HBoxContainer" parent="." unique_id=2106621442]
 unique_name_in_owner = true
@@ -690,6 +706,7 @@ horizontal_alignment = 1
 
 [node name="ExitButton" type="Button" parent="FooterStrip" unique_id=1921263944]
 unique_name_in_owner = true
+script = ExtResource("18_auto")
 layout_mode = 0
 offset_left = 14.0
 offset_top = 10.0
@@ -703,8 +720,10 @@ theme_override_styles/pressed = SubResource("ExitNormal")
 theme_override_styles/hover = SubResource("ExitNormal")
 text = "主动返程"
 
+
 [node name="AdvanceButton" type="Button" parent="FooterStrip"]
 unique_name_in_owner = true
+script = ExtResource("18_auto")
 visible = false
 layout_mode = 0
 offset_left = 170.0
@@ -719,8 +738,10 @@ theme_override_styles/pressed = SubResource("ExitNormal")
 theme_override_styles/hover = SubResource("ExitNormal")
 text = "前进"
 
+
 [node name="AutoAdvanceButton" type="Button" parent="FooterStrip"]
 unique_name_in_owner = true
+script = ExtResource("18_auto")
 visible = false
 layout_mode = 0
 offset_left = 328.0
@@ -736,6 +757,7 @@ theme_override_styles/normal = SubResource("ExitNormal")
 theme_override_styles/pressed = SubResource("ExitNormal")
 theme_override_styles/hover = SubResource("ExitNormal")
 text = "自动推进"
+
 
 [node name="AutoAdvanceTimer" type="Timer" parent="." unique_id=271485585]
 unique_name_in_owner = true

@@ -190,6 +190,7 @@ static func _materialize_event_for_context(
 	var context := _event_context(location, node)
 	current["difficulty"] = int(context.get("difficulty", 1))
 	current["location_id"] = str(context.get("location_id", current.get("location_id", "")))
+	current["node_type"] = str(context.get("node_type", current.get("node_type", "")))
 	if ExpeditionRulesServiceScript.is_battle_type(str(current.get("type", ""))):
 		current = _materialize_battle_event(location, node, current, rng)
 	if not current.is_empty() and str(current.get("id", "")).strip_edges() != "":
@@ -485,12 +486,19 @@ static func build_battle_enemies(event: Dictionary) -> Array:
 static func build_enemy_formation(event: Dictionary, enemies: Array) -> Dictionary:
 	if enemies.is_empty():
 		return {}
-	return {
+	var formation := {
 		"mode": "columns",
 		"columns": 3,
 		"rows": 5,
 		"active_columns": 1,
 	}
+	var formation_type := str(event.get("node_type", event.get("type", ""))).strip_edges()
+	match formation_type:
+		"boss":
+			formation["rank_size"] = 1
+		"elite":
+			formation["rank_size"] = 2
+	return formation
 
 
 static func _normalize_battle_enemy(enemy_src: Dictionary) -> Dictionary:
@@ -725,6 +733,7 @@ static func _event_context(location: Dictionary, node: Dictionary) -> Dictionary
 	return {
 		"difficulty": maxi(1, difficulty),
 		"location_id": str(location.get("id", location.get("location_id", ""))),
+		"node_type": str(node.get("type", "")),
 	}
 
 

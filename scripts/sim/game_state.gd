@@ -3,6 +3,8 @@ extends Node
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
+const KnowledgeStudyServiceScript := preload("res://scripts/dao/knowledge_study_service.gd")
+const KnowledgeEffectServiceScript := preload("res://scripts/dao/knowledge_effect_service.gd")
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const SIM_PATH := "res://data/simulation.yaml"
@@ -22,6 +24,7 @@ const EnumActivityTimeScript := preload("res://scripts/enum/enum_activity_time.g
 const RewardTipBuilderScript := preload("res://scripts/ui/tips/core/reward_tip_builder.gd")
 
 const INSTABILITY_REDUCTION_PER_WIN := 10
+const PASSIVE_METHOD_PRACTICE_RATIO := 0.25
 
 
 var day: int:
@@ -430,8 +433,7 @@ func _apply_alchemy_brew_result(
 	next_alchemy["total_batches"] = int(next_alchemy.get("total_batches", 0)) + 1
 	alchemy = next_alchemy
 	var elapsed := int(result.get("days", 1))
-	day += elapsed
-	injury_days = maxi(0, injury_days - elapsed)
+	_advance_time(elapsed, true, true)
 	if not defer_activity_log:
 		var outcome := str(result.get("quality_name", "无产物"))
 		var log_text := "炼制%s：%s" % [str(result.get("pill_name", "丹药")), outcome]
@@ -456,6 +458,90 @@ func max_cultivation_days(mode_id: String = EnumCultivationMode.LABEL_CYCLE, pil
 			return 1
 		return mini(planned_days, int(inventory.get(resolved_pill_id, 0)))
 	return planned_days
+
+
+func max_knowledge_study_days(skill_id: String = "") -> int:
+	var sid := skill_id.strip_edges()
+	var rank := 1.0
+	if sid != "":
+		var skill := DaoTreeServiceScript.skill_by_id(sid)
+		rank = maxf(1.0, float(skill.get("rank", 1)))
+	var suggested := GameTimeServiceScript.suggested_activity_days(
+		EnumActivityTimeScript.LABEL_SELF_STUDY,
+		major_realm_id(),
+		rank
+	)
+	if sid == "":
+		return suggested
+	var gate := KnowledgeStudyServiceScript.can_study(DataStore.savedata, sid, major_realm_id())
+	if not bool(gate.get("ok", false)):
+		return suggested
+	var entry := KnowledgeServiceScript.get_entry(DataStore.savedata, sid)
+	var current_level := int(entry.get("level", 0))
+	var policy := gate.get("policy", {}) as Dictionary
+	var target_level := mini(current_level + 1, int(policy.get("max_level", 3)))
+	if target_level <= current_level:
+		return suggested
+	var speed := DaoTreeServiceScript.training_speed(sid, foundations, aptitudes)
+	var required := DaoTreeServiceScript.required_xp_for_level(sid, target_level)
+	var remaining := maxf(0.0, required - float(entry.get("xp", 0.0)))
+	var days_to_next := int(ceil(remaining / maxf(0.01, speed * float(policy.get("efficiency", 1.0)))))
+	return maxi(suggested, days_to_next)
+
+
+func studyable_knowledge() -> Array:
+	return KnowledgeStudyServiceScript.studyable_skills(DataStore.savedata, major_realm_id())
+
+
+func preview_knowledge_study(skill_id: String, days: int = 1) -> Dictionary:
+	var safe_days := clampi(days, 1, max_knowledge_study_days(skill_id))
+	var preview := KnowledgeStudyServiceScript.preview(
+		DataStore.savedata,
+		skill_id,
+		safe_days,
+		major_realm_id()
+	)
+	if bool(preview.get("ok", false)):
+		preview["duration_label"] = GameTimeServiceScript.duration_label(safe_days)
+		preview["start_day"] = day
+		preview["end_day"] = day + safe_days
+		preview["start_date_label"] = GameTimeServiceScript.date_label(day)
+		preview["end_date_label"] = GameTimeServiceScript.date_label(day + safe_days)
+	return preview
+
+
+func study_knowledge(skill_id: String, days: int = 1) -> Dictionary:
+	if not can_persist():
+		return {"ok": false, "error": "历练中无法自主研读"}
+	var preview := preview_knowledge_study(skill_id, days)
+	if not bool(preview.get("ok", false)):
+		return preview
+	var safe_days := int(preview.get("days", 1))
+	var result := KnowledgeStudyServiceScript.apply_study(
+		DataStore.savedata,
+		skill_id,
+		safe_days,
+		major_realm_id()
+	)
+	if not bool(result.get("ok", false)):
+		return result
+	_advance_time(safe_days, true, true)
+	var skill_name := str(result.get("skill_name", skill_id))
+	var log_text := "自主研读%s：%s训练点 +%.1f" % [
+		GameTimeServiceScript.duration_label(safe_days),
+		skill_name,
+		float(result.get("xp", 0.0)),
+	]
+	if int(result.get("levels_gained", 0)) > 0:
+		log_text += "，提升至%s级" % _roman_knowledge_level(int(result.get("level_after", 0)))
+	_append_activity(log_text)
+	result["days"] = safe_days
+	result["duration_label"] = GameTimeServiceScript.duration_label(safe_days)
+	result["start_day"] = int(preview.get("start_day", day - safe_days))
+	result["end_day"] = day
+	result["start_date_label"] = str(preview.get("start_date_label", GameTimeServiceScript.date_label(day - safe_days)))
+	result["end_date_label"] = GameTimeServiceScript.date_label(day)
+	return result
 
 
 func preview_cultivation_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: int = 1, pill_id: String = "") -> Dictionary:
@@ -570,7 +656,7 @@ func cultivate_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: 
 			aggregate["levels_gained"] = int(aggregate["levels_gained"]) + int(applied.get("levels_gained", 0))
 			knowledge_summary[skill_id] = aggregate
 		layer_advances += _auto_advance_layers()
-		_finish_activity("修炼·%s" % str(mode["name"]), true)
+		_finish_activity("修炼·%s" % str(mode["name"]), true, false)
 	var knowledge_gains: Array = []
 	for row in knowledge_summary.values():
 		knowledge_gains.append(row)
@@ -916,8 +1002,7 @@ func travel_to_city(target_city_id: String, path: Array, total_days: int) -> Dic
 	next_map["current_city_id"] = target_city_id
 	set_map_data(next_map)
 	if elapsed > 0:
-		day += elapsed
-		injury_days = maxi(0, injury_days - elapsed)
+		_advance_time(elapsed, true, true)
 	activity_log.append({
 		"day": day,
 		"text": "旅行至%s，耗时 %s" % [
@@ -1048,9 +1133,10 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 	)
 	cultivation_instability -= instability_reduced
 	if start_day > 0:
-		day = start_day + elapsed_days
+		day = start_day
+		_advance_time(elapsed_days, false, true)
 	else:
-		day += elapsed_days
+		_advance_time(elapsed_days, false, true)
 	var location_name := str(result.get("location_name", "未知地点"))
 	var reward_labels: PackedStringArray = []
 	for reward in last_rewards:
@@ -1114,15 +1200,25 @@ func refresh_derived_attrs(preserve_vital_ratio: bool = true) -> void:
 	var method_mods := CultivationMethodServiceScript.build_modifiers(
 		cultivation_method_slots, DataStore.savedata
 	)
+	var knowledge_mods := KnowledgeEffectServiceScript.build_modifiers(DataStore.savedata)
 	var flat_mods: Dictionary = (method_mods.get("flat", {}) as Dictionary).duplicate(true)
+	for key in (knowledge_mods.get("flat", {}) as Dictionary).keys():
+		var stat := str(key)
+		flat_mods[stat] = float(flat_mods.get(stat, 0.0)) \
+			+ float((knowledge_mods.get("flat", {}) as Dictionary)[stat])
 	var realm_mods := CharacterStatsScript.realm_flat_modifiers(realm_index)
 	for key in realm_mods.keys():
 		var stat := str(key)
 		flat_mods[stat] = float(flat_mods.get(stat, 0.0)) + float(realm_mods[stat])
+	var percent_mods: Dictionary = (method_mods.get("percent", {}) as Dictionary).duplicate(true)
+	for key in (knowledge_mods.get("percent", {}) as Dictionary).keys():
+		var stat := str(key)
+		percent_mods[stat] = float(percent_mods.get(stat, 0.0)) \
+			+ float((knowledge_mods.get("percent", {}) as Dictionary)[stat])
 	attrs = CharacterStatsScript.build_combat_attrs(
 		foundations,
 		flat_mods,
-		method_mods.get("percent", {}) as Dictionary
+		percent_mods
 	)
 	if preserve_vital_ratio:
 		hp = float(attrs.get(FightAttr.HP_MAX, 100.0)) * hp_ratio
@@ -1391,17 +1487,100 @@ func reward_label(reward: Dictionary) -> String:
 	return "%s x%d" % [name, int(reward.get("count", 0))]
 
 
-func _finish_activity(text: String, reduce_injury: bool) -> void:
+func _finish_activity(text: String, reduce_injury: bool, passive_method: bool = true) -> void:
 	if reduce_injury and injury_days > 0:
 		injury_days -= 1
 	_append_activity(text)
-	day += 1
+	_advance_time(1, false, passive_method)
+
+
+func _advance_time(days_value: int, reduce_injury: bool = true, passive_method: bool = true) -> Dictionary:
+	var elapsed := maxi(0, days_value)
+	var summary := {
+		"days": elapsed,
+		"method_id": str(cultivation_method_slots.get("main", "")),
+		"mastery_gained": 0.0,
+		"knowledge": [],
+	}
+	if elapsed <= 0:
+		return summary
+	if passive_method:
+		summary = _apply_passive_method_practice(elapsed)
+	day += elapsed
+	if reduce_injury:
+		injury_days = maxi(0, injury_days - elapsed)
+	return summary
+
+
+func _apply_passive_method_practice(days_value: int) -> Dictionary:
+	var method_id := str(cultivation_method_slots.get("main", ""))
+	var mastery_before := CultivationMethodServiceScript.method_mastery(DataStore.savedata, method_id)
+	var summary := {
+		"days": maxi(0, days_value),
+		"method_id": method_id,
+		"mastery_gained": 0.0,
+		"knowledge": [],
+	}
+	var speed := CultivationMethodServiceScript.cultivation_speed(cultivation_method_slots)
+	if method_id == "" or speed <= 0.0:
+		return summary
+	var cfg := _activity_cfg("cultivate")
+	var base_gain := maxi(0, int(cfg.get("cultivation_gain", 20)))
+	var practice_xp := float(maxi(1, int(round(float(base_gain) * speed)))) \
+		* PASSIVE_METHOD_PRACTICE_RATIO
+	var knowledge_summary: Dictionary = {}
+	for _day_index in days_value:
+		var cycle := CultivationMethodServiceScript.apply_cultivation_cycle(
+			DataStore.savedata,
+			practice_xp,
+			1.0,
+			PASSIVE_METHOD_PRACTICE_RATIO
+		)
+		for row_v in cycle.get("knowledge", []) as Array:
+			if not row_v is Dictionary:
+				continue
+			var row := row_v as Dictionary
+			var skill_id := str(row.get("skillId", ""))
+			var applied := row.get("applied", {}) as Dictionary
+			var aggregate: Dictionary = knowledge_summary.get(skill_id, {
+				"skill_id": skill_id,
+				"xp": 0.0,
+				"levels_gained": 0,
+			})
+			aggregate["xp"] = float(aggregate["xp"]) + float(applied.get("applied", 0.0))
+			aggregate["levels_gained"] = int(aggregate["levels_gained"]) + int(applied.get("levels_gained", 0))
+			knowledge_summary[skill_id] = aggregate
+	var knowledge_gains: Array = []
+	for row in knowledge_summary.values():
+		knowledge_gains.append(row)
+	summary["knowledge"] = knowledge_gains
+	summary["mastery_gained"] = CultivationMethodServiceScript.method_mastery(
+		DataStore.savedata,
+		method_id
+	) - mastery_before
+	return summary
 
 
 func _append_activity(text: String) -> void:
 	activity_log.append({"day": day, "text": text})
 	if activity_log.size() > 30:
 		activity_log = activity_log.slice(activity_log.size() - 30)
+
+
+func _roman_knowledge_level(level: int) -> String:
+	match level:
+		1:
+			return "I"
+		2:
+			return "II"
+		3:
+			return "III"
+		4:
+			return "IV"
+		5:
+			return "V"
+		_:
+			return "—"
 
 
 func _realms() -> Array:

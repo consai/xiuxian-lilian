@@ -9,10 +9,12 @@ const FIGHT := "fight"
 const BREAKTHROUGH_SUMMARY := "breakthrough_summary"
 const CULTIVATION_PANEL := "cultivation_panel"
 const CULTIVATION_PROGRESS := "cultivation_progress"
+const KNOWLEDGE_STUDY_PANEL := "knowledge_study_panel"
 const ALCHEMY_PANEL := "alchemy_panel"
 const ALCHEMY_PROGRESS := "alchemy_progress"
 const ALCHEMY_RESULT := "alchemy_result"
 const CHARACTER_ATTRIBUTES_PANEL := "character_attributes_panel"
+const MASTERED_ARTS_PANEL := "mastered_arts_panel"
 const COMBAT_LOADOUT_PANEL := "combat_loadout_panel"
 const SKILL_RELEASE_STRATEGY_PANEL := "skill_release_strategy_panel"
 const BACKPACK_PANEL := "backpack_panel"
@@ -28,10 +30,12 @@ const SCENE_PATHS := {
 	BREAKTHROUGH_SUMMARY: "res://scenes/sim/breakthrough_summary.tscn",
 	CULTIVATION_PANEL: "res://scenes/sim/cultivation_panel.tscn",
 	CULTIVATION_PROGRESS: "res://scenes/sim/cultivation_progress_fullscreen.tscn",
+	KNOWLEDGE_STUDY_PANEL: "res://scenes/ui/knowledge_study_panel.tscn",
 	ALCHEMY_PANEL: "res://scenes/sim/alchemy_panel.tscn",
 	ALCHEMY_PROGRESS: "res://scenes/sim/alchemy_progress_fullscreen.tscn",
 	ALCHEMY_RESULT: "res://scenes/sim/alchemy_result_popup.tscn",
 	CHARACTER_ATTRIBUTES_PANEL: "res://scenes/ui/character_attributes_panel.tscn",
+	MASTERED_ARTS_PANEL: "res://scenes/ui/mastered_arts_panel.tscn",
 	COMBAT_LOADOUT_PANEL: "res://scenes/ui/combat_loadout_panel.tscn",
 	SKILL_RELEASE_STRATEGY_PANEL: "res://scenes/ui/skill_release_strategy_panel.tscn",
 	BACKPACK_PANEL: "res://scenes/ui/backpack_panel.tscn",
@@ -116,6 +120,10 @@ func go_cultivation_panel() -> Dictionary:
 	return go_to(CULTIVATION_PANEL)
 
 
+func go_knowledge_study_panel() -> Dictionary:
+	return go_to(KNOWLEDGE_STUDY_PANEL)
+
+
 func go_alchemy_panel() -> Dictionary:
 	return go_to(ALCHEMY_PANEL)
 
@@ -157,6 +165,10 @@ func go_breakthrough_summary(summary: Dictionary) -> Dictionary:
 
 func go_character_attributes_panel() -> Dictionary:
 	return go_to(CHARACTER_ATTRIBUTES_PANEL)
+
+
+func go_mastered_arts_panel() -> Dictionary:
+	return go_to(MASTERED_ARTS_PANEL)
 
 
 func go_combat_loadout_panel() -> Dictionary:

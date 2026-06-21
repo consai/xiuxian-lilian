@@ -65,7 +65,7 @@ const COMBAT_CONTROL_EFFECTS := {
 	"stagger_power": {"duration": 0.6, "chance": 0.65, "name": "踉跄"},
 	"control_duration": {"duration_from_value": true, "chance": 0.75, "name": "封印"},
 	"stun_chance": {"duration": 1.0, "chance_from_value": true, "name": "麻痹"},
-	"cast_interrupt_chance": {"duration": 0.4, "chance_from_value": true, "name": "打断"},
+	"delay_special_action_chance": {"duration": 0.4, "chance_from_value": true, "name": "延缓"},
 	"knockdown_duration": {"duration_from_value": true, "chance": 0.7, "name": "击倒"},
 	"law_suppression": {"duration": 1.5, "chance_from_value": true, "name": "律令压制"},
 }

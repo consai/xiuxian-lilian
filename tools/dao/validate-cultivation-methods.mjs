@@ -10,6 +10,9 @@ const realmOrder = new Map(dao.realms.map((realm) => [realm.id, realm.order]));
 const families = new Map(config.families.map((family) => [family.id, family]));
 const methods = new Map(config.methods.map((method) => [method.id, method]));
 const sharedEffectIds = new Set(sharedCatalog.effects.map((effect) => effect.id));
+const ordinaryRarities = new Set(config.rules.learningKnowledgeGatePolicy?.ordinaryRarities ?? ["common", "uncommon"]);
+const maxLearningRequirements = config.rules.learningKnowledgeGatePolicy?.maxKnowledgeRequirements ?? 2;
+const maxRequirementLevel = config.rules.learningKnowledgeGatePolicy?.maxRequirementLevel ?? 2;
 
 if (families.size !== config.families.length) errors.push("存在重复功法谱系 ID");
 if (methods.size !== config.methods.length) errors.push("存在重复功法层 ID");
@@ -110,11 +113,14 @@ for (const method of config.methods) {
 
   if (method.learningRequirements?.realm !== method.realm) errors.push(`${method.id}: 学习境界门槛与功法境界不一致`);
   const learningKnowledge = method.learningRequirements?.knowledge ?? [];
-  if (learningKnowledge.length > 2) errors.push(`${method.id}: 除境界外学习门槛最多 2 个`);
+  if ((ordinaryRarities.has(method.rarity) || method.tier === 1) && learningKnowledge.length > 0) {
+    errors.push(`${method.id}: 普通功法或传承首层不得配置知识学习门槛`);
+  }
+  if (learningKnowledge.length > maxLearningRequirements) errors.push(`${method.id}: 除境界外学习门槛最多 ${maxLearningRequirements} 个`);
   for (const req of learningKnowledge) {
     const skill = skills.get(req.skillId);
     if (!skill) errors.push(`${method.id}: 学习要求引用未知知识 ${req.skillId}`);
-    else if (req.level < 1 || req.level > 2) errors.push(`${method.id}: 基础学习门槛过高 ${req.skillId}:${req.level}`);
+    else if (req.level < 1 || req.level > maxRequirementLevel) errors.push(`${method.id}: 基础学习门槛过高 ${req.skillId}:${req.level}`);
   }
 }
 

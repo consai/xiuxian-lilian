@@ -7,6 +7,8 @@
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="5_title"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="6_body"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="7_auto"]
+
 [sub_resource type="StyleBoxFlat" id="PopupStyle"]
 bg_color = Color(1, 0.945, 0.835, 0.99)
 border_width_left = 4
@@ -109,13 +111,16 @@ value = 1.0
 
 [node name="MaxButton" type="Button" parent="Panel/SliderRow" unique_id=728968061]
 unique_name_in_owner = true
+script = ExtResource("7_auto")
 custom_minimum_size = Vector2(72, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "最大"
 
+
 [node name="CancelButton" type="TextureButton" parent="Panel" unique_id=63768504]
 unique_name_in_owner = true
+script = ExtResource("7_auto")
 layout_mode = 0
 offset_left = 52.0
 offset_top = 252.0
@@ -124,6 +129,7 @@ offset_bottom = 308.0
 texture_normal = ExtResource("3_cancel")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="Label" type="Label" parent="Panel/CancelButton" unique_id=363251897]
 layout_mode = 1
@@ -139,6 +145,7 @@ vertical_alignment = 1
 
 [node name="ConfirmButton" type="TextureButton" parent="Panel" unique_id=108094872]
 unique_name_in_owner = true
+script = ExtResource("7_auto")
 layout_mode = 0
 offset_left = 328.0
 offset_top = 252.0
@@ -147,6 +154,7 @@ offset_bottom = 308.0
 texture_normal = ExtResource("4_confirm")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="Label" type="Label" parent="Panel/ConfirmButton" unique_id=1217881110]
 layout_mode = 1

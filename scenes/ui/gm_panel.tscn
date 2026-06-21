@@ -8,6 +8,8 @@
 [ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="6_small"]
 [ext_resource type="Script" path="res://scripts/ui/components/long_press_scroll_container.gd" id="7_lpsc"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="8_auto"]
+
 [sub_resource type="StyleBoxFlat" id="Style_panel"]
 bg_color = Color(1, 0.933333, 0.823529, 0.98)
 border_width_left = 3
@@ -68,6 +70,7 @@ horizontal_alignment = 1
 
 [node name="CloseButton" type="TextureButton" parent="Panel"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 0
 offset_left = 848.0
 offset_top = 8.0
@@ -76,6 +79,7 @@ offset_bottom = 68.0
 texture_normal = ExtResource("3_close")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="StatusLabel" type="Label" parent="Panel"]
 unique_name_in_owner = true
@@ -112,28 +116,38 @@ theme_override_constants/separation = 8
 
 [node name="Cultivation100Button" type="Button" parent="Panel/Scroll/Content/CharacterRow1"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "修为 +100"
 
+
 [node name="Cultivation1000Button" type="Button" parent="Panel/Scroll/Content/CharacterRow1"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "修为 +1000"
 
+
 [node name="CultivationMaxButton" type="Button" parent="Panel/Scroll/Content/CharacterRow1"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "修为满门槛"
 
+
 [node name="Stones100Button" type="Button" parent="Panel/Scroll/Content/CharacterRow1"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "灵石 +100"
 
+
 [node name="Stones1000Button" type="Button" parent="Panel/Scroll/Content/CharacterRow1"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "灵石 +1000"
+
 
 [node name="CharacterRow2" type="HBoxContainer" parent="Panel/Scroll/Content"]
 layout_mode = 2
@@ -141,33 +155,45 @@ theme_override_constants/separation = 8
 
 [node name="Day1Button" type="Button" parent="Panel/Scroll/Content/CharacterRow2"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "日数 +1"
 
+
 [node name="Day10Button" type="Button" parent="Panel/Scroll/Content/CharacterRow2"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "日数 +10"
 
+
 [node name="RealmNextButton" type="Button" parent="Panel/Scroll/Content/CharacterRow2"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "境界 +1 层"
 
+
 [node name="RealmMaxButton" type="Button" parent="Panel/Scroll/Content/CharacterRow2"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "境界渡劫期"
 
+
 [node name="HealButton" type="Button" parent="Panel/Scroll/Content/CharacterRow2"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "满血满蓝"
 
+
 [node name="ClearInjuryButton" type="Button" parent="Panel/Scroll/Content/CharacterRow2"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "清除伤势"
+
 
 [node name="ItemTitle" type="Label" parent="Panel/Scroll/Content"]
 layout_mode = 2
@@ -180,8 +206,10 @@ theme_override_constants/separation = 8
 
 [node name="OpenItemGrantButton" type="Button" parent="Panel/Scroll/Content/ItemRow"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "打开添加道具面板"
+
 
 [node name="SceneTitle" type="Label" parent="Panel/Scroll/Content"]
 layout_mode = 2
@@ -194,23 +222,31 @@ theme_override_constants/separation = 8
 
 [node name="HubButton" type="Button" parent="Panel/Scroll/Content/SceneRow"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "洞府"
 
+
 [node name="WorldMapButton" type="Button" parent="Panel/Scroll/Content/SceneRow"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "世界地图"
 
+
 [node name="AttributesButton" type="Button" parent="Panel/Scroll/Content/SceneRow"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "人物属性"
 
+
 [node name="BackpackButton" type="Button" parent="Panel/Scroll/Content/SceneRow"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "背包"
+
 
 [node name="ExpeditionTitle" type="Label" parent="Panel/Scroll/Content"]
 layout_mode = 2
@@ -228,18 +264,57 @@ size_flags_horizontal = 3
 
 [node name="StartExpeditionButton" type="Button" parent="Panel/Scroll/Content/ExpeditionRow"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "开始历练"
 
+
 [node name="ForceSettleButton" type="Button" parent="Panel/Scroll/Content/ExpeditionRow"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "强制结算"
 
+
 [node name="ResetExpeditionButton" type="Button" parent="Panel/Scroll/Content/ExpeditionRow"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "重置历练"
+
+
+[node name="BattleTitle" type="Label" parent="Panel/Scroll/Content"]
+layout_mode = 2
+text = "战斗"
+label_settings = ExtResource("5_body")
+
+[node name="BattleRow" type="HBoxContainer" parent="Panel/Scroll/Content"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MonsterOption" type="OptionButton" parent="Panel/Scroll/Content/BattleRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EnemyCountLabel" type="Label" parent="Panel/Scroll/Content/BattleRow"]
+layout_mode = 2
+text = "数量"
+label_settings = ExtResource("5_body")
+
+[node name="EnemyCountInput" type="SpinBox" parent="Panel/Scroll/Content/BattleRow"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 8.0
+value = 1.0
+
+[node name="StartGmBattleButton" type="Button" parent="Panel/Scroll/Content/BattleRow"]
+unique_name_in_owner = true
+script = ExtResource("8_auto")
+layout_mode = 2
+text = "创建战斗"
+
 
 [node name="DangerTitle" type="Label" parent="Panel/Scroll/Content"]
 layout_mode = 2
@@ -252,8 +327,10 @@ theme_override_constants/separation = 8
 
 [node name="NewGameButton" type="Button" parent="Panel/Scroll/Content/DangerRow"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 2
 text = "新游戏（重置进度）"
+
 
 [node name="MessageLabel" type="Label" parent="Panel"]
 unique_name_in_owner = true

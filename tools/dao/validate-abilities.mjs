@@ -9,6 +9,9 @@ const realmOrder = new Map(dao.realms.map((realm) => [realm.id, realm.order]));
 const effectIds = new Set(catalog.effects.map((effect) => effect.id));
 const abilityIds = new Set();
 const v1Realms = new Set(["qi", "foundation"]);
+const ordinaryRarities = new Set(config.rules.learningKnowledgeGatePolicy?.ordinaryRarities ?? ["common", "uncommon"]);
+const maxLearningRequirements = config.rules.learningKnowledgeGatePolicy?.maxKnowledgeRequirements ?? 2;
+const maxRequirementLevel = config.rules.learningKnowledgeGatePolicy?.maxRequirementLevel ?? 2;
 const runtimeCombatEffects = new Set([
   "damage_spiritual", "damage_sword", "damage_elemental", "damage_physical", "damage_true",
   "shield_flat", "shield_spiritual", "heal_hp", "restore_mana", "armor_pierce",
@@ -29,7 +32,10 @@ for (const ability of config.abilities) {
   if (!config.rules.types.includes(ability.type)) errors.push(`${ability.id}: 未知技能类型 ${ability.type}`);
   if (ability.learningRequirements?.realm !== ability.realm) errors.push(`${ability.id}: 学习境界不一致`);
   const learningKnowledge = ability.learningRequirements?.knowledge ?? [];
-  if (learningKnowledge.length > 2) errors.push(`${ability.id}: 除境界外学习门槛最多 2 个`);
+  if (ordinaryRarities.has(ability.rarity) && learningKnowledge.length > 0) {
+    errors.push(`${ability.id}: 普通技能不得配置知识学习门槛`);
+  }
+  if (learningKnowledge.length > maxLearningRequirements) errors.push(`${ability.id}: 除境界外学习门槛最多 ${maxLearningRequirements} 个`);
   if (!ability.knowledgeScaling?.knowledge?.length) errors.push(`${ability.id}: 没有成长知识`);
   for (const req of ability.knowledgeScaling?.knowledge ?? []) {
     const source = knowledge.get(req.skillId);
@@ -41,7 +47,7 @@ for (const ability of config.abilities) {
     const source = knowledge.get(gate.skillId);
     if (!source) errors.push(`${ability.id}: 学习门槛引用未知知识 ${gate.skillId}`);
     else if (realmOrder.get(source.realm) > realmOrder.get(ability.realm)) errors.push(`${ability.id}: 学习门槛引用了高于技能境界的知识 ${gate.skillId}`);
-    if (gate.level < 1 || gate.level >= 5) errors.push(`${ability.id}: 学习门槛等级必须在 1..4 ${gate.skillId}`);
+    if (gate.level < 1 || gate.level > maxRequirementLevel) errors.push(`${ability.id}: 学习门槛等级必须在 1..${maxRequirementLevel} ${gate.skillId}`);
   }
   for (const effect of ability.effects ?? []) {
     if ("masteryGrowth" in effect) errors.push(`${ability.id}: 禁止使用 masteryGrowth ${effect.effectId}`);

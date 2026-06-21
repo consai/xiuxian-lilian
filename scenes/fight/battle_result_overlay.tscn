@@ -7,6 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://d3mta65yicnke" path="res://assets/art/ui_new/imt_fail.png" id="5_s8ofd"]
 [ext_resource type="Script" path="res://scripts/ui/components/long_press_scroll_container.gd" id="6_lpsc"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="7_auto"]
+
 [node name="BattleResultOverlay" type="Control" unique_id=444096834]
 z_index = 50
 layout_mode = 3
@@ -88,6 +90,7 @@ scroll_active = false
 
 [node name="BattleResultLog" type="Button" parent="Panel" unique_id=1630051712]
 unique_name_in_owner = true
+script = ExtResource("7_auto")
 self_modulate = Color(0.87058824, 0.7372549, 0.5372549, 1)
 layout_mode = 1
 anchors_preset = 3
@@ -103,8 +106,10 @@ grow_horizontal = 0
 grow_vertical = 0
 text = "战报"
 
+
 [node name="BattleResultClose" type="Button" parent="Panel" unique_id=1630051711]
 unique_name_in_owner = true
+script = ExtResource("7_auto")
 self_modulate = Color(0.87058824, 0.7372549, 0.5372549, 1)
 layout_mode = 1
 anchors_preset = 3
@@ -119,6 +124,7 @@ offset_bottom = -36.0
 grow_horizontal = 0
 grow_vertical = 0
 text = "确定"
+
 
 [node name="rewards" type="HBoxContainer" parent="Panel" unique_id=1008248288]
 unique_name_in_owner = true
@@ -205,6 +211,7 @@ scroll_active = false
 
 [node name="BattleLogPopupClose" type="Button" parent="BattleLogPopup/Panel" unique_id=1630051719]
 unique_name_in_owner = true
+script = ExtResource("7_auto")
 self_modulate = Color(0.87058824, 0.7372549, 0.5372549, 1)
 layout_mode = 1
 anchors_preset = 7
@@ -219,3 +226,4 @@ offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 0
 text = "关闭"
+

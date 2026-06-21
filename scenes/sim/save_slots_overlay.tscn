@@ -78,6 +78,7 @@ label_settings = ExtResource("4_label20")
 
 [node name="Slot1SaveButton" type="Button" parent="Panel" unique_id=1666426855]
 unique_name_in_owner = true
+script = ExtResource("6_feedback")
 layout_mode = 0
 offset_left = 24.0
 offset_top = 100.0
@@ -86,14 +87,17 @@ offset_bottom = 136.0
 disabled = true
 text = "自动"
 
+
 [node name="Slot1LoadButton" type="Button" parent="Panel" unique_id=1766111598]
 unique_name_in_owner = true
+script = ExtResource("6_feedback")
 layout_mode = 0
 offset_left = 156.0
 offset_top = 100.0
 offset_right = 276.0
 offset_bottom = 136.0
 text = "读取"
+
 
 [node name="Slot2Label" type="Label" parent="Panel" unique_id=1365809735]
 unique_name_in_owner = true
@@ -107,6 +111,7 @@ label_settings = ExtResource("4_label20")
 
 [node name="Slot2SaveButton" type="Button" parent="Panel" unique_id=1581322035]
 unique_name_in_owner = true
+script = ExtResource("6_feedback")
 layout_mode = 0
 offset_left = 24.0
 offset_top = 184.0
@@ -114,14 +119,17 @@ offset_right = 144.0
 offset_bottom = 220.0
 text = "存入"
 
+
 [node name="Slot2LoadButton" type="Button" parent="Panel" unique_id=813100905]
 unique_name_in_owner = true
+script = ExtResource("6_feedback")
 layout_mode = 0
 offset_left = 156.0
 offset_top = 184.0
 offset_right = 276.0
 offset_bottom = 220.0
 text = "读取"
+
 
 [node name="Slot3Label" type="Label" parent="Panel" unique_id=1640979384]
 unique_name_in_owner = true
@@ -135,6 +143,7 @@ label_settings = ExtResource("4_label20")
 
 [node name="Slot3SaveButton" type="Button" parent="Panel" unique_id=1196883159]
 unique_name_in_owner = true
+script = ExtResource("6_feedback")
 layout_mode = 0
 offset_left = 24.0
 offset_top = 268.0
@@ -142,14 +151,17 @@ offset_right = 144.0
 offset_bottom = 304.0
 text = "存入"
 
+
 [node name="Slot3LoadButton" type="Button" parent="Panel" unique_id=363474881]
 unique_name_in_owner = true
+script = ExtResource("6_feedback")
 layout_mode = 0
 offset_left = 156.0
 offset_top = 268.0
 offset_right = 276.0
 offset_bottom = 304.0
 text = "读取"
+
 
 [node name="CloseButton" type="TextureButton" parent="Panel" unique_id=803602933]
 unique_name_in_owner = true

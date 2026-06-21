@@ -6,6 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://cgkulmxyyxtuv" path="res://assets/art/ui_new/tips.png" id="3_g8b7a"]
 [ext_resource type="Script" path="res://scripts/ui/hover/hover_tip_source.gd" id="4_hover"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="5_auto"]
+
 [node name="BreakthroughValueRow" type="HBoxContainer"]
 custom_minimum_size = Vector2(0, 48)
 theme_override_constants/separation = 10
@@ -38,6 +40,7 @@ vertical_alignment = 1
 
 [node name="Help" type="TextureButton" parent="."]
 unique_name_in_owner = true
+script = ExtResource("5_auto")
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 mouse_filter = 0
@@ -45,6 +48,7 @@ focus_mode = 0
 texture_normal = ExtResource("3_g8b7a")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="HoverTipSource" type="Node" parent="Help"]
 script = ExtResource("4_hover")

@@ -9,6 +9,7 @@ const MODE_IDS := EnumCultivationMode.MODE_IDS
 @onready var _player_label: Label = %PlayerLabel
 @onready var _day_label: Label = %DayLabel
 @onready var _method_label: Label = %MethodLabel
+@onready var _method_change_button: Button = %MethodChangeButton
 @onready var _mastery_label: Label = %MasteryLabel
 @onready var _mastery_bar: ProgressBar = %MasteryBar
 @onready var _knowledge_label: Label = %KnowledgeLabel
@@ -24,6 +25,7 @@ const MODE_IDS := EnumCultivationMode.MODE_IDS
 @onready var _pill_slot: ItemView = %PillSlot
 @onready var _pill_hint: Label = %PillHint
 @onready var _pill_picker: LoadoutBagPopup = %PillPicker
+@onready var _method_picker: LoadoutSelectionPopup = %MethodPicker
 
 var _mode_id := EnumCultivationMode.LABEL_CYCLE
 var _days := 0
@@ -32,6 +34,7 @@ var _selected_pill_id := ""
 
 func _ready() -> void:
 	%CloseButton.pressed.connect(_on_close_pressed)
+	_method_change_button.pressed.connect(_on_method_change_pressed)
 	_start_button.pressed.connect(_on_start_pressed)
 	for index in _mode_buttons.size():
 		_mode_buttons[index].pressed.connect(_select_mode.bind(MODE_IDS[index]))
@@ -41,6 +44,7 @@ func _ready() -> void:
 	_pill_slot.show_info_on_click = false
 	_pill_slot.clicked.connect(_on_pill_slot_clicked)
 	_pill_picker.entry_picked.connect(_on_pill_picked)
+	_method_picker.selected.connect(_on_method_picked)
 	_refresh()
 
 
@@ -206,6 +210,19 @@ func _on_pill_slot_clicked() -> void:
 func _on_pill_picked(entry: Dictionary) -> void:
 	_selected_pill_id = str(entry.get("id", ""))
 	_refresh()
+
+
+func _on_method_change_pressed() -> void:
+	_method_picker.open_for("method", "main")
+
+
+func _on_method_picked(entry_id: Variant) -> void:
+	var result: Dictionary = GameState.equip_method("main", str(entry_id))
+	if not bool(result.get("ok", false)):
+		_result_label.text = str(result.get("error", "无法替换主修功法"))
+		return
+	_refresh()
+	_result_label.text = "已替换当前主修功法。"
 
 
 func _update_button_states() -> void:

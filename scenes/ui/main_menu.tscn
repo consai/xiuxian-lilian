@@ -8,6 +8,8 @@
 [ext_resource type="PackedScene" uid="uid://cwdqcxgu67n23" path="res://scenes/sim/save_slots_overlay.tscn" id="6_save"]
 [ext_resource type="PackedScene" path="res://scenes/ui/components/cultivation_primary_button.tscn" id="7_primary"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="8_auto"]
+
 [sub_resource type="StyleBoxFlat" id="Style_panel"]
 bg_color = Color(1, 0.933333, 0.823529, 0.92)
 border_width_left = 3
@@ -133,6 +135,7 @@ text = "开始游戏"
 
 [node name="LoadButton" type="Button" parent="MenuPanel/Actions"]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 custom_minimum_size = Vector2(318, 72)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 0.12549, 0.0705882, 1)
@@ -143,6 +146,7 @@ theme_override_styles/normal = SubResource("Style_secondary_normal")
 theme_override_styles/hover = SubResource("Style_secondary_hover")
 theme_override_styles/pressed = SubResource("Style_secondary_hover")
 text = "读取存档"
+
 
 [node name="MessageLabel" type="Label" parent="MenuPanel"]
 unique_name_in_owner = true

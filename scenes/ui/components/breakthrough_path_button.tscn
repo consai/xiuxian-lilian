@@ -1,7 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Texture2D" path="res://assets/art/ui_new/dazuo.png" id="1_icon"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/16.tres" id="2_text"]
+
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="3_auto"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_path"]
 bg_color = Color(0.96, 0.88, 0.72, 0.92)
@@ -21,11 +23,13 @@ theme_override_constants/separation = 2
 alignment = 1
 
 [node name="Button" type="Button" parent="."]
+script = ExtResource("3_auto")
 custom_minimum_size = Vector2(66, 66)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBox_path")
 theme_override_styles/hover = SubResource("StyleBox_path")
 theme_override_styles/pressed = SubResource("StyleBox_path")
+
 
 [node name="Icon" type="TextureRect" parent="Button"]
 layout_mode = 1

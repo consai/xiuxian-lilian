@@ -4,6 +4,7 @@ extends RefCounted
 const ITEMS_PATH := "res://data/item.yaml"
 const DAO_TREE_PATH := "res://data/dao_tree.yaml"
 const CULTIVATION_METHODS_PATH := "res://data/cultivation_methods.yaml"
+const KNOWLEDGE_EFFECTS_PATH := "res://data/knowledge_effects.yaml"
 const ABILITIES_PATH := "res://data/abilities.yaml"
 const EFFECT_CATALOG_PATH := "res://data/effect_catalog.yaml"
 const EQUIPS_PATH := "res://data/equip.yaml"
@@ -597,6 +598,10 @@ static func load_dao_tree() -> Dictionary:
 
 static func load_cultivation_methods_bundle() -> Dictionary:
 	return _read_json_root_object(CULTIVATION_METHODS_PATH)
+
+
+static func load_knowledge_effects_bundle() -> Dictionary:
+	return _read_json_root_object(KNOWLEDGE_EFFECTS_PATH)
 
 
 static func load_abilities_bundle() -> Dictionary:

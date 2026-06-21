@@ -35,6 +35,7 @@ enum Tab { ATTRIBUTES, EXPERIENCE, STATISTICS }
 @onready var _experience_tab: TextureButton = %ExperienceTab
 @onready var _statistics_tab: TextureButton = %StatisticsTab
 @onready var _loadout_tab: TextureButton = %LoadoutTab
+@onready var _mastered_arts_tab: TextureButton = %MasteredArtsTab
 
 var _active_tab: Tab = Tab.ATTRIBUTES
 
@@ -45,6 +46,7 @@ func _ready() -> void:
 	_experience_tab.pressed.connect(func() -> void: _select_tab(Tab.EXPERIENCE))
 	_statistics_tab.pressed.connect(func() -> void: _select_tab(Tab.STATISTICS))
 	_loadout_tab.pressed.connect(func() -> void: SceneManager.go_combat_loadout_panel())
+	_mastered_arts_tab.pressed.connect(func() -> void: SceneManager.go_mastered_arts_panel())
 	_experience_tab.pressed.connect(func() -> void: SceneManager.go_dao_tree_panel())
 	_select_tab(Tab.ATTRIBUTES)
 	refresh()

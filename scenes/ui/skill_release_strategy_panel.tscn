@@ -13,6 +13,8 @@
 [ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="16_small"]
 [ext_resource type="Script" uid="uid://13p5wfwy3xc" path="res://scripts/ui/skill_release_strategy_panel.gd" id="17_script"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="18_auto"]
+
 [sub_resource type="StyleBoxFlat" id="MainPanel"]
 bg_color = Color(1, 0.945, 0.835, 0.985)
 border_width_left = 5
@@ -120,6 +122,7 @@ vertical_alignment = 1
 
 [node name="CloseButton" type="TextureButton" parent="Panel" unique_id=510187021]
 unique_name_in_owner = true
+script = ExtResource("18_auto")
 layout_mode = 0
 offset_left = 1060.0
 offset_top = -16.0
@@ -128,6 +131,7 @@ offset_bottom = 56.0
 texture_normal = ExtResource("3_close")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="SkillListCard" type="Panel" parent="Panel" unique_id=1953292034]
 layout_mode = 0
@@ -158,6 +162,7 @@ theme_override_constants/separation = 8
 
 [node name="AddButton" type="TextureButton" parent="Panel/SkillListCard" unique_id=1478011632]
 unique_name_in_owner = true
+script = ExtResource("18_auto")
 layout_mode = 0
 offset_left = 20.0
 offset_top = 464.0
@@ -166,6 +171,7 @@ offset_bottom = 506.0
 texture_normal = ExtResource("11_green")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="Label" type="Label" parent="Panel/SkillListCard/AddButton" unique_id=1687991667]
 layout_mode = 1
@@ -313,6 +319,7 @@ vertical_alignment = 1
 
 [node name="ConfirmButton" type="TextureButton" parent="Panel" unique_id=2133056835]
 unique_name_in_owner = true
+script = ExtResource("18_auto")
 layout_mode = 0
 offset_left = 710.0
 offset_top = 610.0
@@ -321,6 +328,7 @@ offset_bottom = 666.0
 texture_normal = ExtResource("12_blue")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="Label" type="Label" parent="Panel/ConfirmButton" unique_id=686670850]
 layout_mode = 1
@@ -336,6 +344,7 @@ vertical_alignment = 1
 
 [node name="CancelButton" type="TextureButton" parent="Panel" unique_id=1881473672]
 unique_name_in_owner = true
+script = ExtResource("18_auto")
 layout_mode = 0
 offset_left = 920.0
 offset_top = 610.0
@@ -344,6 +353,7 @@ offset_bottom = 666.0
 texture_normal = ExtResource("13_yellow")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="Label" type="Label" parent="Panel/CancelButton" unique_id=916555335]
 layout_mode = 1

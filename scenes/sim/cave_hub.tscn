@@ -88,12 +88,14 @@ horizontal_alignment = 1
 
 [node name="SaveButton" type="Button" parent="ProfilePanel" unique_id=1418512808]
 unique_name_in_owner = true
+script = ExtResource("12_av2rb")
 layout_mode = 0
 offset_left = 72.0
 offset_top = 84.0
 offset_right = 180.0
 offset_bottom = 108.0
 text = "存档"
+
 
 [node name="StatusPanel" type="Panel" parent="." unique_id=144307130]
 layout_mode = 1
@@ -381,6 +383,27 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "修炼"
+label_settings = ExtResource("18_label28")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="KnowledgeStudyButton" type="TextureButton" parent="BottomActions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(128.315, 76.08)
+layout_mode = 2
+texture_normal = ExtResource("12_green_button")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="BottomActions/KnowledgeStudyButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "研读"
 label_settings = ExtResource("18_label28")
 horizontal_alignment = 1
 vertical_alignment = 1

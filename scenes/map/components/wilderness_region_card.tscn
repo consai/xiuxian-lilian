@@ -1,8 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/map/wilderness_region_card.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_theme"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="3_label"]
+
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="4_auto"]
 
 [sub_resource type="StyleBoxFlat" id="RegionStyle"]
 bg_color = Color(0.45, 0.66, 0.45, 0.38)
@@ -26,6 +28,7 @@ theme = ExtResource("2_theme")
 script = ExtResource("1_script")
 
 [node name="Button" type="Button" parent="."]
+script = ExtResource("4_auto")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -35,6 +38,7 @@ grow_vertical = 2
 theme_override_styles/normal = SubResource("RegionStyle")
 theme_override_styles/hover = SubResource("RegionStyle")
 theme_override_styles/pressed = SubResource("RegionStyle")
+
 
 [node name="NameLabel" type="Label" parent="."]
 unique_name_in_owner = true

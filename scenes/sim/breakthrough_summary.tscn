@@ -23,6 +23,8 @@
 [ext_resource type="Texture2D" uid="uid://cm3ndcqb2rpty" path="res://assets/art/ui_new/qitia.png" id="21_other"]
 [ext_resource type="Texture2D" uid="uid://botslvvwakrxs" path="res://assets/art/ui_new/xiulian.png" id="22_practice"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="23_auto"]
+
 [sub_resource type="StyleBoxFlat" id="Style_inner"]
 bg_color = Color(1, 0.94, 0.82, 0.78)
 border_width_left = 2
@@ -157,6 +159,7 @@ vertical_alignment = 1
 
 [node name="CloseButton" type="TextureButton" parent="." unique_id=1858959142]
 unique_name_in_owner = true
+script = ExtResource("23_auto")
 layout_mode = 0
 offset_left = 1185.0
 offset_top = 16.0
@@ -165,6 +168,7 @@ offset_bottom = 80.0
 texture_normal = ExtResource("5_close")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="LeftPanel" type="PanelContainer" parent="." unique_id=920557966]
 unique_name_in_owner = true
@@ -493,6 +497,7 @@ text = "其他"
 
 [node name="StartButton" type="TextureButton" parent="." unique_id=95008596]
 unique_name_in_owner = true
+script = ExtResource("23_auto")
 layout_mode = 0
 offset_left = 956.0
 offset_top = 674.0
@@ -501,6 +506,7 @@ offset_bottom = 768.0
 texture_normal = ExtResource("4_green")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="StartLabel" type="Label" parent="StartButton" unique_id=356307112]
 unique_name_in_owner = true

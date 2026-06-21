@@ -11,6 +11,8 @@
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="12_text"]
 [ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="13_small"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="14_auto"]
+
 [sub_resource type="StyleBoxFlat" id="Style_dialog"]
 content_margin_left = 24.0
 content_margin_top = 24.0
@@ -249,11 +251,13 @@ alignment = 1
 
 [node name="ContinueButton" type="TextureButton" parent="Dialog/Content/Buttons" unique_id=1862974775]
 unique_name_in_owner = true
+script = ExtResource("14_auto")
 custom_minimum_size = Vector2(260, 68)
 layout_mode = 2
 texture_normal = ExtResource("9_yellow")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="Text" type="Label" parent="Dialog/Content/Buttons/ContinueButton" unique_id=1708342176]
 layout_mode = 1
@@ -269,11 +273,13 @@ vertical_alignment = 1
 
 [node name="ReturnButton" type="TextureButton" parent="Dialog/Content/Buttons" unique_id=1929324581]
 unique_name_in_owner = true
+script = ExtResource("14_auto")
 custom_minimum_size = Vector2(260, 68)
 layout_mode = 2
 texture_normal = ExtResource("10_cream")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="Text" type="Label" parent="Dialog/Content/Buttons/ReturnButton" unique_id=1286615997]
 layout_mode = 1

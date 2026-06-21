@@ -2,6 +2,8 @@
 
 [ext_resource type="Texture2D" path="res://assets/art/ui_new/xiulian.png" id="1_icon"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="2_auto"]
+
 [sub_resource type="StyleBoxFlat" id="Style_normal"]
 bg_color = Color(0.909804, 0.862745, 0.698039, 0.98)
 border_width_left = 3
@@ -39,6 +41,7 @@ corner_radius_bottom_right = 22
 corner_radius_bottom_left = 22
 
 [node name="CultivationModeButton" type="Button"]
+script = ExtResource("2_auto")
 custom_minimum_size = Vector2(0, 88)
 theme_override_colors/font_color = Color(0.2, 0.12549, 0.0705882, 1)
 theme_override_colors/font_hover_color = Color(0.2, 0.12549, 0.0705882, 1)
@@ -48,6 +51,7 @@ theme_override_styles/normal = SubResource("Style_normal")
 theme_override_styles/hover = SubResource("Style_hover")
 theme_override_styles/pressed = SubResource("Style_pressed")
 text = "运转周天\n修为 100% · 知识 100%"
+
 
 [node name="Icon" type="TextureRect" parent="."]
 layout_mode = 0

@@ -13,6 +13,7 @@ extends Control
 @onready var _expedition_object_button: TextureButton = %ExpeditionObjectButton
 @onready var _backpack_button: TextureButton = %BackpackButton
 @onready var _cultivate_button: TextureButton = %CultivateButton
+@onready var _knowledge_study_button: TextureButton = %KnowledgeStudyButton
 @onready var _expedition_button: TextureButton = %ExpeditionButton
 @onready var _attributes_button: TextureButton = %btnattrs
 @onready var _save_button: Button = %SaveButton
@@ -34,6 +35,7 @@ func _connect_actions() -> void:
 	_expedition_object_button.pressed.connect(_on_encounter)
 	_backpack_button.pressed.connect(_on_backpack)
 	_cultivate_button.pressed.connect(_on_cultivate)
+	_knowledge_study_button.pressed.connect(_on_knowledge_study)
 	_breakthrough_button.pressed.connect(_on_breakthrough)
 	_expedition_button.pressed.connect(_on_encounter)
 	_attributes_button.pressed.connect(_on_character_attributes)
@@ -91,6 +93,12 @@ func _on_cultivate() -> void:
 	var nav: Dictionary = SceneManager.go_cultivation_panel()
 	if not bool(nav.get("ok", false)):
 		_refresh(str(nav.get("error", "无法打开修炼界面")))
+
+
+func _on_knowledge_study() -> void:
+	var nav: Dictionary = SceneManager.go_knowledge_study_panel()
+	if not bool(nav.get("ok", false)):
+		_refresh(str(nav.get("error", "无法打开自主研读")))
 
 
 func _on_rest() -> void:

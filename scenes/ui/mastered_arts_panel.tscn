@@ -1,0 +1,270 @@
+[gd_scene load_steps=17 format=3]
+
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://8mwstvi8kywh" path="res://assets/art/ui_new/btn_close.png" id="3_close"]
+[ext_resource type="Texture2D" uid="uid://c3f3nny73kvhg" path="res://assets/art/ui_new/btn_lv.png" id="4_green"]
+[ext_resource type="Texture2D" uid="uid://gyhsfoix048v" path="res://assets/art/ui_new/btn_lan.png" id="5_blue"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="6_title"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="7_h2"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="8_body"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="9_small"]
+[ext_resource type="Script" path="res://scripts/ui/mastered_arts_panel.gd" id="10_script"]
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="11_press"]
+
+[sub_resource type="StyleBoxFlat" id="MainPanel"]
+bg_color = Color(1, 0.945, 0.835, 0.985)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.31, 0.19, 0.12, 1)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+shadow_color = Color(0.12, 0.07, 0.03, 0.45)
+shadow_size = 16
+
+[sub_resource type="StyleBoxFlat" id="TitlePanel"]
+bg_color = Color(0.91, 0.72, 0.48, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.4, 0.25, 0.14, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="InsetPanel"]
+bg_color = Color(1, 0.965, 0.89, 0.78)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.57, 0.38, 0.22, 0.85)
+corner_radius_top_left = 17
+corner_radius_top_right = 17
+corner_radius_bottom_right = 17
+corner_radius_bottom_left = 17
+
+[sub_resource type="StyleBoxFlat" id="FooterPanel"]
+bg_color = Color(0.97, 0.88, 0.73, 0.38)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.66, 0.47, 0.29, 0.65)
+corner_radius_top_left = 13
+corner_radius_top_right = 13
+corner_radius_bottom_right = 13
+corner_radius_bottom_left = 13
+
+[node name="MasteredArtsPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_theme")
+script = ExtResource("10_script")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Dimmer" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.12, 0.08, 0.04, 0.48)
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -520.0
+offset_top = -340.0
+offset_right = 520.0
+offset_bottom = 340.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("MainPanel")
+
+[node name="TitleBack" type="Panel" parent="Panel"]
+layout_mode = 0
+offset_left = 320.0
+offset_top = -16.0
+offset_right = 720.0
+offset_bottom = 58.0
+theme_override_styles/panel = SubResource("TitlePanel")
+
+[node name="Title" type="Label" parent="Panel/TitleBack"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "功法技能"
+label_settings = ExtResource("6_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="TextureButton" parent="Panel"]
+unique_name_in_owner = true
+script = ExtResource("11_press")
+layout_mode = 0
+offset_left = 980.0
+offset_top = -15.0
+offset_right = 1054.0
+offset_bottom = 59.0
+texture_normal = ExtResource("3_close")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="MethodsCard" type="Panel" parent="Panel"]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 76.0
+offset_right = 512.0
+offset_bottom = 590.0
+theme_override_styles/panel = SubResource("InsetPanel")
+
+[node name="Heading" type="Label" parent="Panel/MethodsCard"]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 12.0
+offset_right = 472.0
+offset_bottom = 44.0
+text = "已掌握功法"
+label_settings = ExtResource("7_h2")
+horizontal_alignment = 1
+
+[node name="MethodCountLabel" type="Label" parent="Panel/MethodsCard"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 22.0
+offset_top = 48.0
+offset_right = 464.0
+offset_bottom = 74.0
+text = "已掌握 0 门"
+label_settings = ExtResource("9_small")
+horizontal_alignment = 1
+
+[node name="MethodsScroll" type="ScrollContainer" parent="Panel/MethodsCard"]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 86.0
+offset_right = 472.0
+offset_bottom = 492.0
+horizontal_scroll_mode = 0
+
+[node name="MethodsContainer" type="VBoxContainer" parent="Panel/MethodsCard/MethodsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 7
+
+[node name="SkillsCard" type="Panel" parent="Panel"]
+layout_mode = 0
+offset_left = 528.0
+offset_top = 76.0
+offset_right = 1014.0
+offset_bottom = 590.0
+theme_override_styles/panel = SubResource("InsetPanel")
+
+[node name="Heading" type="Label" parent="Panel/SkillsCard"]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 12.0
+offset_right = 472.0
+offset_bottom = 44.0
+text = "已掌握技能"
+label_settings = ExtResource("7_h2")
+horizontal_alignment = 1
+
+[node name="SkillCountLabel" type="Label" parent="Panel/SkillsCard"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 22.0
+offset_top = 48.0
+offset_right = 464.0
+offset_bottom = 74.0
+text = "已掌握 0 个"
+label_settings = ExtResource("9_small")
+horizontal_alignment = 1
+
+[node name="SkillsScroll" type="ScrollContainer" parent="Panel/SkillsCard"]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 86.0
+offset_right = 472.0
+offset_bottom = 492.0
+horizontal_scroll_mode = 0
+
+[node name="SkillsContainer" type="VBoxContainer" parent="Panel/SkillsCard/SkillsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 7
+
+[node name="Footer" type="Panel" parent="Panel"]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 606.0
+offset_right = 1014.0
+offset_bottom = 664.0
+theme_override_styles/panel = SubResource("FooterPanel")
+
+[node name="Hint" type="Label" parent="Panel/Footer"]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 10.0
+offset_right = 678.0
+offset_bottom = 48.0
+text = "这里展示已经研读掌握的功法与技能；战斗槽位仍在配置面板中调整。"
+label_settings = ExtResource("8_body")
+vertical_alignment = 1
+
+[node name="ConfigureButton" type="TextureButton" parent="Panel/Footer"]
+unique_name_in_owner = true
+script = ExtResource("11_press")
+layout_mode = 0
+offset_left = 760.0
+offset_top = 0.0
+offset_right = 970.0
+offset_bottom = 58.0
+texture_normal = ExtResource("5_blue")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="Panel/Footer/ConfigureButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "前往配置"
+label_settings = ExtResource("7_h2")
+horizontal_alignment = 1
+vertical_alignment = 1

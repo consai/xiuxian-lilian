@@ -33,6 +33,7 @@ var acting_enemy_slot: int = -1
 var formation_columns: int = DEFAULT_FORMATION_COLUMNS
 var formation_rows: int = DEFAULT_FORMATION_ROWS
 var active_columns: int = DEFAULT_ACTIVE_COLUMNS
+var formation_rank_size: int = 0
 var formation_mode: String = FORMATION_MODE_COLUMNS
 var enemy_formation_slots: Array = []
 var enemy_reserve_indices: Array = []
@@ -681,6 +682,7 @@ func _apply_formation_config(cfg: Dictionary) -> void:
 	formation_columns = clampi(int(cfg.get("columns", DEFAULT_FORMATION_COLUMNS)), 1, 6)
 	formation_rows = clampi(int(cfg.get("rows", DEFAULT_FORMATION_ROWS)), 1, 8)
 	active_columns = clampi(int(cfg.get("active_columns", DEFAULT_ACTIVE_COLUMNS)), 1, formation_columns)
+	formation_rank_size = clampi(int(cfg.get("rank_size", 0)), 0, formation_rows)
 	enemy_waves = _normalize_enemy_waves(cfg.get("waves", []))
 	active_wave_index = 0
 	if formation_mode == FORMATION_MODE_WAVES and enemy_waves.is_empty():
@@ -728,6 +730,13 @@ func _rebuild_formation_slots() -> void:
 		enemy_formation_slots.append(-1)
 	if formation_mode == FORMATION_MODE_WAVES:
 		_rebuild_wave_formation_slots()
+		return
+	if formation_rank_size > 0:
+		var ordered_slots := _rank_limited_slot_order()
+		for i in mini(ordered_slots.size(), enemies.size()):
+			enemy_formation_slots[int(ordered_slots[i])] = i
+		for i in range(ordered_slots.size(), enemies.size()):
+			enemy_reserve_indices.append(i)
 		return
 	if formation_rows == DEFAULT_FORMATION_ROWS and enemies.size() <= formation_rows:
 		var centered_rows := _centered_row_order()
@@ -907,6 +916,17 @@ func _centered_row_order() -> Array:
 	return out
 
 
+func _rank_limited_slot_order() -> Array:
+	var out: Array = []
+	var rows := _centered_row_order()
+	var per_row := clampi(formation_rank_size, 1, formation_columns)
+	for row_v in rows:
+		var row := int(row_v)
+		for col in mini(per_row, formation_columns):
+			out.append(_slot_index(col, row))
+	return out
+
+
 func _active_row_order() -> Array:
 	if formation_rows == DEFAULT_FORMATION_ROWS:
 		return _centered_row_order()
@@ -954,6 +974,7 @@ func get_formation_snapshot() -> Dictionary:
 		"columns": formation_columns,
 		"rows": formation_rows,
 		"active_columns": active_columns,
+		"rank_size": formation_rank_size,
 		"mode": formation_mode,
 		"current_wave": active_wave_index,
 		"slots": slots,

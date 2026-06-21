@@ -13,6 +13,8 @@
 [ext_resource type="PackedScene" path="res://scenes/expedition/expedition_log_panel.tscn" id="15_log_panel"]
 [ext_resource type="PackedScene" uid="uid://bx04spldnbiyv" path="res://scenes/items/item.tscn" id="16_item"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="17_auto"]
+
 [sub_resource type="StyleBoxFlat" id="PanelMain"]
 bg_color = Color(1, 0.945, 0.835, 0.985)
 border_width_left = 5
@@ -296,6 +298,7 @@ modulate = Color(0.82, 0.62, 0.62, 1)
 
 [node name="LogButton" type="Button" parent="Dialog/DetailCard" unique_id=2147483646]
 unique_name_in_owner = true
+script = ExtResource("17_auto")
 layout_mode = 0
 offset_left = 140.0
 offset_top = 384.0
@@ -309,6 +312,7 @@ theme_override_styles/normal = SubResource("ReturnNormal")
 theme_override_styles/pressed = SubResource("ReturnHover")
 theme_override_styles/hover = SubResource("ReturnHover")
 text = "查看历练记录"
+
 
 [node name="RulePanel" type="Panel" parent="Dialog" unique_id=407967364]
 layout_mode = 0
@@ -334,6 +338,7 @@ vertical_alignment = 1
 
 [node name="ReturnButton" type="Button" parent="Dialog" unique_id=1053941849]
 unique_name_in_owner = true
+script = ExtResource("17_auto")
 layout_mode = 0
 offset_left = 365.0
 offset_top = 596.0
@@ -358,3 +363,4 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+

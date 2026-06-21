@@ -6,6 +6,8 @@
 [ext_resource type="FontFile" uid="uid://btkp4vukwqrul" path="res://assets/art/AlimamaDaoLiTi.ttf" id="4_font"]
 [ext_resource type="Script" path="res://scripts/ui/components/long_press_scroll_container.gd" id="5_lpsc"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="6_auto"]
+
 [sub_resource type="StyleBoxFlat" id="PanelMain"]
 bg_color = Color(1, 0.945, 0.835, 0.985)
 border_width_left = 5
@@ -155,6 +157,7 @@ scroll_active = false
 
 [node name="CloseButton" type="Button" parent="Dialog"]
 unique_name_in_owner = true
+script = ExtResource("6_auto")
 layout_mode = 0
 offset_left = 300.0
 offset_top = 504.0
@@ -168,3 +171,4 @@ theme_override_styles/normal = SubResource("CloseNormal")
 theme_override_styles/pressed = SubResource("CloseHover")
 theme_override_styles/hover = SubResource("CloseHover")
 text = "关闭"
+

@@ -7,6 +7,8 @@
 [ext_resource type="Script" path="res://scripts/ui/loadout_selection_popup.gd" id="5_script"]
 [ext_resource type="Script" path="res://scripts/ui/components/long_press_scroll_container.gd" id="6_lpsc"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="7_auto"]
+
 [sub_resource type="StyleBoxFlat" id="MainPanel"]
 bg_color = Color(1, 0.945, 0.835, 0.995)
 border_width_left = 5
@@ -102,6 +104,7 @@ vertical_alignment = 1
 
 [node name="CloseButton" type="TextureButton" parent="Panel"]
 unique_name_in_owner = true
+script = ExtResource("7_auto")
 layout_mode = 0
 offset_left = 658.0
 offset_top = -17.0
@@ -110,6 +113,7 @@ offset_bottom = 57.0
 texture_normal = ExtResource("2_close")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="Filters" type="HBoxContainer" parent="Panel"]
 unique_name_in_owner = true

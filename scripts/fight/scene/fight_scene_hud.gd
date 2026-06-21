@@ -241,9 +241,12 @@ func _apply_enemy_slot_node(ctx: FightSceneContext, node: Node2D, slot: Dictiona
 	var enemy_index := int(slot.get("enemy_index", -1))
 	var unit := ctx.domain._enemy_at(enemy_index)
 	var row_data: Dictionary = {}
+	# 敌人信息
 	if enemy_index >= 0 and enemy_index < ctx.battle_enemy_rows.size() and ctx.battle_enemy_rows[enemy_index] is Dictionary:
+		#
 		row_data = ctx.battle_enemy_rows[enemy_index] as Dictionary
 	var intent_row := _resolve_enemy_intent_row(ctx, enemy_index) if active and not dead else {}
+	# 应用敌人信息
 	if node.has_method("apply_slot"):
 		node.call("apply_slot", row_data, unit, intent_row, active, dead)
 	var actor_id := str(slot.get("actor_id", ""))
@@ -252,6 +255,7 @@ func _apply_enemy_slot_node(ctx: FightSceneContext, node: Node2D, slot: Dictiona
 		_enemy_actor_nodes[actor_id] = actor_node
 		if _refs.vfx != null:
 			_ensure_vfx_actor(actor_id, actor_node)
+	# 当前敌人
 	if bool(slot.get("current", false)):
 		_enemy_actor_nodes[FightSceneContext.UNIT_ENEMY] = actor_node
 		if _refs.vfx != null:

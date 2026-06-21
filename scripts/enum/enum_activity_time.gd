@@ -10,6 +10,7 @@ enum Type {
 	INSIGHT,
 	SKILL_BASIC,
 	SKILL_ADVANCED,
+	SELF_STUDY,
 	ALCHEMY,
 	CRAFTING,
 	BREAKTHROUGH,
@@ -23,6 +24,7 @@ const LABEL_TRAVEL_LONG := "travel_long"
 const LABEL_INSIGHT := "insight"
 const LABEL_SKILL_BASIC := "skill_basic"
 const LABEL_SKILL_ADVANCED := "skill_advanced"
+const LABEL_SELF_STUDY := "self_study"
 const LABEL_ALCHEMY := "alchemy"
 const LABEL_CRAFTING := "crafting"
 const LABEL_BREAKTHROUGH := "breakthrough"
@@ -44,6 +46,8 @@ static func label(type: Type) -> String:
 			return LABEL_SKILL_BASIC
 		Type.SKILL_ADVANCED:
 			return LABEL_SKILL_ADVANCED
+		Type.SELF_STUDY:
+			return LABEL_SELF_STUDY
 		Type.ALCHEMY:
 			return LABEL_ALCHEMY
 		Type.CRAFTING:
@@ -70,6 +74,8 @@ static func display_name(activity_id: String) -> String:
 			return "学习普通技能"
 		LABEL_SKILL_ADVANCED:
 			return "学习高级技能"
+		LABEL_SELF_STUDY:
+			return "自主研读"
 		LABEL_ALCHEMY:
 			return "炼丹"
 		LABEL_CRAFTING:

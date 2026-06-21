@@ -3,9 +3,11 @@ extends SceneTree
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
+const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
 const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
+const KnowledgeEffectServiceScript := preload("res://scripts/dao/knowledge_effect_service.gd")
 const BreakthroughServiceScript := preload("res://scripts/sim/breakthrough_service.gd")
 const AlchemyServiceScript := preload("res://scripts/sim/alchemy_service.gd")
 const PlayerAutoBattleServiceScript := preload("res://scripts/sim/player_auto_battle_service.gd")
@@ -23,7 +25,9 @@ func _run_all() -> void:
 	_run("new game and daily activities", _test_new_game_and_daily_activities)
 	_run("breakthrough preview survives knowledge gate", _test_breakthrough_preview_with_knowledge_gate)
 	_run("foundations derive combat attributes", _test_foundations_derive_combat_attributes)
+	_run("knowledge effects feed derived attributes", _test_knowledge_effects_feed_attrs)
 	_run("cultivation methods gate growth and apply effects", _test_cultivation_methods)
+	_run("main cultivation method can be replaced and passively practices", _test_main_method_replacement_and_passive_practice)
 	_run("cultivation sessions support focus and duration", _test_cultivation_sessions)
 	_run("pill cultivation preview reports missing and selected pills", _test_pill_cultivation_preview)
 	_run("pill cultivation accelerates growth and combat presses instability", _test_pill_cultivation_and_instability)
@@ -123,6 +127,24 @@ func _grant_foundation_knowledge_gate(state: Node) -> void:
 	state.grant_knowledge("foundation.breathing", 5)
 
 
+func _test_main_method_replacement_and_passive_practice() -> void:
+	var state := _state()
+	var replacement_id := "method.basic_breathing.1"
+	state.unlocked_methods.append(replacement_id)
+	var equip_result: Dictionary = state.equip_method("main", replacement_id)
+	_expect_true(bool(equip_result.get("ok", false)), "replace main cultivation method")
+	_expect_eq(
+		str(state.cultivation_method_slots.get("main", "")),
+		replacement_id,
+		"main method slot replaced"
+	)
+	var store := root.get_node("DataStore")
+	var mastery_before := CultivationMethodServiceScript.method_mastery(store.savedata, replacement_id)
+	state.rest()
+	var mastery_after := CultivationMethodServiceScript.method_mastery(store.savedata, replacement_id)
+	_expect_gt(mastery_after, mastery_before, "resting day passively practices current method")
+
+
 func _test_breakthrough_preview_with_knowledge_gate() -> void:
 	var state := _state()
 	state.realm_index = 8
@@ -154,6 +176,39 @@ func _test_foundations_derive_combat_attributes() -> void:
 	_expect_near(FightAttr.get_attr(attrs, FightAttr.PHYSICAL_DEF), 20.0, "derived physical defense")
 	_expect_near(FightAttr.get_attr(attrs, FightAttr.MAGIC_DEF), 24.0, "derived magic defense")
 	_expect_near(FightAttr.get_attr(attrs, FightAttr.SPD), 100.0, "derived action speed")
+
+
+func _test_knowledge_effects_feed_attrs() -> void:
+	var state := _state()
+	var rows := [
+		{
+			"skillId": "foundation.breathing",
+			"level": 2,
+			"effectId": "max_mana",
+			"base": 9.0,
+			"operation": "add_flat",
+			"stackGroup": "test_refresh_mana",
+			"stackPolicy": "add_capped",
+			"cap": 99.0,
+		},
+	]
+	KnowledgeEffectServiceScript.replace_effects_for_tests(rows)
+	var mods := KnowledgeEffectServiceScript.resolve_modifiers(state.to_dict(), rows)
+	_expect_true((mods.get("flat", {}) as Dictionary).is_empty(), "knowledge effect inactive below full level")
+	state.grant_knowledge("foundation.breathing", 2)
+	KnowledgeEffectServiceScript.reload()
+	state.refresh_derived_attrs(true)
+	var without_config := FightAttr.get_attr(state.attrs, FightAttr.MP_MAX)
+	KnowledgeEffectServiceScript.replace_effects_for_tests(rows)
+	state.refresh_derived_attrs(true)
+	_expect_near(
+		FightAttr.get_attr(state.attrs, FightAttr.MP_MAX),
+		without_config + 9.0,
+		"knowledge effect feeds GameState derived attrs"
+	)
+	KnowledgeEffectServiceScript.reload()
+	state.refresh_derived_attrs(true)
+	_expect_near(FightAttr.get_attr(state.attrs, FightAttr.MP_MAX), without_config, "empty production knowledge config is safe")
 
 
 func _test_cultivation_methods() -> void:

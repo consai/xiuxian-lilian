@@ -23,6 +23,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/loadout_selection_popup.tscn" id="21_popup"]
 [ext_resource type="PackedScene" path="res://scenes/ui/loadout_bag_popup.tscn" id="22_bag_popup"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="23_auto"]
+
 [sub_resource type="StyleBoxFlat" id="MainPanel"]
 bg_color = Color(1, 0.945, 0.835, 0.985)
 border_width_left = 5
@@ -142,6 +144,7 @@ vertical_alignment = 1
 
 [node name="CloseButton" type="TextureButton" parent="Panel" unique_id=1656777434]
 unique_name_in_owner = true
+script = ExtResource("23_auto")
 layout_mode = 0
 offset_left = 1060.0
 offset_top = -16.0
@@ -150,6 +153,7 @@ offset_bottom = 56.0
 texture_normal = ExtResource("3_close")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="MethodsCard" type="Panel" parent="Panel" unique_id=1475931300]
 layout_mode = 0
@@ -486,6 +490,7 @@ vertical_alignment = 1
 
 [node name="FightsetButton" type="TextureButton" parent="Panel/Footer" unique_id=2084296045]
 unique_name_in_owner = true
+script = ExtResource("23_auto")
 layout_mode = 0
 offset_left = 640.0
 offset_top = 5.0
@@ -494,6 +499,7 @@ offset_bottom = 63.0
 texture_normal = ExtResource("4_strategy")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="Label" type="Label" parent="Panel/Footer/FightsetButton" unique_id=2084296046]
 layout_mode = 1
@@ -509,6 +515,7 @@ vertical_alignment = 1
 
 [node name="SaveButton" type="TextureButton" parent="Panel/Footer" unique_id=684280729]
 unique_name_in_owner = true
+script = ExtResource("23_auto")
 layout_mode = 0
 offset_left = 850.0
 offset_top = 5.0
@@ -517,6 +524,7 @@ offset_bottom = 63.0
 texture_normal = ExtResource("4_save")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="Label" type="Label" parent="Panel/Footer/SaveButton" unique_id=443154215]
 layout_mode = 1

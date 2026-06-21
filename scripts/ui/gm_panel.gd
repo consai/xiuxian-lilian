@@ -16,10 +16,13 @@ extends Control
 ## - 日数：无独立「跳日」玩法 API，GM 直接改 day 仅用于测试时间轴
 
 const SIM_PATH := "res://data/simulation.yaml"
+const GmBattleBuilderScript := preload("res://scripts/ui/gm_battle_builder.gd")
 
 @onready var _status_label: Label = %StatusLabel
 @onready var _message_label: Label = %MessageLabel
 @onready var _location_option: OptionButton = %LocationOption
+@onready var _monster_option: OptionButton = %MonsterOption
+@onready var _enemy_count_input: SpinBox = %EnemyCountInput
 @onready var _close_button: TextureButton = %CloseButton
 
 
@@ -28,6 +31,7 @@ func _ready() -> void:
 	_close_button.pressed.connect(_on_close_pressed)
 	_connect_buttons()
 	_build_location_options()
+	_build_monster_options()
 
 
 func refresh() -> void:
@@ -55,6 +59,7 @@ func _connect_buttons() -> void:
 	%StartExpeditionButton.pressed.connect(_start_expedition)
 	%ForceSettleButton.pressed.connect(_force_settle_expedition)
 	%ResetExpeditionButton.pressed.connect(_reset_expedition)
+	%StartGmBattleButton.pressed.connect(_start_gm_battle)
 	%NewGameButton.pressed.connect(_new_game)
 	if has_node("%DaoKnowledgeButton"):
 		%DaoKnowledgeButton.pressed.connect(_grant_dao_knowledge)
@@ -72,6 +77,38 @@ func _build_location_options() -> void:
 		_location_option.set_item_metadata(_location_option.item_count - 1, location_id)
 	if _location_option.item_count > 0:
 		_location_option.select(0)
+
+
+func _build_monster_options() -> void:
+	_monster_option.clear()
+	var rows: Array = []
+	for monster_id_v in ConfigManager.all_monster_ids():
+		var monster_id := str(monster_id_v)
+		var monster := ConfigManager.monster_by_id(monster_id)
+		if monster.is_empty():
+			continue
+		rows.append({
+			"id": monster_id,
+			"name": str(monster.get("name", monster_id)),
+			"species": str(monster.get("species", "")),
+		})
+	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return str(a.get("name", "")) < str(b.get("name", ""))
+	)
+	for row_v in rows:
+		var row := row_v as Dictionary
+		var monster_id := str(row.get("id", ""))
+		var species := str(row.get("species", ""))
+		var label := "%s · %s" % [str(row.get("name", monster_id)), monster_id]
+		if species != "":
+			label += " · " + species
+		_monster_option.add_item(label, _monster_option.item_count)
+		_monster_option.set_item_metadata(_monster_option.item_count - 1, monster_id)
+	if _monster_option.item_count > 0:
+		_monster_option.select(0)
+	_enemy_count_input.min_value = 1
+	_enemy_count_input.max_value = 8
+	_enemy_count_input.value = 1
 
 
 func _bind_status() -> void:
@@ -243,6 +280,31 @@ func _reset_expedition() -> void:
 		return
 	ExpeditionState.reset()
 	_flash("历练状态已重置")
+
+
+func _start_gm_battle() -> void:
+	if ExpeditionState.active:
+		_flash("历练中不能创建 GM 战斗，请先结算或重置历练")
+		return
+	if _monster_option.item_count <= 0:
+		_flash("没有可用敌人配置")
+		return
+	var monster_id := str(_monster_option.get_item_metadata(_monster_option.selected))
+	var count := int(_enemy_count_input.value)
+	var battle_data := _build_gm_battle_init(monster_id, count)
+	if battle_data.is_empty():
+		_flash("创建战斗失败：敌人配置无效")
+		return
+	var errors := BattleInitData.collect_errors(battle_data)
+	if not errors.is_empty():
+		_flash("创建战斗失败：%s" % errors[0])
+		return
+	visible = false
+	_navigate(SceneManager.go_fight(battle_data, "gm_panel"), "无法进入 GM 战斗")
+
+
+func _build_gm_battle_init(monster_id: String, count: int) -> Dictionary:
+	return GmBattleBuilderScript.build(monster_id, count, GameState, ConfigManager)
 
 
 func _new_game() -> void:

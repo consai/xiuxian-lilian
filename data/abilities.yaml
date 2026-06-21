@@ -21,6 +21,26 @@ rules:
   combatActivePolicy: "cast_from_combat_skill_slot"
   generalPassiveStackPolicy: "highest"
   effectCatalogConfigId: "effect_catalog"
+  targetSelectionPolicy:
+    defaultSingleTarget: "current_selectable_enemy"
+    lowestHpPolicy: "current_selectable_enemy_only"
+    backlinePolicy: "protected_by_frontline_no_direct_target"
+    exposedPolicy: "backline_can_be_targeted_only_when_exposed_or_frontline_cleared"
+    areaPolicy: "area_line_pierce_splash_domain_may_affect_backline_indirectly"
+  specialActionControlPolicy:
+    realtimeCastingTarget: false
+    priorityTarget: "current_selectable_high_threat_enemy"
+    sealPolicy: "delay_or_seal_next_special_action"
+    triggerField: "hasPriorityEnemy"
+  learningKnowledgeGatePolicy:
+    ordinaryRarities:
+      - "common"
+      - "uncommon"
+    ordinaryPolicy: "realm_only_no_knowledge_requirements"
+    specialPolicy: "rare_or_above_may_require_knowledge"
+    maxKnowledgeRequirements: 2
+    maxRequirementLevel: 2
+    note: "知识仍可参与 knowledgeScaling 成长，但普通技能学习不被知识卡住。"
 abilities:
   - id: "ability.combat.qi_bolt"
     name: "御气弹"
@@ -31,6 +51,7 @@ abilities:
     tags:
       - "spell"
       - "ranged"
+      - "filler"
     knowledgeScaling:
       formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
       bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
@@ -62,12 +83,13 @@ abilities:
         scalingMode: "positive"
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "spell.projectile"
-          level: 1
-        - skillId: "foundation.control"
-          level: 1
-    trigger: {}
+      knowledge: []
+    trigger:
+      recommendedWhen:
+        role: "filler"
+        enemyCountGte: 1
+        hasPriorityEnemy: false
+        playerHpLte: null
     upgrade_options: []
     evolution_conditions: []
   - id: "ability.combat.wind_step"
@@ -78,6 +100,7 @@ abilities:
     description: "流风步"
     tags:
       - "mobility"
+      - "defense"
     knowledgeScaling:
       formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
       bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
@@ -119,12 +142,13 @@ abilities:
         clampMax: 0.6
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "spell.escape"
-          level: 1
-        - skillId: "cultivation.cycle"
-          level: 1
-    trigger: {}
+      knowledge: []
+    trigger:
+      recommendedWhen:
+        role: "defense"
+        enemyCountGte: 3
+        hasPriorityEnemy: false
+        playerHpLte: 0.45
     upgrade_options: []
     evolution_conditions: []
   - id: "ability.combat.sword_qi"
@@ -136,6 +160,7 @@ abilities:
     tags:
       - "sword"
       - "ranged"
+      - "execute"
     knowledgeScaling:
       formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
       bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
@@ -147,7 +172,7 @@ abilities:
           requiredLevel: 2
           scalingWeight: 1
     combat:
-      target: "enemy"
+      target: "enemy_lowest_hp"
       castTime: 0.8
       cooldown: 4
       costs:
@@ -161,7 +186,7 @@ abilities:
         base: 55
         knowledgeGrowth: 22
         operation: "add_flat"
-        target: "enemy"
+        target: "enemy_lowest_hp"
         stackGroup: "damage_sword"
         stackPolicy: "ability_instance"
         scalingMode: "positive"
@@ -169,7 +194,7 @@ abilities:
         base: 0.08
         knowledgeGrowth: 0.04
         operation: "add_percent"
-        target: "enemy"
+        target: "enemy_lowest_hp"
         stackGroup: "armor_pierce"
         stackPolicy: "ability_instance"
         scalingMode: "positive"
@@ -177,12 +202,14 @@ abilities:
         clampMax: 0.7
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "sword.qi"
-          level: 1
-        - skillId: "sword.weapon"
-          level: 2
-    trigger: {}
+      knowledge: []
+    trigger:
+      recommendedWhen:
+        role: "execute"
+        enemyCountGte: 1
+        hasPriorityEnemy: false
+        targetHpLte: 0.35
+        playerHpLte: null
     upgrade_options: []
     evolution_conditions: []
   - id: "ability.combat.blood_strike"
@@ -194,6 +221,7 @@ abilities:
     tags:
       - "body"
       - "melee"
+      - "control"
     knowledgeScaling:
       formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
       bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
@@ -205,7 +233,7 @@ abilities:
           requiredLevel: 2
           scalingWeight: 1
     combat:
-      target: "enemy"
+      target: "enemy_front"
       castTime: 0.8
       cooldown: 6
       costs:
@@ -219,7 +247,7 @@ abilities:
         base: 75
         knowledgeGrowth: 28
         operation: "add_flat"
-        target: "enemy"
+        target: "enemy_front"
         stackGroup: "damage_physical"
         stackPolicy: "ability_instance"
         scalingMode: "positive"
@@ -227,7 +255,7 @@ abilities:
         base: 0.15
         knowledgeGrowth: 0.06
         operation: "add_percent"
-        target: "enemy"
+        target: "enemy_front"
         stackGroup: "stagger_power"
         stackPolicy: "ability_instance"
         scalingMode: "positive"
@@ -235,12 +263,13 @@ abilities:
         clampMax: 1
     learningRequirements:
       realm: "foundation"
-      knowledge:
-        - skillId: "body.bone"
-          level: 2
-        - skillId: "body.recovery"
-          level: 2
-    trigger: {}
+      knowledge: []
+    trigger:
+      recommendedWhen:
+        role: "frontline_control"
+        enemyCountGte: 1
+        hasPriorityEnemy: false
+        playerHpLte: null
     upgrade_options: []
     evolution_conditions: []
   - id: "ability.combat.five_phase_burst"
@@ -252,6 +281,7 @@ abilities:
     tags:
       - "spell"
       - "area"
+      - "wave_clear"
     knowledgeScaling:
       formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
       bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
@@ -263,7 +293,7 @@ abilities:
           requiredLevel: 3
           scalingWeight: 1
     combat:
-      target: "area"
+      target: "enemies_all"
       castTime: 1.2
       cooldown: 10
       costs:
@@ -277,7 +307,7 @@ abilities:
         base: 95
         knowledgeGrowth: 34
         operation: "add_flat"
-        target: "area"
+        target: "enemies_all"
         stackGroup: "damage_elemental"
         stackPolicy: "ability_instance"
         scalingMode: "positive"
@@ -285,7 +315,7 @@ abilities:
         base: 0.1
         knowledgeGrowth: 0.04
         operation: "add_percent"
-        target: "area"
+        target: "enemies_all"
         stackGroup: "elemental_vulnerability"
         stackPolicy: "ability_instance"
         scalingMode: "positive"
@@ -297,8 +327,13 @@ abilities:
         - skillId: "spell.five_phase"
           level: 2
         - skillId: "spell.elements"
-          level: 3
-    trigger: {}
+          level: 2
+    trigger:
+      recommendedWhen:
+        role: "area"
+        enemyCountGte: 3
+        hasPriorityEnemy: false
+        playerHpLte: null
     upgrade_options: []
     evolution_conditions: []
   - id: "ability.combat.seal_bind"
@@ -310,6 +345,7 @@ abilities:
     tags:
       - "talisman"
       - "control"
+      - "seal"
     knowledgeScaling:
       formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
       bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
@@ -321,7 +357,7 @@ abilities:
           requiredLevel: 2
           scalingWeight: 1
     combat:
-      target: "enemy"
+      target: "enemy_priority"
       castTime: 1.1
       cooldown: 14
       costs:
@@ -335,7 +371,7 @@ abilities:
         base: 2
         knowledgeGrowth: 0.5
         operation: "add_flat"
-        target: "enemy"
+        target: "enemy_priority"
         stackGroup: "control_duration"
         stackPolicy: "ability_instance"
         scalingMode: "positive"
@@ -343,7 +379,7 @@ abilities:
         base: 0.12
         knowledgeGrowth: 0.05
         operation: "add_percent"
-        target: "enemy"
+        target: "enemy_priority"
         stackGroup: "spirit_suppression"
         stackPolicy: "ability_instance"
         scalingMode: "positive"
@@ -356,7 +392,12 @@ abilities:
           level: 2
         - skillId: "spirit.sense"
           level: 2
-    trigger: {}
+    trigger:
+      recommendedWhen:
+        role: "seal"
+        enemyCountGte: 1
+        hasPriorityEnemy: true
+        playerHpLte: null
     upgrade_options: []
     evolution_conditions: []
   - id: "ability.combat.thunder_judgment"
@@ -474,8 +515,6 @@ abilities:
           level: 2
         - skillId: "formation.array"
           level: 2
-        - skillId: "spirit.sense"
-          level: 3
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -517,12 +556,12 @@ abilities:
         stackGroup: "damage_spirit"
         stackPolicy: "ability_instance"
         scalingMode: "positive"
-      - effectId: "cast_interrupt_chance"
+      - effectId: "delay_special_action_chance"
         base: 0.2
         knowledgeGrowth: 0.06
         operation: "add_percent"
         target: "area"
-        stackGroup: "cast_interrupt_chance"
+        stackGroup: "delay_special_action_chance"
         stackPolicy: "ability_instance"
         scalingMode: "positive"
         clampMin: 0
@@ -645,7 +684,7 @@ abilities:
         - skillId: "spirit.dream"
           level: 2
         - skillId: "spirit.inner_demon"
-          level: 3
+          level: 2
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -825,8 +864,6 @@ abilities:
         - skillId: "spell.law"
           level: 2
         - skillId: "talisman.command"
-          level: 3
-        - skillId: "heaven.law_seed"
           level: 2
     trigger: {}
     upgrade_options: []
@@ -887,11 +924,9 @@ abilities:
       realm: "tribulation"
       knowledge:
         - skillId: "sword.heaven_cut"
-          level: 3
+          level: 2
         - skillId: "sword.dao"
-          level: 4
-        - skillId: "heaven.law_mastery"
-          level: 3
+          level: 2
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -951,11 +986,9 @@ abilities:
       realm: "tribulation"
       knowledge:
         - skillId: "spell.cataclysm"
-          level: 3
+          level: 2
         - skillId: "heaven.tribulation"
-          level: 3
-        - skillId: "spell.world"
-          level: 3
+          level: 2
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -997,11 +1030,7 @@ abilities:
         clampMax: 0.6
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "body.bone"
-          level: 1
-        - skillId: "body.tempering"
-          level: 2
+      knowledge: []
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1159,7 +1188,7 @@ abilities:
         - skillId: "body.regeneration"
           level: 2
         - skillId: "body.recovery"
-          level: 4
+          level: 2
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1215,7 +1244,7 @@ abilities:
         - skillId: "sword.unity"
           level: 2
         - skillId: "artifact.life_bound"
-          level: 3
+          level: 2
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1269,9 +1298,9 @@ abilities:
       realm: "great"
       knowledge:
         - skillId: "spirit.dao_heart"
-          level: 3
+          level: 2
         - skillId: "heaven.causality"
-          level: 3
+          level: 2
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1325,9 +1354,9 @@ abilities:
       realm: "tribulation"
       knowledge:
         - skillId: "body.tribulation_body"
-          level: 3
+          level: 2
         - skillId: "heaven.thunder_body"
-          level: 4
+          level: 2
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1431,12 +1460,12 @@ abilities:
         scalingMode: "positive"
         clampMin: 0
         clampMax: 2
-      - effectId: "enemy_cast_slow"
+      - effectId: "enemy_special_action_slow"
         base: 0.18
         knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "area"
-        stackGroup: "enemy_cast_slow"
+        stackGroup: "enemy_special_action_slow"
         stackPolicy: "ability_instance"
         scalingMode: "magnitude"
         clampMin: -1
@@ -1447,7 +1476,7 @@ abilities:
         - skillId: "spell.domain"
           level: 2
         - skillId: "spell.thunder"
-          level: 4
+          level: 2
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1507,7 +1536,7 @@ abilities:
         - skillId: "body.dharma_form"
           level: 2
         - skillId: "body.jade"
-          level: 4
+          level: 2
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1567,7 +1596,7 @@ abilities:
         - skillId: "spirit.primordial"
           level: 2
         - skillId: "spirit.split"
-          level: 3
+          level: 2
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1627,7 +1656,7 @@ abilities:
         - skillId: "heaven.law_mastery"
           level: 2
         - skillId: "spell.law"
-          level: 3
+          level: 2
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1662,11 +1691,7 @@ abilities:
         clampMax: 2
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "cultivation.qi_sense"
-          level: 1
-        - skillId: "foundation.breathing"
-          level: 2
+      knowledge: []
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1698,9 +1723,7 @@ abilities:
         clampMax: 2
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "foundation.meridians"
-          level: 1
+      knowledge: []
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1735,11 +1758,7 @@ abilities:
         clampMax: 2
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "world.appraisal"
-          level: 1
-        - skillId: "foundation.literacy"
-          level: 2
+      knowledge: []
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1774,11 +1793,7 @@ abilities:
         clampMax: 2
     learningRequirements:
       realm: "qi"
-      knowledge:
-        - skillId: "alchemy.herbs"
-          level: 1
-        - skillId: "world.gathering"
-          level: 1
+      knowledge: []
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1823,11 +1838,7 @@ abilities:
         clampMax: 2
     learningRequirements:
       realm: "foundation"
-      knowledge:
-        - skillId: "artifact.smelting"
-          level: 2
-        - skillId: "artifact.materials"
-          level: 3
+      knowledge: []
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1872,11 +1883,7 @@ abilities:
         clampMax: 2
     learningRequirements:
       realm: "foundation"
-      knowledge:
-        - skillId: "alchemy.furnace"
-          level: 2
-        - skillId: "alchemy.herbs"
-          level: 3
+      knowledge: []
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1921,11 +1928,7 @@ abilities:
         clampMax: 2
     learningRequirements:
       realm: "foundation"
-      knowledge:
-        - skillId: "formation.array"
-          level: 2
-        - skillId: "formation.runes"
-          level: 3
+      knowledge: []
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -1970,11 +1973,7 @@ abilities:
         clampMax: 2
     learningRequirements:
       realm: "foundation"
-      knowledge:
-        - skillId: "talisman.script"
-          level: 3
-        - skillId: "talisman.activation"
-          level: 3
+      knowledge: []
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -2017,11 +2016,7 @@ abilities:
         scalingMode: "positive"
     learningRequirements:
       realm: "foundation"
-      knowledge:
-        - skillId: "world.beast"
-          level: 2
-        - skillId: "talisman.seal"
-          level: 2
+      knowledge: []
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -2070,7 +2065,7 @@ abilities:
         - skillId: "world.geomancy"
           level: 2
         - skillId: "formation.array"
-          level: 3
+          level: 2
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -2168,7 +2163,7 @@ abilities:
         - skillId: "world.civilization"
           level: 2
         - skillId: "world.trade"
-          level: 4
+          level: 2
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -2215,9 +2210,9 @@ abilities:
       realm: "tribulation"
       knowledge:
         - skillId: "heaven.tribulation"
-          level: 3
+          level: 2
         - skillId: "heaven.astrology"
-          level: 4
+          level: 2
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -2280,8 +2275,6 @@ abilities:
           level: 2
         - skillId: "spirit.split"
           level: 2
-        - skillId: "sword.qi"
-          level: 4
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -2399,11 +2392,9 @@ abilities:
       realm: "great"
       knowledge:
         - skillId: "sword.dao"
-          level: 3
-        - skillId: "spell.world"
           level: 2
         - skillId: "heaven.dao_fruit"
-          level: 3
+          level: 2
     trigger: {}
     upgrade_options: []
     evolution_conditions: []
@@ -2463,10 +2454,8 @@ abilities:
       realm: "great"
       knowledge:
         - skillId: "spell.world"
-          level: 3
+          level: 2
         - skillId: "formation.cave_heaven"
-          level: 3
-        - skillId: "heaven.law_mastery"
           level: 2
     trigger: {}
     upgrade_options: []

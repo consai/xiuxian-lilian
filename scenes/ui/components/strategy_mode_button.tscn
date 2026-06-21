@@ -1,6 +1,8 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="2_auto"]
+
 [sub_resource type="StyleBoxFlat" id="Active"]
 bg_color = Color(0.62, 0.72, 0.43, 1)
 border_width_left = 2
@@ -24,6 +26,7 @@ corner_radius_top_right = 14
 corner_radius_bottom_right = 14
 corner_radius_bottom_left = 14
 [node name="StrategyModeButton" type="Button"]
+script = ExtResource("2_auto")
 custom_minimum_size = Vector2(104, 42)
 theme = ExtResource("1_theme")
 theme_override_styles/disabled = SubResource("Active")
@@ -31,3 +34,4 @@ theme_override_styles/normal = SubResource("Idle")
 theme_override_styles/hover = SubResource("Active")
 theme_override_styles/pressed = SubResource("Active")
 text = "策略"
+

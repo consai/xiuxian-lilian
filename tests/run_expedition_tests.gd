@@ -535,6 +535,11 @@ func _test_elite_and_boss_nodes_always_resolve_battle() -> void:
 		_expect_eq(str(result.get("mode", "")), "battle", "%s node falls back to battle candidate" % forced_type)
 		var init_data: Dictionary = expedition.build_battle_init()
 		_expect_true(BattleInitData.collect_errors(init_data).is_empty(), "%s fallback battle init is valid" % forced_type)
+		var formation := init_data.get("enemy_formation", {}) as Dictionary
+		if forced_type == "boss":
+			_expect_eq(int(formation.get("rank_size", 0)), 1, "boss battle places one enemy per rank")
+		else:
+			_expect_eq(int(formation.get("rank_size", 0)), 2, "elite battle places two enemies per rank")
 
 
 func _test_high_difficulty_battle_nodes_generate_map_enemies() -> void:
@@ -562,8 +567,10 @@ func _test_high_difficulty_battle_nodes_generate_map_enemies() -> void:
 		_expect_eq(int(formation.get("active_columns", 0)), 1, "%s generated battle only activates front column" % forced_type)
 		if forced_type == "battle":
 			_expect_eq(enemies.size(), 4, "difficulty six normal battle generates group size from difficulty")
+			_expect_eq(int(formation.get("rank_size", 0)), 0, "normal battle fills a full front rank")
 		else:
 			_expect_eq(enemies.size(), 3, "difficulty six elite battle generates elite group size from difficulty")
+			_expect_eq(int(formation.get("rank_size", 0)), 2, "elite battle places two enemies per rank")
 		_expect_true(not enemies.is_empty(), "%s generated battle has enemies" % forced_type)
 		if not enemies.is_empty():
 			var enemy := enemies[0] as Dictionary

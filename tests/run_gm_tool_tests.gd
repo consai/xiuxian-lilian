@@ -1,6 +1,7 @@
 extends SceneTree
 
 const GmItemGrantPanelScene := preload("res://scenes/ui/gm_item_grant_panel.tscn")
+const GmBattleBuilderScript := preload("res://scripts/ui/gm_battle_builder.gd")
 const GmItemSearchScript := preload("res://scripts/ui/gm_item_search.gd")
 
 var _failures: Array[String] = []
@@ -15,6 +16,7 @@ func _run_all() -> void:
 	_run("gm item search handles chinese and english", _test_search_handles_chinese_and_english)
 	_run("gm grant panel includes equips first", _test_grant_panel_includes_equips_first)
 	_run("gm grant equip writes owned equips", _test_grant_equip_writes_owned_equips)
+	_run("gm battle builder supports enemy kind and count", _test_battle_builder_enemy_kind_and_count)
 	if _failures.is_empty():
 		print("PASS: %d gm tool tests" % _tests_run)
 		quit(0)
@@ -69,6 +71,31 @@ func _test_grant_equip_writes_owned_equips() -> void:
 	_expect_true(ok, "grant equip succeeds")
 	_expect_true((state.owned_equips as Array).has(5001), "owned_equips receives equip id")
 	panel.queue_free()
+
+
+func _test_battle_builder_enemy_kind_and_count() -> void:
+	var state := root.get_node("GameState")
+	state.new_game()
+	var init_data: Dictionary = GmBattleBuilderScript.build(
+		"qinglan_wolf",
+		3,
+		state,
+		root.get_node("ConfigManager")
+	)
+	_expect_true(not init_data.is_empty(), "gm battle init built")
+	_expect_eq((init_data.get("enemies", []) as Array).size(), 3, "gm battle enemy count")
+	_expect_eq(str(((init_data.get("enemies", []) as Array)[0] as Dictionary).get("name", "")), "青牙狼·1", "gm battle enemy kind")
+	var errors := BattleInitData.collect_errors(init_data)
+	_expect_true(errors.is_empty(), "gm battle init valid: %s" % str(errors))
+
+	var boss_init: Dictionary = GmBattleBuilderScript.build(
+		"qinglan_boss",
+		3,
+		state,
+		root.get_node("ConfigManager")
+	)
+	_expect_eq(int((boss_init.get("enemy_formation", {}) as Dictionary).get("rank_size", 0)), 1, "gm boss battle places one boss per rank")
+	_expect_eq(str((boss_init.get("enemy_formation", {}) as Dictionary).get("mode", "")), "columns", "gm boss battle uses column formation")
 
 
 func _new_panel() -> Control:

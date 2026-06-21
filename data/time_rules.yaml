@@ -20,6 +20,7 @@ activity_base_days:
   travel_mid: 15
   travel_long: 90
   insight: 100
+  self_study: 7
   skill_basic: 30
   skill_advanced: 180
   alchemy: 7

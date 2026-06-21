@@ -10,9 +10,9 @@ const _SHIELD_ICON := preload("res://assets/art/ui_new/hudun_icon.png")
 @onready var _intent_icon: TextureRect = %IntentIcon
 @onready var _intent_damage: Label = %IntentDamage
 @onready var _intent_hover: HoverTipSource = %IntentHover
-@onready var sprite: Sprite2D = $Sprite
-@onready var hp_bar: ProgressBar = $HpBar
-@onready var name_label: Label = $Name
+@onready var sprite: Sprite2D = %Sprite
+@onready var hp_bar: ProgressBar = %HpBar
+@onready var name_label: Label = %Name
 @onready var _buff_status: BuffStatusBar = %BuffStatusBar
 
 

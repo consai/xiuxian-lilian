@@ -11,6 +11,8 @@
 [ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="12_small"]
 [ext_resource type="PackedScene" uid="uid://bi634vsmiednp" path="res://scenes/ui/alchemy_batch_popup.tscn" id="13_batch_popup"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="14_auto"]
+
 [sub_resource type="StyleBoxFlat" id="Style_chip"]
 bg_color = Color(1, 0.952941, 0.847059, 0.96)
 border_width_left = 3
@@ -119,6 +121,7 @@ vertical_alignment = 1
 
 [node name="CloseButton" type="TextureButton" parent="." unique_id=1495146172]
 unique_name_in_owner = true
+script = ExtResource("14_auto")
 layout_mode = 0
 offset_left = 1187.0
 offset_top = 16.0
@@ -127,6 +130,7 @@ offset_bottom = 84.0
 texture_normal = ExtResource("8_close")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="RecipePanel" type="PanelContainer" parent="." unique_id=1373006282]
 layout_mode = 0
@@ -351,6 +355,7 @@ autowrap_mode = 2
 
 [node name="BrewButton" type="Button" parent="." unique_id=132595461]
 unique_name_in_owner = true
+script = ExtResource("14_auto")
 layout_mode = 0
 offset_left = 501.0
 offset_top = 607.0
@@ -365,3 +370,4 @@ text = "开炉炼制"
 [node name="BatchPopup" parent="." unique_id=97140122 instance=ExtResource("13_batch_popup")]
 unique_name_in_owner = true
 layout_mode = 1
+

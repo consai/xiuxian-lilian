@@ -14,6 +14,9 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/components/cultivation_primary_button.tscn" id="19_primary"]
 [ext_resource type="PackedScene" uid="uid://bx04spldnbiyv" path="res://scenes/items/item.tscn" id="20_item"]
 [ext_resource type="PackedScene" uid="uid://dgqc00b7e6pfa" path="res://scenes/ui/loadout_bag_popup.tscn" id="21_pill_picker"]
+[ext_resource type="PackedScene" path="res://scenes/ui/loadout_selection_popup.tscn" id="23_method_picker"]
+
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="22_auto"]
 
 [sub_resource type="StyleBoxFlat" id="Style_float_card"]
 content_margin_left = 18.0
@@ -211,6 +214,7 @@ vertical_alignment = 1
 
 [node name="CloseButton" type="TextureButton" parent="." unique_id=114442987]
 unique_name_in_owner = true
+script = ExtResource("22_auto")
 layout_mode = 0
 offset_left = 1184.0
 offset_top = 17.0
@@ -219,6 +223,7 @@ offset_bottom = 83.0
 texture_normal = ExtResource("6_close")
 ignore_texture_size = true
 stretch_mode = 5
+
 
 [node name="MeditationAura" type="Panel" parent="." unique_id=44545731]
 layout_mode = 0
@@ -271,6 +276,14 @@ layout_mode = 2
 text = "混元归一经"
 label_settings = ExtResource("16_head")
 horizontal_alignment = 1
+
+[node name="MethodChangeButton" type="Button" parent="MethodPanel/MethodContent"]
+unique_name_in_owner = true
+script = ExtResource("22_auto")
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "更换主修功法"
 
 [node name="MasteryLabel" type="Label" parent="MethodPanel/MethodContent" unique_id=1532461028]
 unique_name_in_owner = true
@@ -358,10 +371,12 @@ value = 1.0
 
 [node name="DayMaxButton" type="Button" parent="PlanPanel/PlanContent/DaySelectRow/SliderRow"]
 unique_name_in_owner = true
+script = ExtResource("22_auto")
 custom_minimum_size = Vector2(64, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "最大"
+
 
 [node name="Divider" type="HSeparator" parent="PlanPanel/PlanContent" unique_id=1958102969]
 layout_mode = 2
@@ -538,6 +553,12 @@ visible = false
 layout_mode = 1
 mouse_filter = 2
 
+[node name="MethodPicker" parent="." instance=ExtResource("23_method_picker")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+mouse_filter = 2
+
 [node name="StartButton" parent="." unique_id=1772438226 instance=ExtResource("19_primary")]
 unique_name_in_owner = true
 layout_mode = 0
@@ -547,6 +568,7 @@ offset_right = 799.0
 offset_bottom = 772.0
 
 [editable path="PlanPanel/PlanContent/PillSelectRow/Choice/PillSlot"]
+[editable path="MethodPicker"]
 [editable path="ModePanel/ModeContent/ModeButtons/CycleButton"]
 [editable path="ModePanel/ModeContent/ModeButtons/InsightButton"]
 [editable path="ModePanel/ModeContent/ModeButtons/BreathingButton"]

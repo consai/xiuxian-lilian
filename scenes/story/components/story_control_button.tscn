@@ -2,6 +2,8 @@
 
 [ext_resource type="Theme" path="res://ui/theme_tuhuang.tres" id="1_theme"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="2_auto"]
+
 [sub_resource type="StyleBoxFlat" id="Style_normal"]
 bg_color = Color(1, 0.94902, 0.85098, 0.96)
 border_width_left = 3
@@ -27,6 +29,7 @@ corner_radius_bottom_right = 17
 corner_radius_bottom_left = 17
 
 [node name="StoryControlButton" type="Button"]
+script = ExtResource("2_auto")
 custom_minimum_size = Vector2(98, 56)
 theme = ExtResource("1_theme")
 theme_override_colors/font_color = Color(0.2, 0.12549, 0.0705882, 1)
@@ -37,3 +40,4 @@ theme_override_styles/normal = SubResource("Style_normal")
 theme_override_styles/hover = SubResource("Style_hover")
 theme_override_styles/pressed = SubResource("Style_hover")
 text = "自动"
+

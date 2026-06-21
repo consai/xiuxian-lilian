@@ -32,6 +32,7 @@ func _init() -> void:
 	_run("enemy formation defaults to five rows and centers small groups", _test_enemy_formation_centers_small_groups)
 	_run("enemy formation only advances active column", _test_enemy_formation_only_advances_active_column)
 	_run("enemy formation compacts rows and reserves", _test_enemy_formation_compacts_rows_and_reserves)
+	_run("enemy formation supports limited rank size", _test_enemy_formation_limited_rank_size)
 	_run("enemy wave formation advances after current row dies", _test_enemy_wave_formation_advances_after_current_row_dies)
 	_run("cultivation method restores mp every two seconds", _test_method_mp_recovery)
 	_run("skill damage supports pierce and vulnerability", _test_pierce_and_vulnerability)
@@ -402,6 +403,51 @@ func _test_enemy_formation_compacts_rows_and_reserves() -> void:
 	_expect_eq(int((slots[8] as Dictionary).get("enemy_index", -1)), 12, "reserve should fill row 0 back slot")
 	_expect_true(domain.enemy == enemies[4], "legacy enemy pointer should follow new front target")
 	_expect_near(float(domain.interval_elapsed_enemies[4]), 0.0, "replacement keeps own progress")
+
+
+func _test_enemy_formation_limited_rank_size() -> void:
+	var player := _make_unit(100.0, 100.0)
+	var enemies: Array = []
+	for i in 5:
+		enemies.append(_make_unit(100.0, 100.0))
+	var domain := BattleDomainServiceScript.new()
+	domain.start_battle_many(player, enemies, {}, 200.0, {}, {}, {
+		"columns": 3,
+		"rows": 5,
+		"active_columns": 1,
+		"rank_size": 2,
+	})
+	var formation := domain.get_formation_snapshot()
+	_expect_eq(int(formation.get("rank_size", 0)), 2, "formation should expose rank size")
+	var slots := formation.get("slots", []) as Array
+	_expect_eq(int((slots[2] as Dictionary).get("enemy_index", -1)), 0, "first rank center slot")
+	_expect_eq(int((slots[7] as Dictionary).get("enemy_index", -1)), 1, "first rank second slot")
+	_expect_eq(int((slots[1] as Dictionary).get("enemy_index", -1)), 2, "second rank center slot")
+	_expect_eq(int((slots[6] as Dictionary).get("enemy_index", -1)), 3, "second rank second slot")
+	_expect_eq(int((slots[3] as Dictionary).get("enemy_index", -1)), 4, "third rank center slot")
+	_expect_true(bool((slots[12] as Dictionary).get("empty", false)), "third column center slot stays empty")
+
+	(enemies[0] as FightObj).change_hp(-999.0)
+	_expect_eq(domain.check_end_after_resolve(), "", "battle should continue after first limited-rank enemy dies")
+	var compacted := domain.get_formation_snapshot().get("slots", []) as Array
+	_expect_eq(int((compacted[2] as Dictionary).get("enemy_index", -1)), 1, "same row moves forward from second slot")
+	_expect_true(bool((compacted[7] as Dictionary).get("empty", false)), "same row second slot becomes empty")
+
+	var boss_enemies: Array = []
+	for i in 3:
+		boss_enemies.append(_make_unit(100.0, 100.0))
+	var boss_domain := BattleDomainServiceScript.new()
+	boss_domain.start_battle_many(player, boss_enemies, {}, 200.0, {}, {}, {
+		"columns": 3,
+		"rows": 5,
+		"active_columns": 1,
+		"rank_size": 1,
+	})
+	var boss_slots := boss_domain.get_formation_snapshot().get("slots", []) as Array
+	_expect_eq(int((boss_slots[2] as Dictionary).get("enemy_index", -1)), 0, "first boss center row")
+	_expect_eq(int((boss_slots[1] as Dictionary).get("enemy_index", -1)), 1, "second boss uses another row")
+	_expect_eq(int((boss_slots[3] as Dictionary).get("enemy_index", -1)), 2, "third boss uses another row")
+	_expect_true(bool((boss_slots[7] as Dictionary).get("empty", false)), "bosses do not share center row")
 
 
 func _test_enemy_wave_formation_advances_after_current_row_dies() -> void:

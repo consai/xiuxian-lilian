@@ -6,6 +6,8 @@
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="21_title"]
 [ext_resource type="Script" path="res://scripts/ui/backpack_panel.gd" id="22_script"]
 
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="23_auto"]
+
 [sub_resource type="StyleBoxFlat" id="TitlePanel"]
 bg_color = Color(0.91, 0.72, 0.48, 0.98)
 border_width_left = 3
@@ -82,6 +84,7 @@ vertical_alignment = 1
 
 [node name="CloseButton" type="TextureButton" parent="."]
 unique_name_in_owner = true
+script = ExtResource("23_auto")
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -99,3 +102,4 @@ ignore_texture_size = true
 stretch_mode = 5
 
 [editable path="BagBase"]
+

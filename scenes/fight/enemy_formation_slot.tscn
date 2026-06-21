@@ -27,6 +27,7 @@ corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
 [node name="EnemyFormationSlot" type="Node2D" unique_id=356159525]
+y_sort_enabled = true
 script = ExtResource("1_slot")
 
 [node name="IntentBadge" type="Control" parent="." unique_id=-2147483636]
@@ -70,10 +71,12 @@ unique_name_in_owner = true
 script = ExtResource("5_hover")
 
 [node name="Sprite" type="Sprite2D" parent="." unique_id=1112236993]
+unique_name_in_owner = true
 position = Vector2(0, -18)
 scale = Vector2(0.52, 0.52)
 
 [node name="HpBar" type="ProgressBar" parent="." unique_id=572268535]
+unique_name_in_owner = true
 offset_left = -31.0
 offset_top = 59.0
 offset_right = 31.0
@@ -84,6 +87,7 @@ value = 26.93
 show_percentage = false
 
 [node name="Name" type="Label" parent="." unique_id=792346274]
+unique_name_in_owner = true
 offset_left = -44.0
 offset_top = 69.0
 offset_right = 44.0

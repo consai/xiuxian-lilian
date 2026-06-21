@@ -5,6 +5,10 @@
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="5_body"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="6_banner_text"]
 
+[ext_resource type="Script" path="res://scripts/ui/components/long_press_scroll_container.gd" id="7_auto"]
+
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="8_auto"]
+
 [sub_resource type="StyleBoxFlat" id="Style_parchment"]
 bg_color = Color(1, 0.941176, 0.803922, 0.96)
 border_width_left = 3
@@ -60,8 +64,10 @@ grow_vertical = 2
 theme_override_styles/panel = SubResource("Style_parchment")
 
 [node name="HistoryScroll" type="ScrollContainer" parent="Panel"]
+script = ExtResource("7_auto")
 layout_mode = 2
 horizontal_scroll_mode = 0
+
 
 [node name="Entries" type="VBoxContainer" parent="Panel/HistoryScroll"]
 unique_name_in_owner = true
@@ -118,6 +124,7 @@ vertical_alignment = 1
 
 [node name="CloseButton" type="TextureButton" parent="."]
 unique_name_in_owner = true
+script = ExtResource("8_auto")
 layout_mode = 0
 offset_left = 650.0
 offset_top = 12.0
@@ -126,4 +133,5 @@ offset_bottom = 70.0
 texture_normal = ExtResource("4_close")
 ignore_texture_size = true
 stretch_mode = 5
+
 

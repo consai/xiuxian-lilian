@@ -1,0 +1,258 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/knowledge_study_panel.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_theme"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="3_title"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="4_head"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="5_text"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="6_small"]
+
+[sub_resource type="StyleBoxFlat" id="Style_panel"]
+content_margin_left = 18.0
+content_margin_top = 18.0
+content_margin_right = 18.0
+content_margin_bottom = 18.0
+bg_color = Color(1, 0.941176, 0.803922, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 0.92)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="Style_banner"]
+bg_color = Color(1, 0.890196, 0.690196, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25098, 0.160784, 0.0901961, 0.95)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="Style_progress_fill"]
+bg_color = Color(0.639216, 0.698039, 0.411765, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="KnowledgeStudyPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.41, 0.31, 0.2, 1)
+
+[node name="HeaderBanner" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 360.0
+offset_top = 18.0
+offset_right = -360.0
+offset_bottom = 88.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("Style_banner")
+
+[node name="Title" type="Label" parent="HeaderBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "自 主 研 读"
+label_settings = ExtResource("3_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlayerCard" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 18.0
+offset_right = 292.0
+offset_bottom = 88.0
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="PlayerLabel" type="Label" parent="PlayerCard"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "清风剑仙 · 炼气一层"
+label_settings = ExtResource("5_text")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DayCard" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -292.0
+offset_top = 18.0
+offset_right = -96.0
+offset_bottom = 88.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="DayLabel" type="Label" parent="DayCard"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "第1年1月1日"
+label_settings = ExtResource("5_text")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -82.0
+offset_top = 26.0
+offset_right = -20.0
+offset_bottom = 78.0
+grow_horizontal = 0
+text = "×"
+
+[node name="Main" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+offset_top = 112.0
+offset_right = -28.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 18
+
+[node name="ListPanel" type="PanelContainer" parent="Main"]
+custom_minimum_size = Vector2(390, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="ListBox" type="VBoxContainer" parent="Main/ListPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ListTitle" type="Label" parent="Main/ListPanel/ListBox"]
+layout_mode = 2
+text = "可研读知识"
+label_settings = ExtResource("4_head")
+
+[node name="SkillList" type="ItemList" parent="Main/ListPanel/ListBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+allow_reselect = true
+
+[node name="EmptyLabel" type="Label" parent="Main/ListPanel/ListBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "暂无可自主学习的知识"
+label_settings = ExtResource("5_text")
+autowrap_mode = 3
+
+[node name="DetailPanel" type="PanelContainer" parent="Main"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="DetailBox" type="VBoxContainer" parent="Main/DetailPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="NameLabel" type="Label" parent="Main/DetailPanel/DetailBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "知识名称"
+label_settings = ExtResource("4_head")
+
+[node name="DescriptionLabel" type="Label" parent="Main/DetailPanel/DetailBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "说明"
+label_settings = ExtResource("5_text")
+autowrap_mode = 3
+
+[node name="StateLabel" type="Label" parent="Main/DetailPanel/DetailBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "状态"
+label_settings = ExtResource("6_small")
+
+[node name="Progress" type="ProgressBar" parent="Main/DetailPanel/DetailBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+max_value = 100.0
+theme_override_styles/fill = SubResource("Style_progress_fill")
+show_percentage = false
+
+[node name="PreviewLabel" type="Label" parent="Main/DetailPanel/DetailBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "选择知识后显示预计收益"
+label_settings = ExtResource("5_text")
+autowrap_mode = 3
+
+[node name="DayRow" type="HBoxContainer" parent="Main/DetailPanel/DetailBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DayCountLabel" type="Label" parent="Main/DetailPanel/DetailBox/DayRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+text = "研读 1日"
+label_settings = ExtResource("5_text")
+
+[node name="DaySlider" type="HSlider" parent="Main/DetailPanel/DetailBox/DayRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 7.0
+value = 1.0
+rounded = true
+
+[node name="MaxButton" type="Button" parent="Main/DetailPanel/DetailBox/DayRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(84, 42)
+layout_mode = 2
+text = "最长"
+
+[node name="StartButton" type="Button" parent="Main/DetailPanel/DetailBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "开始研读"
+
+[node name="ResultLabel" type="Label" parent="Main/DetailPanel/DetailBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+label_settings = ExtResource("5_text")
+autowrap_mode = 3

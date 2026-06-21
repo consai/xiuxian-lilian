@@ -1,0 +1,8 @@
+schemaVersion: 1
+configId: knowledge_effects
+rules:
+  levelPolicy: cumulative_per_learned_level
+  supportedOperations:
+    - add_flat
+    - add_percent
+effects: []
