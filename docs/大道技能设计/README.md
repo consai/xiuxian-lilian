@@ -8,6 +8,7 @@
 - [功法体系设计规格](docs/功法体系.md)
 - [技能 JSON 配置](config/abilities.json)
 - [技能体系设计规格](docs/技能体系.md)
+- [1v5 多波战斗技能设计](docs/1v5多波战斗技能设计.md)
 - [统一效果属性目录](config/effect_catalog.json)
 - [一致性校验器](scripts/validate-dao-tree.mjs)
 
