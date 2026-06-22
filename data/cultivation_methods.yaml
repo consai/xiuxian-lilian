@@ -64,15 +64,15 @@ rules:
       mergePolicy: "current_method_only"
       note: "高层功法只激活当前层效果，旧层效果需切回旧功法或由当前层显式重申。"
   learningKnowledgeGatePolicy:
-    ordinaryRarities:
-      - "common"
-      - "uncommon"
+    ordinaryQualities:
+      - 1
+      - 2
     ordinaryPolicy: "realm_only_no_knowledge_requirements"
     firstLayerPolicy: "realm_only_no_knowledge_requirements"
-    specialPolicy: "rare_or_above_tier_2_plus_may_require_knowledge"
+    specialPolicy: "quality_3_or_above_tier_2_plus_may_require_knowledge"
     maxKnowledgeRequirements: 2
     maxRequirementLevel: 2
-    note: "知识仍决定功法效果反哺和可修上限；学习普通功法不被知识卡住。"
+    note: "知识仍决定功法效果反哺和可修上限；学习下品与中品功法不被知识卡住。"
 effectDefinitions:
   activation: "active_method"
   defaultOperation: "add_percent"
@@ -87,7 +87,7 @@ families:
   - id: "method.hunyuan"
     name: "混元归一经"
     role: "通用周天与稳健突破"
-    rarity: "rare"
+    quality: 3
     methodIds:
       - "method.hunyuan.1"
       - "method.hunyuan.2"
@@ -101,7 +101,7 @@ families:
   - id: "method.changsheng"
     name: "青木长生诀"
     role: "恢复、丹医与生命造化"
-    rarity: "rare"
+    quality: 3
     methodIds:
       - "method.changsheng.1"
       - "method.changsheng.2"
@@ -115,7 +115,7 @@ families:
   - id: "method.taixu_sword"
     name: "太虚剑典"
     role: "御剑、剑域与破法杀伐"
-    rarity: "epic"
+    quality: 4
     methodIds:
       - "method.taixu_sword.1"
       - "method.taixu_sword.2"
@@ -129,7 +129,7 @@ families:
   - id: "method.vajra"
     name: "金刚不灭身"
     role: "炼体、生存与正面承伤"
-    rarity: "rare"
+    quality: 3
     methodIds:
       - "method.vajra.1"
       - "method.vajra.2"
@@ -143,7 +143,7 @@ families:
   - id: "method.taiyin"
     name: "太阴炼神录"
     role: "神魂、心防与咒法"
-    rarity: "epic"
+    quality: 4
     methodIds:
       - "method.taiyin.1"
       - "method.taiyin.2"
@@ -157,7 +157,7 @@ families:
   - id: "method.leihuo"
     name: "赤霄雷火典"
     role: "五行雷法与爆发神通"
-    rarity: "epic"
+    quality: 4
     methodIds:
       - "method.leihuo.1"
       - "method.leihuo.2"
@@ -171,7 +171,7 @@ families:
   - id: "method.zhoutian_craft"
     name: "周天阵器录"
     role: "阵法、炼器与洞天工程"
-    rarity: "rare"
+    quality: 3
     methodIds:
       - "method.zhoutian_craft.1"
       - "method.zhoutian_craft.2"
@@ -185,7 +185,7 @@ families:
   - id: "method.wanxiang"
     name: "万象御灵经"
     role: "探索、御兽与世界经营"
-    rarity: "uncommon"
+    quality: 2
     methodIds:
       - "method.wanxiang.1"
       - "method.wanxiang.2"
@@ -199,7 +199,7 @@ families:
   - id: "method.jiuji"
     name: "九劫飞升录"
     role: "劫数推演与终局飞升"
-    rarity: "legendary"
+    quality: 4
     methodIds:
       - "method.jiuji.1"
       - "method.jiuji.2"
@@ -209,90 +209,90 @@ families:
   - id: "method.basic_breathing"
     name: "基础吐纳诀"
     role: "单知识入门与快速补课"
-    rarity: "common"
+    quality: 1
     methodIds:
       - "method.basic_breathing.1"
   - id: "method.small_cycle"
     name: "小周天行气法"
     role: "单知识入门与快速补课"
-    rarity: "common"
+    quality: 1
     methodIds:
       - "method.small_cycle.1"
   - id: "method.iron_skin"
     name: "铁衣功"
     role: "单知识入门与快速补课"
-    rarity: "common"
+    quality: 1
     methodIds:
       - "method.iron_skin.1"
   - id: "method.clear_mind"
     name: "清心定念法"
     role: "单知识入门与快速补课"
-    rarity: "common"
+    quality: 1
     methodIds:
       - "method.clear_mind.1"
   - id: "method.sword_control"
     name: "御剑诀"
     role: "单知识入门与快速补课"
-    rarity: "common"
+    quality: 1
     methodIds:
       - "method.sword_control.1"
   - id: "method.herb_manual"
     name: "百草采炼录"
     role: "单知识入门与快速补课"
-    rarity: "common"
+    quality: 1
     methodIds:
       - "method.herb_manual.1"
   - id: "method.rune_manual"
     name: "基础阵纹册"
     role: "单知识入门与快速补课"
-    rarity: "common"
+    quality: 1
     methodIds:
       - "method.rune_manual.1"
   - id: "method.appraisal_manual"
     name: "万物鉴识篇"
     role: "单知识入门与快速补课"
-    rarity: "common"
+    quality: 1
     methodIds:
       - "method.appraisal_manual.1"
   - id: "method.blood_burst"
     name: "燃血断脉术"
     role: "旁门爆发，以伤换攻"
-    rarity: "uncommon"
+    quality: 2
     methodIds:
       - "method.blood_burst.1"
     progressionType: "side_path"
   - id: "method.escape_art"
     name: "浮光掠影诀"
     role: "专精遁法与脱离"
-    rarity: "uncommon"
+    quality: 2
     methodIds:
       - "method.escape_art.1"
     progressionType: "side_path"
   - id: "method.poison_codex"
     name: "百毒真经"
     role: "毒理、炼毒与解毒"
-    rarity: "uncommon"
+    quality: 2
     methodIds:
       - "method.poison_codex.1"
     progressionType: "side_path"
   - id: "method.fate_gaze"
     name: "望气寻机篇"
     role: "趋吉避凶与天机探索"
-    rarity: "uncommon"
+    quality: 2
     methodIds:
       - "method.fate_gaze.1"
     progressionType: "side_path"
   - id: "method.talisman_archive"
     name: "万符归藏录"
     role: "符箓储备与快速激发"
-    rarity: "uncommon"
+    quality: 2
     methodIds:
       - "method.talisman_archive.1"
     progressionType: "side_path"
   - id: "method.heavy_sword"
     name: "无锋重剑诀"
     role: "低阶高专精重剑流派"
-    rarity: "uncommon"
+    quality: 2
     methodIds:
       - "method.heavy_sword.1"
     progressionType: "side_path"
@@ -302,7 +302,7 @@ methods:
     familyId: "method.hunyuan"
     tier: 1
     realm: "qi"
-    rarity: "rare"
+    quality: 3
     predecessorId: null
     nextMethodId: "method.hunyuan.2"
     description: "调和吐纳与小周天，根基平稳。"
@@ -386,7 +386,7 @@ methods:
     familyId: "method.hunyuan"
     tier: 2
     realm: "foundation"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.hunyuan.1"
     nextMethodId: "method.hunyuan.3"
     description: "以混元真气筑成兼容性道基。"
@@ -476,7 +476,7 @@ methods:
     familyId: "method.hunyuan"
     tier: 3
     realm: "core"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.hunyuan.2"
     nextMethodId: "method.hunyuan.4"
     description: "凝练无属性偏向的混元金丹。"
@@ -566,7 +566,7 @@ methods:
     familyId: "method.hunyuan"
     tier: 4
     realm: "nascent"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.hunyuan.3"
     nextMethodId: "method.hunyuan.5"
     description: "令元婴与本体共享完整周天。"
@@ -656,7 +656,7 @@ methods:
     familyId: "method.hunyuan"
     tier: 5
     realm: "transform"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.hunyuan.4"
     nextMethodId: "method.hunyuan.6"
     description: "借天地灵机维持混元法相。"
@@ -747,7 +747,7 @@ methods:
     familyId: "method.hunyuan"
     tier: 6
     realm: "void"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.hunyuan.5"
     nextMethodId: "method.hunyuan.7"
     description: "以虚空为炉，转化异质力量。"
@@ -838,7 +838,7 @@ methods:
     familyId: "method.hunyuan"
     tier: 7
     realm: "merge"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.hunyuan.6"
     nextMethodId: "method.hunyuan.8"
     description: "精气神与法力循环归于一体。"
@@ -928,7 +928,7 @@ methods:
     familyId: "method.hunyuan"
     tier: 8
     realm: "great"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.hunyuan.7"
     nextMethodId: "method.hunyuan.9"
     description: "以混元道果统合所学。"
@@ -1019,7 +1019,7 @@ methods:
     familyId: "method.hunyuan"
     tier: 9
     realm: "tribulation"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.hunyuan.8"
     nextMethodId: null
     description: "转化劫力与仙灵之气，完成飞升。"
@@ -1110,7 +1110,7 @@ methods:
     familyId: "method.changsheng"
     tier: 1
     realm: "qi"
-    rarity: "rare"
+    quality: 3
     predecessorId: null
     nextMethodId: "method.changsheng.2"
     description: "以草木生机温养气血。"
@@ -1195,7 +1195,7 @@ methods:
     familyId: "method.changsheng"
     tier: 2
     realm: "foundation"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.changsheng.1"
     nextMethodId: "method.changsheng.3"
     description: "筑成生生不息的青木道基。"
@@ -1285,7 +1285,7 @@ methods:
     familyId: "method.changsheng"
     tier: 3
     realm: "core"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.changsheng.2"
     nextMethodId: "method.changsheng.4"
     description: "木丹滋养血肉与药性。"
@@ -1376,7 +1376,7 @@ methods:
     familyId: "method.changsheng"
     tier: 4
     realm: "nascent"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.changsheng.3"
     nextMethodId: "method.changsheng.5"
     description: "元婴蕴养魂魄，医治魂伤。"
@@ -1467,7 +1467,7 @@ methods:
     familyId: "method.changsheng"
     tier: 5
     realm: "transform"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.changsheng.4"
     nextMethodId: "method.changsheng.6"
     description: "法相化作生命领域。"
@@ -1558,7 +1558,7 @@ methods:
     familyId: "method.changsheng"
     tier: 6
     realm: "void"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.changsheng.5"
     nextMethodId: "method.changsheng.7"
     description: "在绝地与虚空中培育生机。"
@@ -1649,7 +1649,7 @@ methods:
     familyId: "method.changsheng"
     tier: 7
     realm: "merge"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.changsheng.6"
     nextMethodId: "method.changsheng.8"
     description: "将法则炼成延寿道丹。"
@@ -1739,7 +1739,7 @@ methods:
     familyId: "method.changsheng"
     tier: 8
     realm: "great"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.changsheng.7"
     nextMethodId: "method.changsheng.9"
     description: "逆转命数，护持一线生机。"
@@ -1830,7 +1830,7 @@ methods:
     familyId: "method.changsheng"
     tier: 9
     realm: "tribulation"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.changsheng.8"
     nextMethodId: null
     description: "炼成渡劫仙丹并借劫新生。"
@@ -1921,7 +1921,7 @@ methods:
     familyId: "method.taixu_sword"
     tier: 1
     realm: "qi"
-    rarity: "epic"
+    quality: 4
     predecessorId: null
     nextMethodId: "method.taixu_sword.2"
     description: "以灵力御剑并凝聚剑气。"
@@ -2006,7 +2006,7 @@ methods:
     familyId: "method.taixu_sword"
     tier: 2
     realm: "foundation"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taixu_sword.1"
     nextMethodId: "method.taixu_sword.3"
     description: "以兵意筑成锋锐道基。"
@@ -2097,7 +2097,7 @@ methods:
     familyId: "method.taixu_sword"
     tier: 3
     realm: "core"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taixu_sword.2"
     nextMethodId: "method.taixu_sword.4"
     description: "丹火蕴剑，一念成阵。"
@@ -2187,7 +2187,7 @@ methods:
     familyId: "method.taixu_sword"
     tier: 4
     realm: "nascent"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taixu_sword.3"
     nextMethodId: "method.taixu_sword.5"
     description: "剑心映照破绽，元婴驭剑千里。"
@@ -2278,7 +2278,7 @@ methods:
     familyId: "method.taixu_sword"
     tier: 5
     realm: "transform"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taixu_sword.4"
     nextMethodId: "method.taixu_sword.6"
     description: "展开剑域，压制万法。"
@@ -2369,7 +2369,7 @@ methods:
     familyId: "method.taixu_sword"
     tier: 6
     realm: "void"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taixu_sword.5"
     nextMethodId: "method.taixu_sword.7"
     description: "剑锋斩破虚实边界。"
@@ -2460,7 +2460,7 @@ methods:
     familyId: "method.taixu_sword"
     tier: 7
     realm: "merge"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taixu_sword.6"
     nextMethodId: "method.taixu_sword.8"
     description: "本命剑与修士合为一体。"
@@ -2551,7 +2551,7 @@ methods:
     familyId: "method.taixu_sword"
     tier: 8
     realm: "great"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taixu_sword.7"
     nextMethodId: "method.taixu_sword.9"
     description: "一剑承载完整兵道道果。"
@@ -2642,7 +2642,7 @@ methods:
     familyId: "method.taixu_sword"
     tier: 9
     realm: "tribulation"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taixu_sword.8"
     nextMethodId: null
     description: "开天一式斩破劫数。"
@@ -2733,7 +2733,7 @@ methods:
     familyId: "method.vajra"
     tier: 1
     realm: "qi"
-    rarity: "rare"
+    quality: 3
     predecessorId: null
     nextMethodId: "method.vajra.2"
     description: "锤炼皮肉筋骨。"
@@ -2817,7 +2817,7 @@ methods:
     familyId: "method.vajra"
     tier: 2
     realm: "foundation"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.vajra.1"
     nextMethodId: "method.vajra.3"
     description: "玉骨灵身承载灵力冲击。"
@@ -2907,7 +2907,7 @@ methods:
     familyId: "method.vajra"
     tier: 3
     realm: "core"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.vajra.2"
     nextMethodId: "method.vajra.4"
     description: "以金丹之力唤醒战体血脉。"
@@ -2997,7 +2997,7 @@ methods:
     familyId: "method.vajra"
     tier: 4
     realm: "nascent"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.vajra.3"
     nextMethodId: "method.vajra.5"
     description: "滴血重生，重创不倒。"
@@ -3088,7 +3088,7 @@ methods:
     familyId: "method.vajra"
     tier: 5
     realm: "transform"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.vajra.4"
     nextMethodId: "method.vajra.6"
     description: "法相真身撼动领域。"
@@ -3178,7 +3178,7 @@ methods:
     familyId: "method.vajra"
     tier: 6
     realm: "void"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.vajra.5"
     nextMethodId: "method.vajra.7"
     description: "虚空法体无惧撕裂。"
@@ -3268,7 +3268,7 @@ methods:
     familyId: "method.vajra"
     tier: 7
     realm: "merge"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.vajra.6"
     nextMethodId: "method.vajra.8"
     description: "精气神合一，力量毫无损耗。"
@@ -3359,7 +3359,7 @@ methods:
     familyId: "method.vajra"
     tier: 8
     realm: "great"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.vajra.7"
     nextMethodId: "method.vajra.9"
     description: "道果维系不灭道身。"
@@ -3449,7 +3449,7 @@ methods:
     familyId: "method.vajra"
     tier: 9
     realm: "tribulation"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.vajra.8"
     nextMethodId: null
     description: "以天劫完成最终淬体。"
@@ -3540,7 +3540,7 @@ methods:
     familyId: "method.taiyin"
     tier: 1
     realm: "qi"
-    rarity: "epic"
+    quality: 4
     predecessorId: null
     nextMethodId: "method.taiyin.2"
     description: "入定凝神，初生神识。"
@@ -3625,7 +3625,7 @@ methods:
     familyId: "method.taiyin"
     tier: 2
     realm: "foundation"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taiyin.1"
     nextMethodId: "method.taiyin.3"
     description: "辨识心魔并封守心神。"
@@ -3716,7 +3716,7 @@ methods:
     familyId: "method.taiyin"
     tier: 3
     realm: "core"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taiyin.2"
     nextMethodId: "method.taiyin.4"
     description: "固化魂魄，抵御夺舍与咒杀。"
@@ -3807,7 +3807,7 @@ methods:
     familyId: "method.taiyin"
     tier: 4
     realm: "nascent"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taiyin.3"
     nextMethodId: "method.taiyin.5"
     description: "分神化念，结成魂契。"
@@ -3897,7 +3897,7 @@ methods:
     familyId: "method.taiyin"
     tier: 5
     realm: "transform"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taiyin.4"
     nextMethodId: "method.taiyin.6"
     description: "元神出窍，行走梦界。"
@@ -3988,7 +3988,7 @@ methods:
     familyId: "method.taiyin"
     tier: 6
     realm: "void"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taiyin.5"
     nextMethodId: "method.taiyin.7"
     description: "一念跨越虚实，以真名锁敌。"
@@ -4079,7 +4079,7 @@ methods:
     familyId: "method.taiyin"
     tier: 7
     realm: "merge"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taiyin.6"
     nextMethodId: "method.taiyin.8"
     description: "万念归一并封锁因果。"
@@ -4170,7 +4170,7 @@ methods:
     familyId: "method.taiyin"
     tier: 8
     realm: "great"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taiyin.7"
     nextMethodId: "method.taiyin.9"
     description: "不坏道心代天敕命。"
@@ -4261,7 +4261,7 @@ methods:
     familyId: "method.taiyin"
     tier: 9
     realm: "tribulation"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.taiyin.8"
     nextMethodId: null
     description: "超脱心劫，重构劫后元神。"
@@ -4352,7 +4352,7 @@ methods:
     familyId: "method.leihuo"
     tier: 1
     realm: "qi"
-    rarity: "epic"
+    quality: 4
     predecessorId: null
     nextMethodId: "method.leihuo.2"
     description: "辨五行、御气成术。"
@@ -4437,7 +4437,7 @@ methods:
     familyId: "method.leihuo"
     tier: 2
     realm: "foundation"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.leihuo.1"
     nextMethodId: "method.leihuo.3"
     description: "五行轮转，火法筑基。"
@@ -4528,7 +4528,7 @@ methods:
     familyId: "method.leihuo"
     tier: 3
     realm: "core"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.leihuo.2"
     nextMethodId: "method.leihuo.4"
     description: "丹火化雷，爆发克邪。"
@@ -4618,7 +4618,7 @@ methods:
     familyId: "method.leihuo"
     tier: 4
     realm: "nascent"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.leihuo.3"
     nextMethodId: "method.leihuo.5"
     description: "借天地共鸣连续施法。"
@@ -4709,7 +4709,7 @@ methods:
     familyId: "method.leihuo"
     tier: 5
     realm: "transform"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.leihuo.4"
     nextMethodId: "method.leihuo.6"
     description: "展开赤霄雷火领域。"
@@ -4800,7 +4800,7 @@ methods:
     familyId: "method.leihuo"
     tier: 6
     realm: "void"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.leihuo.5"
     nextMethodId: "method.leihuo.7"
     description: "雷火穿越虚空锁定目标。"
@@ -4891,7 +4891,7 @@ methods:
     familyId: "method.leihuo"
     tier: 7
     realm: "merge"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.leihuo.6"
     nextMethodId: "method.leihuo.8"
     description: "言出法随，敕雷焚世。"
@@ -4982,7 +4982,7 @@ methods:
     familyId: "method.leihuo"
     tier: 8
     realm: "great"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.leihuo.7"
     nextMethodId: "method.leihuo.9"
     description: "掌中天地化作雷池火海。"
@@ -5073,7 +5073,7 @@ methods:
     familyId: "method.leihuo"
     tier: 9
     realm: "tribulation"
-    rarity: "epic"
+    quality: 4
     predecessorId: "method.leihuo.8"
     nextMethodId: null
     description: "引劫灭敌，并借雷火飞升。"
@@ -5164,7 +5164,7 @@ methods:
     familyId: "method.zhoutian_craft"
     tier: 1
     realm: "qi"
-    rarity: "rare"
+    quality: 3
     predecessorId: null
     nextMethodId: "method.zhoutian_craft.2"
     description: "读阵纹、辨灵材、制基础器具。"
@@ -5249,7 +5249,7 @@ methods:
     familyId: "method.zhoutian_craft"
     tier: 2
     realm: "foundation"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.zhoutian_craft.1"
     nextMethodId: "method.zhoutian_craft.3"
     description: "器纹与阵法互相承载。"
@@ -5340,7 +5340,7 @@ methods:
     familyId: "method.zhoutian_craft"
     tier: 3
     realm: "core"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.zhoutian_craft.2"
     nextMethodId: "method.zhoutian_craft.4"
     description: "炼制法宝与自主傀儡。"
@@ -5430,7 +5430,7 @@ methods:
     familyId: "method.zhoutian_craft"
     tier: 4
     realm: "nascent"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.zhoutian_craft.3"
     nextMethodId: "method.zhoutian_craft.5"
     description: "本命法宝与传送阵同调。"
@@ -5521,7 +5521,7 @@ methods:
     familyId: "method.zhoutian_craft"
     tier: 5
     realm: "transform"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.zhoutian_craft.4"
     nextMethodId: "method.zhoutian_craft.6"
     description: "孕育器灵并固化领域。"
@@ -5612,7 +5612,7 @@ methods:
     familyId: "method.zhoutian_craft"
     tier: 6
     realm: "void"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.zhoutian_craft.5"
     nextMethodId: "method.zhoutian_craft.7"
     description: "建造穿行虚空的飞舟。"
@@ -5703,7 +5703,7 @@ methods:
     familyId: "method.zhoutian_craft"
     tier: 7
     realm: "merge"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.zhoutian_craft.6"
     nextMethodId: "method.zhoutian_craft.8"
     description: "道器成为洞天的法则核心。"
@@ -5794,7 +5794,7 @@ methods:
     familyId: "method.zhoutian_craft"
     tier: 8
     realm: "great"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.zhoutian_craft.7"
     nextMethodId: "method.zhoutian_craft.9"
     description: "炼成世界重器并布周天星阵。"
@@ -5885,7 +5885,7 @@ methods:
     familyId: "method.zhoutian_craft"
     tier: 9
     realm: "tribulation"
-    rarity: "rare"
+    quality: 3
     predecessorId: "method.zhoutian_craft.8"
     nextMethodId: null
     description: "以天劫令重器蜕变为仙器。"
@@ -5976,7 +5976,7 @@ methods:
     familyId: "method.wanxiang"
     tier: 1
     realm: "qi"
-    rarity: "uncommon"
+    quality: 2
     predecessorId: null
     nextMethodId: "method.wanxiang.2"
     description: "识万物、采灵材、适应荒野。"
@@ -6061,7 +6061,7 @@ methods:
     familyId: "method.wanxiang"
     tier: 2
     realm: "foundation"
-    rarity: "uncommon"
+    quality: 2
     predecessorId: "method.wanxiang.1"
     nextMethodId: "method.wanxiang.3"
     description: "经营资源并以基础封印约束灵兽。"
@@ -6147,7 +6147,7 @@ methods:
     familyId: "method.wanxiang"
     tier: 3
     realm: "core"
-    rarity: "uncommon"
+    quality: 2
     predecessorId: "method.wanxiang.2"
     nextMethodId: "method.wanxiang.4"
     description: "堪舆寻脉，培育兽群。"
@@ -6234,7 +6234,7 @@ methods:
     familyId: "method.wanxiang"
     tier: 4
     realm: "nascent"
-    rarity: "uncommon"
+    quality: 2
     predecessorId: "method.wanxiang.3"
     nextMethodId: "method.wanxiang.5"
     description: "观天测候，跨域迁徙。"
@@ -6321,7 +6321,7 @@ methods:
     familyId: "method.wanxiang"
     tier: 5
     realm: "transform"
-    rarity: "uncommon"
+    quality: 2
     predecessorId: "method.wanxiang.4"
     nextMethodId: "method.wanxiang.6"
     description: "建立稳定界域航线。"
@@ -6408,7 +6408,7 @@ methods:
     familyId: "method.wanxiang"
     tier: 6
     realm: "void"
-    rarity: "uncommon"
+    quality: 2
     predecessorId: "method.wanxiang.5"
     nextMethodId: "method.wanxiang.7"
     description: "驾驭灵兽与飞舟穿行虚空。"
@@ -6495,7 +6495,7 @@ methods:
     familyId: "method.wanxiang"
     tier: 7
     realm: "merge"
-    rarity: "uncommon"
+    quality: 2
     predecessorId: "method.wanxiang.6"
     nextMethodId: "method.wanxiang.8"
     description: "治理跨界宗门与资源网络。"
@@ -6582,7 +6582,7 @@ methods:
     familyId: "method.wanxiang"
     tier: 8
     realm: "great"
-    rarity: "uncommon"
+    quality: 2
     predecessorId: "method.wanxiang.7"
     nextMethodId: "method.wanxiang.9"
     description: "牧养一方世界的生态文明。"
@@ -6669,7 +6669,7 @@ methods:
     familyId: "method.wanxiang"
     tier: 9
     realm: "tribulation"
-    rarity: "uncommon"
+    quality: 2
     predecessorId: "method.wanxiang.8"
     nextMethodId: null
     description: "维护通往飞升界域的航路。"
@@ -6753,9 +6753,9 @@ methods:
   - id: "method.jiuji.1"
     name: "九劫飞升录·化神篇"
     familyId: "method.jiuji"
-    tier: 1
+    tier: 5
     realm: "transform"
-    rarity: "legendary"
+    quality: 4
     predecessorId: null
     nextMethodId: "method.jiuji.2"
     description: "从因果中辨识自身未来劫数。"
@@ -6838,9 +6838,9 @@ methods:
   - id: "method.jiuji.2"
     name: "九劫飞升录·炼虚篇"
     familyId: "method.jiuji"
-    tier: 2
+    tier: 6
     realm: "void"
-    rarity: "legendary"
+    quality: 4
     predecessorId: "method.jiuji.1"
     nextMethodId: "method.jiuji.3"
     description: "培育法则种子，推演应劫之法。"
@@ -6929,9 +6929,9 @@ methods:
   - id: "method.jiuji.3"
     name: "九劫飞升录·合体篇"
     familyId: "method.jiuji"
-    tier: 3
+    tier: 7
     realm: "merge"
-    rarity: "legendary"
+    quality: 4
     predecessorId: "method.jiuji.2"
     nextMethodId: "method.jiuji.4"
     description: "执掌法则并统合应劫体系。"
@@ -7019,9 +7019,9 @@ methods:
   - id: "method.jiuji.4"
     name: "九劫飞升录·大乘篇"
     familyId: "method.jiuji"
-    tier: 4
+    tier: 8
     realm: "great"
-    rarity: "legendary"
+    quality: 4
     predecessorId: "method.jiuji.3"
     nextMethodId: "method.jiuji.5"
     description: "道果圆融，主动适应劫雷。"
@@ -7110,9 +7110,9 @@ methods:
   - id: "method.jiuji.5"
     name: "九劫飞升录·渡劫篇"
     familyId: "method.jiuji"
-    tier: 5
+    tier: 9
     realm: "tribulation"
-    rarity: "legendary"
+    quality: 4
     predecessorId: "method.jiuji.4"
     nextMethodId: null
     description: "推演天劫并完成劫后新生。"
@@ -7203,7 +7203,7 @@ methods:
     familyId: "method.basic_breathing"
     tier: 1
     realm: "qi"
-    rarity: "common"
+    quality: 1
     predecessorId: null
     nextMethodId: null
     description: "仅教授foundation.breathing的基础功法。"
@@ -7261,7 +7261,7 @@ methods:
     familyId: "method.small_cycle"
     tier: 1
     realm: "qi"
-    rarity: "common"
+    quality: 1
     predecessorId: null
     nextMethodId: null
     description: "仅教授cultivation.cycle的基础功法。"
@@ -7320,7 +7320,7 @@ methods:
     familyId: "method.iron_skin"
     tier: 1
     realm: "qi"
-    rarity: "common"
+    quality: 1
     predecessorId: null
     nextMethodId: null
     description: "仅教授body.tempering的基础功法。"
@@ -7379,7 +7379,7 @@ methods:
     familyId: "method.clear_mind"
     tier: 1
     realm: "qi"
-    rarity: "common"
+    quality: 1
     predecessorId: null
     nextMethodId: null
     description: "仅教授spirit.meditation的基础功法。"
@@ -7438,7 +7438,7 @@ methods:
     familyId: "method.sword_control"
     tier: 1
     realm: "qi"
-    rarity: "common"
+    quality: 1
     predecessorId: null
     nextMethodId: null
     description: "仅教授sword.qi的基础功法。"
@@ -7497,7 +7497,7 @@ methods:
     familyId: "method.herb_manual"
     tier: 1
     realm: "qi"
-    rarity: "common"
+    quality: 1
     predecessorId: null
     nextMethodId: null
     description: "仅教授alchemy.herbs的基础功法。"
@@ -7556,7 +7556,7 @@ methods:
     familyId: "method.rune_manual"
     tier: 1
     realm: "qi"
-    rarity: "common"
+    quality: 1
     predecessorId: null
     nextMethodId: null
     description: "仅教授formation.runes的基础功法。"
@@ -7615,7 +7615,7 @@ methods:
     familyId: "method.appraisal_manual"
     tier: 1
     realm: "qi"
-    rarity: "common"
+    quality: 1
     predecessorId: null
     nextMethodId: null
     description: "仅教授world.appraisal的基础功法。"
@@ -7672,9 +7672,9 @@ methods:
   - id: "method.blood_burst.1"
     name: "燃血断脉术"
     familyId: "method.blood_burst"
-    tier: 1
+    tier: 3
     realm: "core"
-    rarity: "uncommon"
+    quality: 2
     predecessorId: null
     nextMethodId: null
     description: "旁门爆发，以伤换攻"
@@ -7755,9 +7755,9 @@ methods:
   - id: "method.escape_art.1"
     name: "浮光掠影诀"
     familyId: "method.escape_art"
-    tier: 1
+    tier: 2
     realm: "foundation"
-    rarity: "uncommon"
+    quality: 2
     predecessorId: null
     nextMethodId: null
     description: "专精遁法与脱离"
@@ -7838,9 +7838,9 @@ methods:
   - id: "method.poison_codex.1"
     name: "百毒真经"
     familyId: "method.poison_codex"
-    tier: 1
+    tier: 3
     realm: "core"
-    rarity: "uncommon"
+    quality: 2
     predecessorId: null
     nextMethodId: null
     description: "毒理、炼毒与解毒"
@@ -7921,9 +7921,9 @@ methods:
   - id: "method.fate_gaze.1"
     name: "望气寻机篇"
     familyId: "method.fate_gaze"
-    tier: 1
+    tier: 2
     realm: "foundation"
-    rarity: "uncommon"
+    quality: 2
     predecessorId: null
     nextMethodId: null
     description: "趋吉避凶与天机探索"
@@ -8004,9 +8004,9 @@ methods:
   - id: "method.talisman_archive.1"
     name: "万符归藏录"
     familyId: "method.talisman_archive"
-    tier: 1
+    tier: 3
     realm: "core"
-    rarity: "uncommon"
+    quality: 2
     predecessorId: null
     nextMethodId: null
     description: "符箓储备与快速激发"
@@ -8087,9 +8087,9 @@ methods:
   - id: "method.heavy_sword.1"
     name: "无锋重剑诀"
     familyId: "method.heavy_sword"
-    tier: 1
+    tier: 2
     realm: "foundation"
-    rarity: "uncommon"
+    quality: 2
     predecessorId: null
     nextMethodId: null
     description: "低阶高专精重剑流派"

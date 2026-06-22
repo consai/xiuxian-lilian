@@ -33,20 +33,21 @@ rules:
     sealPolicy: "delay_or_seal_next_special_action"
     triggerField: "hasPriorityEnemy"
   learningKnowledgeGatePolicy:
-    ordinaryRarities:
-      - "common"
-      - "uncommon"
+    ordinaryQualities:
+      - 1
+      - 2
     ordinaryPolicy: "realm_only_no_knowledge_requirements"
-    specialPolicy: "rare_or_above_may_require_knowledge"
+    specialPolicy: "quality_3_or_above_may_require_knowledge"
     maxKnowledgeRequirements: 2
     maxRequirementLevel: 2
-    note: "知识仍可参与 knowledgeScaling 成长，但普通技能学习不被知识卡住。"
+    note: "知识仍可参与 knowledgeScaling 成长，但下品与中品技能学习不被知识卡住。"
 abilities:
   - id: "ability.combat.qi_bolt"
     name: "御气弹"
     type: "combat_active"
     realm: "qi"
-    rarity: "common"
+    tier: 1
+    quality: 1
     description: "御气弹"
     tags:
       - "spell"
@@ -96,7 +97,8 @@ abilities:
     name: "流风步"
     type: "combat_active"
     realm: "qi"
-    rarity: "common"
+    tier: 1
+    quality: 1
     description: "流风步"
     tags:
       - "mobility"
@@ -155,7 +157,8 @@ abilities:
     name: "破空剑气"
     type: "combat_active"
     realm: "qi"
-    rarity: "uncommon"
+    tier: 1
+    quality: 2
     description: "破空剑气"
     tags:
       - "sword"
@@ -216,7 +219,8 @@ abilities:
     name: "震血拳"
     type: "combat_active"
     realm: "foundation"
-    rarity: "uncommon"
+    tier: 2
+    quality: 2
     description: "震血拳"
     tags:
       - "body"
@@ -276,7 +280,8 @@ abilities:
     name: "五行轮爆"
     type: "combat_active"
     realm: "foundation"
-    rarity: "rare"
+    tier: 2
+    quality: 3
     description: "五行轮爆"
     tags:
       - "spell"
@@ -340,7 +345,8 @@ abilities:
     name: "镇灵封印"
     type: "combat_active"
     realm: "foundation"
-    rarity: "rare"
+    tier: 2
+    quality: 3
     description: "镇灵封印"
     tags:
       - "talisman"
@@ -404,7 +410,8 @@ abilities:
     name: "九霄雷击"
     type: "combat_active"
     realm: "core"
-    rarity: "rare"
+    tier: 3
+    quality: 3
     description: "九霄雷击"
     tags:
       - "spell"
@@ -462,7 +469,8 @@ abilities:
     name: "七星剑阵"
     type: "combat_active"
     realm: "core"
-    rarity: "epic"
+    tier: 3
+    quality: 4
     description: "七星剑阵"
     tags:
       - "sword"
@@ -522,7 +530,8 @@ abilities:
     name: "撼魂钟鸣"
     type: "combat_active"
     realm: "core"
-    rarity: "rare"
+    tier: 3
+    quality: 3
     description: "撼魂钟鸣"
     tags:
       - "spirit"
@@ -580,7 +589,8 @@ abilities:
     name: "法相镇岳掌"
     type: "combat_active"
     realm: "transform"
-    rarity: "epic"
+    tier: 5
+    quality: 4
     description: "法相镇岳掌"
     tags:
       - "body"
@@ -636,7 +646,8 @@ abilities:
     name: "梦狱"
     type: "combat_active"
     realm: "transform"
-    rarity: "epic"
+    tier: 5
+    quality: 4
     description: "梦狱"
     tags:
       - "spirit"
@@ -692,7 +703,8 @@ abilities:
     name: "斩虚"
     type: "combat_active"
     realm: "void"
-    rarity: "epic"
+    tier: 6
+    quality: 4
     description: "斩虚"
     tags:
       - "sword"
@@ -750,7 +762,8 @@ abilities:
     name: "真名蚀魂咒"
     type: "combat_active"
     realm: "void"
-    rarity: "epic"
+    tier: 6
+    quality: 4
     description: "真名蚀魂咒"
     tags:
       - "curse"
@@ -810,7 +823,8 @@ abilities:
     name: "律令·止"
     type: "combat_active"
     realm: "merge"
-    rarity: "legendary"
+    tier: 7
+    quality: 4
     description: "律令·止"
     tags:
       - "law"
@@ -872,7 +886,8 @@ abilities:
     name: "开天一式"
     type: "combat_active"
     realm: "tribulation"
-    rarity: "mythic"
+    tier: 9
+    quality: 4
     description: "开天一式"
     tags:
       - "sword"
@@ -934,7 +949,8 @@ abilities:
     name: "劫灭神通"
     type: "combat_active"
     realm: "tribulation"
-    rarity: "mythic"
+    tier: 9
+    quality: 4
     description: "劫灭神通"
     tags:
       - "spell"
@@ -996,7 +1012,8 @@ abilities:
     name: "铁骨"
     type: "combat_passive"
     realm: "qi"
-    rarity: "common"
+    tier: 1
+    quality: 1
     description: "铁骨"
     tags: []
     knowledgeScaling:
@@ -1038,7 +1055,8 @@ abilities:
     name: "剑心通明"
     type: "combat_passive"
     realm: "nascent"
-    rarity: "epic"
+    tier: 4
+    quality: 4
     description: "剑心通明"
     tags: []
     knowledgeScaling:
@@ -1094,7 +1112,8 @@ abilities:
     name: "固魂守一"
     type: "combat_passive"
     realm: "core"
-    rarity: "rare"
+    tier: 3
+    quality: 3
     description: "固魂守一"
     tags: []
     knowledgeScaling:
@@ -1140,7 +1159,8 @@ abilities:
     name: "滴血不灭"
     type: "combat_passive"
     realm: "nascent"
-    rarity: "epic"
+    tier: 4
+    quality: 4
     description: "滴血不灭"
     tags: []
     knowledgeScaling:
@@ -1196,7 +1216,8 @@ abilities:
     name: "人兵相契"
     type: "combat_passive"
     realm: "merge"
-    rarity: "legendary"
+    tier: 7
+    quality: 4
     description: "人兵相契"
     tags: []
     knowledgeScaling:
@@ -1252,7 +1273,8 @@ abilities:
     name: "不坏道心"
     type: "combat_passive"
     realm: "great"
-    rarity: "legendary"
+    tier: 8
+    quality: 4
     description: "不坏道心"
     tags: []
     knowledgeScaling:
@@ -1308,7 +1330,8 @@ abilities:
     name: "万劫不坏"
     type: "combat_passive"
     realm: "tribulation"
-    rarity: "mythic"
+    tier: 9
+    quality: 4
     description: "万劫不坏"
     tags: []
     knowledgeScaling:
@@ -1364,7 +1387,8 @@ abilities:
     name: "太虚剑域"
     type: "combat_upkeep"
     realm: "transform"
-    rarity: "epic"
+    tier: 5
+    quality: 4
     description: "太虚剑域"
     tags:
       - "sword"
@@ -1424,7 +1448,8 @@ abilities:
     name: "赤霄雷域"
     type: "combat_upkeep"
     realm: "transform"
-    rarity: "epic"
+    tier: 5
+    quality: 4
     description: "赤霄雷域"
     tags:
       - "spell"
@@ -1484,7 +1509,8 @@ abilities:
     name: "金刚法相"
     type: "combat_upkeep"
     realm: "transform"
-    rarity: "epic"
+    tier: 5
+    quality: 4
     description: "金刚法相"
     tags:
       - "body"
@@ -1544,7 +1570,8 @@ abilities:
     name: "元神出窍"
     type: "combat_upkeep"
     realm: "transform"
-    rarity: "epic"
+    tier: 5
+    quality: 4
     description: "元神出窍"
     tags:
       - "spirit"
@@ -1604,7 +1631,8 @@ abilities:
     name: "法则领域"
     type: "combat_upkeep"
     realm: "merge"
-    rarity: "legendary"
+    tier: 7
+    quality: 4
     description: "法则领域"
     tags:
       - "law"
@@ -1664,7 +1692,8 @@ abilities:
     name: "灵气亲和"
     type: "general_passive"
     realm: "qi"
-    rarity: "common"
+    tier: 1
+    quality: 1
     description: "灵气亲和"
     tags: []
     knowledgeScaling:
@@ -1699,7 +1728,8 @@ abilities:
     name: "经脉通识"
     type: "general_passive"
     realm: "qi"
-    rarity: "common"
+    tier: 1
+    quality: 1
     description: "经脉通识"
     tags: []
     knowledgeScaling:
@@ -1731,7 +1761,8 @@ abilities:
     name: "鉴宝师"
     type: "general_passive"
     realm: "qi"
-    rarity: "common"
+    tier: 1
+    quality: 1
     description: "鉴宝师"
     tags: []
     knowledgeScaling:
@@ -1766,7 +1797,8 @@ abilities:
     name: "灵植师"
     type: "general_passive"
     realm: "qi"
-    rarity: "common"
+    tier: 1
+    quality: 1
     description: "灵植师"
     tags: []
     knowledgeScaling:
@@ -1801,7 +1833,8 @@ abilities:
     name: "炼器师"
     type: "general_passive"
     realm: "foundation"
-    rarity: "uncommon"
+    tier: 2
+    quality: 2
     description: "炼器师"
     tags: []
     knowledgeScaling:
@@ -1846,7 +1879,8 @@ abilities:
     name: "炼丹师"
     type: "general_passive"
     realm: "foundation"
-    rarity: "uncommon"
+    tier: 2
+    quality: 2
     description: "炼丹师"
     tags: []
     knowledgeScaling:
@@ -1891,7 +1925,8 @@ abilities:
     name: "阵法师"
     type: "general_passive"
     realm: "foundation"
-    rarity: "uncommon"
+    tier: 2
+    quality: 2
     description: "阵法师"
     tags: []
     knowledgeScaling:
@@ -1936,7 +1971,8 @@ abilities:
     name: "符师"
     type: "general_passive"
     realm: "foundation"
-    rarity: "uncommon"
+    tier: 2
+    quality: 2
     description: "符师"
     tags: []
     knowledgeScaling:
@@ -1981,7 +2017,8 @@ abilities:
     name: "御兽师"
     type: "general_passive"
     realm: "foundation"
-    rarity: "uncommon"
+    tier: 2
+    quality: 2
     description: "御兽师"
     tags: []
     knowledgeScaling:
@@ -2024,7 +2061,8 @@ abilities:
     name: "堪舆师"
     type: "general_passive"
     realm: "core"
-    rarity: "rare"
+    tier: 3
+    quality: 3
     description: "堪舆师"
     tags: []
     knowledgeScaling:
@@ -2073,7 +2111,8 @@ abilities:
     name: "虚空行者"
     type: "general_passive"
     realm: "void"
-    rarity: "epic"
+    tier: 6
+    quality: 4
     description: "虚空行者"
     tags: []
     knowledgeScaling:
@@ -2122,7 +2161,8 @@ abilities:
     name: "宗门执掌"
     type: "general_passive"
     realm: "merge"
-    rarity: "legendary"
+    tier: 7
+    quality: 4
     description: "宗门执掌"
     tags: []
     knowledgeScaling:
@@ -2171,7 +2211,8 @@ abilities:
     name: "应劫宗师"
     type: "general_passive"
     realm: "tribulation"
-    rarity: "mythic"
+    tier: 9
+    quality: 4
     description: "应劫宗师"
     tags: []
     knowledgeScaling:
@@ -2220,7 +2261,8 @@ abilities:
     name: "元婴御灵斩"
     type: "combat_active"
     realm: "nascent"
-    rarity: "epic"
+    tier: 4
+    quality: 4
     description: "元婴御灵斩"
     tags:
       - "sword"
@@ -2282,7 +2324,8 @@ abilities:
     name: "魂契敕令"
     type: "combat_active"
     realm: "nascent"
-    rarity: "epic"
+    tier: 4
+    quality: 4
     description: "魂契敕令"
     tags:
       - "talisman"
@@ -2340,7 +2383,8 @@ abilities:
     name: "道剑长河"
     type: "combat_active"
     realm: "great"
-    rarity: "legendary"
+    tier: 8
+    quality: 4
     description: "道剑长河"
     tags:
       - "sword"
@@ -2402,7 +2446,8 @@ abilities:
     name: "掌中天地·镇"
     type: "combat_active"
     realm: "great"
-    rarity: "legendary"
+    tier: 8
+    quality: 4
     description: "掌中天地·镇"
     tags:
       - "world"

@@ -9,8 +9,8 @@ var name: String = ""
 var item_type: String = ""
 var primary_type: String = ""
 var secondary_type: String = ""
-var rarity: String = ""
 var quality: int = 1
+var tier: int = 1
 var desc: String = ""
 var stackable: bool = true
 var max_stack: int = 999
@@ -81,6 +81,7 @@ func to_fight_runtime_dict() -> Dictionary:
 		"id": fight_id,
 		"name": name,
 		"quality": quality,
+		"tier": tier,
 		"effects": fight_effect.duplicate(true),
 		"cd": fight_cd,
 		"cd_total": fight_cd,
@@ -117,8 +118,20 @@ static func from_dict(data: Dictionary) -> ItemDef:
 		legacy_type
 	)
 	item.item_type = EnumItemTypeScript.full_label(item.primary_type, item.secondary_type)
-	item.rarity = str(data.get("rarity", ""))
-	item.quality = maxi(1, int(data.get("quality", EnumQuality.from_label(item.rarity))))
+	if not data.has("quality"):
+		push_error("ItemDef.from_dict: missing quality in %s" % item.id)
+		return null
+	item.quality = int(data.get("quality", 0))
+	if not EnumQuality.is_valid_quality(item.quality):
+		push_error("ItemDef.from_dict: invalid quality %s in %s" % [str(data.get("quality")), item.id])
+		return null
+	if not data.has("tier"):
+		push_error("ItemDef.from_dict: missing tier in %s" % item.id)
+		return null
+	item.tier = int(data.get("tier", 0))
+	if not EnumItemTier.is_valid_tier(item.tier):
+		push_error("ItemDef.from_dict: invalid tier %s in %s" % [str(data.get("tier")), item.id])
+		return null
 	item.desc = str(data.get("desc", ""))
 	item.stackable = bool(data.get("stackable", true))
 	item.max_stack = maxi(1, int(data.get("max_stack", 999)))

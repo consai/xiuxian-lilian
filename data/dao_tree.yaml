@@ -149,7 +149,9 @@ skills:
     name: "吐纳入门"
     domain: "foundation"
     realm: "qi"
+    tier: 1
     rank: 1
+    quality: 1
     maxLevel: 5
     prereqs: []
     description: "感知灵气并完成最基础的吐纳。"
@@ -161,7 +163,9 @@ skills:
     name: "经脉辨识"
     domain: "foundation"
     realm: "qi"
+    tier: 1
     rank: 1
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "foundation.breathing"
@@ -174,7 +178,9 @@ skills:
     name: "灵力操控"
     domain: "foundation"
     realm: "qi"
+    tier: 1
     rank: 2
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "foundation.breathing"
@@ -188,7 +194,9 @@ skills:
     name: "修真博闻"
     domain: "foundation"
     realm: "qi"
+    tier: 1
     rank: 1
+    quality: 1
     maxLevel: 5
     prereqs: []
     description: "识别常见灵材、术语、势力和风险。"
@@ -199,7 +207,9 @@ skills:
     name: "道基构筑"
     domain: "foundation"
     realm: "foundation"
+    tier: 2
     rank: 3
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "foundation.meridians"
@@ -214,7 +224,9 @@ skills:
     name: "结丹总纲"
     domain: "foundation"
     realm: "core"
+    tier: 3
     rank: 5
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "foundation.dao_base"
@@ -229,7 +241,9 @@ skills:
     name: "元婴道解"
     domain: "foundation"
     realm: "nascent"
+    tier: 4
     rank: 7
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "foundation.core_theory"
@@ -245,7 +259,9 @@ skills:
     name: "化神真解"
     domain: "foundation"
     realm: "transform"
+    tier: 5
     rank: 9
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "foundation.nascent_theory"
@@ -260,7 +276,9 @@ skills:
     name: "炼虚玄章"
     domain: "foundation"
     realm: "void"
+    tier: 6
     rank: 12
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "foundation.spirit_theory"
@@ -275,7 +293,9 @@ skills:
     name: "合体道典"
     domain: "foundation"
     realm: "merge"
+    tier: 7
     rank: 16
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "foundation.void_theory"
@@ -290,7 +310,9 @@ skills:
     name: "大乘道果"
     domain: "foundation"
     realm: "great"
+    tier: 8
     rank: 22
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "foundation.integration_theory"
@@ -305,7 +327,9 @@ skills:
     name: "飞升总纲"
     domain: "foundation"
     realm: "tribulation"
+    tier: 9
     rank: 32
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "foundation.mahayana_theory"
@@ -320,7 +344,9 @@ skills:
     name: "引气术"
     domain: "cultivation"
     realm: "qi"
+    tier: 1
     rank: 1
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "foundation.breathing"
@@ -332,7 +358,9 @@ skills:
     name: "小周天"
     domain: "cultivation"
     realm: "qi"
+    tier: 1
     rank: 2
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "cultivation.qi_sense"
@@ -347,7 +375,9 @@ skills:
     name: "真气纯化"
     domain: "cultivation"
     realm: "qi"
+    tier: 1
     rank: 2
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "cultivation.cycle"
@@ -359,7 +389,9 @@ skills:
     name: "大周天"
     domain: "cultivation"
     realm: "foundation"
+    tier: 2
     rank: 4
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "cultivation.cycle"
@@ -373,7 +405,9 @@ skills:
     name: "真元化液"
     domain: "cultivation"
     realm: "foundation"
+    tier: 2
     rank: 4
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "cultivation.purity"
@@ -387,7 +421,9 @@ skills:
     name: "丹火自生"
     domain: "cultivation"
     realm: "core"
+    tier: 3
     rank: 6
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "cultivation.liquid_mana"
@@ -402,7 +438,9 @@ skills:
     name: "婴息周天"
     domain: "cultivation"
     realm: "nascent"
+    tier: 4
     rank: 8
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "cultivation.core_fire"
@@ -416,7 +454,9 @@ skills:
     name: "天地周天"
     domain: "cultivation"
     realm: "transform"
+    tier: 5
     rank: 10
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "cultivation.nascent_cycle"
@@ -430,7 +470,9 @@ skills:
     name: "虚空烘炉"
     domain: "cultivation"
     realm: "void"
+    tier: 6
     rank: 14
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "cultivation.heaven_cycle"
@@ -444,7 +486,9 @@ skills:
     name: "法力无涯"
     domain: "cultivation"
     realm: "merge"
+    tier: 7
     rank: 18
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "cultivation.void_furnace"
@@ -458,7 +502,9 @@ skills:
     name: "道果运转"
     domain: "cultivation"
     realm: "great"
+    tier: 8
     rank: 24
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "cultivation.endless"
@@ -472,7 +518,9 @@ skills:
     name: "仙灵转化"
     domain: "cultivation"
     realm: "tribulation"
+    tier: 9
     rank: 36
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "cultivation.dao_engine"
@@ -486,7 +534,9 @@ skills:
     name: "皮肉锻炼"
     domain: "body"
     realm: "qi"
+    tier: 1
     rank: 1
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "foundation.breathing"
@@ -499,7 +549,9 @@ skills:
     name: "锻骨易筋"
     domain: "body"
     realm: "qi"
+    tier: 1
     rank: 2
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "body.tempering"
@@ -514,7 +566,9 @@ skills:
     name: "气血搬运"
     domain: "body"
     realm: "qi"
+    tier: 1
     rank: 2
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "body.tempering"
@@ -529,7 +583,9 @@ skills:
     name: "玉骨灵身"
     domain: "body"
     realm: "foundation"
+    tier: 2
     rank: 4
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "body.bone"
@@ -544,7 +600,9 @@ skills:
     name: "血脉觉醒"
     domain: "body"
     realm: "core"
+    tier: 3
     rank: 6
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "body.jade"
@@ -558,7 +616,9 @@ skills:
     name: "滴血重生"
     domain: "body"
     realm: "nascent"
+    tier: 4
     rank: 9
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "body.bloodline"
@@ -573,7 +633,9 @@ skills:
     name: "法相真身"
     domain: "body"
     realm: "transform"
+    tier: 5
     rank: 11
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "body.regeneration"
@@ -588,7 +650,9 @@ skills:
     name: "虚空法体"
     domain: "body"
     realm: "void"
+    tier: 6
     rank: 15
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "body.dharma_form"
@@ -603,7 +667,9 @@ skills:
     name: "精气神合一"
     domain: "body"
     realm: "merge"
+    tier: 7
     rank: 19
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "body.void_body"
@@ -617,7 +683,9 @@ skills:
     name: "不灭道身"
     domain: "body"
     realm: "great"
+    tier: 8
     rank: 26
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "body.unity"
@@ -631,7 +699,9 @@ skills:
     name: "劫体"
     domain: "body"
     realm: "tribulation"
+    tier: 9
     rank: 38
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "body.indestructible"
@@ -646,7 +716,9 @@ skills:
     name: "入定"
     domain: "spirit"
     realm: "qi"
+    tier: 1
     rank: 1
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "foundation.breathing"
@@ -658,7 +730,9 @@ skills:
     name: "神识初生"
     domain: "spirit"
     realm: "qi"
+    tier: 1
     rank: 2
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "spirit.meditation"
@@ -673,7 +747,9 @@ skills:
     name: "心魔辨识"
     domain: "spirit"
     realm: "foundation"
+    tier: 2
     rank: 3
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "spirit.meditation"
@@ -688,7 +764,9 @@ skills:
     name: "魂魄固化"
     domain: "spirit"
     realm: "core"
+    tier: 3
     rank: 6
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "spirit.sense"
@@ -703,7 +781,9 @@ skills:
     name: "分神化念"
     domain: "spirit"
     realm: "nascent"
+    tier: 4
     rank: 8
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "spirit.soul"
@@ -718,7 +798,9 @@ skills:
     name: "元神出窍"
     domain: "spirit"
     realm: "transform"
+    tier: 5
     rank: 11
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "spirit.split"
@@ -733,7 +815,9 @@ skills:
     name: "梦界行走"
     domain: "spirit"
     realm: "transform"
+    tier: 5
     rank: 10
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "spirit.inner_demon"
@@ -748,7 +832,9 @@ skills:
     name: "一念生灭"
     domain: "spirit"
     realm: "void"
+    tier: 6
     rank: 15
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "spirit.primordial"
@@ -763,7 +849,9 @@ skills:
     name: "万念归一"
     domain: "spirit"
     realm: "merge"
+    tier: 7
     rank: 20
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "spirit.void_thought"
@@ -777,7 +865,9 @@ skills:
     name: "不坏道心"
     domain: "spirit"
     realm: "great"
+    tier: 8
     rank: 27
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "spirit.myriad"
@@ -792,7 +882,9 @@ skills:
     name: "心劫超脱"
     domain: "spirit"
     realm: "tribulation"
+    tier: 9
     rank: 40
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "spirit.dao_heart"
@@ -806,7 +898,9 @@ skills:
     name: "五行辨性"
     domain: "spell"
     realm: "qi"
+    tier: 1
     rank: 1
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "foundation.control"
@@ -819,7 +913,9 @@ skills:
     name: "御气成术"
     domain: "spell"
     realm: "qi"
+    tier: 1
     rank: 2
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "spell.elements"
@@ -834,7 +930,9 @@ skills:
     name: "轻身遁术"
     domain: "spell"
     realm: "qi"
+    tier: 1
     rank: 2
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "cultivation.cycle"
@@ -847,7 +945,9 @@ skills:
     name: "五行术典"
     domain: "spell"
     realm: "foundation"
+    tier: 2
     rank: 4
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "spell.elements"
@@ -862,7 +962,9 @@ skills:
     name: "雷法"
     domain: "spell"
     realm: "core"
+    tier: 3
     rank: 7
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "spell.five_phase"
@@ -877,7 +979,9 @@ skills:
     name: "天地共鸣"
     domain: "spell"
     realm: "nascent"
+    tier: 4
     rank: 9
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "spell.five_phase"
@@ -891,7 +995,9 @@ skills:
     name: "术法领域"
     domain: "spell"
     realm: "transform"
+    tier: 5
     rank: 12
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "spell.resonance"
@@ -906,7 +1012,9 @@ skills:
     name: "虚空术"
     domain: "spell"
     realm: "void"
+    tier: 6
     rank: 16
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "spell.domain"
@@ -921,7 +1029,9 @@ skills:
     name: "言出法随"
     domain: "spell"
     realm: "merge"
+    tier: 7
     rank: 21
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "spell.void"
@@ -936,7 +1046,9 @@ skills:
     name: "掌中天地"
     domain: "spell"
     realm: "great"
+    tier: 8
     rank: 29
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "spell.law"
@@ -951,7 +1063,9 @@ skills:
     name: "劫灭神通"
     domain: "spell"
     realm: "tribulation"
+    tier: 9
     rank: 42
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "spell.world"
@@ -966,7 +1080,9 @@ skills:
     name: "百兵基础"
     domain: "sword"
     realm: "qi"
+    tier: 1
     rank: 1
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "body.tempering"
@@ -979,7 +1095,9 @@ skills:
     name: "御剑与剑气"
     domain: "sword"
     realm: "qi"
+    tier: 1
     rank: 3
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "sword.weapon"
@@ -994,7 +1112,9 @@ skills:
     name: "兵意萌芽"
     domain: "sword"
     realm: "foundation"
+    tier: 2
     rank: 4
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "sword.weapon"
@@ -1008,7 +1128,9 @@ skills:
     name: "剑阵操控"
     domain: "sword"
     realm: "core"
+    tier: 3
     rank: 7
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "sword.qi"
@@ -1023,7 +1145,9 @@ skills:
     name: "剑心通明"
     domain: "sword"
     realm: "nascent"
+    tier: 4
     rank: 9
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "sword.intent"
@@ -1038,7 +1162,9 @@ skills:
     name: "剑域"
     domain: "sword"
     realm: "transform"
+    tier: 5
     rank: 12
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "sword.heart"
@@ -1053,7 +1179,9 @@ skills:
     name: "斩虚"
     domain: "sword"
     realm: "void"
+    tier: 6
     rank: 16
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "sword.domain"
@@ -1068,7 +1196,9 @@ skills:
     name: "人兵合一"
     domain: "sword"
     realm: "merge"
+    tier: 7
     rank: 21
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "sword.void_cut"
@@ -1083,7 +1213,9 @@ skills:
     name: "一剑成道"
     domain: "sword"
     realm: "great"
+    tier: 8
     rank: 30
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "sword.unity"
@@ -1098,7 +1230,9 @@ skills:
     name: "开天一式"
     domain: "sword"
     realm: "tribulation"
+    tier: 9
     rank: 44
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "sword.dao"
@@ -1113,7 +1247,9 @@ skills:
     name: "灵材性理"
     domain: "artifact"
     realm: "qi"
+    tier: 1
     rank: 1
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "foundation.literacy"
@@ -1127,7 +1263,9 @@ skills:
     name: "火候与锻造"
     domain: "artifact"
     realm: "qi"
+    tier: 1
     rank: 2
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "artifact.materials"
@@ -1143,7 +1281,9 @@ skills:
     name: "器纹铭刻"
     domain: "artifact"
     realm: "foundation"
+    tier: 2
     rank: 4
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "artifact.smelting"
@@ -1158,7 +1298,9 @@ skills:
     name: "法宝炼制"
     domain: "artifact"
     realm: "core"
+    tier: 3
     rank: 7
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "artifact.inscription"
@@ -1173,7 +1315,9 @@ skills:
     name: "傀儡机关"
     domain: "artifact"
     realm: "core"
+    tier: 3
     rank: 6
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "artifact.inscription"
@@ -1188,7 +1332,9 @@ skills:
     name: "本命法宝"
     domain: "artifact"
     realm: "nascent"
+    tier: 4
     rank: 9
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "artifact.treasure"
@@ -1204,7 +1350,9 @@ skills:
     name: "器灵孕育"
     domain: "artifact"
     realm: "transform"
+    tier: 5
     rank: 12
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "artifact.life_bound"
@@ -1219,7 +1367,9 @@ skills:
     name: "虚空飞舟"
     domain: "artifact"
     realm: "void"
+    tier: 6
     rank: 17
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "artifact.spirit"
@@ -1234,7 +1384,9 @@ skills:
     name: "道器炼制"
     domain: "artifact"
     realm: "merge"
+    tier: 7
     rank: 22
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "artifact.spirit"
@@ -1249,7 +1401,9 @@ skills:
     name: "洞天重器"
     domain: "artifact"
     realm: "great"
+    tier: 8
     rank: 31
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "artifact.dao_weapon"
@@ -1264,7 +1418,9 @@ skills:
     name: "仙器蜕变"
     domain: "artifact"
     realm: "tribulation"
+    tier: 9
     rank: 45
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "artifact.world_treasure"
@@ -1279,7 +1435,9 @@ skills:
     name: "灵植辨识"
     domain: "alchemy"
     realm: "qi"
+    tier: 1
     rank: 1
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "foundation.literacy"
@@ -1293,7 +1451,9 @@ skills:
     name: "药理与医术"
     domain: "alchemy"
     realm: "qi"
+    tier: 1
     rank: 2
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "alchemy.herbs"
@@ -1308,7 +1468,9 @@ skills:
     name: "控火开炉"
     domain: "alchemy"
     realm: "foundation"
+    tier: 2
     rank: 4
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "alchemy.herbs"
@@ -1324,7 +1486,9 @@ skills:
     name: "毒理"
     domain: "alchemy"
     realm: "foundation"
+    tier: 2
     rank: 4
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "alchemy.medicine"
@@ -1339,7 +1503,9 @@ skills:
     name: "血肉药性"
     domain: "alchemy"
     realm: "core"
+    tier: 3
     rank: 6
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "alchemy.furnace"
@@ -1354,7 +1520,9 @@ skills:
     name: "养魂丹法"
     domain: "alchemy"
     realm: "nascent"
+    tier: 4
     rank: 9
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "alchemy.furnace"
@@ -1369,7 +1537,9 @@ skills:
     name: "生机造化"
     domain: "alchemy"
     realm: "transform"
+    tier: 5
     rank: 12
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "alchemy.soul"
@@ -1384,7 +1554,9 @@ skills:
     name: "虚空灵植"
     domain: "alchemy"
     realm: "void"
+    tier: 6
     rank: 16
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "alchemy.life"
@@ -1399,7 +1571,9 @@ skills:
     name: "道丹"
     domain: "alchemy"
     realm: "merge"
+    tier: 7
     rank: 22
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "alchemy.life"
@@ -1414,7 +1588,9 @@ skills:
     name: "逆命续生"
     domain: "alchemy"
     realm: "great"
+    tier: 8
     rank: 31
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "alchemy.dao_pill"
@@ -1429,7 +1605,9 @@ skills:
     name: "渡劫仙丹"
     domain: "alchemy"
     realm: "tribulation"
+    tier: 9
     rank: 45
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "alchemy.resurrection"
@@ -1444,7 +1622,9 @@ skills:
     name: "阵纹基础"
     domain: "formation"
     realm: "qi"
+    tier: 1
     rank: 1
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "foundation.literacy"
@@ -1460,7 +1640,9 @@ skills:
     name: "聚灵与警戒阵"
     domain: "formation"
     realm: "qi"
+    tier: 1
     rank: 2
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "formation.runes"
@@ -1475,7 +1657,9 @@ skills:
     name: "护山阵理"
     domain: "formation"
     realm: "foundation"
+    tier: 2
     rank: 4
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "formation.array"
@@ -1490,7 +1674,9 @@ skills:
     name: "禁制破解"
     domain: "formation"
     realm: "core"
+    tier: 3
     rank: 6
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "formation.runes"
@@ -1505,7 +1691,9 @@ skills:
     name: "传送阵"
     domain: "formation"
     realm: "nascent"
+    tier: 4
     rank: 9
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "formation.defense"
@@ -1520,7 +1708,9 @@ skills:
     name: "领域阵"
     domain: "formation"
     realm: "transform"
+    tier: 5
     rank: 12
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "formation.teleport"
@@ -1535,7 +1725,9 @@ skills:
     name: "空间阵理"
     domain: "formation"
     realm: "void"
+    tier: 6
     rank: 16
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "formation.teleport"
@@ -1550,7 +1742,9 @@ skills:
     name: "洞天营造"
     domain: "formation"
     realm: "merge"
+    tier: 7
     rank: 22
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "formation.space"
@@ -1566,7 +1760,9 @@ skills:
     name: "周天星斗阵"
     domain: "formation"
     realm: "great"
+    tier: 8
     rank: 31
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "formation.cave_heaven"
@@ -1581,7 +1777,9 @@ skills:
     name: "欺天渡劫阵"
     domain: "formation"
     realm: "tribulation"
+    tier: 9
     rank: 46
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "formation.star"
@@ -1596,7 +1794,9 @@ skills:
     name: "符文书写"
     domain: "talisman"
     realm: "qi"
+    tier: 1
     rank: 1
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "foundation.literacy"
@@ -1612,7 +1812,9 @@ skills:
     name: "符箓激发"
     domain: "talisman"
     realm: "qi"
+    tier: 1
     rank: 2
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "talisman.script"
@@ -1626,7 +1828,9 @@ skills:
     name: "封印术"
     domain: "talisman"
     realm: "foundation"
+    tier: 2
     rank: 4
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "talisman.script"
@@ -1643,7 +1847,9 @@ skills:
     name: "咒法与解咒"
     domain: "talisman"
     realm: "core"
+    tier: 3
     rank: 6
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "talisman.seal"
@@ -1659,7 +1865,9 @@ skills:
     name: "魂契"
     domain: "talisman"
     realm: "nascent"
+    tier: 4
     rank: 9
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "talisman.seal"
@@ -1675,7 +1883,9 @@ skills:
     name: "敕令"
     domain: "talisman"
     realm: "transform"
+    tier: 5
     rank: 12
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "talisman.soul_seal"
@@ -1691,7 +1901,9 @@ skills:
     name: "真名秘术"
     domain: "talisman"
     realm: "void"
+    tier: 6
     rank: 17
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "talisman.command"
@@ -1707,7 +1919,9 @@ skills:
     name: "因果封印"
     domain: "talisman"
     realm: "merge"
+    tier: 7
     rank: 23
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "talisman.true_name"
@@ -1722,7 +1936,9 @@ skills:
     name: "代天敕命"
     domain: "talisman"
     realm: "great"
+    tier: 8
     rank: 32
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "talisman.causality_seal"
@@ -1737,7 +1953,9 @@ skills:
     name: "劫数敕书"
     domain: "talisman"
     realm: "tribulation"
+    tier: 9
     rank: 47
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "talisman.heaven_decree"
@@ -1752,7 +1970,9 @@ skills:
     name: "野外生存"
     domain: "world"
     realm: "qi"
+    tier: 1
     rank: 1
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "foundation.literacy"
@@ -1765,7 +1985,9 @@ skills:
     name: "鉴宝估物"
     domain: "world"
     realm: "qi"
+    tier: 1
     rank: 1
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "foundation.literacy"
@@ -1779,7 +2001,9 @@ skills:
     name: "灵材采集"
     domain: "world"
     realm: "qi"
+    tier: 1
     rank: 2
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "world.survival"
@@ -1795,7 +2019,9 @@ skills:
     name: "修真经营"
     domain: "world"
     realm: "foundation"
+    tier: 2
     rank: 3
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "world.appraisal"
@@ -1809,7 +2035,9 @@ skills:
     name: "御兽"
     domain: "world"
     realm: "foundation"
+    tier: 2
     rank: 4
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "world.survival"
@@ -1825,7 +2053,9 @@ skills:
     name: "堪舆寻脉"
     domain: "world"
     realm: "core"
+    tier: 3
     rank: 6
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "world.gathering"
@@ -1841,7 +2071,9 @@ skills:
     name: "观天测候"
     domain: "world"
     realm: "nascent"
+    tier: 4
     rank: 8
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "world.geomancy"
@@ -1856,7 +2088,9 @@ skills:
     name: "界域行旅"
     domain: "world"
     realm: "transform"
+    tier: 5
     rank: 11
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "world.weather"
@@ -1871,7 +2105,9 @@ skills:
     name: "虚空生存"
     domain: "world"
     realm: "void"
+    tier: 6
     rank: 15
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "world.realm_travel"
@@ -1887,7 +2123,9 @@ skills:
     name: "宗门与文明治理"
     domain: "world"
     realm: "merge"
+    tier: 7
     rank: 20
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "world.trade"
@@ -1903,7 +2141,9 @@ skills:
     name: "世界牧养"
     domain: "world"
     realm: "great"
+    tier: 8
     rank: 29
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "world.civilization"
@@ -1918,7 +2158,9 @@ skills:
     name: "飞升航路"
     domain: "world"
     realm: "tribulation"
+    tier: 9
     rank: 43
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "world.world_shepherd"
@@ -1933,7 +2175,9 @@ skills:
     name: "趋吉避凶"
     domain: "heaven"
     realm: "qi"
+    tier: 1
     rank: 2
+    quality: 1
     maxLevel: 5
     prereqs:
       - id: "spirit.meditation"
@@ -1947,7 +2191,9 @@ skills:
     name: "星象历法"
     domain: "heaven"
     realm: "foundation"
+    tier: 2
     rank: 4
+    quality: 2
     maxLevel: 5
     prereqs:
       - id: "heaven.omen"
@@ -1962,7 +2208,9 @@ skills:
     name: "功德业力"
     domain: "heaven"
     realm: "core"
+    tier: 3
     rank: 7
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "heaven.omen"
@@ -1976,7 +2224,9 @@ skills:
     name: "命数观测"
     domain: "heaven"
     realm: "nascent"
+    tier: 4
     rank: 10
+    quality: 3
     maxLevel: 5
     prereqs:
       - id: "heaven.karma"
@@ -1990,7 +2240,9 @@ skills:
     name: "因果之线"
     domain: "heaven"
     realm: "transform"
+    tier: 5
     rank: 13
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "heaven.fate"
@@ -2005,7 +2257,9 @@ skills:
     name: "法则种子"
     domain: "heaven"
     realm: "void"
+    tier: 6
     rank: 17
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "heaven.causality"
@@ -2020,7 +2274,9 @@ skills:
     name: "法则执掌"
     domain: "heaven"
     realm: "merge"
+    tier: 7
     rank: 23
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "heaven.law_seed"
@@ -2035,7 +2291,9 @@ skills:
     name: "道果圆融"
     domain: "heaven"
     realm: "great"
+    tier: 8
     rank: 32
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "heaven.law_mastery"
@@ -2050,7 +2308,9 @@ skills:
     name: "劫雷适应"
     domain: "heaven"
     realm: "great"
+    tier: 8
     rank: 30
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "spell.thunder"
@@ -2065,7 +2325,9 @@ skills:
     name: "天劫推演"
     domain: "heaven"
     realm: "tribulation"
+    tier: 9
     rank: 42
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "heaven.dao_fruit"
@@ -2081,7 +2343,9 @@ skills:
     name: "劫后新生"
     domain: "heaven"
     realm: "tribulation"
+    tier: 9
     rank: 50
+    quality: 4
     maxLevel: 5
     prereqs:
       - id: "foundation.ascension"

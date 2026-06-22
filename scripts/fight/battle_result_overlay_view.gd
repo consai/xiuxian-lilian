@@ -217,6 +217,7 @@ func _apply_reward_row(view: ItemView, row: Dictionary) -> void:
 	var count := maxi(1, int(row.get("count", row.get("amount", 1))))
 	var item_name := str(row.get("name", row.get("item_name", ""))).strip_edges()
 	var quality := str(row.get("quality", row.get("pin_zhi", ""))).strip_edges()
+	var tier := maxi(1, int(row.get("tier", 1)))
 	var icon: Texture2D = null
 	var icon_v: Variant = row.get("icon")
 	if icon_v is Texture2D:
@@ -228,6 +229,7 @@ func _apply_reward_row(view: ItemView, row: Dictionary) -> void:
 		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
 		if quality == "":
 			quality = EnumQuality.display_label(int(equip_cfg.get("quality", 1)))
+		tier = maxi(1, int(equip_cfg.get("tier", tier)))
 	elif kind == "item":
 		var item_id := str(row.get("id", ""))
 		if item_name == "" and ConfigManager != null:
@@ -238,12 +240,13 @@ func _apply_reward_row(view: ItemView, row: Dictionary) -> void:
 				icon = ItemDefScript.resolve_icon_texture(def.icon_path, null)
 				if quality == "":
 					quality = EnumQuality.display_label(def.quality)
+				tier = def.tier
 	else:
 		if item_name == "":
 			item_name = str(row.get("id", "奖励"))
 		var path := str(row.get("icon_path", row.get("icon", ""))).strip_edges()
 		if path != "":
 			icon = ItemDefScript.resolve_icon_texture(path, null)
-	view.apply_display(icon, item_name, count, Color.WHITE, quality)
+	view.apply_display(icon, item_name, count, Color.WHITE, quality, false, tier)
 	view.show_name_label = true
 	view.set_info_entry(ItemView.entry_from_reward_row(row))

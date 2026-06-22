@@ -3,6 +3,7 @@ equips:
     name: "天雷印"
     icon: "ui_new/jian.png"
     quality: 4
+    tier: 1
     cd_total: 6
     tags:
       - "magic"
@@ -19,6 +20,7 @@ equips:
     name: "寒潭珠"
     icon: "ui_new/shuijing.png"
     quality: 3
+    tier: 1
     cd_total: 7
     tags:
       - "magic"
@@ -33,7 +35,8 @@ equips:
   5003:
     name: "赤焰令"
     icon: "ui_new/huo.png"
-    quality: 5
+    quality: 4
+    tier: 1
     cd_total: 8
     tags:
       - "magic"

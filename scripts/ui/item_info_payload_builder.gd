@@ -47,6 +47,7 @@ static func from_item_id(item_id: String, count: int = 1) -> Dictionary:
 		"title_color": EnumQuality.get_color(def.quality),
 		"icon": icon,
 		"quality": EnumQuality.display_label(def.quality),
+		"tier": def.tier,
 		"meta": _item_meta(def),
 		"desc": def.desc.strip_edges(),
 		"detail_lines": detail_lines,
@@ -65,6 +66,7 @@ static func from_equip_id(equip_id: int) -> Dictionary:
 		return {}
 	var title := str(cfg.get("name", "法宝")).strip_edges()
 	var quality := maxi(1, int(cfg.get("quality", 1)))
+	var tier := maxi(1, int(cfg.get("tier", 1)))
 	var detail_lines: Array[String] = []
 	detail_lines.append(StringsZh.getp("item_info.equip_kind", "战斗法宝"))
 	var cost_text := str(cfg.get("cost_text", "")).strip_edges()
@@ -91,6 +93,7 @@ static func from_equip_id(equip_id: int) -> Dictionary:
 		"title_color": EnumQuality.get_color(quality),
 		"icon": BattleInitDataScript._resolve_icon_texture(cfg),
 		"quality": rarity,
+		"tier": tier,
 		"meta": StringsZh.format_template(
 			StringsZh.getp("item_info.type", "类型：{value}"),
 			{
@@ -99,6 +102,9 @@ static func from_equip_id(equip_id: int) -> Dictionary:
 					EnumItemType.SECONDARY_ACTIVE_TREASURE
 				)
 			}
+		) + " · " + StringsZh.format_template(
+			"阶位：{value}",
+			{"value": EnumItemTier.label(tier)}
 		) + " · " + StringsZh.format_template(
 			StringsZh.getp("item_info.rarity", "品质：{value}"),
 			{"value": rarity}
@@ -118,6 +124,10 @@ static func _item_meta(def: ItemDef) -> String:
 			{"value": item_type}
 		))
 	var rarity := EnumQuality.display_label(def.quality)
+	parts.append(StringsZh.format_template(
+		"阶位：{value}",
+		{"value": EnumItemTier.label(def.tier)}
+	))
 	if rarity != "":
 		parts.append(StringsZh.format_template(
 			StringsZh.getp("item_info.rarity", "品质：{value}"),

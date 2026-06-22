@@ -85,7 +85,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = ExtResource("1_a8f5r")
 
-[node name="GcItemQualityTint" type="Panel" parent="." unique_id=160386251]
+[node name="GcItemTierTint" type="Panel" parent="." unique_id=160386251]
 unique_name_in_owner = true
 self_modulate = Color(0.7, 0.62, 0.52, 1)
 layout_mode = 1

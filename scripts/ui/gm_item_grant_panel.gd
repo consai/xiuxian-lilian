@@ -53,6 +53,7 @@ func _build_catalog() -> void:
 			"primary_type": def.primary_type,
 			"secondary_type": def.secondary_type,
 			"rarity": EnumQuality.display_label(def.quality),
+			"tier": EnumItemTier.label(def.tier),
 		})
 	var equip_ids := cm.call("all_equip_ids") as Array
 	for equip_id_v in equip_ids:
@@ -68,6 +69,7 @@ func _build_catalog() -> void:
 			"primary_type": "法宝",
 			"secondary_type": "战斗法宝",
 			"rarity": EnumQuality.display_label(int(equip.get("quality", 1))),
+			"tier": EnumItemTier.label(maxi(1, int(equip.get("tier", 1)))),
 		})
 	_catalog.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		var kind_order_a := 0 if str(a.get("kind", "")) == EnumRewardKind.LABEL_EQUIP else 1
@@ -100,8 +102,11 @@ func _rebuild_result_list() -> void:
 		var meta_parts: PackedStringArray = []
 		var item_type := str(row.get("type", ""))
 		var rarity := str(row.get("rarity", ""))
+		var tier := str(row.get("tier", ""))
 		if item_type != "":
 			meta_parts.append(item_type)
+		if tier != "":
+			meta_parts.append(tier)
 		if rarity != "":
 			meta_parts.append(rarity)
 		if not meta_parts.is_empty():

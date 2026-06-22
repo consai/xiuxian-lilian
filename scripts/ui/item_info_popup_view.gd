@@ -71,9 +71,10 @@ func apply_payload(payload: Dictionary) -> void:
 	var icon_v: Variant = payload.get("icon", null)
 	var icon := icon_v as Texture2D if icon_v is Texture2D else null
 	var quality := str(payload.get("quality", "")).strip_edges()
+	var tier := maxi(1, int(payload.get("tier", 1)))
 	var learn_blocked := bool(payload.get("learn_blocked", false))
 	var count := maxi(0, int(payload.get("count", 0)))
-	_item_preview.apply_display(icon, title, count, Color.WHITE, quality, learn_blocked)
+	_item_preview.apply_display(icon, title, count, Color.WHITE, quality, learn_blocked, tier)
 
 
 func _on_backdrop_gui_input(event: InputEvent) -> void:

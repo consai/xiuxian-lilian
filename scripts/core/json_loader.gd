@@ -357,13 +357,12 @@ static func _build_generated_learning_book(
 		category: String,
 		item_id: String
 ) -> Dictionary:
-	var rarity_id := str(source_row.get("rarity", "common")).strip_edges().to_lower()
+	var rarity_id := str(source_row.get("rarity", "")).strip_edges().to_lower()
 	var name := str(source_row.get("name", item_id)).strip_edges()
 	var values := {
 		"name": name,
 		"id": str(source_row.get("id", "")),
 		"realm": str(source_row.get("realm", "")),
-		"rarity": rarity_id,
 	}
 	var out := {
 		"id": item_id,
@@ -371,8 +370,8 @@ static func _build_generated_learning_book(
 		"type": str(template.get("secondary_type", template.get("type", "学习典籍"))),
 		"primary_type": str(template.get("primary_type", "")),
 		"secondary_type": str(template.get("secondary_type", "")),
-		"rarity": _template_lookup_string(template.get("rarity_map", {}), rarity_id, "普通"),
-		"quality": _template_lookup_int(template.get("quality_map", {}), rarity_id, 1),
+		"quality": _template_lookup_int(template.get("quality_by_source_rarity", {}), rarity_id, 1),
+		"tier": maxi(1, int(template.get("tier", 1))),
 		"stackable": bool(template.get("stackable", true)),
 		"max_stack": maxi(1, int(template.get("max_stack", 9))),
 		"desc": StringsZh.format_template(

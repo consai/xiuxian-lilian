@@ -4,7 +4,7 @@ extends Control
 ## 道具展示块，场景 [code]item.tscn[/code]。
 ## [member click_enabled] 为 [code]false[/code] 时仅展示（如详情弹窗）；为 [code]true[/code] 时可点击并带缩放反馈（如背包）。
 ## [member show_info_on_click] 为 [code]true[/code] 且已 [method set_info_entry] 时，左键打开全局道具详情。
-## [code]%GcItemQualityTint[/code] / [code]%GcItemHighlight[/code] / [code]%GcItemQualityGem[/code] 为品质效果，随 [member quality] / [method apply_display] 更新。
+## [code]%GcItemTierTint[/code] / [code]%GcItemHighlight[/code] 为阶位底盘，[code]%GcItemQualityGem[/code] 为品质点。
 ## [code]%GcItemCountBadge[/code] 在 [member show_name_label] 为真且数量大于 1 时显示角标；
 ## [member always_show_count_badge] 为真时，数量大于 0 即显示角标（如消耗展示）。
 
@@ -38,19 +38,21 @@ signal right_clicked
 @onready var _count_badge_wrap: Control = %GcItemCountBadgeWrap
 @onready var _count_badge: Label = %GcItemCountBadge
 @onready var _press: PressScale = %GcItemPress
-@onready var _quality_tint: Panel = %GcItemQualityTint
+@onready var _tier_tint: Panel = %GcItemTierTint
 @onready var _quality_border: Panel = %GcItemHighlight
 @onready var _quality_gem: Panel = %GcItemQualityGem
 
 var _display_name: String = ""
 var _display_count: int = 0
 var _quality: String = ""
+var _tier: int = 1
 var _learn_blocked_flag: bool = false
 var _icon_modulate: Color = Color.WHITE
 var _info_entry: Dictionary = {}
 var _insufficient: bool = false
 var _name_label_settings_normal: LabelSettings
 var _name_label_settings_insufficient: LabelSettings
+var _name_label_settings_quality: LabelSettings
 var _count_label_settings_normal: LabelSettings
 var _count_label_settings_insufficient: LabelSettings
 
@@ -110,6 +112,7 @@ static func apply_item_id(view: ItemView, item_id: String, count: int = 0, optio
 	var icon: Texture2D = null
 	var item_name := name_override
 	var quality := ""
+	var tier := 1
 	if iid != "" and ConfigManager != null:
 		var def := ConfigManager.item_def_by_id(iid)
 		if def != null:
@@ -117,7 +120,8 @@ static func apply_item_id(view: ItemView, item_id: String, count: int = 0, optio
 			if item_name == "":
 				item_name = def.name
 			quality = EnumQuality.display_label(def.quality)
-	view.apply_display(icon, item_name, maxi(0, count), Color.WHITE, quality)
+			tier = def.tier
+	view.apply_display(icon, item_name, maxi(0, count), Color.WHITE, quality, false, tier)
 	view.set_insufficient(insufficient)
 	if show_info and iid != "":
 		view.set_info_entry({"kind": EnumRewardKind.LABEL_ITEM, "id": iid, "count": maxi(1, count)})
@@ -139,6 +143,7 @@ static func apply_reward_row(view: ItemView, row: Dictionary, options: Dictionar
 	var count := maxi(1, int(row.get("count", row.get("amount", 1))))
 	var item_name := str(row.get("name", row.get("item_name", ""))).strip_edges()
 	var quality := str(row.get("quality", row.get("pin_zhi", ""))).strip_edges()
+	var tier := maxi(1, int(row.get("tier", 1)))
 	var icon: Texture2D = null
 	var icon_v: Variant = row.get("icon")
 	if icon_v is Texture2D:
@@ -153,6 +158,7 @@ static func apply_reward_row(view: ItemView, row: Dictionary, options: Dictionar
 		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
 		if quality == "":
 			quality = EnumQuality.display_label(int(equip_cfg.get("quality", 1)))
+		tier = maxi(1, int(equip_cfg.get("tier", tier)))
 	elif kind == EnumRewardKind.LABEL_ITEM:
 		var item_id := str(row.get("id", ""))
 		if item_name == "" and ConfigManager != null:
@@ -163,13 +169,14 @@ static func apply_reward_row(view: ItemView, row: Dictionary, options: Dictionar
 				icon = ItemDef.resolve_icon_texture(def.icon_path, null)
 				if quality == "":
 					quality = EnumQuality.display_label(def.quality)
+				tier = def.tier
 	else:
 		if item_name == "":
 			item_name = str(row.get("id", "奖励"))
 		var path := str(row.get("icon_path", row.get("icon", ""))).strip_edges()
 		if path != "":
 			icon = ItemDef.resolve_icon_texture(path, null)
-	view.apply_display(icon, item_name, count, Color.WHITE, quality)
+	view.apply_display(icon, item_name, count, Color.WHITE, quality, false, tier)
 	view.set_info_entry(entry_from_reward_row(row))
 
 
@@ -203,6 +210,7 @@ func apply_empty(placeholder: Texture2D, icon_modulate: Color = Color(1, 1, 1, 0
 	_display_name = ""
 	_display_count = 0
 	_quality = ""
+	_tier = 1
 	_insufficient = false
 	clear_info_entry()
 	_icon_modulate = icon_modulate
@@ -219,11 +227,13 @@ func apply_display(
 	count: int = 0,
 	icon_modulate: Color = Color.WHITE,
 	quality: String = "",
-	learn_blocked: bool = false
+	learn_blocked: bool = false,
+	tier: int = 1
 ) -> void:
 	_display_name = item_name.strip_edges()
 	_display_count = maxi(0, count)
 	_quality = quality.strip_edges()
+	_tier = maxi(1, tier)
 	_icon_modulate = icon_modulate
 	_icon.texture = icon
 	_apply_icon_modulate(learn_blocked)
@@ -239,7 +249,12 @@ func _apply_text_colors() -> void:
 		if _insufficient and _name_label_settings_insufficient != null:
 			_name_count.label_settings = _name_label_settings_insufficient
 		elif _name_label_settings_normal != null:
-			_name_count.label_settings = _name_label_settings_normal
+			if _quality.strip_edges() != "":
+				_name_label_settings_quality = _name_label_settings_normal.duplicate()
+				_name_label_settings_quality.font_color = EnumQuality.border_color_from_label(_quality)
+				_name_count.label_settings = _name_label_settings_quality
+			else:
+				_name_count.label_settings = _name_label_settings_normal
 	if _count_badge != null:
 		if _insufficient:
 			if _count_label_settings_insufficient != null:
@@ -268,7 +283,8 @@ func apply_row(row: Dictionary, fallback_icon: Texture2D = null) -> void:
 	var nm := str(row.get("wuPinMing", row.get("wuPinId", "")))
 	var cnt := maxi(1, int(row.get("shuLiang", 1)))
 	var pin := str(row.get("pinZhi", ""))
-	apply_display(tex, nm, cnt, Color.WHITE, pin)
+	var tier := maxi(1, int(row.get("tier", 1)))
+	apply_display(tex, nm, cnt, Color.WHITE, pin, false, tier)
 
 
 func _on_press_clicked() -> void:
@@ -328,19 +344,19 @@ func _set_learn_blocked(blocked: bool) -> void:
 func _apply_quality_border(pin_zhi: String) -> void:
 	var quality_text := pin_zhi.strip_edges()
 	var quality_color := EnumQuality.border_color_from_label(quality_text)
-	if _quality_tint != null:
-		_quality_tint.visible = quality_text != ""
-		if _quality_tint.visible:
-			_quality_tint.self_modulate = Color(
-				quality_color.r,
-				quality_color.g,
-				quality_color.b,
-				EnumQuality.tint_alpha_from_label(quality_text)
-			)
+	var tier_color := EnumItemTier.get_color(_tier)
+	if _tier_tint != null:
+		_tier_tint.visible = quality_text != ""
+		_tier_tint.self_modulate = Color(
+			tier_color.r,
+			tier_color.g,
+			tier_color.b,
+			EnumItemTier.tint_alpha(_tier) if _tier_tint.visible else 0.0
+		)
 	if _quality_border != null:
-		_quality_border.visible = EnumQuality.should_show_border(quality_text)
+		_quality_border.visible = quality_text != ""
 		if _quality_border.visible:
-			_quality_border.self_modulate = quality_color
+			_quality_border.self_modulate = tier_color
 	if _quality_gem != null:
 		_quality_gem.visible = EnumQuality.should_show_gem(quality_text)
 		if _quality_gem.visible:

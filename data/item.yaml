@@ -1,4 +1,4 @@
-﻿generated_learning_books:
+generated_learning_books:
   - category: "ability"
     enabled: true
     id_prefix: "book_skill_"
@@ -10,18 +10,13 @@
     max_stack: 9
     name_template: "{name}"
     desc_template: "研读后习得技能「{name}」。"
-    rarity_map:
-      common: "普通"
-      uncommon: "普通"
-      rare: "稀有"
-      epic: "稀有"
-      legendary: "传说"
-    quality_map:
+    quality_by_source_rarity:
       common: 1
       uncommon: 2
       rare: 3
-      epic: 5
-      legendary: 6
+      epic: 4
+      legendary: 4
+      mythic: 4
   - category: "method"
     enabled: true
     id_prefix: "book_method_"
@@ -33,18 +28,13 @@
     max_stack: 9
     name_template: "{name}"
     desc_template: "研读后习得功法「{name}」。"
-    rarity_map:
-      common: "普通"
-      uncommon: "普通"
-      rare: "稀有"
-      epic: "稀有"
-      legendary: "传说"
-    quality_map:
+    quality_by_source_rarity:
       common: 1
       uncommon: 2
       rare: 3
-      epic: 5
-      legendary: 6
+      epic: 4
+      legendary: 4
+      mythic: 4
 legacy_learning_book_aliases:
   book_method_iron_body: "book_method_iron_skin_1"
   book_method_leihuo: "book_method_leihuo_1"
@@ -55,8 +45,8 @@ items:
     type: "材料"
     primary_type: "道具"
     secondary_type: "药材"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 8
     stackable: true
     max_stack: 999
@@ -67,8 +57,8 @@ items:
     type: "材料"
     primary_type: "道具"
     secondary_type: "药材"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 14
     stackable: true
     max_stack: 999
@@ -86,8 +76,8 @@ items:
     type: "材料"
     primary_type: "道具"
     secondary_type: "药材"
-    rarity: "稀有"
     quality: 3
+    tier: 1
     ling_shi: 62
     stackable: true
     max_stack: 999
@@ -98,8 +88,8 @@ items:
     type: "矿材"
     primary_type: "道具"
     secondary_type: "矿石"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 10
     stackable: true
     max_stack: 999
@@ -110,8 +100,8 @@ items:
     type: "矿材"
     primary_type: "道具"
     secondary_type: "矿石"
-    rarity: "稀有"
     quality: 3
+    tier: 1
     ling_shi: 58
     stackable: true
     max_stack: 999
@@ -122,8 +112,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 25
     stackable: true
     max_stack: 99
@@ -144,8 +134,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 35
     stackable: true
     max_stack: 99
@@ -163,8 +153,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 40
     stackable: true
     max_stack: 99
@@ -185,8 +175,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "稀有"
     quality: 3
+    tier: 1
     ling_shi: 120
     stackable: true
     max_stack: 99
@@ -204,8 +194,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 30
     stackable: true
     max_stack: 99
@@ -232,8 +222,8 @@ items:
     type: "法宝"
     primary_type: "法宝"
     secondary_type: "主动法宝"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 85
     stackable: false
     max_stack: 1
@@ -244,8 +234,8 @@ items:
     type: "法宝"
     primary_type: "法宝"
     secondary_type: "被动法宝"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 92
     stackable: false
     max_stack: 1
@@ -256,8 +246,8 @@ items:
     type: "法宝"
     primary_type: "法宝"
     secondary_type: "被动法宝"
-    rarity: "稀有"
     quality: 3
+    tier: 1
     ling_shi: 210
     stackable: false
     max_stack: 1
@@ -268,8 +258,8 @@ items:
     type: "法宝"
     primary_type: "法宝"
     secondary_type: "移动法宝"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 155
     stackable: false
     max_stack: 1
@@ -280,8 +270,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "传说"
-    quality: 6
+    quality: 4
+    tier: 1
     ling_shi: 520
     stackable: true
     max_stack: 9
@@ -302,8 +292,8 @@ items:
     type: "法宝"
     primary_type: "法宝"
     secondary_type: "主动法宝"
-    rarity: "传说"
-    quality: 6
+    quality: 4
+    tier: 1
     ling_shi: 880
     stackable: false
     max_stack: 1
@@ -314,8 +304,8 @@ items:
     type: "法宝"
     primary_type: "法宝"
     secondary_type: "被动法宝"
-    rarity: "传说"
-    quality: 6
+    quality: 4
+    tier: 1
     ling_shi: 620
     stackable: false
     max_stack: 1
@@ -326,8 +316,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 1
     stackable: true
     max_stack: 99
@@ -354,8 +344,8 @@ items:
     type: "材料"
     primary_type: "道具"
     secondary_type: "药材"
-    rarity: "普通"
     quality: 2
+    tier: 1
     ling_shi: 18
     stackable: true
     max_stack: 999
@@ -366,8 +356,8 @@ items:
     type: "材料"
     primary_type: "道具"
     secondary_type: "药材"
-    rarity: "稀有"
     quality: 3
+    tier: 1
     ling_shi: 38
     stackable: true
     max_stack: 999
@@ -378,8 +368,8 @@ items:
     type: "材料"
     primary_type: "道具"
     secondary_type: "药材"
-    rarity: "普通"
     quality: 2
+    tier: 1
     ling_shi: 28
     stackable: true
     max_stack: 999
@@ -390,8 +380,8 @@ items:
     type: "材料"
     primary_type: "道具"
     secondary_type: "药材"
-    rarity: "稀有"
     quality: 3
+    tier: 1
     ling_shi: 55
     stackable: true
     max_stack: 999
@@ -402,8 +392,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 2
     stackable: true
     max_stack: 999
@@ -416,8 +406,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 16
     stackable: true
     max_stack: 99
@@ -432,8 +422,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "稀有"
     quality: 3
+    tier: 1
     ling_shi: 40
     stackable: true
     max_stack: 99
@@ -448,8 +438,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "稀有"
     quality: 4
+    tier: 1
     ling_shi: 65
     stackable: true
     max_stack: 99
@@ -464,8 +454,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 20
     stackable: true
     max_stack: 99
@@ -486,8 +476,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "稀有"
     quality: 3
+    tier: 1
     ling_shi: 48
     stackable: true
     max_stack: 99
@@ -508,8 +498,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "稀有"
     quality: 4
+    tier: 1
     ling_shi: 78
     stackable: true
     max_stack: 99
@@ -530,8 +520,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 26
     stackable: true
     max_stack: 99
@@ -546,8 +536,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "稀有"
     quality: 3
+    tier: 1
     ling_shi: 64
     stackable: true
     max_stack: 99
@@ -562,8 +552,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "稀有"
     quality: 4
+    tier: 1
     ling_shi: 104
     stackable: true
     max_stack: 99
@@ -578,8 +568,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 23
     stackable: true
     max_stack: 99
@@ -597,8 +587,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "稀有"
     quality: 3
+    tier: 1
     ling_shi: 56
     stackable: true
     max_stack: 99
@@ -616,8 +606,8 @@ items:
     type: "典籍"
     primary_type: "书籍"
     secondary_type: "心得"
-    rarity: "普通"
     quality: 1
+    tier: 1
     ling_shi: 0
     stackable: true
     max_stack: 99
@@ -633,8 +623,8 @@ items:
     type: "丹药"
     primary_type: "消耗品"
     secondary_type: "丹药"
-    rarity: "稀有"
     quality: 4
+    tier: 1
     ling_shi: 91
     stackable: true
     max_stack: 99

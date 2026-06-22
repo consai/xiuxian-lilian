@@ -262,7 +262,8 @@ func _bind_entry(view: ItemView, entry: Dictionary, index: int) -> void:
 		int(data.get("count", 1)),
 		Color.WHITE,
 		str(data.get("quality", "")),
-		bool(data.get("learn_blocked", false))
+		bool(data.get("learn_blocked", false)),
+		int(data.get("tier", 1))
 	)
 	view.show_info_on_click = show_info_on_click
 	if show_info_on_click:
@@ -466,6 +467,7 @@ func _entry_view_data(entry: Dictionary, cache_key: String = "") -> Dictionary:
 	var icon: Texture2D = null
 	var item_name := str(entry.get("name", "")).strip_edges()
 	var quality := str(entry.get("quality", "")).strip_edges()
+	var tier := maxi(1, int(entry.get("tier", 1)))
 	var count := maxi(1, int(entry.get("count", 1)))
 	var kind := str(entry.get("kind", EnumRewardKind.LABEL_ITEM))
 	var learn_blocked := false
@@ -476,6 +478,7 @@ func _entry_view_data(entry: Dictionary, cache_key: String = "") -> Dictionary:
 		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
 		if quality == "":
 			quality = EnumQuality.display_label(int(equip_cfg.get("quality", 1)))
+		tier = maxi(1, int(equip_cfg.get("tier", tier)))
 	else:
 		var item_id := str(entry.get("id", ""))
 		if item_name == "" and ConfigManager != null:
@@ -486,12 +489,14 @@ func _entry_view_data(entry: Dictionary, cache_key: String = "") -> Dictionary:
 				icon = ItemDefScript.resolve_icon_texture(def.icon_path, null)
 				if quality == "":
 					quality = EnumQuality.display_label(def.quality)
+				tier = def.tier
 				learn_blocked = ItemInfoPayloadBuilderScript.learning_book_condition_unmet(def)
 	var data := {
 		"icon": icon,
 		"name": item_name,
 		"count": count,
 		"quality": quality,
+		"tier": tier,
 		"learn_blocked": learn_blocked,
 		"hover_payload": _hover_payload_for_entry(entry),
 	}
@@ -500,10 +505,12 @@ func _entry_view_data(entry: Dictionary, cache_key: String = "") -> Dictionary:
 
 
 func _entry_cache_key(entry: Dictionary) -> String:
-	return "%s:%s:%d" % [
+	return "%s:%s:%d:%s:%d" % [
 		str(entry.get("kind", EnumRewardKind.LABEL_ITEM)),
 		str(entry.get("id", "")),
 		maxi(1, int(entry.get("count", 1))),
+		str(entry.get("quality", "")),
+		maxi(1, int(entry.get("tier", 1))),
 	]
 
 
@@ -586,6 +593,9 @@ static func _normalize_entries(entries: Array) -> Array:
 				)
 			row["primary_type"] = EnumItemType.PRIMARY_TREASURE
 			row["secondary_type"] = EnumItemType.SECONDARY_ACTIVE_TREASURE
+			if not row.has("tier"):
+				var equip_cfg := ConfigManager.equip_by_id(int(row.get("id", -1)))
+				row["tier"] = maxi(1, int(equip_cfg.get("tier", 1)))
 		else:
 			row["kind"] = EnumRewardKind.LABEL_ITEM
 			var item_id := str(row.get("id", "")).strip_edges()
@@ -603,6 +613,8 @@ static func _normalize_entries(entries: Array) -> Array:
 					row["name"] = def.name
 				if not row.has("quality"):
 					row["quality"] = EnumQuality.display_label(def.quality)
+				if not row.has("tier"):
+					row["tier"] = def.tier
 			if not row.has("sort_name"):
 				row["sort_name"] = str(row.get("name", item_id))
 			if not row.has("item_type"):
@@ -629,6 +641,7 @@ static func _entry_from_item(item_id: String, count: int) -> Dictionary:
 		"secondary_type": def.secondary_type if def != null else "",
 		"name": def.name if def != null else iid,
 		"quality": EnumQuality.display_label(def.quality) if def != null else "",
+		"tier": def.tier if def != null else 1,
 		"sort_name": def.name if def != null else iid,
 	}
 
@@ -650,6 +663,7 @@ static func _entry_from_equip(equip_id: int) -> Dictionary:
 		"secondary_type": EnumItemType.SECONDARY_ACTIVE_TREASURE,
 		"name": equip_name,
 		"quality": EnumQuality.display_label(int(cfg.get("quality", 1))),
+		"tier": maxi(1, int(cfg.get("tier", 1))),
 		"sort_name": equip_name,
 	}
 
