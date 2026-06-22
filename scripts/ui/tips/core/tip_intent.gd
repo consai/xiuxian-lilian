@@ -9,13 +9,13 @@ const CHANNEL_REWARD_ITEM := EnumTipChannel.LABEL_REWARD_ITEM
 const CHANNEL_REWARD_GROWTH := EnumTipChannel.LABEL_REWARD_GROWTH
 const CHANNEL_REWARD_RESOURCE := EnumTipChannel.LABEL_REWARD_RESOURCE
 
-const TONE_NEUTRAL := "neutral"
-const TONE_GAIN := "gain"
-const TONE_LOSS := "loss"
+const TONE_NEUTRAL := EnumTipTone.LABEL_NEUTRAL
+const TONE_GAIN := EnumTipTone.LABEL_GAIN
+const TONE_LOSS := EnumTipTone.LABEL_LOSS
 
-const TYPE_TOAST := "toast"
-const TYPE_HINT := "hint"
-const TYPE_BLOCK_REASON := "block_reason"
+const TYPE_TOAST := EnumTipIntentType.LABEL_TOAST
+const TYPE_HINT := EnumTipIntentType.LABEL_HINT
+const TYPE_BLOCK_REASON := EnumTipIntentType.LABEL_BLOCK_REASON
 
 const DEFAULT_TTL_MS := 2000
 
@@ -79,14 +79,7 @@ static func _normalize_channel(v: Variant) -> String:
 
 
 static func _normalize_tone(v: Variant) -> String:
-	var s := str(v).strip_edges().to_lower()
-	match s:
-		TONE_GAIN, "green", "up":
-			return TONE_GAIN
-		TONE_LOSS, "red", "down":
-			return TONE_LOSS
-		_:
-			return TONE_NEUTRAL
+	return EnumTipTone.normalize_label(v)
 
 
 static func _safe_dict(v: Variant) -> Dictionary:

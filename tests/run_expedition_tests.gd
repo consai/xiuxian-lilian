@@ -34,9 +34,8 @@ func _run_all() -> void:
 	_run("common decision choice resolves", _test_common_decision_choice_resolves)
 	_run("non battle events advance expedition", _test_non_battle_events_advance)
 	_run("manual exit keeps all loot", _test_manual_exit_keeps_all_loot)
-	_run("defeat exit drops inventory and injury", _test_defeat_exit_drops_inventory_and_injury)
-	_run("defeat inventory drop is deterministic", _test_defeat_inventory_drop_deterministic)
-	_run("defeat loot drop is deterministic", _test_defeat_loot_drop_deterministic)
+	_run("defeat exit drops session loot and injury", _test_defeat_exit_drops_session_loot_and_injury)
+	_run("defeat loot drops fixed thirty percent", _test_defeat_loot_drops_fixed_thirty_percent)
 	_run("elapsed days track expedition days", _test_elapsed_days_track_expedition_days)
 	_run("quiet days advance time without logs", _test_quiet_days_advance_without_logs)
 	_run("battle node builds unchanged battle init", _test_battle_node_builds_unchanged_battle_init)
@@ -438,7 +437,7 @@ func _test_manual_exit_keeps_all_loot() -> void:
 	_expect_eq(game.day, 31, "manual exit advances by expedition duration")
 
 
-func _test_defeat_exit_drops_inventory_and_injury() -> void:
+func _test_defeat_exit_drops_session_loot_and_injury() -> void:
 	var game := _state()
 	game.inventory["items_LingCao"] = 3
 	var expedition := _expedition()
@@ -456,36 +455,35 @@ func _test_defeat_exit_drops_inventory_and_injury() -> void:
 	var loot_total := 0
 	for r in loot_arr:
 		loot_total += int((r as Dictionary).get("count", 0))
-	_expect_true(loot_total > 0, "defeat keeps partial session loot")
-	_expect_true(loot_total < 5, "session loot reduced on defeat")
+	_expect_eq(loot_total, 3, "defeat keeps seventy percent of rounded session loot")
+	var lost_total := 0
+	for r in finish.get("loot_lost", []) as Array:
+		lost_total += int((r as Dictionary).get("count", 0))
+	_expect_eq(lost_total, 2, "defeat drops thirty percent of rounded session loot")
 	game.settle_expedition(finish)
 	_expect_eq(_inventory_total(game.inventory), inv_before + loot_total, "kept session loot merged on settle")
 	_expect_near(game.hp, FightAttr.get_attr(game.attrs, FightAttr.HP_MAX) * 0.25, "defeat hp floor")
 	_expect_eq(game.injury_days, 3, "defeat injury applied after elapsed reduction")
 
 
-func _test_defeat_inventory_drop_deterministic() -> void:
-	var inventory_a := {"items_LingCao": 8, "items_HuiQiDan": 4}
-	var inventory_b := {"items_LingCao": 8, "items_HuiQiDan": 4}
-	var loss_a := ExpeditionRewardServiceScript.apply_inventory_loss_on_defeat(inventory_a, _rng(4242))
-	var loss_b := ExpeditionRewardServiceScript.apply_inventory_loss_on_defeat(inventory_b, _rng(4242))
-	_expect_eq(inventory_a, inventory_b, "same seed same inventory result")
-	_expect_eq(loss_a, loss_b, "same seed same loss result")
-	_expect_true(not (loss_a.get("lost", []) as Array).is_empty(), "drops at least one stack")
-	_expect_true(_inventory_total(inventory_a) < 12, "inventory count reduced")
-
-
-func _test_defeat_loot_drop_deterministic() -> void:
-	var loot_a: Array = [{"kind": "item", "id": "items_LingCao", "count": 6}, {"kind": "item", "id": "items_HuiQiDan", "count": 4}]
-	var loot_b: Array = [{"kind": "item", "id": "items_LingCao", "count": 6}, {"kind": "item", "id": "items_HuiQiDan", "count": 4}]
-	var loss_a := ExpeditionRewardServiceScript.apply_loot_loss_on_defeat(loot_a, _rng(7777))
-	var loss_b := ExpeditionRewardServiceScript.apply_loot_loss_on_defeat(loot_b, _rng(7777))
-	_expect_eq(loss_a, loss_b, "same seed same loot loss result")
-	_expect_true(not (loss_a.get("lost", []) as Array).is_empty(), "drops at least one loot stack")
+func _test_defeat_loot_drops_fixed_thirty_percent() -> void:
+	var loot_a: Array = [
+		{"kind": "item", "id": "items_LingCao", "count": 6},
+		{"kind": "item", "id": "items_HuiQiDan", "count": 4},
+	]
+	var loss_a := ExpeditionRewardServiceScript.apply_loot_loss_on_defeat(loot_a)
+	_expect_eq(
+		loss_a.get("lost", []),
+		[
+			{"kind": "item", "id": "items_LingCao", "count": 2, "source": "session_loot"},
+			{"kind": "item", "id": "items_HuiQiDan", "count": 1, "source": "session_loot"},
+		],
+		"defeat drops fixed thirty percent across loot stacks"
+	)
 	var remaining := 0
 	for r in loot_a:
 		remaining += int((r as Dictionary).get("count", 0))
-	_expect_true(remaining < 10, "session loot count reduced")
+	_expect_eq(remaining, 7, "session loot keeps seventy percent")
 
 
 func _test_elapsed_days_track_expedition_days() -> void:
@@ -561,7 +559,7 @@ func _test_high_difficulty_battle_nodes_generate_map_enemies() -> void:
 		_expect_true(BattleInitData.collect_errors(init_data).is_empty(), "%s generated battle init valid" % forced_type)
 		var enemies := init_data.get("enemies", []) as Array
 		var formation := init_data.get("enemy_formation", {}) as Dictionary
-		_expect_eq(str(formation.get("mode", "")), "columns", "%s generated battle uses column formation" % forced_type)
+		_expect_eq(str(formation.get("mode", "")), EnumBattleFormationMode.LABEL_COLUMNS, "%s generated battle uses column formation" % forced_type)
 		_expect_eq(int(formation.get("columns", 0)), 3, "%s generated battle has three formation columns" % forced_type)
 		_expect_eq(int(formation.get("rows", 0)), 5, "%s generated battle has five formation rows" % forced_type)
 		_expect_eq(int(formation.get("active_columns", 0)), 1, "%s generated battle only activates front column" % forced_type)

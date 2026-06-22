@@ -179,8 +179,8 @@ func _play_sequence_event(event: BattleVfxEvent) -> void:
 	var caster_vfx := ctx.get_vfx(event.source_id)
 	var target_vfx := ctx.get_vfx(event.target_id)
 	var needs_caster_motion := event.skill_type in [
-		BattleVfxEvent.SkillType.MELEE,
-		BattleVfxEvent.SkillType.RANGED,
+		EnumBattleVfxSkillType.Type.MELEE,
+		EnumBattleVfxSkillType.Type.RANGED,
 	]
 	if needs_caster_motion and caster_vfx == null:
 		BattleDebugLog.write("特效", "中止（施法者未注册）", {

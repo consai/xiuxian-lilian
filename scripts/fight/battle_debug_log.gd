@@ -69,13 +69,13 @@ static func end_reason_label(reason: String) -> String:
 
 static func skill_type_label(skill_type: int) -> String:
 	match skill_type:
-		BattleVfxEvent.SkillType.MELEE:
+		EnumBattleVfxSkillType.Type.MELEE:
 			return "近战"
-		BattleVfxEvent.SkillType.RANGED:
+		EnumBattleVfxSkillType.Type.RANGED:
 			return "远程"
-		BattleVfxEvent.SkillType.HEAL:
+		EnumBattleVfxSkillType.Type.HEAL:
 			return "治疗"
-		BattleVfxEvent.SkillType.BUFF:
+		EnumBattleVfxSkillType.Type.BUFF:
 			return "增益"
 		_:
 			return "其他"

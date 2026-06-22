@@ -71,11 +71,11 @@ func _on_use_requested() -> void:
 
 
 func _emit_use_error_tip(text: String) -> void:
-	_emit_use_tip(text, TipIntentScript.TONE_LOSS)
+	_emit_use_tip(text, EnumTipTone.LABEL_LOSS)
 
 
 func _emit_use_success_tip(text: String) -> void:
-	_emit_use_tip(text, TipIntentScript.TONE_GAIN)
+	_emit_use_tip(text, EnumTipTone.LABEL_GAIN)
 
 
 func _emit_use_tip(text: String, tone: String) -> void:
@@ -83,7 +83,7 @@ func _emit_use_tip(text: String, tone: String) -> void:
 	if message == "":
 		return
 	DataEvents.emit_tip_intent(TipIntentScript.make({
-		"type": TipIntentScript.TYPE_TOAST,
+		"type": EnumTipIntentType.LABEL_TOAST,
 		"text": message,
 		"tone": tone,
 		"channel": TipIntentScript.CHANNEL_BAR,

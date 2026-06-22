@@ -50,7 +50,7 @@ static func _resolve_overlay(
 		var eff := eff_v as Dictionary
 		var eff_type := str(eff.get("type", "")).strip_edges().to_lower()
 		match eff_type:
-			"damage":
+			EnumCombatEffectType.LABEL_DAMAGE:
 				if not _targets_player(eff):
 					continue
 				damage_total += FightAttr.estimate_skill_damage(
@@ -61,7 +61,7 @@ static func _resolve_overlay(
 					str(eff.get("damage_type", default_damage_type)),
 					float(eff.get("armor_pierce", 0.0)),
 				)
-			"shield":
+			EnumCombatEffectType.LABEL_SHIELD:
 				has_shield = true
 	if damage_total > 0.0:
 		return {
@@ -91,7 +91,7 @@ static func _attacker_skill_cfg(attacker: FightObj, skill_cfg: Dictionary, skill
 
 static func _targets_player(effect: Dictionary) -> bool:
 	var target_key := str(effect.get("target", "")).strip_edges().to_lower()
-	if target_key == "enemy":
+	if target_key == EnumCombatTarget.LABEL_ENEMY:
 		return true
 	if target_key == "":
 		return true

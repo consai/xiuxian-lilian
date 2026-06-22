@@ -97,9 +97,9 @@ static func item(name: String, count: int, source: String, quality: int = 1, ico
 	var rare := quality >= RARE_QUALITY_THRESHOLD
 	var text := "获得：%s x%d" % [name, maxi(1, count)]
 	return TipIntentScript.make({
-		"type": TipIntentScript.TYPE_TOAST,
+		"type": EnumTipIntentType.LABEL_TOAST,
 		"text": text,
-		"tone": TipIntentScript.TONE_GAIN,
+		"tone": EnumTipTone.LABEL_GAIN,
 		"channel": TipIntentScript.CHANNEL_REWARD_ITEM,
 		"source": source,
 		"priority": 80 if rare else 40,
@@ -117,9 +117,9 @@ static func item(name: String, count: int, source: String, quality: int = 1, ico
 static func growth(label: String, amount: int, source: String, key: String = "") -> Dictionary:
 	var safe_key := key if key.strip_edges() != "" else label
 	return TipIntentScript.make({
-		"type": TipIntentScript.TYPE_HINT,
+		"type": EnumTipIntentType.LABEL_HINT,
 		"text": "%s +%d" % [label, maxi(1, amount)],
-		"tone": TipIntentScript.TONE_GAIN,
+		"tone": EnumTipTone.LABEL_GAIN,
 		"channel": TipIntentScript.CHANNEL_REWARD_GROWTH,
 		"source": source,
 		"priority": 20,
@@ -137,9 +137,9 @@ static func resource(label: String, amount: int, source: String, key: String = "
 	var large := amount >= LARGE_LING_STONE_THRESHOLD
 	var channel := TipIntentScript.CHANNEL_REWARD_ITEM if large else TipIntentScript.CHANNEL_REWARD_RESOURCE
 	return TipIntentScript.make({
-		"type": TipIntentScript.TYPE_TOAST,
+		"type": EnumTipIntentType.LABEL_TOAST,
 		"text": "%s +%d" % [label, maxi(1, amount)],
-		"tone": TipIntentScript.TONE_GAIN,
+		"tone": EnumTipTone.LABEL_GAIN,
 		"channel": channel,
 		"source": source,
 		"priority": 60 if large else 30,
@@ -157,9 +157,9 @@ static func resource(label: String, amount: int, source: String, key: String = "
 
 static func major_event(text: String, source: String, key: String = "") -> Dictionary:
 	return TipIntentScript.make({
-		"type": TipIntentScript.TYPE_TOAST,
+		"type": EnumTipIntentType.LABEL_TOAST,
 		"text": text,
-		"tone": TipIntentScript.TONE_GAIN,
+		"tone": EnumTipTone.LABEL_GAIN,
 		"channel": TipIntentScript.CHANNEL_REWARD_ITEM,
 		"source": source,
 		"priority": 100,

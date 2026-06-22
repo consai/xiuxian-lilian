@@ -16,7 +16,7 @@ func consume_runtime_events(ctx: FightSceneContext, hud: FightSceneHud) -> void:
 		var ev := ev_v as Dictionary
 		var unit_id := str(ev.get(CombatEventScript.KEY_UNIT_ID, ""))
 		match str(ev.get(CombatEventScript.KEY_TYPE, "")):
-			CombatEventScript.TYPE_BUFF_TICK_DAMAGE:
+			EnumCombatEventType.LABEL_BUFF_TICK_DAMAGE:
 				var report_v: Variant = ev.get(CombatEventScript.KEY_REPORT, {})
 				if report_v is Dictionary:
 					_on_buff_tick_damage(
@@ -25,7 +25,7 @@ func consume_runtime_events(ctx: FightSceneContext, hud: FightSceneHud) -> void:
 						CombatReportScript.normalize_report(report_v as Dictionary),
 						unit_id
 					)
-			CombatEventScript.TYPE_BUFF_EXPIRED:
+			EnumCombatEventType.LABEL_BUFF_EXPIRED:
 				_on_buff_expired(str(ev.get(CombatEventScript.KEY_BUFF_ID, "")), unit_id)
 
 

@@ -66,8 +66,9 @@ func set_entries(entries: Array) -> void:
 	_entry_view_cache.clear()
 	_hover_payload_cache.clear()
 	if is_node_ready():
-		_scroll.scroll_vertical = 0
+		var saved_scroll := _scroll.scroll_vertical
 		_refresh()
+		_scroll.scroll_vertical = _clamp_scroll_vertical(saved_scroll)
 
 
 func set_picker_mode(filter: PickerFilter) -> void:
@@ -141,6 +142,15 @@ func _measure_row_height() -> void:
 		sep = 8.0
 	_row_height = maxf(1.0, float(_slot_pool[0].custom_minimum_size.y) + sep)
 	_refresh()
+
+
+func _clamp_scroll_vertical(scroll: int) -> int:
+	if _content == null or _scroll == null:
+		return maxi(0, scroll)
+	var max_scroll := int(
+		maxf(0.0, _content.custom_minimum_size.y - float(_scroll.size.y))
+	)
+	return clampi(scroll, 0, max_scroll)
 
 
 func _configure_content_size() -> void:

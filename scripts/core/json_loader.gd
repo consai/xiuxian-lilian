@@ -18,17 +18,6 @@ const BuffDefScript = preload("res://scripts/fight/buff_def.gd")
 
 ## 配置文件中的文档用元数据键（加载后剔除）。
 const JSON_COMMENT_KEYS: Array[String] = ["_comment", "_说明", "_doc", "_备注"]
-const COMBAT_EFFECT_TYPES := {
-	"damage": true,
-	"heal": true,
-	"shield": true,
-	"restore_mp": true,
-	"buff": true,
-	"apply_buff": true,
-	"buff_add": true,
-}
-const COMBAT_EFFECT_TARGETS := {"self": true, "enemy": true}
-
 
 ## 配置表 id 统一为 String（空串表示无效/缺省）。
 static func config_id_to_string(v: Variant) -> String:
@@ -516,13 +505,13 @@ static func _validate_combat_effects_schema(raw: Variant, path_label: String, al
 		if etype == "":
 			push_error("JsonLoader: %s[%d].type is required" % [path_label, i])
 			continue
-		if not COMBAT_EFFECT_TYPES.has(etype):
+		if not EnumCombatEffectType.is_valid_label(etype):
 			push_error("JsonLoader: %s[%d].type '%s' is unsupported" % [path_label, i, etype])
 		if allow_target and item.has("target"):
 			var target := str(item.get("target", "")).strip_edges().to_lower()
-			if target != "" and not COMBAT_EFFECT_TARGETS.has(target):
+			if target != "" and not EnumCombatTarget.is_valid_label(target):
 				push_error("JsonLoader: %s[%d].target '%s' is unsupported" % [path_label, i, target])
-		if etype in ["damage", "heal", "shield", "restore_mp"] and not item.has("value"):
+		if EnumCombatEffectType.requires_value(etype) and not item.has("value"):
 			push_error("JsonLoader: %s[%d].value is required for type '%s'" % [path_label, i, etype])
 
 

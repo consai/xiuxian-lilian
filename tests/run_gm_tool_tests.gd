@@ -95,7 +95,7 @@ func _test_battle_builder_enemy_kind_and_count() -> void:
 		root.get_node("ConfigManager")
 	)
 	_expect_eq(int((boss_init.get("enemy_formation", {}) as Dictionary).get("rank_size", 0)), 1, "gm boss battle places one boss per rank")
-	_expect_eq(str((boss_init.get("enemy_formation", {}) as Dictionary).get("mode", "")), "columns", "gm boss battle uses column formation")
+	_expect_eq(str((boss_init.get("enemy_formation", {}) as Dictionary).get("mode", "")), EnumBattleFormationMode.LABEL_COLUMNS, "gm boss battle uses column formation")
 
 
 func _new_panel() -> Control:

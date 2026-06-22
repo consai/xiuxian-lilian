@@ -235,7 +235,7 @@ func _test_skill_slot_scales_runtime_effects() -> void:
 			"cd": 0.0,
 			"power": 1000.0,
 			"effects": [
-				{"type": "damage", "value": 40.0, "damage_type": FightAttr.DAMAGE_MAGIC, "can_miss": false},
+				{"type": EnumCombatEffectType.LABEL_DAMAGE, "value": 40.0, "damage_type": FightAttr.DAMAGE_MAGIC, "can_miss": false},
 			],
 		},
 	}
@@ -282,7 +282,12 @@ func _test_effect_scaling() -> void:
 			"mp_cost": 0.0,
 			"cd": 0.0,
 			"effects": [
-				{"type": "shield", "value": 10.0, "scaling": {FightAttr.MAGIC_ATK: 1.5}, "target": "self"},
+				{
+					"type": EnumCombatEffectType.LABEL_SHIELD,
+					"value": 10.0,
+					"scaling": {FightAttr.MAGIC_ATK: 1.5},
+					"target": EnumCombatTarget.LABEL_SELF,
+				},
 			],
 		},
 	}
@@ -457,14 +462,14 @@ func _test_enemy_wave_formation_advances_after_current_row_dies() -> void:
 		enemies.append(_make_unit(100.0, 100.0))
 	var domain := BattleDomainServiceScript.new()
 	domain.start_battle_many(player, enemies, {}, 200.0, {}, {}, {
-		"mode": "waves",
+		"mode": EnumBattleFormationMode.LABEL_WAVES,
 		"columns": 3,
 		"rows": 5,
 		"active_columns": 1,
 		"waves": [[0, 1], [2], [3]],
 	})
 
-	_expect_eq(str(domain.get_formation_snapshot().get("mode", "")), "waves", "wave mode active")
+	_expect_eq(str(domain.get_formation_snapshot().get("mode", "")), EnumBattleFormationMode.LABEL_WAVES, "wave mode active")
 	_expect_eq(domain.tick_advancing(0.5), "", "half tick should not ready")
 	_expect_true(float(domain.interval_elapsed_enemies[0]) > 0.0, "front row enemy 0 advances")
 	_expect_true(float(domain.interval_elapsed_enemies[1]) > 0.0, "front row enemy 1 advances")
@@ -535,7 +540,7 @@ func _test_knowledge_growth() -> void:
 		"effectId": "damage_spiritual",
 		"base": 40.0,
 		"knowledgeGrowth": 18.0,
-		"target": "enemy",
+		"target": EnumCombatTarget.LABEL_ENEMY,
 	}]
 	var base := EffectResolverScript.resolve_combat_effects(rows, 0.0)
 	var full := EffectResolverScript.resolve_combat_effects(rows, 1.0)
@@ -580,10 +585,10 @@ func _test_intent_preview_honors_slot_effect_scale() -> void:
 		"power": 1000.0,
 		"effects": [
 			{
-				"type": "damage",
+				"type": EnumCombatEffectType.LABEL_DAMAGE,
 				"value": 40.0,
 				"damage_type": FightAttr.DAMAGE_MAGIC,
-				"target": "enemy",
+				"target": EnumCombatTarget.LABEL_ENEMY,
 			},
 		],
 	}
@@ -638,7 +643,7 @@ func _runtime_dot(duration: float, ticktime: float, damage: float) -> Dictionary
 		"duration_left": duration,
 		"tick_accum": 0.0,
 		"ticktime": ticktime,
-		"tick_effects": [{"type": "damage", "value": damage}],
+		"tick_effects": [{"type": EnumCombatEffectType.LABEL_DAMAGE, "value": damage}],
 		"stat_modifiers": {},
 	}
 

@@ -2,7 +2,7 @@ extends Node
 
 signal snapshot_updated(scene_id: String, snapshot: Dictionary)
 signal toast(message: String)
-## 历练内由事件等写入的逐条提示：[code]{ "text": String, "tone": "gain"|"loss"|"neutral" }[/code]
+## 历练内由事件等写入的逐条提示：[code]{ "text": String, "tone": EnumTipTone.LABEL_* }[/code]
 signal tip_hints(entries: Array)
 ## 统一提示协议（TipIntent V1）
 signal tip_intent(intent: Dictionary)

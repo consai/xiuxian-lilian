@@ -487,7 +487,7 @@ static func build_enemy_formation(event: Dictionary, enemies: Array) -> Dictiona
 	if enemies.is_empty():
 		return {}
 	var formation := {
-		"mode": "columns",
+		"mode": EnumBattleFormationMode.LABEL_COLUMNS,
 		"columns": 3,
 		"rows": 5,
 		"active_columns": 1,

@@ -23,6 +23,13 @@ if (!config.rules.layerInheritance?.recursive) errors.push("功法层必须启�
 if (config.rules.layerInheritance?.knowledge?.maximumCapLevel !== dao.training.maxLevel) errors.push("继承知识最高等级与大道树不一致");
 if (config.rules.blockedKnowledgeXpPolicy !== "discard") errors.push("知识经验不得暂存");
 if (config.rules.layerInheritance?.effects?.inheritPreviousEffects !== false) errors.push("高层功法不得自动继承旧层效果");
+if (config.rules.methodMasteryLeveling?.effectTypePolicy !== "fixed_effect_types_level_changes_values_only") {
+  errors.push("功法熟练度等级只能改变固定效果数值");
+}
+if (!Array.isArray(config.rules.methodMasteryLeveling?.valueRatios)
+  || config.rules.methodMasteryLeveling.valueRatios.length !== config.rules.methodMasteryLeveling.maxLevel) {
+  errors.push("功法熟练度数值倍率必须与最大等级一一对应");
+}
 if (config.rules.layerInheritance?.knowledge?.inheritedGrowthWeightMultiplierPerTierDistance <= 0
   || config.rules.layerInheritance?.knowledge?.inheritedGrowthWeightMultiplierPerTierDistance >= 1) {
   errors.push("继承知识权重倍率必须在 0 与 1 之间");

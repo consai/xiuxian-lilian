@@ -6,7 +6,7 @@
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="7_text"]
 [ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="8_small"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="9_banner_text"]
-[ext_resource type="Script" path="res://scripts/ui/components/long_press_scroll_container.gd" id="10_lpsc"]
+[ext_resource type="Script" uid="uid://dxe5p5sw8ftc0" path="res://scripts/ui/components/long_press_scroll_container.gd" id="10_lpsc"]
 
 [sub_resource type="StyleBoxFlat" id="Style_banner"]
 bg_color = Color(1, 0.890196, 0.690196, 0.98)
@@ -86,7 +86,7 @@ custom_minimum_size = Vector2(0, 160)
 layout_mode = 0
 offset_left = 27.0
 offset_top = 49.0
-offset_right = 338.0
+offset_right = 331.0
 offset_bottom = 453.0
 size_flags_vertical = 3
 horizontal_scroll_mode = 0

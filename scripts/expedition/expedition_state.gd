@@ -599,10 +599,8 @@ func finish(exit_reason: String) -> Dictionary:
 	var settlement_loot := loot.duplicate(true)
 	var loot_lost: Array = []
 	if reason == "defeated":
-		_restore_rng()
-		var loot_loss := ExpeditionRewardServiceScript.apply_loot_loss_on_defeat(settlement_loot, _rng)
+		var loot_loss := ExpeditionRewardServiceScript.apply_loot_loss_on_defeat(settlement_loot)
 		loot_lost.append_array(loot_loss.get("lost", []) as Array)
-		_save_rng()
 		var rules: Dictionary = ExpeditionRulesServiceScript.rules()
 		var hp_max := float((player_snapshot.get("attrs", {}) as Dictionary).get(FightAttr.HP_MAX, 100.0))
 		runtime["hp"] = maxf(float(runtime.get("hp", 0.0)), hp_max * float(rules.get("defeat_hp_floor_ratio", 0.25)))

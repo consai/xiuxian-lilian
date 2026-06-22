@@ -12,8 +12,8 @@ const SIGNAL_ENEMY_DEAD := "enemy_dead"
 const DEFAULT_FORMATION_COLUMNS := 3
 const DEFAULT_FORMATION_ROWS := 5
 const DEFAULT_ACTIVE_COLUMNS := 1
-const FORMATION_MODE_COLUMNS := "columns"
-const FORMATION_MODE_WAVES := "waves"
+const FORMATION_MODE_COLUMNS := EnumBattleFormationMode.LABEL_COLUMNS
+const FORMATION_MODE_WAVES := EnumBattleFormationMode.LABEL_WAVES
 
 var state: EnumBattleState.State = EnumBattleState.State.ADVANCING
 var paused_side: String = ""
@@ -676,7 +676,7 @@ func _sync_legacy_enemy_interval() -> void:
 
 
 func _apply_formation_config(cfg: Dictionary) -> void:
-	formation_mode = str(cfg.get("mode", FORMATION_MODE_COLUMNS)).strip_edges()
+	formation_mode = EnumBattleFormationMode.normalize_label(cfg.get("mode", FORMATION_MODE_COLUMNS))
 	if formation_mode == "":
 		formation_mode = FORMATION_MODE_COLUMNS
 	formation_columns = clampi(int(cfg.get("columns", DEFAULT_FORMATION_COLUMNS)), 1, 6)

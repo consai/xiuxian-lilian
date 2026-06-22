@@ -522,14 +522,16 @@ static func emit_block_reason_intent(
 	var de: Node = ctx.scene.get_node_or_null("/root/DataEvents")
 	if de == null or not de.has_method("emit_tip_intent"):
 		return
-	var tone := "loss" if reason_code in [BLOCK_INSUFFICIENT_MP, BLOCK_NO_COUNT] else "neutral"
+	var tone := EnumTipTone.LABEL_LOSS \
+			if reason_code in [BLOCK_INSUFFICIENT_MP, BLOCK_NO_COUNT] \
+			else EnumTipTone.LABEL_NEUTRAL
 	de.emit_tip_intent({
 		"id": "fight_block_%d" % Time.get_ticks_msec(),
 		"schema_version": 1,
-		"type": "block_reason",
+		"type": EnumTipIntentType.LABEL_BLOCK_REASON,
 		"text": text,
 		"tone": tone,
-		"channel": "combat_block",
+		"channel": EnumTipChannel.LABEL_COMBAT_BLOCK,
 		"source": "fight_scene",
 		"created_at_ms": Time.get_ticks_msec(),
 		"throttle_key": "fight_block.%s.%d.%s" % [slot_type, index, reason_code],

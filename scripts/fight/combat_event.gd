@@ -1,8 +1,8 @@
 class_name CombatEvent
 extends RefCounted
 
-const TYPE_BUFF_TICK_DAMAGE := "buff_tick_damage"
-const TYPE_BUFF_EXPIRED := "buff_expired"
+const TYPE_BUFF_TICK_DAMAGE := EnumCombatEventType.LABEL_BUFF_TICK_DAMAGE
+const TYPE_BUFF_EXPIRED := EnumCombatEventType.LABEL_BUFF_EXPIRED
 
 const KEY_TYPE := "type"
 const KEY_UNIT_ID := "unit_id"

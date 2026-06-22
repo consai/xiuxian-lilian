@@ -4,8 +4,6 @@ extends PanelContainer
 signal pressed(skill_id: String)
 signal double_pressed(skill_id: String)
 
-const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
-
 @onready var _title: Label = $VBox/Title
 @onready var _rank: Label = $VBox/Rank
 
@@ -24,7 +22,7 @@ func bind(skill: Dictionary, state: int, effective_level: float, marked: bool) -
 	_title.text = str(skill.get("name", ""))
 	if effective_level >= 1.0:
 		_rank.text = _roman_level(maxi(1, int(floor(effective_level))))
-	elif state == DaoTreeServiceScript.NodeState.LOCKED:
+	elif state == EnumDaoNodeState.State.LOCKED:
 		_rank.text = "未解锁"
 	else:
 		_rank.text = "—"
@@ -33,11 +31,11 @@ func bind(skill: Dictionary, state: int, effective_level: float, marked: bool) -
 
 func _apply_state(state: int, marked: bool) -> void:
 	match state:
-		DaoTreeServiceScript.NodeState.LEARNED:
+		EnumDaoNodeState.State.LEARNED:
 			modulate = Color(0.65, 0.7, 0.53, 0.96)
-		DaoTreeServiceScript.NodeState.GROWING:
+		EnumDaoNodeState.State.GROWING:
 			modulate = Color(0.55, 0.72, 0.68, 0.96)
-		DaoTreeServiceScript.NodeState.AVAILABLE:
+		EnumDaoNodeState.State.AVAILABLE:
 			modulate = Color(0.97, 0.91, 0.78, 0.96)
 		_:
 			modulate = Color(0.68, 0.64, 0.55, 0.78)

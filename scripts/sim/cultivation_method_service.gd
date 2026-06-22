@@ -176,6 +176,29 @@ static func method_mastery(savedata: Dictionary, method_id: String) -> float:
 	return 0.0
 
 
+static func method_mastery_level(savedata: Dictionary, method_id: String) -> int:
+	var rules: Dictionary = bundle().get("rules", {}) as Dictionary
+	var leveling: Dictionary = rules.get("methodMasteryLeveling", {}) as Dictionary
+	var max_level := maxi(1, int(leveling.get("maxLevel", 5)))
+	var mastery := method_mastery(savedata, method_id)
+	if mastery >= 1.0:
+		return max_level
+	return clampi(int(floor(mastery * float(max_level))) + 1, 1, max_level)
+
+
+static func method_mastery_value_ratio(savedata: Dictionary, method_id: String) -> float:
+	var rules: Dictionary = bundle().get("rules", {}) as Dictionary
+	var leveling: Dictionary = rules.get("methodMasteryLeveling", {}) as Dictionary
+	var ratios: Array = leveling.get("valueRatios", []) as Array
+	var level := method_mastery_level(savedata, method_id)
+	if level - 1 < ratios.size():
+		return clampf(float(ratios[level - 1]), 0.0, 1.0)
+	var max_level := maxi(1, int(leveling.get("maxLevel", 5)))
+	if max_level <= 1:
+		return method_mastery(savedata, method_id)
+	return float(level - 1) / float(max_level - 1)
+
+
 static func add_method_mastery(savedata: Dictionary, method_id: String, amount: float) -> void:
 	if not savedata.get("method_mastery") is Dictionary:
 		savedata["method_mastery"] = {}
@@ -272,7 +295,7 @@ static func build_modifiers(slots: Dictionary, savedata: Dictionary) -> Dictiona
 			continue
 		var method_id := str(method.get("id", ""))
 		var slot_weight := float(SLOT_WEIGHTS[slot_key])
-		var mastery := method_mastery(savedata, method_id)
+		var mastery := method_mastery_value_ratio(savedata, method_id)
 		var knowledge_bonus := 1.0 + knowledge_mastery_for_method(savedata, method_id)
 		for effect_v in method.get("effects", []) as Array:
 			if not effect_v is Dictionary:

@@ -209,7 +209,7 @@ static func _validate_expedition_rules(config_manager: Node) -> PackedStringArra
 		return errors
 	var required := [
 		"event_day_chance", "max_idle_days", "choice_count",
-		"defeat_hp_floor_ratio", "defeat_injury_days",
+		"defeat_hp_floor_ratio", "defeat_injury_days", "defeat_loot_drop_ratio",
 	]
 	for key in required:
 		if not rules.has(key):
@@ -224,6 +224,9 @@ static func _validate_expedition_rules(config_manager: Node) -> PackedStringArra
 	var floor_ratio := float(rules.get("defeat_hp_floor_ratio", -1.0))
 	if floor_ratio < 0.0 or floor_ratio > 1.0:
 		errors.append("defeat_hp_floor_ratio 必须在 0~1 之间")
+	var loot_drop_ratio := float(rules.get("defeat_loot_drop_ratio", -1.0))
+	if loot_drop_ratio < 0.0 or loot_drop_ratio > 1.0:
+		errors.append("defeat_loot_drop_ratio 必须在 0~1 之间")
 	return errors
 
 

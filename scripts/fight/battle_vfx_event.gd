@@ -3,19 +3,11 @@ extends RefCounted
 
 ## 战斗逻辑层 → 表现层 的事件载荷（与 [FightObj] 解耦）。
 
-enum SkillType {
-	MELEE,
-	RANGED,
-	HEAL,
-	BUFF,
-	OTHER,
-}
-
 var source_id: String = ""
 var target_id: String = ""
 var damage_value: float = 0.0
 var is_crit: bool = false
-var skill_type: SkillType = SkillType.MELEE
+var skill_type: EnumBattleVfxSkillType.Type = EnumBattleVfxSkillType.Type.MELEE
 var extra: Dictionary = {}
 
 
@@ -32,18 +24,5 @@ static func from_dict(data: Dictionary) -> BattleVfxEvent:
 	return ev
 
 
-static func _parse_skill_type(raw: Variant) -> SkillType:
-	if raw is int:
-		return clampi(raw, 0, SkillType.size() - 1) as SkillType
-	var key := str(raw).strip_edges().to_lower()
-	match key:
-		"melee", "physical", "attack", "近战":
-			return SkillType.MELEE
-		"ranged", "remote", "magic", "spell", "远程":
-			return SkillType.RANGED
-		"heal", "治疗":
-			return SkillType.HEAL
-		"buff":
-			return SkillType.BUFF
-		_:
-			return SkillType.OTHER
+static func _parse_skill_type(raw: Variant) -> EnumBattleVfxSkillType.Type:
+	return EnumBattleVfxSkillType.from_label(raw)

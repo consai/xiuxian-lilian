@@ -49,7 +49,7 @@ flowchart LR
 | F19 | 低资源保底 | HP/MP 比例 < 35% 优先抽 recover | Director `_resource_ratio()` |
 | F20 | 单次事件 | `once_per_expedition` 本局不重复 | `completed_events` / `visited_once_events` |
 | F21 | 主动返程 | 非战斗、非待抉择时可退出 | `can_exit()` + `go_expedition_result("manual")` |
-| F22 | 战败 | 战斗失败强制结算；扣背包、伤势、气血下限 | `settle_pending_battle()` → `finish("defeated")` |
+| F22 | 战败 | 战斗失败强制结算；固定掉落 30% 本次收获、伤势、气血下限 | `settle_pending_battle()` → `finish("defeated")` |
 | F23 | 战前撤退 | 战斗弹窗选撤退，记手动返程 | `retreat_from_pending_battle()` |
 | F24 | 结算页 | 统计、战利品、损失、世界变化、历练纪要 | `expedition_result.gd` |
 | F25 | 存档回写 | 推进天数、同步物品、累计 totals、活动日志 | `GameState.settle_expedition()` |
@@ -246,7 +246,7 @@ choose_map_node(node_id)
 | `auto_event_advance_seconds` | 1.0 | 遭遇日之间的自动推进间隔（秒）；空窗日不适用 |
 | `defeat_hp_floor_ratio` | 0.25 | 战败后气血下限（相对 max） |
 | `defeat_injury_days` | 3 | 战败伤势天数 |
-| `defeat_inventory_drop_*` | 见 JSON | 战败随机丢失背包堆数与比例 |
+| `defeat_loot_drop_ratio` | 0.3 | 战败固定掉落本次历练收获比例 |
 | `reward_budget.daily_base_value` | 12 | 每日历练基础收益值，用于工业化调节平均产出 |
 | `reward_budget.difficulty_growth` | 0.22 | 每点难度带来的收益值增长 |
 | `reward_budget.event_type_multipliers` | 见 YAML | 采集、普通战斗、精英、首领等奖励倍率 |

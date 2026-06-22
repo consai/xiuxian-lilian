@@ -5,13 +5,6 @@ const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 
 const PATH := "res://data/dao_tree.yaml"
 
-enum NodeState {
-	LEARNED,
-	GROWING,
-	AVAILABLE,
-	LOCKED,
-}
-
 static var _config: Dictionary = {}
 static var _skills_by_id: Dictionary = {}
 static var _skills_by_domain: Dictionary = {}
@@ -188,16 +181,16 @@ static func node_display_state(
 ) -> int:
 	if effective_level >= 1.0:
 		if growth_source != "" and effective_level < float(skill_by_id(skill_id).get("maxLevel", 5)):
-			return NodeState.GROWING
-		return NodeState.LEARNED
+			return EnumDaoNodeState.State.GROWING
+		return EnumDaoNodeState.State.LEARNED
 	var skill := skill_by_id(skill_id)
 	if skill.is_empty():
-		return NodeState.LOCKED
+		return EnumDaoNodeState.State.LOCKED
 	if not meets_realm_gate(str(skill.get("realm", "")), player_major_realm):
-		return NodeState.LOCKED
+		return EnumDaoNodeState.State.LOCKED
 	if prereqs_met(skill_id, knowledge_levels):
-		return NodeState.AVAILABLE
-	return NodeState.LOCKED
+		return EnumDaoNodeState.State.AVAILABLE
+	return EnumDaoNodeState.State.LOCKED
 
 
 static func _attr_value(attr_id: String, foundations: Dictionary, aptitudes: Dictionary) -> float:

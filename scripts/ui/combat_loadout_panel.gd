@@ -104,7 +104,7 @@ func _bind_method_row(row: Control, type_label: String, method: Dictionary) -> v
 
 func _bind_method_summary() -> void:
 	var main := CultivationMethodServiceScript.by_id(str(GameState.cultivation_method_slots.get("main", "")))
-	var mastery := CultivationMethodServiceScript.method_mastery(
+	var mastery := CultivationMethodServiceScript.method_mastery_value_ratio(
 		GameState.to_dict(), str(main.get("id", ""))
 	)
 	var mp_restore := EffectResolverScript.combat_mp_restore_from_method(

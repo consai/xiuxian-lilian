@@ -2,7 +2,6 @@ class_name ExpeditionRewardService
 extends RefCounted
 
 const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
-const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
 const DropPoolServiceScript := preload("res://scripts/sim/drop_pool_service.gd")
 
@@ -78,66 +77,54 @@ static func grant_to_player(game_state: Node, session_loot: Array, rewards: Arra
 	return applied
 
 
-static func apply_inventory_loss_on_defeat(inventory: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
+static func apply_loot_loss_on_defeat(loot: Array) -> Dictionary:
 	var rules := ExpeditionRulesServiceScript.rules()
-	var min_stacks := maxi(0, int(rules.get("defeat_inventory_drop_min_stacks", 1)))
-	var max_stacks := maxi(min_stacks, int(rules.get("defeat_inventory_drop_max_stacks", 2)))
-	var min_ratio := clampf(float(rules.get("defeat_inventory_drop_min_ratio", 0.25)), 0.0, 1.0)
-	var max_ratio := clampf(float(rules.get("defeat_inventory_drop_max_ratio", 0.75)), min_ratio, 1.0)
-	var candidates: Array = []
-	for iid_v in inventory.keys():
-		var iid := str(iid_v)
-		if int(inventory.get(iid, 0)) > 0:
-			candidates.append(iid)
-	if candidates.is_empty():
+	var drop_ratio := clampf(float(rules.get("defeat_loot_drop_ratio", 0.3)), 0.0, 1.0)
+	if drop_ratio <= 0.0:
 		return {"lost": []}
-	_shuffle_array(candidates, rng)
-	var pick_count := mini(candidates.size(), rng.randi_range(min_stacks, max_stacks))
-	var lost: Array = []
-	for i in pick_count:
-		var iid := str(candidates[i])
-		var count := int(inventory.get(iid, 0))
-		if count <= 0:
-			continue
-		var min_drop := maxi(1, int(floor(float(count) * min_ratio)))
-		var max_drop := maxi(min_drop, int(floor(float(count) * max_ratio)))
-		var drop := mini(count, rng.randi_range(min_drop, max_drop))
-		if drop <= 0:
-			continue
-		InventoryServiceScript.remove_item(inventory, iid, drop)
-		lost.append({"kind": "item", "id": iid, "count": drop, "source": "inventory"})
-	return {"lost": lost}
-
-
-static func apply_loot_loss_on_defeat(loot: Array, rng: RandomNumberGenerator) -> Dictionary:
-	var rules := ExpeditionRulesServiceScript.rules()
-	var min_stacks := maxi(0, int(rules.get("defeat_loot_drop_min_stacks", 1)))
-	var max_stacks := maxi(min_stacks, int(rules.get("defeat_loot_drop_max_stacks", 2)))
-	var min_ratio := clampf(float(rules.get("defeat_loot_drop_min_ratio", 0.25)), 0.0, 1.0)
-	var max_ratio := clampf(float(rules.get("defeat_loot_drop_max_ratio", 0.75)), min_ratio, 1.0)
-	var candidate_indices: Array = []
+	var candidates: Array = []
+	var total_count := 0
 	for i in loot.size():
 		var row_v: Variant = loot[i]
 		if not row_v is Dictionary:
 			continue
-		if int((row_v as Dictionary).get("count", 0)) > 0:
-			candidate_indices.append(i)
-	if candidate_indices.is_empty():
+		var count := int((row_v as Dictionary).get("count", 0))
+		if count <= 0:
+			continue
+		var raw_drop := float(count) * drop_ratio
+		candidates.append({
+			"idx": i,
+			"count": count,
+			"drop": int(floor(raw_drop)),
+			"fraction": raw_drop - floor(raw_drop),
+		})
+		total_count += count
+	if candidates.is_empty():
 		return {"lost": []}
-	_shuffle_array(candidate_indices, rng)
-	var pick_count := mini(candidate_indices.size(), rng.randi_range(min_stacks, max_stacks))
+	var target_drop := mini(total_count, maxi(1, int(round(float(total_count) * drop_ratio))))
+	var assigned := 0
+	for candidate_v in candidates:
+		var candidate := candidate_v as Dictionary
+		assigned += int(candidate.get("drop", 0))
+	var remaining := target_drop - assigned
+	if remaining > 0:
+		candidates.sort_custom(_sort_loss_candidate)
+	for candidate_v in candidates:
+		if remaining <= 0:
+			break
+		var candidate := candidate_v as Dictionary
+		var add := mini(remaining, int(candidate.get("count", 0)) - int(candidate.get("drop", 0)))
+		candidate["drop"] = int(candidate.get("drop", 0)) + add
+		remaining -= add
+	candidates.sort_custom(_sort_loss_candidate_by_index)
 	var lost: Array = []
-	for i in pick_count:
-		var idx: int = int(candidate_indices[i])
+	for candidate_v in candidates:
+		var candidate := candidate_v as Dictionary
+		var idx: int = int(candidate.get("idx", -1))
 		var row := loot[idx] as Dictionary
 		var kind := str(row.get("kind", "item"))
 		var id_key := str(row.get("id", ""))
-		var count := int(row.get("count", 0))
-		if count <= 0:
-			continue
-		var min_drop := maxi(1, int(floor(float(count) * min_ratio)))
-		var max_drop := maxi(min_drop, int(floor(float(count) * max_ratio)))
-		var drop := mini(count, rng.randi_range(min_drop, max_drop))
+		var drop := mini(int(row.get("count", 0)), int(candidate.get("drop", 0)))
 		if drop <= 0:
 			continue
 		_remove_reward_count(loot, idx, drop)
@@ -186,12 +173,16 @@ static func _prune_empty_loot(loot: Array) -> void:
 			loot.remove_at(i)
 
 
-static func _shuffle_array(values: Array, rng: RandomNumberGenerator) -> void:
-	for i in range(values.size() - 1, 0, -1):
-		var j := rng.randi_range(0, i)
-		var tmp: Variant = values[i]
-		values[i] = values[j]
-		values[j] = tmp
+static func _sort_loss_candidate(a: Dictionary, b: Dictionary) -> bool:
+	var frac_a := float(a.get("fraction", 0.0))
+	var frac_b := float(b.get("fraction", 0.0))
+	if not is_equal_approx(frac_a, frac_b):
+		return frac_a > frac_b
+	return int(a.get("idx", 0)) < int(b.get("idx", 0))
+
+
+static func _sort_loss_candidate_by_index(a: Dictionary, b: Dictionary) -> bool:
+	return int(a.get("idx", 0)) < int(b.get("idx", 0))
 
 
 static func _weighted_pick(pool: Array, rng: RandomNumberGenerator) -> Dictionary:

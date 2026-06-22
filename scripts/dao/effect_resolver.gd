@@ -4,24 +4,24 @@ extends RefCounted
 const FightAttrScript := preload("res://scripts/fight/fight_attr.gd")
 
 const EFFECT_TO_FIGHT := {
-	"damage_spiritual": {"type": "damage", "damage_type": "magic"},
-	"damage_sword": {"type": "damage", "damage_type": "magic"},
-	"damage_sword_area": {"type": "damage", "damage_type": "magic"},
-	"damage_elemental": {"type": "damage", "damage_type": "magic"},
-	"damage_physical": {"type": "damage", "damage_type": "physical"},
-	"damage_physical_area": {"type": "damage", "damage_type": "physical"},
-	"damage_thunder": {"type": "damage", "damage_type": "magic"},
-	"damage_spirit": {"type": "damage", "damage_type": "magic"},
-	"damage_spirit_sword": {"type": "damage", "damage_type": "magic"},
-	"damage_void": {"type": "damage", "damage_type": "true"},
-	"damage_law": {"type": "damage", "damage_type": "true"},
-	"damage_law_area": {"type": "damage", "damage_type": "true"},
-	"damage_tribulation": {"type": "damage", "damage_type": "true"},
-	"damage_true": {"type": "damage", "damage_type": "true"},
-	"shield_flat": {"type": "shield"},
-	"shield_spiritual": {"type": "shield"},
-	"heal_hp": {"type": "heal"},
-	"restore_mana": {"type": "restore_mp"},
+	"damage_spiritual": {"type": EnumCombatEffectType.LABEL_DAMAGE, "damage_type": "magic"},
+	"damage_sword": {"type": EnumCombatEffectType.LABEL_DAMAGE, "damage_type": "magic"},
+	"damage_sword_area": {"type": EnumCombatEffectType.LABEL_DAMAGE, "damage_type": "magic"},
+	"damage_elemental": {"type": EnumCombatEffectType.LABEL_DAMAGE, "damage_type": "magic"},
+	"damage_physical": {"type": EnumCombatEffectType.LABEL_DAMAGE, "damage_type": "physical"},
+	"damage_physical_area": {"type": EnumCombatEffectType.LABEL_DAMAGE, "damage_type": "physical"},
+	"damage_thunder": {"type": EnumCombatEffectType.LABEL_DAMAGE, "damage_type": "magic"},
+	"damage_spirit": {"type": EnumCombatEffectType.LABEL_DAMAGE, "damage_type": "magic"},
+	"damage_spirit_sword": {"type": EnumCombatEffectType.LABEL_DAMAGE, "damage_type": "magic"},
+	"damage_void": {"type": EnumCombatEffectType.LABEL_DAMAGE, "damage_type": "true"},
+	"damage_law": {"type": EnumCombatEffectType.LABEL_DAMAGE, "damage_type": "true"},
+	"damage_law_area": {"type": EnumCombatEffectType.LABEL_DAMAGE, "damage_type": "true"},
+	"damage_tribulation": {"type": EnumCombatEffectType.LABEL_DAMAGE, "damage_type": "true"},
+	"damage_true": {"type": EnumCombatEffectType.LABEL_DAMAGE, "damage_type": "true"},
+	"shield_flat": {"type": EnumCombatEffectType.LABEL_SHIELD},
+	"shield_spiritual": {"type": EnumCombatEffectType.LABEL_SHIELD},
+	"heal_hp": {"type": EnumCombatEffectType.LABEL_HEAL},
+	"restore_mana": {"type": EnumCombatEffectType.LABEL_RESTORE_MP},
 	"mana_regen": {FightAttrScript.MP_REGEN: true},
 	"max_mana": {FightAttrScript.MP_MAX: true},
 	"max_hp": {FightAttrScript.HP_MAX: true},
@@ -36,27 +36,27 @@ const EFFECT_TO_FIGHT := {
 
 const COMBAT_MODIFIER_EFFECTS := {
 	"evasion_window": {
-		"type": "timed_modifier", "target": "self", "stat": FightAttrScript.EVASION,
+		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumCombatTarget.LABEL_SELF, "stat": FightAttrScript.EVASION,
 		"duration": 2.0, "name": "流风护身", "percent": true,
 	},
 	"elemental_vulnerability": {
-		"type": "timed_modifier", "target": "enemy", "stat": FightAttrScript.DAMAGE_TAKEN,
+		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumCombatTarget.LABEL_ENEMY, "stat": FightAttrScript.DAMAGE_TAKEN,
 		"duration": 5.0, "name": "五行易伤",
 	},
 	"spirit_suppression": {
-		"type": "timed_modifier", "target": "enemy", "stat": FightAttrScript.CONTROL_RESIST,
+		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumCombatTarget.LABEL_ENEMY, "stat": FightAttrScript.CONTROL_RESIST,
 		"duration": 4.0, "name": "神识压制", "negative": true, "percent": true,
 	},
 	"enemy_all_resistance": {
-		"type": "timed_modifier", "target": "enemy", "stat": FightAttrScript.DAMAGE_TAKEN,
+		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumCombatTarget.LABEL_ENEMY, "stat": FightAttrScript.DAMAGE_TAKEN,
 		"duration": 6.0, "name": "抗性崩解", "invert_negative": true,
 	},
 	"tribulation_mark": {
-		"type": "timed_modifier", "target": "enemy", "stat": FightAttrScript.DAMAGE_TAKEN,
+		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumCombatTarget.LABEL_ENEMY, "stat": FightAttrScript.DAMAGE_TAKEN,
 		"duration": 10.0, "name": "劫痕",
 	},
 	"healing_reduction": {
-		"type": "timed_modifier", "target": "enemy", "stat": FightAttrScript.HP_REGEN,
+		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumCombatTarget.LABEL_ENEMY, "stat": FightAttrScript.HP_REGEN,
 		"duration": 8.0, "name": "疗愈阻断", "negative": true, "percent": true,
 	},
 }
@@ -126,9 +126,9 @@ static func resolve_combat_effects(effect_rows: Array, knowledge_mastery: float 
 		if mapping is Dictionary and (mapping as Dictionary).has("type"):
 			var map := mapping as Dictionary
 			var row := {
-				"type": str(map.get("type", "damage")),
+				"type": str(map.get("type", EnumCombatEffectType.LABEL_DAMAGE)),
 				"value": magnitude,
-				"target": str(effect.get("target", "enemy")),
+				"target": str(effect.get("target", EnumCombatTarget.LABEL_ENEMY)),
 			}
 			if map.has("damage_type"):
 				row["damage_type"] = str(map["damage_type"])
@@ -141,10 +141,10 @@ static func resolve_combat_effects(effect_rows: Array, knowledge_mastery: float 
 			if bool(modifier.get("invert_negative", false)) and magnitude < 0.0:
 				value = absf(magnitude)
 			var modifier_row := {
-				"type": "timed_modifier",
+				"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER,
 				"id": "ability_%s" % effect_id,
 				"name": str(modifier.get("name", effect_id)),
-				"target": str(modifier.get("target", effect.get("target", "enemy"))),
+				"target": str(modifier.get("target", effect.get("target", EnumCombatTarget.LABEL_ENEMY))),
 				"duration": float(modifier.get("duration", 3.0)),
 			}
 			if bool(modifier.get("percent", false)):
@@ -157,10 +157,10 @@ static func resolve_combat_effects(effect_rows: Array, knowledge_mastery: float 
 		if control_v is Dictionary:
 			var control := control_v as Dictionary
 			out.append({
-				"type": "control",
+				"type": EnumCombatEffectType.LABEL_CONTROL,
 				"id": "ability_%s" % effect_id,
 				"name": str(control.get("name", effect_id)),
-				"target": str(effect.get("target", "enemy")),
+				"target": str(effect.get("target", EnumCombatTarget.LABEL_ENEMY)),
 				"duration": magnitude if bool(control.get("duration_from_value", false)) else float(control.get("duration", 0.5)),
 				"control_chance": magnitude if bool(control.get("chance_from_value", false)) else float(control.get("chance", 0.75)),
 			})
@@ -180,7 +180,7 @@ static func resolve_combat_effects(effect_rows: Array, knowledge_mastery: float 
 static func _apply_pierce_to_previous_damage(out: Array, magnitude: float) -> void:
 	for index in range(out.size() - 1, -1, -1):
 		var previous := out[index] as Dictionary
-		if str(previous.get("type", "")) == "damage":
+		if str(previous.get("type", "")) == EnumCombatEffectType.LABEL_DAMAGE:
 			previous["armor_pierce"] = magnitude
 			break
 

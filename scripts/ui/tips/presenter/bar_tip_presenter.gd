@@ -7,9 +7,9 @@ const BAR_TTL_MS := 2000
 const DISMISS_AFTER_MS := 200
 
 const _TONE_COLORS := {
-	TipIntentScript.TONE_GAIN: Color(0.22, 0.52, 0.28, 1.0),
-	TipIntentScript.TONE_LOSS: Color(0.72, 0.22, 0.18, 1.0),
-	TipIntentScript.TONE_NEUTRAL: Color(0.33, 0.2, 0.18, 1.0),
+	EnumTipTone.LABEL_GAIN: Color(0.22, 0.52, 0.28, 1.0),
+	EnumTipTone.LABEL_LOSS: Color(0.72, 0.22, 0.18, 1.0),
+	EnumTipTone.LABEL_NEUTRAL: Color(0.33, 0.2, 0.18, 1.0),
 }
 
 var _root: Control
@@ -37,11 +37,11 @@ func present_tip(intent: Dictionary) -> Dictionary:
 	var text := str(intent.get("text", "")).strip_edges()
 	if text == "":
 		return {"ok": false, "reason_code": "empty_text"}
-	var tone := str(intent.get("tone", TipIntentScript.TONE_NEUTRAL))
+	var tone := str(intent.get("tone", EnumTipTone.LABEL_NEUTRAL))
 	_label.text = text
 	_label.add_theme_color_override(
 		"font_color",
-		_TONE_COLORS.get(tone, _TONE_COLORS[TipIntentScript.TONE_NEUTRAL])
+		_TONE_COLORS.get(tone, _TONE_COLORS[EnumTipTone.LABEL_NEUTRAL])
 	)
 	_serial += 1
 	var serial := _serial

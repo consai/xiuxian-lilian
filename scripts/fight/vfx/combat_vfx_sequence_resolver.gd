@@ -99,11 +99,13 @@ static func overrides_from_cfg(cfg: Dictionary) -> Dictionary:
 	return {}
 
 
-static func _skill_type_to_vfx_type(skill_type: BattleVfxEvent.SkillType) -> String:
+static func _skill_type_to_vfx_type(skill_type: EnumBattleVfxSkillType.Type) -> String:
 	match skill_type:
-		BattleVfxEvent.SkillType.RANGED:
+		EnumBattleVfxSkillType.Type.RANGED:
 			return "ranged"
-		BattleVfxEvent.SkillType.HEAL, BattleVfxEvent.SkillType.BUFF, BattleVfxEvent.SkillType.OTHER:
+		EnumBattleVfxSkillType.Type.HEAL, \
+		EnumBattleVfxSkillType.Type.BUFF, \
+		EnumBattleVfxSkillType.Type.OTHER:
 			return "other"
 		_:
 			return "melee"

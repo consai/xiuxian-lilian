@@ -235,13 +235,13 @@ static func _basic_strike_row() -> Dictionary:
 		"realm": "qi",
 		"description": "基础近战攻击。",
 		"tags": ["attack", "physical"],
-		"combat": {"target": "enemy", "castTime": 0.0, "cooldown": 0.0, "costs": []},
+		"combat": {"target": EnumCombatTarget.LABEL_ENEMY, "castTime": 0.0, "cooldown": 0.0, "costs": []},
 		"effects": [{
 			"effectId": "damage_physical",
 			"base": 12,
 			"knowledgeGrowth": 0,
 			"operation": "add_flat",
-			"target": "enemy",
+			"target": EnumCombatTarget.LABEL_ENEMY,
 		}],
 		"learningRequirements": {"realm": "qi", "knowledge": []},
 	}
@@ -264,7 +264,12 @@ static func _basic_strike_runtime() -> Dictionary:
 		"vfx_type": "melee",
 		"vfx": "melee_default",
 		"tags": ["attack", "physical"],
-		"effects": [{"type": "damage", "damage_type": "physical", "value": 12.0, "target": "enemy"}],
+		"effects": [{
+			"type": EnumCombatEffectType.LABEL_DAMAGE,
+			"damage_type": "physical",
+			"value": 12.0,
+			"target": EnumCombatTarget.LABEL_ENEMY,
+		}],
 	}
 
 

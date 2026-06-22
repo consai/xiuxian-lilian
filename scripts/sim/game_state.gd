@@ -259,10 +259,10 @@ func auto_save() -> Dictionary:
 	var result := _persist_slot(SaveService.AUTO_SAVE_SLOT)
 	if bool(result.get("ok", false)):
 		DataEvents.emit_tip_intent({
-			"type": "toast",
+			"type": EnumTipIntentType.LABEL_TOAST,
 			"text": "自动存档成功",
-			"tone": "gain",
-			"channel": "bar",
+			"tone": EnumTipTone.LABEL_GAIN,
+			"channel": EnumTipChannel.LABEL_BAR,
 			"source": "auto_save",
 			"ttl_ms": 2200,
 			"dedupe_key": "auto_save_success",

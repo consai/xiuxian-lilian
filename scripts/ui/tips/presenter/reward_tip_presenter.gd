@@ -19,9 +19,9 @@ const _CHANNEL_TO_LANE := {
 }
 
 const _TONE_COLORS := {
-	TipIntentScript.TONE_GAIN: Color(0.25, 0.48, 0.26, 1.0),
-	TipIntentScript.TONE_LOSS: Color(0.72, 0.22, 0.18, 1.0),
-	TipIntentScript.TONE_NEUTRAL: Color(0.33, 0.2, 0.18, 1.0),
+	EnumTipTone.LABEL_GAIN: Color(0.25, 0.48, 0.26, 1.0),
+	EnumTipTone.LABEL_LOSS: Color(0.72, 0.22, 0.18, 1.0),
+	EnumTipTone.LABEL_NEUTRAL: Color(0.33, 0.2, 0.18, 1.0),
 }
 
 var _root: Control
@@ -75,8 +75,8 @@ func _apply_intent(row: Control, intent: Dictionary, text: String) -> void:
 		var color := _color_from_context(context)
 		if color == Color.TRANSPARENT:
 			color = _TONE_COLORS.get(
-				str(intent.get("tone", TipIntentScript.TONE_NEUTRAL)),
-				_TONE_COLORS[TipIntentScript.TONE_NEUTRAL]
+				str(intent.get("tone", EnumTipTone.LABEL_NEUTRAL)),
+				_TONE_COLORS[EnumTipTone.LABEL_NEUTRAL]
 			)
 		label.add_theme_color_override("font_color", color)
 	var icon := row.get_node_or_null("%Icon") as TextureRect
