@@ -93,7 +93,9 @@ func _bind_methods() -> void:
 
 func _bind_method_row(row: Control, type_label: String, method: Dictionary) -> void:
 	row.get_node("%TypeLabel").text = type_label
-	row.get_node("%NameLabel").text = str(method.get("name", "空槽位"))
+	var name_label := row.get_node("%NameLabel") as Label
+	name_label.text = str(method.get("name", "空槽位"))
+	name_label.add_theme_color_override("font_color", EnumQuality.get_color(_entry_quality(method)))
 	row.get_node("%MetaLabel").text = _method_effect(method)
 	row.tooltip_text = str(method.get("desc", "点击选择功法"))
 	var icon := row.get_node("%Icon") as TextureRect
@@ -124,7 +126,9 @@ func _bind_skills() -> void:
 		var skill := AbilityServiceScript.to_runtime_dict(aid, GameState.to_dict()) if aid != "" else {}
 		var row := _skills.get_child(i) as Control
 		row.get_node("%PriorityLabel").text = str(i + 1)
-		row.get_node("%NameLabel").text = str(skill.get("name", "空槽位"))
+		var name_label := row.get_node("%NameLabel") as Label
+		name_label.text = str(skill.get("name", "空槽位"))
+		name_label.add_theme_color_override("font_color", EnumQuality.get_color(_entry_quality(skill)))
 		row.get_node("%MetaLabel").text = _skill_effect(skill)
 		row.tooltip_text = "点击选择第 %d 顺位技能" % (i + 1)
 		var icon := row.get_node("%Icon") as TextureRect
@@ -260,29 +264,49 @@ func _on_save_pressed() -> void:
 func _method_effect(method: Dictionary) -> String:
 	if method.is_empty():
 		return "点击选择功法"
+	var parts: PackedStringArray = [
+		EnumItemTier.label(_entry_tier(method)),
+		EnumQuality.display_label(_entry_quality(method)),
+	]
 	if float(method.get("combat_mp_restore_2s", 0.0)) > 0.0:
-		return "每 2 秒恢复 %.0f 法力" % float(method.get("combat_mp_restore_2s", 0.0))
-	return str(method.get("desc", "提供修炼与战斗加成"))
+		parts.append("每 2 秒恢复 %.0f 法力" % float(method.get("combat_mp_restore_2s", 0.0)))
+	else:
+		parts.append(str(method.get("desc", "提供修炼与战斗加成")))
+	return " · ".join(parts)
 
 
 func _skill_effect(skill: Dictionary) -> String:
 	if skill.is_empty():
 		return "未配置技能"
+	var parts: PackedStringArray = [
+		EnumItemTier.label(_entry_tier(skill)),
+		EnumQuality.display_label(_entry_quality(skill)),
+	]
 	var effects := skill.get("effects", []) as Array
 	if effects.is_empty():
-		return "基础战斗行动"
+		parts.append("基础战斗行动")
+		return " · ".join(parts)
 	match str((effects[0] as Dictionary).get("type", "")):
-		"damage": return "对敌人造成伤害"
-		"shield": return "为自身提供护盾"
-		"heal": return "恢复自身气血"
-		"restore_mp": return "恢复自身法力"
-		_: return "提供战斗辅助效果"
+		"damage": parts.append("对敌人造成伤害")
+		"shield": parts.append("为自身提供护盾")
+		"heal": parts.append("恢复自身气血")
+		"restore_mp": parts.append("恢复自身法力")
+		_: parts.append("提供战斗辅助效果")
+	return " · ".join(parts)
 
 
 func _entry_icon(entry: Dictionary) -> Texture2D:
 	if entry.is_empty() or not entry.has("icon") or entry.get("icon") == null:
 		return null
 	return BattleInitDataScript._resolve_icon_texture(entry)
+
+
+func _entry_quality(entry: Dictionary) -> int:
+	return clampi(int(entry.get("quality", 1)), EnumQuality.Type.LOW, EnumQuality.Type.SUPREME)
+
+
+func _entry_tier(entry: Dictionary) -> int:
+	return EnumItemTier.clamp_tier(int(entry.get("tier", 1)))
 
 
 func _go_back() -> void:

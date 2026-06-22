@@ -13,7 +13,8 @@ static func build(method_id: String, savedata: Dictionary, icon: Texture2D = nul
 	if method.is_empty():
 		return {}
 	var family := CultivationMethodServiceScript.family_by_id(str(method.get("familyId", "")))
-	var quality := EnumQuality.from_label(str(method.get("rarity", "common")))
+	var quality := clampi(int(method.get("quality", family.get("quality", 1))), EnumQuality.Type.LOW, EnumQuality.Type.SUPREME)
+	var tier := EnumItemTier.clamp_tier(int(method.get("tier", 1)))
 	var mastery := CultivationMethodServiceScript.method_mastery(savedata, method_id)
 	var knowledge_bonus := CultivationMethodServiceScript.knowledge_mastery_for_method(savedata, method_id)
 	var lines: Array[String] = []
@@ -24,6 +25,7 @@ static func build(method_id: String, savedata: Dictionary, icon: Texture2D = nul
 	var realm := DaoTreeServiceScript.realm_display_name(str(method.get("realm", "")))
 	if realm != "":
 		lines.append("境界：%s" % realm)
+	lines.append("阶位：%s" % EnumItemTier.label(tier))
 	lines.append("品质：%s" % EnumQuality.display_label(quality))
 	var family_name := str(family.get("name", "")).strip_edges()
 	if family_name != "":

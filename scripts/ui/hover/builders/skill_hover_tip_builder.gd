@@ -74,7 +74,8 @@ static func build_ability(ability_id: String, savedata: Dictionary, icon: Textur
 		return {}
 	var runtime := AbilityService.to_runtime_dict(ability_id, savedata)
 	var title := str(ability.get("name", ability_id)).strip_edges()
-	var quality := EnumQuality.from_label(str(ability.get("rarity", "common")))
+	var quality := clampi(int(ability.get("quality", 1)), EnumQuality.Type.LOW, EnumQuality.Type.SUPREME)
+	var tier := EnumItemTier.clamp_tier(int(ability.get("tier", 1)))
 	var mastery := AbilityService.knowledge_mastery_ratio(ability_id, savedata)
 	var lines: Array[String] = []
 	var desc := str(ability.get("description", "")).strip_edges()
@@ -84,6 +85,7 @@ static func build_ability(ability_id: String, savedata: Dictionary, icon: Textur
 	var realm := str(ability.get("realm", "")).strip_edges()
 	if realm != "":
 		lines.append("境界：%s" % DaoTreeServiceScript.realm_display_name(realm))
+	lines.append("阶位：%s" % EnumItemTier.label(tier))
 	lines.append("品质：%s" % EnumQuality.display_label(quality))
 	var combat_v: Variant = ability.get("combat", {})
 	if combat_v is Dictionary:

@@ -1,7 +1,7 @@
 class_name GmItemSearch
 extends RefCounted
 
-## GM 道具模糊搜索：支持名称 / ID / 类型 / 稀有度的子序列匹配与关键词组合。
+## GM 道具模糊搜索：支持名称 / ID / 类型 / 品质 / 阶位的子序列匹配与关键词组合。
 
 
 static func filter_entries(catalog: Array, query: String, limit: int = 200) -> Array:
@@ -32,7 +32,8 @@ static func _entry_score(query: String, entry: Dictionary) -> int:
 		str(entry.get("id", "")),
 		str(entry.get("type", "")),
 		"%s %s" % [str(entry.get("primary_type", "")), str(entry.get("secondary_type", ""))],
-		str(entry.get("rarity", "")),
+		str(entry.get("quality", "")),
+		str(entry.get("tier", "")),
 	]
 	return _score_text(query, haystack)
 

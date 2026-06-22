@@ -10,13 +10,6 @@ generated_learning_books:
     max_stack: 9
     name_template: "{name}"
     desc_template: "研读后习得技能「{name}」。"
-    quality_by_source_rarity:
-      common: 1
-      uncommon: 2
-      rare: 3
-      epic: 4
-      legendary: 4
-      mythic: 4
   - category: "method"
     enabled: true
     id_prefix: "book_method_"
@@ -28,13 +21,6 @@ generated_learning_books:
     max_stack: 9
     name_template: "{name}"
     desc_template: "研读后习得功法「{name}」。"
-    quality_by_source_rarity:
-      common: 1
-      uncommon: 2
-      rare: 3
-      epic: 4
-      legendary: 4
-      mythic: 4
 legacy_learning_book_aliases:
   book_method_iron_body: "book_method_iron_skin_1"
   book_method_leihuo: "book_method_leihuo_1"

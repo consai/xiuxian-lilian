@@ -36,8 +36,8 @@ func _run(name: String, test: Callable) -> void:
 
 func _test_search_handles_chinese_and_english() -> void:
 	var catalog := [
-		{"kind": "equip", "id": 5001, "name": "天雷印", "type": "法宝", "primary_type": "法宝", "secondary_type": "战斗法宝", "rarity": "极品"},
-		{"kind": "item", "id": "items_LingCao", "name": "灵草", "type": "材料", "primary_type": "材料", "secondary_type": "草药", "rarity": "1"},
+		{"kind": "equip", "id": 5001, "name": "天雷印", "type": "法宝", "primary_type": "法宝", "secondary_type": "战斗法宝", "quality": "极品", "tier": "三阶"},
+		{"kind": "item", "id": "items_LingCao", "name": "灵草", "type": "材料", "primary_type": "材料", "secondary_type": "草药", "quality": "下品", "tier": "一阶"},
 	]
 	var by_kind := GmItemSearchScript.filter_entries(catalog, "法宝")
 	_expect_true(not by_kind.is_empty(), "search 法宝 returns results")

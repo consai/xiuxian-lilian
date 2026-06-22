@@ -85,15 +85,22 @@ func _build_skill_entries() -> void:
 
 func _add_entry(entry_id: Variant, row: Dictionary, category: String, equipped: bool) -> void:
 	var button := Button.new()
+	var quality := _entry_quality(row)
 	button.custom_minimum_size = Vector2(0, 82)
-	button.text = "%s    [%s]\n%s" % [
+	button.text = "%s    [%s]    %s · %s\n%s" % [
 		str(row.get("name", "未命名")),
 		_category_label(category),
+		EnumItemTier.label(_entry_tier(row)),
+		EnumQuality.display_label(quality),
 		str(row.get("desc", _skill_description(row))),
 	]
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.icon = _entry_icon(row)
 	button.expand_icon = true
+	var color := EnumQuality.get_color(quality)
+	button.add_theme_color_override("font_color", color)
+	button.add_theme_color_override("font_hover_color", color.lightened(0.12))
+	button.add_theme_color_override("font_pressed_color", color.darkened(0.08))
 	button.disabled = equipped and _is_equipped_at_target(entry_id)
 	if button.disabled:
 		button.text += "    已装备"
@@ -143,6 +150,14 @@ func _entry_icon(row: Dictionary) -> Texture2D:
 	if row.is_empty() or not row.has("icon") or row.get("icon") == null:
 		return null
 	return BattleInitDataScript._resolve_icon_texture(row)
+
+
+func _entry_quality(row: Dictionary) -> int:
+	return clampi(int(row.get("quality", 1)), EnumQuality.Type.LOW, EnumQuality.Type.SUPREME)
+
+
+func _entry_tier(row: Dictionary) -> int:
+	return EnumItemTier.clamp_tier(int(row.get("tier", 1)))
 
 
 func _method_category(row: Dictionary) -> String:

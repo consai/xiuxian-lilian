@@ -87,12 +87,12 @@ static func from_equip_id(equip_id: int) -> Dictionary:
 		))
 	for effect_line in HoverTipEffectFormatter.format_lines(cfg.get("effects", [])):
 		detail_lines.append(effect_line)
-	var rarity := EnumQuality.display_label(quality)
+	var quality_label := EnumQuality.display_label(quality)
 	return {
 		"title": title,
 		"title_color": EnumQuality.get_color(quality),
 		"icon": BattleInitDataScript._resolve_icon_texture(cfg),
-		"quality": rarity,
+		"quality": quality_label,
 		"tier": tier,
 		"meta": StringsZh.format_template(
 			StringsZh.getp("item_info.type", "类型：{value}"),
@@ -106,8 +106,8 @@ static func from_equip_id(equip_id: int) -> Dictionary:
 			"阶位：{value}",
 			{"value": EnumItemTier.label(tier)}
 		) + " · " + StringsZh.format_template(
-			StringsZh.getp("item_info.rarity", "品质：{value}"),
-			{"value": rarity}
+			StringsZh.getp("item_info.quality", "品质：{value}"),
+			{"value": quality_label}
 		),
 		"desc": str(cfg.get("desc", "")).strip_edges(),
 		"detail_lines": detail_lines,
@@ -123,15 +123,15 @@ static func _item_meta(def: ItemDef) -> String:
 			StringsZh.getp("item_info.type", "类型：{value}"),
 			{"value": item_type}
 		))
-	var rarity := EnumQuality.display_label(def.quality)
+	var quality_label := EnumQuality.display_label(def.quality)
 	parts.append(StringsZh.format_template(
 		"阶位：{value}",
 		{"value": EnumItemTier.label(def.tier)}
 	))
-	if rarity != "":
+	if quality_label != "":
 		parts.append(StringsZh.format_template(
-			StringsZh.getp("item_info.rarity", "品质：{value}"),
-			{"value": rarity}
+			StringsZh.getp("item_info.quality", "品质：{value}"),
+			{"value": quality_label}
 		))
 	if def.stackable and def.max_stack > 1:
 		parts.append(StringsZh.format_template(

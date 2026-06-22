@@ -16,6 +16,10 @@ func apply_gain(row: Dictionary, animate: bool = true) -> void:
 	var levels_gained := int(row.get("levels_gained", 0))
 	var skill := DaoTreeServiceScript.skill_by_id(skill_id)
 	_name_label.text = str(skill.get("name", skill_id))
+	_name_label.add_theme_color_override(
+		"font_color",
+		EnumQuality.get_color(clampi(int(skill.get("quality", 1)), EnumQuality.Type.LOW, EnumQuality.Type.SUPREME))
+	)
 	var suffix := ""
 	if levels_gained > 0:
 		suffix = "  ↑%d级" % levels_gained

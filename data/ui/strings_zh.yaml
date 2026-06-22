@@ -51,7 +51,7 @@ hover:
 item_info:
   type: "类型：{value}"
   type_equip: "法宝"
-  rarity: "品质：{value}"
+  quality: "品质：{value}"
   count: "数量：{value}"
   price: "灵石估价：{value}"
   stack: "可堆叠（上限 {value}）"

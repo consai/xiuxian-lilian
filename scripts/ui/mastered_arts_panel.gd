@@ -65,7 +65,12 @@ func _bind_methods() -> void:
 		var row := MethodRowScene.instantiate() as Control
 		var icon := _method_icon(method)
 		row.get_node("%TypeLabel").text = _method_type_label(method)
-		row.get_node("%NameLabel").text = str(method.get("name", method_id))
+		var name_label := row.get_node("%NameLabel") as Label
+		name_label.text = str(method.get("name", method_id))
+		name_label.add_theme_color_override(
+			"font_color",
+			EnumQuality.get_color(_entry_quality(method, CultivationMethodServiceScript.family_by_id(str(method.get("familyId", "")))))
+		)
 		row.get_node("%MetaLabel").text = _method_meta(method, method_id)
 		row.get_node("%EffectLabel").text = _method_brief_effect(method, method_id)
 		var hover := row.get_node("%HoverTipSource") as HoverTipSource
@@ -99,7 +104,9 @@ func _bind_skills() -> void:
 		var icon := _entry_icon(display)
 		row.get_node("%IndexLabel").text = str(visible_count)
 		row.get_node("%TypeLabel").text = SkillHoverTipBuilder.ability_type_label(ability_type)
-		row.get_node("%NameLabel").text = str(ability.get("name", ability_id))
+		var name_label := row.get_node("%NameLabel") as Label
+		name_label.text = str(ability.get("name", ability_id))
+		name_label.add_theme_color_override("font_color", EnumQuality.get_color(_entry_quality(ability)))
 		row.get_node("%MetaLabel").text = _skill_meta(ability, skill, ability_id)
 		row.get_node("%EffectLabel").text = _skill_brief_effect(ability, skill, ability_id)
 		_set_icon(row.get_node("%Icon") as TextureRect, icon)
@@ -134,9 +141,8 @@ func _skill_meta(ability: Dictionary, runtime: Dictionary, ability_id: String) -
 	var realm := str(ability.get("realm", "")).strip_edges()
 	if realm != "":
 		parts.append("境界 %s" % DaoTreeServiceScript.realm_display_name(realm))
-	var rarity := str(ability.get("rarity", "")).strip_edges()
-	if rarity != "":
-		parts.append(EnumQuality.display_label(EnumQuality.from_label(rarity)))
+	parts.append(EnumItemTier.label(_entry_tier(ability)))
+	parts.append(EnumQuality.display_label(_entry_quality(ability)))
 	var combat_v: Variant = ability.get("combat", {})
 	if combat_v is Dictionary:
 		var combat := combat_v as Dictionary
@@ -205,9 +211,9 @@ func _method_meta(method: Dictionary, method_id: String) -> String:
 	var realm := str(method.get("realm", "")).strip_edges()
 	if realm != "":
 		parts.append("境界 %s" % DaoTreeServiceScript.realm_display_name(realm))
-	var rarity := str(method.get("rarity", "")).strip_edges()
-	if rarity != "":
-		parts.append(EnumQuality.display_label(EnumQuality.from_label(rarity)))
+	var family := CultivationMethodServiceScript.family_by_id(str(method.get("familyId", "")))
+	parts.append(EnumItemTier.label(_entry_tier(method)))
+	parts.append(EnumQuality.display_label(_entry_quality(method, family)))
 	var mastery := CultivationMethodServiceScript.method_mastery(GameState.to_dict(), method_id)
 	parts.append("熟练 %.0f%%" % (mastery * 100.0))
 	var practice: Dictionary = method.get("practice", {}) as Dictionary
@@ -250,6 +256,18 @@ func _entry_icon(entry: Dictionary) -> Texture2D:
 func _set_icon(icon: TextureRect, texture: Texture2D) -> void:
 	icon.texture = texture
 	icon.visible = texture != null
+
+
+func _entry_quality(entry: Dictionary, fallback: Dictionary = {}) -> int:
+	return clampi(
+		int(entry.get("quality", fallback.get("quality", EnumQuality.Type.LOW))),
+		EnumQuality.Type.LOW,
+		EnumQuality.Type.SUPREME
+	)
+
+
+func _entry_tier(entry: Dictionary) -> int:
+	return EnumItemTier.clamp_tier(int(entry.get("tier", 1)))
 
 
 func _format_cost_text(costs_v: Variant) -> String:

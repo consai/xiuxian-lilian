@@ -59,12 +59,16 @@ func _bind_list() -> void:
 		var skill := DaoTreeServiceScript.skill_by_id(skill_id)
 		var domain := DaoTreeServiceScript.domain_by_id(str(skill.get("domain", "")))
 		var level := int(row.get("level", 0))
-		var label := "%s  %s  · %s" % [
+		var quality := _entry_quality(skill)
+		var label := "%s  %s  · %s · %s · %s" % [
 			str(row.get("name", skill_id)),
 			_roman(level) if level > 0 else "未入门",
+			EnumItemTier.label(_entry_tier(skill)),
+			EnumQuality.display_label(quality),
 			str(domain.get("name", "")),
 		]
-		_skill_list.add_item(label)
+		var index := _skill_list.add_item(label)
+		_skill_list.set_item_custom_fg_color(index, EnumQuality.get_color(quality))
 
 
 func _bind_details() -> void:
@@ -86,13 +90,16 @@ func _bind_details() -> void:
 	_day_slider.set_value_no_signal(float(_days))
 	_max_button.disabled = max_days <= 1
 	_name_label.text = "%s  %s" % [str(skill.get("name", "")), _roman(level) if level > 0 else "未入门"]
+	_name_label.add_theme_color_override("font_color", EnumQuality.get_color(_entry_quality(skill)))
 	_description_label.text = str(skill.get("description", ""))
 	var preview := GameState.preview_knowledge_study(_selected_skill_id, _days)
 	_progress.max_value = 100.0
 	_progress.value = KnowledgeServiceScript.level_progress_percent(GameState.to_dict(), _selected_skill_id)
 	var domain := DaoTreeServiceScript.domain_by_id(str(skill.get("domain", "")))
-	_state_label.text = "%s · 自主学习上限 %s · 当前 %.0f%%" % [
+	_state_label.text = "%s · %s · %s · 自主学习上限 %s · 当前 %.0f%%" % [
 		str(domain.get("name", "")),
+		EnumItemTier.label(_entry_tier(skill)),
+		EnumQuality.display_label(_entry_quality(skill)),
 		_roman(int(preview.get("max_self_study_level", 3))) if bool(preview.get("ok", false)) else "—",
 		_progress.value,
 	]
@@ -179,3 +186,11 @@ func _roman(level: int) -> String:
 			return "V"
 		_:
 			return "—"
+
+
+func _entry_quality(skill: Dictionary) -> int:
+	return clampi(int(skill.get("quality", 1)), EnumQuality.Type.LOW, EnumQuality.Type.SUPREME)
+
+
+func _entry_tier(skill: Dictionary) -> int:
+	return EnumItemTier.clamp_tier(int(skill.get("tier", 1)))
