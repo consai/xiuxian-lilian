@@ -46,7 +46,7 @@ static func from_item_id(item_id: String, count: int = 1) -> Dictionary:
 		"title": def.name,
 		"title_color": EnumQuality.get_color(def.quality),
 		"icon": icon,
-		"quality": def.rarity,
+		"quality": EnumQuality.display_label(def.quality),
 		"meta": _item_meta(def),
 		"desc": def.desc.strip_edges(),
 		"detail_lines": detail_lines,
@@ -85,7 +85,7 @@ static func from_equip_id(equip_id: int) -> Dictionary:
 		))
 	for effect_line in HoverTipEffectFormatter.format_lines(cfg.get("effects", [])):
 		detail_lines.append(effect_line)
-	var rarity := _rarity_label_from_int(quality)
+	var rarity := EnumQuality.display_label(quality)
 	return {
 		"title": title,
 		"title_color": EnumQuality.get_color(quality),
@@ -117,7 +117,7 @@ static func _item_meta(def: ItemDef) -> String:
 			StringsZh.getp("item_info.type", "类型：{value}"),
 			{"value": item_type}
 		))
-	var rarity := def.rarity.strip_edges()
+	var rarity := EnumQuality.display_label(def.quality)
 	if rarity != "":
 		parts.append(StringsZh.format_template(
 			StringsZh.getp("item_info.rarity", "品质：{value}"),
@@ -320,14 +320,6 @@ static func format_use_effect_lines(use_effect: Array) -> Array[String]:
 					{"recipe": recipe_name, "value": _fmt_num(mastery_gain)}
 				))
 	return lines
-
-
-static func _rarity_label_from_int(quality: int) -> String:
-	if quality >= 5:
-		return "传说"
-	if quality >= 3:
-		return "稀有"
-	return "普通"
 
 
 static func _fmt_num(value: float) -> String:

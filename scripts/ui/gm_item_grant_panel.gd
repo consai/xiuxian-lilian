@@ -52,7 +52,7 @@ func _build_catalog() -> void:
 			"type": def.item_type,
 			"primary_type": def.primary_type,
 			"secondary_type": def.secondary_type,
-			"rarity": def.rarity,
+			"rarity": EnumQuality.display_label(def.quality),
 		})
 	var equip_ids := cm.call("all_equip_ids") as Array
 	for equip_id_v in equip_ids:
@@ -67,7 +67,7 @@ func _build_catalog() -> void:
 			"type": "法宝",
 			"primary_type": "法宝",
 			"secondary_type": "战斗法宝",
-			"rarity": "品质%d" % int(equip.get("quality", 1)),
+			"rarity": EnumQuality.display_label(int(equip.get("quality", 1))),
 		})
 	_catalog.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		var kind_order_a := 0 if str(a.get("kind", "")) == EnumRewardKind.LABEL_EQUIP else 1

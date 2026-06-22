@@ -227,7 +227,7 @@ func _apply_reward_row(view: ItemView, row: Dictionary) -> void:
 			item_name = str(equip_cfg.get("name", "法宝"))
 		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
 		if quality == "":
-			quality = _quality_label_from_int(int(equip_cfg.get("quality", 1)))
+			quality = EnumQuality.display_label(int(equip_cfg.get("quality", 1)))
 	elif kind == "item":
 		var item_id := str(row.get("id", ""))
 		if item_name == "" and ConfigManager != null:
@@ -237,7 +237,7 @@ func _apply_reward_row(view: ItemView, row: Dictionary) -> void:
 			if def != null:
 				icon = ItemDefScript.resolve_icon_texture(def.icon_path, null)
 				if quality == "":
-					quality = def.rarity
+					quality = EnumQuality.display_label(def.quality)
 	else:
 		if item_name == "":
 			item_name = str(row.get("id", "奖励"))
@@ -247,11 +247,3 @@ func _apply_reward_row(view: ItemView, row: Dictionary) -> void:
 	view.apply_display(icon, item_name, count, Color.WHITE, quality)
 	view.show_name_label = true
 	view.set_info_entry(ItemView.entry_from_reward_row(row))
-
-
-func _quality_label_from_int(quality: int) -> String:
-	if quality >= 5:
-		return "传说"
-	if quality >= 3:
-		return "稀有"
-	return ""

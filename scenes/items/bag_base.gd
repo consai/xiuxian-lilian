@@ -475,7 +475,7 @@ func _entry_view_data(entry: Dictionary, cache_key: String = "") -> Dictionary:
 			item_name = str(equip_cfg.get("name", "法宝"))
 		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
 		if quality == "":
-			quality = _quality_label_from_int(int(equip_cfg.get("quality", 1)))
+			quality = EnumQuality.display_label(int(equip_cfg.get("quality", 1)))
 	else:
 		var item_id := str(entry.get("id", ""))
 		if item_name == "" and ConfigManager != null:
@@ -485,7 +485,7 @@ func _entry_view_data(entry: Dictionary, cache_key: String = "") -> Dictionary:
 			if def != null:
 				icon = ItemDefScript.resolve_icon_texture(def.icon_path, null)
 				if quality == "":
-					quality = def.rarity
+					quality = EnumQuality.display_label(def.quality)
 				learn_blocked = ItemInfoPayloadBuilderScript.learning_book_condition_unmet(def)
 	var data := {
 		"icon": icon,
@@ -602,7 +602,7 @@ static func _normalize_entries(entries: Array) -> Array:
 				if not row.has("name"):
 					row["name"] = def.name
 				if not row.has("quality"):
-					row["quality"] = def.rarity
+					row["quality"] = EnumQuality.display_label(def.quality)
 			if not row.has("sort_name"):
 				row["sort_name"] = str(row.get("name", item_id))
 			if not row.has("item_type"):
@@ -628,7 +628,7 @@ static func _entry_from_item(item_id: String, count: int) -> Dictionary:
 		"primary_type": def.primary_type if def != null else "",
 		"secondary_type": def.secondary_type if def != null else "",
 		"name": def.name if def != null else iid,
-		"quality": def.rarity if def != null else "",
+		"quality": EnumQuality.display_label(def.quality) if def != null else "",
 		"sort_name": def.name if def != null else iid,
 	}
 
@@ -649,7 +649,7 @@ static func _entry_from_equip(equip_id: int) -> Dictionary:
 		"primary_type": EnumItemType.PRIMARY_TREASURE,
 		"secondary_type": EnumItemType.SECONDARY_ACTIVE_TREASURE,
 		"name": equip_name,
-		"quality": _quality_label_from_int(int(cfg.get("quality", 1))),
+		"quality": EnumQuality.display_label(int(cfg.get("quality", 1))),
 		"sort_name": equip_name,
 	}
 
@@ -674,11 +674,3 @@ static func _item_def(item_id: String) -> ItemDef:
 	if ConfigManager != null:
 		return ConfigManager.item_def_by_id(item_id)
 	return null
-
-
-static func _quality_label_from_int(quality: int) -> String:
-	if quality >= 5:
-		return "传说"
-	if quality >= 3:
-		return "稀有"
-	return ""

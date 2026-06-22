@@ -4,7 +4,7 @@ extends Control
 ## 道具展示块，场景 [code]item.tscn[/code]。
 ## [member click_enabled] 为 [code]false[/code] 时仅展示（如详情弹窗）；为 [code]true[/code] 时可点击并带缩放反馈（如背包）。
 ## [member show_info_on_click] 为 [code]true[/code] 且已 [method set_info_entry] 时，左键打开全局道具详情。
-## [code]%GcItemHighlight[/code] 为品质边框，随 [member quality] / [method apply_display] 更新。
+## [code]%GcItemQualityTint[/code] / [code]%GcItemHighlight[/code] / [code]%GcItemQualityGem[/code] 为品质效果，随 [member quality] / [method apply_display] 更新。
 ## [code]%GcItemCountBadge[/code] 在 [member show_name_label] 为真且数量大于 1 时显示角标；
 ## [member always_show_count_badge] 为真时，数量大于 0 即显示角标（如消耗展示）。
 
@@ -38,7 +38,9 @@ signal right_clicked
 @onready var _count_badge_wrap: Control = %GcItemCountBadgeWrap
 @onready var _count_badge: Label = %GcItemCountBadge
 @onready var _press: PressScale = %GcItemPress
+@onready var _quality_tint: Panel = %GcItemQualityTint
 @onready var _quality_border: Panel = %GcItemHighlight
+@onready var _quality_gem: Panel = %GcItemQualityGem
 
 var _display_name: String = ""
 var _display_count: int = 0
@@ -114,7 +116,7 @@ static func apply_item_id(view: ItemView, item_id: String, count: int = 0, optio
 			icon = ItemDef.resolve_icon_texture(def.icon_path, null)
 			if item_name == "":
 				item_name = def.name
-			quality = def.rarity
+			quality = EnumQuality.display_label(def.quality)
 	view.apply_display(icon, item_name, maxi(0, count), Color.WHITE, quality)
 	view.set_insufficient(insufficient)
 	if show_info and iid != "":
@@ -150,7 +152,7 @@ static func apply_reward_row(view: ItemView, row: Dictionary, options: Dictionar
 			item_name = str(equip_cfg.get("name", "法宝"))
 		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
 		if quality == "":
-			quality = _quality_label_from_int(int(equip_cfg.get("quality", 1)))
+			quality = EnumQuality.display_label(int(equip_cfg.get("quality", 1)))
 	elif kind == EnumRewardKind.LABEL_ITEM:
 		var item_id := str(row.get("id", ""))
 		if item_name == "" and ConfigManager != null:
@@ -160,7 +162,7 @@ static func apply_reward_row(view: ItemView, row: Dictionary, options: Dictionar
 			if def != null:
 				icon = ItemDef.resolve_icon_texture(def.icon_path, null)
 				if quality == "":
-					quality = def.rarity
+					quality = EnumQuality.display_label(def.quality)
 	else:
 		if item_name == "":
 			item_name = str(row.get("id", "奖励"))
@@ -169,14 +171,6 @@ static func apply_reward_row(view: ItemView, row: Dictionary, options: Dictionar
 			icon = ItemDef.resolve_icon_texture(path, null)
 	view.apply_display(icon, item_name, count, Color.WHITE, quality)
 	view.set_info_entry(entry_from_reward_row(row))
-
-
-static func _quality_label_from_int(quality: int) -> String:
-	if quality >= 5:
-		return "传说"
-	if quality >= 3:
-		return "稀有"
-	return ""
 
 
 static func entry_from_reward_row(row: Dictionary) -> Dictionary:
@@ -332,15 +326,25 @@ func _set_learn_blocked(blocked: bool) -> void:
 
 
 func _apply_quality_border(pin_zhi: String) -> void:
-	match pin_zhi.strip_edges():
-		"稀有":
-			_quality_border.visible = true
-			_quality_border.self_modulate = Color(0.45, 0.72, 1.0)
-		"传说":
-			_quality_border.visible = true
-			_quality_border.self_modulate = Color(1.0, 0.82, 0.35)
-		_:
-			_quality_border.visible = false
+	var quality_text := pin_zhi.strip_edges()
+	var quality_color := EnumQuality.border_color_from_label(quality_text)
+	if _quality_tint != null:
+		_quality_tint.visible = quality_text != ""
+		if _quality_tint.visible:
+			_quality_tint.self_modulate = Color(
+				quality_color.r,
+				quality_color.g,
+				quality_color.b,
+				EnumQuality.tint_alpha_from_label(quality_text)
+			)
+	if _quality_border != null:
+		_quality_border.visible = EnumQuality.should_show_border(quality_text)
+		if _quality_border.visible:
+			_quality_border.self_modulate = quality_color
+	if _quality_gem != null:
+		_quality_gem.visible = EnumQuality.should_show_gem(quality_text)
+		if _quality_gem.visible:
+			_quality_gem.self_modulate = quality_color
 
 
 func _refresh_name_count_text() -> void:

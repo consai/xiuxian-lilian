@@ -3,8 +3,17 @@ extends Control
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
 const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const MethodRowScene := preload("res://scenes/ui/components/loadout_method_row.tscn")
-const SkillRowScene := preload("res://scenes/ui/components/loadout_skill_order_row.tscn")
+const SkillRowScene := preload("res://scenes/ui/components/mastered_skill_row.tscn")
+
+const FILTER_ALL := "all"
+const FILTER_ACTIVE := "combat_active"
+const FILTER_UPKEEP := "combat_upkeep"
+const FILTER_COMBAT_PASSIVE := "combat_passive"
+const FILTER_GENERAL_PASSIVE := "general_passive"
+
+var _skill_filter := FILTER_ALL
 
 @onready var _close_button: TextureButton = %CloseButton
 @onready var _configure_button: TextureButton = %ConfigureButton
@@ -12,11 +21,21 @@ const SkillRowScene := preload("res://scenes/ui/components/loadout_skill_order_r
 @onready var _skill_count: Label = %SkillCountLabel
 @onready var _methods: VBoxContainer = %MethodsContainer
 @onready var _skills: VBoxContainer = %SkillsContainer
+@onready var _filter_all: Button = %FilterAll
+@onready var _filter_active: Button = %FilterActive
+@onready var _filter_upkeep: Button = %FilterUpkeep
+@onready var _filter_combat_passive: Button = %FilterCombatPassive
+@onready var _filter_general_passive: Button = %FilterGeneralPassive
 
 
 func _ready() -> void:
 	_close_button.pressed.connect(_go_back)
 	_configure_button.pressed.connect(func() -> void: SceneManager.go_combat_loadout_panel())
+	_filter_all.pressed.connect(_set_skill_filter.bind(FILTER_ALL))
+	_filter_active.pressed.connect(_set_skill_filter.bind(FILTER_ACTIVE))
+	_filter_upkeep.pressed.connect(_set_skill_filter.bind(FILTER_UPKEEP))
+	_filter_combat_passive.pressed.connect(_set_skill_filter.bind(FILTER_COMBAT_PASSIVE))
+	_filter_general_passive.pressed.connect(_set_skill_filter.bind(FILTER_GENERAL_PASSIVE))
 	refresh()
 
 
@@ -28,6 +47,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func refresh() -> void:
 	_bind_methods()
+	_refresh_filter_buttons()
 	_bind_skills()
 
 
@@ -43,11 +63,14 @@ func _bind_methods() -> void:
 			continue
 		count += 1
 		var row := MethodRowScene.instantiate() as Control
+		var icon := _method_icon(method)
 		row.get_node("%TypeLabel").text = _method_type_label(method)
 		row.get_node("%NameLabel").text = str(method.get("name", method_id))
 		row.get_node("%MetaLabel").text = _method_meta(method, method_id)
-		row.tooltip_text = str(method.get("description", method.get("desc", "")))
-		_set_icon(row.get_node("%Icon") as TextureRect, _method_icon(method))
+		row.get_node("%EffectLabel").text = _method_brief_effect(method, method_id)
+		var hover := row.get_node("%HoverTipSource") as HoverTipSource
+		hover.set_payload(MethodHoverTipBuilder.build(method_id, GameState.to_dict(), icon))
+		_set_icon(row.get_node("%Icon") as TextureRect, icon)
 		_methods.add_child(row)
 	_method_count.text = "已掌握 %d 门" % count
 	if count == 0:
@@ -57,24 +80,92 @@ func _bind_methods() -> void:
 func _bind_skills() -> void:
 	_clear(_skills)
 	var count := 0
+	var visible_count := 0
 	for ability_id_v in GameState.unlocked_abilities:
 		var ability_id := str(ability_id_v).strip_edges()
 		if ability_id == "" or ability_id == "-1":
 			continue
-		var skill := AbilityServiceScript.to_runtime_dict(ability_id, GameState.to_dict())
-		if skill.is_empty():
+		var ability := AbilityServiceScript.by_id(ability_id)
+		if ability.is_empty():
 			continue
 		count += 1
+		var ability_type := str(ability.get("type", ""))
+		if _skill_filter != FILTER_ALL and ability_type != _skill_filter:
+			continue
+		var skill := AbilityServiceScript.to_runtime_dict(ability_id, GameState.to_dict())
+		var display := skill if not skill.is_empty() else ability
+		visible_count += 1
 		var row := SkillRowScene.instantiate() as Control
-		row.get_node("%PriorityLabel").text = str(count)
-		row.get_node("%NameLabel").text = str(skill.get("name", ability_id))
-		row.get_node("%MetaLabel").text = _skill_meta(skill, ability_id)
-		row.tooltip_text = str(skill.get("desc", ""))
-		_set_icon(row.get_node("%Icon") as TextureRect, _entry_icon(skill))
+		var icon := _entry_icon(display)
+		row.get_node("%IndexLabel").text = str(visible_count)
+		row.get_node("%TypeLabel").text = SkillHoverTipBuilder.ability_type_label(ability_type)
+		row.get_node("%NameLabel").text = str(ability.get("name", ability_id))
+		row.get_node("%MetaLabel").text = _skill_meta(ability, skill, ability_id)
+		row.get_node("%EffectLabel").text = _skill_brief_effect(ability, skill, ability_id)
+		_set_icon(row.get_node("%Icon") as TextureRect, icon)
+		var hover := row.get_node("%HoverTipSource") as HoverTipSource
+		hover.set_payload(SkillHoverTipBuilder.build_ability(ability_id, GameState.to_dict(), icon))
 		_skills.add_child(row)
-	_skill_count.text = "已掌握 %d 个" % count
-	if count == 0:
+	_skill_count.text = "已掌握 %d 个    当前显示 %d 个" % [count, visible_count]
+	if visible_count == 0:
 		_add_empty_skill_row()
+
+
+func _set_skill_filter(next_filter: String) -> void:
+	_skill_filter = next_filter
+	_refresh_filter_buttons()
+	_bind_skills()
+
+
+func _refresh_filter_buttons() -> void:
+	for pair in [
+		[_filter_all, FILTER_ALL],
+		[_filter_active, FILTER_ACTIVE],
+		[_filter_upkeep, FILTER_UPKEEP],
+		[_filter_combat_passive, FILTER_COMBAT_PASSIVE],
+		[_filter_general_passive, FILTER_GENERAL_PASSIVE],
+	]:
+		var button := pair[0] as Button
+		button.theme_type_variation = "TabActive" if str(pair[1]) == _skill_filter else "TabIdle"
+
+
+func _skill_meta(ability: Dictionary, runtime: Dictionary, ability_id: String) -> String:
+	var parts: PackedStringArray = []
+	var realm := str(ability.get("realm", "")).strip_edges()
+	if realm != "":
+		parts.append("境界 %s" % DaoTreeServiceScript.realm_display_name(realm))
+	var rarity := str(ability.get("rarity", "")).strip_edges()
+	if rarity != "":
+		parts.append(EnumQuality.display_label(EnumQuality.from_label(rarity)))
+	var combat_v: Variant = ability.get("combat", {})
+	if combat_v is Dictionary:
+		var combat := combat_v as Dictionary
+		var cost := _format_cost_text(combat.get("costs", []))
+		if cost != "":
+			parts.append(cost)
+		var upkeep := _format_cost_text(combat.get("upkeepCostsPerSecond", []))
+		if upkeep != "":
+			parts.append("维持 %s/秒" % upkeep)
+		var cooldown := float(combat.get("cooldown", 0.0))
+		if cooldown > 0.0:
+			parts.append("冷却 %ss" % _fmt_num(cooldown))
+	var mastery := AbilityServiceScript.knowledge_mastery_ratio(ability_id, GameState.to_dict())
+	if mastery > 0.0:
+		parts.append("知识 %.0f%%" % (mastery * 100.0))
+	if parts.is_empty():
+		parts.append("学习后生效")
+	return "    ".join(parts)
+
+
+func _skill_brief_effect(ability: Dictionary, runtime: Dictionary, ability_id: String) -> String:
+	var mastery := AbilityServiceScript.knowledge_mastery_ratio(ability_id, GameState.to_dict())
+	var lines := HoverTipEffectFormatter.format_lines(runtime.get("effects", []))
+	if lines.is_empty():
+		lines = HoverTipEffectFormatter.format_raw_ability_lines(ability.get("effects", []), mastery)
+	if not lines.is_empty():
+		return str(lines[0])
+	var desc := str(ability.get("description", "")).strip_edges()
+	return desc if desc != "" else "查看悬浮详情了解效果"
 
 
 func _add_empty_method_row() -> void:
@@ -82,15 +173,18 @@ func _add_empty_method_row() -> void:
 	row.get_node("%TypeLabel").text = "功法"
 	row.get_node("%NameLabel").text = "尚未掌握功法"
 	row.get_node("%MetaLabel").text = "研读功法典籍后会出现在这里"
+	row.get_node("%EffectLabel").text = ""
 	_set_icon(row.get_node("%Icon") as TextureRect, null)
 	_methods.add_child(row)
 
 
 func _add_empty_skill_row() -> void:
 	var row := SkillRowScene.instantiate() as Control
-	row.get_node("%PriorityLabel").text = "-"
+	row.get_node("%IndexLabel").text = "-"
+	row.get_node("%TypeLabel").text = "技能"
 	row.get_node("%NameLabel").text = "尚未掌握技能"
 	row.get_node("%MetaLabel").text = "研读技能典籍后会出现在这里"
+	row.get_node("%EffectLabel").text = ""
 	_set_icon(row.get_node("%Icon") as TextureRect, null)
 	_skills.add_child(row)
 
@@ -98,10 +192,11 @@ func _add_empty_skill_row() -> void:
 func _method_type_label(method: Dictionary) -> String:
 	var family := CultivationMethodServiceScript.family_by_id(str(method.get("familyId", "")))
 	var role := str(family.get("role", "")).strip_edges()
-	if role != "":
-		return role
-	if bool(method.get("is_movement", false)) or str(method.get("slot_type", "")) == "movement":
+	if bool(method.get("is_movement", false)) or str(method.get("slot_type", "")) == "movement" \
+			or role.find("身法") >= 0 or role.find("遁法") >= 0:
 		return "身法"
+	if str(family.get("progressionType", method.get("progressionType", ""))) == "side_path":
+		return "旁门"
 	return "功法"
 
 
@@ -109,7 +204,10 @@ func _method_meta(method: Dictionary, method_id: String) -> String:
 	var parts: PackedStringArray = []
 	var realm := str(method.get("realm", "")).strip_edges()
 	if realm != "":
-		parts.append("境界 %s" % realm)
+		parts.append("境界 %s" % DaoTreeServiceScript.realm_display_name(realm))
+	var rarity := str(method.get("rarity", "")).strip_edges()
+	if rarity != "":
+		parts.append(EnumQuality.display_label(EnumQuality.from_label(rarity)))
 	var mastery := CultivationMethodServiceScript.method_mastery(GameState.to_dict(), method_id)
 	parts.append("熟练 %.0f%%" % (mastery * 100.0))
 	var practice: Dictionary = method.get("practice", {}) as Dictionary
@@ -118,32 +216,21 @@ func _method_meta(method: Dictionary, method_id: String) -> String:
 	return "    ".join(parts)
 
 
-func _skill_meta(skill: Dictionary, ability_id: String) -> String:
-	var parts: PackedStringArray = []
-	var tags: Array = skill.get("tags", []) as Array
-	parts.append(_skill_category_label(tags))
-	var cost := str(skill.get("cost_text", "")).strip_edges()
-	if cost != "":
-		parts.append(cost)
-	var cooldown := float(skill.get("cd_total", skill.get("cd", 0.0)))
-	if cooldown > 0.0:
-		parts.append("冷却 %.1fs" % cooldown)
-	var mastery := AbilityServiceScript.knowledge_mastery_ratio(ability_id, GameState.to_dict())
-	if mastery > 0.0:
-		parts.append("知识加成 %.0f%%" % (mastery * 100.0))
-	return "    ".join(parts)
-
-
-func _skill_category_label(tags: Array) -> String:
-	if tags.has("attack") or tags.has("fire") or tags.has("poison"):
-		return "攻击"
-	if tags.has("shield"):
-		return "防御"
-	if tags.has("heal") or tags.has("restore"):
-		return "恢复"
-	if tags.has("mobility"):
-		return "身法"
-	return "辅助"
+func _method_brief_effect(method: Dictionary, method_id: String) -> String:
+	var lines := HoverTipEffectFormatter.format_raw_ability_lines(
+		method.get("effects", []),
+		CultivationMethodServiceScript.method_mastery_value_ratio(GameState.to_dict(), method_id)
+	)
+	if not lines.is_empty():
+		return str(lines[0])
+	var practice: Dictionary = method.get("practice", {}) as Dictionary
+	if not practice.is_empty():
+		return "修炼速度 x%s    知识经验 %s%%" % [
+			_fmt_num(float(practice.get("efficiency", 1.0))),
+			_fmt_num(float(practice.get("knowledgeXpRatio", 0.0)) * 100.0),
+		]
+	var desc := str(method.get("description", "")).strip_edges()
+	return desc if desc != "" else "查看悬浮详情了解效果"
 
 
 func _method_icon(method: Dictionary) -> Texture2D:
@@ -163,6 +250,37 @@ func _entry_icon(entry: Dictionary) -> Texture2D:
 func _set_icon(icon: TextureRect, texture: Texture2D) -> void:
 	icon.texture = texture
 	icon.visible = texture != null
+
+
+func _format_cost_text(costs_v: Variant) -> String:
+	if not costs_v is Array:
+		return ""
+	var labels: PackedStringArray = []
+	for cost_v in costs_v as Array:
+		if not cost_v is Dictionary:
+			continue
+		var cost := cost_v as Dictionary
+		var value := float(cost.get("value", 0.0))
+		if value <= 0.0:
+			continue
+		labels.append("%s %s" % [_resource_label(str(cost.get("resource", "mana"))), _fmt_num(value)])
+	return "、".join(labels)
+
+
+func _resource_label(resource: String) -> String:
+	match resource.strip_edges().to_lower():
+		"stamina":
+			return "体力"
+		"spirit":
+			return "神魂"
+		_:
+			return "法力"
+
+
+func _fmt_num(value: float) -> String:
+	if is_equal_approx(value, roundf(value)):
+		return str(int(roundf(value)))
+	return "%0.1f" % value
 
 
 func _clear(container: Node) -> void:

@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
 [ext_resource type="Texture2D" uid="uid://cex3kl0pxni0d" path="res://assets/art/ui_new/fulu.png" id="2_icon"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="3_body"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/16.tres" id="4_small"]
+[ext_resource type="Script" path="res://scripts/ui/hover/hover_tip_source.gd" id="5_hover"]
 
 [sub_resource type="StyleBoxFlat" id="RowStyle"]
 bg_color = Color(0.97, 0.88, 0.73, 0.48)
@@ -22,7 +23,7 @@ content_margin_right = 10.0
 content_margin_bottom = 8.0
 
 [node name="LoadoutMethodRow" type="PanelContainer"]
-custom_minimum_size = Vector2(0, 72)
+custom_minimum_size = Vector2(0, 92)
 size_flags_horizontal = 3
 theme = ExtResource("1_theme")
 theme_override_styles/panel = SubResource("RowStyle")
@@ -70,3 +71,16 @@ size_flags_horizontal = 3
 autowrap_mode = 3
 text = "炼气恢复"
 label_settings = ExtResource("4_small")
+
+[node name="EffectLabel" type="Label" parent="Row/TextColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+text = "修炼速度 +4%"
+label_settings = ExtResource("4_small")
+text_overrun_behavior = 3
+
+[node name="HoverTipSource" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("5_hover")

@@ -36,7 +36,7 @@ func _run(name: String, test: Callable) -> void:
 
 func _test_search_handles_chinese_and_english() -> void:
 	var catalog := [
-		{"kind": "equip", "id": 5001, "name": "天雷印", "type": "法宝", "primary_type": "法宝", "secondary_type": "战斗法宝", "rarity": "品质4"},
+		{"kind": "equip", "id": 5001, "name": "天雷印", "type": "法宝", "primary_type": "法宝", "secondary_type": "战斗法宝", "rarity": "极品"},
 		{"kind": "item", "id": "items_LingCao", "name": "灵草", "type": "材料", "primary_type": "材料", "secondary_type": "草药", "rarity": "1"},
 	]
 	var by_kind := GmItemSearchScript.filter_entries(catalog, "法宝")

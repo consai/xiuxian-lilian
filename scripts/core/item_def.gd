@@ -118,7 +118,7 @@ static func from_dict(data: Dictionary) -> ItemDef:
 	)
 	item.item_type = EnumItemTypeScript.full_label(item.primary_type, item.secondary_type)
 	item.rarity = str(data.get("rarity", ""))
-	item.quality = maxi(1, int(data.get("quality", _quality_by_rarity(item.rarity))))
+	item.quality = maxi(1, int(data.get("quality", EnumQuality.from_label(item.rarity))))
 	item.desc = str(data.get("desc", ""))
 	item.stackable = bool(data.get("stackable", true))
 	item.max_stack = maxi(1, int(data.get("max_stack", 999)))
@@ -142,15 +142,3 @@ static func from_dict(data: Dictionary) -> ItemDef:
 	if not item.stackable:
 		item.max_stack = 1
 	return item
-
-
-static func _quality_by_rarity(rarity: String) -> int:
-	match rarity.strip_edges():
-		"普通":
-			return 1
-		"稀有":
-			return 3
-		"传说":
-			return 6
-		_:
-			return 1
