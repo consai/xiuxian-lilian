@@ -4,7 +4,7 @@ extends Control
 ## 道具展示块，场景 [code]item.tscn[/code]。
 ## [member click_enabled] 为 [code]false[/code] 时仅展示（如详情弹窗）；为 [code]true[/code] 时可点击并带缩放反馈（如背包）。
 ## [member show_info_on_click] 为 [code]true[/code] 且已 [method set_info_entry] 时，左键打开全局道具详情。
-## [code]%GcItemTierTint[/code] / [code]%GcItemHighlight[/code] 为阶位底盘，[code]%GcItemQualityGem[/code] 为品质点。
+## [code]%GcItemQualityTint[/code] / [code]%GcItemHighlight[/code] 为品质底盘与边框，[code]%GcItemTierLabel[/code] 显示阶位文字。
 ## [code]%GcItemCountBadge[/code] 在 [member show_name_label] 为真且数量大于 1 时显示角标；
 ## [member always_show_count_badge] 为真时，数量大于 0 即显示角标（如消耗展示）。
 
@@ -38,9 +38,9 @@ signal right_clicked
 @onready var _count_badge_wrap: Control = %GcItemCountBadgeWrap
 @onready var _count_badge: Label = %GcItemCountBadge
 @onready var _press: PressScale = %GcItemPress
-@onready var _tier_tint: Panel = %GcItemTierTint
+@onready var _quality_tint: Panel = %GcItemQualityTint
 @onready var _quality_border: Panel = %GcItemHighlight
-@onready var _quality_gem: Panel = %GcItemQualityGem
+@onready var _tier_label: Label = %GcItemTierLabel
 
 var _display_name: String = ""
 var _display_count: int = 0
@@ -52,7 +52,6 @@ var _info_entry: Dictionary = {}
 var _insufficient: bool = false
 var _name_label_settings_normal: LabelSettings
 var _name_label_settings_insufficient: LabelSettings
-var _name_label_settings_quality: LabelSettings
 var _count_label_settings_normal: LabelSettings
 var _count_label_settings_insufficient: LabelSettings
 
@@ -248,13 +247,10 @@ func _apply_text_colors() -> void:
 	if _name_count != null:
 		if _insufficient and _name_label_settings_insufficient != null:
 			_name_count.label_settings = _name_label_settings_insufficient
+			_name_count.add_theme_color_override("font_color", INSUFFICIENT_TEXT_COLOR)
 		elif _name_label_settings_normal != null:
-			if _quality.strip_edges() != "":
-				_name_label_settings_quality = _name_label_settings_normal.duplicate()
-				_name_label_settings_quality.font_color = EnumQuality.border_color_from_label(_quality)
-				_name_count.label_settings = _name_label_settings_quality
-			else:
-				_name_count.label_settings = _name_label_settings_normal
+			_name_count.label_settings = _name_label_settings_normal
+			_name_count.remove_theme_color_override("font_color")
 	if _count_badge != null:
 		if _insufficient:
 			if _count_label_settings_insufficient != null:
@@ -344,23 +340,21 @@ func _set_learn_blocked(blocked: bool) -> void:
 func _apply_quality_border(pin_zhi: String) -> void:
 	var quality_text := pin_zhi.strip_edges()
 	var quality_color := EnumQuality.border_color_from_label(quality_text)
-	var tier_color := EnumItemTier.get_color(_tier)
-	if _tier_tint != null:
-		_tier_tint.visible = quality_text != ""
-		_tier_tint.self_modulate = Color(
-			tier_color.r,
-			tier_color.g,
-			tier_color.b,
-			EnumItemTier.tint_alpha(_tier) if _tier_tint.visible else 0.0
+	if _quality_tint != null:
+		_quality_tint.visible = quality_text != ""
+		_quality_tint.self_modulate = Color(
+			quality_color.r,
+			quality_color.g,
+			quality_color.b,
+			0.18 if _quality_tint.visible else 0.0
 		)
 	if _quality_border != null:
 		_quality_border.visible = quality_text != ""
 		if _quality_border.visible:
-			_quality_border.self_modulate = tier_color
-	if _quality_gem != null:
-		_quality_gem.visible = EnumQuality.should_show_gem(quality_text)
-		if _quality_gem.visible:
-			_quality_gem.self_modulate = quality_color
+			_quality_border.self_modulate = quality_color
+	if _tier_label != null:
+		_tier_label.visible = quality_text != ""
+		_tier_label.text = EnumItemTier.label(_tier)
 
 
 func _refresh_name_count_text() -> void:

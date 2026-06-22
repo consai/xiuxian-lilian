@@ -88,7 +88,7 @@ var cultivation_method_slots: Dictionary:
 	get: return DataStore.savedata.get("cultivation_method_slots", {}) as Dictionary
 	set(value): DataStore.savedata["cultivation_method_slots"] = value
 var auto_battle_enabled: bool:
-	get: return bool(DataStore.savedata.get("auto_battle_enabled", true))
+	get: return bool(DataStore.savedata.get("auto_battle_enabled", false))
 	set(value): DataStore.savedata["auto_battle_enabled"] = value
 var auto_battle_preset: String:
 	get: return str(DataStore.savedata.get("auto_battle_preset", "balanced"))
@@ -185,7 +185,7 @@ func new_game() -> void:
 		"main": "method.hunyuan.1", "support_1": "", "support_2": "", "movement": "",
 	}) as Dictionary).duplicate(true)
 	_seed_starter_knowledge()
-	auto_battle_enabled = true
+	auto_battle_enabled = false
 	auto_battle_preset = "balanced"
 	auto_battle_rules = {}
 	owned_equips = (initial.get("equips", []) as Array).duplicate(true)

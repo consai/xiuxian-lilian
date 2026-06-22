@@ -1,10 +1,10 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene format=3 uid="uid://n22rndjrvf7s"]
 
 [ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
 [ext_resource type="Texture2D" uid="uid://si46blfimdsw" path="res://assets/art/ui_new/pugong.png" id="2_icon"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="3_body"]
 [ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="4_small"]
-[ext_resource type="Script" path="res://scripts/ui/hover/hover_tip_source.gd" id="5_hover"]
+[ext_resource type="Script" uid="uid://i2ey5righwn7" path="res://scripts/ui/hover/hover_tip_source.gd" id="5_hover"]
 
 [sub_resource type="StyleBoxFlat" id="RowStyle"]
 bg_color = Color(0.97, 0.88, 0.73, 0.48)
@@ -18,24 +18,39 @@ corner_radius_top_right = 13
 corner_radius_bottom_right = 13
 corner_radius_bottom_left = 13
 
-[node name="MasteredSkillRow" type="Panel"]
+[sub_resource type="StyleBoxFlat" id="BadgeStyle"]
+bg_color = Color(1, 1, 1, 0.86)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.12, 0.08, 0.55)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 7.0
+content_margin_top = 1.0
+content_margin_right = 7.0
+content_margin_bottom = 1.0
+
+[node name="MasteredSkillRow" type="Panel" unique_id=464643572]
 custom_minimum_size = Vector2(0, 98)
 theme = ExtResource("1_theme")
 theme_override_styles/panel = SubResource("RowStyle")
 
-[node name="IndexLabel" type="Label" parent="."]
+[node name="IndexLabel" type="Label" parent="." unique_id=1252625804]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 10.0
 offset_top = 34.0
 offset_right = 40.0
 offset_bottom = 64.0
-mouse_filter = 2
 text = "1"
 label_settings = ExtResource("3_body")
 horizontal_alignment = 1
 
-[node name="Icon" type="TextureRect" parent="."]
+[node name="Icon" type="TextureRect" parent="." unique_id=761119205]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 48.0
@@ -47,52 +62,90 @@ texture = ExtResource("2_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TypeLabel" type="Label" parent="."]
+[node name="TypeLabel" type="Label" parent="." unique_id=150848081]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 120.0
 offset_top = 10.0
 offset_right = 214.0
 offset_bottom = 34.0
-mouse_filter = 2
 text = "主动"
 label_settings = ExtResource("4_small")
 
-[node name="NameLabel" type="Label" parent="."]
+[node name="NameLabel" type="Label" parent="." unique_id=655725707]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 210.0
 offset_top = 8.0
-offset_right = 444.0
+offset_right = 342.0
 offset_bottom = 38.0
-mouse_filter = 2
 text = "御气弹"
 label_settings = ExtResource("3_body")
 
-[node name="MetaLabel" type="Label" parent="."]
+[node name="TierBadge" type="PanelContainer" parent="." unique_id=1280919634]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 350.0
+offset_top = 11.0
+offset_right = 398.0
+offset_bottom = 33.0
+theme_override_styles/panel = SubResource("BadgeStyle")
+
+[node name="TierBadgeLabel" type="Label" parent="TierBadge" unique_id=1078495598]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.97, 0.9, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.12, 0.08, 0.95)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 13
+text = "一阶"
+label_settings = ExtResource("4_small")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="QualityBadge" type="PanelContainer" parent="." unique_id=664789125]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 406.0
+offset_top = 11.0
+offset_right = 454.0
+offset_bottom = 33.0
+theme_override_styles/panel = SubResource("BadgeStyle")
+
+[node name="QualityBadgeLabel" type="Label" parent="QualityBadge" unique_id=1815650694]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.97, 0.9, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.12, 0.08, 0.95)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 13
+text = "下品"
+label_settings = ExtResource("4_small")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MetaLabel" type="Label" parent="." unique_id=1726536155]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 120.0
 offset_top = 40.0
 offset_right = 446.0
 offset_bottom = 64.0
-mouse_filter = 2
 text = "法力 8    冷却 3s"
 label_settings = ExtResource("4_small")
 text_overrun_behavior = 3
 
-[node name="EffectLabel" type="Label" parent="."]
+[node name="EffectLabel" type="Label" parent="." unique_id=59111725]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 120.0
 offset_top = 66.0
 offset_right = 446.0
 offset_bottom = 90.0
-mouse_filter = 2
 text = "伤害 40 + 法攻"
 label_settings = ExtResource("4_small")
 text_overrun_behavior = 3
 
-[node name="HoverTipSource" type="Node" parent="."]
+[node name="HoverTipSource" type="Node" parent="." unique_id=725603592]
 unique_name_in_owner = true
 script = ExtResource("5_hover")

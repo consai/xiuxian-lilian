@@ -9,6 +9,18 @@
 [ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="6_db6vm"]
 [ext_resource type="FontFile" uid="uid://btkp4vukwqrul" path="res://assets/art/AlimamaDaoLiTi.ttf" id="7_font"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_quality_tint"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+corner_detail = 5
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u6xce"]
 content_margin_left = 0.0
 content_margin_top = 0.0
@@ -25,34 +37,6 @@ corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 corner_detail = 5
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_quality_tint"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(1, 1, 1, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-corner_detail = 5
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_quality_gem"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(1, 1, 1, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(1, 0.96, 0.84, 0.92)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_blocked"]
 bg_color = Color(1, 0.94, 0.84, 0.96)
@@ -85,7 +69,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = ExtResource("1_a8f5r")
 
-[node name="GcItemTierTint" type="Panel" parent="." unique_id=160386251]
+[node name="GcItemQualityTint" type="Panel" parent="." unique_id=160386251]
 unique_name_in_owner = true
 self_modulate = Color(0.7, 0.62, 0.52, 1)
 layout_mode = 1
@@ -110,19 +94,24 @@ mouse_filter = 2
 theme = ExtResource("3_g5kul")
 theme_override_styles/panel = SubResource("StyleBoxFlat_u6xce")
 
-[node name="GcItemQualityGem" type="Panel" parent="." unique_id=827145008]
+[node name="GcItemTierLabel" type="Label" parent="." unique_id=827145008]
 unique_name_in_owner = true
-self_modulate = Color(0.7, 0.62, 0.52, 1)
 z_index = 2
-custom_minimum_size = Vector2(10, 10)
+custom_minimum_size = Vector2(28, 16)
 layout_mode = 1
-anchors_preset = 0
-offset_left = 6.0
-offset_top = 5.0
-offset_right = 16.0
-offset_bottom = 15.0
+offset_left = 3.0
+offset_top = 2.0
+offset_right = 33.0
+offset_bottom = 18.0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_quality_gem")
+theme_override_colors/font_color = Color(1, 0.97, 0.9, 1)
+theme_override_colors/font_outline_color = Color(0.2, 0.12, 0.08, 0.95)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 11
+text = "一阶"
+label_settings = ExtResource("5_blocked")
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="GcDetailIcon" type="TextureRect" parent="." unique_id=302395797]
 unique_name_in_owner = true

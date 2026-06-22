@@ -318,7 +318,7 @@ func _default_savedata() -> Dictionary:
 		"cultivation_method_slots": {
 			"main": "method.hunyuan.1", "support_1": "", "support_2": "", "movement": ""
 		},
-		"auto_battle_enabled": true,
+		"auto_battle_enabled": false,
 		"auto_battle_preset": "balanced",
 		"auto_battle_rules": {},
 		"owned_equips": [],

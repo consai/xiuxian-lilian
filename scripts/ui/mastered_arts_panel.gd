@@ -65,14 +65,16 @@ func _bind_methods() -> void:
 		var row := MethodRowScene.instantiate() as Control
 		var icon := _method_icon(method)
 		row.get_node("%TypeLabel").text = _method_type_label(method)
+		var family := CultivationMethodServiceScript.family_by_id(str(method.get("familyId", "")))
 		var name_label := row.get_node("%NameLabel") as Label
 		name_label.text = str(method.get("name", method_id))
 		name_label.add_theme_color_override(
 			"font_color",
-			EnumQuality.get_color(_entry_quality(method, CultivationMethodServiceScript.family_by_id(str(method.get("familyId", "")))))
+			EnumQuality.get_color(_entry_quality(method, family))
 		)
 		row.get_node("%MetaLabel").text = _method_meta(method, method_id)
 		row.get_node("%EffectLabel").text = _method_brief_effect(method, method_id)
+		_apply_quality_tier_badges(row, method, family)
 		var hover := row.get_node("%HoverTipSource") as HoverTipSource
 		hover.set_payload(MethodHoverTipBuilder.build(method_id, GameState.to_dict(), icon))
 		_set_icon(row.get_node("%Icon") as TextureRect, icon)
@@ -109,6 +111,7 @@ func _bind_skills() -> void:
 		name_label.add_theme_color_override("font_color", EnumQuality.get_color(_entry_quality(ability)))
 		row.get_node("%MetaLabel").text = _skill_meta(ability, skill, ability_id)
 		row.get_node("%EffectLabel").text = _skill_brief_effect(ability, skill, ability_id)
+		_apply_quality_tier_badges(row, ability)
 		_set_icon(row.get_node("%Icon") as TextureRect, icon)
 		var hover := row.get_node("%HoverTipSource") as HoverTipSource
 		hover.set_payload(SkillHoverTipBuilder.build_ability(ability_id, GameState.to_dict(), icon))
@@ -180,6 +183,7 @@ func _add_empty_method_row() -> void:
 	row.get_node("%NameLabel").text = "尚未掌握功法"
 	row.get_node("%MetaLabel").text = "研读功法典籍后会出现在这里"
 	row.get_node("%EffectLabel").text = ""
+	_apply_quality_tier_badges(row, {})
 	_set_icon(row.get_node("%Icon") as TextureRect, null)
 	_methods.add_child(row)
 
@@ -191,6 +195,7 @@ func _add_empty_skill_row() -> void:
 	row.get_node("%NameLabel").text = "尚未掌握技能"
 	row.get_node("%MetaLabel").text = "研读技能典籍后会出现在这里"
 	row.get_node("%EffectLabel").text = ""
+	_apply_quality_tier_badges(row, {})
 	_set_icon(row.get_node("%Icon") as TextureRect, null)
 	_skills.add_child(row)
 
@@ -268,6 +273,26 @@ func _entry_quality(entry: Dictionary, fallback: Dictionary = {}) -> int:
 
 func _entry_tier(entry: Dictionary) -> int:
 	return EnumItemTier.clamp_tier(int(entry.get("tier", 1)))
+
+
+func _apply_quality_tier_badges(row: Control, entry: Dictionary, fallback: Dictionary = {}) -> void:
+	var tier_badge := row.get_node_or_null("%TierBadge") as CanvasItem
+	var quality_badge := row.get_node_or_null("%QualityBadge") as CanvasItem
+	var tier_label := row.get_node_or_null("%TierBadgeLabel") as Label
+	var quality_label := row.get_node_or_null("%QualityBadgeLabel") as Label
+	var has_entry := not entry.is_empty()
+	if tier_badge != null:
+		tier_badge.visible = has_entry
+		if has_entry:
+			tier_badge.self_modulate = EnumItemTier.get_color(_entry_tier(entry))
+	if quality_badge != null:
+		quality_badge.visible = has_entry
+		if has_entry:
+			quality_badge.self_modulate = EnumQuality.get_color(_entry_quality(entry, fallback))
+	if tier_label != null and has_entry:
+		tier_label.text = EnumItemTier.label(_entry_tier(entry))
+	if quality_label != null and has_entry:
+		quality_label.text = EnumQuality.display_label(_entry_quality(entry, fallback))
 
 
 func _format_cost_text(costs_v: Variant) -> String:

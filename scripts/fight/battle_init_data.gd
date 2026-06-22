@@ -717,7 +717,9 @@ static func build_skills_ui(player: FightObj, skill_cfg: Dictionary) -> Array:
 				var basic_icon := _resolve_icon_texture(ba)
 				if basic_icon != null:
 					basic["icon"] = basic_icon
-				basic["back_color"] = _quality_back_color(int(ba.get("quality", 1)))
+				basic["quality"] = EnumQuality.clamp_quality(int(ba.get("quality", 1)))
+				basic["tier"] = EnumItemTier.clamp_tier(int(ba.get("tier", 1)))
+				basic["back_color"] = _quality_back_color(int(basic["quality"]))
 			rows.append(basic)
 			continue
 		var cfg := FightObj._lookup_cfg(skill_cfg, skill_id)
@@ -735,7 +737,9 @@ static func build_skills_ui(player: FightObj, skill_cfg: Dictionary) -> Array:
 		}
 		if icon != null:
 			row["icon"] = icon
-		row["back_color"] = _quality_back_color(int(cfg.get("quality", 1)))
+		row["quality"] = EnumQuality.clamp_quality(int(cfg.get("quality", 1)))
+		row["tier"] = EnumItemTier.clamp_tier(int(cfg.get("tier", 1)))
+		row["back_color"] = _quality_back_color(int(row["quality"]))
 		rows.append(row)
 	return rows
 
@@ -773,7 +777,9 @@ static func build_slot_items_ui(slots_v: Variant, item_cfg: Dictionary) -> Array
 		var icon := _resolve_icon_texture(cfg)
 		if icon != null:
 			row["icon"] = icon
-		row["back_color"] = _quality_back_color(int(cfg.get("quality", 1)))
+		row["quality"] = EnumQuality.clamp_quality(int(cfg.get("quality", 1)))
+		row["tier"] = EnumItemTier.clamp_tier(int(cfg.get("tier", 1)))
+		row["back_color"] = _quality_back_color(int(row["quality"]))
 		rows.append(row)
 	return rows
 
@@ -809,7 +815,9 @@ static func build_equips_ui(slots_v: Variant, equip_cfg: Dictionary) -> Array:
 		var icon := _resolve_icon_texture(cfg)
 		if icon != null:
 			row["icon"] = icon
-		row["back_color"] = _quality_back_color(int(cfg.get("quality", 1)))
+		row["quality"] = EnumQuality.clamp_quality(int(cfg.get("quality", 1)))
+		row["tier"] = EnumItemTier.clamp_tier(int(cfg.get("tier", 1)))
+		row["back_color"] = _quality_back_color(int(row["quality"]))
 		rows.append(row)
 	return rows
 

@@ -20,6 +20,18 @@ signal entry_clicked(entry: Dictionary)
 signal entry_right_clicked(entry: Dictionary)
 signal sort_requested(entries: Array)
 
+enum SortField {
+	QUALITY,
+	TIER,
+	TYPE,
+}
+
+const SORT_FIELD_LABELS := {
+	SortField.QUALITY: "品质",
+	SortField.TIER: "阶级",
+	SortField.TYPE: "类型",
+}
+
 @export var max_slots_show: int = 25
 @export var grid_columns: int = 5
 @export var title_text: String = "背包"
@@ -30,7 +42,8 @@ signal sort_requested(entries: Array)
 @onready var _grid: GridContainer = %BagGrid
 @onready var _scroll: ScrollContainer = %Scroll
 @onready var _filter_bar: HBoxContainer = %FilterBar
-@onready var _sort_button: TextureButton = %BagSort
+@onready var _sort_bar: Control = %SortBar
+@onready var _sort_field_option: OptionButton = %SortFieldOption
 
 var _entries: Array = []
 var _filtered_cache: Array = []
@@ -43,12 +56,14 @@ var _slot_pool: Array[ItemView] = []
 var _row_height: float = 96.0
 var _entry_view_cache: Dictionary = {}
 var _hover_payload_cache: Dictionary = {}
+var _sort_field: SortField = SortField.TYPE # 默认按类型排序
+var _sort_ascending: bool = true # 默认升序
 
 
 func _ready() -> void:
 	_grid.columns = maxi(1, grid_columns)
 	_title.text = title_text
-	_sort_button.pressed.connect(_on_sort_pressed)
+	_setup_sort_options()
 	_scroll.get_v_scroll_bar().value_changed.connect(_on_scroll_changed)
 	_ensure_slot_pool()
 	call_deferred("_measure_row_height")
@@ -65,6 +80,7 @@ func set_entries(entries: Array) -> void:
 	_entries = _normalize_entries(entries)
 	_entry_view_cache.clear()
 	_hover_payload_cache.clear()
+	_apply_sort(false)
 	if is_node_ready():
 		var saved_scroll := _scroll.scroll_vertical
 		_refresh()
@@ -108,7 +124,7 @@ static func build_entries_from_inventory(inventory: Dictionary, owned_equips: Ar
 		var entry := _entry_from_equip(eid)
 		if not entry.is_empty():
 			out.append(entry)
-	out.sort_custom(_compare_entries)
+	out.sort_custom(_compare_entries_default)
 	return out
 
 
@@ -355,11 +371,87 @@ func _sync_filter_button_states() -> void:
 			button.theme_type_variation = "TabActive" if button.text == _active_filter else "TabIdle"
 
 
-func _on_sort_pressed() -> void:
-	_entries.sort_custom(_compare_entries)
+func _setup_sort_options() -> void:
+	if _sort_field_option != null:
+		_sort_field_option.clear()
+		for field in [SortField.QUALITY, SortField.TIER, SortField.TYPE]:
+			_sort_field_option.add_item(
+				_sort_field_option_label(field, true),
+				_sort_option_id(field, true)
+			)
+			_sort_field_option.add_item(
+				_sort_field_option_label(field, false),
+				_sort_option_id(field, false)
+			)
+		var sort_popup := _sort_field_option.get_popup()
+		if sort_popup != null:
+			sort_popup.id_pressed.connect(_on_sort_field_option_pressed)
+			sort_popup.theme = theme
+	_sync_sort_option_states()
+
+
+func _on_sort_field_option_pressed(option_id: int) -> void:
+	_sort_field = (option_id >> 1) as SortField
+	_sort_ascending = (option_id & 1) == 0
+	_apply_sort()
+
+
+
+
+func _apply_sort(should_emit_sort_signal: bool = true) -> void:
+	_entries.sort_custom(_compare_entries_active)
+	_sync_sort_option_states()
+	if not is_node_ready():
+		return
 	_scroll.scroll_vertical = 0
 	_refresh()
-	sort_requested.emit(_entries.duplicate(true))
+	if should_emit_sort_signal:
+		sort_requested.emit(_entries.duplicate(true))
+
+
+func _sync_sort_option_states() -> void:
+	if _sort_field_option != null:
+		var option_id := _sort_option_id(_sort_field, _sort_ascending)
+		var field_index := _sort_field_option.get_item_index(option_id)
+		if field_index >= 0:
+			_sort_field_option.select(field_index)
+
+
+func _sort_option_id(field: SortField, ascending: bool) -> int:
+	return int(field) * 2 + (0 if ascending else 1)
+
+
+func _sort_field_option_label(field: SortField, ascending: bool) -> String:
+	var base := str(SORT_FIELD_LABELS.get(field, ""))
+	return "%s ▲" % base if ascending else "%s ▼" % base
+
+
+func _compare_entries_active(a: Dictionary, b: Dictionary) -> bool:
+	var cmp := _compare_entries_by_field(a, b, _sort_field)
+	if cmp != 0:
+		return cmp < 0 if _sort_ascending else cmp > 0
+
+	return str(a.get("sort_name", "")) < str(b.get("sort_name", ""))
+
+
+static func _compare_entries_by_field(a: Dictionary, b: Dictionary, field: SortField) -> int:
+	match field:
+		SortField.QUALITY:
+			return _entry_quality_value(a) - _entry_quality_value(b)
+		SortField.TIER:
+			return _entry_tier_value(a) - _entry_tier_value(b)
+		SortField.TYPE:
+			return _entry_sort_order(a) - _entry_sort_order(b)
+		_:
+			return 0
+
+
+static func _entry_quality_value(entry: Dictionary) -> int:
+	return EnumQuality.from_label(str(entry.get("quality", "")), EnumQuality.Type.LOW)
+
+
+static func _entry_tier_value(entry: Dictionary) -> int:
+	return maxi(1, int(entry.get("tier", 1)))
 
 
 func _set_active_filter(filter_label: String) -> void:
@@ -392,8 +484,8 @@ func _filtered_entries() -> Array:
 func _set_picker_chrome(show_chrome: bool) -> void:
 	if _filter_bar != null:
 		_filter_bar.visible = show_chrome
-	if _sort_button != null:
-		_sort_button.visible = show_chrome
+	if _sort_bar != null:
+		_sort_bar.visible = show_chrome
 
 
 func _ensure_hover_tip(view: ItemView) -> HoverTipSource:
@@ -668,11 +760,10 @@ static func _entry_from_equip(equip_id: int) -> Dictionary:
 	}
 
 
-static func _compare_entries(a: Dictionary, b: Dictionary) -> bool:
-	var order_a := _entry_sort_order(a)
-	var order_b := _entry_sort_order(b)
-	if order_a != order_b:
-		return order_a < order_b
+static func _compare_entries_default(a: Dictionary, b: Dictionary) -> bool:
+	var cmp := _compare_entries_by_field(a, b, SortField.TYPE)
+	if cmp != 0:
+		return cmp < 0
 	return str(a.get("sort_name", "")) < str(b.get("sort_name", ""))
 
 

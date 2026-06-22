@@ -102,6 +102,7 @@ func _bind_method_row(row: Control, type_label: String, method: Dictionary) -> v
 	var texture := _entry_icon(method)
 	icon.texture = texture
 	icon.visible = texture != null
+	_apply_quality_tier_badges(row, method)
 
 
 func _bind_method_summary() -> void:
@@ -135,6 +136,7 @@ func _bind_skills() -> void:
 		var texture := _entry_icon(skill)
 		icon.texture = texture
 		icon.visible = texture != null
+		_apply_quality_tier_badges(row, skill)
 
 
 func _bind_treasure() -> void:
@@ -307,6 +309,26 @@ func _entry_quality(entry: Dictionary) -> int:
 
 func _entry_tier(entry: Dictionary) -> int:
 	return EnumItemTier.clamp_tier(int(entry.get("tier", 1)))
+
+
+func _apply_quality_tier_badges(row: Control, entry: Dictionary) -> void:
+	var tier_badge := row.get_node_or_null("%TierBadge") as CanvasItem
+	var quality_badge := row.get_node_or_null("%QualityBadge") as CanvasItem
+	var tier_label := row.get_node_or_null("%TierBadgeLabel") as Label
+	var quality_label := row.get_node_or_null("%QualityBadgeLabel") as Label
+	var has_entry := not entry.is_empty()
+	if tier_badge != null:
+		tier_badge.visible = has_entry
+		if has_entry:
+			tier_badge.self_modulate = EnumItemTier.get_color(_entry_tier(entry))
+	if quality_badge != null:
+		quality_badge.visible = has_entry
+		if has_entry:
+			quality_badge.self_modulate = EnumQuality.get_color(_entry_quality(entry))
+	if tier_label != null and has_entry:
+		tier_label.text = EnumItemTier.label(_entry_tier(entry))
+	if quality_label != null and has_entry:
+		quality_label.text = EnumQuality.display_label(_entry_quality(entry))
 
 
 func _go_back() -> void:

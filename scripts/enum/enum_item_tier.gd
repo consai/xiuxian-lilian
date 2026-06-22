@@ -70,9 +70,9 @@ static func get_color(tier: int) -> Color:
 static func tint_alpha(tier: int) -> float:
 	var t := clamp_tier(tier)
 	if t >= Type.GREAT:
-		return 0.34
+		return 1
 	if t >= Type.TRANSFORM:
-		return 0.30
+		return 1
 	if t >= Type.CORE:
-		return 0.26
-	return 0.22
+		return 1
+	return 1
