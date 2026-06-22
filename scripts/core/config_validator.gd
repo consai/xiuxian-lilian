@@ -6,6 +6,7 @@ const WorldMapDataValidatorScript := preload("res://scripts/map/world_map_data_v
 const SceneManagerScript := preload("res://scripts/core/scene_manager.gd")
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const KnowledgeEffectServiceScript := preload("res://scripts/dao/knowledge_effect_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 const RealmBalanceServiceScript := preload("res://scripts/sim/realm_balance_service.gd")
@@ -23,11 +24,42 @@ static func collect_all_errors(config_manager: Node, game_state: Node = null) ->
 	errors.append_array(_validate_location_preview_rewards(config_manager))
 	errors.append_array(_validate_v1_abilities())
 	errors.append_array(_validate_method_stack_policies())
+	errors.append_array(_validate_arts_quality_and_tier())
 	errors.append_array(KnowledgeEffectServiceScript.collect_config_errors())
 	errors.append_array(_validate_learning_book_coverage(config_manager))
 	errors.append_array(_validate_item_alias_targets(config_manager))
 	errors.append_array(ExpeditionDataValidatorScript.collect_errors(game_state))
 	errors.append_array(WorldMapDataValidatorScript.collect_errors())
+	return errors
+
+
+static func _validate_arts_quality_and_tier() -> PackedStringArray:
+	var errors: PackedStringArray = []
+	for ability_v in AbilityServiceScript.all_abilities():
+		if ability_v is Dictionary:
+			errors.append_array(_validate_quality_tier_row(ability_v as Dictionary, "技能"))
+	for method_v in CultivationMethodServiceScript.all_methods():
+		if method_v is Dictionary:
+			errors.append_array(_validate_quality_tier_row(method_v as Dictionary, "功法"))
+	for skill_v in DaoTreeServiceScript.config().get("skills", []) as Array:
+		if skill_v is Dictionary:
+			errors.append_array(_validate_quality_tier_row(skill_v as Dictionary, "知识"))
+	return errors
+
+
+static func _validate_quality_tier_row(row: Dictionary, label: String) -> PackedStringArray:
+	var errors: PackedStringArray = []
+	var row_id := str(row.get("id", ""))
+	if row.has("rarity"):
+		errors.append("%s %s 使用了旧字段 rarity" % [label, row_id])
+	if not row.has("quality"):
+		errors.append("%s %s 缺少 quality" % [label, row_id])
+	elif not EnumQuality.is_valid_quality(int(row.get("quality", 0))):
+		errors.append("%s %s quality 必须在 1..4" % [label, row_id])
+	if not row.has("tier"):
+		errors.append("%s %s 缺少 tier" % [label, row_id])
+	elif not EnumItemTier.is_valid_tier(int(row.get("tier", 0))):
+		errors.append("%s %s tier 必须在 1..9" % [label, row_id])
 	return errors
 
 
