@@ -23,7 +23,9 @@ monsters:
       control_resist: 55
       crit: 5
       crit_damage: 150
-    skills: []
+    skills:
+      - 1
+      - 0
     drops:
       entries:
         - kind: "item"

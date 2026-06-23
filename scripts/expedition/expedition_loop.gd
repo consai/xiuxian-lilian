@@ -400,7 +400,7 @@ func _route_switch_summary() -> Dictionary:
 
 
 func _resize_map_world() -> void:
-	if _map_world == null:
+	if _map_world == null or not is_inside_tree():
 		return
 	var viewport_size := get_viewport_rect().size
 	var target_width := maxf(1500.0, viewport_size.x * 1.55)

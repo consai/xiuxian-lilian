@@ -1,8 +1,10 @@
 # 项目任务看板
 
-## 当前冲刺：P0 可玩闭环稳定版
+## 已完成：P0 可玩闭环稳定版
 
-### [ ] PM-001：确认历练浮层链路
+完成标准：完整 headless 测试通过，手动验收清单已建立。
+
+### [x] PM-001：确认历练浮层链路
 
 描述：核对历练中进入战斗、胜利返回、战败结算、打开背包 / 技能策略面板的状态变化。
 
@@ -20,7 +22,7 @@
 - `scripts/expedition/expedition_loop.gd`
 - `scripts/ui/backpack_panel.gd`
 
-### [ ] PM-002：补齐历练背包验收
+### [x] PM-002：补齐历练背包验收
 
 描述：确认历练运行时背包只改 `DataStore.expedition_runtime()`，结算后再投影回存档。
 
@@ -37,7 +39,7 @@
 - `scripts/expedition/expedition_reward_service.gd`
 - `tests/run_expedition_tests.gd`
 
-### [ ] PM-003：跑通场景导航回归
+### [x] PM-003：跑通场景导航回归
 
 描述：覆盖主菜单、洞府、世界地图、历练、战斗、结算、背包、功法策略这些可导航场景。
 
@@ -52,7 +54,7 @@
 - `scripts/core/scene_manager.gd`
 - `tests/run_scene_manager_tests.gd`
 
-### [ ] PM-004：配置校验做 P0 门禁
+### [x] PM-004：配置校验做 P0 门禁
 
 描述：把 P0 涉及配置表的缺字段、非法引用、奖励 ID、怪物 ID 检查保持在测试里。
 
@@ -82,7 +84,7 @@
 
 - `docs/project-management/playtest-checklist.md`
 
-## 下一冲刺：P1 新手体验
+## 当前冲刺：P1 新手体验
 
 ### [ ] PM-101：新局教程状态审计
 

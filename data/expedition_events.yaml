@@ -108,13 +108,18 @@ events:
     desc: "狼群自林间扑出。"
     risk_text: "普通"
     weight: 42
+    enemy_pool: "qinglan_wolf"
+    drop_pool: "monster:qinglan_wolf"
     enemy_count: 2
     once_per_expedition: false
     effects: []
     tags:
       - "battle"
     conditions: []
-    results: []
+    results:
+      - type: "drop"
+        drop_pool: "monster:qinglan_wolf"
+        rolls: 2
   qinglan_serpent:
     id: "qinglan_serpent"
     location_id: "wild_wolf_valley"
@@ -123,12 +128,17 @@ events:
     desc: "潭底巨蟒破水而出。"
     risk_text: "精英"
     weight: 18
+    enemy_pool: "qinglan_serpent"
+    drop_pool: "monster:qinglan_serpent"
     once_per_expedition: false
     effects: []
     tags:
       - "elite"
     conditions: []
-    results: []
+    results:
+      - type: "drop"
+        drop_pool: "monster:qinglan_serpent"
+        rolls: 3
   qinglan_boss:
     id: "qinglan_boss"
     location_id: "wild_wolf_valley"
@@ -137,9 +147,14 @@ events:
     desc: "山巅妖王威压如山。"
     risk_text: "首领"
     weight: 8
+    enemy_pool: "qinglan_boss"
+    drop_pool: "monster:qinglan_boss"
     once_per_expedition: true
     effects: []
     tags:
       - "boss"
     conditions: []
-    results: []
+    results:
+      - type: "drop"
+        drop_pool: "monster:qinglan_boss"
+        rolls: 4
