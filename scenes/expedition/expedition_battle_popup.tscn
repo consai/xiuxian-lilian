@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://dvpjl4wd8fubw"]
+[gd_scene format=3 uid="uid://d2dcm5k6p4sdp"]
 
-[ext_resource type="Script" path="res://scripts/expedition/expedition_battle_popup_view.gd" id="1_view"]
+[ext_resource type="Script" uid="uid://dn0v3aaq8tos4" path="res://scripts/expedition/expedition_battle_popup_view.gd" id="1_view"]
 [ext_resource type="StyleBox" uid="uid://bdjlyraa36sst" path="res://ui/panel_itemback.tres" id="2_panel"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="3_title"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="4_meta"]
@@ -22,7 +22,7 @@ corner_radius_top_right = 14
 corner_radius_bottom_right = 14
 corner_radius_bottom_left = 14
 
-[node name="ExpeditionBattlePopup" type="Control"]
+[node name="ExpeditionBattlePopup" type="Control" unique_id=1892619424]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -32,7 +32,7 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_view")
 
-[node name="Backdrop" type="ColorRect" parent="."]
+[node name="Backdrop" type="ColorRect" parent="." unique_id=1568639261]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -42,7 +42,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.5)
 
-[node name="Center" type="Control" parent="."]
+[node name="Center" type="Control" parent="." unique_id=160576149]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -57,7 +57,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="Panel" type="PanelContainer" parent="Center"]
+[node name="Panel" type="PanelContainer" parent="Center" unique_id=153730780]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -67,34 +67,38 @@ grow_vertical = 2
 mouse_filter = 1
 theme_override_styles/panel = ExtResource("2_panel")
 
-[node name="Margin" type="MarginContainer" parent="Center/Panel"]
+[node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=1724028518]
 layout_mode = 2
 theme_override_constants/margin_left = 22
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 22
 theme_override_constants/margin_bottom = 20
 
-[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin"]
+[node name="VBox" type="Control" parent="Center/Panel/Margin" unique_id=1293091197]
 layout_mode = 2
-theme_override_constants/separation = 12
 
-[node name="EventTitle" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="EventTitle" type="Label" parent="Center/Panel/Margin/VBox" unique_id=2140072840]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_right = 432.0
+offset_bottom = 35.0
 text = "遭遇战"
 label_settings = ExtResource("3_title")
 horizontal_alignment = 1
 
-[node name="Header" type="HBoxContainer" parent="Center/Panel/Margin/VBox"]
-layout_mode = 2
+[node name="Header" type="HBoxContainer" parent="Center/Panel/Margin/VBox" unique_id=1232365328]
+layout_mode = 0
+offset_top = 47.0
+offset_right = 432.0
+offset_bottom = 143.0
 theme_override_constants/separation = 16
 
-[node name="Portrait" type="Panel" parent="Center/Panel/Margin/VBox/Header"]
+[node name="Portrait" type="Panel" parent="Center/Panel/Margin/VBox/Header" unique_id=2041776694]
 custom_minimum_size = Vector2(96, 96)
 layout_mode = 2
 theme_override_styles/panel = SubResource("PortraitBack")
 
-[node name="EnemyPreview" type="TextureRect" parent="Center/Panel/Margin/VBox/Header/Portrait"]
+[node name="EnemyPreview" type="TextureRect" parent="Center/Panel/Margin/VBox/Header/Portrait" unique_id=1288859622]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -109,48 +113,59 @@ grow_vertical = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Info" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Header"]
+[node name="Info" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Header" unique_id=131865475]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="EnemyName" type="Label" parent="Center/Panel/Margin/VBox/Header/Info"]
+[node name="EnemyName" type="Label" parent="Center/Panel/Margin/VBox/Header/Info" unique_id=1412036510]
 unique_name_in_owner = true
 layout_mode = 2
 text = "对手名称"
 label_settings = ExtResource("3_title")
 autowrap_mode = 3
 
-[node name="RiskLabel" type="Label" parent="Center/Panel/Margin/VBox/Header/Info"]
+[node name="RiskLabel" type="Label" parent="Center/Panel/Margin/VBox/Header/Info" unique_id=2035469552]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.635294, 0.239216, 0.168627, 1)
 text = "普通"
 label_settings = ExtResource("4_meta")
 
-[node name="DescLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="DescLabel" type="Label" parent="Center/Panel/Margin/VBox" unique_id=928776939]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_left = 23.0
+offset_top = 155.0
+offset_right = 413.0
+offset_bottom = 175.0
 theme_override_colors/font_color = Color(0.4117647, 0.3019608, 0.27450982, 1)
 text = "事件描述"
 label_settings = ExtResource("5_body")
 autowrap_mode = 3
 
-[node name="StatsLabel" type="Label" parent="Center/Panel/Margin/VBox"]
+[node name="StatsLabel" type="Label" parent="Center/Panel/Margin/VBox" unique_id=590855326]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_left = 23.0
+offset_top = 187.0
+offset_right = 411.0
+offset_bottom = 253.0
 theme_override_colors/font_color = Color(0.4117647, 0.3019608, 0.27450982, 1)
 text = "气血 100
 攻击 50    防御 40"
 label_settings = ExtResource("5_body")
 autowrap_mode = 3
 
-[node name="Buttons" type="HBoxContainer" parent="Center/Panel/Margin/VBox"]
-layout_mode = 2
+[node name="Buttons" type="HBoxContainer" parent="Center/Panel/Margin/VBox" unique_id=20999429]
+layout_mode = 0
+offset_top = 437.0
+offset_right = 432.0
+offset_bottom = 495.0
 theme_override_constants/separation = 18
 alignment = 1
 
-[node name="RetreatButton" type="TextureButton" parent="Center/Panel/Margin/VBox/Buttons"]
+[node name="RetreatButton" type="TextureButton" parent="Center/Panel/Margin/VBox/Buttons" unique_id=1950360640]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 58)
 layout_mode = 2
@@ -159,20 +174,19 @@ ignore_texture_size = true
 stretch_mode = 5
 script = ExtResource("9_press")
 
-[node name="Label" type="Label" parent="Center/Panel/Margin/VBox/Buttons/RetreatButton"]
+[node name="Label" type="Label" parent="Center/Panel/Margin/VBox/Buttons/RetreatButton" unique_id=1587651769]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 text = "撤退"
 label_settings = ExtResource("6_btn")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="FightButton" type="TextureButton" parent="Center/Panel/Margin/VBox/Buttons"]
+[node name="FightButton" type="TextureButton" parent="Center/Panel/Margin/VBox/Buttons" unique_id=505905537]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(180, 58)
 layout_mode = 2
@@ -181,14 +195,13 @@ ignore_texture_size = true
 stretch_mode = 5
 script = ExtResource("9_press")
 
-[node name="Label" type="Label" parent="Center/Panel/Margin/VBox/Buttons/FightButton"]
+[node name="Label" type="Label" parent="Center/Panel/Margin/VBox/Buttons/FightButton" unique_id=694677445]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
 text = "开打"
 label_settings = ExtResource("6_btn")
 horizontal_alignment = 1

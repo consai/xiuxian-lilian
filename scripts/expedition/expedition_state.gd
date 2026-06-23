@@ -742,6 +742,113 @@ func _sync_runtime_from_summary(summary: Dictionary) -> void:
 	runtime["inventory"] = inv
 
 
+func use_runtime_item_slot(slot_index: int) -> Dictionary:
+	if not active:
+		return {"ok": false, "error": "历练未进行"}
+	if phase == "battle":
+		return {"ok": false, "error": "战斗中无法使用丹药"}
+	if slot_index < 0 or slot_index >= 2:
+		return {"ok": false, "error": "无效丹药槽"}
+	var slots := (runtime.get("item_slots", ["", ""]) as Array).duplicate(true)
+	while slots.size() < 2:
+		slots.append("")
+	var inv := (runtime.get("inventory", {}) as Dictionary).duplicate(true)
+	var item_id := str(slots[slot_index]).strip_edges()
+	if item_id == "":
+		return {"ok": false, "error": "该槽位未装备丹药"}
+	if int(inv.get(item_id, 0)) <= 0:
+		return {"ok": false, "error": "丹药已用尽"}
+	var def: ItemDef = null
+	if ConfigManager != null:
+		def = ConfigManager.item_def_by_id(item_id)
+	if def == null:
+		return {"ok": false, "error": "未知丹药"}
+	var mp_cost := maxf(0.0, float(def.fight_mp_cost))
+	if mp_cost > 0.0 and float(runtime.get("mp", 0.0)) < mp_cost:
+		return {"ok": false, "error": "法力不足，无法催动丹药"}
+	var attrs := player_snapshot.get("attrs", {}) as Dictionary
+	var feedback_parts := _apply_runtime_item_effects(def, attrs)
+	if feedback_parts.is_empty():
+		return {"ok": false, "error": "该丹药无法在此使用"}
+	if mp_cost > 0.0:
+		runtime["mp"] = maxf(0.0, float(runtime.get("mp", 0.0)) - mp_cost)
+	var remaining := maxi(0, int(inv.get(item_id, 0)) - 1)
+	if remaining > 0:
+		inv[item_id] = remaining
+	else:
+		inv.erase(item_id)
+		slots[slot_index] = ""
+	runtime["inventory"] = inv
+	runtime["item_slots"] = slots
+	var item_name := item_id
+	if ConfigManager != null:
+		item_name = ConfigManager.get_item_display_name(item_id)
+	return {
+		"ok": true,
+		"feedback": "使用 %s，%s" % [item_name, "，".join(feedback_parts)],
+		"item_id": item_id,
+	}
+
+
+func _apply_runtime_item_effects(def: ItemDef, player_attrs: Dictionary) -> PackedStringArray:
+	var feedback_parts: PackedStringArray = []
+	var hp_max := maxf(1.0, float(player_attrs.get(FightAttr.HP_MAX, 100.0)))
+	var mp_max := maxf(1.0, float(player_attrs.get(FightAttr.MP_MAX, 100.0)))
+	if def.has_fight_config():
+		for effect_v in def.fight_effect:
+			if not effect_v is Dictionary:
+				continue
+			var effect := effect_v as Dictionary
+			if str(effect.get("target", "self")).strip_edges() not in ["", "self"]:
+				continue
+			var value := float(effect.get("value", 0.0))
+			match str(effect.get("type", "")):
+				"heal":
+					var hp_before := float(runtime.get("hp", 0.0))
+					var healed := minf(hp_max - hp_before, value)
+					runtime["hp"] = hp_before + healed
+					if healed >= 1.0:
+						feedback_parts.append("气血回升 %d 点" % int(round(healed)))
+					else:
+						feedback_parts.append("气血已满")
+				"restore_mp":
+					var mp_before := float(runtime.get("mp", 0.0))
+					var restored := minf(mp_max - mp_before, value)
+					runtime["mp"] = mp_before + restored
+					if restored >= 1.0:
+						feedback_parts.append("法力恢复 %d 点" % int(round(restored)))
+					else:
+						feedback_parts.append("法力已满")
+	elif def.has_use_effect():
+		for row_v in def.use_effect:
+			if not row_v is Dictionary:
+				continue
+			var row := row_v as Dictionary
+			var op := str(row.get("op", "")).strip_edges().to_lower()
+			var args_v: Variant = row.get("args", [])
+			var amount := 0.0
+			if args_v is Array and not (args_v as Array).is_empty():
+				amount = float((args_v as Array)[0])
+			match op:
+				"hp":
+					var hp_before := float(runtime.get("hp", 0.0))
+					var healed := minf(hp_max - hp_before, amount)
+					runtime["hp"] = hp_before + healed
+					if healed >= 1.0:
+						feedback_parts.append("气血回升 %d 点" % int(round(healed)))
+					else:
+						feedback_parts.append("气血已满")
+				"mp":
+					var mp_before := float(runtime.get("mp", 0.0))
+					var restored := minf(mp_max - mp_before, amount)
+					runtime["mp"] = mp_before + restored
+					if restored >= 1.0:
+						feedback_parts.append("法力恢复 %d 点" % int(round(restored)))
+					else:
+						feedback_parts.append("法力已满")
+	return feedback_parts
+
+
 func _apply_session_rewards(rewards: Array) -> void:
 	if rewards.is_empty():
 		return

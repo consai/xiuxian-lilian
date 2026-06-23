@@ -39,11 +39,11 @@ func _ready() -> void:
 	(%AdvanceButton as Button).pressed.connect(_on_advance_pressed)
 	(%AutoAdvanceButton as Button).toggled.connect(_on_auto_advance_toggled)
 	(%StatusToggleButton as Button).pressed.connect(_on_info_toggle_pressed.bind("status"))
-	(%LootToggleButton as Button).pressed.connect(_on_info_toggle_pressed.bind("loot"))
 	(%LogToggleButton as Button).pressed.connect(_on_info_toggle_pressed.bind("log"))
 	(%StatusCloseButton as Button).pressed.connect(_hide_info_popups)
-	(%LootCloseButton as Button).pressed.connect(_hide_info_popups)
 	(%LogCloseButton as Button).pressed.connect(_hide_info_popups)
+	_wire_potion_slot(%PotionSlot1 as Panel, 0)
+	_wire_potion_slot(%PotionSlot2 as Panel, 1)
 	if not resized.is_connected(_on_resized):
 		resized.connect(_on_resized)
 	if not _map_world.resized.is_connected(_queue_map_refresh_after_layout):
@@ -121,26 +121,18 @@ func _refresh_status_panel() -> void:
 	var hp_max := maxf(1.0, float(attrs.get(FightAttr.HP_MAX, 100.0)))
 	var mp := float(ExpeditionState.runtime.get("mp", 0.0))
 	var mp_max := maxf(1.0, float(attrs.get(FightAttr.MP_MAX, 100.0)))
-	(%HpLabel as Label).text = "气血  %.0f / %.0f" % [hp, hp_max]
 	(%HudHpLabel as Label).text = "气血  %.0f / %.0f" % [hp, hp_max]
-	var hp_bar := %HpBar as ProgressBar
-	hp_bar.max_value = hp_max
-	hp_bar.value = clampf(hp, 0.0, hp_max)
 	var hud_hp_bar := %HudHpBar as ProgressBar
 	hud_hp_bar.max_value = hp_max
 	hud_hp_bar.value = clampf(hp, 0.0, hp_max)
-	(%MpLabel as Label).text = "法力  %.0f / %.0f" % [mp, mp_max]
 	(%HudMpLabel as Label).text = "法力  %.0f / %.0f" % [mp, mp_max]
-	var mp_bar := %MpBar as ProgressBar
-	mp_bar.max_value = mp_max
-	mp_bar.value = clampf(mp, 0.0, mp_max)
 	var hud_mp_bar := %HudMpBar as ProgressBar
 	hud_mp_bar.max_value = mp_max
 	hud_mp_bar.value = clampf(mp, 0.0, mp_max)
 	var inv := ExpeditionState.runtime.get("inventory", {}) as Dictionary
 	var slots := ExpeditionState.runtime.get("item_slots", []) as Array
-	_refresh_potion_slot(%PotionSlot1 as Panel, str(slots[0]) if slots.size() > 0 else "", inv)
-	_refresh_potion_slot(%PotionSlot2 as Panel, str(slots[1]) if slots.size() > 1 else "", inv)
+	_refresh_potion_slot(%PotionSlot1 as Panel, 0, str(slots[0]) if slots.size() > 0 else "", inv)
+	_refresh_potion_slot(%PotionSlot2 as Panel, 1, str(slots[1]) if slots.size() > 1 else "", inv)
 	var stats := ExpeditionState.stats
 	(%Runtime as RichTextLabel).text = "战斗 %d  胜 %d  负 %d" % [
 		int(stats.get("battles", 0)),
@@ -149,18 +141,22 @@ func _refresh_status_panel() -> void:
 	]
 
 
-func _refresh_potion_slot(slot: Panel, item_id: String, inv: Dictionary) -> void:
+func _refresh_potion_slot(slot: Panel, _slot_index: int, item_id: String, inv: Dictionary) -> void:
 	if slot == null:
 		return
 	var icon := slot.get_node_or_null("Icon") as TextureRect
 	var count_label := slot.get_node_or_null("Count") as Label
 	var iid := item_id.strip_edges()
+	var usable := not _locked and ExpeditionState.phase != "battle" and iid != "" and int(inv.get(iid, 0)) > 0
+	slot.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if usable else Control.CURSOR_ARROW
+	slot.modulate = Color.WHITE if usable or iid != "" else Color(1, 1, 1, 0.72)
 	if iid == "":
 		if icon != null:
 			icon.texture = null
 			icon.self_modulate = Color(1, 1, 1, 0.2)
 		if count_label != null:
 			count_label.text = "—"
+		slot.tooltip_text = "空槽位"
 		return
 	var item_name := iid
 	var tex: Texture2D = null
@@ -175,6 +171,33 @@ func _refresh_potion_slot(slot: Panel, item_id: String, inv: Dictionary) -> void
 		icon.self_modulate = Color.WHITE if tex != null else Color(1, 1, 1, 0.35)
 	if count_label != null:
 		count_label.text = "%s ×%d" % [item_name, count] if count > 1 else item_name
+	slot.tooltip_text = "点击使用 %s" % item_name if usable else item_name
+
+
+func _wire_potion_slot(slot: Panel, slot_index: int) -> void:
+	if slot == null:
+		return
+	slot.mouse_filter = Control.MOUSE_FILTER_STOP
+	var press := slot.get_node_or_null("PressScale")
+	if press != null and press.has_signal("clicked"):
+		press.clicked.connect(_on_potion_slot_pressed.bind(slot_index))
+		return
+	slot.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventMouseButton:
+			var mouse := event as InputEventMouseButton
+			if mouse.pressed and mouse.button_index == MOUSE_BUTTON_LEFT:
+				_on_potion_slot_pressed(slot_index)
+	)
+
+
+func _on_potion_slot_pressed(slot_index: int) -> void:
+	if _locked:
+		return
+	var result: Dictionary = ExpeditionState.use_runtime_item_slot(slot_index)
+	var feedback := str(result.get("feedback", result.get("error", ""))).strip_edges()
+	if feedback != "":
+		(%Feedback as Label).text = feedback
+	_refresh_all()
 
 
 func _refresh_progress_dots() -> void:
@@ -204,11 +227,6 @@ func _refresh_controls() -> void:
 
 
 func _refresh_info_buttons() -> void:
-	var loot_count := 0
-	for reward_v in ExpeditionState.loot:
-		if reward_v is Dictionary:
-			loot_count += 1
-	(%LootToggleButton as Button).text = "战利品 %d" % loot_count
 	(%LogToggleButton as Button).text = "日志 %d" % ExpeditionState.event_log.size()
 
 
@@ -352,7 +370,7 @@ func _on_info_toggle_pressed(panel_id: String) -> void:
 
 
 func _hide_info_popups() -> void:
-	for panel in [%StatusPanel, %LootPanel, %LogPanel]:
+	for panel in [%StatusPanel, %LogPanel]:
 		var control := panel as Control
 		if control != null:
 			control.visible = false
@@ -362,8 +380,6 @@ func _info_panel(panel_id: String) -> Control:
 	match panel_id:
 		"status":
 			return %StatusPanel as Control
-		"loot":
-			return %LootPanel as Control
 		"log":
 			return %LogPanel as Control
 		_:
@@ -482,6 +498,15 @@ func _on_battle_fight_requested() -> void:
 		return
 	if popup != null:
 		popup.visible = false
+
+
+## 历练叠层战斗结束后由 SceneManager 回调：解锁 UI 并刷新状态，不重建场景。
+func resume_after_battle() -> void:
+	_locked = false
+	var popup := %BattlePopup as ExpeditionBattlePopupView
+	if popup != null:
+		popup.visible = false
+	_refresh_all()
 
 
 func _on_battle_retreat_requested() -> void:

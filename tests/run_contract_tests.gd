@@ -1,5 +1,7 @@
 extends SceneTree
 
+const UiDragMoveScript := preload("res://scripts/ui/components/ui_drag_move.gd")
+
 var _failures: Array[String] = []
 var _tests_run := 0
 
@@ -16,6 +18,7 @@ func _run_all() -> void:
 	_run("tip intent accepts reward channels", _test_tip_intent_reward_channels)
 	_run("reward tip builder separates resource and growth", _test_reward_tip_builder_channels)
 	_run("scene payload rejects invalid reason", _test_scene_payload_invalid_reason)
+	_run("ui drag move clamps center inside viewport", _test_ui_drag_move_clamp_center)
 	if _failures.is_empty():
 		print("PASS: %d contract tests" % _tests_run)
 		quit(0)
@@ -86,6 +89,17 @@ func _test_reward_tip_builder_channels() -> void:
 func _test_scene_payload_invalid_reason() -> void:
 	var payload := ScenePayload.expedition_result("invalid_reason")
 	_expect_true(payload.is_empty(), "invalid reason payload rejected")
+
+
+func _test_ui_drag_move_clamp_center() -> void:
+	var viewport := Rect2(0, 0, 200, 100)
+	var panel_size := Vector2(40, 40)
+	var left: Vector2 = UiDragMoveScript.clamp_center_to_viewport(Vector2(-10, 50), panel_size, viewport)
+	_expect_eq(left, Vector2(20, 50), "left overflow clamps center x")
+	var right: Vector2 = UiDragMoveScript.clamp_center_to_viewport(Vector2(250, 50), panel_size, viewport)
+	_expect_eq(right, Vector2(180, 50), "right overflow clamps center x")
+	var oversized: Vector2 = UiDragMoveScript.clamp_center_to_viewport(Vector2(999, -5), Vector2(300, 80), viewport)
+	_expect_eq(oversized, Vector2(100, 40), "oversized panel clamps each axis independently")
 
 
 func _expect_eq(actual: Variant, expected: Variant, message: String) -> void:

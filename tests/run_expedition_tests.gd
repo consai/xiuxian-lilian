@@ -44,6 +44,7 @@ func _run_all() -> void:
 	_run("battle win opens next map nodes", _test_battle_win_opens_next_map_nodes)
 	_run("reward budget scales by days and difficulty", _test_reward_budget_scales_by_days_and_difficulty)
 	_run("battle win returns to expedition", _test_battle_win_returns_to_expedition)
+	_run("runtime potion slot can be used manually", _test_runtime_potion_slot_can_be_used_manually)
 	_run("battle loss forces expedition result", _test_battle_loss_forces_expedition_result)
 	_run("boss battle resolves at high difficulty", _test_boss_battle_resolves_at_high_difficulty)
 	_run("game settlement occurs once", _test_game_settlement_occurs_once)
@@ -637,6 +638,28 @@ func _test_battle_win_returns_to_expedition() -> void:
 	if slot_id != "":
 		var runtime_inv := expedition.runtime.get("inventory", {}) as Dictionary
 		_expect_eq(int(runtime_inv.get(slot_id, 0)), 2, "runtime pill consumption updated")
+
+
+func _test_runtime_potion_slot_can_be_used_manually() -> void:
+	var game := _state()
+	game.item_slots = ["items_HuiQiDan", ""]
+	game.inventory["items_HuiQiDan"] = 2
+	var expedition := _expedition()
+	expedition.start("qinglan_mountain", game, 1313)
+	expedition.runtime["hp"] = 10.0
+	var hp_before := float(expedition.runtime.get("hp", 0.0))
+	var inv_before := int((expedition.runtime.get("inventory", {}) as Dictionary).get("items_HuiQiDan", 0))
+	var used: Dictionary = expedition.use_runtime_item_slot(0)
+	_expect_true(bool(used.get("ok", false)), "manual potion use ok")
+	_expect_true(float(expedition.runtime.get("hp", 0.0)) > hp_before, "hp increased after potion")
+	_expect_eq(
+		int((expedition.runtime.get("inventory", {}) as Dictionary).get("items_HuiQiDan", 0)),
+		inv_before - 1,
+		"inventory decremented"
+	)
+	expedition.phase = "battle"
+	var in_battle: Dictionary = expedition.use_runtime_item_slot(0)
+	_expect_true(not bool(in_battle.get("ok", false)), "cannot use potion during battle")
 
 
 func _test_battle_loss_forces_expedition_result() -> void:
