@@ -10,9 +10,7 @@
 [ext_resource type="LabelSettings" uid="uid://dknyivqhm6bby" path="res://ui/ziti_new/13.tres" id="8_small"]
 [ext_resource type="FontFile" uid="uid://btkp4vukwqrul" path="res://assets/art/AlimamaDaoLiTi.ttf" id="9_font"]
 [ext_resource type="Script" uid="uid://cpiladese8gly" path="res://scripts/ui/components/ui_drag_move.gd" id="10_lacj6"]
-[ext_resource type="Texture2D" uid="uid://bbm4bvkcfdh4b" path="res://assets/art/ui_new/yaoping.png" id="10_potion"]
 [ext_resource type="PackedScene" uid="uid://bx04spldnbiyv" path="res://scenes/items/item.tscn" id="11_mg1gv"]
-[ext_resource type="Texture2D" uid="uid://c8shvppighp3w" path="res://assets/art/ui_new/yaoping1.png" id="11_potion2"]
 [ext_resource type="PackedScene" uid="uid://d2dcm5k6p4sdp" path="res://scenes/expedition/expedition_battle_popup.tscn" id="12_battle_popup"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hp_bar.tscn" id="13_hp_bar"]
 [ext_resource type="PackedScene" uid="uid://c440pyv03mhf8" path="res://scenes/ui/mp_bar.tscn" id="14_mp_bar"]
@@ -34,30 +32,6 @@ corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 shadow_color = Color(0.145098, 0.0862745, 0.0470588, 0.25)
 shadow_size = 8
-
-[sub_resource type="StyleBoxFlat" id="SidePanel"]
-bg_color = Color(1, 0.960784, 0.870588, 0.94)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.427451, 0.301961, 0.203922, 0.95)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
-
-[sub_resource type="StyleBoxFlat" id="SlotBack"]
-bg_color = Color(0.937255, 0.85098, 0.690196, 0.9)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.607843, 0.443137, 0.294118, 0.9)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="BottomStrip"]
 bg_color = Color(0.960784, 0.878431, 0.72549, 0.94)
@@ -82,6 +56,18 @@ corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="SidePanel"]
+bg_color = Color(1, 0.960784, 0.870588, 0.94)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.427451, 0.301961, 0.203922, 0.95)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
 
 [node name="ExpeditionLoop" type="Control" unique_id=359009857]
 layout_mode = 3
@@ -172,7 +158,6 @@ label_settings = ExtResource("7_body")
 horizontal_alignment = 1
 
 [node name="HudStatusPanel" type="Panel" parent="." unique_id=1653228551]
-z_index = 15
 layout_mode = 1
 offset_left = 24.0
 offset_top = 20.0
@@ -255,6 +240,7 @@ script = ExtResource("15_lpsc")
 unique_name_in_owner = true
 custom_minimum_size = Vector2(1780, 500)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="MapCanvas" type="Control" parent="MapPanel/MapScroll/MapWorld" unique_id=665170343]
 unique_name_in_owner = true
@@ -283,246 +269,33 @@ offset_right = -18.0
 offset_bottom = -16.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="MapNodeTemplate" parent="MapPanel/MapScroll/MapWorld/MapNodes" unique_id=1264895463 instance=ExtResource("17_map_node")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
 
-[node name="LogPanel" type="Panel" parent="." unique_id=1646645513]
-unique_name_in_owner = true
-visible = false
-z_index = 30
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -442.0
-offset_top = 96.0
-offset_right = -24.0
-offset_bottom = 640.0
-grow_horizontal = 0
-theme_override_styles/panel = SubResource("SidePanel")
-
-[node name="LogTitle" type="Label" parent="LogPanel" unique_id=440161162]
+[node name="Rule" type="Label" parent="MapPanel" unique_id=790069682]
 layout_mode = 0
-offset_left = 18.0
+offset_left = 84.0
+offset_top = 15.0
+offset_right = 596.0
+offset_bottom = 41.0
+text = "地图可左右拖动 · 点击明牌节点选择路线 · 信息按钮可随时查看详情"
+label_settings = ExtResource("8_small")
+horizontal_alignment = 1
+
+[node name="Step" type="Label" parent="MapPanel" unique_id=793390105]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 570.0
 offset_top = 14.0
-offset_right = 368.0
-offset_bottom = 46.0
-text = "历练日志"
-label_settings = ExtResource("6_section")
-horizontal_alignment = 1
-
-[node name="LogCloseButton" type="Button" parent="LogPanel" unique_id=1655591372]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 370.0
-offset_top = 12.0
-offset_right = 404.0
-offset_bottom = 46.0
-theme_override_fonts/font = ExtResource("9_font")
-theme_override_font_sizes/font_size = 16
-text = "×"
-script = ExtResource("18_auto")
-
-[node name="Log" type="RichTextLabel" parent="LogPanel" unique_id=1566093167]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 22.0
-offset_top = 58.0
-offset_right = 396.0
-offset_bottom = 520.0
-theme_override_colors/default_color = Color(0.333333, 0.196078, 0.184314, 1)
-theme_override_fonts/normal_font = ExtResource("9_font")
-theme_override_font_sizes/normal_font_size = 14
-bbcode_enabled = true
-text = "[color=#8a7568]启程[/color]
-[color=#4a3028]启程[/color]
-踏入青岚山脉，林深雾重，灵草与妖兽并存
-[color=#6a5048]你整理行装，握紧法器，正式踏上历练之路。[/color]"
-scroll_following = true
-
-[node name="StatusPanel" type="Panel" parent="." unique_id=2054035168]
-unique_name_in_owner = true
-z_index = 30
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -342.0
-offset_top = 72.0
-offset_right = -24.0
-offset_bottom = 719.0
-grow_horizontal = 0
-theme_override_styles/panel = SubResource("SidePanel")
-script = ExtResource("10_lacj6")
-
-[node name="Title" type="Label" parent="StatusPanel" unique_id=1179553948]
-layout_mode = 0
-offset_left = 12.0
-offset_top = 14.0
-offset_right = 270.0
-offset_bottom = 46.0
-text = "历练信息"
-label_settings = ExtResource("6_section")
-horizontal_alignment = 1
-
-[node name="StatusCloseButton" type="Button" parent="StatusPanel" unique_id=2146013526]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 270.0
-offset_top = 12.0
-offset_right = 304.0
-offset_bottom = 46.0
-theme_override_fonts/font = ExtResource("9_font")
-theme_override_font_sizes/font_size = 16
-text = "×"
-script = ExtResource("18_auto")
-
-[node name="SupplyTitle" type="Label" parent="StatusPanel" unique_id=1389485290]
-layout_mode = 0
-offset_left = 20.0
-offset_top = 50.0
-offset_right = 218.0
-offset_bottom = 80.0
-text = "携带丹药"
-label_settings = ExtResource("7_body")
-horizontal_alignment = 1
-
-[node name="PotionSlot1" type="Panel" parent="StatusPanel" unique_id=689387070]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 26.0
-offset_top = 84.0
-offset_right = 108.0
-offset_bottom = 180.0
-theme_override_styles/panel = SubResource("SlotBack")
-
-[node name="Icon" type="TextureRect" parent="StatusPanel/PotionSlot1" unique_id=511951245]
-layout_mode = 0
-offset_left = 14.0
-offset_top = 8.0
-offset_right = 68.0
-offset_bottom = 62.0
-texture = ExtResource("10_potion")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Count" type="Label" parent="StatusPanel/PotionSlot1" unique_id=497135006]
-layout_mode = 0
-offset_left = 5.0
-offset_top = 65.0
-offset_right = 77.0
-offset_bottom = 91.0
-text = "回气丹 ×2"
+offset_right = 730.0
+offset_bottom = 40.0
+text = "当前第 4 步"
 label_settings = ExtResource("8_small")
 horizontal_alignment = 1
-
-[node name="PressScale" type="Node" parent="StatusPanel/PotionSlot1" unique_id=635071804]
-script = ExtResource("18_auto")
-target_path = NodePath("..")
-
-[node name="PotionSlot2" type="Panel" parent="StatusPanel" unique_id=1035258306]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 130.0
-offset_top = 84.0
-offset_right = 212.0
-offset_bottom = 180.0
-theme_override_styles/panel = SubResource("SlotBack")
-
-[node name="Icon" type="TextureRect" parent="StatusPanel/PotionSlot2" unique_id=155798879]
-layout_mode = 0
-offset_left = 14.0
-offset_top = 8.0
-offset_right = 68.0
-offset_bottom = 62.0
-texture = ExtResource("11_potion2")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Count" type="Label" parent="StatusPanel/PotionSlot2" unique_id=1412317173]
-layout_mode = 0
-offset_left = 5.0
-offset_top = 65.0
-offset_right = 77.0
-offset_bottom = 91.0
-text = "疗伤丹 ×1"
-label_settings = ExtResource("8_small")
-horizontal_alignment = 1
-
-[node name="PressScale" type="Node" parent="StatusPanel/PotionSlot2" unique_id=479447217]
-script = ExtResource("18_auto")
-target_path = NodePath("..")
-
-[node name="RuntimeTitle" type="Label" parent="StatusPanel" unique_id=1875368418]
-layout_mode = 0
-offset_left = 20.0
-offset_top = 193.0
-offset_right = 218.0
-offset_bottom = 223.0
-text = "历练统计"
-label_settings = ExtResource("7_body")
-horizontal_alignment = 1
-
-[node name="Runtime" type="RichTextLabel" parent="StatusPanel" unique_id=592344161]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 22.0
-offset_top = 222.0
-offset_right = 283.0
-offset_bottom = 347.0
-theme_override_colors/default_color = Color(0.333333, 0.196078, 0.184314, 1)
-theme_override_fonts/normal_font = ExtResource("9_font")
-theme_override_font_sizes/normal_font_size = 15
-bbcode_enabled = true
-text = "气血 76/100
-法力 48/100
-回气丹 x2  疗伤丹 x1
-
-战斗 1  胜 1  负 0"
-fit_content = true
-
-[node name="LootTitle" type="Label" parent="StatusPanel" unique_id=2062069258]
-layout_mode = 0
-offset_left = 23.0
-offset_top = 380.0
-offset_right = 133.0
-offset_bottom = 407.0
-text = "本次战利品"
-label_settings = ExtResource("6_section")
-horizontal_alignment = 1
-
-[node name="LootScroll" type="ScrollContainer" parent="StatusPanel" unique_id=1596541915]
-layout_mode = 0
-offset_left = 19.0
-offset_top = 416.0
-offset_right = 321.0
-offset_bottom = 594.8235
-scale = Vector2(0.85, 0.85)
-script = ExtResource("15_lpsc")
-
-[node name="LootItems" type="GridContainer" parent="StatusPanel/LootScroll" unique_id=1571947775]
-unique_name_in_owner = true
-layout_mode = 2
-columns = 4
-
-[node name="LootItemTemplate" parent="StatusPanel/LootScroll/LootItems" unique_id=845706498 instance=ExtResource("11_mg1gv")]
-layout_mode = 2
-
-[node name="LootEmpty" type="Label" parent="StatusPanel" unique_id=321532457]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 23.0
-offset_top = 445.0
-offset_right = 217.0
-offset_bottom = 479.0
-theme_override_colors/font_color = Color(0.333333, 0.196078, 0.184314, 0.65)
-text = "无"
-label_settings = ExtResource("8_small")
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="EventCards" type="HBoxContainer" parent="." unique_id=2106621442]
 unique_name_in_owner = true
@@ -568,27 +341,6 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/panel = SubResource("BottomStrip")
 
-[node name="Rule" type="Label" parent="FooterStrip" unique_id=790069682]
-layout_mode = 0
-offset_left = 170.0
-offset_top = 13.0
-offset_right = 682.0
-offset_bottom = 39.0
-text = "地图可左右拖动 · 点击明牌节点选择路线 · 信息按钮可随时查看详情"
-label_settings = ExtResource("8_small")
-horizontal_alignment = 1
-
-[node name="Step" type="Label" parent="FooterStrip" unique_id=793390105]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 690.0
-offset_top = 13.0
-offset_right = 850.0
-offset_bottom = 39.0
-text = "当前第 4 步"
-label_settings = ExtResource("8_small")
-horizontal_alignment = 1
-
 [node name="ExitButton" type="Button" parent="FooterStrip" unique_id=1921263944]
 unique_name_in_owner = true
 layout_mode = 0
@@ -605,52 +357,15 @@ theme_override_styles/hover = SubResource("ExitNormal")
 text = "主动返程"
 script = ExtResource("18_auto")
 
-[node name="AdvanceButton" type="Button" parent="FooterStrip" unique_id=831939619]
-unique_name_in_owner = true
-visible = false
-layout_mode = 0
-offset_left = 170.0
-offset_top = 10.0
-offset_right = 314.0
-offset_bottom = 72.0
-theme_override_colors/font_color = Color(0.333333, 0.196078, 0.184314, 1)
-theme_override_fonts/font = ExtResource("9_font")
-theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = SubResource("ExitNormal")
-theme_override_styles/pressed = SubResource("ExitNormal")
-theme_override_styles/hover = SubResource("ExitNormal")
-text = "前进"
-script = ExtResource("18_auto")
-
-[node name="AutoAdvanceButton" type="Button" parent="FooterStrip" unique_id=1508098559]
-unique_name_in_owner = true
-visible = false
-layout_mode = 0
-offset_left = 328.0
-offset_top = 10.0
-offset_right = 472.0
-offset_bottom = 72.0
-theme_override_colors/font_color = Color(0.333333, 0.196078, 0.184314, 1)
-theme_override_fonts/font = ExtResource("9_font")
-theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("ExitNormal")
-theme_override_styles/pressed = SubResource("ExitNormal")
-theme_override_styles/hover = SubResource("ExitNormal")
-toggle_mode = true
-button_pressed = true
-text = "自动推进"
-script = ExtResource("18_auto")
-
 [node name="InfoDock" type="HBoxContainer" parent="FooterStrip" unique_id=1829962295]
-z_index = 35
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -730.0
-offset_top = 35.0
-offset_right = -410.0
-offset_bottom = 83.0
+offset_left = -731.0
+offset_top = 21.0
+offset_right = -411.0
+offset_bottom = 69.0
 grow_horizontal = 0
 theme_override_constants/separation = 8
 alignment = 2
@@ -664,10 +379,10 @@ theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("ExitNormal")
 theme_override_styles/pressed = SubResource("ExitNormal")
 theme_override_styles/hover = SubResource("ExitNormal")
-text = "状态"
+text = "历练信息"
 script = ExtResource("18_auto")
 
-[node name="LogToggleButton" type="Button" parent="FooterStrip/InfoDock" unique_id=1069587163]
+[node name="bag" type="Button" parent="FooterStrip/InfoDock" unique_id=1487617175]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(88, 44)
 layout_mode = 2
@@ -676,7 +391,19 @@ theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("ExitNormal")
 theme_override_styles/pressed = SubResource("ExitNormal")
 theme_override_styles/hover = SubResource("ExitNormal")
-text = "日志"
+text = "储物袋"
+script = ExtResource("18_auto")
+
+[node name="fightsetting" type="Button" parent="FooterStrip/InfoDock" unique_id=1195851935]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(88, 44)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_font")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("ExitNormal")
+theme_override_styles/pressed = SubResource("ExitNormal")
+theme_override_styles/hover = SubResource("ExitNormal")
+text = "战斗设置"
 script = ExtResource("18_auto")
 
 [node name="AutoAdvanceTimer" type="Timer" parent="." unique_id=271485585]
@@ -687,3 +414,130 @@ one_shot = true
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
+
+[node name="StatusPanel" type="Panel" parent="." unique_id=2054035168]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -355.0
+offset_top = 38.0
+offset_right = -37.0
+offset_bottom = 685.0
+grow_horizontal = 0
+mouse_force_pass_scroll_events = false
+theme_override_styles/panel = SubResource("SidePanel")
+script = ExtResource("10_lacj6")
+
+[node name="Title" type="Label" parent="StatusPanel" unique_id=1179553948]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 14.0
+offset_right = 270.0
+offset_bottom = 46.0
+text = "历练信息"
+label_settings = ExtResource("6_section")
+horizontal_alignment = 1
+
+[node name="StatusCloseButton" type="Button" parent="StatusPanel" unique_id=2146013526]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 270.0
+offset_top = 12.0
+offset_right = 304.0
+offset_bottom = 46.0
+theme_override_fonts/font = ExtResource("9_font")
+theme_override_font_sizes/font_size = 16
+text = "×"
+script = ExtResource("18_auto")
+
+[node name="Runtime" type="RichTextLabel" parent="StatusPanel" unique_id=592344161]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 22.0
+offset_top = 64.0
+offset_right = 283.0
+offset_bottom = 189.0
+theme_override_colors/default_color = Color(0.333333, 0.196078, 0.184314, 1)
+theme_override_fonts/normal_font = ExtResource("9_font")
+theme_override_font_sizes/normal_font_size = 15
+bbcode_enabled = true
+text = "气血 76/100
+法力 48/100
+回气丹 x2  疗伤丹 x1
+
+战斗 1  胜 1  负 0"
+fit_content = true
+
+[node name="LootTitle" type="Label" parent="StatusPanel" unique_id=2062069258]
+layout_mode = 0
+offset_left = 23.0
+offset_top = 207.0
+offset_right = 133.0
+offset_bottom = 234.0
+text = "本次战利品"
+label_settings = ExtResource("6_section")
+horizontal_alignment = 1
+
+[node name="LootScroll" type="ScrollContainer" parent="StatusPanel" unique_id=1596541915]
+layout_mode = 0
+offset_left = 19.0
+offset_top = 243.0
+offset_right = 321.0
+offset_bottom = 421.8235
+scale = Vector2(0.85, 0.85)
+script = ExtResource("15_lpsc")
+
+[node name="LootItems" type="GridContainer" parent="StatusPanel/LootScroll" unique_id=1571947775]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 4
+
+[node name="LootItemTemplate" parent="StatusPanel/LootScroll/LootItems" unique_id=845706498 instance=ExtResource("11_mg1gv")]
+layout_mode = 2
+
+[node name="LootEmpty" type="Label" parent="StatusPanel" unique_id=321532457]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 23.0
+offset_top = 272.0
+offset_right = 217.0
+offset_bottom = 306.0
+theme_override_colors/font_color = Color(0.333333, 0.196078, 0.184314, 0.65)
+text = "无"
+label_settings = ExtResource("8_small")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LogTitle" type="Label" parent="StatusPanel" unique_id=595662696]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 402.0
+offset_right = 217.0
+offset_bottom = 434.0
+text = "历练日志"
+label_settings = ExtResource("6_section")
+
+[node name="Log" type="RichTextLabel" parent="StatusPanel" unique_id=1331247759]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -219.0
+offset_right = -23.0
+offset_bottom = -17.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/default_color = Color(0.333333, 0.196078, 0.184314, 1)
+theme_override_fonts/normal_font = ExtResource("9_font")
+theme_override_font_sizes/normal_font_size = 14
+bbcode_enabled = true
+text = "[color=#8a7568]启程[/color]
+[color=#4a3028]启程[/color]
+踏入青岚山脉，林深雾重，灵草与妖兽并存
+[color=#6a5048]你整理行装，握紧法器，正式踏上历练之路。[/color]"
+scroll_following = true

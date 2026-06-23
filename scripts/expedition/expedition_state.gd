@@ -745,49 +745,70 @@ func _sync_runtime_from_summary(summary: Dictionary) -> void:
 func use_runtime_item_slot(slot_index: int) -> Dictionary:
 	if not active:
 		return {"ok": false, "error": "历练未进行"}
-	if phase == "battle":
-		return {"ok": false, "error": "战斗中无法使用丹药"}
 	if slot_index < 0 or slot_index >= 2:
 		return {"ok": false, "error": "无效丹药槽"}
 	var slots := (runtime.get("item_slots", ["", ""]) as Array).duplicate(true)
 	while slots.size() < 2:
 		slots.append("")
-	var inv := (runtime.get("inventory", {}) as Dictionary).duplicate(true)
 	var item_id := str(slots[slot_index]).strip_edges()
 	if item_id == "":
 		return {"ok": false, "error": "该槽位未装备丹药"}
-	if int(inv.get(item_id, 0)) <= 0:
-		return {"ok": false, "error": "丹药已用尽"}
+	return use_runtime_inventory_item(item_id)
+
+
+## 历练背包中右键/使用消耗品：扣减 runtime 库存并恢复气血法力。
+func use_runtime_inventory_item(item_id: String) -> Dictionary:
+	if not active:
+		return {"ok": false, "error": "历练未进行"}
+	if _blocks_runtime_item_use():
+		return {"ok": false, "error": "战斗中无法使用丹药"}
+	var iid := item_id.strip_edges()
+	if iid == "":
+		return {"ok": false, "error": "无效物品"}
+	var inv := (runtime.get("inventory", {}) as Dictionary).duplicate(true)
+	if int(inv.get(iid, 0)) <= 0:
+		return {"ok": false, "error": "背包中没有该物品"}
 	var def: ItemDef = null
 	if ConfigManager != null:
-		def = ConfigManager.item_def_by_id(item_id)
+		def = ConfigManager.item_def_by_id(iid)
 	if def == null:
-		return {"ok": false, "error": "未知丹药"}
+		return {"ok": false, "error": "未知物品"}
 	var mp_cost := maxf(0.0, float(def.fight_mp_cost))
 	if mp_cost > 0.0 and float(runtime.get("mp", 0.0)) < mp_cost:
 		return {"ok": false, "error": "法力不足，无法催动丹药"}
 	var attrs := player_snapshot.get("attrs", {}) as Dictionary
 	var feedback_parts := _apply_runtime_item_effects(def, attrs)
 	if feedback_parts.is_empty():
-		return {"ok": false, "error": "该丹药无法在此使用"}
+		return {"ok": false, "error": "该物品无法在此使用"}
 	if mp_cost > 0.0:
 		runtime["mp"] = maxf(0.0, float(runtime.get("mp", 0.0)) - mp_cost)
-	var remaining := maxi(0, int(inv.get(item_id, 0)) - 1)
+	var remaining := maxi(0, int(inv.get(iid, 0)) - 1)
 	if remaining > 0:
-		inv[item_id] = remaining
+		inv[iid] = remaining
 	else:
-		inv.erase(item_id)
-		slots[slot_index] = ""
+		inv.erase(iid)
+	var slots := (runtime.get("item_slots", ["", ""]) as Array).duplicate(true)
+	while slots.size() < 2:
+		slots.append("")
+	for slot_index in slots.size():
+		if str(slots[slot_index]) == iid and remaining <= 0:
+			slots[slot_index] = ""
 	runtime["inventory"] = inv
 	runtime["item_slots"] = slots
-	var item_name := item_id
+	var item_name := iid
 	if ConfigManager != null:
-		item_name = ConfigManager.get_item_display_name(item_id)
+		item_name = ConfigManager.get_item_display_name(iid)
 	return {
 		"ok": true,
 		"feedback": "使用 %s，%s" % [item_name, "，".join(feedback_parts)],
-		"item_id": item_id,
+		"item_id": iid,
 	}
+
+
+func _blocks_runtime_item_use() -> bool:
+	if SceneManager != null and SceneManager.has_method("is_expedition_fight_overlay_active"):
+		return SceneManager.is_expedition_fight_overlay_active()
+	return phase == "battle"
 
 
 func _apply_runtime_item_effects(def: ItemDef, player_attrs: Dictionary) -> PackedStringArray:
@@ -856,45 +877,35 @@ func _apply_session_rewards(rewards: Array) -> void:
 
 
 func _project_inventory_for_settlement() -> Dictionary:
-	if _game_state == null:
-		return (runtime.get("inventory", {}) as Dictionary).duplicate(true)
-	var inv := (_game_state.inventory as Dictionary).duplicate(true)
-	var runtime_inv := runtime.get("inventory", {}) as Dictionary
-	for slot_v in runtime.get("item_slots", []) as Array:
-		var iid := str(slot_v)
-		if iid == "":
-			continue
-		var remaining := int(runtime_inv.get(iid, 0))
-		if remaining > 0:
-			inv[iid] = remaining
-		else:
-			inv.erase(iid)
-	return inv
+	return (runtime.get("inventory", {}) as Dictionary).duplicate(true)
 
 
 func _runtime_items_for_settlement() -> Array:
 	var out: Array = []
 	var inv := runtime.get("inventory", {}) as Dictionary
-	for slot_v in runtime.get("item_slots", []) as Array:
-		var iid := str(slot_v)
+	for iid_v in inv.keys():
+		var iid := str(iid_v).strip_edges()
 		if iid == "":
 			continue
-		out.append({"inventory_id": iid, "count": int(inv.get(iid, 0))})
+		out.append({"inventory_id": iid, "count": int(inv.get(iid_v, 0))})
 	return out
 
 
 func _copy_runtime_from_game(game_state: Node) -> Dictionary:
-	var inv := {}
-	for slot_v in game_state.item_slots as Array:
-		var iid := str(slot_v)
-		if iid != "":
-			inv[iid] = int(game_state.inventory.get(iid, 0))
 	return {
 		"hp": float(game_state.hp),
 		"mp": float(game_state.mp),
 		"item_slots": (game_state.item_slots as Array).duplicate(true),
-		"inventory": inv,
+		"inventory": (game_state.inventory as Dictionary).duplicate(true),
+		"owned_equips": (game_state.owned_equips as Array).duplicate(true),
 	}
+
+
+## 历练中调整战备后，把洞府道具槽写回 runtime，供下一场战斗读取。
+func sync_runtime_loadout_from_game() -> void:
+	if _game_state == null:
+		return
+	runtime["item_slots"] = (_game_state.item_slots as Array).duplicate(true)
 
 
 func _copy_player_snapshot(game_state: Node) -> Dictionary:

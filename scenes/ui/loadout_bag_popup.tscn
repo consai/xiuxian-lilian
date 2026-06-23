@@ -5,8 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://dvun4oamukfyn" path="res://scenes/items/bag_base.tscn" id="3_bag"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="4_title"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="5_body"]
-[ext_resource type="Script" path="res://scripts/ui/loadout_bag_popup.gd" id="6_script"]
-
+[ext_resource type="Script" uid="uid://ba2eqj0ntdi04" path="res://scripts/ui/loadout_bag_popup.gd" id="6_script"]
 [ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="7_auto"]
 
 [sub_resource type="StyleBoxFlat" id="FooterPanel"]
@@ -30,15 +29,6 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_theme")
 script = ExtResource("6_script")
-
-[node name="Dimmer" type="ColorRect" parent="." unique_id=2075057930]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.08, 0.05, 0.02, 0.62)
 
 [node name="BagBase" parent="." unique_id=1350652928 instance=ExtResource("3_bag")]
 unique_name_in_owner = true
@@ -85,7 +75,6 @@ vertical_alignment = 1
 
 [node name="CloseButton" type="TextureButton" parent="." unique_id=1484765078]
 unique_name_in_owner = true
-script = ExtResource("7_auto")
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -101,7 +90,7 @@ grow_vertical = 2
 texture_normal = ExtResource("2_close")
 ignore_texture_size = true
 stretch_mode = 5
-
+script = ExtResource("7_auto")
 
 [node name="Footer" type="Panel" parent="." unique_id=1658383163]
 layout_mode = 1

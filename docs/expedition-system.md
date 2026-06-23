@@ -34,7 +34,7 @@ flowchart LR
 | F05 | 节点事件解析 | 根据节点类型从地点事件池按权重抽事件，具体内容仍复用现有事件配置 | `ExpeditionEventService.roll_event_for_node()` |
 | F06 | 自动事件 | travel / gather / recover / hazard 即时结算 | `ExpeditionEventService.resolve_non_battle_event()` |
 | F07 | 抉择事件 | 多选项卡片 UI，选项可触发子事件、效果或战斗 | `mode: decision` + `expedition_event_card` |
-| F08 | 战斗事件 | battle / elite / boss，弹窗选迎战或撤退 | `expedition_battle_popup` + `build_battle_init()` |
+| F08 | 战斗事件 | battle / elite / boss，弹窗选迎战或取消暂缓 | `expedition_battle_popup` + `build_battle_init()` |
 | F09 | 战斗衔接 | 进战 source=`expedition`，战后回历练循环或战败结算 | `ExpeditionBattleFlow` |
 | F10 | 历练日数 | `days` 与事件数 `steps` 独立；进行中显示实际行进日，结算耗时至少为时间规则中的普通历练时长 | `estimated_elapsed_days()`、`planned_elapsed_days()`、`finish()` |
 | F11 | 运行时难度 | 事件配置不再写 `difficulty`；节点 difficulty 随层数从地点难度范围递增，抽中事件后注入运行时事件；结算统计 `max_difficulty` | `ExpeditionMapService` + `ExpeditionEventService.materialize_event_for_context()` |
@@ -48,9 +48,9 @@ flowchart LR
 | F18 | 世界效果 | 完成带 `world_effects` 的事件后写入结算 | `finish()` → `GameState._apply_world_changes()` |
 | F19 | 低资源保底 | HP/MP 比例 < 35% 优先抽 recover | Director `_resource_ratio()` |
 | F20 | 单次事件 | `once_per_expedition` 本局不重复 | `completed_events` / `visited_once_events` |
-| F21 | 主动返程 | 非战斗、非待抉择时可退出 | `can_exit()` + `go_expedition_result("manual")` |
+| F21 | 主动返程 | 非待战、非待抉择时可退出；战前弹窗关闭后的待战状态点返程走战前撤退 | `can_exit()` / `_is_pending_battle_dismissed()` + `go_expedition_result("manual")` |
 | F22 | 战败 | 战斗失败强制结算；固定掉落 30% 本次收获、伤势、气血下限 | `settle_pending_battle()` → `finish("defeated")` |
-| F23 | 战前撤退 | 战斗弹窗选撤退，记手动返程 | `retreat_from_pending_battle()` |
+| F23 | 战前撤退 | 关闭战前弹窗后点「主动返程」，记手动返程 | `retreat_from_pending_battle()` |
 | F24 | 结算页 | 统计、战利品、损失、世界变化、历练纪要 | `expedition_result.gd` |
 | F25 | 存档回写 | 推进天数、同步物品、累计 totals、活动日志 | `GameState.settle_expedition()` |
 | F26 | 配置校验 | 地点池、事件、战斗初始化、奖励合法性 | `ExpeditionDataValidator` + 测试 |
@@ -107,14 +107,14 @@ flowchart LR
 | `idle` | 未历练 | — |
 | `resolving` | 等待下一日推进或结算非战斗 | 自动 timer 或手动「前进」、`advance_day` / `complete_current_step` |
 | `choosing` | 抉择事件，展示选项卡 | `choose_event(choice_id)` |
-| `battle` | 待确认战斗（弹窗） | 迎战 → 战斗场景；撤退 → 结算 |
+| `battle` | 待确认战斗（弹窗） | 迎战 → 战斗场景；取消 → 暂缓（可再开弹窗）；关闭后主动返程 → 撤退结算 |
 | `result` | 战败待跳转结算 | `should_go_to_result()` |
 
 ### 4.2 退出原因 `exit_reason`
 
 | 值 | 触发 |
 |----|------|
-| `manual` | 主循环点返程；战前撤退 |
+| `manual` | 主循环点返程；战前弹窗关闭后的主动返程（战前撤退） |
 | `defeated` | 战斗失败 |
 
 ### 4.3 `DataStore.expedition_runtime()` 主要字段
@@ -265,10 +265,11 @@ choose_map_node(node_id)
 | 战利品区 | `ExpeditionState.loot` |
 | 日志 | `event_log` → BBCode（仅遭遇日） |
 | 抉择卡 | `pending_decision_event` → `current_choices` |
-| 返程按钮 | `can_exit()` |
+| 返程按钮 | `can_exit()`；战前弹窗关闭后的待战状态亦可用（走战前撤退） |
 | 前进按钮 | 手动推进时，事件结算后可见，触发 `advance_day` |
 | 自动推进开关 | 切换 `auto_advance`；开启时沿用 timer 连续推进 |
-| 战斗弹窗 | 敌人信息 + 迎战/撤退 |
+| 战斗弹窗 | 敌人信息 + 开打 / 取消（取消仅关闭，不结算） |
+| 待战再开 | 取消后点当前遭遇地图节点或 Step 提示，重新打开战前弹窗 |
 
 ---
 
@@ -296,7 +297,7 @@ choose_map_node(node_id)
 
 | 日期 | 变更摘要 |
 |------|----------|
-| 2026-06-10 | 初版：自现有代码与配置梳理全功能点 |
+| 2026-06-23 | 战前弹窗「取消」仅关闭弹窗；战前撤退改由关闭后点「主动返程」；待战可点地图节点或 Step 再开 |
 | 2026-06-10 | 天数与事件解耦：`days` 独立推进，无遭遇日不产生日志 |
 | 2026-06-10 | 深度仅作事件入池门槛，敌人/奖励取消深度倍率 |
 | 2026-06-10 | 正文改为只描述当前规则；所有待办移入文末 |

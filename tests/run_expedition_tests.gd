@@ -659,7 +659,7 @@ func _test_runtime_potion_slot_can_be_used_manually() -> void:
 	)
 	expedition.phase = "battle"
 	var in_battle: Dictionary = expedition.use_runtime_item_slot(0)
-	_expect_true(not bool(in_battle.get("ok", false)), "cannot use potion during battle")
+	_expect_true(bool(in_battle.get("ok", false)), "can use potion before fight overlay starts")
 
 
 func _test_battle_loss_forces_expedition_result() -> void:

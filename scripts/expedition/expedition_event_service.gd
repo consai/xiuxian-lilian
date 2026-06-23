@@ -513,6 +513,10 @@ static func _normalize_battle_enemy(enemy_src: Dictionary) -> Dictionary:
 		enemy["hp"] = float(attrs[FightAttr.HP_MAX])
 	elif enemy.has("hp"):
 		enemy["hp"] = float(enemy["hp"])
+	if attrs.has(FightAttr.MP_MAX):
+		enemy["mp"] = float(attrs[FightAttr.MP_MAX])
+	elif enemy.has("mp"):
+		enemy["mp"] = float(enemy["mp"])
 	var enemy_skills: Array = []
 	for sid_v in enemy.get("skills", [0]) as Array:
 		if sid_v is Dictionary:

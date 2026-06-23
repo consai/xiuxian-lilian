@@ -3,7 +3,6 @@ extends Control
 const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
-const ItemDefScript := preload("res://scripts/core/item_def.gd")
 const ExpeditionBattlePopupView := preload("res://scripts/expedition/expedition_battle_popup_view.gd")
 const ExpeditionLogServiceScript := preload("res://scripts/expedition/expedition_log_service.gd")
 const ExpeditionMapServiceScript := preload("res://scripts/expedition/expedition_map_service.gd")
@@ -36,14 +35,11 @@ func _ready() -> void:
 	if not ExpeditionState.log_updated.is_connected(_refresh_log_display):
 		ExpeditionState.log_updated.connect(_refresh_log_display)
 	(%ExitButton as Button).pressed.connect(_on_exit_pressed)
-	(%AdvanceButton as Button).pressed.connect(_on_advance_pressed)
-	(%AutoAdvanceButton as Button).toggled.connect(_on_auto_advance_toggled)
-	(%StatusToggleButton as Button).pressed.connect(_on_info_toggle_pressed.bind("status"))
-	(%LogToggleButton as Button).pressed.connect(_on_info_toggle_pressed.bind("log"))
+	(%StatusToggleButton as Button).pressed.connect(_on_info_toggle_pressed)
+	(%bag as Button).pressed.connect(_on_bag_pressed)
+	(%fightsetting as Button).pressed.connect(_on_fightsetting_pressed)
 	(%StatusCloseButton as Button).pressed.connect(_hide_info_popups)
-	(%LogCloseButton as Button).pressed.connect(_hide_info_popups)
-	_wire_potion_slot(%PotionSlot1 as Panel, 0)
-	_wire_potion_slot(%PotionSlot2 as Panel, 1)
+	(%Step as Label).gui_input.connect(_on_step_gui_input)
 	if not resized.is_connected(_on_resized):
 		resized.connect(_on_resized)
 	if not _map_world.resized.is_connected(_queue_map_refresh_after_layout):
@@ -79,13 +75,12 @@ func _refresh_all() -> void:
 	]
 	_refresh_progress_dots()
 	_refresh_status_panel()
-	(%Step as Label).text = "过程第 %d 日 · %d 件事" % [ExpeditionState.days, ExpeditionState.steps]
+	_refresh_step_label()
 	_refresh_map_display()
 	_sync_loot_items()
 	_refresh_log_display()
 	_refresh_event_presentation()
 	_refresh_controls()
-	_refresh_info_buttons()
 
 
 func _refresh_log_display() -> void:
@@ -129,10 +124,6 @@ func _refresh_status_panel() -> void:
 	var hud_mp_bar := %HudMpBar as ProgressBar
 	hud_mp_bar.max_value = mp_max
 	hud_mp_bar.value = clampf(mp, 0.0, mp_max)
-	var inv := ExpeditionState.runtime.get("inventory", {}) as Dictionary
-	var slots := ExpeditionState.runtime.get("item_slots", []) as Array
-	_refresh_potion_slot(%PotionSlot1 as Panel, 0, str(slots[0]) if slots.size() > 0 else "", inv)
-	_refresh_potion_slot(%PotionSlot2 as Panel, 1, str(slots[1]) if slots.size() > 1 else "", inv)
 	var stats := ExpeditionState.stats
 	(%Runtime as RichTextLabel).text = "战斗 %d  胜 %d  负 %d" % [
 		int(stats.get("battles", 0)),
@@ -141,63 +132,64 @@ func _refresh_status_panel() -> void:
 	]
 
 
-func _refresh_potion_slot(slot: Panel, _slot_index: int, item_id: String, inv: Dictionary) -> void:
-	if slot == null:
-		return
-	var icon := slot.get_node_or_null("Icon") as TextureRect
-	var count_label := slot.get_node_or_null("Count") as Label
-	var iid := item_id.strip_edges()
-	var usable := not _locked and ExpeditionState.phase != "battle" and iid != "" and int(inv.get(iid, 0)) > 0
-	slot.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if usable else Control.CURSOR_ARROW
-	slot.modulate = Color.WHITE if usable or iid != "" else Color(1, 1, 1, 0.72)
-	if iid == "":
-		if icon != null:
-			icon.texture = null
-			icon.self_modulate = Color(1, 1, 1, 0.2)
-		if count_label != null:
-			count_label.text = "—"
-		slot.tooltip_text = "空槽位"
-		return
-	var item_name := iid
-	var tex: Texture2D = null
-	if ConfigManager != null:
-		item_name = ConfigManager.get_item_display_name(iid)
-		var def := ConfigManager.item_def_by_id(iid)
-		if def != null:
-			tex = ItemDefScript.resolve_icon_texture(def.icon_path, null)
-	var count := maxi(0, int(inv.get(iid, 0)))
-	if icon != null:
-		icon.texture = tex
-		icon.self_modulate = Color.WHITE if tex != null else Color(1, 1, 1, 0.35)
-	if count_label != null:
-		count_label.text = "%s ×%d" % [item_name, count] if count > 1 else item_name
-	slot.tooltip_text = "点击使用 %s" % item_name if usable else item_name
+func _refresh_controls() -> void:
+	var exit_button := %ExitButton as Button
+	exit_button.disabled = _locked or not _can_manual_exit()
+	var utility_enabled := _can_open_utility_panels()
+	(%bag as Button).disabled = not utility_enabled
+	(%fightsetting as Button).disabled = not utility_enabled
 
 
-func _wire_potion_slot(slot: Panel, slot_index: int) -> void:
-	if slot == null:
-		return
-	slot.mouse_filter = Control.MOUSE_FILTER_STOP
-	var press := slot.get_node_or_null("PressScale")
-	if press != null and press.has_signal("clicked"):
-		press.clicked.connect(_on_potion_slot_pressed.bind(slot_index))
-		return
-	slot.gui_input.connect(func(event: InputEvent) -> void:
-		if event is InputEventMouseButton:
-			var mouse := event as InputEventMouseButton
-			if mouse.pressed and mouse.button_index == MOUSE_BUTTON_LEFT:
-				_on_potion_slot_pressed(slot_index)
-	)
-
-
-func _on_potion_slot_pressed(slot_index: int) -> void:
+## 战前弹窗已关闭且仍有待战事件：可再次打开迎战，或点主动返程走战前撤退
+func _is_pending_battle_dismissed() -> bool:
+	if ExpeditionState.phase != "battle" or ExpeditionState.pending_battle_event_id == "":
+		return false
 	if _locked:
+		return false
+	var popup := %BattlePopup as ExpeditionBattlePopupView
+	return popup != null and not popup.visible
+
+
+func _can_manual_exit() -> bool:
+	return ExpeditionState.can_exit() or _is_pending_battle_dismissed()
+
+
+func _refresh_step_label() -> void:
+	var step := %Step as Label
+	var base := "过程第 %d 日 · %d 件事" % [ExpeditionState.days, ExpeditionState.steps]
+	if _is_pending_battle_dismissed():
+		step.text = "%s · 遭遇战待处理（点此迎战）" % base
+		step.mouse_filter = Control.MOUSE_FILTER_STOP
+		step.add_theme_color_override("font_color", Color(0.635294, 0.239216, 0.168627, 1.0))
+	else:
+		step.text = base
+		step.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		step.remove_theme_color_override("font_color")
+
+
+func _on_step_gui_input(event: InputEvent) -> void:
+	if not _is_pending_battle_dismissed():
 		return
-	var result: Dictionary = ExpeditionState.use_runtime_item_slot(slot_index)
-	var feedback := str(result.get("feedback", result.get("error", ""))).strip_edges()
-	if feedback != "":
-		(%Feedback as Label).text = feedback
+	if event is InputEventMouseButton:
+		var mb := event as InputEventMouseButton
+		if mb.button_index == MOUSE_BUTTON_LEFT and mb.pressed:
+			_reopen_pending_battle_popup()
+
+
+func _reopen_pending_battle_popup() -> void:
+	var pending_event := ExpeditionEventServiceScript.by_id(ExpeditionState.pending_battle_event_id)
+	if pending_event.is_empty():
+		return
+	_show_pending_battle_popup(pending_event)
 	_refresh_all()
+
+
+func _can_open_utility_panels() -> bool:
+	if not ExpeditionState.active:
+		return false
+	if SceneManager.is_expedition_fight_overlay_active():
+		return false
+	return true
 
 
 func _refresh_progress_dots() -> void:
@@ -211,27 +203,6 @@ func _refresh_progress_dots() -> void:
 		int(switches.get("remaining", 0)),
 		int(switches.get("total", 0)),
 	]
-
-
-func _refresh_controls() -> void:
-	var exit_button := %ExitButton as Button
-	exit_button.disabled = _locked or not ExpeditionState.can_exit()
-	var advance_button := %AdvanceButton as Button
-	var awaiting_manual := false
-	advance_button.visible = awaiting_manual
-	advance_button.disabled = _locked or not awaiting_manual
-	var auto_button := %AutoAdvanceButton as Button
-	if auto_button.button_pressed != ExpeditionState.auto_advance:
-		auto_button.set_pressed_no_signal(ExpeditionState.auto_advance)
-	auto_button.disabled = _locked
-
-
-func _refresh_info_buttons() -> void:
-	(%LogToggleButton as Button).text = "日志 %d" % ExpeditionState.event_log.size()
-
-
-func _continue_expedition() -> void:
-	_refresh_all()
 
 
 func _advance_auto_step() -> void:
@@ -344,46 +315,50 @@ func _on_event_chosen(event_id: String) -> void:
 
 
 func _on_exit_pressed() -> void:
+	if _is_pending_battle_dismissed():
+		ExpeditionState.retreat_from_pending_battle()
+		SceneManager.go_expedition_result("manual")
+		return
 	if not ExpeditionState.can_exit():
 		return
 	SceneManager.go_expedition_result("manual")
 
 
-func _on_advance_pressed() -> void:
-	_refresh_all()
+func _on_bag_pressed() -> void:
+	if not _can_open_utility_panels():
+		return
+	var nav: Dictionary = SceneManager.go_backpack_panel()
+	if not bool(nav.get("ok", false)):
+		var err := str(nav.get("error", "无法打开储物袋")).strip_edges()
+		if err != "":
+			(%Feedback as Label).text = err
 
 
-func _on_auto_advance_toggled(enabled: bool) -> void:
-	ExpeditionState.auto_advance = false
-	_refresh_controls()
+func _on_fightsetting_pressed() -> void:
+	if not _can_open_utility_panels():
+		return
+	var nav: Dictionary = SceneManager.go_combat_loadout_panel()
+	if not bool(nav.get("ok", false)):
+		var err := str(nav.get("error", "无法打开战斗设置")).strip_edges()
+		if err != "":
+			(%Feedback as Label).text = err
 
 
-func _on_info_toggle_pressed(panel_id: String) -> void:
-	var panel := _info_panel(panel_id)
+func _on_info_toggle_pressed() -> void:
+	var panel := %StatusPanel as Control
 	if panel == null:
 		return
 	var will_show := not panel.visible
 	_hide_info_popups()
 	panel.visible = will_show
-	if will_show and panel_id == "log":
+	if will_show:
 		_scroll_log_to_latest(%Log as RichTextLabel)
 
 
 func _hide_info_popups() -> void:
-	for panel in [%StatusPanel, %LogPanel]:
-		var control := panel as Control
-		if control != null:
-			control.visible = false
-
-
-func _info_panel(panel_id: String) -> Control:
-	match panel_id:
-		"status":
-			return %StatusPanel as Control
-		"log":
-			return %LogPanel as Control
-		_:
-			return null
+	var panel := %StatusPanel as Control
+	if panel != null:
+		panel.visible = false
 
 
 func _route_switch_summary() -> Dictionary:
@@ -462,14 +437,21 @@ func _fallback_hub() -> void:
 	SceneManager.go_hub()
 
 
+func _go_completed_result() -> void:
+	var reason := ExpeditionState.pending_exit_reason
+	if reason == "":
+		reason = "defeated"
+	SceneManager.go_expedition_result(reason)
+
+
 func _prepare_battle_popup() -> void:
 	var popup := %BattlePopup as ExpeditionBattlePopupView
 	if popup == null:
 		return
 	if not popup.fight_requested.is_connected(_on_battle_fight_requested):
 		popup.fight_requested.connect(_on_battle_fight_requested)
-	if not popup.retreat_requested.is_connected(_on_battle_retreat_requested):
-		popup.retreat_requested.connect(_on_battle_retreat_requested)
+	if not popup.close_requested.is_connected(_on_battle_popup_close_requested):
+		popup.close_requested.connect(_on_battle_popup_close_requested)
 
 
 func _show_pending_battle_popup(event: Dictionary) -> void:
@@ -509,15 +491,26 @@ func resume_after_battle() -> void:
 	_refresh_all()
 
 
-func _on_battle_retreat_requested() -> void:
+## 历练浮层面板（背包/战斗设置）关闭后刷新界面。
+func resume_after_panel() -> void:
+	var ui_rt: Dictionary = DataStore.ui_runtime()
+	var feedback := str(ui_rt.get("expedition_bag_feedback", "")).strip_edges()
+	ui_rt["expedition_bag_feedback"] = ""
+	if feedback != "":
+		(%Feedback as Label).text = feedback
+	ExpeditionState.sync_runtime_loadout_from_game()
+	_refresh_all()
+
+
+## 取消按钮：仅关闭战前弹窗，不触发撤退结算
+func _on_battle_popup_close_requested() -> void:
 	if not _locked:
 		return
-	ExpeditionState.retreat_from_pending_battle()
 	var popup := %BattlePopup as ExpeditionBattlePopupView
 	if popup != null:
 		popup.visible = false
 	_locked = false
-	SceneManager.go_expedition_result("manual")
+	_refresh_all()
 
 
 func _prepare_loot_template() -> void:
@@ -605,8 +598,8 @@ func _refresh_map_display() -> void:
 		var node_id := str(node.get("id", ""))
 		var state := "locked"
 		if node_id == current:
-			state = "current"
-		if visited.has(node_id):
+			state = "pending_battle" if _is_pending_battle_dismissed() else "current"
+		if visited.has(node_id) and state != "pending_battle":
 			state = "visited"
 		if available.has(node_id):
 			state = "available"
@@ -642,6 +635,10 @@ func _make_map_node() -> Button:
 
 func _on_map_node_selected(node_id: String) -> void:
 	if _locked:
+		return
+	# 取消战前弹窗后，点当前遭遇节点重新打开
+	if _is_pending_battle_dismissed() and node_id == ExpeditionState.current_node_id:
+		_reopen_pending_battle_popup()
 		return
 	_locked = true
 	_refresh_controls()

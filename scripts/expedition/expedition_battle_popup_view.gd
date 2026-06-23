@@ -2,7 +2,8 @@ class_name ExpeditionBattlePopupView
 extends Control
 
 signal fight_requested
-signal retreat_requested
+## 仅关闭战前弹窗，不触发撤退结算
+signal close_requested
 
 const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
 const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
@@ -25,7 +26,7 @@ const _META_COLOR := Color(0.5372549, 0.42745098, 0.3882353, 1.0)
 func _ready() -> void:
 	visible = false
 	_fight_button.pressed.connect(func() -> void: fight_requested.emit())
-	_retreat_button.pressed.connect(func() -> void: retreat_requested.emit())
+	_retreat_button.pressed.connect(func() -> void: close_requested.emit())
 	_backdrop.gui_input.connect(_on_backdrop_gui_input)
 
 

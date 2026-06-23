@@ -44,6 +44,11 @@ const SCENE_PATHS := {
 
 const _BLOCKED_EXPEDITION_ACTIVE := "当前仍在历练中，请先完成或结算后再操作。"
 
+## 叠在当前场景上的战斗/面板浮层，避免 change_scene 销毁底层界面。
+var _fight_overlay: Node = null
+var _panel_overlay: Node = null
+var _scene_underlay: Node = null
+
 
 func _game_state() -> Node:
 	return _autoload("GameState")
@@ -106,6 +111,7 @@ func go_expedition_loop() -> Dictionary:
 
 
 func go_expedition_result(reason: String = "manual") -> Dictionary:
+	_discard_expedition_fight_stack()
 	var payload := ScenePayload.expedition_result(reason)
 	if payload.is_empty():
 		return {"ok": false, "error": "invalid_expedition_result_payload"}
@@ -172,15 +178,26 @@ func go_mastered_arts_panel() -> Dictionary:
 
 
 func go_combat_loadout_panel() -> Dictionary:
+	if _can_overlay_panel_on_expedition_loop():
+		return _push_panel_popup(COMBAT_LOADOUT_PANEL, {})
 	return go_to(COMBAT_LOADOUT_PANEL)
 
 
 func go_skill_release_strategy_panel() -> Dictionary:
+	if _can_overlay_panel_on_expedition_loop():
+		return _push_panel_popup(SKILL_RELEASE_STRATEGY_PANEL, {})
 	return go_to(SKILL_RELEASE_STRATEGY_PANEL)
 
 
-func go_backpack_panel() -> Dictionary:
-	return go_to(BACKPACK_PANEL)
+## 背包统一以弹窗叠在当前场景上打开，不切场景、不压栈。
+func go_backpack_panel(payload: Dictionary = {}) -> Dictionary:
+	var merged := payload.duplicate(true)
+	if _should_use_expedition_bag_context():
+		merged["context"] = "expedition"
+	var preflight := _preflight_panel_popup()
+	if not bool(preflight.get("ok", false)):
+		return preflight
+	return _push_panel_popup(BACKPACK_PANEL, merged)
 
 
 func go_dao_tree_panel() -> Dictionary:
@@ -192,6 +209,8 @@ func go_dao_tree_panel() -> Dictionary:
 
 
 func go_back(fallback_scene_id: String = HUB, options: Dictionary = {}) -> Dictionary:
+	if _panel_overlay != null:
+		return dismiss_panel_popup()
 	var scene_rt: Dictionary = _data_store().scene_runtime()
 	if bool(scene_rt.get("transitioning", false)):
 		return {"ok": false, "error": "transition_in_progress"}
@@ -221,10 +240,57 @@ func go_fight(battle_data: Dictionary, source: String = "scene_manager") -> Dict
 	if not bool(preflight.get("ok", false)):
 		return preflight
 	BattleInitData.set_pending(get_tree(), merged, source)
-	var nav := _perform_transition(FIGHT, {}, true)
+	var nav: Dictionary
+	if _can_overlay_fight_on_expedition_loop(source):
+		nav = _push_fight_overlay()
+	else:
+		nav = _perform_transition(FIGHT, {}, true)
 	if not bool(nav.get("ok", false)):
 		_data_store().battle_runtime()["pending_init"] = {}
 	return nav
+
+
+## 历练战斗胜利后：移除战斗叠层并恢复历练界面（不重新加载场景）。
+func resume_expedition_after_fight() -> Dictionary:
+	if _fight_overlay == null or _scene_underlay == null:
+		return go_expedition_loop()
+	_remove_fight_overlay()
+	_restore_scene_underlay()
+	if _scene_underlay.has_method("resume_after_battle"):
+		_scene_underlay.call("resume_after_battle")
+	return {"ok": true, "scene_id": EXPEDITION_LOOP, "resumed": true}
+
+
+## 历练战斗战败/撤退结算：清掉叠层与历练界面后进入结算场景。
+func end_expedition_fight_and_go_result(reason: String = "defeated") -> Dictionary:
+	_discard_expedition_fight_stack()
+	return go_expedition_result(reason)
+
+
+## 关闭面板弹窗并恢复底层场景。
+func dismiss_panel_popup() -> Dictionary:
+	if _panel_overlay == null:
+		return {"ok": false, "error": "no_panel_overlay"}
+	var underlay := _scene_underlay
+	_remove_panel_overlay()
+	if underlay != null and is_instance_valid(underlay):
+		if not underlay.visible:
+			underlay.visible = true
+			underlay.process_mode = Node.PROCESS_MODE_INHERIT
+		get_tree().current_scene = underlay
+		if underlay.has_method("resume_after_panel"):
+			underlay.call("resume_after_panel")
+	if _fight_overlay == null:
+		_scene_underlay = null
+	return {"ok": true, "resumed": true}
+
+
+func is_panel_popup_active() -> bool:
+	return _panel_overlay != null and is_instance_valid(_panel_overlay)
+
+
+func is_expedition_fight_overlay_active() -> bool:
+	return _fight_overlay != null and is_instance_valid(_fight_overlay)
 
 
 func take_payload(scene_id: String) -> Dictionary:
@@ -271,6 +337,7 @@ func _preflight_transition() -> Dictionary:
 
 
 func _perform_transition(scene_id: String, payload: Dictionary, record_history: bool) -> Dictionary:
+	_discard_expedition_fight_stack()
 	var scene_rt: Dictionary = _data_store().scene_runtime()
 	if bool(scene_rt.get("transitioning", false)):
 		return {"ok": false, "error": "transition_in_progress"}
@@ -295,3 +362,145 @@ func _perform_transition(scene_id: String, payload: Dictionary, record_history: 
 func _release_transition_lock() -> void:
 	await get_tree().process_frame
 	_data_store().scene_runtime()["transitioning"] = false
+
+
+func _can_overlay_fight_on_expedition_loop(source: String) -> bool:
+	if not _is_expedition_fight_source(source):
+		return false
+	if _fight_overlay != null or _panel_overlay != null:
+		return false
+	var underlay := get_tree().current_scene
+	if underlay == null:
+		return false
+	return str(underlay.scene_file_path) == str(SCENE_PATHS.get(EXPEDITION_LOOP, ""))
+
+
+## 与 ExpeditionBattleFlow.is_expedition_source 保持一致，避免 SceneManager 与战斗出口脚本循环依赖。
+func _is_expedition_fight_source(source: String) -> bool:
+	var trimmed := source.strip_edges()
+	return trimmed == "expedition" or trimmed.begins_with("expedition_")
+
+
+func _push_fight_overlay() -> Dictionary:
+	var scene_rt: Dictionary = _data_store().scene_runtime()
+	if bool(scene_rt.get("transitioning", false)):
+		return {"ok": false, "error": "transition_in_progress"}
+	var path := str(SCENE_PATHS.get(FIGHT, ""))
+	if path == "":
+		return {"ok": false, "error": "unknown_scene_id:%s" % FIGHT}
+	var underlay := get_tree().current_scene
+	if underlay == null:
+		return {"ok": false, "error": "no_current_scene"}
+	var packed := load(path)
+	if packed == null:
+		return {"ok": false, "error": "fight_scene_load_failed"}
+	var overlay: Node = packed.instantiate()
+	if overlay == null:
+		return {"ok": false, "error": "fight_scene_instantiate_failed"}
+	scene_rt["transitioning"] = true
+	scene_rt["overlay_id"] = FIGHT
+	_scene_underlay = underlay
+	_scene_underlay.visible = false
+	_scene_underlay.process_mode = Node.PROCESS_MODE_DISABLED
+	_fight_overlay = overlay
+	get_tree().root.add_child(_fight_overlay)
+	get_tree().current_scene = _fight_overlay
+	call_deferred("_release_transition_lock")
+	return {"ok": true, "scene_id": FIGHT, "path": path, "overlay": true}
+
+
+func _remove_fight_overlay() -> void:
+	if _fight_overlay != null and is_instance_valid(_fight_overlay):
+		_fight_overlay.queue_free()
+	_fight_overlay = null
+	_data_store().scene_runtime()["overlay_id"] = ""
+
+
+func _restore_scene_underlay() -> void:
+	if _scene_underlay == null or not is_instance_valid(_scene_underlay):
+		_scene_underlay = null
+		return
+	_scene_underlay.visible = true
+	_scene_underlay.process_mode = Node.PROCESS_MODE_INHERIT
+	get_tree().current_scene = _scene_underlay
+
+
+func _discard_scene_underlay() -> void:
+	if _scene_underlay != null and is_instance_valid(_scene_underlay):
+		_scene_underlay.queue_free()
+	_scene_underlay = null
+
+
+func _should_use_expedition_bag_context() -> bool:
+	var expedition := _expedition_state()
+	return expedition != null and expedition.active
+
+
+func _preflight_panel_popup() -> Dictionary:
+	if _fight_overlay != null or _panel_overlay != null:
+		return {"ok": false, "error": "panel_popup_already_open"}
+	return _preflight_transition()
+
+
+func _can_overlay_panel_on_expedition_loop() -> bool:
+	if not _preflight_panel_popup().get("ok", false):
+		return false
+	var expedition := _expedition_state()
+	if expedition == null or not expedition.active:
+		return false
+	var underlay := get_tree().current_scene
+	if underlay == null:
+		return false
+	return str(underlay.scene_file_path) == str(SCENE_PATHS.get(EXPEDITION_LOOP, ""))
+
+
+func _push_panel_popup(scene_id: String, payload: Dictionary) -> Dictionary:
+	var scene_rt: Dictionary = _data_store().scene_runtime()
+	if bool(scene_rt.get("transitioning", false)):
+		return {"ok": false, "error": "transition_in_progress"}
+	var path := str(SCENE_PATHS.get(scene_id, ""))
+	if path == "":
+		return {"ok": false, "error": "unknown_scene_id:%s" % scene_id}
+	var underlay := get_tree().current_scene
+	if underlay == null:
+		return {"ok": false, "error": "no_current_scene"}
+	var packed := load(path)
+	if packed == null:
+		return {"ok": false, "error": "panel_scene_load_failed"}
+	var overlay: Node = packed.instantiate()
+	if overlay == null:
+		return {"ok": false, "error": "panel_scene_instantiate_failed"}
+	scene_rt["transitioning"] = true
+	if not payload.is_empty():
+		_data_store().set_scene_payload(scene_id, payload)
+	scene_rt["overlay_id"] = scene_id
+	_scene_underlay = underlay
+	var keep_underlay_visible := scene_id == BACKPACK_PANEL
+	if not keep_underlay_visible:
+		_scene_underlay.visible = false
+		_scene_underlay.process_mode = Node.PROCESS_MODE_DISABLED
+	_panel_overlay = overlay
+	if keep_underlay_visible:
+		# 背包弹窗：底层场景保持可见，仅在上层叠半透明遮罩与背包面板。
+		_panel_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+		_panel_overlay.set_offsets_preset(Control.PRESET_FULL_RECT)
+		_scene_underlay.add_child(_panel_overlay)
+	else:
+		get_tree().root.add_child(_panel_overlay)
+		get_tree().current_scene = _panel_overlay
+	call_deferred("_release_transition_lock")
+	return {"ok": true, "scene_id": scene_id, "path": path, "popup": true}
+
+
+func _remove_panel_overlay() -> void:
+	if _panel_overlay != null and is_instance_valid(_panel_overlay):
+		_panel_overlay.queue_free()
+	_panel_overlay = null
+	if _fight_overlay == null:
+		_data_store().scene_runtime()["overlay_id"] = ""
+
+
+func _discard_expedition_fight_stack() -> void:
+	_remove_fight_overlay()
+	_remove_panel_overlay()
+	_discard_scene_underlay()

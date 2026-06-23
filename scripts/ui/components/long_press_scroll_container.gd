@@ -21,7 +21,6 @@ var _suppressed_controls: Array[Dictionary] = []
 
 
 func _ready() -> void:
-	set_process_input(drag_enabled)
 	_connect_scroll_bars()
 
 
@@ -34,7 +33,8 @@ func _connect_scroll_bars() -> void:
 		h_bar.value_changed.connect(_on_bar_value_changed)
 
 
-func _input(event: InputEvent) -> void:
+## 经 GUI 输入链接收拖拽，上层遮罩/面板可正常挡住滚动（区别于全局 _input）。
+func _gui_input(event: InputEvent) -> void:
 	if not drag_enabled:
 		return
 	if event is InputEventMouseButton:
@@ -76,7 +76,7 @@ func _handle_mouse_button(mb: InputEventMouseButton) -> void:
 		var was_dragging := _dragging
 		_end_press()
 		if was_dragging:
-			get_viewport().set_input_as_handled()
+			accept_event()
 
 
 func _handle_screen_touch(st: InputEventScreenTouch) -> void:
@@ -89,7 +89,7 @@ func _handle_screen_touch(st: InputEventScreenTouch) -> void:
 		var was_dragging := _dragging
 		_end_press()
 		if was_dragging:
-			get_viewport().set_input_as_handled()
+			accept_event()
 
 
 func _handle_mouse_motion(motion: InputEventMouseMotion) -> void:
@@ -97,7 +97,7 @@ func _handle_mouse_motion(motion: InputEventMouseMotion) -> void:
 		return
 	_update_drag(_event_local(motion.global_position), false)
 	if _dragging:
-		get_viewport().set_input_as_handled()
+		accept_event()
 
 
 func _handle_screen_drag(sd: InputEventScreenDrag) -> void:
@@ -105,7 +105,7 @@ func _handle_screen_drag(sd: InputEventScreenDrag) -> void:
 		return
 	_update_drag(_event_local(sd.position), true)
 	if _dragging:
-		get_viewport().set_input_as_handled()
+		accept_event()
 
 
 func _begin_press(local: Vector2, touch_index: int) -> void:

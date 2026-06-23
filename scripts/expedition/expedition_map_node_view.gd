@@ -14,7 +14,7 @@ func setup(node: Dictionary, state: String) -> void:
 		EnumExpeditionNodeTypeScript.label(str(node.get("type", ""))),
 		str(node.get("risk_text", "")),
 	]
-	disabled = state != "available"
+	disabled = state != "available" and state != "pending_battle"
 	tooltip_text = "%s · 难度 %d" % [str(node.get("label", "")), int(node.get("difficulty", 1))]
 	match state:
 		"visited":
@@ -23,6 +23,10 @@ func setup(node: Dictionary, state: String) -> void:
 			modulate = Color(1.0, 0.94, 0.62, 1.0)
 		"current":
 			modulate = Color(0.98, 0.76, 0.42, 1.0)
+		"pending_battle":
+			# 战前弹窗关闭后：当前遭遇节点可再次点击打开弹窗
+			modulate = Color(0.98, 0.76, 0.42, 1.0)
+			tooltip_text = "%s · 点此迎战" % tooltip_text
 		_:
 			modulate = Color(0.82, 0.78, 0.70, 1.0)
 

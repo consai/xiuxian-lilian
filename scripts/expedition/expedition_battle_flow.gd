@@ -22,6 +22,6 @@ static func handle_result_close() -> void:
 		var reason := ExpeditionState.pending_exit_reason
 		if reason == "":
 			reason = "defeated"
-		SceneManager.go_expedition_result(reason)
+		SceneManager.end_expedition_fight_and_go_result(reason)
 	else:
-		SceneManager.go_expedition_loop()
+		SceneManager.resume_expedition_after_fight()
