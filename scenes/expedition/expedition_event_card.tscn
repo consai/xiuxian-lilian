@@ -82,8 +82,9 @@ theme_override_styles/focus = SubResource("CardHover")
 script = ExtResource("1")
 
 
-[node name="PressScaleFeedback" type="Node" parent="EventCard"]
+[node name="PressScaleFeedback" type="Node" parent="."]
 script = ExtResource("6_auto")
+target_path = NodePath("..")
 
 [node name="Content" type="MarginContainer" parent="."]
 layout_mode = 1

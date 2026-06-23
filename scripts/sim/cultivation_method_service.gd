@@ -169,6 +169,58 @@ static func cultivation_speed(slots: Dictionary) -> float:
 	return maxf(0.0, float(practice.get("efficiency", 1.0)))
 
 
+static func active_cultivation_method_id(savedata: Dictionary) -> String:
+	var method_id := str(savedata.get("current_cultivation_method_id", "")).strip_edges()
+	if method_id != "":
+		return method_id
+	var slots := savedata.get("cultivation_method_slots", {}) as Dictionary
+	return str(slots.get("main", "")).strip_edges()
+
+
+static func cultivation_session_speed(method_id: String, savedata: Dictionary) -> float:
+	var method := by_id(method_id)
+	if method.is_empty():
+		return 0.0
+	var speed := 1.0
+	var mastery := method_mastery_value_ratio(savedata, method_id)
+	var knowledge_bonus := 1.0 + knowledge_mastery_for_method(savedata, method_id)
+	for effect_v in method.get("effects", []) as Array:
+		if not effect_v is Dictionary:
+			continue
+		var effect := effect_v as Dictionary
+		if str(effect.get("effectId", "")) != "cultivation_speed":
+			continue
+		speed += (float(effect.get("base", 0.0)) + float(effect.get("masteryGrowth", 0.0)) * mastery) \
+			* knowledge_bonus
+	return clampf(speed, 0.5, 10.0)
+
+
+static func base_cultivation_gain_breakdown(method_id: String) -> Dictionary:
+	var method := by_id(method_id)
+	if method.is_empty():
+		return {"gain": 0}
+	var major_id := str(method.get("realm", "")).strip_edges()
+	if major_id == "":
+		return {"gain": 0}
+	var realm_base := RealmBalanceService.base_monthly_cultivation_gain({
+		"major_realm": major_id,
+		"id": "%s_early" % major_id,
+	})
+	var family := family_by_id(str(method.get("familyId", "")))
+	var quality := EnumQuality.clamp_quality(int(method.get("quality", family.get("quality", 1))))
+	var coefficient := 1.0 + float(quality) * 0.2
+	return {
+		"realm_base": realm_base,
+		"quality": quality,
+		"coefficient": coefficient,
+		"gain": maxi(0, int(round(float(realm_base) * coefficient))),
+	}
+
+
+static func base_cultivation_gain(method_id: String) -> int:
+	return int(base_cultivation_gain_breakdown(method_id).get("gain", 0))
+
+
 static func method_mastery(savedata: Dictionary, method_id: String) -> float:
 	var root_v: Variant = savedata.get("method_mastery", {})
 	if root_v is Dictionary:
@@ -212,8 +264,7 @@ static func apply_cultivation_cycle(
 		knowledge_multiplier: float = 1.0,
 		mastery_multiplier: float = 1.0
 ) -> Dictionary:
-	var slots: Dictionary = savedata.get("cultivation_method_slots", {}) as Dictionary
-	var main_id := str(slots.get("main", ""))
+	var main_id := active_cultivation_method_id(savedata)
 	var method := by_id(main_id)
 	if method.is_empty() or practice_xp <= 0.0:
 		return {"knowledge": [], "method_id": main_id, "mastery_applied": 0.0}
@@ -230,9 +281,6 @@ static func apply_cultivation_cycle(
 		if not bool(row.get("gainFromCultivation", true)):
 			continue
 		var sid := str(row.get("skillId", ""))
-		var cap_level := int(row.get("capLevel", 5))
-		if KnowledgeServiceScript.effective_level(savedata, sid) >= float(cap_level):
-			continue
 		var weight := float(row.get("growthWeight", 1.0))
 		total_weight += weight
 		weights.append({"skillId": sid, "weight": weight})
@@ -271,11 +319,12 @@ static func knowledge_mastery_for_method(savedata: Dictionary, method_id: String
 			continue
 		var row := row_v as Dictionary
 		var sid := str(row.get("skillId", ""))
-		var cap_level := maxi(1, int(row.get("capLevel", 1)))
-		var mastery_weight := float(row.get("masteryWeight", 1.0)) * float(cap_level * cap_level)
+		var skill := DaoTreeServiceScript.skill_by_id(sid)
+		var max_level := maxi(1, int(skill.get("maxLevel", 5)))
+		var mastery_weight := float(row.get("masteryWeight", 1.0))
 		total_weight += mastery_weight
 		var rate := clampf(
-			KnowledgeServiceScript.effective_level(savedata, sid) / float(cap_level), 0.0, 1.0
+			KnowledgeServiceScript.effective_level(savedata, sid) / float(max_level), 0.0, 1.0
 		)
 		weighted += rate * mastery_weight
 	if total_weight <= 0.0:
@@ -370,8 +419,6 @@ static func _collect_knowledge_chain(method: Dictionary, tier_distance: int, mer
 	var rules: Dictionary = bundle().get("rules", {}) as Dictionary
 	var layer_rules: Dictionary = (rules.get("layerInheritance", {}) as Dictionary).get("knowledge", {}) as Dictionary
 	var distance_mul := float(layer_rules.get("inheritedGrowthWeightMultiplierPerTierDistance", 0.35))
-	var cap_bonus := int(layer_rules.get("inheritedCapBonusPerUpgrade", 1))
-	var max_cap := int(layer_rules.get("maximumCapLevel", 5))
 	for row_v in method.get("knowledge", []) as Array:
 		if not row_v is Dictionary:
 			continue
@@ -382,15 +429,12 @@ static func _collect_knowledge_chain(method: Dictionary, tier_distance: int, mer
 		var weight := float(row.get("growthWeight", 1.0))
 		if tier_distance > 0:
 			weight *= pow(distance_mul, float(tier_distance))
-		var cap_level := mini(max_cap, int(row.get("capLevel", 1)) + cap_bonus * tier_distance)
 		if merged.has(sid):
 			var existing := merged[sid] as Dictionary
 			existing["growthWeight"] = maxf(float(existing.get("growthWeight", 0.0)), weight)
-			existing["capLevel"] = maxi(int(existing.get("capLevel", 0)), cap_level)
 			merged[sid] = existing
 		else:
 			row["growthWeight"] = weight
-			row["capLevel"] = cap_level
 			merged[sid] = row
 	var predecessor := str(method.get("predecessorId", ""))
 	if predecessor != "":

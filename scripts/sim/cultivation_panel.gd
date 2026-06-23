@@ -15,6 +15,8 @@ const MODE_IDS := EnumCultivationMode.MODE_IDS
 @onready var _knowledge_label: Label = %KnowledgeLabel
 @onready var _mode_description: Label = %ModeDescription
 @onready var _preview_label: Label = %PreviewLabel
+@onready var _formula_label: Label = %FormulaLabel
+@onready var _preview_meta_label: Label = %PreviewMetaLabel
 @onready var _result_label: Label = %ResultLabel
 @onready var _start_button: Button = %StartButton
 @onready var _mode_buttons: Array[Button] = [%CycleButton, %InsightButton, %BreathingButton, %PillButton]
@@ -28,7 +30,7 @@ const MODE_IDS := EnumCultivationMode.MODE_IDS
 @onready var _method_picker: LoadoutSelectionPopup = %MethodPicker
 
 var _mode_id := EnumCultivationMode.LABEL_CYCLE
-var _days := 0
+var _months := 0
 var _selected_pill_id := ""
 
 
@@ -58,7 +60,7 @@ func _refresh() -> void:
 	_pill_select_row.visible = EnumCultivationMode.is_pill_mode(_mode_id)
 	_refresh_pill_slot(preview)
 	if not bool(preview.get("ok", false)):
-		var method_preview: Dictionary = GameState.preview_cultivation_session(EnumCultivationMode.LABEL_CYCLE, _days)
+		var method_preview: Dictionary = GameState.preview_cultivation_session(EnumCultivationMode.LABEL_CYCLE, _cultivation_days())
 		if bool(method_preview.get("ok", false)):
 			_bind_method_preview(method_preview)
 		else:
@@ -71,6 +73,10 @@ func _refresh() -> void:
 			preview
 		)
 		_preview_label.text = str(preview.get("error", "当前无法修炼"))
+		_formula_label.text = ""
+		_formula_label.visible = false
+		_preview_meta_label.text = ""
+		_preview_meta_label.visible = false
 		_start_button.disabled = true
 		_start_button.text = "暂不可闭关"
 		_update_button_states()
@@ -78,48 +84,58 @@ func _refresh() -> void:
 	var mode := preview.get("mode", {}) as Dictionary
 	_bind_method_preview(preview)
 	_mode_description.text = _format_mode_description(mode, preview)
-	var preview_text := (
-		"闭关 %s\n预计修为 +%d\n%s → %s"
-	) % [
-		str(preview.get("duration_label", GameState.time_duration_label(_days))),
+	var formula_text := _format_cultivation_formula(preview)
+	_preview_label.text = "闭关 %s\n预计修为 +%d" % [
+		str(preview.get("duration_label", GameState.time_duration_label(_cultivation_days()))),
 		int(preview.get("estimated_cultivation", 0)),
+	]
+	var meta_text := "%s → %s" % [
 		str(preview.get("start_date_label", "")),
 		str(preview.get("end_date_label", "")),
 	]
 	if int(preview.get("instability_gain", 0)) > 0:
 		var pill_id := str(preview.get("pill_id", ""))
 		var pill_name := ConfigManager.get_item_display_name(pill_id)
-		preview_text += "\n消耗%s x%d · 境界虚浮 +%d" % [
+		meta_text += "\n消耗%s x%d · 灵力驳杂 +%d" % [
 			pill_name,
-			_days,
+			_months,
 			int(preview.get("instability_gain", 0)),
 		]
-	preview_text += "\n\n世界时间将在闭关期间正常流逝。"
-	_preview_label.text = preview_text
+	meta_text += "\n\n世界时间将在闭关期间正常流逝。"
+	_formula_label.text = formula_text
+	_formula_label.visible = formula_text != ""
+	_preview_meta_label.text = meta_text
+	_preview_meta_label.visible = true
 	_start_button.disabled = false
-	_start_button.text = "开始闭关（%s）" % str(preview.get("duration_label", GameState.time_duration_label(_days)))
+	_start_button.text = "开始闭关（%s）" % str(preview.get("duration_label", GameState.time_duration_label(_cultivation_days())))
 	_result_label.text = ""
 	_update_button_states()
 
 
 func _sync_day_slider() -> void:
-	var max_days := maxi(1, GameState.max_cultivation_days(_mode_id, _selected_pill_id))
-	_day_slider.max_value = float(max_days)
-	if _days <= 0:
-		_days = max_days
-	_days = clampi(_days, 1, max_days)
-	if int(round(_day_slider.value)) != _days:
-		_day_slider.set_value_no_signal(float(_days))
-	_day_max_button.disabled = max_days <= 1
-	_day_count_label.text = "闭关 %s" % GameState.time_duration_label(_days)
+	var min_months := GameState.min_cultivation_months()
+	var max_months := maxi(min_months, GameState.max_cultivation_months(_mode_id, _selected_pill_id))
+	_day_slider.min_value = float(min_months)
+	_day_slider.max_value = float(max_months)
+	if _months < min_months:
+		_months = max_months
+	_months = clampi(_months, min_months, max_months)
+	if int(round(_day_slider.value)) != _months:
+		_day_slider.set_value_no_signal(float(_months))
+	_day_max_button.disabled = max_months <= min_months
+	_day_count_label.text = "闭关 %s" % GameState.time_duration_label(_cultivation_days())
+
+
+func _cultivation_days() -> int:
+	return _months * GameTimeService.days_per_month()
 
 
 func _on_day_slider_changed(value: float) -> void:
-	var new_days := int(round(value))
-	if new_days == _days:
+	var new_months := int(round(value))
+	if new_months == _months:
 		return
-	_days = new_days
-	_day_count_label.text = "闭关 %s" % GameState.time_duration_label(_days)
+	_months = new_months
+	_day_count_label.text = "闭关 %s" % GameState.time_duration_label(_cultivation_days())
 	_refresh()
 
 
@@ -137,8 +153,8 @@ func _bind_method_preview(preview: Dictionary) -> void:
 
 func _build_preview() -> Dictionary:
 	if EnumCultivationMode.is_pill_mode(_mode_id):
-		return GameState.preview_cultivation_session(_mode_id, _days, _selected_pill_id)
-	return GameState.preview_cultivation_session(_mode_id, _days)
+		return GameState.preview_cultivation_session(_mode_id, _cultivation_days(), _selected_pill_id)
+	return GameState.preview_cultivation_session(_mode_id, _cultivation_days())
 
 
 func _format_mode_description(mode: Dictionary, preview: Dictionary) -> String:
@@ -146,10 +162,10 @@ func _format_mode_description(mode: Dictionary, preview: Dictionary) -> String:
 		return str(mode.get("description", ""))
 	var pill_id := str(preview.get("pill_id", ""))
 	if pill_id == "":
-		return "点击选择修炼丹药后打坐炼化，修为增长极快，但会积累境界虚浮。"
+		return "点击选择修炼丹药后打坐炼化，修为增长极快，但会使灵力驳杂。"
 	var multiplier: float = GameState.cultivation_pill_multiplier(pill_id)
 	var pill_name := ConfigManager.get_item_display_name(pill_id)
-	return "炼化【%s】，修为增长约为普通周天的 %.0f 倍，但会积累境界虚浮。" % [
+	return "炼化【%s】，修为增长约为普通周天的 %.0f 倍，但会使灵力驳杂。" % [
 		pill_name,
 		multiplier,
 	]
@@ -173,6 +189,34 @@ func _refresh_pill_slot(preview: Dictionary) -> void:
 	_pill_hint.text = "点击更换修炼丹药"
 
 
+func _format_cultivation_formula(preview: Dictionary) -> String:
+	var formula := preview.get("cultivation_formula", {}) as Dictionary
+	if formula.is_empty():
+		return ""
+	var speed_part := int(formula.get("speed_part", 0))
+	var method_gain := int(formula.get("method_base_gain", 0))
+	var monthly := int(formula.get("monthly_total", speed_part + method_gain))
+	var months := int(formula.get("months", 1))
+	var monthly_gains := formula.get("monthly_gains", []) as Array
+	var injury_mult := float(formula.get("injury_multiplier", 1.0))
+	if injury_mult < 1.0:
+		return "每月 %d + 功法 %d = %d（受伤 ×%.1f）" % [
+			speed_part, method_gain, monthly, injury_mult,
+		]
+	if months > 1:
+		var uniform := true
+		for gain_v in monthly_gains:
+			if int(gain_v) != monthly:
+				uniform = false
+				break
+		if uniform:
+			return "每月 %d + 功法 %d = %d × %d月" % [
+				speed_part, method_gain, monthly, months,
+			]
+		return "合计 +%d（各月受伤状态不同）" % int(preview.get("estimated_cultivation", 0))
+	return "每月 %d + 功法 %d = %d" % [speed_part, method_gain, monthly]
+
+
 func _format_knowledge_routes(rows: Array) -> String:
 	var lines: PackedStringArray = ["本功法可领悟"]
 	for row_v in rows:
@@ -183,10 +227,7 @@ func _format_knowledge_routes(rows: Array) -> String:
 			continue
 		var skill_id := str(row.get("skillId", ""))
 		var skill := DaoTreeServiceScript.skill_by_id(skill_id)
-		lines.append("· %s  上限 %s 级" % [
-			str(skill.get("name", skill_id)),
-			str(row.get("capLevel", 5)),
-		])
+		lines.append("· %s" % str(skill.get("name", skill_id)))
 	if lines.size() == 1:
 		lines.append("· 当前功法没有可通过修炼增长的知识")
 	return "\n".join(lines)
@@ -238,7 +279,7 @@ func _on_start_pressed() -> void:
 	var mode := preview.get("mode", {}) as Dictionary
 	var session := {
 		"mode_id": _mode_id,
-		"days": _days,
+		"days": _cultivation_days(),
 		"method_name": str(preview.get("method_name", "主功法")),
 		"mode_name": str(mode.get("name", "运转周天")),
 		"start_day": int(preview.get("start_day", GameState.day)),

@@ -11,6 +11,7 @@ const KnowledgeEffectServiceScript := preload("res://scripts/dao/knowledge_effec
 const BreakthroughServiceScript := preload("res://scripts/sim/breakthrough_service.gd")
 const AlchemyServiceScript := preload("res://scripts/sim/alchemy_service.gd")
 const PlayerAutoBattleServiceScript := preload("res://scripts/sim/player_auto_battle_service.gd")
+const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
 const EnemyAiPolicyPlayerAutoScript := preload("res://scripts/fight/ai/enemy_ai_policy_player_auto.gd")
 const EnemyAiContextScript := preload("res://scripts/fight/ai/enemy_ai_context.gd")
 var _failures: Array[String] = []
@@ -87,10 +88,10 @@ func _save_service() -> Node:
 func _test_new_game_and_daily_activities() -> void:
 	var state := _state()
 	_expect_eq(state.day, 1, "new game day")
-	_expect_eq(state.cultivate(), 140, "healthy cultivate gain")
-	_expect_eq(state.day, 8, "cultivate advances by rule duration")
+	_expect_eq(state.cultivate(), 80, "healthy cultivate gain")
+	_expect_eq(state.day, 1 + GameTimeServiceScript.days_per_month(), "cultivate advances one month")
 	state.injury_days = 3
-	_expect_eq(state.cultivate(), 110, "injured cultivate gain")
+	_expect_eq(state.cultivate(), 40, "injured cultivate gain")
 	_expect_eq(state.injury_days, 0, "cultivation duration clears injury")
 	state.hp = 1.0
 	state.rest()
@@ -129,10 +130,11 @@ func _grant_foundation_knowledge_gate(state: Node) -> void:
 
 func _test_main_method_replacement_and_passive_practice() -> void:
 	var state := _state()
-	var replacement_id := "method.basic_breathing.1"
+	var replacement_id := "method.changsheng.1"
 	state.unlocked_methods.append(replacement_id)
 	var equip_result: Dictionary = state.equip_method("main", replacement_id)
 	_expect_true(bool(equip_result.get("ok", false)), "replace main cultivation method")
+	_expect_true(bool(state.set_current_cultivation_method(replacement_id).get("ok", false)), "select current cultivation method")
 	_expect_eq(
 		str(state.cultivation_method_slots.get("main", "")),
 		replacement_id,
@@ -213,7 +215,7 @@ func _test_knowledge_effects_feed_attrs() -> void:
 
 func _test_cultivation_methods() -> void:
 	var state := _state()
-	_expect_eq(state.cultivate(), 140, "starter main method enables cultivation")
+	_expect_eq(state.cultivate(), 80, "starter main method enables cultivation")
 	var before_mp := FightAttr.get_attr(state.attrs, FightAttr.MP_MAX)
 	state.cultivate()
 	_expect_gt(
@@ -223,13 +225,23 @@ func _test_cultivation_methods() -> void:
 	)
 	_expect_gt(FightAttr.get_attr(state.attrs, FightAttr.MP_MAX), 0.0, "method modifiers apply")
 	_expect_gt(before_mp, 0.0, "starter attrs initialized")
+	var sword_mods := CultivationMethodServiceScript.build_modifiers(
+		{"main": "method.taixu_sword.1"},
+		state.to_dict()
+	)
+	_expect_gt(
+		float((sword_mods.get("percent", {}) as Dictionary).get(FightAttr.DAMAGE_BONUS, 0.0)),
+		0.0,
+		"combat method damage effects apply"
+	)
 
 
 func _test_cultivation_sessions() -> void:
 	var state := _state()
-	var balanced_preview: Dictionary = state.preview_cultivation_session("cycle", 3)
-	var breathing_preview: Dictionary = state.preview_cultivation_session("breathing", 3)
-	var insight_preview: Dictionary = state.preview_cultivation_session("insight", 3)
+	var three_months := GameTimeServiceScript.days_per_month() * 3
+	var balanced_preview: Dictionary = state.preview_cultivation_session("cycle", three_months)
+	var breathing_preview: Dictionary = state.preview_cultivation_session("breathing", three_months)
+	var insight_preview: Dictionary = state.preview_cultivation_session("insight", three_months)
 	_expect_true(bool(balanced_preview.get("ok", false)), "balanced cultivation preview")
 	_expect_gt(
 		int(breathing_preview.get("estimated_cultivation", 0)),
@@ -241,10 +253,10 @@ func _test_cultivation_sessions() -> void:
 		int(insight_preview.get("estimated_cultivation", 0)),
 		"insight estimates less cultivation"
 	)
-	var result: Dictionary = state.cultivate_session("insight", 3)
+	var result: Dictionary = state.cultivate_session("insight", three_months)
 	_expect_true(bool(result.get("ok", false)), "insight session succeeds")
-	_expect_eq(state.day, 4, "three day session advances three days")
-	_expect_eq(int(result.get("cultivation_gained", 0)), 36, "insight session cultivation")
+	_expect_eq(state.day, 1 + three_months, "three month session advances calendar days")
+	_expect_eq(int(result.get("cultivation_gained", 0)), 201, "insight session cultivation")
 	_expect_gt(float(result.get("mastery_gained", 0.0)), 0.06, "insight gains extra mastery")
 	_expect_true(not (result.get("knowledge_gains", []) as Array).is_empty(), "session reports knowledge gains")
 
@@ -252,36 +264,39 @@ func _test_cultivation_sessions() -> void:
 func _test_pill_cultivation_preview() -> void:
 	var state := _state()
 	state.inventory.erase("items_JuQiDan")
-	var missing: Dictionary = state.preview_cultivation_session("pill", 1)
+	var one_month := GameTimeServiceScript.days_per_month()
+	var missing: Dictionary = state.preview_cultivation_session("pill", one_month)
 	_expect_true(not bool(missing.get("ok", true)), "pill preview blocked without cultivation pill")
 	_expect_true(
 		str(missing.get("error", "")).contains("丹药"),
 		"pill preview explains missing cultivation pill"
 	)
 	state.inventory["items_JuQiDan"] = 3
-	var selected: Dictionary = state.preview_cultivation_session("pill", 3, "items_JuQiDan")
+	var three_months := one_month * 3
+	var selected: Dictionary = state.preview_cultivation_session("pill", three_months, "items_JuQiDan")
 	_expect_true(bool(selected.get("ok", false)), "pill preview accepts selected pill")
 	_expect_eq(str(selected.get("pill_id", "")), "items_JuQiDan", "pill preview preserves selected pill")
-	_expect_eq((selected.get("pill_ids", []) as Array).size(), 3, "pill preview plans one pill per day")
+	_expect_eq((selected.get("pill_ids", []) as Array).size(), 3, "pill preview plans one pill per month")
 
 
 func _test_pill_cultivation_and_instability() -> void:
 	var state := _state()
-	var normal: Dictionary = state.preview_cultivation_session("cycle", 1)
-	var pill: Dictionary = state.preview_cultivation_session("pill", 1)
+	var one_month := GameTimeServiceScript.days_per_month()
+	var normal: Dictionary = state.preview_cultivation_session("cycle", one_month)
+	var pill: Dictionary = state.preview_cultivation_session("pill", one_month)
 	_expect_true(bool(pill.get("ok", false)), "starter pill enables pill cultivation")
 	_expect_gt(
 		int(pill.get("estimated_cultivation", 0)),
-		int(normal.get("estimated_cultivation", 0)) * 8,
-		"pill cultivation is roughly an order faster"
+		int(normal.get("estimated_cultivation", 0)) * 4,
+		"pill cultivation is significantly faster"
 	)
 	var pills_before := int(state.inventory.get("items_JuQiDan", 0))
-	var result: Dictionary = state.cultivate_session("pill", 1)
+	var result: Dictionary = state.cultivate_session("pill", one_month)
 	_expect_eq(int(state.inventory.get("items_JuQiDan", 0)), pills_before - 1, "pill cultivation consumes pill")
 	_expect_eq(int(result.get("instability_gained", 0)), 12, "pill cultivation adds instability")
 	var settlement := {
 		"settlement_id": "test-pill-instability",
-		"elapsed_days": 1,
+		"elapsed_days": one_month,
 		"start_day": state.day,
 		"exit_reason": "manual",
 		"hp": state.hp,
@@ -300,37 +315,35 @@ func _test_pill_cultivation_and_instability() -> void:
 func _test_learning_books() -> void:
 	var state := _state()
 	_expect_true(state.unlocked_abilities.has("ability.combat.qi_bolt"), "starter ability unlocked")
+	_expect_true(state.unlocked_abilities.has("ability.combat.wind_step"), "starter wind step unlocked")
+	_expect_true(state.unlocked_abilities.has("ability.combat.sword_qi"), "starter sword qi unlocked")
 	_expect_true(
 		(state.equipped_abilities as Array).has("ability.combat.qi_bolt"),
 		"starter ability equipped"
 	)
-	state.inventory["book_skill_qi_bolt"] = 1
-	var duplicate: Dictionary = state.use_learning_book("book_skill_qi_bolt")
-	_expect_true(not bool(duplicate.get("ok", false)), "duplicate skill book rejected")
-	_expect_eq(int(state.inventory.get("book_skill_qi_bolt", 0)), 1, "duplicate skill book not consumed")
-	state.grant_knowledge("spell.escape", 1)
-	state.grant_knowledge("cultivation.cycle", 1)
-	state.inventory["book_skill_wind_step"] = 1
-	var skill: Dictionary = state.use_learning_book("book_skill_wind_step")
-	_expect_true(bool(skill.get("ok", false)), "skill book learns wind step")
-	_expect_true(state.unlocked_abilities.has("ability.combat.wind_step"), "wind step unlocked")
-	_expect_eq(int(state.inventory.get("book_skill_wind_step", 0)), 0, "skill book consumed")
+	_expect_true(
+		(state.equipped_abilities as Array).has("ability.combat.wind_step"),
+		"starter wind step equipped"
+	)
+	_expect_true(
+		(state.equipped_abilities as Array).has("ability.combat.sword_qi"),
+		"starter sword qi equipped"
+	)
+	for book_id in ["book_skill_qi_bolt", "book_skill_wind_step", "book_skill_sword_qi"]:
+		state.inventory[book_id] = 1
+		var duplicate: Dictionary = state.use_learning_book(book_id)
+		_expect_true(not bool(duplicate.get("ok", false)), "duplicate skill book rejected: %s" % book_id)
+		_expect_eq(int(state.inventory.get(book_id, 0)), 1, "duplicate skill book not consumed: %s" % book_id)
 	state.grant_knowledge("body.tempering", 1)
 	state.inventory["book_method_iron_body"] = 1
 	var method: Dictionary = state.use_learning_book("book_method_iron_body")
-	_expect_true(bool(method.get("ok", false)), "method book learns iron skin")
-	_expect_true(state.unlocked_methods.has("method.iron_skin.1"), "iron skin unlocked")
-	state.grant_knowledge("sword.qi", 1)
-	state.grant_knowledge("sword.weapon", 2)
-	state.inventory["book_skill_sword_qi"] = 1
-	var generated_skill: Dictionary = state.use_learning_book("book_skill_sword_qi")
-	_expect_true(bool(generated_skill.get("ok", false)), "generated skill book learns sword qi")
-	_expect_true(state.unlocked_abilities.has("ability.combat.sword_qi"), "generated skill unlocked")
+	_expect_true(bool(method.get("ok", false)), "method book learns vajra")
+	_expect_true(state.unlocked_methods.has("method.vajra.1"), "vajra unlocked")
 	state.grant_knowledge("foundation.breathing", 1)
-	state.inventory["book_method_basic_breathing_1"] = 1
-	var generated_method: Dictionary = state.use_learning_book("book_method_basic_breathing_1")
-	_expect_true(bool(generated_method.get("ok", false)), "generated method book learns breathing method")
-	_expect_true(state.unlocked_methods.has("method.basic_breathing.1"), "generated method unlocked")
+	state.inventory["book_method_changsheng_1"] = 1
+	var generated_method: Dictionary = state.use_learning_book("book_method_changsheng_1")
+	_expect_true(bool(generated_method.get("ok", false)), "generated method book learns changsheng method")
+	_expect_true(state.unlocked_methods.has("method.changsheng.1"), "generated method unlocked")
 
 
 func _test_player_auto_battle_rules() -> void:

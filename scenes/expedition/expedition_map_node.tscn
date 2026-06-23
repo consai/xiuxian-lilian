@@ -69,5 +69,6 @@ text = "采集
 安全"
 script = ExtResource("1_script")
 
-[node name="PressScaleFeedback" type="Node" parent="ExpeditionMapNode"]
+[node name="PressScaleFeedback" type="Node" parent="."]
 script = ExtResource("3_auto")
+target_path = NodePath("..")

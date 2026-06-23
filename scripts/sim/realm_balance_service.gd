@@ -107,6 +107,20 @@ static func benchmark_enemy_attrs(enemy_id: String) -> Dictionary:
 	return (attrs_v as Dictionary).duplicate(true) if attrs_v is Dictionary else {}
 
 
+static func base_monthly_cultivation_gain(realm_row: Dictionary) -> int:
+	var progression := bundle().get("cultivation_progression", {}) as Dictionary
+	var table := progression.get("base_monthly_gain_by_realm", {}) as Dictionary
+	var major_id := str(realm_row.get("major_realm", "")).strip_edges()
+	if major_id == "":
+		major_id = str(realm_row.get("id", "")).split("_", false, 1)[0]
+	var major_table_v: Variant = table.get(major_id, {})
+	if not major_table_v is Dictionary:
+		return 20
+	var phase := _realm_phase(realm_row)
+	var major_table := major_table_v as Dictionary
+	return maxi(1, int(major_table.get(phase, major_table.get("single", 20))))
+
+
 static func acceptance() -> Dictionary:
 	var row_v: Variant = bundle().get("acceptance", {})
 	return (row_v as Dictionary).duplicate(true) if row_v is Dictionary else {}
@@ -193,3 +207,22 @@ static func _realm_flat_per_layer() -> Dictionary:
 	if table_v is Dictionary and not (table_v as Dictionary).is_empty():
 		return table_v as Dictionary
 	return DEFAULT_REALM_FLAT_PER_LAYER.duplicate(true)
+
+
+static func _realm_phase(realm_row: Dictionary) -> String:
+	var id := str(realm_row.get("id", "")).strip_edges()
+	if id.ends_with("_early"):
+		return "early"
+	if id.ends_with("_mid"):
+		return "mid"
+	if id.ends_with("_late"):
+		return "late"
+	var parts := id.split("_", false)
+	if parts.size() >= 2 and parts[1].is_valid_int():
+		var layer := int(parts[1])
+		if layer <= 3:
+			return "early"
+		if layer <= 6:
+			return "mid"
+		return "late"
+	return "single"

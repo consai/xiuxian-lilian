@@ -1,7 +1,7 @@
 schema_version: 1
 activities:
   cultivate:
-    days: 1
+    days: 30
     cultivation_gain: 20
   rest:
     days: 1
@@ -150,9 +150,12 @@ initial_player:
       wood: 35
   abilities:
     - "ability.combat.qi_bolt"
+    - "ability.combat.wind_step"
+    - "ability.combat.sword_qi"
   equipped_abilities:
-    - ""
     - "ability.combat.qi_bolt"
+    - "ability.combat.wind_step"
+    - "ability.combat.sword_qi"
     - ""
     - ""
     - ""

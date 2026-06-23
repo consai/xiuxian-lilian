@@ -65,7 +65,7 @@ nodes:
     commands:
       - type: "guide_focus"
         target: "ConfirmButton"
-        reason: "丹药修炼会增加境界虚浮；历练战斗可以压实根基。确认结果"
+        reason: "丹药修炼会使灵力驳杂；历练战斗可以压实修为。确认结果"
       - type: "await_game_event"
         event: "tutorial.cultivation_completed"
     next: "open_map"

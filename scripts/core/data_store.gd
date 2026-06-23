@@ -64,6 +64,8 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 		"support_2": str(method_slots.get("support_2", "")),
 		"movement": str(method_slots.get("movement", "")),
 	}
+	var current_method := str(out.get("current_cultivation_method_id", "")).strip_edges()
+	out["current_cultivation_method_id"] = current_method if current_method != "" else main_method
 	out = _coalesce_dao_savedata(out)
 	var rules_v: Variant = out.get("auto_battle_rules", {})
 	out["auto_battle_rules"] = (rules_v as Dictionary).duplicate(true) if rules_v is Dictionary else {}
@@ -312,9 +314,20 @@ func _default_savedata() -> Dictionary:
 		"mp": 1000.0,
 		"knowledge": {},
 		"method_mastery": {},
-		"unlocked_abilities": ["ability.combat.qi_bolt"],
-		"equipped_abilities": ["", "ability.combat.qi_bolt", "", "", ""],
+		"unlocked_abilities": [
+			"ability.combat.qi_bolt",
+			"ability.combat.wind_step",
+			"ability.combat.sword_qi",
+		],
+		"equipped_abilities": [
+			"ability.combat.qi_bolt",
+			"ability.combat.wind_step",
+			"ability.combat.sword_qi",
+			"",
+			"",
+		],
 		"unlocked_methods": ["method.hunyuan.1"],
+		"current_cultivation_method_id": "method.hunyuan.1",
 		"cultivation_method_slots": {
 			"main": "method.hunyuan.1", "support_1": "", "support_2": "", "movement": ""
 		},
@@ -349,7 +362,7 @@ func _default_savedata() -> Dictionary:
 			"history": [],
 			"active_snapshot": {},
 		},
-		"tutorial": _default_tutorial_savedata(),
+		"tutorial": _completed_tutorial_savedata(),
 	}
 
 
@@ -478,9 +491,19 @@ func _coalesce_dao_savedata(out: Dictionary) -> Dictionary:
 			if method_id != "" and not methods.has(method_id):
 				methods.append(method_id)
 		out["unlocked_methods"] = methods
+	if (out.get("unlocked_methods", []) as Array).is_empty():
+		out["unlocked_methods"] = ["method.hunyuan.1"]
+	var current_method := str(out.get("current_cultivation_method_id", "")).strip_edges()
+	if current_method == "":
+		current_method = str((out.get("unlocked_methods", []) as Array)[0])
+	out["current_cultivation_method_id"] = current_method
 	var unlocked_abilities_v: Variant = out.get("unlocked_abilities")
 	if not unlocked_abilities_v is Array or (unlocked_abilities_v as Array).is_empty():
-		out["unlocked_abilities"] = ["ability.combat.qi_bolt"]
+		out["unlocked_abilities"] = [
+			"ability.combat.qi_bolt",
+			"ability.combat.wind_step",
+			"ability.combat.sword_qi",
+		]
 	var equipped_abilities_v: Variant = out.get("equipped_abilities")
 	if not equipped_abilities_v is Array or (equipped_abilities_v as Array).is_empty():
 		out["equipped_abilities"] = _normalize_ability_slots(equipped_abilities_v)

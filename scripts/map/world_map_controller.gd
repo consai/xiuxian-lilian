@@ -72,7 +72,6 @@ func select_wilderness(region_id: String) -> void:
 	if region.is_empty():
 		return
 	var can_enter := WorldMapServiceScript.can_enter_wilderness(region_id, map_data)
-	var bounds := WorldMapServiceScript.region_difficulty_bounds(region)
 	DataStore.map_runtime()["selected_region_id"] = region_id
 	_update_selection_for_region(region, map_data)
 	if _wilderness_popup.has_method("show_region"):
@@ -82,8 +81,7 @@ func select_wilderness(region_id: String) -> void:
 			region,
 			WorldMapServiceScript.region_exploration(map_data, region_id),
 			bool(can_enter.get("ok", false)),
-			str(can_enter.get("error", "")),
-			bounds
+			str(can_enter.get("error", ""))
 		)
 func select_wilderness_location(location_id: String) -> void:
 	var map_data := GameState.map_data()
@@ -146,17 +144,8 @@ func enter_wilderness(region_id: String, options: Dictionary = {}) -> void:
 	if not bool(can_enter.get("ok", false)):
 		return
 	var location_id := str(can_enter.get("location_id", ""))
-	var clamped := WorldMapServiceScript.clamp_difficulty_options(
-		location_id,
-		int(options.get("min_difficulty", 1)),
-		int(options.get("max_difficulty", 1))
-	)
-	if not bool(clamped.get("ok", false)):
+	if not _apply_difficulty_override(location_id, options):
 		return
-	DataStore.expedition_runtime()["difficulty_override"] = {
-		"min_difficulty": int(clamped.get("min_difficulty", 1)),
-		"max_difficulty": int(clamped.get("max_difficulty", 1)),
-	}
 	wilderness_entry_requested.emit(region_id)
 	var nav := SceneManager.start_expedition(location_id)
 	if not bool(nav.get("ok", false)):
@@ -169,21 +158,30 @@ func enter_wilderness_location(location_id: String, options: Dictionary = {}) ->
 	if not bool(can_enter.get("ok", false)):
 		return
 	var expedition_id := str(can_enter.get("location_id", ""))
-	var clamped := WorldMapServiceScript.clamp_difficulty_options(
-		expedition_id,
-		int(options.get("min_difficulty", 1)),
-		int(options.get("max_difficulty", 1))
-	)
-	if not bool(clamped.get("ok", false)):
+	if not _apply_difficulty_override(expedition_id, options):
 		return
-	DataStore.expedition_runtime()["difficulty_override"] = {
-		"min_difficulty": int(clamped.get("min_difficulty", 1)),
-		"max_difficulty": int(clamped.get("max_difficulty", 1)),
-	}
 	wilderness_entry_requested.emit(location_id)
 	var nav := SceneManager.start_expedition(expedition_id)
 	if not bool(nav.get("ok", false)):
 		DataStore.expedition_runtime().erase("difficulty_override")
+
+
+func _apply_difficulty_override(location_id: String, options: Dictionary) -> bool:
+	if not options.has("min_difficulty") and not options.has("max_difficulty"):
+		DataStore.expedition_runtime().erase("difficulty_override")
+		return true
+	var clamped := WorldMapServiceScript.clamp_difficulty_options(
+		location_id,
+		int(options.get("min_difficulty", 1)),
+		int(options.get("max_difficulty", 1))
+	)
+	if not bool(clamped.get("ok", false)):
+		return false
+	DataStore.expedition_runtime()["difficulty_override"] = {
+		"min_difficulty": int(clamped.get("min_difficulty", 1)),
+		"max_difficulty": int(clamped.get("max_difficulty", 1)),
+	}
+	return true
 
 
 func close_popups() -> void:

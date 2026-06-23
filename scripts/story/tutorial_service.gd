@@ -2,6 +2,7 @@ extends Node
 
 const STORY_ID := "prologue_tutorial"
 const MAIN_MENU_SCENE := "res://scenes/ui/main_menu.tscn"
+const TUTORIAL_ENABLED := false
 
 
 func _ready() -> void:
@@ -20,11 +21,16 @@ func game_event(event_id: String) -> void:
 
 
 func is_active() -> bool:
+	if not TUTORIAL_ENABLED:
+		return false
 	var tutorial := DataStore.savedata.get("tutorial", {}) as Dictionary
 	return not bool(tutorial.get("completed", false)) and not bool(tutorial.get("skipped", false))
 
 
 func _ensure_started() -> void:
+	if not TUTORIAL_ENABLED:
+		_stop_active_tutorial()
+		return
 	if _is_main_menu_scene():
 		return
 	if is_active() and not StoryDirector.is_active():
@@ -34,6 +40,11 @@ func _ensure_started() -> void:
 func _is_main_menu_scene() -> bool:
 	var scene := get_tree().current_scene
 	return scene != null and scene.scene_file_path == MAIN_MENU_SCENE
+
+
+func _stop_active_tutorial() -> void:
+	if StoryDirector.has_method("get_active_story_id") and StoryDirector.get_active_story_id() == STORY_ID:
+		StoryDirector.skip_active()
 
 
 func _on_scene_changed() -> void:

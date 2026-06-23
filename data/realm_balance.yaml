@@ -61,6 +61,48 @@ player_level_curve:
   content_level_formula:
     realm_flat_index: "level - 1"
     combat_attrs: "CharacterStats.build_combat_attrs(foundations, CharacterStats.realm_flat_modifiers(level - 1))"
+cultivation_progression:
+  base_monthly_gain_formula: "round(20 * major_realm.content_coefficient * layer_multiplier)"
+  layer_multiplier:
+    early: 1
+    mid: 1.15
+    late: 1.3
+    single: 1
+  base_monthly_gain_by_realm:
+    qi:
+      early: 30
+      mid: 40
+      late: 50
+    foundation:
+      early: 100
+      mid: 120
+      late: 140
+    core:
+      early: 300
+      mid: 360
+      late: 420
+    nascent:
+      early: 800
+      mid: 960
+      late: 1120
+    transform:
+      early: 2000
+      mid: 2400
+      late: 2800
+    void:
+      early: 5000
+      mid: 6000
+      late: 7000
+    merge:
+      early: 12000
+      mid: 14400
+      late: 16800
+    great:
+      early: 30000
+      mid: 36000
+      late: 42000
+    tribulation:
+      single: 80000
 monster_design_baseline:
   source: "player_level_curve"
   standard_player: "按目标等级生成标准玩家面板，再乘遭遇强度带与怪物模板修正"

@@ -53,8 +53,10 @@ func _test_self_study() -> void:
 	var result := KnowledgeStudyServiceScript.apply_study(savedata, "foundation.breathing", 30, "qi")
 	if float(result.get("xp", 0.0)) <= 0.0:
 		push_error("self study should apply knowledge xp")
-	if KnowledgeServiceScript.effective_level(savedata, "foundation.breathing") > 3.0:
-		push_error("self study should not exceed default max level III")
+	KnowledgeServiceScript.grant_level(savedata, "foundation.breathing", 3)
+	result = KnowledgeStudyServiceScript.apply_study(savedata, "foundation.breathing", 1000, "qi")
+	if KnowledgeServiceScript.effective_level(savedata, "foundation.breathing") <= 3.0:
+		push_error("self study should not be capped at default max level III")
 	var slow := {
 		"knowledge": {},
 		"foundations": {"body": 10, "spirit": 10, "sense": 10, "agility": 10},
@@ -99,8 +101,8 @@ func _test_method_slot_weights() -> void:
 	var savedata := {"knowledge": {}, "method_mastery": {}}
 	var result := CultivationMethodServiceScript.build_modifiers({
 		"main": "method.hunyuan.1",
-		"support_1": "method.basic_breathing.1",
-		"support_2": "method.small_cycle.1",
+		"support_1": "method.hunyuan.1",
+		"support_2": "method.vajra.1",
 		"movement": "method.hunyuan.1",
 	}, savedata)
 	var weights: Dictionary = {}

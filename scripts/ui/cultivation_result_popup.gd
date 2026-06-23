@@ -89,7 +89,7 @@ static func _format_summary(result: Dictionary) -> String:
 			str(result.get("realm_name", "")),
 		])
 	if int(result.get("instability_gained", 0)) > 0:
-		lines.append("境界虚浮 +%d    当前 %d（历练战斗可压实）" % [
+		lines.append("灵力驳杂 +%d    当前 %d（历练战斗可压实）" % [
 			int(result.get("instability_gained", 0)),
 			int(result.get("cultivation_instability", 0)),
 		])

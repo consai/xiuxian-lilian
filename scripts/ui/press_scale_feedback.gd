@@ -40,9 +40,12 @@ func _ready() -> void:
 		_center_pivot()
 	if _target is BaseButton:
 		_base_button = _target as BaseButton
-		_base_button.button_down.connect(_on_button_down)
-		_base_button.button_up.connect(_on_button_up)
-		_base_button.pressed.connect(_on_clicked)
+		# _base_button.button_down.connect(_on_button_down)
+		# _base_button.button_up.connect(_on_button_up)
+		# _base_button.pressed.connect(_on_clicked)
+		if take_mouse_if_ignored and _target.mouse_filter == Control.MOUSE_FILTER_IGNORE:
+			_target.mouse_filter = Control.MOUSE_FILTER_STOP
+		_target.gui_input.connect(_on_gui_input)
 	else:
 		if take_mouse_if_ignored and _target.mouse_filter == Control.MOUSE_FILTER_IGNORE:
 			_target.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -104,10 +107,10 @@ func _on_gui_input(event: InputEvent) -> void:
 			if _pressed_depth == 0:
 				_play_release()
 				clicked.emit()
-	# 鼠标离开区域, 清空按下深度
 
+# 鼠标离开区域, 清空按下深度
 func _on_mouse_exited() -> void:
-	cancel_press_feedback()
+	_on_button_up()
 
 func _on_clicked() -> void:
 	clicked.emit()

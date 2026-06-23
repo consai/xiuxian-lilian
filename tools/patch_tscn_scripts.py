@@ -130,9 +130,12 @@ def insert_script_line(body: str, ext_id: str) -> str:
 
 
 def make_press_child_block(parent_path: str, ext_id: str) -> str:
+    # Root scene nodes use parent="." so instanced/renamed roots still resolve.
+    tscn_parent = "." if "/" not in parent_path else parent_path
     return (
-        f'\n[node name="{PRESS_CHILD_NAME}" type="Node" parent="{parent_path}"]\n'
-        f'script = ExtResource("{ext_id}")\n\n'
+        f'\n[node name="{PRESS_CHILD_NAME}" type="Node" parent="{tscn_parent}"]\n'
+        f'script = ExtResource("{ext_id}")\n'
+        f'target_path = NodePath("..")\n\n'
     )
 
 

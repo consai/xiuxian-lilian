@@ -23,9 +23,7 @@ monsters:
       control_resist: 55
       crit: 5
       crit_damage: 150
-    skills:
-      - 1
-      - 0
+    skills: []
     drops:
       entries:
         - kind: "item"
@@ -206,9 +204,7 @@ monsters:
       control_resist: 60
       crit: 6
       crit_damage: 150
-    skills:
-      - 1
-      - 0
+    skills: []
     drops:
       entries:
         - kind: "item"

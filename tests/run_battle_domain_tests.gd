@@ -401,9 +401,17 @@ func _test_enemy_formation_compacts_rows_and_reserves() -> void:
 	})
 	(enemies[0] as FightObj).change_hp(-999.0)
 	_expect_eq(domain.check_end_after_resolve(), "", "battle should continue with reserves alive")
+	var partial := domain.get_formation_snapshot()
+	var partial_slots := partial.get("slots", []) as Array
+	_expect_true(bool((partial_slots[0] as Dictionary).get("empty", false)), "front slot stays empty until whole column clears")
+	_expect_eq(int((partial_slots[4] as Dictionary).get("enemy_index", -1)), 4, "second column waits while front column still has enemies")
+
+	for idx in [1, 2, 3]:
+		(enemies[idx] as FightObj).change_hp(-999.0)
+	_expect_eq(domain.check_end_after_resolve(), "", "battle should continue after front column dies")
 	var formation := domain.get_formation_snapshot()
 	var slots := formation.get("slots", []) as Array
-	_expect_eq(int((slots[0] as Dictionary).get("enemy_index", -1)), 4, "row 0 column 1 should move to front")
+	_expect_eq(int((slots[0] as Dictionary).get("enemy_index", -1)), 4, "row 0 column 1 should move to front after column wave")
 	_expect_eq(int((slots[4] as Dictionary).get("enemy_index", -1)), 8, "row 0 column 2 should move to column 1")
 	_expect_eq(int((slots[8] as Dictionary).get("enemy_index", -1)), 12, "reserve should fill row 0 back slot")
 	_expect_true(domain.enemy == enemies[4], "legacy enemy pointer should follow new front target")

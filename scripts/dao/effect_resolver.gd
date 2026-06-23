@@ -25,6 +25,8 @@ const EFFECT_TO_FIGHT := {
 	"mana_regen": {FightAttrScript.MP_REGEN: true},
 	"max_mana": {FightAttrScript.MP_MAX: true},
 	"max_hp": {FightAttrScript.HP_MAX: true},
+	"max_health": {FightAttrScript.HP_MAX: true},
+	"health_regen": {FightAttrScript.HP_REGEN: true},
 	"physical_attack": {FightAttrScript.PHYSICAL_ATK: true},
 	"magic_attack": {FightAttrScript.MAGIC_ATK: true},
 	"physical_defense": {FightAttrScript.PHYSICAL_DEF: true},
@@ -32,6 +34,19 @@ const EFFECT_TO_FIGHT := {
 	"evasion": {FightAttrScript.EVASION: true},
 	"accuracy": {FightAttrScript.ACCURACY: true},
 	"damage_bonus": {FightAttrScript.DAMAGE_BONUS: true},
+	"sword_damage": {FightAttrScript.DAMAGE_BONUS: true},
+	"spell_damage": {FightAttrScript.DAMAGE_BONUS: true},
+	"thunder_damage": {FightAttrScript.DAMAGE_BONUS: true},
+	"melee_damage": {FightAttrScript.DAMAGE_BONUS: true},
+	"spirit_power": {FightAttrScript.DAMAGE_BONUS: true},
+	"poison_power": {FightAttrScript.DAMAGE_BONUS: true},
+	"curse_power": {FightAttrScript.DAMAGE_BONUS: true},
+	"tribulation_damage": {FightAttrScript.DAMAGE_BONUS: true},
+	"physical_resistance": {FightAttrScript.PHYSICAL_DEF: true},
+	"spiritual_resistance": {FightAttrScript.MAGIC_DEF: true},
+	"all_resistance": {FightAttrScript.PHYSICAL_DEF: true, FightAttrScript.MAGIC_DEF: true},
+	"mental_resistance": {FightAttrScript.MAGIC_DEF: true},
+	"evasion_window": {FightAttrScript.EVASION: true},
 }
 
 const COMBAT_MODIFIER_EFFECTS := {

@@ -132,13 +132,6 @@ static func _format_raw_ability_effect(effect: Dictionary, knowledge_mastery: fl
 	var target := _target_label(str(effect.get("target", attrs.get("target", ""))))
 	var value_text := _fmt_effect_value(value, operation)
 	var label := _effect_id_label(effect_id)
-	if growth != 0.0:
-		return "%s：%s %s（满知识成长 %s）" % [
-			target,
-			label,
-			value_text,
-			_fmt_effect_value(growth, operation),
-		]
 	return "%s：%s %s" % [target, label, value_text]
 
 
@@ -215,6 +208,15 @@ static func _effect_id_label(effect_id: String) -> String:
 		"heal_hp": "气血恢复",
 		"restore_mana": "法力恢复",
 		"mana_regen": "法力回复",
+		"activation_speed": "激活速度",
+		"cast_speed": "施法速度",
+		"cultivation_speed": "修炼速度",
+		"formation_setup_speed": "布阵速度",
+		"gather_speed": "采集速度",
+		"regeneration_speed": "再生速度",
+		"sword_attack_speed": "剑道攻速",
+		"talisman_activation_speed": "符箓激活速度",
+		"void_travel_speed": "虚空遁行速度",
 		"max_mana": "法力上限",
 		"max_hp": "气血上限",
 		"max_health": "气血上限",
@@ -365,6 +367,7 @@ static func _humanize_effect_id(effect_id: String) -> String:
 		"weakness": "弱点",
 		"world": "世界",
 		"yield": "产量",
+		"speed": "速度",
 	}
 	var out: PackedStringArray = []
 	for token in effect_id.split("_"):
@@ -395,6 +398,21 @@ static func _attr_label(key: String) -> String:
 		FightAttr.MAGIC_ATK: "法攻",
 		FightAttr.PHYSICAL_DEF: "物防",
 		FightAttr.MAGIC_DEF: "法防",
+		FightAttr.ACCURACY: "命中",
+		FightAttr.EVASION: "闪避",
+		FightAttr.SPD: "速度",
+		FightAttr.HP_MAX: "气血上限",
+		FightAttr.MP_MAX: "法力上限",
+		FightAttr.SHIELD: "护盾",
+		FightAttr.CRIT: "暴击",
+		FightAttr.CRIT_DAMAGE: "暴伤",
 		FightAttr.CONTROL_POWER: "控制",
+		FightAttr.CONTROL_RESIST: "控制抵抗",
+		FightAttr.HP_REGEN: "气血回复",
+		FightAttr.MP_REGEN: "法力回复",
+		FightAttr.CARRY: "携带",
+		FightAttr.DAMAGE_BONUS: "伤害加成",
+		FightAttr.DAMAGE_TAKEN: "承伤",
+		FightAttr.COMBAT_MP_RESTORE_2S: "战斗回蓝",
 	}
 	return str(labels.get(key, key))

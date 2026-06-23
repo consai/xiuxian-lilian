@@ -45,10 +45,10 @@ func _run_all() -> void:
 			"tutorial highlights recipe selection"
 		)
 	)
-	_run("new and legacy saves choose tutorial defaults", func() -> void:
+	_run("new and legacy saves keep tutorial completed by default", func() -> void:
 		var store := root.get_node("DataStore")
 		store.reset_savedata()
-		_expect_false(bool((store.savedata.get("tutorial", {}) as Dictionary).get("completed", true)), "new save tutorial pending")
+		_expect_true(bool((store.savedata.get("tutorial", {}) as Dictionary).get("completed", false)), "new save tutorial completed")
 		var legacy: Dictionary = store.export_savedata()
 		legacy.erase("tutorial")
 		var merged: Dictionary = store.coalesce_savedata(legacy)

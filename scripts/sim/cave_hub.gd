@@ -49,7 +49,7 @@ func _refresh(message: String = "") -> void:
 	_realm_label.text = "%s · 修为 %d/%d" % [
 		GameState.realm_name, GameState.cultivation, GameState.breakthrough_at
 	]
-	var status := "%s  |  灵石 %d  |  气血 %.0f/%.0f  |  法力 %.0f/%.0f  |  伤势 %s  |  境界虚浮 %d" % [
+	var status := "%s  |  灵石 %d  |  气血 %.0f/%.0f  |  法力 %.0f/%.0f  |  伤势 %s  |  灵力驳杂 %d" % [
 		GameState.time_date_label(GameState.day), GameState.ling_stones, GameState.hp, hp_max,
 		GameState.mp, mp_max, GameState.time_duration_label(GameState.injury_days), GameState.cultivation_instability
 	]

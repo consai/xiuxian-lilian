@@ -204,7 +204,6 @@ static func meets_knowledge_requirements(savedata: Dictionary, requirements: Arr
 static func list_growth_routes(savedata: Dictionary, skill_id: String) -> Array:
 	var sid := skill_id.strip_edges()
 	var out: Array = []
-	var effective := effective_level(savedata, sid)
 	for method_v in CultivationMethodServiceScript.all_methods():
 		var method := method_v as Dictionary
 		for row_v in CultivationMethodServiceScript.resolved_knowledge(str(method.get("id", ""))) as Array:
@@ -214,9 +213,6 @@ static func list_growth_routes(savedata: Dictionary, skill_id: String) -> Array:
 			if str(row.get("skillId", "")) != sid:
 				continue
 			if not bool(row.get("gainFromCultivation", true)):
-				continue
-			var cap_level := int(row.get("capLevel", 5))
-			if effective >= float(cap_level):
 				continue
 			var status := "available"
 			if not CultivationMethodServiceScript.can_learn(method, savedata):
@@ -228,7 +224,6 @@ static func list_growth_routes(savedata: Dictionary, skill_id: String) -> Array:
 				"status": status,
 				"method_id": str(method.get("id", "")),
 				"name": str(method.get("name", "")),
-				"cap_level": cap_level,
 			})
 	return out
 

@@ -4,8 +4,6 @@ extends RefCounted
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
 
-const DEFAULT_MAX_LEVEL := 3
-
 
 static func study_policy(skill: Dictionary) -> Dictionary:
 	var explicit_v: Variant = skill.get("independentStudy", {})
@@ -13,17 +11,9 @@ static func study_policy(skill: Dictionary) -> Dictionary:
 		var explicit := explicit_v as Dictionary
 		return {
 			"enabled": bool(explicit.get("enabled", true)),
-			"max_level": clampi(int(explicit.get("maxLevel", DEFAULT_MAX_LEVEL)), 0, 5),
 			"efficiency": maxf(0.0, float(explicit.get("efficiency", 1.0))),
 		}
-	var sid := str(skill.get("id", ""))
-	var domain := str(skill.get("domain", ""))
-	var max_level := DEFAULT_MAX_LEVEL
-	if domain == "heaven":
-		max_level = 1
-	elif sid.ends_with("_theory") or sid.ends_with(".dao_base") or sid.contains("dao_fruit"):
-		max_level = 2
-	return {"enabled": true, "max_level": max_level, "efficiency": 1.0}
+	return {"enabled": true, "efficiency": 1.0}
 
 
 static func can_study(
@@ -46,9 +36,6 @@ static func can_study(
 	if not DaoTreeServiceScript.prereqs_met(sid, KnowledgeServiceScript.effective_levels_map(savedata)):
 		return {"ok": false, "error": "前置知识不足"}
 	var effective := KnowledgeServiceScript.effective_level(savedata, sid)
-	var max_level := int(policy.get("max_level", DEFAULT_MAX_LEVEL))
-	if effective >= float(max_level):
-		return {"ok": false, "error": "自主学习最多提升至%s级" % _roman(max_level)}
 	if int(floor(effective)) >= int(skill.get("maxLevel", 5)):
 		return {"ok": false, "error": "该知识已圆满"}
 	return {"ok": true, "policy": policy}
@@ -75,10 +62,10 @@ static func preview(
 	var xp := maxf(1.0, speed * safe_days * float(policy.get("efficiency", 1.0)))
 	var before := KnowledgeServiceScript.get_entry(savedata, sid)
 	var projected := savedata.duplicate(true)
-	var applied := _apply_xp_capped(projected, sid, xp, int(policy.get("max_level", DEFAULT_MAX_LEVEL)))
+	var applied := KnowledgeServiceScript.apply_xp(projected, sid, xp, "self_study")
 	var after := KnowledgeServiceScript.get_entry(projected, sid)
 	var level := int(before.get("level", 0))
-	var next_level := mini(level + 1, int(policy.get("max_level", DEFAULT_MAX_LEVEL)))
+	var next_level := mini(level + 1, int(skill.get("maxLevel", 5)))
 	var req := DaoTreeServiceScript.required_xp_for_level(sid, next_level) if next_level > level else 0.0
 	var remaining_to_next := maxf(0.0, req - float(before.get("xp", 0.0)))
 	var estimated_days_to_next := 0
@@ -95,7 +82,6 @@ static func preview(
 		"level_after": int(after.get("level", 0)),
 		"progress_before": KnowledgeServiceScript.level_progress_percent(savedata, sid),
 		"progress_after": KnowledgeServiceScript.level_progress_percent(projected, sid),
-		"max_self_study_level": int(policy.get("max_level", DEFAULT_MAX_LEVEL)),
 		"training_speed": speed,
 		"rank": int(skill.get("rank", 1)),
 		"points_to_next": remaining_to_next,
@@ -107,13 +93,7 @@ static func apply_study(savedata: Dictionary, skill_id: String, days: int, playe
 	var result := preview(savedata, skill_id, days, player_major_realm)
 	if not bool(result.get("ok", false)):
 		return result
-	var policy := (can_study(savedata, skill_id, player_major_realm).get("policy", {}) as Dictionary)
-	var applied := _apply_xp_capped(
-		savedata,
-		skill_id,
-		float(result.get("xp", 0.0)),
-		int(policy.get("max_level", DEFAULT_MAX_LEVEL))
-	)
+	var applied := KnowledgeServiceScript.apply_xp(savedata, skill_id, float(result.get("xp", 0.0)), "self_study")
 	result["xp"] = float(applied.get("applied", 0.0))
 	result["levels_gained"] = int(applied.get("levels_gained", 0))
 	return result
@@ -137,7 +117,6 @@ static func studyable_skills(savedata: Dictionary, player_major_realm: String) -
 			"realm": str(skill.get("realm", "")),
 			"level": int(entry.get("level", 0)),
 			"progress": KnowledgeServiceScript.level_progress_percent(savedata, sid),
-			"max_self_study_level": int((gate.get("policy", {}) as Dictionary).get("max_level", DEFAULT_MAX_LEVEL)),
 		})
 	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		if str(a.get("domain", "")) == str(b.get("domain", "")):
@@ -145,49 +124,3 @@ static func studyable_skills(savedata: Dictionary, player_major_realm: String) -
 		return str(a.get("domain", "")) < str(b.get("domain", ""))
 	)
 	return rows
-
-
-static func _apply_xp_capped(savedata: Dictionary, skill_id: String, amount: float, cap_level: int) -> Dictionary:
-	var sid := skill_id.strip_edges()
-	var skill := DaoTreeServiceScript.skill_by_id(sid)
-	if skill.is_empty():
-		return {"applied": 0.0, "levels_gained": 0}
-	var entry := KnowledgeServiceScript.get_entry(savedata, sid)
-	var level := int(entry.get("level", 0))
-	var target_cap := mini(cap_level, int(skill.get("maxLevel", 5)))
-	if level >= target_cap:
-		return {"applied": 0.0, "levels_gained": 0}
-	var remaining := maxf(0.0, amount)
-	var levels_gained := 0
-	while remaining > 0.0 and level < target_cap:
-		var req := DaoTreeServiceScript.required_xp_for_level(sid, level + 1)
-		var have := float(entry.get("xp", 0.0))
-		var need := maxf(0.0, req - have)
-		if remaining < need:
-			entry["xp"] = have + remaining
-			remaining = 0.0
-			break
-		remaining -= need
-		level += 1
-		levels_gained += 1
-		entry["level"] = level
-		entry["xp"] = 0.0
-	entry["growth_source"] = "self_study" if level < target_cap else ""
-	KnowledgeServiceScript.set_entry(savedata, sid, entry)
-	return {"applied": amount - remaining, "levels_gained": levels_gained}
-
-
-static func _roman(level: int) -> String:
-	match level:
-		1:
-			return "I"
-		2:
-			return "II"
-		3:
-			return "III"
-		4:
-			return "IV"
-		5:
-			return "V"
-		_:
-			return "—"

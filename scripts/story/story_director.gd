@@ -57,6 +57,10 @@ func is_active() -> bool:
 	return _story_id != ""
 
 
+func get_active_story_id() -> String:
+	return _story_id
+
+
 func is_waiting_for(event_id: String) -> bool:
 	return _story_id != "" and _waiting_event == event_id
 

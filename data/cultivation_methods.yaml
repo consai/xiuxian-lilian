@@ -3,8 +3,8 @@ configId: "cultivation_methods"
 metadata:
   name: "功法体系"
   description: "开放学习、分层传承、旁门分支及知识加权反哺的功法体系"
-  familyCount: 23
-  methodCount: 91
+  familyCount: 15
+  methodCount: 83
   effectTypeCount: 175
 rules:
   knowledgeTreeConfigId: "dao_tree"
@@ -34,7 +34,7 @@ rules:
   blockedKnowledgeXpPolicy: "discard"
   knowledgeExperience:
     accumulationPolicy: "immediately_apply_to_level_progress"
-    stopAtConfiguredCap: true
+    stopAtConfiguredCap: false
     noOverflowStorage: true
     nonCultivatableSkillIds:
       - "foundation.meridians"
@@ -47,18 +47,16 @@ rules:
       - "heaven.omen"
     note: "这些知识只能通过学习、使用或后续生活技能系统增长。"
   knowledgeGainFormula: "practice_xp * knowledgeXpRatio * normalized(growthWeight)"
-  knowledgeMasteryFormula: "min(effective_skill_level / capLevel, 1)"
-  masteryWeightFormula: "masteryWeight * capLevel ^ 2"
-  weightedMasteryFormula: "sum(knowledge_mastery * normalized(masteryWeight * capLevel ^ 2))"
+  knowledgeMasteryFormula: "min(effective_skill_level / skill_max_level, 1)"
+  masteryWeightFormula: "masteryWeight"
+  weightedMasteryFormula: "sum(knowledge_mastery * normalized(masteryWeight))"
   effectFormula: "base_effect * (1 + masteryBonusMax * weighted_knowledge_mastery)"
   effectiveSkillLevelFormula: "level + current_level_xp / required_level_xp"
   layerInheritance:
     recursive: true
     knowledge:
       inheritedGrowthWeightMultiplierPerTierDistance: 0.35
-      inheritedCapBonusPerUpgrade: 1
-      maximumCapLevel: 5
-      mergePolicy: "same_skill_uses_highest_cap_and_nearest_growth_weight"
+      mergePolicy: "same_skill_uses_nearest_growth_weight"
     effects:
       inheritPreviousEffects: false
       mergePolicy: "current_method_only"
@@ -72,7 +70,7 @@ rules:
     specialPolicy: "quality_3_or_above_tier_2_plus_may_require_knowledge"
     maxKnowledgeRequirements: 2
     maxRequirementLevel: 2
-    note: "知识仍决定功法效果反哺和可修上限；学习下品与中品功法不被知识卡住。"
+    note: "知识仍决定功法效果反哺；学习下品与中品功法不被知识卡住。"
 effectDefinitions:
   activation: "active_method"
   defaultOperation: "add_percent"
@@ -206,54 +204,6 @@ families:
       - "method.jiuji.3"
       - "method.jiuji.4"
       - "method.jiuji.5"
-  - id: "method.basic_breathing"
-    name: "基础吐纳诀"
-    role: "单知识入门与快速补课"
-    quality: 1
-    methodIds:
-      - "method.basic_breathing.1"
-  - id: "method.small_cycle"
-    name: "小周天行气法"
-    role: "单知识入门与快速补课"
-    quality: 1
-    methodIds:
-      - "method.small_cycle.1"
-  - id: "method.iron_skin"
-    name: "铁衣功"
-    role: "单知识入门与快速补课"
-    quality: 1
-    methodIds:
-      - "method.iron_skin.1"
-  - id: "method.clear_mind"
-    name: "清心定念法"
-    role: "单知识入门与快速补课"
-    quality: 1
-    methodIds:
-      - "method.clear_mind.1"
-  - id: "method.sword_control"
-    name: "御剑诀"
-    role: "单知识入门与快速补课"
-    quality: 1
-    methodIds:
-      - "method.sword_control.1"
-  - id: "method.herb_manual"
-    name: "百草采炼录"
-    role: "单知识入门与快速补课"
-    quality: 1
-    methodIds:
-      - "method.herb_manual.1"
-  - id: "method.rune_manual"
-    name: "基础阵纹册"
-    role: "单知识入门与快速补课"
-    quality: 1
-    methodIds:
-      - "method.rune_manual.1"
-  - id: "method.appraisal_manual"
-    name: "万物鉴识篇"
-    role: "单知识入门与快速补课"
-    quality: 1
-    methodIds:
-      - "method.appraisal_manual.1"
   - id: "method.blood_burst"
     name: "燃血断脉术"
     role: "旁门爆发，以伤换攻"
@@ -312,17 +262,14 @@ methods:
       deviationRisk: 0.07
     knowledge:
       - skillId: "foundation.breathing"
-        capLevel: 3
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "cultivation.cycle"
-        capLevel: 3
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "cultivation.purity"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -331,7 +278,6 @@ methods:
         base: 80
         knowledgeScales:
           - "cultivation.cycle"
-        knowledgeGrowth: 20
         operation: "add_flat"
         stackGroup: "max_mana"
         stackPolicy: "highest"
@@ -342,11 +288,11 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 1
+        masteryGrowth: 20
       - effectId: "mana_regen"
         base: 0.08
         knowledgeScales:
           - "foundation.breathing"
-        knowledgeGrowth: 0.015
         operation: "add_percent"
         stackGroup: "mana_regen"
         stackPolicy: "highest"
@@ -358,9 +304,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.015
       - effectId: "cultivation_speed"
         base: 0.06
-        knowledgeGrowth: 0.03
         knowledgeScales:
           - "foundation.breathing"
         operation: "add_percent"
@@ -374,6 +320,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.03
     learningRequirements:
       realm: "qi"
       knowledge: []
@@ -392,21 +339,18 @@ methods:
     description: "以混元真气筑成兼容性道基。"
     practice:
       efficiency: 1.12
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.715
       deviationRisk: 0.065
     knowledge:
       - skillId: "foundation.dao_base"
-        capLevel: 3
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "cultivation.great_cycle"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "cultivation.purity"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -415,7 +359,6 @@ methods:
         base: 160
         knowledgeScales:
           - "cultivation.great_cycle"
-        knowledgeGrowth: 35
         operation: "add_flat"
         stackGroup: "max_mana"
         stackPolicy: "highest"
@@ -426,11 +369,11 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 1
+        masteryGrowth: 35
       - effectId: "cultivation_stability"
         base: 0.12
         knowledgeScales:
           - "foundation.dao_base"
-        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "cultivation_stability"
         stackPolicy: "highest"
@@ -442,9 +385,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.02
       - effectId: "deviation_resistance"
         base: 0.12
-        knowledgeGrowth: 0.04
         knowledgeScales:
           - "foundation.dao_base"
         operation: "add_percent"
@@ -458,6 +401,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.04
     learningRequirements:
       realm: "foundation"
       knowledge:
@@ -482,21 +426,18 @@ methods:
     description: "凝练无属性偏向的混元金丹。"
     practice:
       efficiency: 1.24
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.71
       deviationRisk: 0.06
     knowledge:
       - skillId: "foundation.core_theory"
-        capLevel: 3
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "cultivation.core_fire"
-        capLevel: 3
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "cultivation.liquid_mana"
-        capLevel: 5
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -505,7 +446,6 @@ methods:
         base: 280
         knowledgeScales:
           - "cultivation.liquid_mana"
-        knowledgeGrowth: 55
         operation: "add_flat"
         stackGroup: "max_mana"
         stackPolicy: "highest"
@@ -516,11 +456,11 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 1
+        masteryGrowth: 55
       - effectId: "all_spell_efficiency"
         base: 0.08
         knowledgeScales:
           - "foundation.core_theory"
-        knowledgeGrowth: 0.015
         operation: "add_percent"
         stackGroup: "all_spell_efficiency"
         stackPolicy: "highest"
@@ -532,9 +472,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.015
       - effectId: "breakthrough_success"
         base: 0.08
-        knowledgeGrowth: 0.03
         knowledgeScales:
           - "foundation.core_theory"
         operation: "add_percent"
@@ -548,6 +488,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.03
     learningRequirements:
       realm: "core"
       knowledge:
@@ -572,21 +513,18 @@ methods:
     description: "令元婴与本体共享完整周天。"
     practice:
       efficiency: 1.36
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.705
       deviationRisk: 0.055
     knowledge:
       - skillId: "foundation.nascent_theory"
-        capLevel: 3
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "cultivation.nascent_cycle"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "spirit.split"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -595,7 +533,6 @@ methods:
         base: 430
         knowledgeScales:
           - "cultivation.nascent_cycle"
-        knowledgeGrowth: 75
         operation: "add_flat"
         stackGroup: "max_mana"
         stackPolicy: "highest"
@@ -606,11 +543,11 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 1
+        masteryGrowth: 75
       - effectId: "parallel_action_efficiency"
         base: 0.06
         knowledgeScales:
           - "spirit.split"
-        knowledgeGrowth: 0.012
         operation: "add_percent"
         stackGroup: "parallel_action_efficiency"
         stackPolicy: "highest"
@@ -622,9 +559,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.012
       - effectId: "mana_control"
         base: 0.14
-        knowledgeGrowth: 0.04
         knowledgeScales:
           - "foundation.nascent_theory"
         operation: "add_percent"
@@ -638,6 +575,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.04
     learningRequirements:
       realm: "nascent"
       knowledge:
@@ -662,21 +600,18 @@ methods:
     description: "借天地灵机维持混元法相。"
     practice:
       efficiency: 1.48
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.7
       deviationRisk: 0.05
     knowledge:
       - skillId: "foundation.spirit_theory"
-        capLevel: 3
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "cultivation.heaven_cycle"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "spell.resonance"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -685,7 +620,6 @@ methods:
         base: 0.22
         knowledgeScales:
           - "cultivation.heaven_cycle"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "mana_regen"
         stackPolicy: "highest"
@@ -697,11 +631,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.025
       - effectId: "domain_resistance"
         base: 0.1
         knowledgeScales:
           - "foundation.spirit_theory"
-        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "domain_resistance"
         stackPolicy: "add_capped"
@@ -713,9 +647,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.018
       - effectId: "ambient_qi_absorption"
         base: 0.18
-        knowledgeGrowth: 0.05
         knowledgeScales:
           - "foundation.spirit_theory"
         operation: "add_percent"
@@ -729,6 +663,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.05
     learningRequirements:
       realm: "transform"
       knowledge:
@@ -753,21 +688,18 @@ methods:
     description: "以虚空为炉，转化异质力量。"
     practice:
       efficiency: 1.6
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.695
       deviationRisk: 0.045
     knowledge:
       - skillId: "foundation.void_theory"
-        capLevel: 3
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "cultivation.void_furnace"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "body.void_body"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -776,7 +708,6 @@ methods:
         base: 0.2
         knowledgeScales:
           - "body.void_body"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "void_resistance"
         stackPolicy: "add_capped"
@@ -788,11 +719,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.025
       - effectId: "resource_conversion"
         base: 0.12
         knowledgeScales:
           - "cultivation.void_furnace"
-        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "resource_conversion"
         stackPolicy: "highest"
@@ -804,9 +735,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.02
       - effectId: "hostile_energy_conversion"
         base: 0.16
-        knowledgeGrowth: 0.05
         knowledgeScales:
           - "foundation.void_theory"
         operation: "add_percent"
@@ -820,6 +751,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.05
     learningRequirements:
       realm: "void"
       knowledge:
@@ -844,21 +776,18 @@ methods:
     description: "精气神与法力循环归于一体。"
     practice:
       efficiency: 1.72
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.69
       deviationRisk: 0.04
     knowledge:
       - skillId: "foundation.integration_theory"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "cultivation.endless"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "body.unity"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -867,7 +796,6 @@ methods:
         base: 760
         knowledgeScales:
           - "cultivation.endless"
-        knowledgeGrowth: 120
         operation: "add_flat"
         stackGroup: "max_mana"
         stackPolicy: "highest"
@@ -878,11 +806,11 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 1
+        masteryGrowth: 120
       - effectId: "all_efficiency"
         base: 0.12
         knowledgeScales:
           - "body.unity"
-        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "all_efficiency"
         stackPolicy: "highest"
@@ -894,9 +822,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.02
       - effectId: "sustained_cast_efficiency"
         base: 0.22
-        knowledgeGrowth: 0.06
         knowledgeScales:
           - "foundation.integration_theory"
         operation: "add_percent"
@@ -910,6 +838,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.06
     learningRequirements:
       realm: "merge"
       knowledge:
@@ -934,21 +863,18 @@ methods:
     description: "以混元道果统合所学。"
     practice:
       efficiency: 1.84
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.685
       deviationRisk: 0.035
     knowledge:
       - skillId: "foundation.mahayana_theory"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "cultivation.dao_engine"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "heaven.dao_fruit"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -957,7 +883,6 @@ methods:
         base: 0.2
         knowledgeScales:
           - "heaven.dao_fruit"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "all_efficiency"
         stackPolicy: "highest"
@@ -969,11 +894,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.025
       - effectId: "law_resistance"
         base: 0.16
         knowledgeScales:
           - "foundation.mahayana_theory"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "law_resistance"
         stackPolicy: "add_capped"
@@ -985,9 +910,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.025
       - effectId: "law_compatibility"
         base: 0.2
-        knowledgeGrowth: 0.06
         knowledgeScales:
           - "foundation.mahayana_theory"
         operation: "add_percent"
@@ -1001,6 +926,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.06
     learningRequirements:
       realm: "great"
       knowledge:
@@ -1025,21 +951,18 @@ methods:
     description: "转化劫力与仙灵之气，完成飞升。"
     practice:
       efficiency: 1.96
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.68
       deviationRisk: 0.03
     knowledge:
       - skillId: "foundation.ascension"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "cultivation.immortal_qi"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "heaven.tribulation"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -1048,7 +971,6 @@ methods:
         base: 0.24
         knowledgeScales:
           - "heaven.tribulation"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "tribulation_resistance"
         stackPolicy: "add_capped"
@@ -1060,11 +982,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.03
       - effectId: "immortal_qi_conversion"
         base: 0.22
         knowledgeScales:
           - "cultivation.immortal_qi"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "immortal_qi_conversion"
         stackPolicy: "highest"
@@ -1076,9 +998,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.03
       - effectId: "ascension_stability"
         base: 0.24
-        knowledgeGrowth: 0.07
         knowledgeScales:
           - "foundation.ascension"
         operation: "add_percent"
@@ -1092,6 +1014,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.07
     learningRequirements:
       realm: "tribulation"
       knowledge:
@@ -1120,17 +1043,14 @@ methods:
       deviationRisk: 0.07
     knowledge:
       - skillId: "body.recovery"
-        capLevel: 3
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "alchemy.herbs"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "alchemy.medicine"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -1139,7 +1059,6 @@ methods:
         base: 0.1
         knowledgeScales:
           - "body.recovery"
-        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "health_regen"
         stackPolicy: "highest"
@@ -1151,11 +1070,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.018
       - effectId: "herb_yield"
         base: 0.08
         knowledgeScales:
           - "alchemy.herbs"
-        knowledgeGrowth: 0.015
         operation: "add_percent"
         stackGroup: "herb_yield"
         stackPolicy: "highest"
@@ -1167,9 +1086,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.015
       - effectId: "injury_recovery"
         base: 0.1
-        knowledgeGrowth: 0.03
         knowledgeScales:
           - "body.recovery"
         operation: "add_percent"
@@ -1183,6 +1102,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.03
     learningRequirements:
       realm: "qi"
       knowledge: []
@@ -1201,21 +1121,18 @@ methods:
     description: "筑成生生不息的青木道基。"
     practice:
       efficiency: 1.12
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.715
       deviationRisk: 0.065
     knowledge:
       - skillId: "foundation.dao_base"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "alchemy.furnace"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "body.jade"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -1224,7 +1141,6 @@ methods:
         base: 140
         knowledgeScales:
           - "body.jade"
-        knowledgeGrowth: 30
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -1235,11 +1151,11 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 1
+        masteryGrowth: 30
       - effectId: "healing_power"
         base: 0.1
         knowledgeScales:
           - "alchemy.furnace"
-        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "healing_power"
         stackPolicy: "highest"
@@ -1251,9 +1167,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.018
       - effectId: "medicine_efficiency"
         base: 0.14
-        knowledgeGrowth: 0.04
         knowledgeScales:
           - "foundation.dao_base"
         operation: "add_percent"
@@ -1267,6 +1183,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.04
     learningRequirements:
       realm: "foundation"
       knowledge:
@@ -1291,21 +1208,18 @@ methods:
     description: "木丹滋养血肉与药性。"
     practice:
       efficiency: 1.24
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.71
       deviationRisk: 0.06
     knowledge:
       - skillId: "foundation.core_theory"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "alchemy.blood"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "body.bloodline"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -1314,7 +1228,6 @@ methods:
         base: 0.18
         knowledgeScales:
           - "alchemy.blood"
-        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "healing_power"
         stackPolicy: "highest"
@@ -1326,11 +1239,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.022
       - effectId: "poison_resistance"
         base: 0.12
         knowledgeScales:
           - "body.bloodline"
-        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "poison_resistance"
         stackPolicy: "add_capped"
@@ -1342,9 +1255,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.018
       - effectId: "bloodline_stability"
         base: 0.16
-        knowledgeGrowth: 0.05
         knowledgeScales:
           - "foundation.core_theory"
         operation: "add_percent"
@@ -1358,6 +1271,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.05
     learningRequirements:
       realm: "core"
       knowledge:
@@ -1382,21 +1296,18 @@ methods:
     description: "元婴蕴养魂魄，医治魂伤。"
     practice:
       efficiency: 1.36
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.705
       deviationRisk: 0.055
     knowledge:
       - skillId: "alchemy.soul"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "spirit.soul"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "body.regeneration"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -1405,7 +1316,6 @@ methods:
         base: 0.18
         knowledgeScales:
           - "alchemy.soul"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "soul_recovery"
         stackPolicy: "highest"
@@ -1417,11 +1327,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.025
       - effectId: "health_regen"
         base: 0.24
         knowledgeScales:
           - "body.regeneration"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "health_regen"
         stackPolicy: "highest"
@@ -1433,9 +1343,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.025
       - effectId: "soul_healing"
         base: 0.18
-        knowledgeGrowth: 0.05
         knowledgeScales:
           - "alchemy.soul"
         operation: "add_percent"
@@ -1449,6 +1359,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.05
     learningRequirements:
       realm: "nascent"
       knowledge:
@@ -1473,21 +1384,18 @@ methods:
     description: "法相化作生命领域。"
     practice:
       efficiency: 1.48
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.7
       deviationRisk: 0.05
     knowledge:
       - skillId: "alchemy.life"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "body.dharma_form"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "spell.domain"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -1496,7 +1404,6 @@ methods:
         base: 0.3
         knowledgeScales:
           - "alchemy.life"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "healing_power"
         stackPolicy: "highest"
@@ -1508,11 +1415,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.03
       - effectId: "healing_domain"
         base: 0.16
         knowledgeScales:
           - "spell.domain"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "healing_domain"
         stackPolicy: "highest"
@@ -1524,9 +1431,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.025
       - effectId: "ally_healing"
         base: 0.22
-        knowledgeGrowth: 0.06
         knowledgeScales:
           - "alchemy.life"
         operation: "add_percent"
@@ -1540,6 +1447,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.06
     learningRequirements:
       realm: "transform"
       knowledge:
@@ -1564,21 +1472,18 @@ methods:
     description: "在绝地与虚空中培育生机。"
     practice:
       efficiency: 1.6
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.695
       deviationRisk: 0.045
     knowledge:
       - skillId: "alchemy.void_herb"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "world.void_survival"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "body.void_body"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -1587,7 +1492,6 @@ methods:
         base: 0.24
         knowledgeScales:
           - "world.void_survival"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "void_survival"
         stackPolicy: "highest"
@@ -1599,11 +1503,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.03
       - effectId: "rare_herb_yield"
         base: 0.18
         knowledgeScales:
           - "alchemy.void_herb"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "rare_herb_yield"
         stackPolicy: "highest"
@@ -1615,9 +1519,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.025
       - effectId: "void_herb_growth"
         base: 0.2
-        knowledgeGrowth: 0.06
         knowledgeScales:
           - "alchemy.void_herb"
         operation: "add_percent"
@@ -1631,6 +1535,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.06
     learningRequirements:
       realm: "void"
       knowledge:
@@ -1655,21 +1560,18 @@ methods:
     description: "将法则炼成延寿道丹。"
     practice:
       efficiency: 1.72
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.69
       deviationRisk: 0.04
     knowledge:
       - skillId: "alchemy.dao_pill"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "heaven.law_seed"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "body.unity"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -1678,7 +1580,6 @@ methods:
         base: 0.24
         knowledgeScales:
           - "alchemy.dao_pill"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "pill_quality"
         stackPolicy: "highest"
@@ -1690,11 +1591,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.03
       - effectId: "max_health"
         base: 520
         knowledgeScales:
           - "body.unity"
-        knowledgeGrowth: 85
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -1705,9 +1606,9 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 2
+        masteryGrowth: 85
       - effectId: "alchemy_success"
         base: 0.24
-        knowledgeGrowth: 0.06
         knowledgeScales:
           - "alchemy.dao_pill"
         operation: "add_percent"
@@ -1721,6 +1622,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.06
     learningRequirements:
       realm: "merge"
       knowledge:
@@ -1745,21 +1647,18 @@ methods:
     description: "逆转命数，护持一线生机。"
     practice:
       efficiency: 1.84
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.685
       deviationRisk: 0.035
     knowledge:
       - skillId: "alchemy.resurrection"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "heaven.causality"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "body.indestructible"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -1768,7 +1667,6 @@ methods:
         base: 0.12
         knowledgeScales:
           - "alchemy.resurrection"
-        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "fatal_recovery_chance"
         stackPolicy: "add_capped"
@@ -1780,11 +1678,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.018
       - effectId: "lifespan_efficiency"
         base: 0.22
         knowledgeScales:
           - "heaven.causality"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "lifespan_efficiency"
         stackPolicy: "highest"
@@ -1796,9 +1694,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.03
       - effectId: "resurrection_cost_reduction"
         base: 0.22
-        knowledgeGrowth: 0.07
         knowledgeScales:
           - "alchemy.resurrection"
         operation: "add_percent"
@@ -1812,6 +1710,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.07
     learningRequirements:
       realm: "great"
       knowledge:
@@ -1836,21 +1735,18 @@ methods:
     description: "炼成渡劫仙丹并借劫新生。"
     practice:
       efficiency: 1.96
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.68
       deviationRisk: 0.03
     knowledge:
       - skillId: "alchemy.ascension_pill"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "heaven.tribulation"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "foundation.ascension"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -1859,7 +1755,6 @@ methods:
         base: 0.28
         knowledgeScales:
           - "alchemy.ascension_pill"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "tribulation_recovery"
         stackPolicy: "highest"
@@ -1871,11 +1766,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.035
       - effectId: "tribulation_resistance"
         base: 0.14
         knowledgeScales:
           - "heaven.tribulation"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "tribulation_resistance"
         stackPolicy: "add_capped"
@@ -1887,9 +1782,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.025
       - effectId: "pill_tribulation_resistance"
         base: 0.28
-        knowledgeGrowth: 0.08
         knowledgeScales:
           - "alchemy.ascension_pill"
         operation: "add_percent"
@@ -1903,6 +1798,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.08
     learningRequirements:
       realm: "tribulation"
       knowledge:
@@ -1926,31 +1822,27 @@ methods:
     nextMethodId: "method.taixu_sword.2"
     description: "以灵力御剑并凝聚剑气。"
     practice:
-      efficiency: 1
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.07
+      efficiency: 1.04
+      knowledgeXpRatio: 0.755
+      deviationRisk: 0.065
     knowledge:
       - skillId: "sword.weapon"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "sword.qi"
-        capLevel: 3
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "foundation.control"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "sword_damage"
-        base: 0.12
+        base: 0.132
         knowledgeScales:
           - "sword.qi"
-        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "sword_damage"
         stackPolicy: "highest"
@@ -1962,11 +1854,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.022
       - effectId: "sword_control"
-        base: 0.1
+        base: 0.11
         knowledgeScales:
           - "foundation.control"
-        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "sword_control"
         stackPolicy: "highest"
@@ -1978,9 +1870,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.02
       - effectId: "sword_attack_speed"
-        base: 0.08
-        knowledgeGrowth: 0.03
+        base: 0.088
         knowledgeScales:
           - "sword.weapon"
         operation: "add_percent"
@@ -1994,6 +1886,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.033
     learningRequirements:
       realm: "qi"
       knowledge: []
@@ -2011,31 +1904,27 @@ methods:
     nextMethodId: "method.taixu_sword.3"
     description: "以兵意筑成锋锐道基。"
     practice:
-      efficiency: 1.12
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.065
+      efficiency: 1.16
+      knowledgeXpRatio: 0.75
+      deviationRisk: 0.06
     knowledge:
       - skillId: "sword.intent"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "foundation.dao_base"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "spirit.meditation"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "critical_chance"
-        base: 0.08
+        base: 0.088
         knowledgeScales:
           - "sword.intent"
-        knowledgeGrowth: 0.014
         operation: "add_percent"
         stackGroup: "critical_chance"
         stackPolicy: "add_capped"
@@ -2047,11 +1936,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.015
       - effectId: "sword_damage"
-        base: 0.18
+        base: 0.198
         knowledgeScales:
           - "foundation.dao_base"
-        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "sword_damage"
         stackPolicy: "highest"
@@ -2063,9 +1952,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.024
       - effectId: "sword_intent_power"
-        base: 0.14
-        knowledgeGrowth: 0.04
+        base: 0.154
         knowledgeScales:
           - "sword.intent"
         operation: "add_percent"
@@ -2079,6 +1968,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.044
     learningRequirements:
       realm: "foundation"
       knowledge:
@@ -2102,31 +1992,27 @@ methods:
     nextMethodId: "method.taixu_sword.4"
     description: "丹火蕴剑，一念成阵。"
     practice:
-      efficiency: 1.24
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.06
+      efficiency: 1.28
+      knowledgeXpRatio: 0.745
+      deviationRisk: 0.055
     knowledge:
       - skillId: "sword.formation"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "formation.array"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "cultivation.core_fire"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "multi_sword_count"
-        base: 2
+        base: 2.2
         knowledgeScales:
           - "sword.formation"
-        knowledgeGrowth: 1
         operation: "add_flat"
         stackGroup: "multi_sword_count"
         stackPolicy: "highest"
@@ -2137,11 +2023,11 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 1
+        masteryGrowth: 1.1
       - effectId: "formation_damage"
-        base: 0.14
+        base: 0.154
         knowledgeScales:
           - "formation.array"
-        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "formation_damage"
         stackPolicy: "highest"
@@ -2153,9 +2039,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.022
       - effectId: "sword_formation_control"
-        base: 0.16
-        knowledgeGrowth: 0.05
+        base: 0.176
         knowledgeScales:
           - "sword.formation"
         operation: "add_percent"
@@ -2169,6 +2055,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.055
     learningRequirements:
       realm: "core"
       knowledge:
@@ -2192,31 +2079,27 @@ methods:
     nextMethodId: "method.taixu_sword.5"
     description: "剑心映照破绽，元婴驭剑千里。"
     practice:
-      efficiency: 1.36
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.055
+      efficiency: 1.4
+      knowledgeXpRatio: 0.74
+      deviationRisk: 0.05
     knowledge:
       - skillId: "sword.heart"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "spirit.soul"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "foundation.nascent_theory"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "armor_pierce"
-        base: 0.16
+        base: 0.176
         knowledgeScales:
           - "sword.heart"
-        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "armor_pierce"
         stackPolicy: "highest"
@@ -2228,11 +2111,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.024
       - effectId: "remote_control_range"
-        base: 0.2
+        base: 0.22
         knowledgeScales:
           - "spirit.soul"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "remote_control_range"
         stackPolicy: "highest"
@@ -2244,9 +2127,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.033
       - effectId: "weakness_detection"
-        base: 0.18
-        knowledgeGrowth: 0.05
+        base: 0.198
         knowledgeScales:
           - "sword.heart"
         operation: "add_percent"
@@ -2260,6 +2143,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.055
     learningRequirements:
       realm: "nascent"
       knowledge:
@@ -2283,31 +2167,27 @@ methods:
     nextMethodId: "method.taixu_sword.6"
     description: "展开剑域，压制万法。"
     practice:
-      efficiency: 1.48
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.05
+      efficiency: 1.52
+      knowledgeXpRatio: 0.735
+      deviationRisk: 0.045
     knowledge:
       - skillId: "sword.domain"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "spell.domain"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "foundation.spirit_theory"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "sword_domain"
-        base: 0.24
+        base: 0.264
         knowledgeScales:
           - "sword.domain"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "sword_domain"
         stackPolicy: "highest"
@@ -2319,11 +2199,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.033
       - effectId: "spell_suppression"
-        base: 0.12
+        base: 0.132
         knowledgeScales:
           - "spell.domain"
-        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "spell_suppression"
         stackPolicy: "highest"
@@ -2335,9 +2215,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.022
       - effectId: "domain_range"
-        base: 0.2
-        knowledgeGrowth: 0.06
+        base: 0.22
         knowledgeScales:
           - "sword.domain"
         operation: "add_percent"
@@ -2351,6 +2231,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.066
     learningRequirements:
       realm: "transform"
       knowledge:
@@ -2374,31 +2255,27 @@ methods:
     nextMethodId: "method.taixu_sword.7"
     description: "剑锋斩破虚实边界。"
     practice:
-      efficiency: 1.6
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.045
+      efficiency: 1.64
+      knowledgeXpRatio: 0.73
+      deviationRisk: 0.04
     knowledge:
       - skillId: "sword.void_cut"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "spell.void"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "formation.space"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "space_pierce"
-        base: 0.22
+        base: 0.242
         knowledgeScales:
           - "sword.void_cut"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "space_pierce"
         stackPolicy: "highest"
@@ -2410,11 +2287,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.033
       - effectId: "sword_damage"
-        base: 0.34
+        base: 0.374
         knowledgeScales:
           - "spell.void"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "sword_damage"
         stackPolicy: "highest"
@@ -2426,9 +2303,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.039
       - effectId: "void_target_accuracy"
-        base: 0.22
-        knowledgeGrowth: 0.06
+        base: 0.242
         knowledgeScales:
           - "sword.void_cut"
         operation: "add_percent"
@@ -2442,6 +2319,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.066
     learningRequirements:
       realm: "void"
       knowledge:
@@ -2465,31 +2343,27 @@ methods:
     nextMethodId: "method.taixu_sword.8"
     description: "本命剑与修士合为一体。"
     practice:
-      efficiency: 1.72
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.04
+      efficiency: 1.76
+      knowledgeXpRatio: 0.725
+      deviationRisk: 0.035
     knowledge:
       - skillId: "sword.unity"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "artifact.life_bound"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "body.unity"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "sword_damage"
-        base: 0.42
+        base: 0.462
         knowledgeScales:
           - "sword.unity"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "sword_damage"
         stackPolicy: "highest"
@@ -2501,11 +2375,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.044
       - effectId: "weapon_loss_resistance"
-        base: 0.3
+        base: 0.33
         knowledgeScales:
           - "artifact.life_bound"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "weapon_loss_resistance"
         stackPolicy: "add_capped"
@@ -2517,9 +2391,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.044
       - effectId: "life_bound_sync"
-        base: 0.25
-        knowledgeGrowth: 0.07
+        base: 0.275
         knowledgeScales:
           - "sword.unity"
         operation: "add_percent"
@@ -2533,6 +2407,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.077
     learningRequirements:
       realm: "merge"
       knowledge:
@@ -2556,31 +2431,27 @@ methods:
     nextMethodId: "method.taixu_sword.9"
     description: "一剑承载完整兵道道果。"
     practice:
-      efficiency: 1.84
+      efficiency: 1.88
       knowledgeXpRatio: 0.72
-      deviationRisk: 0.035
+      deviationRisk: 0.03
     knowledge:
       - skillId: "sword.dao"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "heaven.dao_fruit"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "foundation.mahayana_theory"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "law_pierce"
-        base: 0.26
+        base: 0.286
         knowledgeScales:
           - "sword.dao"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "law_pierce"
         stackPolicy: "highest"
@@ -2592,11 +2463,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.039
       - effectId: "sword_damage"
-        base: 0.56
+        base: 0.616
         knowledgeScales:
           - "heaven.dao_fruit"
-        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "sword_damage"
         stackPolicy: "highest"
@@ -2608,9 +2479,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.05
       - effectId: "dao_sword_power"
-        base: 0.28
-        knowledgeGrowth: 0.08
+        base: 0.308
         knowledgeScales:
           - "sword.dao"
         operation: "add_percent"
@@ -2624,6 +2495,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.088
     learningRequirements:
       realm: "great"
       knowledge:
@@ -2647,31 +2519,27 @@ methods:
     nextMethodId: null
     description: "开天一式斩破劫数。"
     practice:
-      efficiency: 1.96
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.03
+      efficiency: 2
+      knowledgeXpRatio: 0.715
+      deviationRisk: 0.025
     knowledge:
       - skillId: "sword.heaven_cut"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "heaven.law_mastery"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "heaven.tribulation"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "tribulation_damage"
-        base: 0.4
+        base: 0.44
         knowledgeScales:
           - "sword.heaven_cut"
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         stackGroup: "tribulation_damage"
         stackPolicy: "highest"
@@ -2683,11 +2551,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.055
       - effectId: "law_pierce"
-        base: 0.38
+        base: 0.418
         knowledgeScales:
           - "heaven.law_mastery"
-        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "law_pierce"
         stackPolicy: "highest"
@@ -2699,9 +2567,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.05
       - effectId: "tribulation_sever"
-        base: 0.32
-        knowledgeGrowth: 0.09
+        base: 0.352
         knowledgeScales:
           - "sword.heaven_cut"
         operation: "add_percent"
@@ -2715,6 +2583,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.099
     learningRequirements:
       realm: "tribulation"
       knowledge:
@@ -2743,17 +2612,14 @@ methods:
       deviationRisk: 0.07
     knowledge:
       - skillId: "body.tempering"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "body.bone"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "body.recovery"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -2762,7 +2628,6 @@ methods:
         base: 120
         knowledgeScales:
           - "body.tempering"
-        knowledgeGrowth: 25
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -2773,11 +2638,11 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 1
+        masteryGrowth: 25
       - effectId: "physical_resistance"
         base: 0.08
         knowledgeScales:
           - "body.bone"
-        knowledgeGrowth: 0.015
         operation: "add_percent"
         stackGroup: "physical_resistance"
         stackPolicy: "add_capped"
@@ -2789,9 +2654,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.015
       - effectId: "stamina"
         base: 0.1
-        knowledgeGrowth: 0.03
         knowledgeScales:
           - "body.tempering"
         operation: "add_percent"
@@ -2805,6 +2670,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.03
     learningRequirements:
       realm: "qi"
       knowledge: []
@@ -2823,21 +2689,18 @@ methods:
     description: "玉骨灵身承载灵力冲击。"
     practice:
       efficiency: 1.12
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.715
       deviationRisk: 0.065
     knowledge:
       - skillId: "body.jade"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "foundation.dao_base"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "cultivation.great_cycle"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -2846,7 +2709,6 @@ methods:
         base: 240
         knowledgeScales:
           - "body.jade"
-        knowledgeGrowth: 45
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -2857,11 +2719,11 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 1
+        masteryGrowth: 45
       - effectId: "spiritual_resistance"
         base: 0.1
         knowledgeScales:
           - "foundation.dao_base"
-        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "spiritual_resistance"
         stackPolicy: "add_capped"
@@ -2873,9 +2735,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.018
       - effectId: "stagger_resistance"
         base: 0.14
-        knowledgeGrowth: 0.04
         knowledgeScales:
           - "body.jade"
         operation: "add_percent"
@@ -2889,6 +2751,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.04
     learningRequirements:
       realm: "foundation"
       knowledge:
@@ -2913,21 +2776,18 @@ methods:
     description: "以金丹之力唤醒战体血脉。"
     practice:
       efficiency: 1.24
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.71
       deviationRisk: 0.06
     knowledge:
       - skillId: "body.bloodline"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "alchemy.blood"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "foundation.core_theory"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -2936,7 +2796,6 @@ methods:
         base: 380
         knowledgeScales:
           - "body.bloodline"
-        knowledgeGrowth: 65
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -2947,11 +2806,11 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 1
+        masteryGrowth: 65
       - effectId: "melee_damage"
         base: 0.15
         knowledgeScales:
           - "alchemy.blood"
-        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "melee_damage"
         stackPolicy: "highest"
@@ -2963,9 +2822,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.022
       - effectId: "bloodline_output"
         base: 0.16
-        knowledgeGrowth: 0.05
         knowledgeScales:
           - "body.bloodline"
         operation: "add_percent"
@@ -2979,6 +2838,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.05
     learningRequirements:
       realm: "core"
       knowledge:
@@ -3003,21 +2863,18 @@ methods:
     description: "滴血重生，重创不倒。"
     practice:
       efficiency: 1.36
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.705
       deviationRisk: 0.055
     knowledge:
       - skillId: "body.regeneration"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "spirit.soul"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "cultivation.nascent_cycle"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -3026,7 +2883,6 @@ methods:
         base: 0.22
         knowledgeScales:
           - "body.regeneration"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "health_regen"
         stackPolicy: "highest"
@@ -3038,11 +2894,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.03
       - effectId: "fatal_resistance"
         base: 0.1
         knowledgeScales:
           - "spirit.soul"
-        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "fatal_resistance"
         stackPolicy: "add_capped"
@@ -3054,9 +2910,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.018
       - effectId: "regeneration_speed"
         base: 0.18
-        knowledgeGrowth: 0.05
         knowledgeScales:
           - "body.regeneration"
         operation: "add_percent"
@@ -3070,6 +2926,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.05
     learningRequirements:
       realm: "nascent"
       knowledge:
@@ -3094,21 +2951,18 @@ methods:
     description: "法相真身撼动领域。"
     practice:
       efficiency: 1.48
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.7
       deviationRisk: 0.05
     knowledge:
       - skillId: "body.dharma_form"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "foundation.spirit_theory"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "spell.domain"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -3117,7 +2971,6 @@ methods:
         base: 0.3
         knowledgeScales:
           - "body.dharma_form"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "melee_damage"
         stackPolicy: "highest"
@@ -3129,11 +2982,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.035
       - effectId: "max_health"
         base: 620
         knowledgeScales:
           - "foundation.spirit_theory"
-        knowledgeGrowth: 90
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -3144,9 +2997,9 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 2
+        masteryGrowth: 90
       - effectId: "dharma_form_power"
         base: 0.22
-        knowledgeGrowth: 0.06
         knowledgeScales:
           - "body.dharma_form"
         operation: "add_percent"
@@ -3160,6 +3013,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.06
     learningRequirements:
       realm: "transform"
       knowledge:
@@ -3184,21 +3038,18 @@ methods:
     description: "虚空法体无惧撕裂。"
     practice:
       efficiency: 1.6
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.695
       deviationRisk: 0.045
     knowledge:
       - skillId: "body.void_body"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "foundation.void_theory"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "world.void_survival"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -3207,7 +3058,6 @@ methods:
         base: 0.3
         knowledgeScales:
           - "body.void_body"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "void_resistance"
         stackPolicy: "add_capped"
@@ -3219,11 +3069,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.035
       - effectId: "max_health"
         base: 800
         knowledgeScales:
           - "world.void_survival"
-        knowledgeGrowth: 110
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -3234,9 +3084,9 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 2
+        masteryGrowth: 110
       - effectId: "void_mobility"
         base: 0.2
-        knowledgeGrowth: 0.06
         knowledgeScales:
           - "body.void_body"
         operation: "add_percent"
@@ -3250,6 +3100,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.06
     learningRequirements:
       realm: "void"
       knowledge:
@@ -3274,21 +3125,18 @@ methods:
     description: "精气神合一，力量毫无损耗。"
     practice:
       efficiency: 1.72
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.69
       deviationRisk: 0.04
     knowledge:
       - skillId: "body.unity"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "foundation.integration_theory"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "spirit.myriad"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -3297,7 +3145,6 @@ methods:
         base: 0.18
         knowledgeScales:
           - "body.unity"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "all_resistance"
         stackPolicy: "add_capped"
@@ -3309,11 +3156,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.025
       - effectId: "melee_damage"
         base: 0.38
         knowledgeScales:
           - "spirit.myriad"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "melee_damage"
         stackPolicy: "highest"
@@ -3325,9 +3172,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.04
       - effectId: "body_energy_efficiency"
         base: 0.24
-        knowledgeGrowth: 0.07
         knowledgeScales:
           - "body.unity"
         operation: "add_percent"
@@ -3341,6 +3188,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.07
     learningRequirements:
       realm: "merge"
       knowledge:
@@ -3365,21 +3213,18 @@ methods:
     description: "道果维系不灭道身。"
     practice:
       efficiency: 1.84
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.685
       deviationRisk: 0.035
     knowledge:
       - skillId: "body.indestructible"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "heaven.dao_fruit"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "foundation.mahayana_theory"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -3388,7 +3233,6 @@ methods:
         base: 0.25
         knowledgeScales:
           - "body.indestructible"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "fatal_resistance"
         stackPolicy: "add_capped"
@@ -3400,11 +3244,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.03
       - effectId: "max_health"
         base: 1250
         knowledgeScales:
           - "heaven.dao_fruit"
-        knowledgeGrowth: 150
         operation: "add_flat"
         stackGroup: "max_health"
         stackPolicy: "highest"
@@ -3415,9 +3259,9 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 2
+        masteryGrowth: 150
       - effectId: "immortal_recovery"
         base: 0.26
-        knowledgeGrowth: 0.08
         knowledgeScales:
           - "body.indestructible"
         operation: "add_percent"
@@ -3431,6 +3275,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.08
     learningRequirements:
       realm: "great"
       knowledge:
@@ -3455,21 +3300,18 @@ methods:
     description: "以天劫完成最终淬体。"
     practice:
       efficiency: 1.96
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.68
       deviationRisk: 0.03
     knowledge:
       - skillId: "body.tribulation_body"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "heaven.thunder_body"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "heaven.tribulation"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -3478,7 +3320,6 @@ methods:
         base: 0.4
         knowledgeScales:
           - "body.tribulation_body"
-        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "tribulation_resistance"
         stackPolicy: "add_capped"
@@ -3490,11 +3331,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.045
       - effectId: "all_resistance"
         base: 0.28
         knowledgeScales:
           - "heaven.thunder_body"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "all_resistance"
         stackPolicy: "add_capped"
@@ -3506,9 +3347,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.035
       - effectId: "tribulation_energy_absorption"
         base: 0.3
-        knowledgeGrowth: 0.09
         knowledgeScales:
           - "body.tribulation_body"
         operation: "add_percent"
@@ -3522,6 +3363,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.09
     learningRequirements:
       realm: "tribulation"
       knowledge:
@@ -3545,31 +3387,27 @@ methods:
     nextMethodId: "method.taiyin.2"
     description: "入定凝神，初生神识。"
     practice:
-      efficiency: 1
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.07
+      efficiency: 1.04
+      knowledgeXpRatio: 0.755
+      deviationRisk: 0.065
     knowledge:
       - skillId: "spirit.meditation"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "spirit.sense"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "foundation.control"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "spirit_power"
-        base: 0.12
+        base: 0.132
         knowledgeScales:
           - "spirit.sense"
-        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "spirit_power"
         stackPolicy: "highest"
@@ -3581,11 +3419,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.022
       - effectId: "mental_resistance"
-        base: 0.1
+        base: 0.11
         knowledgeScales:
           - "spirit.meditation"
-        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "mental_resistance"
         stackPolicy: "add_capped"
@@ -3597,9 +3435,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.02
       - effectId: "spirit_sense_range"
-        base: 0.1
-        knowledgeGrowth: 0.03
+        base: 0.11
         knowledgeScales:
           - "spirit.meditation"
         operation: "add_percent"
@@ -3613,6 +3451,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.033
     learningRequirements:
       realm: "qi"
       knowledge: []
@@ -3630,31 +3469,27 @@ methods:
     nextMethodId: "method.taiyin.3"
     description: "辨识心魔并封守心神。"
     practice:
-      efficiency: 1.12
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.065
+      efficiency: 1.16
+      knowledgeXpRatio: 0.75
+      deviationRisk: 0.06
     knowledge:
       - skillId: "spirit.inner_demon"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "talisman.seal"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "foundation.dao_base"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "mental_resistance"
-        base: 0.2
+        base: 0.22
         knowledgeScales:
           - "spirit.inner_demon"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "mental_resistance"
         stackPolicy: "add_capped"
@@ -3666,11 +3501,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.028
       - effectId: "seal_power"
-        base: 0.1
+        base: 0.11
         knowledgeScales:
           - "talisman.seal"
-        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "seal_power"
         stackPolicy: "highest"
@@ -3682,9 +3517,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.02
       - effectId: "inner_demon_resistance"
-        base: 0.14
-        knowledgeGrowth: 0.04
+        base: 0.154
         knowledgeScales:
           - "spirit.inner_demon"
         operation: "add_percent"
@@ -3698,6 +3533,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.044
     learningRequirements:
       realm: "foundation"
       knowledge:
@@ -3721,31 +3557,27 @@ methods:
     nextMethodId: "method.taiyin.4"
     description: "固化魂魄，抵御夺舍与咒杀。"
     practice:
-      efficiency: 1.24
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.06
+      efficiency: 1.28
+      knowledgeXpRatio: 0.745
+      deviationRisk: 0.055
     knowledge:
       - skillId: "spirit.soul"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "talisman.curse"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "heaven.karma"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "soul_resistance"
-        base: 0.24
+        base: 0.264
         knowledgeScales:
           - "spirit.soul"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "soul_resistance"
         stackPolicy: "add_capped"
@@ -3757,11 +3589,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.033
       - effectId: "curse_power"
-        base: 0.12
+        base: 0.132
         knowledgeScales:
           - "talisman.curse"
-        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "curse_power"
         stackPolicy: "highest"
@@ -3773,9 +3605,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.022
       - effectId: "curse_resistance"
-        base: 0.16
-        knowledgeGrowth: 0.05
+        base: 0.176
         knowledgeScales:
           - "spirit.soul"
         operation: "add_percent"
@@ -3789,6 +3621,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.055
     learningRequirements:
       realm: "core"
       knowledge:
@@ -3812,31 +3645,27 @@ methods:
     nextMethodId: "method.taiyin.5"
     description: "分神化念，结成魂契。"
     practice:
-      efficiency: 1.36
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.055
+      efficiency: 1.4
+      knowledgeXpRatio: 0.74
+      deviationRisk: 0.05
     knowledge:
       - skillId: "spirit.split"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "talisman.soul_seal"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "foundation.nascent_theory"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "parallel_action_efficiency"
-        base: 0.18
+        base: 0.198
         knowledgeScales:
           - "spirit.split"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "parallel_action_efficiency"
         stackPolicy: "highest"
@@ -3848,11 +3677,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.028
       - effectId: "contract_power"
-        base: 0.14
+        base: 0.154
         knowledgeScales:
           - "talisman.soul_seal"
-        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "contract_power"
         stackPolicy: "highest"
@@ -3864,9 +3693,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.024
       - effectId: "split_mind_capacity"
-        base: 1
-        knowledgeGrowth: 1
+        base: 1.1
         knowledgeScales:
           - "spirit.split"
         operation: "add_flat"
@@ -3879,6 +3708,7 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 3
+        masteryGrowth: 1.1
     learningRequirements:
       realm: "nascent"
       knowledge:
@@ -3902,31 +3732,27 @@ methods:
     nextMethodId: "method.taiyin.6"
     description: "元神出窍，行走梦界。"
     practice:
-      efficiency: 1.48
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.05
+      efficiency: 1.52
+      knowledgeXpRatio: 0.735
+      deviationRisk: 0.045
     knowledge:
       - skillId: "spirit.primordial"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "spirit.dream"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "talisman.command"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "spirit_power"
-        base: 0.3
+        base: 0.33
         knowledgeScales:
           - "spirit.primordial"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "spirit_power"
         stackPolicy: "highest"
@@ -3938,11 +3764,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.039
       - effectId: "dream_power"
-        base: 0.2
+        base: 0.22
         knowledgeScales:
           - "spirit.dream"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "dream_power"
         stackPolicy: "highest"
@@ -3954,9 +3780,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.033
       - effectId: "dream_infiltration"
-        base: 0.22
-        knowledgeGrowth: 0.06
+        base: 0.242
         knowledgeScales:
           - "spirit.primordial"
         operation: "add_percent"
@@ -3970,6 +3796,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.066
     learningRequirements:
       realm: "transform"
       knowledge:
@@ -3993,31 +3820,27 @@ methods:
     nextMethodId: "method.taiyin.7"
     description: "一念跨越虚实，以真名锁敌。"
     practice:
-      efficiency: 1.6
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.045
+      efficiency: 1.64
+      knowledgeXpRatio: 0.73
+      deviationRisk: 0.04
     knowledge:
       - skillId: "spirit.void_thought"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "talisman.true_name"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "foundation.void_theory"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "spirit_power"
-        base: 0.42
+        base: 0.462
         knowledgeScales:
           - "spirit.void_thought"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "spirit_power"
         stackPolicy: "highest"
@@ -4029,11 +3852,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.044
       - effectId: "true_name_power"
-        base: 0.2
+        base: 0.22
         knowledgeScales:
           - "talisman.true_name"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "true_name_power"
         stackPolicy: "highest"
@@ -4045,9 +3868,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.033
       - effectId: "true_name_accuracy"
-        base: 0.22
-        knowledgeGrowth: 0.06
+        base: 0.242
         knowledgeScales:
           - "spirit.void_thought"
         operation: "add_percent"
@@ -4061,6 +3884,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.066
     learningRequirements:
       realm: "void"
       knowledge:
@@ -4084,31 +3908,27 @@ methods:
     nextMethodId: "method.taiyin.8"
     description: "万念归一并封锁因果。"
     practice:
-      efficiency: 1.72
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.04
+      efficiency: 1.76
+      knowledgeXpRatio: 0.725
+      deviationRisk: 0.035
     knowledge:
       - skillId: "spirit.myriad"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "talisman.causality_seal"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "heaven.causality"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "mental_resistance"
-        base: 0.36
+        base: 0.396
         knowledgeScales:
           - "spirit.myriad"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "mental_resistance"
         stackPolicy: "add_capped"
@@ -4120,11 +3940,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.044
       - effectId: "causality_resistance"
-        base: 0.2
+        base: 0.22
         knowledgeScales:
           - "heaven.causality"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "causality_resistance"
         stackPolicy: "add_capped"
@@ -4136,9 +3956,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.033
       - effectId: "causality_detection"
-        base: 0.24
-        knowledgeGrowth: 0.07
+        base: 0.264
         knowledgeScales:
           - "spirit.myriad"
         operation: "add_percent"
@@ -4152,6 +3972,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.077
     learningRequirements:
       realm: "merge"
       knowledge:
@@ -4175,31 +3996,27 @@ methods:
     nextMethodId: "method.taiyin.9"
     description: "不坏道心代天敕命。"
     practice:
-      efficiency: 1.84
+      efficiency: 1.88
       knowledgeXpRatio: 0.72
-      deviationRisk: 0.035
+      deviationRisk: 0.03
     knowledge:
       - skillId: "spirit.dao_heart"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "talisman.heaven_decree"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "heaven.dao_fruit"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "mental_resistance"
-        base: 0.5
+        base: 0.55
         knowledgeScales:
           - "spirit.dao_heart"
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         stackGroup: "mental_resistance"
         stackPolicy: "add_capped"
@@ -4211,11 +4028,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.055
       - effectId: "decree_power"
-        base: 0.26
+        base: 0.286
         knowledgeScales:
           - "talisman.heaven_decree"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "decree_power"
         stackPolicy: "highest"
@@ -4227,9 +4044,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.039
       - effectId: "dao_heart_stability"
-        base: 0.28
-        knowledgeGrowth: 0.08
+        base: 0.308
         knowledgeScales:
           - "spirit.dao_heart"
         operation: "add_percent"
@@ -4243,6 +4060,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.088
     learningRequirements:
       realm: "great"
       knowledge:
@@ -4266,31 +4084,27 @@ methods:
     nextMethodId: null
     description: "超脱心劫，重构劫后元神。"
     practice:
-      efficiency: 1.96
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.03
+      efficiency: 2
+      knowledgeXpRatio: 0.715
+      deviationRisk: 0.025
     knowledge:
       - skillId: "spirit.tribulation_mind"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "talisman.tribulation_edict"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "foundation.ascension"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "heart_tribulation_resistance"
-        base: 0.5
+        base: 0.55
         knowledgeScales:
           - "spirit.tribulation_mind"
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         stackGroup: "heart_tribulation_resistance"
         stackPolicy: "add_capped"
@@ -4302,11 +4116,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.055
       - effectId: "tribulation_control"
-        base: 0.22
+        base: 0.242
         knowledgeScales:
           - "talisman.tribulation_edict"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "tribulation_control"
         stackPolicy: "highest"
@@ -4318,9 +4132,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.039
       - effectId: "heart_tribulation_insight"
-        base: 0.32
-        knowledgeGrowth: 0.09
+        base: 0.352
         knowledgeScales:
           - "spirit.tribulation_mind"
         operation: "add_percent"
@@ -4334,6 +4148,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.099
     learningRequirements:
       realm: "tribulation"
       knowledge:
@@ -4357,31 +4172,27 @@ methods:
     nextMethodId: "method.leihuo.2"
     description: "辨五行、御气成术。"
     practice:
-      efficiency: 1
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.07
+      efficiency: 1.04
+      knowledgeXpRatio: 0.755
+      deviationRisk: 0.065
     knowledge:
       - skillId: "spell.elements"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "spell.projectile"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "foundation.control"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "spell_damage"
-        base: 0.14
+        base: 0.154
         knowledgeScales:
           - "spell.projectile"
-        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "spell_damage"
         stackPolicy: "highest"
@@ -4393,11 +4204,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.024
       - effectId: "element_control"
-        base: 0.1
+        base: 0.11
         knowledgeScales:
           - "spell.elements"
-        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "element_control"
         stackPolicy: "highest"
@@ -4409,9 +4220,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.02
       - effectId: "cast_speed"
-        base: 0.08
-        knowledgeGrowth: 0.03
+        base: 0.088
         knowledgeScales:
           - "spell.elements"
         operation: "add_percent"
@@ -4425,6 +4236,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.033
     learningRequirements:
       realm: "qi"
       knowledge: []
@@ -4442,31 +4254,27 @@ methods:
     nextMethodId: "method.leihuo.3"
     description: "五行轮转，火法筑基。"
     practice:
-      efficiency: 1.12
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.065
+      efficiency: 1.16
+      knowledgeXpRatio: 0.75
+      deviationRisk: 0.06
     knowledge:
       - skillId: "spell.five_phase"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "foundation.dao_base"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "cultivation.purity"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "spell_damage"
-        base: 0.22
+        base: 0.242
         knowledgeScales:
           - "spell.five_phase"
-        knowledgeGrowth: 0.028
         operation: "add_percent"
         stackGroup: "spell_damage"
         stackPolicy: "highest"
@@ -4478,11 +4286,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.031
       - effectId: "mana_efficiency"
-        base: 0.1
+        base: 0.11
         knowledgeScales:
           - "cultivation.purity"
-        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "mana_efficiency"
         stackPolicy: "highest"
@@ -4494,9 +4302,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.02
       - effectId: "element_conversion"
-        base: 0.14
-        knowledgeGrowth: 0.04
+        base: 0.154
         knowledgeScales:
           - "spell.five_phase"
         operation: "add_percent"
@@ -4510,6 +4318,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.044
     learningRequirements:
       realm: "foundation"
       knowledge:
@@ -4533,31 +4342,27 @@ methods:
     nextMethodId: "method.leihuo.4"
     description: "丹火化雷，爆发克邪。"
     practice:
-      efficiency: 1.24
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.06
+      efficiency: 1.28
+      knowledgeXpRatio: 0.745
+      deviationRisk: 0.055
     knowledge:
       - skillId: "spell.thunder"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "cultivation.core_fire"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "foundation.core_theory"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "thunder_damage"
-        base: 0.3
+        base: 0.33
         knowledgeScales:
           - "spell.thunder"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "thunder_damage"
         stackPolicy: "highest"
@@ -4569,11 +4374,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.039
       - effectId: "evil_bane"
-        base: 0.16
+        base: 0.176
         knowledgeScales:
           - "cultivation.core_fire"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "evil_bane"
         stackPolicy: "highest"
@@ -4585,9 +4390,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.028
       - effectId: "lightning_chain_count"
-        base: 1
-        knowledgeGrowth: 1
+        base: 1.1
         knowledgeScales:
           - "spell.thunder"
         operation: "add_flat"
@@ -4600,6 +4405,7 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 3
+        masteryGrowth: 1.1
     learningRequirements:
       realm: "core"
       knowledge:
@@ -4623,31 +4429,27 @@ methods:
     nextMethodId: "method.leihuo.5"
     description: "借天地共鸣连续施法。"
     practice:
-      efficiency: 1.36
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.055
+      efficiency: 1.4
+      knowledgeXpRatio: 0.74
+      deviationRisk: 0.05
     knowledge:
       - skillId: "spell.resonance"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "cultivation.nascent_cycle"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "world.weather"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "spell_damage"
-        base: 0.34
+        base: 0.374
         knowledgeScales:
           - "spell.resonance"
-        knowledgeGrowth: 0.038
         operation: "add_percent"
         stackGroup: "spell_damage"
         stackPolicy: "highest"
@@ -4659,11 +4461,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.042
       - effectId: "weather_control"
-        base: 0.12
+        base: 0.132
         knowledgeScales:
           - "world.weather"
-        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "weather_control"
         stackPolicy: "highest"
@@ -4675,9 +4477,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.022
       - effectId: "environment_spell_bonus"
-        base: 0.18
-        knowledgeGrowth: 0.05
+        base: 0.198
         knowledgeScales:
           - "spell.resonance"
         operation: "add_percent"
@@ -4691,6 +4493,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.055
     learningRequirements:
       realm: "nascent"
       knowledge:
@@ -4714,31 +4517,27 @@ methods:
     nextMethodId: "method.leihuo.6"
     description: "展开赤霄雷火领域。"
     practice:
-      efficiency: 1.48
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.05
+      efficiency: 1.52
+      knowledgeXpRatio: 0.735
+      deviationRisk: 0.045
     knowledge:
       - skillId: "spell.domain"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "foundation.spirit_theory"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "heaven.causality"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "spell_domain"
-        base: 0.3
+        base: 0.33
         knowledgeScales:
           - "spell.domain"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "spell_domain"
         stackPolicy: "highest"
@@ -4750,11 +4549,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.039
       - effectId: "thunder_damage"
-        base: 0.4
+        base: 0.44
         knowledgeScales:
           - "foundation.spirit_theory"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "thunder_damage"
         stackPolicy: "highest"
@@ -4766,9 +4565,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.044
       - effectId: "domain_damage"
-        base: 0.22
-        knowledgeGrowth: 0.06
+        base: 0.242
         knowledgeScales:
           - "spell.domain"
         operation: "add_percent"
@@ -4782,6 +4581,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.066
     learningRequirements:
       realm: "transform"
       knowledge:
@@ -4805,31 +4605,27 @@ methods:
     nextMethodId: "method.leihuo.7"
     description: "雷火穿越虚空锁定目标。"
     practice:
-      efficiency: 1.6
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.045
+      efficiency: 1.64
+      knowledgeXpRatio: 0.73
+      deviationRisk: 0.04
     knowledge:
       - skillId: "spell.void"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "foundation.void_theory"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "talisman.true_name"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "space_pierce"
-        base: 0.2
+        base: 0.22
         knowledgeScales:
           - "spell.void"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "space_pierce"
         stackPolicy: "highest"
@@ -4841,11 +4637,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.033
       - effectId: "spell_damage"
-        base: 0.5
+        base: 0.55
         knowledgeScales:
           - "talisman.true_name"
-        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "spell_damage"
         stackPolicy: "highest"
@@ -4857,9 +4653,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.05
       - effectId: "void_spell_accuracy"
-        base: 0.22
-        knowledgeGrowth: 0.06
+        base: 0.242
         knowledgeScales:
           - "spell.void"
         operation: "add_percent"
@@ -4873,6 +4669,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.066
     learningRequirements:
       realm: "void"
       knowledge:
@@ -4896,31 +4693,27 @@ methods:
     nextMethodId: "method.leihuo.8"
     description: "言出法随，敕雷焚世。"
     practice:
-      efficiency: 1.72
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.04
+      efficiency: 1.76
+      knowledgeXpRatio: 0.725
+      deviationRisk: 0.035
     knowledge:
       - skillId: "spell.law"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "heaven.law_seed"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "talisman.command"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "law_spell_power"
-        base: 0.32
+        base: 0.352
         knowledgeScales:
           - "spell.law"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "law_spell_power"
         stackPolicy: "highest"
@@ -4932,11 +4725,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.044
       - effectId: "thunder_damage"
-        base: 0.58
+        base: 0.638
         knowledgeScales:
           - "heaven.law_seed"
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         stackGroup: "thunder_damage"
         stackPolicy: "highest"
@@ -4948,9 +4741,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.055
       - effectId: "law_spell_efficiency"
-        base: 0.25
-        knowledgeGrowth: 0.07
+        base: 0.275
         knowledgeScales:
           - "spell.law"
         operation: "add_percent"
@@ -4964,6 +4757,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.077
     learningRequirements:
       realm: "merge"
       knowledge:
@@ -4987,31 +4781,27 @@ methods:
     nextMethodId: "method.leihuo.9"
     description: "掌中天地化作雷池火海。"
     practice:
-      efficiency: 1.84
+      efficiency: 1.88
       knowledgeXpRatio: 0.72
-      deviationRisk: 0.035
+      deviationRisk: 0.03
     knowledge:
       - skillId: "spell.world"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "heaven.law_mastery"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "formation.cave_heaven"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "world_spell_power"
-        base: 0.4
+        base: 0.44
         knowledgeScales:
           - "spell.world"
-        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "world_spell_power"
         stackPolicy: "highest"
@@ -5023,11 +4813,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.05
       - effectId: "spell_domain"
-        base: 0.42
+        base: 0.462
         knowledgeScales:
           - "formation.cave_heaven"
-        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "spell_domain"
         stackPolicy: "highest"
@@ -5039,9 +4829,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.05
       - effectId: "world_spell_duration"
-        base: 0.28
-        knowledgeGrowth: 0.08
+        base: 0.308
         knowledgeScales:
           - "spell.world"
         operation: "add_percent"
@@ -5055,6 +4845,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.088
     learningRequirements:
       realm: "great"
       knowledge:
@@ -5078,31 +4869,27 @@ methods:
     nextMethodId: null
     description: "引劫灭敌，并借雷火飞升。"
     practice:
-      efficiency: 1.96
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.03
+      efficiency: 2
+      knowledgeXpRatio: 0.715
+      deviationRisk: 0.025
     knowledge:
       - skillId: "spell.cataclysm"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "heaven.tribulation"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "heaven.thunder_body"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "tribulation_damage"
-        base: 0.55
+        base: 0.605
         knowledgeScales:
           - "spell.cataclysm"
-        knowledgeGrowth: 0.055
         operation: "add_percent"
         stackGroup: "tribulation_damage"
         stackPolicy: "highest"
@@ -5114,11 +4901,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.061
       - effectId: "tribulation_resistance"
-        base: 0.2
+        base: 0.22
         knowledgeScales:
           - "heaven.thunder_body"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "tribulation_resistance"
         stackPolicy: "add_capped"
@@ -5130,9 +4917,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.033
       - effectId: "tribulation_energy_absorption"
-        base: 0.3
-        knowledgeGrowth: 0.09
+        base: 0.33
         knowledgeScales:
           - "spell.cataclysm"
         operation: "add_percent"
@@ -5146,6 +4933,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.099
     learningRequirements:
       realm: "tribulation"
       knowledge:
@@ -5174,17 +4962,14 @@ methods:
       deviationRisk: 0.07
     knowledge:
       - skillId: "formation.runes"
-        capLevel: 3
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "artifact.materials"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "artifact.smelting"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -5193,7 +4978,6 @@ methods:
         base: 0.1
         knowledgeScales:
           - "artifact.smelting"
-        knowledgeGrowth: 0.018
         operation: "add_percent"
         stackGroup: "craft_quality"
         stackPolicy: "highest"
@@ -5205,11 +4989,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.018
       - effectId: "formation_power"
         base: 0.08
         knowledgeScales:
           - "formation.runes"
-        knowledgeGrowth: 0.015
         operation: "add_percent"
         stackGroup: "formation_power"
         stackPolicy: "highest"
@@ -5221,9 +5005,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.015
       - effectId: "material_efficiency"
         base: 0.1
-        knowledgeGrowth: 0.03
         knowledgeScales:
           - "formation.runes"
         operation: "add_percent"
@@ -5237,6 +5021,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.03
     learningRequirements:
       realm: "qi"
       knowledge: []
@@ -5255,21 +5040,18 @@ methods:
     description: "器纹与阵法互相承载。"
     practice:
       efficiency: 1.12
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.715
       deviationRisk: 0.065
     knowledge:
       - skillId: "artifact.inscription"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "formation.defense"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "formation.array"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -5278,7 +5060,6 @@ methods:
         base: 0.18
         knowledgeScales:
           - "artifact.inscription"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "craft_quality"
         stackPolicy: "highest"
@@ -5290,11 +5071,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.025
       - effectId: "formation_power"
         base: 0.16
         knowledgeScales:
           - "formation.defense"
-        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "formation_power"
         stackPolicy: "highest"
@@ -5306,9 +5087,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.022
       - effectId: "inscription_success"
         base: 0.14
-        knowledgeGrowth: 0.04
         knowledgeScales:
           - "artifact.inscription"
         operation: "add_percent"
@@ -5322,6 +5103,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.04
     learningRequirements:
       realm: "foundation"
       knowledge:
@@ -5346,21 +5128,18 @@ methods:
     description: "炼制法宝与自主傀儡。"
     practice:
       efficiency: 1.24
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.71
       deviationRisk: 0.06
     knowledge:
       - skillId: "artifact.treasure"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "artifact.puppet"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "formation.restriction"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -5369,7 +5148,6 @@ methods:
         base: 0.22
         knowledgeScales:
           - "artifact.treasure"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "artifact_power"
         stackPolicy: "highest"
@@ -5381,11 +5159,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.03
       - effectId: "puppet_power"
         base: 0.16
         knowledgeScales:
           - "artifact.puppet"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "puppet_power"
         stackPolicy: "highest"
@@ -5397,9 +5175,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.025
       - effectId: "puppet_capacity"
         base: 1
-        knowledgeGrowth: 1
         knowledgeScales:
           - "artifact.treasure"
         operation: "add_flat"
@@ -5412,6 +5190,7 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 3
+        masteryGrowth: 1
     learningRequirements:
       realm: "core"
       knowledge:
@@ -5436,21 +5215,18 @@ methods:
     description: "本命法宝与传送阵同调。"
     practice:
       efficiency: 1.36
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.705
       deviationRisk: 0.055
     knowledge:
       - skillId: "artifact.life_bound"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "formation.teleport"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "spirit.soul"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -5459,7 +5235,6 @@ methods:
         base: 0.3
         knowledgeScales:
           - "artifact.life_bound"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "artifact_power"
         stackPolicy: "highest"
@@ -5471,11 +5246,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.035
       - effectId: "teleport_stability"
         base: 0.2
         knowledgeScales:
           - "formation.teleport"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "teleport_stability"
         stackPolicy: "highest"
@@ -5487,9 +5262,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.03
       - effectId: "life_bound_sync"
         base: 0.18
-        knowledgeGrowth: 0.05
         knowledgeScales:
           - "artifact.life_bound"
         operation: "add_percent"
@@ -5503,6 +5278,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.05
     learningRequirements:
       realm: "nascent"
       knowledge:
@@ -5527,21 +5303,18 @@ methods:
     description: "孕育器灵并固化领域。"
     practice:
       efficiency: 1.48
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.7
       deviationRisk: 0.05
     knowledge:
       - skillId: "artifact.spirit"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "formation.domain"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "spirit.split"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -5550,7 +5323,6 @@ methods:
         base: 0.38
         knowledgeScales:
           - "artifact.spirit"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "artifact_power"
         stackPolicy: "highest"
@@ -5562,11 +5334,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.04
       - effectId: "formation_power"
         base: 0.3
         knowledgeScales:
           - "formation.domain"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "formation_power"
         stackPolicy: "highest"
@@ -5578,9 +5350,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.035
       - effectId: "artifact_autonomy"
         base: 0.22
-        knowledgeGrowth: 0.06
         knowledgeScales:
           - "artifact.spirit"
         operation: "add_percent"
@@ -5594,6 +5366,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.06
     learningRequirements:
       realm: "transform"
       knowledge:
@@ -5618,21 +5391,18 @@ methods:
     description: "建造穿行虚空的飞舟。"
     practice:
       efficiency: 1.6
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.695
       deviationRisk: 0.045
     knowledge:
       - skillId: "artifact.void_ship"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "formation.space"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "world.void_survival"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -5641,7 +5411,6 @@ methods:
         base: 0.32
         knowledgeScales:
           - "artifact.void_ship"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "ship_performance"
         stackPolicy: "highest"
@@ -5653,11 +5422,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.04
       - effectId: "space_stability"
         base: 0.26
         knowledgeScales:
           - "formation.space"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "space_stability"
         stackPolicy: "highest"
@@ -5669,9 +5438,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.035
       - effectId: "void_ship_range"
         base: 0.22
-        knowledgeGrowth: 0.06
         knowledgeScales:
           - "artifact.void_ship"
         operation: "add_percent"
@@ -5685,6 +5454,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.06
     learningRequirements:
       realm: "void"
       knowledge:
@@ -5709,21 +5479,18 @@ methods:
     description: "道器成为洞天的法则核心。"
     practice:
       efficiency: 1.72
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.69
       deviationRisk: 0.04
     knowledge:
       - skillId: "artifact.dao_weapon"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "formation.cave_heaven"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "heaven.law_seed"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -5732,7 +5499,6 @@ methods:
         base: 0.5
         knowledgeScales:
           - "artifact.dao_weapon"
-        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "artifact_power"
         stackPolicy: "highest"
@@ -5744,11 +5510,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.045
       - effectId: "cave_heaven_growth"
         base: 0.25
         knowledgeScales:
           - "formation.cave_heaven"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "cave_heaven_growth"
         stackPolicy: "highest"
@@ -5760,9 +5526,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.035
       - effectId: "dao_artifact_stability"
         base: 0.25
-        knowledgeGrowth: 0.07
         knowledgeScales:
           - "artifact.dao_weapon"
         operation: "add_percent"
@@ -5776,6 +5542,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.07
     learningRequirements:
       realm: "merge"
       knowledge:
@@ -5800,21 +5567,18 @@ methods:
     description: "炼成世界重器并布周天星阵。"
     practice:
       efficiency: 1.84
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.685
       deviationRisk: 0.035
     knowledge:
       - skillId: "artifact.world_treasure"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "formation.star"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "heaven.astrology"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -5823,7 +5587,6 @@ methods:
         base: 0.45
         knowledgeScales:
           - "artifact.world_treasure"
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         stackGroup: "world_artifact_power"
         stackPolicy: "highest"
@@ -5835,11 +5598,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.05
       - effectId: "formation_power"
         base: 0.46
         knowledgeScales:
           - "formation.star"
-        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "formation_power"
         stackPolicy: "highest"
@@ -5851,9 +5614,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.045
       - effectId: "star_array_output"
         base: 0.28
-        knowledgeGrowth: 0.08
         knowledgeScales:
           - "artifact.world_treasure"
         operation: "add_percent"
@@ -5867,6 +5630,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.08
     learningRequirements:
       realm: "great"
       knowledge:
@@ -5891,21 +5655,18 @@ methods:
     description: "以天劫令重器蜕变为仙器。"
     practice:
       efficiency: 1.96
-      knowledgeXpRatio: 0.72
+      knowledgeXpRatio: 0.68
       deviationRisk: 0.03
     knowledge:
       - skillId: "artifact.immortal"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "formation.tribulation"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "heaven.tribulation"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
@@ -5914,7 +5675,6 @@ methods:
         base: 0.55
         knowledgeScales:
           - "artifact.immortal"
-        knowledgeGrowth: 0.055
         operation: "add_percent"
         stackGroup: "immortal_artifact_power"
         stackPolicy: "highest"
@@ -5926,11 +5686,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.055
       - effectId: "tribulation_control"
         base: 0.36
         knowledgeScales:
           - "formation.tribulation"
-        knowledgeGrowth: 0.045
         operation: "add_percent"
         stackGroup: "tribulation_control"
         stackPolicy: "highest"
@@ -5942,9 +5702,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.045
       - effectId: "artifact_tribulation_success"
         base: 0.3
-        knowledgeGrowth: 0.09
         knowledgeScales:
           - "artifact.immortal"
         operation: "add_percent"
@@ -5958,6 +5718,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.09
     learningRequirements:
       realm: "tribulation"
       knowledge:
@@ -5981,31 +5742,27 @@ methods:
     nextMethodId: "method.wanxiang.2"
     description: "识万物、采灵材、适应荒野。"
     practice:
-      efficiency: 1
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.07
+      efficiency: 0.96
+      knowledgeXpRatio: 0.685
+      deviationRisk: 0.075
     knowledge:
       - skillId: "world.survival"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "world.appraisal"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "world.gathering"
-        capLevel: 3
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
     effects:
       - effectId: "gather_yield"
-        base: 0.12
+        base: 0.11
         knowledgeScales:
           - "world.gathering"
-        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "gather_yield"
         stackPolicy: "highest"
@@ -6017,11 +5774,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.018
       - effectId: "exploration_safety"
-        base: 0.08
+        base: 0.074
         knowledgeScales:
           - "world.survival"
-        knowledgeGrowth: 0.015
         operation: "add_percent"
         stackGroup: "exploration_safety"
         stackPolicy: "highest"
@@ -6033,9 +5790,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.014
       - effectId: "gather_speed"
-        base: 0.1
-        knowledgeGrowth: 0.03
+        base: 0.092
         knowledgeScales:
           - "world.survival"
         operation: "add_percent"
@@ -6049,6 +5806,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.028
     learningRequirements:
       realm: "qi"
       knowledge: []
@@ -6066,31 +5824,27 @@ methods:
     nextMethodId: "method.wanxiang.3"
     description: "经营资源并以基础封印约束灵兽。"
     practice:
-      efficiency: 1.12
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.065
+      efficiency: 1.08
+      knowledgeXpRatio: 0.68
+      deviationRisk: 0.07
     knowledge:
       - skillId: "world.trade"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "world.beast"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "talisman.seal"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "trade_profit"
-        base: 0.12
+        base: 0.11
         knowledgeScales:
           - "world.trade"
-        knowledgeGrowth: 0.02
         operation: "add_percent"
         stackGroup: "trade_profit"
         stackPolicy: "highest"
@@ -6102,11 +5856,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.018
       - effectId: "beast_power"
-        base: 0.16
+        base: 0.147
         knowledgeScales:
           - "world.beast"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "beast_power"
         stackPolicy: "highest"
@@ -6118,9 +5872,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.023
       - effectId: "beast_contract_capacity"
-        base: 1
-        knowledgeGrowth: 1
+        base: 0.92
         knowledgeScales:
           - "world.trade"
         operation: "add_flat"
@@ -6133,6 +5887,7 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 3
+        masteryGrowth: 0.92
     learningRequirements:
       realm: "foundation"
       knowledge: []
@@ -6152,31 +5907,27 @@ methods:
     nextMethodId: "method.wanxiang.4"
     description: "堪舆寻脉，培育兽群。"
     practice:
-      efficiency: 1.24
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.06
+      efficiency: 1.2
+      knowledgeXpRatio: 0.675
+      deviationRisk: 0.065
     knowledge:
       - skillId: "world.geomancy"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "formation.array"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "alchemy.blood"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "rare_find_chance"
-        base: 0.16
+        base: 0.147
         knowledgeScales:
           - "world.geomancy"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "rare_find_chance"
         stackPolicy: "add_capped"
@@ -6188,11 +5939,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.023
       - effectId: "beast_growth"
-        base: 0.14
+        base: 0.129
         knowledgeScales:
           - "alchemy.blood"
-        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "beast_growth"
         stackPolicy: "highest"
@@ -6204,9 +5955,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.02
       - effectId: "spirit_vein_detection"
-        base: 0.16
-        knowledgeGrowth: 0.05
+        base: 0.147
         knowledgeScales:
           - "world.geomancy"
         operation: "add_percent"
@@ -6220,6 +5971,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.046
     learningRequirements:
       realm: "core"
       knowledge: []
@@ -6239,31 +5991,27 @@ methods:
     nextMethodId: "method.wanxiang.5"
     description: "观天测候，跨域迁徙。"
     practice:
-      efficiency: 1.36
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.055
+      efficiency: 1.32
+      knowledgeXpRatio: 0.67
+      deviationRisk: 0.06
     knowledge:
       - skillId: "world.weather"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "formation.teleport"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "heaven.fate"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "exploration_safety"
-        base: 0.22
+        base: 0.202
         knowledgeScales:
           - "world.weather"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "exploration_safety"
         stackPolicy: "highest"
@@ -6275,11 +6023,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.028
       - effectId: "rare_find_chance"
-        base: 0.2
+        base: 0.184
         knowledgeScales:
           - "heaven.fate"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "rare_find_chance"
         stackPolicy: "add_capped"
@@ -6291,9 +6039,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.028
       - effectId: "weather_warning"
-        base: 0.18
-        knowledgeGrowth: 0.05
+        base: 0.166
         knowledgeScales:
           - "world.weather"
         operation: "add_percent"
@@ -6307,6 +6055,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.046
     learningRequirements:
       realm: "nascent"
       knowledge: []
@@ -6326,31 +6075,27 @@ methods:
     nextMethodId: "method.wanxiang.6"
     description: "建立稳定界域航线。"
     practice:
-      efficiency: 1.48
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.05
+      efficiency: 1.44
+      knowledgeXpRatio: 0.665
+      deviationRisk: 0.055
     knowledge:
       - skillId: "world.realm_travel"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "spirit.split"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "spell.resonance"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "travel_efficiency"
-        base: 0.3
+        base: 0.276
         knowledgeScales:
           - "world.realm_travel"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "travel_efficiency"
         stackPolicy: "highest"
@@ -6362,11 +6107,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.032
       - effectId: "expedition_capacity"
-        base: 0.18
+        base: 0.166
         knowledgeScales:
           - "spirit.split"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "expedition_capacity"
         stackPolicy: "highest"
@@ -6378,9 +6123,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.023
       - effectId: "route_discovery"
-        base: 0.22
-        knowledgeGrowth: 0.06
+        base: 0.202
         knowledgeScales:
           - "world.realm_travel"
         operation: "add_percent"
@@ -6394,6 +6139,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.055
     learningRequirements:
       realm: "transform"
       knowledge: []
@@ -6413,31 +6159,27 @@ methods:
     nextMethodId: "method.wanxiang.7"
     description: "驾驭灵兽与飞舟穿行虚空。"
     practice:
-      efficiency: 1.6
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.045
+      efficiency: 1.56
+      knowledgeXpRatio: 0.66
+      deviationRisk: 0.05
     knowledge:
       - skillId: "world.void_survival"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "artifact.void_ship"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "body.void_body"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "void_survival"
-        base: 0.34
+        base: 0.313
         knowledgeScales:
           - "world.void_survival"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "void_survival"
         stackPolicy: "highest"
@@ -6449,11 +6191,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.037
       - effectId: "ship_performance"
-        base: 0.16
+        base: 0.147
         knowledgeScales:
           - "artifact.void_ship"
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         stackGroup: "ship_performance"
         stackPolicy: "highest"
@@ -6465,9 +6207,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.023
       - effectId: "void_route_safety"
-        base: 0.22
-        knowledgeGrowth: 0.06
+        base: 0.202
         knowledgeScales:
           - "world.void_survival"
         operation: "add_percent"
@@ -6481,6 +6223,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.055
     learningRequirements:
       realm: "void"
       knowledge: []
@@ -6500,31 +6243,27 @@ methods:
     nextMethodId: "method.wanxiang.8"
     description: "治理跨界宗门与资源网络。"
     practice:
-      efficiency: 1.72
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.04
+      efficiency: 1.68
+      knowledgeXpRatio: 0.655
+      deviationRisk: 0.045
     knowledge:
       - skillId: "world.civilization"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "foundation.integration_theory"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "heaven.causality"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "settlement_output"
-        base: 0.28
+        base: 0.258
         knowledgeScales:
           - "world.civilization"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "settlement_output"
         stackPolicy: "highest"
@@ -6536,11 +6275,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.032
       - effectId: "trade_profit"
-        base: 0.24
+        base: 0.221
         knowledgeScales:
           - "heaven.causality"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "trade_profit"
         stackPolicy: "highest"
@@ -6552,9 +6291,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.028
       - effectId: "governance_efficiency"
-        base: 0.25
-        knowledgeGrowth: 0.07
+        base: 0.23
         knowledgeScales:
           - "world.civilization"
         operation: "add_percent"
@@ -6568,6 +6307,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.064
     learningRequirements:
       realm: "merge"
       knowledge: []
@@ -6587,31 +6327,27 @@ methods:
     nextMethodId: "method.wanxiang.9"
     description: "牧养一方世界的生态文明。"
     practice:
-      efficiency: 1.84
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.035
+      efficiency: 1.8
+      knowledgeXpRatio: 0.65
+      deviationRisk: 0.04
     knowledge:
       - skillId: "world.world_shepherd"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "formation.cave_heaven"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "heaven.dao_fruit"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "world_growth"
-        base: 0.34
+        base: 0.313
         knowledgeScales:
           - "world.world_shepherd"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "world_growth"
         stackPolicy: "highest"
@@ -6623,11 +6359,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.037
       - effectId: "settlement_output"
-        base: 0.36
+        base: 0.331
         knowledgeScales:
           - "formation.cave_heaven"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "settlement_output"
         stackPolicy: "highest"
@@ -6639,9 +6375,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.037
       - effectId: "world_ecology_stability"
-        base: 0.28
-        knowledgeGrowth: 0.08
+        base: 0.258
         knowledgeScales:
           - "world.world_shepherd"
         operation: "add_percent"
@@ -6655,6 +6391,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.074
     learningRequirements:
       realm: "great"
       knowledge: []
@@ -6674,31 +6411,27 @@ methods:
     nextMethodId: null
     description: "维护通往飞升界域的航路。"
     practice:
-      efficiency: 1.96
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.03
+      efficiency: 1.92
+      knowledgeXpRatio: 0.645
+      deviationRisk: 0.035
     knowledge:
       - skillId: "world.ascension_route"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "foundation.ascension"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "heaven.astrology"
-        capLevel: 5
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "ascension_route_stability"
-        base: 0.45
+        base: 0.414
         knowledgeScales:
           - "world.ascension_route"
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         stackGroup: "ascension_route_stability"
         stackPolicy: "highest"
@@ -6710,11 +6443,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.046
       - effectId: "expedition_capacity"
-        base: 0.35
+        base: 0.322
         knowledgeScales:
           - "heaven.astrology"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "expedition_capacity"
         stackPolicy: "highest"
@@ -6726,9 +6459,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.037
       - effectId: "ascension_route_capacity"
-        base: 1
-        knowledgeGrowth: 1
+        base: 0.92
         knowledgeScales:
           - "world.ascension_route"
         operation: "add_flat"
@@ -6741,6 +6474,7 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 3
+        masteryGrowth: 0.92
     learningRequirements:
       realm: "tribulation"
       knowledge: []
@@ -6760,31 +6494,27 @@ methods:
     nextMethodId: "method.jiuji.2"
     description: "从因果中辨识自身未来劫数。"
     practice:
-      efficiency: 1
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.07
+      efficiency: 1.52
+      knowledgeXpRatio: 0.735
+      deviationRisk: 0.045
     knowledge:
       - skillId: "heaven.causality"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "heaven.fate"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "spirit.inner_demon"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "tribulation_forecast"
-        base: 0.18
+        base: 0.198
         knowledgeScales:
           - "heaven.causality"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "tribulation_forecast"
         stackPolicy: "highest"
@@ -6796,11 +6526,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.033
       - effectId: "karma_resistance"
-        base: 0.12
+        base: 0.132
         knowledgeScales:
           - "heaven.fate"
-        knowledgeGrowth: 0.022
         operation: "add_percent"
         stackGroup: "karma_resistance"
         stackPolicy: "add_capped"
@@ -6812,9 +6542,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.024
       - effectId: "tribulation_warning_time"
-        base: 0.18
-        knowledgeGrowth: 0.05
+        base: 0.198
         knowledgeScales:
           - "heaven.causality"
         operation: "add_percent"
@@ -6828,6 +6558,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.055
     learningRequirements:
       realm: "transform"
       knowledge: []
@@ -6845,31 +6576,27 @@ methods:
     nextMethodId: "method.jiuji.3"
     description: "培育法则种子，推演应劫之法。"
     practice:
-      efficiency: 1.12
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.065
+      efficiency: 1.64
+      knowledgeXpRatio: 0.73
+      deviationRisk: 0.04
     knowledge:
       - skillId: "heaven.law_seed"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "foundation.void_theory"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "spirit.void_thought"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "law_resistance"
-        base: 0.2
+        base: 0.22
         knowledgeScales:
           - "heaven.law_seed"
-        knowledgeGrowth: 0.03
         operation: "add_percent"
         stackGroup: "law_resistance"
         stackPolicy: "add_capped"
@@ -6881,11 +6608,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.033
       - effectId: "tribulation_forecast"
-        base: 0.28
+        base: 0.308
         knowledgeScales:
           - "spirit.void_thought"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "tribulation_forecast"
         stackPolicy: "highest"
@@ -6897,9 +6624,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.039
       - effectId: "law_seed_growth"
-        base: 0.22
-        knowledgeGrowth: 0.06
+        base: 0.242
         knowledgeScales:
           - "heaven.law_seed"
         operation: "add_percent"
@@ -6913,6 +6640,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.066
     learningRequirements:
       realm: "void"
       knowledge:
@@ -6936,31 +6664,27 @@ methods:
     nextMethodId: "method.jiuji.4"
     description: "执掌法则并统合应劫体系。"
     practice:
-      efficiency: 1.24
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.06
+      efficiency: 1.76
+      knowledgeXpRatio: 0.725
+      deviationRisk: 0.035
     knowledge:
       - skillId: "heaven.law_mastery"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "foundation.integration_theory"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "talisman.causality_seal"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "law_resistance"
-        base: 0.34
+        base: 0.374
         knowledgeScales:
           - "heaven.law_mastery"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "law_resistance"
         stackPolicy: "add_capped"
@@ -6972,11 +6696,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.044
       - effectId: "tribulation_control"
-        base: 0.18
+        base: 0.198
         knowledgeScales:
           - "talisman.causality_seal"
-        knowledgeGrowth: 0.028
         operation: "add_percent"
         stackGroup: "tribulation_control"
         stackPolicy: "highest"
@@ -6988,9 +6712,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.031
       - effectId: "tribulation_plan_slots"
-        base: 1
-        knowledgeGrowth: 1
+        base: 1.1
         knowledgeScales:
           - "heaven.law_mastery"
         operation: "add_flat"
@@ -7003,6 +6727,7 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 3
+        masteryGrowth: 1.1
     learningRequirements:
       realm: "merge"
       knowledge:
@@ -7026,31 +6751,27 @@ methods:
     nextMethodId: "method.jiuji.5"
     description: "道果圆融，主动适应劫雷。"
     practice:
-      efficiency: 1.36
+      efficiency: 1.88
       knowledgeXpRatio: 0.72
-      deviationRisk: 0.055
+      deviationRisk: 0.03
     knowledge:
       - skillId: "heaven.dao_fruit"
-        capLevel: 5
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "heaven.thunder_body"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "spirit.dao_heart"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "tribulation_resistance"
-        base: 0.32
+        base: 0.352
         knowledgeScales:
           - "heaven.thunder_body"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "tribulation_resistance"
         stackPolicy: "add_capped"
@@ -7062,11 +6783,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.044
       - effectId: "heart_tribulation_resistance"
-        base: 0.3
+        base: 0.33
         knowledgeScales:
           - "spirit.dao_heart"
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         stackGroup: "heart_tribulation_resistance"
         stackPolicy: "add_capped"
@@ -7078,9 +6799,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.044
       - effectId: "tribulation_resource_efficiency"
-        base: 0.28
-        knowledgeGrowth: 0.08
+        base: 0.308
         knowledgeScales:
           - "heaven.dao_fruit"
         operation: "add_percent"
@@ -7094,6 +6815,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.088
     learningRequirements:
       realm: "great"
       knowledge:
@@ -7117,31 +6839,27 @@ methods:
     nextMethodId: null
     description: "推演天劫并完成劫后新生。"
     practice:
-      efficiency: 1.48
-      knowledgeXpRatio: 0.72
-      deviationRisk: 0.05
+      efficiency: 2
+      knowledgeXpRatio: 0.715
+      deviationRisk: 0.025
     knowledge:
       - skillId: "heaven.tribulation"
-        capLevel: 5
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "heaven.ascendant"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "foundation.ascension"
-        capLevel: 5
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "tribulation_resistance"
-        base: 0.5
+        base: 0.55
         knowledgeScales:
           - "heaven.tribulation"
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         stackGroup: "tribulation_resistance"
         stackPolicy: "add_capped"
@@ -7153,11 +6871,11 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.055
       - effectId: "ascension_success"
-        base: 0.24
+        base: 0.264
         knowledgeScales:
           - "heaven.ascendant"
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         stackGroup: "ascension_success"
         stackPolicy: "add_capped"
@@ -7169,9 +6887,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.039
       - effectId: "ascension_failure_protection"
-        base: 0.2
-        knowledgeGrowth: 0.06
+        base: 0.22
         knowledgeScales:
           - "heaven.tribulation"
         operation: "add_percent"
@@ -7185,6 +6903,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.066
     learningRequirements:
       realm: "tribulation"
       knowledge:
@@ -7198,477 +6917,6 @@ methods:
     tags: []
     passive_rules: []
     synergy_rules: []
-  - id: "method.basic_breathing.1"
-    name: "基础吐纳诀"
-    familyId: "method.basic_breathing"
-    tier: 1
-    realm: "qi"
-    quality: 1
-    predecessorId: null
-    nextMethodId: null
-    description: "仅教授foundation.breathing的基础功法。"
-    practice:
-      efficiency: 1.15
-      knowledgeXpRatio: 0.95
-      deviationRisk: 0.01
-    knowledge:
-      - skillId: "foundation.breathing"
-        capLevel: 3
-        growthWeight: 1
-        masteryWeight: 1
-        gainFromCultivation: true
-    effects:
-      - effectId: "max_mana"
-        base: 35
-        knowledgeScales:
-          - "foundation.breathing"
-        knowledgeGrowth: 0
-        operation: "add_flat"
-        stackGroup: "max_mana"
-        stackPolicy: "highest"
-        activation: "active_method"
-        attributes:
-          category: "cultivation"
-          target: "self"
-          polarity: "positive"
-          valueType: "flat"
-          displayPriority: 1
-      - effectId: "cultivation_speed"
-        base: 0.04
-        knowledgeGrowth: 0.02
-        knowledgeScales:
-          - "foundation.breathing"
-        operation: "add_percent"
-        stackGroup: "cultivation_speed"
-        stackPolicy: "add_capped"
-        activation: "active_method"
-        cap: 2
-        attributes:
-          category: "cultivation"
-          target: "self"
-          polarity: "positive"
-          valueType: "ratio"
-          displayPriority: 2
-    learningRequirements:
-      realm: "qi"
-      knowledge: []
-    recommendedProgression: null
-    tags: []
-    passive_rules: []
-    synergy_rules: []
-  - id: "method.small_cycle.1"
-    name: "小周天行气法"
-    familyId: "method.small_cycle"
-    tier: 1
-    realm: "qi"
-    quality: 1
-    predecessorId: null
-    nextMethodId: null
-    description: "仅教授cultivation.cycle的基础功法。"
-    practice:
-      efficiency: 1.15
-      knowledgeXpRatio: 0.95
-      deviationRisk: 0.01
-    knowledge:
-      - skillId: "cultivation.cycle"
-        capLevel: 3
-        growthWeight: 1
-        masteryWeight: 1
-        gainFromCultivation: true
-    effects:
-      - effectId: "mana_regen"
-        base: 0.05
-        knowledgeScales:
-          - "cultivation.cycle"
-        knowledgeGrowth: 0
-        operation: "add_percent"
-        stackGroup: "mana_regen"
-        stackPolicy: "highest"
-        activation: "active_method"
-        cap: 2
-        attributes:
-          category: "cultivation"
-          target: "self"
-          polarity: "positive"
-          valueType: "ratio"
-          displayPriority: 1
-      - effectId: "mana_control"
-        base: 0.05
-        knowledgeGrowth: 0.02
-        knowledgeScales:
-          - "cultivation.cycle"
-        operation: "add_percent"
-        stackGroup: "mana_control"
-        stackPolicy: "add_capped"
-        activation: "active_method"
-        cap: 2
-        attributes:
-          category: "cultivation"
-          target: "self"
-          polarity: "positive"
-          valueType: "ratio"
-          displayPriority: 2
-    learningRequirements:
-      realm: "qi"
-      knowledge: []
-    recommendedProgression: null
-    tags: []
-    passive_rules: []
-    synergy_rules: []
-  - id: "method.iron_skin.1"
-    name: "铁衣功"
-    familyId: "method.iron_skin"
-    tier: 1
-    realm: "qi"
-    quality: 1
-    predecessorId: null
-    nextMethodId: null
-    description: "仅教授body.tempering的基础功法。"
-    practice:
-      efficiency: 1.15
-      knowledgeXpRatio: 0.95
-      deviationRisk: 0.01
-    knowledge:
-      - skillId: "body.tempering"
-        capLevel: 3
-        growthWeight: 1
-        masteryWeight: 1
-        gainFromCultivation: true
-    effects:
-      - effectId: "physical_resistance"
-        base: 0.05
-        knowledgeScales:
-          - "body.tempering"
-        knowledgeGrowth: 0
-        operation: "add_percent"
-        stackGroup: "physical_resistance"
-        stackPolicy: "add_capped"
-        activation: "active_method"
-        cap: 0.85
-        attributes:
-          category: "survival"
-          target: "self"
-          polarity: "positive"
-          valueType: "ratio"
-          displayPriority: 1
-      - effectId: "stagger_resistance"
-        base: 0.06
-        knowledgeGrowth: 0.02
-        knowledgeScales:
-          - "body.tempering"
-        operation: "add_percent"
-        stackGroup: "stagger_resistance"
-        stackPolicy: "add_capped"
-        activation: "active_method"
-        cap: 2
-        attributes:
-          category: "survival"
-          target: "self"
-          polarity: "positive"
-          valueType: "ratio"
-          displayPriority: 2
-    learningRequirements:
-      realm: "qi"
-      knowledge: []
-    recommendedProgression: null
-    tags: []
-    passive_rules: []
-    synergy_rules: []
-  - id: "method.clear_mind.1"
-    name: "清心定念法"
-    familyId: "method.clear_mind"
-    tier: 1
-    realm: "qi"
-    quality: 1
-    predecessorId: null
-    nextMethodId: null
-    description: "仅教授spirit.meditation的基础功法。"
-    practice:
-      efficiency: 1.15
-      knowledgeXpRatio: 0.95
-      deviationRisk: 0.01
-    knowledge:
-      - skillId: "spirit.meditation"
-        capLevel: 3
-        growthWeight: 1
-        masteryWeight: 1
-        gainFromCultivation: true
-    effects:
-      - effectId: "mental_resistance"
-        base: 0.06
-        knowledgeScales:
-          - "spirit.meditation"
-        knowledgeGrowth: 0
-        operation: "add_percent"
-        stackGroup: "mental_resistance"
-        stackPolicy: "add_capped"
-        activation: "active_method"
-        cap: 0.85
-        attributes:
-          category: "survival"
-          target: "self"
-          polarity: "positive"
-          valueType: "ratio"
-          displayPriority: 1
-      - effectId: "inner_demon_resistance"
-        base: 0.06
-        knowledgeGrowth: 0.02
-        knowledgeScales:
-          - "spirit.meditation"
-        operation: "add_percent"
-        stackGroup: "inner_demon_resistance"
-        stackPolicy: "add_capped"
-        activation: "active_method"
-        cap: 2
-        attributes:
-          category: "survival"
-          target: "self"
-          polarity: "positive"
-          valueType: "ratio"
-          displayPriority: 2
-    learningRequirements:
-      realm: "qi"
-      knowledge: []
-    recommendedProgression: null
-    tags: []
-    passive_rules: []
-    synergy_rules: []
-  - id: "method.sword_control.1"
-    name: "御剑诀"
-    familyId: "method.sword_control"
-    tier: 1
-    realm: "qi"
-    quality: 1
-    predecessorId: null
-    nextMethodId: null
-    description: "仅教授sword.qi的基础功法。"
-    practice:
-      efficiency: 1.15
-      knowledgeXpRatio: 0.95
-      deviationRisk: 0.01
-    knowledge:
-      - skillId: "sword.qi"
-        capLevel: 3
-        growthWeight: 1
-        masteryWeight: 1
-        gainFromCultivation: true
-    effects:
-      - effectId: "sword_damage"
-        base: 0.08
-        knowledgeScales:
-          - "sword.qi"
-        knowledgeGrowth: 0
-        operation: "add_percent"
-        stackGroup: "sword_damage"
-        stackPolicy: "highest"
-        activation: "active_method"
-        cap: 2
-        attributes:
-          category: "offense"
-          target: "self"
-          polarity: "positive"
-          valueType: "ratio"
-          displayPriority: 1
-      - effectId: "sword_control"
-        base: 0.06
-        knowledgeGrowth: 0.02
-        knowledgeScales:
-          - "sword.qi"
-        operation: "add_percent"
-        stackGroup: "sword_control"
-        stackPolicy: "add_capped"
-        activation: "active_method"
-        cap: 2
-        attributes:
-          category: "control"
-          target: "self"
-          polarity: "positive"
-          valueType: "ratio"
-          displayPriority: 2
-    learningRequirements:
-      realm: "qi"
-      knowledge: []
-    recommendedProgression: null
-    tags: []
-    passive_rules: []
-    synergy_rules: []
-  - id: "method.herb_manual.1"
-    name: "百草采炼录"
-    familyId: "method.herb_manual"
-    tier: 1
-    realm: "qi"
-    quality: 1
-    predecessorId: null
-    nextMethodId: null
-    description: "仅教授alchemy.herbs的基础功法。"
-    practice:
-      efficiency: 1.15
-      knowledgeXpRatio: 0.95
-      deviationRisk: 0.01
-    knowledge:
-      - skillId: "alchemy.herbs"
-        capLevel: 3
-        growthWeight: 1
-        masteryWeight: 1
-        gainFromCultivation: true
-    effects:
-      - effectId: "herb_yield"
-        base: 0.08
-        knowledgeScales:
-          - "alchemy.herbs"
-        knowledgeGrowth: 0
-        operation: "add_percent"
-        stackGroup: "herb_yield"
-        stackPolicy: "highest"
-        activation: "active_method"
-        cap: 2
-        attributes:
-          category: "production"
-          target: "self"
-          polarity: "positive"
-          valueType: "ratio"
-          displayPriority: 1
-      - effectId: "gather_speed"
-        base: 0.06
-        knowledgeGrowth: 0.02
-        knowledgeScales:
-          - "alchemy.herbs"
-        operation: "add_percent"
-        stackGroup: "gather_speed"
-        stackPolicy: "add_capped"
-        activation: "active_method"
-        cap: 2
-        attributes:
-          category: "exploration"
-          target: "self"
-          polarity: "positive"
-          valueType: "ratio"
-          displayPriority: 2
-    learningRequirements:
-      realm: "qi"
-      knowledge: []
-    recommendedProgression: null
-    tags: []
-    passive_rules: []
-    synergy_rules: []
-  - id: "method.rune_manual.1"
-    name: "基础阵纹册"
-    familyId: "method.rune_manual"
-    tier: 1
-    realm: "qi"
-    quality: 1
-    predecessorId: null
-    nextMethodId: null
-    description: "仅教授formation.runes的基础功法。"
-    practice:
-      efficiency: 1.15
-      knowledgeXpRatio: 0.95
-      deviationRisk: 0.01
-    knowledge:
-      - skillId: "formation.runes"
-        capLevel: 3
-        growthWeight: 1
-        masteryWeight: 1
-        gainFromCultivation: true
-    effects:
-      - effectId: "formation_power"
-        base: 0.06
-        knowledgeScales:
-          - "formation.runes"
-        knowledgeGrowth: 0
-        operation: "add_percent"
-        stackGroup: "formation_power"
-        stackPolicy: "highest"
-        activation: "active_method"
-        cap: 2
-        attributes:
-          category: "production"
-          target: "self"
-          polarity: "positive"
-          valueType: "ratio"
-          displayPriority: 1
-      - effectId: "inscription_success"
-        base: 0.06
-        knowledgeGrowth: 0.02
-        knowledgeScales:
-          - "formation.runes"
-        operation: "add_percent"
-        stackGroup: "inscription_success"
-        stackPolicy: "add_capped"
-        activation: "active_method"
-        cap: 0.75
-        attributes:
-          category: "production"
-          target: "self"
-          polarity: "positive"
-          valueType: "ratio"
-          displayPriority: 2
-    learningRequirements:
-      realm: "qi"
-      knowledge: []
-    recommendedProgression: null
-    tags: []
-    passive_rules: []
-    synergy_rules: []
-  - id: "method.appraisal_manual.1"
-    name: "万物鉴识篇"
-    familyId: "method.appraisal_manual"
-    tier: 1
-    realm: "qi"
-    quality: 1
-    predecessorId: null
-    nextMethodId: null
-    description: "仅教授world.appraisal的基础功法。"
-    practice:
-      efficiency: 1.15
-      knowledgeXpRatio: 0.95
-      deviationRisk: 0.01
-    knowledge:
-      - skillId: "world.appraisal"
-        capLevel: 3
-        growthWeight: 1
-        masteryWeight: 1
-        gainFromCultivation: true
-    effects:
-      - effectId: "rare_find_chance"
-        base: 0.05
-        knowledgeScales:
-          - "world.appraisal"
-        knowledgeGrowth: 0
-        operation: "add_percent"
-        stackGroup: "rare_find_chance"
-        stackPolicy: "add_capped"
-        activation: "active_method"
-        cap: 0.75
-        attributes:
-          category: "exploration"
-          target: "self"
-          polarity: "positive"
-          valueType: "ratio"
-          displayPriority: 1
-      - effectId: "appraisal_accuracy"
-        base: 0.08
-        knowledgeGrowth: 0.02
-        knowledgeScales:
-          - "world.appraisal"
-        operation: "add_percent"
-        stackGroup: "appraisal_accuracy"
-        stackPolicy: "add_capped"
-        activation: "active_method"
-        cap: 2
-        attributes:
-          category: "control"
-          target: "self"
-          polarity: "positive"
-          valueType: "ratio"
-          displayPriority: 2
-    learningRequirements:
-      realm: "qi"
-      knowledge: []
-    recommendedProgression: null
-    tags: []
-    passive_rules: []
-    synergy_rules: []
   - id: "method.blood_burst.1"
     name: "燃血断脉术"
     familyId: "method.blood_burst"
@@ -7679,29 +6927,25 @@ methods:
     nextMethodId: null
     description: "旁门爆发，以伤换攻"
     practice:
-      efficiency: 1.08
-      knowledgeXpRatio: 0.78
-      deviationRisk: 0.08
+      efficiency: 1.2
+      knowledgeXpRatio: 0.675
+      deviationRisk: 0.065
     knowledge:
       - skillId: "body.bloodline"
-        capLevel: 3
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "body.recovery"
-        capLevel: 4
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "alchemy.blood"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "melee_damage"
-        base: 0.38
-        knowledgeGrowth: 0.12
+        base: 0.35
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "melee_damage"
@@ -7714,9 +6958,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.11
       - effectId: "health_cost"
-        base: 0.12
-        knowledgeGrowth: 0.08
+        base: 0.11
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "health_cost"
@@ -7729,9 +6973,9 @@ methods:
           polarity: "negative"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.074
       - effectId: "low_health_damage"
-        base: 0.3
-        knowledgeGrowth: 0.1
+        base: 0.276
         knowledgeScales:
           - "body.bloodline"
         operation: "add_percent"
@@ -7745,6 +6989,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.092
     learningRequirements:
       realm: "core"
       knowledge: []
@@ -7763,28 +7008,24 @@ methods:
     description: "专精遁法与脱离"
     practice:
       efficiency: 1.08
-      knowledgeXpRatio: 0.78
-      deviationRisk: 0.08
+      knowledgeXpRatio: 0.68
+      deviationRisk: 0.07
     knowledge:
       - skillId: "spell.escape"
-        capLevel: 5
         growthWeight: 3
         masteryWeight: 3
         gainFromCultivation: false
       - skillId: "cultivation.cycle"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "world.survival"
-        capLevel: 2
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "travel_efficiency"
-        base: 0.28
-        knowledgeGrowth: 0.1
+        base: 0.258
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "travel_efficiency"
@@ -7797,9 +7038,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.092
       - effectId: "escape_success"
-        base: 0.2
-        knowledgeGrowth: 0.1
+        base: 0.184
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "escape_success"
@@ -7812,9 +7053,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.092
       - effectId: "evasion"
-        base: 0.18
-        knowledgeGrowth: 0.06
+        base: 0.166
         knowledgeScales:
           - "spell.escape"
         operation: "add_percent"
@@ -7828,6 +7069,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.055
     learningRequirements:
       realm: "foundation"
       knowledge: []
@@ -7845,29 +7087,25 @@ methods:
     nextMethodId: null
     description: "毒理、炼毒与解毒"
     practice:
-      efficiency: 1.08
-      knowledgeXpRatio: 0.78
-      deviationRisk: 0.08
+      efficiency: 1.2
+      knowledgeXpRatio: 0.675
+      deviationRisk: 0.065
     knowledge:
       - skillId: "alchemy.poison"
-        capLevel: 5
         growthWeight: 3
         masteryWeight: 3
         gainFromCultivation: false
       - skillId: "alchemy.medicine"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "alchemy.furnace"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "poison_power"
-        base: 0.32
-        knowledgeGrowth: 0.12
+        base: 0.294
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "poison_power"
@@ -7880,9 +7118,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.11
       - effectId: "poison_resistance"
-        base: 0.24
-        knowledgeGrowth: 0.1
+        base: 0.221
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "poison_resistance"
@@ -7895,9 +7133,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.092
       - effectId: "poison_duration"
-        base: 0.2
-        knowledgeGrowth: 0.08
+        base: 0.184
         knowledgeScales:
           - "alchemy.poison"
         operation: "add_percent"
@@ -7911,6 +7149,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.074
     learningRequirements:
       realm: "core"
       knowledge: []
@@ -7929,28 +7168,24 @@ methods:
     description: "趋吉避凶与天机探索"
     practice:
       efficiency: 1.08
-      knowledgeXpRatio: 0.78
-      deviationRisk: 0.08
+      knowledgeXpRatio: 0.68
+      deviationRisk: 0.07
     knowledge:
       - skillId: "heaven.omen"
-        capLevel: 5
         growthWeight: 3
         masteryWeight: 3
         gainFromCultivation: false
       - skillId: "heaven.astrology"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
       - skillId: "world.appraisal"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "rare_find_chance"
-        base: 0.18
-        knowledgeGrowth: 0.08
+        base: 0.166
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "rare_find_chance"
@@ -7963,9 +7198,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.074
       - effectId: "exploration_safety"
-        base: 0.16
-        knowledgeGrowth: 0.08
+        base: 0.147
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "exploration_safety"
@@ -7978,9 +7213,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.074
       - effectId: "danger_warning"
-        base: 0.18
-        knowledgeGrowth: 0.06
+        base: 0.166
         knowledgeScales:
           - "heaven.omen"
         operation: "add_percent"
@@ -7994,6 +7229,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.055
     learningRequirements:
       realm: "foundation"
       knowledge: []
@@ -8011,29 +7247,25 @@ methods:
     nextMethodId: null
     description: "符箓储备与快速激发"
     practice:
-      efficiency: 1.08
-      knowledgeXpRatio: 0.78
-      deviationRisk: 0.08
+      efficiency: 1.2
+      knowledgeXpRatio: 0.675
+      deviationRisk: 0.065
     knowledge:
       - skillId: "talisman.script"
-        capLevel: 5
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: false
       - skillId: "talisman.activation"
-        capLevel: 5
         growthWeight: 3
         masteryWeight: 3
         gainFromCultivation: false
       - skillId: "talisman.seal"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "talisman_capacity"
-        base: 3
-        knowledgeGrowth: 2
+        base: 2.76
         knowledgeScales: []
         operation: "add_flat"
         stackGroup: "talisman_capacity"
@@ -8046,9 +7278,9 @@ methods:
           polarity: "positive"
           valueType: "flat"
           displayPriority: 1
+        masteryGrowth: 1.84
       - effectId: "activation_speed"
-        base: 0.24
-        knowledgeGrowth: 0.1
+        base: 0.221
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "activation_speed"
@@ -8061,9 +7293,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.092
       - effectId: "talisman_cost_efficiency"
-        base: 0.18
-        knowledgeGrowth: 0.06
+        base: 0.166
         knowledgeScales:
           - "talisman.script"
         operation: "add_percent"
@@ -8077,6 +7309,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.055
     learningRequirements:
       realm: "core"
       knowledge: []
@@ -8095,28 +7328,24 @@ methods:
     description: "低阶高专精重剑流派"
     practice:
       efficiency: 1.08
-      knowledgeXpRatio: 0.78
-      deviationRisk: 0.08
+      knowledgeXpRatio: 0.68
+      deviationRisk: 0.07
     knowledge:
       - skillId: "sword.weapon"
-        capLevel: 5
         growthWeight: 3
         masteryWeight: 3
         gainFromCultivation: true
       - skillId: "body.bone"
-        capLevel: 4
         growthWeight: 2
         masteryWeight: 2
         gainFromCultivation: true
       - skillId: "sword.intent"
-        capLevel: 3
         growthWeight: 1
         masteryWeight: 1
         gainFromCultivation: true
     effects:
       - effectId: "melee_damage"
-        base: 0.3
-        knowledgeGrowth: 0.12
+        base: 0.276
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "melee_damage"
@@ -8129,9 +7358,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 1
+        masteryGrowth: 0.11
       - effectId: "armor_pierce"
-        base: 0.18
-        knowledgeGrowth: 0.08
+        base: 0.166
         knowledgeScales: []
         operation: "add_percent"
         stackGroup: "armor_pierce"
@@ -8144,9 +7373,9 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 2
+        masteryGrowth: 0.074
       - effectId: "stagger_power"
-        base: 0.24
-        knowledgeGrowth: 0.08
+        base: 0.221
         knowledgeScales:
           - "sword.weapon"
         operation: "add_percent"
@@ -8160,6 +7389,7 @@ methods:
           polarity: "positive"
           valueType: "ratio"
           displayPriority: 3
+        masteryGrowth: 0.074
     learningRequirements:
       realm: "foundation"
       knowledge: []

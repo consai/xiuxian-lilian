@@ -87,6 +87,9 @@ var unlocked_methods: Array:
 var cultivation_method_slots: Dictionary:
 	get: return DataStore.savedata.get("cultivation_method_slots", {}) as Dictionary
 	set(value): DataStore.savedata["cultivation_method_slots"] = value
+var current_cultivation_method_id: String:
+	get: return str(DataStore.savedata.get("current_cultivation_method_id", ""))
+	set(value): DataStore.savedata["current_cultivation_method_id"] = value
 var auto_battle_enabled: bool:
 	get: return bool(DataStore.savedata.get("auto_battle_enabled", false))
 	set(value): DataStore.savedata["auto_battle_enabled"] = value
@@ -184,6 +187,7 @@ func new_game() -> void:
 	cultivation_method_slots = (initial.get("method_slots", {
 		"main": "method.hunyuan.1", "support_1": "", "support_2": "", "movement": "",
 	}) as Dictionary).duplicate(true)
+	current_cultivation_method_id = str(cultivation_method_slots.get("main", "method.hunyuan.1"))
 	_seed_starter_knowledge()
 	auto_battle_enabled = false
 	auto_battle_preset = "balanced"
@@ -295,7 +299,7 @@ func load_game(slot: int) -> Dictionary:
 func cultivate() -> int:
 	var result := cultivate_session(
 		EnumCultivationMode.LABEL_CYCLE,
-		max_cultivation_days(EnumCultivationMode.LABEL_CYCLE)
+		min_cultivation_days()
 	)
 	return int(result.get("cultivation_gained", 0))
 
@@ -447,17 +451,44 @@ func _apply_alchemy_brew_result(
 	return result
 
 
-func max_cultivation_days(mode_id: String = EnumCultivationMode.LABEL_CYCLE, pill_id: String = "") -> int:
-	var planned_days := GameTimeServiceScript.suggested_activity_days(
-		EnumActivityTimeScript.LABEL_CULTIVATE,
-		major_realm_id()
-	)
+const CULTIVATION_MAX_YEARS := 10
+
+
+func min_cultivation_months() -> int:
+	return 1
+
+
+func max_cultivation_months_cap() -> int:
+	return CULTIVATION_MAX_YEARS * GameTimeServiceScript.months_per_year()
+
+
+func max_cultivation_months(
+	mode_id: String = EnumCultivationMode.LABEL_CYCLE,
+	pill_id: String = ""
+) -> int:
+	var cap := max_cultivation_months_cap()
 	if EnumCultivationMode.is_pill_mode(mode_id):
 		var resolved_pill_id := resolve_cultivation_pill_id(pill_id)
 		if resolved_pill_id == "":
-			return 1
-		return mini(planned_days, int(inventory.get(resolved_pill_id, 0)))
-	return planned_days
+			return min_cultivation_months()
+		return mini(cap, maxi(min_cultivation_months(), int(inventory.get(resolved_pill_id, 0))))
+	return cap
+
+
+func min_cultivation_days() -> int:
+	return GameTimeServiceScript.days_per_month()
+
+
+func max_cultivation_days(
+	mode_id: String = EnumCultivationMode.LABEL_CYCLE,
+	pill_id: String = ""
+) -> int:
+	return max_cultivation_months(mode_id, pill_id) * GameTimeServiceScript.days_per_month()
+
+
+func cultivation_session_months(days: int) -> int:
+	var days_per_month := GameTimeServiceScript.days_per_month()
+	return maxi(1, int(ceil(float(maxi(1, days)) / float(days_per_month))))
 
 
 func max_knowledge_study_days(skill_id: String = "") -> int:
@@ -479,7 +510,8 @@ func max_knowledge_study_days(skill_id: String = "") -> int:
 	var entry := KnowledgeServiceScript.get_entry(DataStore.savedata, sid)
 	var current_level := int(entry.get("level", 0))
 	var policy := gate.get("policy", {}) as Dictionary
-	var target_level := mini(current_level + 1, int(policy.get("max_level", 3)))
+	var skill := DaoTreeServiceScript.skill_by_id(sid)
+	var target_level := mini(current_level + 1, int(skill.get("maxLevel", 5)))
 	if target_level <= current_level:
 		return suggested
 	var speed := DaoTreeServiceScript.training_speed(sid, foundations, aptitudes)
@@ -546,7 +578,12 @@ func study_knowledge(skill_id: String, days: int = 1) -> Dictionary:
 
 func preview_cultivation_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: int = 1, pill_id: String = "") -> Dictionary:
 	var mode := _cultivation_mode(mode_id)
-	var safe_days := clampi(days, 1, max_cultivation_days(mode_id, pill_id))
+	var months := clampi(
+		cultivation_session_months(days),
+		min_cultivation_months(),
+		max_cultivation_months(mode_id, pill_id)
+	)
+	var safe_days := months * GameTimeServiceScript.days_per_month()
 	var resolved_pill_id := ""
 	var pill_ids: Array = []
 	if EnumCultivationMode.is_pill_mode(mode_id):
@@ -557,38 +594,62 @@ func preview_cultivation_session(mode_id: String = EnumCultivationMode.LABEL_CYC
 				"error": "背包中没有可用于修炼的丹药。",
 			}
 		var owned_pills := int(inventory.get(resolved_pill_id, 0))
-		if owned_pills < safe_days:
+		if owned_pills < months:
 			return {
 				"ok": false,
-				"error": "丹药炼化每日至少需要一枚%s，当前仅有 %d 枚。" % [
+				"error": "丹药炼化每月至少需要一枚%s，当前仅有 %d 枚。" % [
 					ConfigManager.get_item_display_name(resolved_pill_id),
 					owned_pills,
 				],
 			}
-		for _day_index in safe_days:
+		for _month_index in months:
 			pill_ids.append(resolved_pill_id)
-	var cfg := _activity_cfg("cultivate")
-	var base_gain := maxi(0, int(cfg.get("cultivation_gain", 20)))
-	var speed := CultivationMethodServiceScript.cultivation_speed(cultivation_method_slots)
+	var method_id := CultivationMethodServiceScript.active_cultivation_method_id(DataStore.savedata)
+	var method := CultivationMethodServiceScript.by_id(method_id)
+	var base_gain := RealmBalanceService.base_monthly_cultivation_gain(_realm_row(realm_index))
+	var speed := CultivationMethodServiceScript.cultivation_session_speed(method_id, DataStore.savedata)
 	if speed <= 0.0:
-		return {"ok": false, "error": "需要先装备主功法"}
-	base_gain = maxi(1, int(round(float(base_gain) * speed)))
+		return {"ok": false, "error": "需要先选择当前修炼功法"}
+	var method_breakdown := CultivationMethodServiceScript.base_cultivation_gain_breakdown(method_id)
+	var method_base_gain := int(method_breakdown.get("gain", 0))
 	var estimated_gain := 0
 	var remaining_injury := injury_days
-	for day_index in safe_days:
-		var normal_gain := base_gain / 2 if remaining_injury > 0 else base_gain
+	var monthly_gains: Array = []
+	var first_month_formula: Dictionary = {}
+	for _month_index in months:
 		var multiplier := float(mode["cultivation_multiplier"])
 		if EnumCultivationMode.is_pill_mode(mode_id):
-			multiplier = cultivation_pill_multiplier(str(pill_ids[day_index]))
-		estimated_gain += maxi(1, int(round(float(normal_gain) * multiplier)))
-		remaining_injury = maxi(0, remaining_injury - 1)
-	var main_id := str(cultivation_method_slots.get("main", ""))
-	var method := CultivationMethodServiceScript.by_id(main_id)
+			multiplier = cultivation_pill_multiplier(str(pill_ids[_month_index]))
+		var speed_part := int(round(float(base_gain) * speed * multiplier))
+		var raw_gain := speed_part + method_base_gain
+		var injury_multiplier := 0.5 if remaining_injury > 0 else 1.0
+		var month_gain := maxi(1, int(round(float(raw_gain) * injury_multiplier)))
+		estimated_gain += month_gain
+		monthly_gains.append(month_gain)
+		if first_month_formula.is_empty():
+			first_month_formula = {
+				"player_base": base_gain,
+				"speed": speed,
+				"mode_name": str(mode.get("name", "运转周天")),
+				"mode_multiplier": multiplier,
+				"speed_part": speed_part,
+				"method_realm_base": int(method_breakdown.get("realm_base", 0)),
+				"method_quality": int(method_breakdown.get("quality", 1)),
+				"method_coefficient": float(method_breakdown.get("coefficient", 1.0)),
+				"method_base_gain": method_base_gain,
+				"raw_gain": raw_gain,
+				"injury_multiplier": injury_multiplier,
+				"monthly_total": month_gain,
+			}
+		remaining_injury = maxi(0, remaining_injury - GameTimeServiceScript.days_per_month())
+	first_month_formula["months"] = months
+	first_month_formula["monthly_gains"] = monthly_gains
 	var recommended_days := max_cultivation_days(mode_id, resolved_pill_id)
 	return {
 		"ok": true,
 		"mode_id": mode_id,
 		"mode": mode.duplicate(true),
+		"months": months,
 		"days": safe_days,
 		"duration_label": GameTimeServiceScript.duration_label(safe_days),
 		"recommended_days": recommended_days,
@@ -598,10 +659,14 @@ func preview_cultivation_session(mode_id: String = EnumCultivationMode.LABEL_CYC
 		"end_day": day + safe_days,
 		"start_date_label": GameTimeServiceScript.date_label(day),
 		"end_date_label": GameTimeServiceScript.date_label(day + safe_days),
-		"method_id": main_id,
-		"method_name": str(method.get("name", "未装备主功法")),
-		"method_mastery": CultivationMethodServiceScript.method_mastery(DataStore.savedata, main_id),
-		"knowledge_rows": CultivationMethodServiceScript.resolved_knowledge(main_id),
+		"method_id": method_id,
+		"method_name": str(method.get("name", "未选择修炼功法")),
+		"method_mastery": CultivationMethodServiceScript.method_mastery(DataStore.savedata, method_id),
+		"knowledge_rows": CultivationMethodServiceScript.resolved_knowledge(method_id),
+		"base_monthly_gain": base_gain,
+		"cultivation_speed": speed,
+		"method_base_gain": method_base_gain,
+		"cultivation_formula": first_month_formula,
 		"pill_ids": pill_ids,
 		"pill_id": resolved_pill_id,
 		"instability_gain": _cultivation_pill_instability_total(pill_ids) if EnumCultivationMode.is_pill_mode(mode_id) else 0,
@@ -615,6 +680,7 @@ func cultivate_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: 
 		return preview
 	var mode: Dictionary = preview.get("mode", {}) as Dictionary
 	var safe_days := int(preview.get("days", 1))
+	var months := int(preview.get("months", cultivation_session_months(safe_days)))
 	var method_id := str(preview.get("method_id", ""))
 	var mastery_before := CultivationMethodServiceScript.method_mastery(DataStore.savedata, method_id)
 	var cultivation_before := cultivation
@@ -623,23 +689,23 @@ func cultivate_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: 
 	var pill_ids := preview.get("pill_ids", []) as Array
 	var knowledge_summary: Dictionary = {}
 	var layer_advances := 0
-	for day_index in safe_days:
-		var cfg := _activity_cfg("cultivate")
-		var base_gain := maxi(0, int(cfg.get("cultivation_gain", 20)))
-		var speed := CultivationMethodServiceScript.cultivation_speed(cultivation_method_slots)
-		base_gain = maxi(1, int(round(float(base_gain) * speed)))
-		var normal_gain := base_gain / 2 if injury_days > 0 else base_gain
+	for month_index in months:
+		var base_gain := RealmBalanceService.base_monthly_cultivation_gain(_realm_row(realm_index))
+		var speed := CultivationMethodServiceScript.cultivation_session_speed(method_id, DataStore.savedata)
+		var method_base_gain := CultivationMethodServiceScript.base_cultivation_gain(method_id)
 		var multiplier := float(mode["cultivation_multiplier"])
 		if EnumCultivationMode.is_pill_mode(mode_id):
-			var active_pill_id := str(pill_ids[day_index])
+			var active_pill_id := str(pill_ids[month_index])
 			InventoryServiceScript.remove_item(inventory, active_pill_id, 1)
 			multiplier = cultivation_pill_multiplier(active_pill_id)
 			cultivation_instability += cultivation_pill_instability(active_pill_id)
-		var gain := maxi(1, int(round(float(normal_gain) * multiplier)))
+		var raw_gain := int(round(float(base_gain) * speed * multiplier)) + method_base_gain
+		var injury_multiplier := 0.5 if injury_days > 0 else 1.0
+		var gain := maxi(1, int(round(float(raw_gain) * injury_multiplier)))
 		cultivation += gain
 		var cycle := CultivationMethodServiceScript.apply_cultivation_cycle(
 			DataStore.savedata,
-			float(normal_gain),
+			float(base_gain) * speed,
 			float(mode["knowledge_multiplier"]),
 			float(mode["mastery_multiplier"])
 		)
@@ -655,8 +721,9 @@ func cultivate_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: 
 			aggregate["xp"] = float(aggregate["xp"]) + float(applied.get("applied", 0.0))
 			aggregate["levels_gained"] = int(aggregate["levels_gained"]) + int(applied.get("levels_gained", 0))
 			knowledge_summary[skill_id] = aggregate
+		injury_days = maxi(0, injury_days - GameTimeServiceScript.days_per_month())
 		layer_advances += _auto_advance_layers()
-		_finish_activity("修炼·%s" % str(mode["name"]), true, false)
+	_advance_time(safe_days, false, false)
 	var knowledge_gains: Array = []
 	for row in knowledge_summary.values():
 		knowledge_gains.append(row)
@@ -669,7 +736,7 @@ func cultivate_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: 
 	if layer_advances > 0:
 		activity_text += "，提升至%s" % realm_name
 	if cultivation_instability > instability_before:
-		activity_text += "，境界虚浮 +%d" % (cultivation_instability - instability_before)
+		activity_text += "，灵力驳杂 +%d" % (cultivation_instability - instability_before)
 	_append_activity(activity_text)
 	var result := {
 		"ok": true,
@@ -1153,7 +1220,7 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 	if exit_reason == "defeated":
 		log_text += "（战败撤退）"
 	if instability_reduced > 0:
-		log_text += "，境界虚浮 -%d" % instability_reduced
+		log_text += "，灵力驳杂 -%d" % instability_reduced
 	activity_log.append({"day": day, "text": log_text})
 	if activity_log.size() > 30:
 		activity_log = activity_log.slice(activity_log.size() - 30)
@@ -1261,7 +1328,17 @@ func learn_method(method_id: String) -> Dictionary:
 	if unlocked_methods.has(method_id):
 		return {"ok": false, "error": "已经掌握该功法"}
 	unlocked_methods.append(method_id)
+	if current_cultivation_method_id.strip_edges() == "":
+		current_cultivation_method_id = method_id
 	return {"ok": true, "method_id": method_id}
+
+
+func set_current_cultivation_method(method_id: String) -> Dictionary:
+	var id := method_id.strip_edges()
+	if not unlocked_methods.has(id) or CultivationMethodServiceScript.by_id(id).is_empty():
+		return {"ok": false, "error": "尚未掌握该功法"}
+	current_cultivation_method_id = id
+	return {"ok": true, "method_id": id}
 
 
 func use_inventory_item(item_id: String) -> Dictionary:
@@ -1498,7 +1575,7 @@ func _advance_time(days_value: int, reduce_injury: bool = true, passive_method: 
 	var elapsed := maxi(0, days_value)
 	var summary := {
 		"days": elapsed,
-		"method_id": str(cultivation_method_slots.get("main", "")),
+		"method_id": CultivationMethodServiceScript.active_cultivation_method_id(DataStore.savedata),
 		"mastery_gained": 0.0,
 		"knowledge": [],
 	}
@@ -1513,7 +1590,7 @@ func _advance_time(days_value: int, reduce_injury: bool = true, passive_method: 
 
 
 func _apply_passive_method_practice(days_value: int) -> Dictionary:
-	var method_id := str(cultivation_method_slots.get("main", ""))
+	var method_id := CultivationMethodServiceScript.active_cultivation_method_id(DataStore.savedata)
 	var mastery_before := CultivationMethodServiceScript.method_mastery(DataStore.savedata, method_id)
 	var summary := {
 		"days": maxi(0, days_value),
@@ -1521,12 +1598,13 @@ func _apply_passive_method_practice(days_value: int) -> Dictionary:
 		"mastery_gained": 0.0,
 		"knowledge": [],
 	}
-	var speed := CultivationMethodServiceScript.cultivation_speed(cultivation_method_slots)
+	var speed := CultivationMethodServiceScript.cultivation_session_speed(method_id, DataStore.savedata)
 	if method_id == "" or speed <= 0.0:
 		return summary
-	var cfg := _activity_cfg("cultivate")
-	var base_gain := maxi(0, int(cfg.get("cultivation_gain", 20)))
-	var practice_xp := float(maxi(1, int(round(float(base_gain) * speed)))) \
+	var base_gain := RealmBalanceService.base_monthly_cultivation_gain(_realm_row(realm_index))
+	var method_base_gain := CultivationMethodServiceScript.base_cultivation_gain(method_id)
+	var monthly_xp := float(maxi(1, int(round(float(base_gain) * speed)) + method_base_gain))
+	var practice_xp := monthly_xp / float(GameTimeServiceScript.days_per_month()) \
 		* PASSIVE_METHOD_PRACTICE_RATIO
 	var knowledge_summary: Dictionary = {}
 	for _day_index in days_value:

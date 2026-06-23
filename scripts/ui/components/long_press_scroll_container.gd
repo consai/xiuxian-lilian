@@ -216,6 +216,7 @@ func _on_bar_value_changed(_value: float) -> void:
 func _suppress_descendant_clicks() -> void:
 	if not _suppressed_controls.is_empty():
 		return
+	
 	_cancel_descendant_press_feedback(self)
 	_collect_click_suppression(self)
 

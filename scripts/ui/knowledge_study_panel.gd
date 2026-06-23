@@ -74,7 +74,7 @@ func _bind_list() -> void:
 func _bind_details() -> void:
 	if _selected_skill_id == "":
 		_name_label.text = "暂无可自主学习的知识"
-		_description_label.text = "当前没有满足境界与前置条件、且未达到自主学习上限的知识。"
+		_description_label.text = "当前没有满足境界与前置条件、且尚未圆满的知识。"
 		_state_label.text = ""
 		_progress.value = 0.0
 		_preview_label.text = ""
@@ -96,11 +96,10 @@ func _bind_details() -> void:
 	_progress.max_value = 100.0
 	_progress.value = KnowledgeServiceScript.level_progress_percent(GameState.to_dict(), _selected_skill_id)
 	var domain := DaoTreeServiceScript.domain_by_id(str(skill.get("domain", "")))
-	_state_label.text = "%s · %s · %s · 自主学习上限 %s · 当前 %.0f%%" % [
+	_state_label.text = "%s · %s · %s · 当前 %.0f%%" % [
 		str(domain.get("name", "")),
 		EnumItemTier.label(_entry_tier(skill)),
 		EnumQuality.display_label(_entry_quality(skill)),
-		_roman(int(preview.get("max_self_study_level", 3))) if bool(preview.get("ok", false)) else "—",
 		_progress.value,
 	]
 	_day_count_label.text = "研读 %s" % GameState.time_duration_label(_days)
@@ -112,7 +111,7 @@ func _bind_details() -> void:
 	var levels_gained := int(preview.get("levels_gained", 0))
 	var level_text := _roman(level) if level > 0 else "未入门"
 	var after_text := _roman(after_level) if after_level > 0 else "未入门"
-	_preview_label.text = "预计训练点 +%.1f\n%s → %s%s\n%s 至 %s\n\n自主学习用于补课与冲门槛，无法替代功法带来的高阶领悟。" % [
+	_preview_label.text = "预计训练点 +%.1f\n%s → %s%s\n%s 至 %s" % [
 		float(preview.get("xp", 0.0)),
 		level_text,
 		after_text,

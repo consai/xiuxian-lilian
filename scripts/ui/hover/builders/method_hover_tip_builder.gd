@@ -86,7 +86,7 @@ static func _knowledge_line(method_id: String) -> String:
 			continue
 		var skill := DaoTreeServiceScript.skill_by_id(sid)
 		var skill_name := str(skill.get("name", sid))
-		names.append("%s 上限%d" % [skill_name, int(row.get("capLevel", 1))])
+		names.append(skill_name)
 		if names.size() >= 4:
 			break
 	if names.is_empty():

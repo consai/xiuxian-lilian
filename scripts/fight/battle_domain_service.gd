@@ -778,36 +778,99 @@ func _compact_formation() -> void:
 	if formation_mode == FORMATION_MODE_WAVES:
 		_compact_wave_formation()
 		return
-	for i in range(enemy_reserve_indices.size() - 1, -1, -1):
-		var reserve_idx := int(enemy_reserve_indices[i])
-		var reserve_unit := _enemy_at(reserve_idx)
-		if reserve_unit == null or reserve_unit.is_dead():
-			enemy_reserve_indices.remove_at(i)
+	_purge_dead_from_formation_slots()
+	_purge_dead_from_reserve()
+	var advance_width := _formation_advance_width()
+	_compact_formation_within_rank(advance_width)
+	while not _front_formation_has_living(advance_width):
+		if not _can_shift_formation_forward(advance_width):
+			break
+		_shift_formation_columns_forward(advance_width)
+	active_enemy_index = _first_active_enemy_index()
+	active_enemy_slot = _slot_for_enemy_index(active_enemy_index)
+	enemy = _enemy_at(active_enemy_index)
+	_sync_legacy_enemy_interval()
+
+
+func _formation_advance_width() -> int:
+	if formation_rank_size > 0:
+		return mini(formation_rank_size, formation_columns)
+	return 1
+
+
+func _purge_dead_from_formation_slots() -> void:
 	for slot in enemy_formation_slots.size():
 		var idx := int(enemy_formation_slots[slot])
 		var unit := _enemy_at(idx)
 		if idx < 0 or unit == null or unit.is_dead():
 			enemy_formation_slots[slot] = -1
+
+
+func _purge_dead_from_reserve() -> void:
+	for i in range(enemy_reserve_indices.size() - 1, -1, -1):
+		var reserve_idx := int(enemy_reserve_indices[i])
+		var reserve_unit := _enemy_at(reserve_idx)
+		if reserve_unit == null or reserve_unit.is_dead():
+			enemy_reserve_indices.remove_at(i)
+
+
+## rank_size>0 时，同一排内从右向左补位；标准列阵不在此步跨列前移。
+func _compact_formation_within_rank(rank_width: int) -> void:
+	if rank_width <= 1:
+		return
 	for row in formation_rows:
-		for col in formation_columns:
+		for col in rank_width - 1:
 			var slot := _slot_index(col, row)
 			if int(enemy_formation_slots[slot]) >= 0:
 				continue
-			var moved := false
-			for next_col in range(col + 1, formation_columns):
+			for next_col in range(col + 1, rank_width):
 				var next_slot := _slot_index(next_col, row)
 				var next_idx := int(enemy_formation_slots[next_slot])
 				if next_idx >= 0:
 					enemy_formation_slots[slot] = next_idx
 					enemy_formation_slots[next_slot] = -1
-					moved = true
 					break
-			if not moved:
-				enemy_formation_slots[slot] = _pop_next_reserve_alive()
-	active_enemy_index = _first_active_enemy_index()
-	active_enemy_slot = _slot_for_enemy_index(active_enemy_index)
-	enemy = _enemy_at(active_enemy_index)
-	_sync_legacy_enemy_interval()
+
+
+func _column_has_living_enemy(col: int) -> bool:
+	for row in formation_rows:
+		var idx := int(enemy_formation_slots[_slot_index(col, row)])
+		if idx < 0:
+			continue
+		var unit := _enemy_at(idx)
+		if unit != null and not unit.is_dead():
+			return true
+	return false
+
+
+func _front_formation_has_living(width: int) -> bool:
+	for col in mini(width, formation_columns):
+		if _column_has_living_enemy(col):
+			return true
+	return false
+
+
+func _can_shift_formation_forward(width: int) -> bool:
+	for col in range(width, formation_columns):
+		if _column_has_living_enemy(col):
+			return true
+	for reserve_idx in enemy_reserve_indices:
+		var unit := _enemy_at(int(reserve_idx))
+		if unit != null and not unit.is_dead():
+			return true
+	return false
+
+
+func _shift_formation_columns_forward(width: int) -> void:
+	if width <= 0 or width >= formation_columns:
+		return
+	for row in formation_rows:
+		for col in range(formation_columns - width):
+			var dst := _slot_index(col, row)
+			var src := _slot_index(col + width, row)
+			enemy_formation_slots[dst] = enemy_formation_slots[src]
+		for col in range(formation_columns - width, formation_columns):
+			enemy_formation_slots[_slot_index(col, row)] = _pop_next_reserve_alive()
 
 
 func _compact_wave_formation() -> void:

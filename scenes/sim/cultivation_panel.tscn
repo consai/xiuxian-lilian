@@ -365,7 +365,7 @@ custom_minimum_size = Vector2(220, 32)
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = 1.0
-max_value = 30.0
+max_value = 120.0
 step = 1.0
 value = 1.0
 
@@ -417,9 +417,25 @@ autowrap_mode = 2
 [node name="PreviewLabel" type="Label" parent="PlanPanel/PlanContent" unique_id=739752265]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 3
 text = "闭关 1 日
 预计修为 +20"
+label_settings = ExtResource("17_text")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="FormulaLabel" type="Label" parent="PlanPanel/PlanContent" unique_id=1983726401]
+unique_name_in_owner = true
+layout_mode = 2
+label_settings = ExtResource("18_small")
+theme_override_colors/font_color = Color(0.45, 0.4, 0.34, 0.88)
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="PreviewMetaLabel" type="Label" parent="PlanPanel/PlanContent" unique_id=1983726402]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
 label_settings = ExtResource("17_text")
 horizontal_alignment = 1
 vertical_alignment = 1

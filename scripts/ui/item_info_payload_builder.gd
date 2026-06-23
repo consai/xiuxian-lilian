@@ -299,7 +299,7 @@ static func format_use_effect_lines(use_effect: Array) -> Array[String]:
 			"instability":
 				if amount != 0.0:
 					lines.append(StringsZh.format_template(
-						StringsZh.getp("item_info.use_instability", "使用效果：境界虚浮 {value}"),
+						StringsZh.getp("item_info.use_instability", "使用效果：灵力驳杂 {value}"),
 						{"value": _fmt_signed_num(amount)}
 					))
 			"pill_cultivation":

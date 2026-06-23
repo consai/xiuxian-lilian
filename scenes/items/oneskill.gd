@@ -21,19 +21,12 @@ var _hot_key: String = "1"
 @onready var _slot_label: Label = %SlotLabel
 @onready var _name_label: Label = %NameLabel
 @onready var _count_label: Label = %CountLabel
-@onready var _quality_tint: Panel = %QualityTint
-@onready var _quality_border: Panel = %QualityBorder
-@onready var _tier_badge: PanelContainer = %TierBadge
-@onready var _tier_label: Label = %TierLabel
-@onready var _quality_badge: PanelContainer = %QualityBadge
-@onready var _quality_label: Label = %QualityLabel
 @onready var _hover_tip: HoverTipSource = %HoverTipSource
 @onready var _press: Control = $Control
 
 var _cd_total: float = 0.0
+var _icon_tint: Color = Color.WHITE
 var _blocked_tween: Tween
-var _quality: int = 0
-var _tier: int = 0
 const _COUNT_COLOR_NORMAL := Color(1.0, 0.9647059, 0.74509805, 1.0)
 const _COUNT_COLOR_ZERO := Color(0.65, 0.65, 0.65, 1.0)
 const _DEFAULT_BACK := Color(0.933, 0.804, 0.702)
@@ -41,7 +34,6 @@ const _DEFAULT_BACK := Color(0.933, 0.804, 0.702)
 
 func _ready() -> void:
 	_apply_hot_key()
-	_apply_quality_tier_chrome(_quality, _tier)
 	if compact_mode:
 		_apply_compact_chrome()
 
@@ -80,7 +72,6 @@ func setup(
 	_back.self_modulate = back_color
 	_icon.texture = icon
 	_name_label.text = skill_name
-	_apply_quality_tier_chrome(quality, tier)
 	set_stack_count(-1)
 	set_cooldown(0.0)
 	_apply_input_mode(true)
@@ -113,7 +104,7 @@ func clear_slot() -> void:
 	_name_label.text = ""
 	_count_label.visible = false
 	_back.self_modulate = Color(1.0, 1.0, 1.0, 0.35)
-	_apply_quality_tier_chrome(0, 0)
+	set_icon_tint(Color.WHITE)
 	set_cooldown(0.0)
 	_apply_input_mode(false)
 	if _hover_tip != null:
@@ -148,6 +139,14 @@ func set_cooldown(remaining: float, total: float = -1.0) -> void:
 	_cd_overlay.visible = remaining > 0.0
 
 
+## 仅作用于技能图标与冷却遮罩；名称/快捷键/数量保持原亮度。
+func set_icon_tint(tint: Color) -> void:
+	_icon_tint = tint
+	if not is_node_ready():
+		return
+	_apply_icon_tint()
+
+
 func set_stack_count(count: int) -> void:
 	if compact_mode or count < 0:
 		_count_label.visible = false
@@ -166,10 +165,14 @@ func play_blocked_feedback() -> void:
 		return
 	if _blocked_tween != null:
 		_blocked_tween.kill()
-	var base := modulate
-	modulate = Color(1.0, 0.72, 0.72, base.a)
+	var base := _icon_tint
+	var flash := Color(1.0, 0.72, 0.72, base.a)
+	_icon.modulate = flash
+	_cd_overlay.modulate = flash
 	_blocked_tween = create_tween()
-	_blocked_tween.tween_property(self, "modulate", base, 0.12)
+	_blocked_tween.set_parallel(true)
+	_blocked_tween.tween_property(_icon, "modulate", base, 0.12)
+	_blocked_tween.tween_property(_cd_overlay, "modulate", base, 0.12)
 
 
 func _apply_full_present(row: Dictionary, icon: Texture2D, back_color: Color) -> void:
@@ -177,7 +180,6 @@ func _apply_full_present(row: Dictionary, icon: Texture2D, back_color: Color) ->
 	_back.self_modulate = back_color
 	_icon.texture = icon
 	_name_label.text = str(row.get("name", ""))
-	_apply_quality_tier_chrome(_row_quality(row), _row_tier(row))
 	var count_v = row.get("count", null)
 	if count_v is int:
 		set_stack_count(int(count_v))
@@ -192,7 +194,6 @@ func _apply_compact_present(row: Dictionary, icon: Texture2D, back_color: Color)
 	_apply_compact_chrome()
 	_back.self_modulate = back_color
 	_icon.texture = icon
-	_apply_quality_tier_chrome(_row_quality(row), _row_tier(row))
 	set_stack_count(-1)
 	set_cooldown(0.0)
 
@@ -206,6 +207,11 @@ func _apply_compact_chrome() -> void:
 func _restore_default_chrome() -> void:
 	_name_label.visible = true
 	_apply_hot_key()
+
+
+func _apply_icon_tint() -> void:
+	_icon.modulate = _icon_tint
+	_cd_overlay.modulate = _icon_tint
 
 
 func _apply_input_mode(interactive: bool) -> void:
@@ -261,43 +267,6 @@ func _row_icon(row: Dictionary) -> Texture2D:
 func _row_back_color(row: Dictionary) -> Color:
 	var back_v: Variant = row.get("back_color")
 	return back_v as Color if back_v is Color else _DEFAULT_BACK
-
-
-func _row_quality(row: Dictionary) -> int:
-	if row.has("quality"):
-		return EnumQuality.clamp_quality(int(row.get("quality", EnumQuality.Type.LOW)))
-	return 0
-
-
-func _row_tier(row: Dictionary) -> int:
-	if row.has("tier"):
-		return EnumItemTier.clamp_tier(int(row.get("tier", EnumItemTier.Type.QI)))
-	return 0
-
-
-func _apply_quality_tier_chrome(quality: int, tier: int) -> void:
-	_quality = quality
-	_tier = tier
-	var has_quality := quality > 0
-	var has_tier := tier > 0
-	var quality_color := EnumQuality.get_color(quality) if has_quality else Color.WHITE
-	var tier_color := EnumItemTier.get_color(tier) if has_tier else Color.WHITE
-	if _quality_tint != null:
-		_quality_tint.visible = has_quality
-		_quality_tint.self_modulate = Color(quality_color.r, quality_color.g, quality_color.b, 0.18)
-	if _quality_border != null:
-		_quality_border.visible = has_quality
-		_quality_border.self_modulate = quality_color
-	if _tier_badge != null:
-		_tier_badge.visible = has_tier
-		_tier_badge.self_modulate = tier_color
-	if _tier_label != null:
-		_tier_label.text = EnumItemTier.label(tier)
-	if _quality_badge != null:
-		_quality_badge.visible = has_quality
-		_quality_badge.self_modulate = quality_color
-	if _quality_label != null:
-		_quality_label.text = EnumQuality.display_label(quality)
 
 
 func _slot_kind_from_row(row: Dictionary) -> String:

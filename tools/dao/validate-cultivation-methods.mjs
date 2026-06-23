@@ -20,7 +20,6 @@ if (config.metadata.familyCount !== config.families.length) errors.push("metadat
 if (config.metadata.methodCount !== config.methods.length) errors.push("metadata.methodCount 不一致");
 if (config.metadata.effectTypeCount !== Object.keys(config.effectCatalog ?? {}).length) errors.push("metadata.effectTypeCount 不一致");
 if (!config.rules.layerInheritance?.recursive) errors.push("功法层必须启用递归继承");
-if (config.rules.layerInheritance?.knowledge?.maximumCapLevel !== dao.training.maxLevel) errors.push("继承知识最高等级与大道树不一致");
 if (config.rules.blockedKnowledgeXpPolicy !== "discard") errors.push("知识经验不得暂存");
 if (config.rules.layerInheritance?.effects?.inheritPreviousEffects !== false) errors.push("高层功法不得自动继承旧层效果");
 if (config.rules.methodMasteryLeveling?.effectTypePolicy !== "fixed_effect_types_level_changes_values_only") {
@@ -62,7 +61,6 @@ for (const method of config.methods) {
     }
     if (localSkills.has(knowledge.skillId)) errors.push(`${method.id}: 重复知识 ${knowledge.skillId}`);
     localSkills.add(knowledge.skillId);
-    if (knowledge.capLevel < 1 || knowledge.capLevel > (skill?.maxLevel ?? 5)) errors.push(`${method.id}: ${knowledge.skillId} capLevel 非法`);
     if (knowledge.growthWeight <= 0) errors.push(`${method.id}: ${knowledge.skillId} growthWeight 必须大于 0`);
     if (knowledge.masteryWeight <= 0) errors.push(`${method.id}: ${knowledge.skillId} masteryWeight 必须大于 0`);
     if (nonCultivatable.has(knowledge.skillId) && knowledge.gainFromCultivation !== false) {
@@ -112,7 +110,7 @@ for (const method of config.methods) {
         }
       }
     }
-  } else if (method.tier !== 1) {
+  } else if (method.id !== family?.methodIds?.[0] && family?.progressionType !== "side_path") {
     errors.push(`${method.id}: 非首层缺少 predecessorId`);
   }
 
