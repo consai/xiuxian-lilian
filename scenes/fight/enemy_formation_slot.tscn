@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://cacywilhlbfpq"]
 
 [ext_resource type="Script" uid="uid://bggejgtife81d" path="res://scripts/fight/enemy_formation_slot_view.gd" id="1_slot"]
+[ext_resource type="Texture2D" uid="uid://c0splu5su3u3u" path="res://assets/art/characters/003_cutout_407x512.png" id="2_rfuso"]
 [ext_resource type="FontFile" uid="uid://btkp4vukwqrul" path="res://assets/art/AlimamaDaoLiTi.ttf" id="3_kkcco"]
 [ext_resource type="Texture2D" uid="uid://dgasoy4txpadq" path="res://assets/art/ui_new/item_jian.png" id="3_sword"]
 [ext_resource type="Script" uid="uid://i2ey5righwn7" path="res://scripts/ui/hover/hover_tip_source.gd" id="5_hover"]
-[ext_resource type="Texture2D" uid="uid://dv4cdt2itjcol" path="res://assets/art/characters/006_cutout_427x512.png" id="5_rfuso"]
 [ext_resource type="PackedScene" path="res://scenes/fight/buff_status_bar.tscn" id="6_buffbar"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_j46pb"]
@@ -37,7 +37,7 @@ scale = Vector2(0.2, 0.2)
 
 [node name="Sprite" type="Sprite2D" parent="role" unique_id=1112236993]
 unique_name_in_owner = true
-texture = ExtResource("5_rfuso")
+texture = ExtResource("2_rfuso")
 
 [node name="IntentBadge" type="Control" parent="." unique_id=-2147483636]
 unique_name_in_owner = true
