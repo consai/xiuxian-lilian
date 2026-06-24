@@ -29,6 +29,9 @@ var player_ai_runtime: EnemyAiRuntimeState
 var battle_time_limit: float = 0.0
 var battle_session_id: String = ""
 var battle_source: String = ""
+var battle_flags: Dictionary = {}
+var escape_bonus: float = 0.0
+var escape_fail_count: int = 0
 var record_names: Dictionary = {}
 
 var recorder = BattleRecorder.new()

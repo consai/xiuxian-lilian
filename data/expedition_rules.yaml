@@ -4,6 +4,7 @@ max_idle_days: 2
 defeat_loot_drop_ratio: 0.3
 defeat_injury_days: 3
 defeat_hp_floor_ratio: 0.25
+fled_injury_days: 1
 choice_count: 3
 auto_event_advance_seconds: 1
 reward_budget:

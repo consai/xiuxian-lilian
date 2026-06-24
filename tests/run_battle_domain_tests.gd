@@ -41,6 +41,10 @@ func _init() -> void:
 	_run("knowledge growth interpolates from base to maximum", _test_knowledge_growth)
 	_run("intent preview subtracts defender shield", _test_intent_preview_subtracts_shield)
 	_run("intent preview honors slot effect scale", _test_intent_preview_honors_slot_effect_scale)
+	_run("intent preview enemy_lowest_hp shows damage", _test_intent_preview_enemy_lowest_hp_shows_damage)
+	_run("escape chance rises with player speed over max enemy", _test_escape_chance_speed_ratio)
+	_run("escape success ends battle", _test_escape_success_ends_battle)
+	_run("escape failure consumes player turn", _test_escape_failure_consumes_turn)
 
 	if _failures.is_empty():
 		print("PASS: %d battle domain tests" % _tests_run)
@@ -583,6 +587,23 @@ func _test_intent_preview_subtracts_shield() -> void:
 	_expect_true(estimated < int(roundf(float(raw))), "shielded preview is lower than raw damage")
 
 
+func _test_intent_preview_enemy_lowest_hp_shows_damage() -> void:
+	AbilityServiceScript.reload()
+	var attacker := _make_unit()
+	attacker.attrs[FightObjScript.ATTR_MAGIC_ATK] = 40.0
+	var defender := _make_unit()
+	var skill_cfg := AbilityServiceScript.to_runtime_dict("ability.combat.sword_qi", {"knowledge": {}})
+	var row := EnemyIntentPreviewScript.enrich_skill_row(
+		{},
+		attacker,
+		defender,
+		skill_cfg,
+		int(skill_cfg.get("id", -1)),
+	)
+	_expect_eq(str(row.get("intent_overlay", "")), "damage", "enemy_lowest_hp shows damage overlay")
+	_expect_true(int(row.get("estimated_damage", 0)) > 0, "enemy_lowest_hp estimates positive damage")
+
+
 func _test_intent_preview_honors_slot_effect_scale() -> void:
 	var attacker := _make_unit()
 	attacker.skills = [{"id": 1, "cd": 0.0, "effect_value_scale": 0.45}]
@@ -620,6 +641,40 @@ func _test_intent_preview_honors_slot_effect_scale() -> void:
 		FightAttr.DAMAGE_MAGIC,
 	)))
 	_expect_true(estimated < unscaled, "scaled preview lower than base skill cfg")
+
+
+func _test_escape_chance_speed_ratio() -> void:
+	var slow := CombatBalance.escape_success_chance(80.0, 120.0, 0.0, 0)
+	var fast := CombatBalance.escape_success_chance(150.0, 100.0, 0.0, 0)
+	_expect_true(fast > slow, "faster player should escape more often")
+	_expect_near(
+		CombatBalance.escape_success_chance(100.0, 100.0, 0.0, 0),
+		CombatBalance.ESCAPE_BASE_AT_PARITY,
+		"parity escape base"
+	)
+
+
+func _test_escape_success_ends_battle() -> void:
+	seed(4242)
+	var domain := _start_domain(_make_unit(150.0, 100.0, 5.0), _make_unit(80.0, 100.0, 5.0))
+	domain.enter_paused(EnumBattleSide.PLAYER)
+	# ponytail: 确定性测试，极高速度差保证首次成功
+	var result := domain.try_escape(0.5, 0)
+	_expect_true(bool(result.get("success", false)), "escape should succeed with high bonus")
+	_expect_eq(domain.end_reason, BattleDomainServiceScript.SIGNAL_PLAYER_ESCAPED, "escape end reason")
+	_expect_eq(domain.state, EnumBattleState.State.END, "escape ends battle")
+
+
+func _test_escape_failure_consumes_turn() -> void:
+	seed(999001)
+	var domain := _start_domain(_make_unit(50.0, 100.0, 5.0), _make_unit(200.0, 100.0, 5.0))
+	domain.enter_paused(EnumBattleSide.PLAYER)
+	var before_hp := domain.player.hp
+	var result := domain.try_escape(-0.5, 0)
+	_expect_true(bool(result.get("ok", false)), "escape attempt should resolve")
+	_expect_true(not bool(result.get("success", false)), "escape should fail with slow player")
+	_expect_eq(domain.state, EnumBattleState.State.ADVANCING, "failed escape resumes advancing")
+	_expect_true(domain.player.hp < before_hp, "failed escape applies chase damage")
 
 
 func _make_unit(hp: float = 100.0, spd: float = 100.0, skill_cd: float = 0.0) -> FightObj:

@@ -6,23 +6,27 @@ extends RefCounted
 const SKILL_HOTKEYS: Array[Key] = [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5]
 const EQUIP_HOTKEYS: Array[Key] = [KEY_Q, KEY_W]
 const ITEM_HOTKEYS: Array[Key] = [KEY_E, KEY_R]
+const ESCAPE_HOTKEY := KEY_X
 
 var _ctx: FightSceneContext
 var _hud: FightSceneHud
 var _on_skill: Callable
 var _on_schedule_player_act: Callable
+var _on_escape: Callable
 
 
 func setup(
 		ctx: FightSceneContext,
 		hud: FightSceneHud,
 		on_skill: Callable,
-		on_schedule_player_act: Callable
+		on_schedule_player_act: Callable,
+		on_escape: Callable = Callable()
 ) -> void:
 	_ctx = ctx
 	_hud = hud
 	_on_skill = on_skill
 	_on_schedule_player_act = on_schedule_player_act
+	_on_escape = on_escape
 
 
 func bind_signals(scene: Control) -> void:
@@ -44,6 +48,9 @@ func bind_signals(scene: Control) -> void:
 	var chk := _hud.get_chk_auto_player()
 	if chk != null and not chk.toggled.is_connected(_on_auto_player_toggled):
 		chk.toggled.connect(_on_auto_player_toggled)
+	var escape_btn := _hud.get_escape_button()
+	if escape_btn != null and not escape_btn.pressed.is_connected(_on_escape_button_pressed):
+		escape_btn.pressed.connect(_on_escape_button_pressed)
 
 
 func setup_auto_battle(default_player: bool, default_enemy: bool) -> void:
@@ -77,6 +84,10 @@ func handle_unhandled_input(event: InputEvent, scene: Control) -> void:
 	if code == KEY_U:
 		scene.get_viewport().set_input_as_handled()
 		toggle_auto_battle_player()
+		return
+	if code == ESCAPE_HOTKEY:
+		scene.get_viewport().set_input_as_handled()
+		trigger_escape()
 
 
 func trigger_skill_slot(scene: Control, index: int) -> void:
@@ -91,6 +102,13 @@ func trigger_item_slot(scene: Control, index: int) -> void:
 		return
 	if scene.has_signal("item_slot_pressed"):
 		scene.emit_signal("item_slot_pressed", index)
+
+
+func trigger_escape() -> void:
+	if not _hud.can_attempt_escape(_ctx):
+		return
+	if _on_escape.is_valid():
+		_on_escape.call()
 
 
 func trigger_equip_slot(scene: Control, index: int) -> void:
@@ -121,6 +139,10 @@ func toggle_auto_battle_player() -> void:
 
 func _on_auto_player_toggled(pressed: bool) -> void:
 	set_auto_battle_player(pressed)
+
+
+func _on_escape_button_pressed() -> void:
+	trigger_escape()
 
 
 static func _connect_slot_click(slot: OneSkillView, on_click: Callable) -> void:

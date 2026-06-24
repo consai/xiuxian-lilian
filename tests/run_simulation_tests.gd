@@ -199,19 +199,19 @@ func _test_knowledge_effects_feed_attrs() -> void:
 	var mods := KnowledgeEffectServiceScript.resolve_modifiers(state.to_dict(), rows)
 	_expect_true((mods.get("flat", {}) as Dictionary).is_empty(), "knowledge effect inactive below full level")
 	state.grant_knowledge("foundation.breathing", 2)
-	KnowledgeEffectServiceScript.reload()
+	KnowledgeEffectServiceScript.replace_effects_for_tests([])
 	state.refresh_derived_attrs(true)
-	var without_config := FightAttr.get_attr(state.attrs, FightAttr.MP_MAX)
+	var baseline := FightAttr.get_attr(state.attrs, FightAttr.MP_MAX)
 	KnowledgeEffectServiceScript.replace_effects_for_tests(rows)
 	state.refresh_derived_attrs(true)
 	_expect_near(
 		FightAttr.get_attr(state.attrs, FightAttr.MP_MAX),
-		without_config + 9.0,
+		baseline + 9.0,
 		"knowledge effect feeds GameState derived attrs"
 	)
 	KnowledgeEffectServiceScript.reload()
 	state.refresh_derived_attrs(true)
-	_expect_near(FightAttr.get_attr(state.attrs, FightAttr.MP_MAX), without_config, "empty production knowledge config is safe")
+	_expect_true(FightAttr.get_attr(state.attrs, FightAttr.MP_MAX) >= baseline, "production knowledge config restores safely")
 
 
 func _test_cultivation_methods() -> void:

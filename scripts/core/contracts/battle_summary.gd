@@ -4,7 +4,8 @@ extends RefCounted
 const OUTCOME_WIN := BattleRecordTypes.OUTCOME_WIN
 const OUTCOME_LOSS := BattleRecordTypes.OUTCOME_LOSS
 const OUTCOME_DRAW := BattleRecordTypes.OUTCOME_DRAW
-const VALID_OUTCOMES := [OUTCOME_WIN, OUTCOME_LOSS, OUTCOME_DRAW]
+const OUTCOME_ESCAPED := BattleRecordTypes.OUTCOME_ESCAPED
+const VALID_OUTCOMES := [OUTCOME_WIN, OUTCOME_LOSS, OUTCOME_DRAW, OUTCOME_ESCAPED]
 
 
 static func from_dict(data: Dictionary) -> Dictionary:

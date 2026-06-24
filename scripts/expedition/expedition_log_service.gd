@@ -86,6 +86,22 @@ static func build_battle_defeat_outcome(event: Dictionary) -> String:
 	return str(entry.get("outcome", ""))
 
 
+static func build_battle_fled_outcome(event: Dictionary) -> String:
+	var entry := build_battle_fled_entry(event, 0, 0)
+	return str(entry.get("outcome", ""))
+
+
+static func build_battle_fled_entry(
+		event: Dictionary,
+		step_day: int,
+		difficulty: int
+) -> Dictionary:
+	var scene := str(event.get("desc", "")).strip_edges()
+	var enemy_name := str((event.get("enemy", {}) as Dictionary).get("name", event.get("name", "强敌")))
+	var outcome := "施展遁法，摆脱%s追袭，结束本次历练。" % enemy_name
+	return build_event_entry(event, step_day, difficulty, scene, outcome)
+
+
 static func build_battle_defeat_entry(
 		event: Dictionary,
 		step_day: int,

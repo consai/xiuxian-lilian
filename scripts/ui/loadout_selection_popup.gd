@@ -174,10 +174,13 @@ func _method_category(row: Dictionary) -> String:
 
 func _skill_category(row: Dictionary) -> String:
 	var tags := row.get("tags", []) as Array
-	if tags.has("attack") or tags.has("fire") or tags.has("poison"):
+	if tags.has("attack") or tags.has("fire") or tags.has("poison") \
+			or tags.has("spell") or tags.has("sword") or tags.has("execute"):
 		return "attack"
-	if tags.has("shield"):
+	if tags.has("shield") or tags.has("defense"):
 		return "defense"
+	if tags.has("mobility"):
+		return "movement"
 	return "support"
 
 

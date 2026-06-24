@@ -36,3 +36,4 @@ var vfx: FightVfxManager
 var float_layer: CombatFloatLayer
 var battle_log_panel: Node
 var battle_result_overlay: Node
+var escape_button: TextureButton

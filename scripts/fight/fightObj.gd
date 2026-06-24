@@ -988,9 +988,9 @@ func _runtime_buff_display_name(effect: Dictionary, buff_id: String) -> String:
 
 func _resolve_effect_target(eff: Dictionary, eff_type: String, default_target: FightObj) -> FightObj:
 	var target_key := str(eff.get("target", "")).strip_edges().to_lower()
-	if target_key == "self":
+	if target_key == EnumCombatTarget.LABEL_SELF:
 		return self
-	if target_key == "enemy":
+	if EnumCombatTarget.is_hostile_label(target_key):
 		return default_target
 	if default_target != null:
 		return default_target if eff_type == "damage" else self

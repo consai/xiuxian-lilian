@@ -90,12 +90,7 @@ static func _attacker_skill_cfg(attacker: FightObj, skill_cfg: Dictionary, skill
 
 
 static func _targets_player(effect: Dictionary) -> bool:
-	var target_key := str(effect.get("target", "")).strip_edges().to_lower()
-	if target_key == EnumCombatTarget.LABEL_ENEMY:
-		return true
-	if target_key == "":
-		return true
-	return false
+	return EnumCombatTarget.is_hostile_label(str(effect.get("target", "")))
 
 
 static func _scaled_effect_value(attacker: FightObj, effect: Dictionary) -> float:

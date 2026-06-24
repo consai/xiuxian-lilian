@@ -107,16 +107,17 @@ func _apply_breakdown(preview: Dictionary) -> void:
 	var can_attempt := bool(preview.get("can_attempt", false))
 	_tier_result.text = str(tier.get("label", "不可突破"))
 	_tier_effect.text = _format_tier_effect(tier)
+	var gap_hint := BreakthroughServiceScript.major_gap_hint(preview)
 	_explain.text = (
 		"突破值达到 %d 可尝试突破\n\n"
-		+ "突破失败将有几率境界不稳\n\n"
-		+ "建议提升突破值后再进行突破"
-	) % min_total
+		+ "%s\n\n"
+		+ "失败可能境界不稳；品质越高，成功率与根基成长越好"
+	) % [min_total, gap_hint]
 	if can_attempt:
 		_warning.text = str(preview.get("hint", tier.get("hint", "可以尝试突破")))
 		_warning.add_theme_color_override("font_color", Color(0.22, 0.42, 0.12, 1))
 	else:
-		_warning.text = str(preview.get("hint", "突破值过低，无法突破"))
+		_warning.text = gap_hint
 		_warning.add_theme_color_override("font_color", Color(0.64, 0.14, 0.08, 1))
 	_start_button.disabled = not can_attempt
 	_start_button.modulate = Color.WHITE if can_attempt else Color(0.65, 0.65, 0.65, 0.85)

@@ -50,6 +50,8 @@ func _render() -> void:
 	var reason_text := "主动返程"
 	if reason == "defeated":
 		reason_text = "战败撤退"
+	elif reason == "fled":
+		reason_text = "战中遁走"
 	title.text = "历练结算 · %s" % reason_text
 	var stats := _result.get("stats", {}) as Dictionary
 	var lines: PackedStringArray = [
@@ -64,6 +66,7 @@ func _render() -> void:
 			int(stats.get("losses", 0)),
 		],
 		"最终气血 %.0f，法力 %.0f" % [float(_result.get("hp", 0.0)), float(_result.get("mp", 0.0))],
+		"突破准备：历练战斗可压实灵力虚浮，带回药材可炼聚气丹补修为项。",
 	]
 	body.text = "\n".join(lines)
 	var log_entries := _event_log_entries()
@@ -181,6 +184,8 @@ func _render_outcome_summary(reason: String) -> void:
 		if not lost.is_empty():
 			lines.append("战败途中遗失部分战利品。")
 		lines.append("伤势加重，需回观中静养。")
+	elif reason == "fled":
+		lines.append("战中遁走，略感气息紊乱，需短暂调息。")
 	if int(_result.get("instability_reduced", 0)) > 0:
 		lines.append("战斗压实境界：虚浮 -%d，当前 %d。" % [
 			int(_result.get("instability_reduced", 0)),

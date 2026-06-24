@@ -5,4 +5,28 @@ rules:
   supportedOperations:
     - add_flat
     - add_percent
-effects: []
+effects:
+  - skillId: "foundation.breathing"
+    level: 2
+    effectId: "max_mana"
+    base: 8
+    operation: "add_flat"
+    stackGroup: "pm204_breathing_mana"
+    stackPolicy: "add_capped"
+    cap: 30
+  - skillId: "foundation.breathing"
+    level: 4
+    effectId: "mana_regen"
+    base: 0.03
+    operation: "add_percent"
+    stackGroup: "pm204_breathing_regen"
+    stackPolicy: "add_capped"
+    cap: 0.12
+  - skillId: "spell.escape"
+    level: 2
+    effectId: "evasion_window"
+    base: 0.04
+    operation: "add_percent"
+    stackGroup: "pm204_escape_evasion"
+    stackPolicy: "add_capped"
+    cap: 0.12

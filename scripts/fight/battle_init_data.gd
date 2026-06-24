@@ -630,6 +630,9 @@ static func _build_setup(merged: Dictionary) -> BattleSetupScript:
 	setup.ui_payload["enemy_count"] = setup.enemies.size()
 	setup.ui_payload["enemy_index"] = 0
 	setup.ui_payload["enemy_formation"] = setup.enemy_formation.duplicate(true)
+	var flags_v: Variant = merged.get("flags", {})
+	setup.battle_flags = (flags_v as Dictionary).duplicate(true) if flags_v is Dictionary else {}
+	setup.escape_bonus = float(merged.get("escape_bonus", 0.0))
 	return setup
 
 

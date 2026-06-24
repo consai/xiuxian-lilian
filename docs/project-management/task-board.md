@@ -238,7 +238,7 @@ P2 通过标准：
 
 - 2026-06-24：聚气丹方难度从 45 调整为 38；新手稳火炼制成功率约 0.53，妖丹仍限制批量放大。新增资源闭环回归：历练材料可炼聚气丹，丹药修炼显著加速并产生灵力驳杂，筑基预览仍需要多次活动积累。`run_simulation_tests.gd` 与 `run_config_validation_tests.gd` 通过。
 
-### [ ] PM-204：功法 / 技能首版池收敛
+### [x] PM-204：功法 / 技能首版池收敛
 
 描述：只保留练气到筑基前真正会用到的功法、技能、知识效果，补齐缺口，暂不扩高阶流派。
 
@@ -257,7 +257,11 @@ P2 通过标准：
 - `data/dao_tree.yaml`
 - `tests/run_dao_knowledge_tests.gd`
 
-### [ ] PM-205：突破前目标可读性
+任务备注：
+
+- 2026-06-24：新手默认技能组保持御气弹 / 流风步 / 破空剑气，补齐输出与防御标签；破空剑气基准伤害从 55 收敛到 54，使练气同阶伤害贴近 `realm_balance.yaml` 预算。新增练气知识效果与 PM-204 回归，知识成长会影响运行时技能数值和派生属性。`validate-abilities.mjs`、`validate-cultivation-methods.mjs`、`run_dao_knowledge_tests.gd`、`run_config_validation_tests.gd`、`run_battle_domain_tests.gd`、`run_simulation_tests.gd`、`run_balance_v1_tests.gd` 通过。
+
+### [x] PM-205：突破前目标可读性
 
 描述：让玩家在筑基前知道自己差什么，不做复杂新面板，只补现有突破 / 角色 / 活动反馈。
 
@@ -273,6 +277,10 @@ P2 通过标准：
 - `scripts/sim/breakthrough_summary.gd`
 - `data/breakthrough_rules.yaml`
 - `docs/breakthrough-system.md`
+
+任务备注：
+
+- 2026-06-24：突破页增加主要缺口提示，区分总分不足、下一品质差距与知识点门槛；修炼、炼丹、历练结果各补一条突破准备反馈。新增 `run_pm205_breakthrough_feedback_tests.gd` 覆盖缺口文案。
 
 ### [ ] PM-206：战斗特效体验版
 

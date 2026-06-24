@@ -54,6 +54,7 @@ signal battle_finished(summary: Dictionary)
 @onready var _float_layer: CombatFloatLayer = %CombatFloatLayer
 @onready var _battle_log_panel = %BattleLogPanel
 @onready var _battle_result_overlay = %BattleResultOverlay
+@onready var _escape_button: TextureButton = %EscapeButton
 
 var _ctx := FightSceneContext.new()
 var _hud := FightSceneHud.new()
@@ -131,12 +132,14 @@ func _bind_modules() -> void:
 	refs.float_layer = _float_layer
 	refs.battle_log_panel = _battle_log_panel
 	refs.battle_result_overlay = _battle_result_overlay
+	refs.escape_button = _escape_button
 	_hud.bind(refs)
 	_input.setup(
 		_ctx,
 		_hud,
 		Callable(self, "_on_skill_slot_pressed"),
-		Callable(self, "_schedule_player_side_act")
+		Callable(self, "_schedule_player_side_act"),
+		Callable(self, "_on_escape_pressed")
 	)
 
 
@@ -255,6 +258,10 @@ func _on_equip_slot_pressed(index: int) -> void:
 		index,
 		Callable(self, "_on_presentation_battle_end")
 	)
+
+
+func _on_escape_pressed() -> void:
+	_combat.on_escape_pressed(_ctx, _hud)
 
 
 func _on_vfx_event_finished(_event: BattleVfxEvent) -> void:

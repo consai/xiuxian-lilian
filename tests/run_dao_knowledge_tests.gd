@@ -6,6 +6,7 @@ const KnowledgeEffectServiceScript := preload("res://scripts/dao/knowledge_effec
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
+const RealmBalanceServiceScript := preload("res://scripts/sim/realm_balance_service.gd")
 
 
 func _initialize() -> void:
@@ -20,6 +21,7 @@ func _initialize() -> void:
 	failed += _run("ability_learn_gate", _test_ability_learn)
 	failed += _run("method_slot_weights", _test_method_slot_weights)
 	failed += _run("knowledge_level_effects", _test_knowledge_level_effects)
+	failed += _run("pm204_starter_pool", _test_pm204_starter_pool)
 	quit(1 if failed > 0 else 0)
 
 
@@ -172,3 +174,84 @@ func _test_knowledge_level_effects() -> void:
 		push_error("knowledge level percent effects should resolve")
 	if (mods.get("unmapped", []) as Array).is_empty():
 		push_error("unmapped knowledge effects should be reported")
+
+
+func _test_pm204_starter_pool() -> void:
+	var starter := [
+		"ability.combat.qi_bolt",
+		"ability.combat.wind_step",
+		"ability.combat.sword_qi",
+	]
+	var has_output := false
+	var has_defense := false
+	for ability_id in starter:
+		var row := AbilityServiceScript.by_id(ability_id)
+		if row.is_empty():
+			push_error("%s should exist in starter pool" % ability_id)
+			continue
+		if str(row.get("realm", "")) != "qi" or int(row.get("tier", 0)) != 1:
+			push_error("%s should stay in qi tier 1 starter scope" % ability_id)
+		var runtime := AbilityServiceScript.to_runtime_dict(ability_id, {"knowledge": {}})
+		for effect_v in runtime.get("effects", []) as Array:
+			if not effect_v is Dictionary:
+				continue
+			var effect := effect_v as Dictionary
+			if str(effect.get("type", "")) == EnumCombatEffectType.LABEL_DAMAGE:
+				has_output = true
+			if str(effect.get("target", "")) == EnumCombatTarget.LABEL_SELF:
+				has_defense = true
+	var full_knowledge := {"knowledge": {}}
+	for skill_id in ["spell.projectile", "foundation.control"]:
+		KnowledgeServiceScript.grant_level(full_knowledge, skill_id, 5)
+	var base := AbilityServiceScript.to_runtime_dict("ability.combat.qi_bolt", {"knowledge": {}})
+	var grown := AbilityServiceScript.to_runtime_dict("ability.combat.qi_bolt", full_knowledge)
+	var base_value := _first_damage_value(base)
+	var grown_value := _first_damage_value(grown)
+	if grown_value <= base_value:
+		push_error("starter skill knowledge growth should increase runtime damage")
+	if not has_output:
+		push_error("starter pool should contain an output tendency")
+	if not has_defense:
+		push_error("starter pool should contain a defensive tendency")
+	_assert_damage_budget_near("qi", 1)
+	_assert_damage_budget_near("foundation", 2)
+
+
+func _first_damage_value(runtime: Dictionary) -> float:
+	for effect_v in runtime.get("effects", []) as Array:
+		if effect_v is Dictionary and str((effect_v as Dictionary).get("type", "")) == EnumCombatEffectType.LABEL_DAMAGE:
+			return float((effect_v as Dictionary).get("value", 0.0))
+	return 0.0
+
+
+func _assert_damage_budget_near(realm: String, tier: int) -> void:
+	var values: Array[float] = []
+	for ability_v in AbilityServiceScript.all_abilities():
+		var ability := ability_v as Dictionary
+		if str(ability.get("realm", "")) != realm or int(ability.get("tier", 0)) != tier:
+			continue
+		if str(ability.get("type", "")) != "combat_active":
+			continue
+		for effect_v in ability.get("effects", []) as Array:
+			if effect_v is Dictionary and str((effect_v as Dictionary).get("effectId", "")).begins_with("damage_"):
+				values.append(float((effect_v as Dictionary).get("base", 0.0)))
+				break
+	if values.size() < 2:
+		return
+	var total := 0.0
+	for value in values:
+		total += value
+	var avg := total / float(values.size())
+	var budget := float((RealmBalanceServiceScript.bundle().get("budgets", {}) as Dictionary).get(
+		"ability_same_tier_variance",
+		0.15
+	))
+	for value in values:
+		if absf(value - avg) / avg > budget:
+			push_error("%s tier %d damage ability %.2f exceeds %.0f%% same-tier budget around %.2f" % [
+				realm,
+				tier,
+				value,
+				budget * 100.0,
+				avg,
+			])

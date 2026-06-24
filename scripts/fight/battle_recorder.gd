@@ -125,6 +125,8 @@ func finalize(end_reason: String, duration_advancing: float, names: Dictionary =
 			outcome = BattleRecordTypesScript.OUTCOME_LOSS
 		"time_limit":
 			outcome = BattleRecordTypesScript.OUTCOME_LOSS
+		"player_escaped":
+			outcome = BattleRecordTypesScript.OUTCOME_ESCAPED
 		_:
 			outcome = BattleRecordTypesScript.OUTCOME_DRAW
 

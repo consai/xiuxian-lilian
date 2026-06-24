@@ -118,8 +118,9 @@ func _sync_outcome_visual(outcome: String) -> void:
 	var is_win := o == BattleRecordTypesScript.OUTCOME_WIN
 	var is_loss := o == BattleRecordTypesScript.OUTCOME_LOSS
 	var is_draw := o == BattleRecordTypesScript.OUTCOME_DRAW
+	var is_escaped := o == BattleRecordTypesScript.OUTCOME_ESCAPED
 	if _img_suc != null:
-		_img_suc.visible = is_win or is_draw
+		_img_suc.visible = is_win or is_draw or is_escaped
 	if _img_fail != null:
 		_img_fail.visible = is_loss
 

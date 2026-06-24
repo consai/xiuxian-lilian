@@ -109,6 +109,8 @@ func format_summary(summary: Dictionary) -> String:
 			title = "战败"
 		BattleRecordTypesScript.OUTCOME_DRAW:
 			title = "平局"
+		BattleRecordTypesScript.OUTCOME_ESCAPED:
+			title = "脱身"
 		_:
 			pass
 

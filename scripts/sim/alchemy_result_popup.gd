@@ -107,6 +107,7 @@ func _apply_result(result: Dictionary) -> void:
 		_mastery_label.text += "  ·  熟练多丹 +%d" % int(result.get("extra_pills", 0))
 	if int(result.get("saved_material_count", 0)) > 0:
 		_mastery_label.text += "  ·  节省药材 %d" % int(result.get("saved_material_count", 0))
+	_mastery_label.text += "\n%s" % _breakthrough_feedback(result)
 	_render_materials(result.get("ingredients", []) as Array)
 
 
@@ -167,6 +168,14 @@ func _product_description(result: Dictionary) -> String:
 		if text != "":
 			return text
 	return EnumAlchemyQuality.failure_flavor(str(result.get("quality", EnumAlchemyQuality.LABEL_NONE)))
+
+
+func _breakthrough_feedback(result: Dictionary) -> String:
+	var product_id := str(result.get("product_id", ""))
+	var pill_name := str(result.get("pill_name", ""))
+	if product_id.contains("JuQiDan") or pill_name.contains("聚气"):
+		return "突破准备：聚气丹可在修炼界面炼化，快速补修为项。"
+	return "突破准备：想冲筑基时，优先炼聚气丹补修为项。"
 
 
 func _render_materials(ingredients: Array) -> void:

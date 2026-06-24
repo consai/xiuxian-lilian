@@ -93,7 +93,19 @@ static func _format_summary(result: Dictionary) -> String:
 			int(result.get("instability_gained", 0)),
 			int(result.get("cultivation_instability", 0)),
 		])
+	lines.append(_breakthrough_feedback(result))
 	return "\n".join(lines)
+
+
+static func _breakthrough_feedback(result: Dictionary) -> String:
+	var cultivation := int(result.get("cultivation", 0))
+	var breakthrough_at := int(result.get("breakthrough_at", 0))
+	if breakthrough_at <= 0:
+		return "突破准备：修为项会随闭关进度提升。"
+	var missing := maxi(0, breakthrough_at - cultivation)
+	if missing == 0:
+		return "突破准备：修为已满，去突破面板查看丹药、心境和根骨缺口。"
+	return "突破准备：修为项还差 %d 修为到门槛。" % missing
 
 
 static func _result_flavor(mode_id: String) -> String:

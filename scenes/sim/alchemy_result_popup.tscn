@@ -231,6 +231,7 @@ layout_mode = 2
 text = "聚气丹熟练度 +12  ·  当前 120/1000"
 label_settings = ExtResource("13_small")
 horizontal_alignment = 1
+autowrap_mode = 2
 
 [node name="Materials" type="HBoxContainer" parent="Dialog/Content" unique_id=1084268562]
 custom_minimum_size = Vector2(0, 84)

@@ -54,6 +54,9 @@ static func apply_battle_setup(ctx: FightSceneContext, hud: FightSceneHud, setup
 	ctx.battle_time_limit = setup.battle_time_limit
 	apply_auto_battle_from_init(ctx, hud, setup.auto_battle)
 	ctx.battle_session_id = setup.battle_session_id
+	ctx.battle_flags = setup.battle_flags.duplicate(true)
+	ctx.escape_bonus = setup.escape_bonus
+	ctx.escape_fail_count = 0
 	ctx.record_names = setup.record_names.duplicate(true)
 	ctx.item_cfg = setup.item_cfg.duplicate(true)
 	ctx.equip_cfg = setup.equip_cfg.duplicate(true)

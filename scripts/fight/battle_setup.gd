@@ -17,6 +17,8 @@ var auto_battle: Dictionary = {}
 var enemy_formation: Dictionary = {}
 var ui_payload: Dictionary = {}
 var record_names: Dictionary = {}
+var battle_flags: Dictionary = {}
+var escape_bonus: float = 0.0
 
 
 func get_enemy_ai_cfg() -> Dictionary:

@@ -48,8 +48,9 @@ abilities:
     realm: "qi"
     tier: 1
     quality: 1
-    description: "御气弹"
+    description: "低耗灵力弹，适合新手稳定补伤害。"
     tags:
+      - "attack"
       - "spell"
       - "ranged"
       - "filler"
@@ -69,7 +70,7 @@ abilities:
       cooldown: 3
       costs:
         - resource: "mana"
-          value: 8
+          value: 6
       upkeepCostsPerSecond: []
       activation: "cast"
       powerScale: 1
@@ -99,9 +100,10 @@ abilities:
     realm: "qi"
     tier: 1
     quality: 1
-    description: "流风步"
+    description: "短暂借风护身，获得闪避与灵力护盾。"
     tags:
       - "mobility"
+      - "shield"
       - "defense"
     knowledgeScaling:
       formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
@@ -142,6 +144,14 @@ abilities:
         scalingMode: "positive"
         clampMin: 0
         clampMax: 0.6
+      - effectId: "shield_spiritual"
+        base: 28
+        knowledgeGrowth: 8
+        operation: "add_flat"
+        target: "self"
+        stackGroup: "shield_spiritual"
+        stackPolicy: "ability_instance"
+        scalingMode: "positive"
     learningRequirements:
       realm: "qi"
       knowledge: []
@@ -150,7 +160,7 @@ abilities:
         role: "defense"
         enemyCountGte: 3
         hasPriorityEnemy: false
-        playerHpLte: 0.45
+        playerHpLte: 0.65
     upgrade_options: []
     evolution_conditions: []
   - id: "ability.combat.sword_qi"
@@ -159,8 +169,9 @@ abilities:
     realm: "qi"
     tier: 1
     quality: 2
-    description: "破空剑气"
+    description: "集中剑气斩向虚弱敌人，负责收割和压低战斗时长。"
     tags:
+      - "attack"
       - "sword"
       - "ranged"
       - "execute"
@@ -186,7 +197,7 @@ abilities:
       powerScale: 1
     effects:
       - effectId: "damage_sword"
-        base: 55
+        base: 54
         knowledgeGrowth: 22
         operation: "add_flat"
         target: "enemy_lowest_hp"
@@ -223,6 +234,7 @@ abilities:
     quality: 2
     description: "震血拳"
     tags:
+      - "attack"
       - "body"
       - "melee"
       - "control"
@@ -284,6 +296,7 @@ abilities:
     quality: 3
     description: "五行轮爆"
     tags:
+      - "attack"
       - "spell"
       - "area"
       - "wave_clear"

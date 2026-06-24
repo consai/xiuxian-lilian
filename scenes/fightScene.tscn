@@ -13,7 +13,6 @@
 [ext_resource type="Texture2D" uid="uid://di6wqkkk0t4tl" path="res://assets/art/ui_new/fali.png" id="8_mh2b2"]
 [ext_resource type="Texture2D" uid="uid://cb0y0hjmgauls" path="res://assets/art/ui_new/flag.png" id="9_mh2b2"]
 [ext_resource type="Texture2D" uid="uid://drq6walh54ag4" path="res://assets/art/ui_new/btn_back.png" id="10_ropvy"]
-[ext_resource type="Texture2D" uid="uid://c0splu5su3u3u" path="res://assets/art/characters/003_cutout_407x512.png" id="11_fax1c"]
 [ext_resource type="LabelSettings" uid="uid://bjruoad7rxryl" path="res://ui/ziti_new/25.tres" id="11_kccqe"]
 [ext_resource type="PackedScene" uid="uid://jcty6ipi0vb2" path="res://scenes/items/skill.tscn" id="12_s4dxh"]
 [ext_resource type="Texture2D" uid="uid://c0splu5su3u3u" path="res://assets/art/characters/003_cutout_407x512.png" id="15_6irjl"]
@@ -30,6 +29,8 @@
 [ext_resource type="PackedScene" path="res://scenes/fight/buff_status_bar.tscn" id="28_buffbar"]
 [ext_resource type="Script" uid="uid://dxe5p5sw8ftc0" path="res://scripts/ui/components/long_press_scroll_container.gd" id="29_lpsc"]
 [ext_resource type="PackedScene" uid="uid://cacywilhlbfpq" path="res://scenes/fight/enemy_formation_slot.tscn" id="30_enemy_slot"]
+[ext_resource type="Texture2D" uid="uid://hwomn6aon70a" path="res://assets/art/ui_new/btn_huang.png" id="31_escape_btn"]
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="32_press"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_beab3"]
 bg_color = Color(0.45882353, 0.28627452, 0.25882354, 1)
@@ -406,7 +407,7 @@ offset_right = -8.0
 offset_bottom = -7.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("11_fax1c")
+texture = ExtResource("15_6irjl")
 expand_mode = 1
 
 [node name="shengming_right" type="ProgressBar" parent="head/right" unique_id=1769926884]
@@ -959,6 +960,34 @@ offset_top = 23.0
 offset_right = 205.0
 offset_bottom = 137.0
 hot_key = "R"
+
+[node name="EscapeButton" type="TextureButton" parent="botton" unique_id=441924690]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_top = -0.18400002
+anchor_right = 1.0
+offset_left = 223.0
+offset_top = -27.983997
+offset_right = -929.0
+offset_bottom = -2.0
+grow_horizontal = 0
+texture_normal = ExtResource("31_escape_btn")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("32_press")
+
+[node name="Label" type="Label" parent="botton/EscapeButton" unique_id=1053443165]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "逃跑"
+label_settings = ExtResource("11_kccqe")
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="auto" type="CheckButton" parent="botton" unique_id=693059749]
 unique_name_in_owner = true

@@ -11,6 +11,16 @@ const COMPONENT_KEYS := [
 	"cultivation", "pills", "mind", "aptitude", "fortune", "special_method", "other"
 ]
 
+const COMPONENT_LABELS := {
+	"cultivation": "修为",
+	"pills": "丹药",
+	"mind": "心境",
+	"aptitude": "根骨",
+	"fortune": "气运",
+	"special_method": "特殊功法",
+	"other": "其他",
+}
+
 const TRANSITION_BY_MAJOR := {
 	"qi": "qi_to_foundation",
 	"foundation": "foundation_to_core",
@@ -98,6 +108,29 @@ static func evaluate_tier(total: int, transition_id: String) -> Dictionary:
 		"perks": (fallback.get("perks", []) as Array).duplicate(),
 		"hint": _tier_hint(str(fallback.get("label", "")), float(fallback.get("success_rate", 0.0))),
 	}
+
+
+static func major_gap_hint(breakdown: Dictionary, max_items: int = 2) -> String:
+	if not bool(breakdown.get("ok", false)):
+		return str(breakdown.get("error", "当前条件不足"))
+	var knowledge_error := str(breakdown.get("knowledge_error", "")).strip_edges()
+	if knowledge_error != "":
+		return "主要缺口：%s。" % knowledge_error
+	var total := int(breakdown.get("total", 0))
+	var min_total := int(breakdown.get("min_total", 0))
+	if total < min_total:
+		return "主要缺口：还差 %d 突破值，优先补 %s。" % [
+			min_total - total,
+			_component_gap_labels(breakdown, max_items),
+		]
+	var next_tier := _next_tier_for_total(total, str(breakdown.get("transition_id", "")))
+	if next_tier.is_empty():
+		return "主要缺口：已达最高品质档，可直接尝试突破。"
+	return "主要缺口：距%s还差 %d 突破值，优先补 %s。" % [
+		str(next_tier.get("label", "下一品质")),
+		int(next_tier.get("min_total", total)) - total,
+		_component_gap_labels(breakdown, max_items),
+	]
 
 
 static func resolve(savedata: Dictionary, realms: Array, realm_index: int, rng: RandomNumberGenerator) -> Dictionary:
@@ -389,6 +422,41 @@ static func _sum_components(components: Dictionary) -> int:
 	for key in COMPONENT_KEYS:
 		total += int(components.get(key, 0))
 	return total
+
+
+static func _component_gap_labels(breakdown: Dictionary, max_items: int) -> String:
+	var cfg := rules()
+	var caps: Dictionary = cfg.get("component_caps", {}) as Dictionary
+	var components: Dictionary = breakdown.get("components", {}) as Dictionary
+	var rows: Array = []
+	for key in COMPONENT_KEYS:
+		var cap := int(caps.get(key, 0))
+		var value := int(components.get(key, 0))
+		var room := cap - value
+		if room <= 0:
+			continue
+		rows.append({"key": key, "room": room})
+	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return int(a.get("room", 0)) > int(b.get("room", 0))
+	)
+	var labels: PackedStringArray = []
+	for i in mini(maxi(max_items, 1), rows.size()):
+		var row := rows[i] as Dictionary
+		labels.append("%s(+%d)" % [
+			str(COMPONENT_LABELS.get(str(row.get("key", "")), row.get("key", ""))),
+			int(row.get("room", 0)),
+		])
+	return "、".join(labels) if not labels.is_empty() else "已满分项"
+
+
+static func _next_tier_for_total(total: int, transition_id: String) -> Dictionary:
+	var best: Dictionary = {}
+	for row_v in _sorted_tiers(_transition_cfg(transition_id)):
+		var row := row_v as Dictionary
+		var row_min := int(row.get("min_total", 0))
+		if total < row_min and (best.is_empty() or row_min < int(best.get("min_total", 0))):
+			best = row
+	return best
 
 
 static func _cap_component(value: int, cap: int) -> int:

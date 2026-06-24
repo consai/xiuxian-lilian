@@ -1160,6 +1160,9 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 		var rules := ExpeditionRulesServiceScript.rules()
 		hp = maxf(hp, float(attrs.get(FightAttr.HP_MAX, 100.0)) * float(rules.get("defeat_hp_floor_ratio", 0.25)))
 		injury_days = maxi(injury_days, int(rules.get("defeat_injury_days", 3)))
+	elif exit_reason == "fled":
+		var fled_rules := ExpeditionRulesServiceScript.rules()
+		injury_days = maxi(injury_days, int(fled_rules.get("fled_injury_days", 1)))
 	for item_row_v in result.get("items", []) as Array:
 		if not item_row_v is Dictionary:
 			continue
@@ -1220,6 +1223,8 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 		log_text += "，带回 %s" % "、".join(reward_labels)
 	if exit_reason == "defeated":
 		log_text += "（战败撤退）"
+	elif exit_reason == "fled":
+		log_text += "（战中遁走）"
 	if instability_reduced > 0:
 		log_text += "，灵力驳杂 -%d" % instability_reduced
 	activity_log.append({"day": day, "text": log_text})

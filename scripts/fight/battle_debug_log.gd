@@ -63,6 +63,8 @@ static func end_reason_label(reason: String) -> String:
 			return "敌方阵亡"
 		"time_limit":
 			return "战斗超时"
+		"player_escaped":
+			return "脱身撤退"
 		_:
 			return reason if reason != "" else "无"
 

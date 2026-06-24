@@ -176,6 +176,30 @@ func on_skill_pressed(
 	await presentation.run_presentation(ctx, hud, payload, on_battle_ended)
 
 
+func on_escape_pressed(ctx: FightSceneContext, hud: FightSceneHud) -> void:
+	ctx.player_act_scheduled = false
+	if not hud.can_attempt_escape(ctx):
+		return
+	var result := ctx.domain.try_escape(ctx.escape_bonus, ctx.escape_fail_count)
+	if not bool(result.get("ok", false)):
+		return
+	if bool(result.get("success", false)):
+		BattleDebugLog.write("场景", "玩家逃跑成功，结束战斗")
+		return_battle_end(ctx, hud, BattleDomainService.SIGNAL_PLAYER_ESCAPED)
+		return
+	ctx.escape_fail_count += 1
+	var chase := float(result.get("chase_damage", 0.0))
+	if chase > 0.0:
+		hud.spawn_unit_float(ctx, FightSceneContext.UNIT_PLAYER, "-%d" % int(chase), "damage")
+	hud.spawn_unit_float(ctx, FightSceneContext.UNIT_PLAYER, "逃跑失败!", "skill")
+	hud.sync_from_domain(ctx)
+	hud.sync_runtime_slot_interactive(ctx)
+	hud.update_skill_input_enabled(ctx)
+	var end_after := str(result.get("end_reason", "")).strip_edges()
+	if end_after != "":
+		return_battle_end(ctx, hud, end_after)
+
+
 func on_item_pressed(
 		ctx: FightSceneContext,
 		hud: FightSceneHud,

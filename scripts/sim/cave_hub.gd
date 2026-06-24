@@ -14,6 +14,7 @@ extends Control
 @onready var _backpack_button: TextureButton = %BackpackButton
 @onready var _knowledge_study_button: TextureButton = %KnowledgeStudyButton
 @onready var _attributes_button: TextureButton = %btnattrs
+@onready var _skills_button: TextureButton = %Skills
 @onready var _save_button: Button = %SaveButton
 
 
@@ -33,6 +34,7 @@ func _connect_actions() -> void:
 	_expedition_object_button.pressed.connect(_on_encounter)
 	_backpack_button.pressed.connect(_on_backpack)
 	_knowledge_study_button.pressed.connect(_on_knowledge_study)
+	_skills_button.pressed.connect(_on_skills)
 	_breakthrough_button.pressed.connect(_on_breakthrough)
 	_attributes_button.pressed.connect(_on_character_attributes)
 	_save_button.pressed.connect(_toggle_save_slots)
@@ -52,8 +54,8 @@ func _refresh(message: String = "") -> void:
 	if GameState.active_save_slot > 0:
 		status += "  |  存档槽 %d" % GameState.active_save_slot
 	_status_label.text = status
-	_breakthrough_button.disabled = not GameState.can_breakthrough()
-	_breakthrough_button.modulate = Color.WHITE if not _breakthrough_button.disabled else Color(0.65, 0.65, 0.65, 0.8)
+	# 仅在大境界可突破时展示入口，避免平时占位干扰洞府布局
+	_breakthrough_button.visible = GameState.can_breakthrough()
 	_message_label.text = _resolve_message(message)
 
 
@@ -95,6 +97,12 @@ func _on_knowledge_study() -> void:
 	var nav: Dictionary = SceneManager.go_knowledge_study_panel()
 	if not bool(nav.get("ok", false)):
 		_refresh(str(nav.get("error", "无法打开自主研读")))
+
+
+func _on_skills() -> void:
+	var nav: Dictionary = SceneManager.go_mastered_arts_panel()
+	if not bool(nav.get("ok", false)):
+		_refresh(str(nav.get("error", "无法打开已学技能")))
 
 
 func _on_rest() -> void:

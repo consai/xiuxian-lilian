@@ -15,6 +15,7 @@ const ACTION_BUFF_TICK := "buff_tick"
 const OUTCOME_WIN := "win"
 const OUTCOME_LOSS := "loss"
 const OUTCOME_DRAW := "draw"
+const OUTCOME_ESCAPED := "escaped"
 
 static func opposite_unit(unit_id: String) -> String:
 	match unit_id.strip_edges():

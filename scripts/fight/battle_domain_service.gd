@@ -8,6 +8,7 @@ const SIGNAL_ENEMY_READY := "enemy_ready"
 const SIGNAL_TIME_LIMIT := "time_limit"
 const SIGNAL_PLAYER_DEAD := "player_dead"
 const SIGNAL_ENEMY_DEAD := "enemy_dead"
+const SIGNAL_PLAYER_ESCAPED := "player_escaped"
 
 const DEFAULT_FORMATION_COLUMNS := 3
 const DEFAULT_FORMATION_ROWS := 5
@@ -227,6 +228,88 @@ func enter_paused(side: String) -> void:
 
 func can_player_act() -> bool:
 	return state == EnumBattleState.State.PAUSED and paused_side == EnumBattleSide.PLAYER
+
+
+## 场上可追击敌人中的最高 spd（多怪取 max，与走条属性一致）。
+func max_active_enemy_spd() -> float:
+	var max_spd := 0.0
+	for i in _active_enemy_indices():
+		var unit := _enemy_at(i)
+		if unit == null or unit.is_dead():
+			continue
+		max_spd = maxf(max_spd, unit.get_attr(FightObj.ATTR_SPD))
+	if max_spd <= 0.0:
+		for unit_v in enemies:
+			if unit_v is FightObj and not (unit_v as FightObj).is_dead():
+				max_spd = maxf(max_spd, (unit_v as FightObj).get_attr(FightObj.ATTR_SPD))
+	return maxf(CombatBalance.SPD_FLOOR, max_spd)
+
+
+## 玩家回合尝试逃跑；成功则进入 END，失败则消耗回合并可能吃追击伤。
+func try_escape(bonus_flat: float = 0.0, fail_count: int = 0) -> Dictionary:
+	if not can_player_act():
+		return {"ok": false, "reason": "not_paused"}
+	if player == null or player.is_dead():
+		return {"ok": false, "reason": "player_dead"}
+	var max_spd := max_active_enemy_spd()
+	var player_spd := player.get_attr(FightObj.ATTR_SPD)
+	var chance := CombatBalance.escape_success_chance(player_spd, max_spd, bonus_flat, fail_count)
+	var success := randf() < chance
+	if success:
+		_set_end(SIGNAL_PLAYER_ESCAPED, "玩家逃跑成功")
+		BattleDebugLog.write("行动", "逃跑成功", {
+			"成功率": "%.0f%%" % (chance * 100.0),
+			"玩家速度": player_spd,
+			"敌方最高速度": max_spd,
+		})
+		return {
+			"ok": true,
+			"success": true,
+			"chance": chance,
+			"player_spd": player_spd,
+			"max_enemy_spd": max_spd,
+		}
+	var chase := _apply_escape_chase_damage()
+	_apply_interval_after_action(EnumBattleSide.PLAYER)
+	paused_side = ""
+	_set_state(EnumBattleState.State.ADVANCING, "逃跑失败")
+	var end_after := check_end_after_resolve()
+	BattleDebugLog.write("行动", "逃跑失败", {
+		"成功率": "%.0f%%" % (chance * 100.0),
+		"追击伤害": chase,
+		"玩家气血": player.hp if player != null else 0.0,
+	})
+	return {
+		"ok": true,
+		"success": false,
+		"chance": chance,
+		"chase_damage": chase,
+		"player_spd": player_spd,
+		"max_enemy_spd": max_spd,
+		"end_reason": end_after,
+	}
+
+
+func _apply_escape_chase_damage() -> float:
+	var fastest: FightObj = null
+	var best_spd := -1.0
+	for i in _active_enemy_indices():
+		var unit := _enemy_at(i)
+		if unit == null or unit.is_dead():
+			continue
+		var spd := unit.get_attr(FightObj.ATTR_SPD)
+		if spd > best_spd:
+			best_spd = spd
+			fastest = unit
+	if fastest == null or player == null:
+		return 0.0
+	var atk := maxf(
+		fastest.get_attr(FightAttr.PHYSICAL_ATK),
+		fastest.get_attr(FightAttr.MAGIC_ATK)
+	)
+	var dmg := CombatBalance.escape_chase_damage(atk)
+	player.be_attacked(dmg)
+	return dmg
 
 
 func resolve_player_basic() -> Dictionary:

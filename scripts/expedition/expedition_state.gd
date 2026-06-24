@@ -477,6 +477,7 @@ func build_battle_init() -> Dictionary:
 	var enemy := ExpeditionEventServiceScript.build_battle_enemy(event)
 	var enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
 	var enemy_formation := ExpeditionEventServiceScript.build_enemy_formation(event, enemies)
+	var event_type := str(event.get("type", "")).strip_edges()
 	var init_data := {
 		"player": player,
 		"enemy": enemy,
@@ -485,6 +486,8 @@ func build_battle_init() -> Dictionary:
 		"battle_time_limit": 200.0,
 		"auto_battle": {"player": bool(_game_state.auto_battle_enabled), "enemy": true},
 		"spd_jitter_ratio": 0.0,
+		"flags": {"can_flee": event_type != "boss"},
+		"escape_bonus": _escape_bonus_from_player(player),
 	}
 	var init_errors := BattleInitData.collect_errors(init_data)
 	if not init_errors.is_empty():
@@ -517,6 +520,7 @@ func settle_pending_battle() -> Dictionary:
 	var event := ExpeditionEventServiceScript.by_id(pending_battle_event_id)
 	_sync_runtime_from_summary(summary)
 	var won := str(summary.get("outcome", "")) == "win"
+	var fled := str(summary.get("outcome", "")) == BattleSummary.OUTCOME_ESCAPED
 	stats["battles"] = int(stats.get("battles", 0)) + 1
 	if won:
 		stats["wins"] = int(stats.get("wins", 0)) + 1
@@ -538,6 +542,28 @@ func settle_pending_battle() -> Dictionary:
 		pending_decision_event = {}
 		TutorialService.game_event("tutorial.first_battle_won")
 		return {"ok": true, "won": true, "mode": "auto_done", "event": event}
+	if fled:
+		if not event.is_empty():
+			_apply_event_duration(event)
+			var fled_outcome := ExpeditionLogServiceScript.build_battle_fled_outcome(event)
+			if _pending_log_index >= 0:
+				_finish_pending_log_outcome(fled_outcome)
+			else:
+				event_log.append(
+					ExpeditionLogServiceScript.build_battle_fled_entry(
+						event,
+						days,
+						_event_difficulty(event)
+					)
+				)
+				log_updated.emit()
+		pending_exit_reason = "fled"
+		pending_battle_event_id = ""
+		pending_battle_summary = {}
+		pending_battle_rewards = []
+		current_choices = []
+		phase = "result"
+		return {"ok": true, "won": false, "fled": true, "forced_exit": true}
 	stats["losses"] = int(stats.get("losses", 0)) + 1
 	if not event.is_empty():
 		_apply_event_duration(event)
@@ -989,6 +1015,15 @@ func map_snapshot() -> Dictionary:
 		"available_node_ids": available_node_ids.duplicate(),
 		"visited_node_ids": visited_node_ids.duplicate(),
 	}
+
+
+## 身法越高，战中逃跑额外成功率略增（ponytail: 待 escape_success 养成接入后替换）。
+func _escape_bonus_from_player(player: Dictionary) -> float:
+	var attrs_v: Variant = player.get("attrs", {})
+	if not attrs_v is Dictionary:
+		return 0.0
+	var evasion := FightAttr.get_attr(attrs_v as Dictionary, FightAttr.EVASION, 100.0)
+	return clampf(evasion / 2500.0, 0.0, 0.12)
 
 
 func _complete_current_node() -> void:

@@ -26,6 +26,10 @@ func get_chk_auto_player() -> CheckButton:
 	return _refs.chk_auto_player if _refs != null else null
 
 
+func get_escape_button() -> TextureButton:
+	return _refs.escape_button if _refs != null else null
+
+
 func apply_battle(ctx: FightSceneContext, data: Dictionary) -> void:
 	var player_v: Variant = data.get("player", {})
 	if player_v is Dictionary:
@@ -451,6 +455,62 @@ func update_skill_input_enabled(ctx: FightSceneContext) -> void:
 		var enabled := can_act and usable
 		var tint := active_tint if enabled else (idle_tint if usable else empty_tint)
 		_set_slot_input_enabled(ctx.equip_slots[i], tint)
+	update_escape_button(ctx)
+
+
+func can_attempt_escape(ctx: FightSceneContext) -> bool:
+	if ctx.domain == null or ctx.presentation_busy:
+		return false
+	if not bool(ctx.battle_flags.get("can_flee", true)):
+		return false
+	return ctx.domain.can_player_act()
+
+
+func escape_block_reason(ctx: FightSceneContext) -> String:
+	if not bool(ctx.battle_flags.get("can_flee", true)):
+		return "强敌封镇，无法逃脱"
+	if ctx.presentation_busy:
+		return "招式运转中，无法脱身"
+	if ctx.domain == null:
+		return "战斗未就绪"
+	if ctx.domain.state == EnumBattleState.State.PRESENTATION:
+		return "招式运转中，无法脱身"
+	if ctx.domain.state != EnumBattleState.State.PAUSED or ctx.domain.paused_side != EnumBattleSide.PLAYER:
+		return "敌方行动中，无法脱身"
+	return ""
+
+
+func preview_escape_chance(ctx: FightSceneContext) -> float:
+	if ctx.domain == null or ctx.domain.player == null:
+		return 0.0
+	return CombatBalance.escape_success_chance(
+		ctx.domain.player.get_attr(FightObj.ATTR_SPD),
+		ctx.domain.max_active_enemy_spd(),
+		ctx.escape_bonus,
+		ctx.escape_fail_count
+	)
+
+
+func update_escape_button(ctx: FightSceneContext) -> void:
+	var btn := _refs.escape_button if _refs != null else null
+	if btn == null:
+		return
+	var enabled := can_attempt_escape(ctx)
+	btn.disabled = not enabled
+	btn.modulate = Color.WHITE if enabled else Color(0.65, 0.65, 0.65, 1.0)
+	var chance := preview_escape_chance(ctx)
+	var block := escape_block_reason(ctx)
+	if block != "":
+		btn.tooltip_text = "%s" % block
+	else:
+		btn.tooltip_text = "逃跑成功率 %.0f%%" % (chance * 100.0)
+
+
+func spawn_unit_float(ctx: FightSceneContext, unit_id: String, text: String, tone: String = "skill") -> void:
+	var float_layer := get_float_layer()
+	if float_layer == null:
+		return
+	float_layer.spawn(text, unit_screen_pos(ctx, unit_id), tone, unit_id)
 
 
 func apply_skill_row(

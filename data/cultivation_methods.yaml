@@ -255,7 +255,7 @@ methods:
     quality: 3
     predecessorId: null
     nextMethodId: "method.hunyuan.2"
-    description: "调和吐纳与小周天，根基平稳。"
+    description: "调和吐纳与小周天，根基平稳，适合新手历练前打底。"
     practice:
       efficiency: 1
       knowledgeXpRatio: 0.72
@@ -274,21 +274,36 @@ methods:
         masteryWeight: 1
         gainFromCultivation: true
     effects:
-      - effectId: "max_mana"
+      - effectId: "max_health"
         base: 80
         knowledgeScales:
           - "cultivation.cycle"
         operation: "add_flat"
-        stackGroup: "max_mana"
+        stackGroup: "max_health"
         stackPolicy: "highest"
         activation: "active_method"
         attributes:
-          category: "cultivation"
+          category: "survival"
           target: "self"
           polarity: "positive"
           valueType: "flat"
           displayPriority: 1
         masteryGrowth: 20
+      - effectId: "combat_mp_restore_2s"
+        base: 3
+        knowledgeScales:
+          - "cultivation.cycle"
+        operation: "add_flat"
+        stackGroup: "combat_mp_restore_2s"
+        stackPolicy: "highest"
+        activation: "active_method"
+        attributes:
+          category: "combat"
+          target: "self"
+          polarity: "positive"
+          valueType: "flat"
+          displayPriority: 2
+        masteryGrowth: 1
       - effectId: "mana_regen"
         base: 0.08
         knowledgeScales:
@@ -303,7 +318,7 @@ methods:
           target: "self"
           polarity: "positive"
           valueType: "ratio"
-          displayPriority: 2
+          displayPriority: 3
         masteryGrowth: 0.015
       - effectId: "cultivation_speed"
         base: 0.06
@@ -319,7 +334,7 @@ methods:
           target: "self"
           polarity: "positive"
           valueType: "ratio"
-          displayPriority: 3
+          displayPriority: 4
         masteryGrowth: 0.03
     learningRequirements:
       realm: "qi"
