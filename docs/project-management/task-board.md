@@ -282,7 +282,7 @@ P2 通过标准：
 
 - 2026-06-24：突破页增加主要缺口提示，区分总分不足、下一品质差距与知识点门槛；修炼、炼丹、历练结果各补一条突破准备反馈。新增 `run_pm205_breakthrough_feedback_tests.gd` 覆盖缺口文案。
 
-### [ ] PM-206：战斗特效体验版
+### [x] PM-206：战斗特效体验版
 
 描述：在战斗节奏和数值稳定后，按技能类型补清晰特效。
 
@@ -298,7 +298,7 @@ P2 通过标准：
 - `scripts/fight/fight_vfx_manager.gd`
 - `data/combat/presets`
 
-### [ ] PM-207：P2 手动游玩验收
+### [x] PM-207：P2 手动游玩验收
 
 描述：做一次 30-60 分钟筑基前游玩记录，验证目标、资源和战斗手感。
 
@@ -312,8 +312,133 @@ P2 通过标准：
 
 - `docs/project-management/p2-playtest-notes.md`
 
+## 待启动：P3 内容扩展
+
+启动条件：
+
+- PM-207 完成。
+- P2 手动验收没有阻塞级数值、资源、战斗问题。
+- `run_config_validation_tests.gd`、`run_expedition_tests.gd`、`run_balance_v1_tests.gd` 通过。
+
+P3 通过标准：
+
+- 新增内容仍走现有地图、历练、战斗、炼丹、知识树系统。
+- 每批内容都有配置校验或现有测试覆盖。
+- 玩家完成筑基前目标后，有 1 条新的短期目标和 1 条中期目标。
+- 只扩到筑基初期可继续玩，不做金丹完整版本。
+
+### [ ] PM-301：新区域最小内容包
+
+描述：新增 1 个筑基初期可去的区域，包含城市 / 野外入口、基础地点、普通 / 精英 / Boss 遭遇。
+
+验收：
+
+- 世界地图可发现并进入新区域。
+- 新区域至少有 1 个资源地点和 1 个危险地点。
+- 怪物、掉落、推荐境界、旅行入口通过配置校验。
+- 不新增地图系统，只补配置和必要 UI 文案。
+
+涉及文件：
+
+- `data/world_map.yaml`
+- `data/locations.yaml`
+- `data/monsters.yaml`
+- `scenes/map`
+- `tests/run_world_map_tests.gd`
+- `tests/run_config_validation_tests.gd`
+
+### [ ] PM-302：区域事件链
+
+描述：给新区域做一条 5-7 步事件链，提供探索目标和阶段奖励。
+
+验收：
+
+- 事件链有起点、选择、普通战、精英战、结尾事件。
+- 至少 1 个选择影响奖励或风险。
+- 事件链能被手动复测，不依赖纯随机撞运气。
+- 完成后给出明确下一目标提示。
+
+涉及文件：
+
+- `data/expedition_events.yaml`
+- `data/expedition_common_events.yaml`
+- `scripts/expedition`
+- `tests/run_expedition_tests.gd`
+
+### [ ] PM-303：筑基初期技能 / 功法扩展
+
+描述：补一小组筑基初期技能、功法和知识节点，延续 P2 的稳健 / 输出两种倾向。
+
+验收：
+
+- 至少新增 2 个技能、2 个功法、3 个知识节点。
+- 新内容有学习条件和展示文案。
+- 技能强度贴近 `realm_balance.yaml` 预算，不压过全部旧技能。
+- 默认练气技能仍可用，但筑基内容有升级价值。
+
+涉及文件：
+
+- `data/abilities.yaml`
+- `data/cultivation_methods.yaml`
+- `data/dao_tree.yaml`
+- `data/knowledge_effects.yaml`
+- `tests/run_dao_knowledge_tests.gd`
+- `tests/run_balance_v1_tests.gd`
+
+### [ ] PM-304：炼丹与突破辅助扩展
+
+描述：新增 2-3 个围绕筑基初期的丹方和突破辅助道具，服务资源消耗和中期目标。
+
+验收：
+
+- 至少 1 个恢复 / 战斗准备丹方。
+- 至少 1 个突破准备相关丹方或道具。
+- 材料来源来自 P3 新区域或既有高难历练。
+- 不加入火候小游戏或复杂生产线。
+
+涉及文件：
+
+- `data/alchemy.yaml`
+- `data/item.yaml`
+- `data/locations.yaml`
+- `scripts/sim/alchemy_service.gd`
+- `tests/run_simulation_tests.gd`
+
+### [ ] PM-305：人物与敌人资产扩展
+
+描述：补 P3 内容需要的最低人物表现，不做全量美术库。
+
+验收：
+
+- 新区域关键 NPC 有头像或立绘。
+- 新区域普通敌 / 精英 / Boss 有可识别战斗图。
+- 资产命名和路径可被现有角色 / 战斗 UI 直接引用。
+- 缺正式图时允许占位，但占位必须风格一致。
+
+涉及文件：
+
+- `assets/art/characters`
+- `assets/art`
+- `data/monsters.yaml`
+- `data/stories`
+- `scenes/fightScene.tscn`
+
+### [ ] PM-306：P3 回归与手动验收
+
+描述：把 P3 新增内容跑一轮自动回归和手动路线，确认没有破坏 P0-P2。
+
+验收：
+
+- `run_config_validation_tests.gd`、`run_world_map_tests.gd`、`run_expedition_tests.gd`、`run_simulation_tests.gd` 通过。
+- 手动路线：筑基前目标完成 -> 发现新区域 -> 完成事件链关键节点 -> 获得新功法 / 丹方目标。
+- 输出 P3 验收记录。
+
+产物：
+
+- `docs/project-management/p3-playtest-notes.md`
+
 ## 暂缓任务
 
-- 高阶境界完整投放：P2 前不做。
-- 新地图大批量内容：P0 稳定后再批量加。
+- 金丹及以后完整投放：P3 不做。
+- 多区域批量内容：先做 1 个新区域验证。
 - 新 UI 框架或管理插件：现有 Godot 场景和 Markdown 文档够用。

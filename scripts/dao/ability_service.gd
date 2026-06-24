@@ -181,14 +181,25 @@ static func to_runtime_dict(ability_id: String, savedata: Dictionary) -> Diction
 	var costs := _runtime_costs(combat)
 	var mp_cost := _total_runtime_cost(costs)
 	var tags: Array = (ability.get("tags", []) as Array).duplicate(true)
-	var vfx_type := "melee"
-	var vfx := "melee_default"
-	if tags.has("spell") or tags.has("ranged"):
-		vfx_type = "ranged"
-		vfx = "ranged_default"
-	if tags.has("mobility"):
-		vfx_type = "ranged"
+	var vfx_type := str(ability.get("vfx_type", "")).strip_edges().to_lower()
+	if vfx_type == "":
+		vfx_type = "melee"
+		if tags.has("spell") or tags.has("ranged"):
+			vfx_type = "ranged"
+		if tags.has("mobility") or tags.has("shield"):
+			vfx_type = "buff"
+	var configured_vfx := ability.has("vfx") or ability.has("vfx_file") or ability.has("vfx_preset")
+	var vfx: Variant = ability.get("vfx", "")
+	if ability.has("vfx_file"):
+		vfx = str(ability.get("vfx_file", "")).strip_edges()
+	elif ability.has("vfx_preset"):
+		vfx = str(ability.get("vfx_preset", "")).strip_edges()
+	if not configured_vfx:
 		vfx = "status_cast"
+		if vfx_type == "ranged":
+			vfx = "ranged_default"
+		elif vfx_type == "melee":
+			vfx = "melee_default"
 	var icon_path := _runtime_icon_path(ability, combat_id)
 	var out := {
 		"id": combat_id,

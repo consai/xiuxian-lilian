@@ -43,7 +43,7 @@ func _run_step(ctx: CombatVfxContext, step: Dictionary) -> void:
 		_DEFS.OP_IMPACT:
 			await _op_impact(ctx)
 		_DEFS.OP_PROJECTILE:
-			await _op_projectile(ctx)
+			await _op_projectile(ctx, step)
 		_DEFS.OP_SCREEN_SHAKE:
 			await _op_screen_shake(ctx)
 		_DEFS.OP_CAPTURE_REST:
@@ -191,19 +191,27 @@ func _op_impact(ctx: CombatVfxContext) -> void:
 		await _op_screen_shake(ctx)
 
 
-func _op_projectile(ctx: CombatVfxContext) -> void:
+func _op_projectile(ctx: CombatVfxContext, step: Dictionary) -> void:
 	var src := ctx.get_actor_for_role(_DEFS.ACTOR_CASTER)
 	var dst := ctx.get_actor_for_role(_DEFS.ACTOR_TARGET)
 	if not is_instance_valid(src) or not is_instance_valid(dst) or ctx.settings == null:
 		return
 	var parent := ctx.projectile_parent if ctx.projectile_parent != null else ctx.host
 	var projectile := CombatProjectileVfx.new()
+	projectile.visual_texture = _load_texture(str(step.get("texture", "")))
+	projectile.visual_size = _vector2_from_value(step.get("visual_size", projectile.visual_size), projectile.visual_size)
+	projectile.rotation_offset_deg = float(step.get("rotation_offset_deg", 0.0))
 	parent.add_child(projectile)
 	var done := {"ok": false}
 	projectile.arrived.connect(func() -> void:
 		done.ok = true
 	, CONNECT_ONE_SHOT)
-	projectile.launch(src.global_position, dst.global_position, ctx.settings)
+	projectile.launch(
+		src.global_position,
+		dst.global_position,
+		ctx.settings,
+		bool(step.get("use_bezier", true))
+	)
 	var wait_sec := 0.0
 	const MAX_WAIT := 12.0
 	while not done.ok and is_instance_valid(ctx.host):
@@ -212,6 +220,26 @@ func _op_projectile(ctx: CombatVfxContext) -> void:
 		if wait_sec >= MAX_WAIT:
 			push_warning("CombatActionExecutor: projectile timeout")
 			break
+
+
+static func _load_texture(path: String) -> Texture2D:
+	var p := path.strip_edges()
+	if p == "":
+		return null
+	var res := ResourceLoader.load(p)
+	if res is Texture2D:
+		return res as Texture2D
+	push_warning("CombatActionExecutor: projectile texture load failed '%s'" % p)
+	return null
+
+
+static func _vector2_from_value(value: Variant, fallback: Vector2) -> Vector2:
+	if value is Vector2:
+		return value as Vector2
+	if value is Array and (value as Array).size() >= 2:
+		var arr := value as Array
+		return Vector2(float(arr[0]), float(arr[1]))
+	return fallback
 
 
 func _op_screen_shake(ctx: CombatVfxContext) -> void:

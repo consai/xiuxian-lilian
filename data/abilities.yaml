@@ -54,6 +54,8 @@ abilities:
       - "spell"
       - "ranged"
       - "filler"
+    vfx:
+      preset: "qi_bolt_projectile"
     knowledgeScaling:
       formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
       bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
@@ -175,6 +177,8 @@ abilities:
       - "sword"
       - "ranged"
       - "execute"
+    vfx:
+      preset: "sword_qi_projectile"
     knowledgeScaling:
       formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
       bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"

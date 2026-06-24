@@ -87,7 +87,7 @@ static func legacy_preset_for_vfx_type(vfx_type: String) -> String:
 	match key:
 		"ranged", "remote", "magic", "spell", "远程", "法术":
 			return "ranged_default"
-		"heal", "buff", "other", "治疗":
+		"heal", "buff", "shield", "other", "治疗", "护盾":
 			return "status_cast"
 		_:
 			return "melee_default"

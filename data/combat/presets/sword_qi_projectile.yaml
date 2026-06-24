@@ -1,0 +1,34 @@
+_comment: "破空剑气：高速飞剑 / 剑气弹道 + 受击"
+sequence:
+  - op: "stop_idle"
+    actor: "caster"
+  - op: "tween"
+    actor: "caster"
+    prop: "position"
+    to:
+      anchor: "recoil"
+    duration: 0.06
+    trans: "sine"
+    ease: "out"
+  - op: "parallel"
+    steps:
+      - op: "sequence"
+        steps:
+          - op: "tween"
+            actor: "caster"
+            prop: "position"
+            to:
+              anchor: "rest"
+            duration: 0.12
+            trans: "quad"
+            ease: "out"
+          - op: "resume_idle"
+            actor: "caster"
+      - op: "sequence"
+        steps:
+          - op: "projectile"
+            texture: "res://assets/art/effect/image_cutout_167x69.png"
+            visual_size: [88, 36]
+            rotation_offset_deg: 0
+            use_bezier: false
+          - op: "impact"

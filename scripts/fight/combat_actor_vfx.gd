@@ -112,6 +112,10 @@ func start_idle() -> void:
 
 func stop_idle() -> void:
 	_kill_idle()
+	# 出手前回到静止位，避免待机呼吸偏移导致 windup/strike 锚点与当前位置脱节。
+	if is_instance_valid(_actor):
+		_actor.position = _rest_position
+		_actor.scale = _rest_scale
 
 
 func kill_action_tween() -> void:
@@ -139,10 +143,16 @@ func attack_direction(target: Node2D) -> Vector2:
 
 
 func strike_point_in_front(target: Node2D, inset: float) -> Vector2:
+	if not is_instance_valid(_actor):
+		return Vector2.ZERO
 	var delta := _delta_to_target_in_parent_space(target)
 	if delta.length_squared() < 1.0:
 		return _actor.position
-	return target.position - delta.normalized() * inset
+	var dist := delta.length()
+	# 终点必须在施法者父节点坐标系内；不可混用 target.position（阵型槽位下父节点不同）。
+	if dist <= inset:
+		return _actor.position + delta * 0.5
+	return _actor.position + delta.normalized() * (dist - inset)
 
 
 func world_direction_to_parent_local(dir: Vector2) -> Vector2:

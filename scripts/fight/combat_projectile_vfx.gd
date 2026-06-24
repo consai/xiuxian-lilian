@@ -9,16 +9,34 @@ signal arrived
 @export var visual_size: Vector2 = Vector2(18.0, 18.0)
 ## 占位飞行道具的颜色。
 @export var visual_color: Color = Color(1.0, 0.85, 0.35, 0.95)
+## 可选静态贴图；为空时使用 ColorRect 占位。
+@export var visual_texture: Texture2D
+## 贴图朝向修正角度（度）。默认素材朝右。
+@export var rotation_offset_deg: float = 0.0
 
-var _visual: ColorRect
+var _visual: CanvasItem
 var _tween: Tween
 
 
 func _ready() -> void:
-	_visual = ColorRect.new()
-	_visual.size = visual_size
-	_visual.position = -visual_size * 0.5
-	_visual.color = visual_color
+	_create_visual()
+
+
+func _create_visual() -> void:
+	if visual_texture != null:
+		var sprite := Sprite2D.new()
+		sprite.texture = visual_texture
+		sprite.centered = true
+		var tex_size := visual_texture.get_size()
+		if tex_size.x > 0.0 and tex_size.y > 0.0:
+			sprite.scale = Vector2(visual_size.x / tex_size.x, visual_size.y / tex_size.y)
+		_visual = sprite
+	else:
+		var rect := ColorRect.new()
+		rect.size = visual_size
+		rect.position = -visual_size * 0.5
+		rect.color = visual_color
+		_visual = rect
 	add_child(_visual)
 
 
@@ -29,6 +47,8 @@ func launch(
 	use_bezier: bool = true
 ) -> void:
 	global_position = from_global
+	var dir := from_global.direction_to(to_global)
+	rotation = (dir.angle() if dir.length_squared() > 0.001 else 0.0) + deg_to_rad(rotation_offset_deg)
 	_kill_tween()
 	var duration := settings.projectile_travel_duration
 	_tween = create_tween()

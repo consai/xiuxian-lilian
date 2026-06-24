@@ -6,6 +6,8 @@ const CombatEventScript := preload("res://scripts/fight/combat_event.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 const EnemyIntentPreviewScript := preload("res://scripts/fight/enemy_intent_preview.gd")
+const CombatActorVfxScript := preload("res://scripts/fight/combat_actor_vfx.gd")
+const CombatVfxSettingsScript := preload("res://scripts/fight/combat_vfx_settings.gd")
 
 var _failures: Array[String] = []
 var _tests_run := 0
@@ -38,6 +40,8 @@ func _init() -> void:
 	_run("skill damage supports pierce and vulnerability", _test_pierce_and_vulnerability)
 	_run("runtime modifier expires cleanly", _test_runtime_modifier_expires)
 	_run("qi and foundation active abilities resolve effects", _test_v1_abilities_resolve_effects)
+	_run("PM-206 projectile presets are bound", _test_pm206_projectile_presets_are_bound)
+	_run("melee strike point works across formation slot parents", _test_melee_strike_across_formation_slots)
 	_run("knowledge growth interpolates from base to maximum", _test_knowledge_growth)
 	_run("intent preview subtracts defender shield", _test_intent_preview_subtracts_shield)
 	_run("intent preview honors slot effect scale", _test_intent_preview_honors_slot_effect_scale)
@@ -547,6 +551,47 @@ func _test_v1_abilities_resolve_effects() -> void:
 		_expect_true(not (runtime.get("effects", []) as Array).is_empty(), "%s has runtime effects" % ability_id)
 
 
+func _test_melee_strike_across_formation_slots() -> void:
+	# 阵型槽位下施法者与目标父节点不同，冲锋终点须在施法者本地坐标系内。
+	var world := Node2D.new()
+	root.add_child(world)
+	var caster_slot := Node2D.new()
+	caster_slot.position = Vector2(-300, 0)
+	var target_slot := Node2D.new()
+	target_slot.position = Vector2(200, 40)
+	var caster := Sprite2D.new()
+	var target := Sprite2D.new()
+	world.add_child(caster_slot)
+	world.add_child(target_slot)
+	caster_slot.add_child(caster)
+	target_slot.add_child(target)
+	var vfx := CombatActorVfxScript.new()
+	vfx.settings = CombatVfxSettingsScript.new()
+	caster.add_child(vfx)
+	vfx.bind_actor(caster)
+	vfx.rebaseline_rest_pose()
+	var strike := vfx.strike_point_in_front(target, 40.0)
+	_expect_true(strike.x > vfx.get_rest_position().x + 100.0, "strike point advances toward target")
+	_expect_true(strike != target.position, "strike point must not reuse target local position")
+	var basic := AbilityServiceScript.to_runtime_dict("ability.combat.basic_strike", {})
+	_expect_eq(str(basic.get("vfx_type", "")), "melee", "basic attack uses melee vfx type")
+	_expect_eq(str(basic.get("vfx", "")), "melee_default", "basic attack uses melee preset")
+	world.queue_free()
+
+
+func _test_pm206_projectile_presets_are_bound() -> void:
+	AbilityServiceScript.reload()
+	var qi := AbilityServiceScript.to_runtime_dict("ability.combat.qi_bolt", {})
+	var sword := AbilityServiceScript.to_runtime_dict("ability.combat.sword_qi", {})
+	_expect_eq(str((qi.get("vfx", {}) as Dictionary).get("preset", "")), "qi_bolt_projectile", "qi bolt vfx preset")
+	_expect_eq(str((sword.get("vfx", {}) as Dictionary).get("preset", "")), "sword_qi_projectile", "sword qi vfx preset")
+	var lib := CombatVfxPresetLibrary.load_default()
+	_expect_true(_has_projectile_texture(lib.get_sequence("qi_bolt_projectile")), "qi bolt projectile texture")
+	_expect_true(_has_projectile_texture(lib.get_sequence("sword_qi_projectile")), "sword qi projectile texture")
+	_expect_eq(CombatVfxPresetLibrary.legacy_preset_for_vfx_type("shield"), "status_cast", "shield fallback")
+	_expect_eq(EnumBattleVfxSkillType.from_label("shield"), EnumBattleVfxSkillType.Type.BUFF, "shield skill type")
+
+
 func _test_knowledge_growth() -> void:
 	var rows := [{
 		"effectId": "damage_spiritual",
@@ -715,6 +760,18 @@ func _start_domain(player: FightObj, enemy: FightObj, time_limit: float = 200.0)
 	var domain := BattleDomainServiceScript.new()
 	domain.start_battle(player, enemy, {}, time_limit)
 	return domain
+
+
+func _has_projectile_texture(steps: Array) -> bool:
+	for step_v in steps:
+		if not step_v is Dictionary:
+			continue
+		var step := step_v as Dictionary
+		if str(step.get("op", "")) == "projectile" and str(step.get("texture", "")).begins_with("res://assets/art/effect/"):
+			return true
+		if step.has("steps") and step["steps"] is Array and _has_projectile_texture(step["steps"] as Array):
+			return true
+	return false
 
 
 func _expect_true(actual: bool, message: String) -> void:

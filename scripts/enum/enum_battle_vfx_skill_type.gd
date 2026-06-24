@@ -23,7 +23,7 @@ static func from_label(raw: Variant) -> Type:
 			return Type.RANGED
 		"heal", "治疗":
 			return Type.HEAL
-		"buff":
+		"buff", "shield", "护盾":
 			return Type.BUFF
 		_:
 			return Type.OTHER
