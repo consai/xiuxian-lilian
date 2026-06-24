@@ -11,6 +11,8 @@ const EnumExpeditionNodeTypeScript := preload("res://scripts/enum/enum_expeditio
 const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
 
 signal log_updated
+## 历练局内气血/法力等即时状态变化（如背包用药），供底层 HUD 同步刷新。
+signal runtime_vitals_changed(feedback: String)
 
 var _pending_log_index := -1
 var _pending_step_event: Dictionary = {}
@@ -151,7 +153,11 @@ func start(location_id_value: String, game_state: Node, seed_override: int = -1)
 	current_choices = []
 	pending_decision_event = {}
 	visited_once_events = []
-	var generated_map := ExpeditionMapServiceScript.generate(effective_location, seed)
+	var generated_map := (
+		ExpeditionMapServiceScript.generate_tutorial(effective_location)
+		if TutorialService.should_use_tutorial_expedition_map()
+		else ExpeditionMapServiceScript.generate(effective_location, seed)
+	)
 	map_nodes = generated_map.get("nodes", []) as Array
 	map_edges = generated_map.get("edges", []) as Array
 	var start_node_id := str(generated_map.get("start_node_id", "start"))
@@ -798,9 +804,11 @@ func use_runtime_inventory_item(item_id: String) -> Dictionary:
 	var item_name := iid
 	if ConfigManager != null:
 		item_name = ConfigManager.get_item_display_name(iid)
+	var feedback_text := "使用 %s，%s" % [item_name, "，".join(feedback_parts)]
+	runtime_vitals_changed.emit(feedback_text)
 	return {
 		"ok": true,
-		"feedback": "使用 %s，%s" % [item_name, "，".join(feedback_parts)],
+		"feedback": feedback_text,
 		"item_id": iid,
 	}
 

@@ -57,14 +57,15 @@ func _start() -> void:
 		return
 	await process_frame
 	await process_frame
-	if current_scene == null or not current_scene.has_signal("battle_finished"):
+	var fight_scene: Node = scene_manager.get_active_scene()
+	if fight_scene == null or not fight_scene.has_signal("battle_finished"):
 		printerr("FAIL: fight scene did not load")
 		quit(1)
 		return
-	current_scene.battle_finished.connect(_on_battle_finished.bind(game_state, expedition, day_before))
+	fight_scene.battle_finished.connect(_on_battle_finished.bind(game_state, expedition, day_before, scene_manager))
 
 
-func _on_battle_finished(summary: Dictionary, game_state: Node, expedition: Node, day_before: int) -> void:
+func _on_battle_finished(summary: Dictionary, game_state: Node, expedition: Node, day_before: int, scene_manager: Node) -> void:
 	if str(summary.get("outcome", "")) != "win":
 		printerr("FAIL: expected battle win")
 		quit(1)
@@ -76,17 +77,20 @@ func _on_battle_finished(summary: Dictionary, game_state: Node, expedition: Node
 		quit(1)
 		return
 	_stage = "close battle"
-	if current_scene.has_method("_on_battle_result_close_requested"):
-		current_scene.call("_on_battle_result_close_requested")
+	var fight_scene: Node = scene_manager.get_active_scene()
+	if fight_scene.has_method("_on_battle_result_close_requested"):
+		fight_scene.call("_on_battle_result_close_requested")
 	else:
 		printerr("FAIL: fight scene missing close handler")
 		quit(1)
 		return
 	for _i in 120:
 		await process_frame
-		if current_scene != null and current_scene.name == "ExpeditionLoop":
+		var active: Node = scene_manager.get_active_scene()
+		if active != null and active.name == "ExpeditionLoop":
 			break
-	if current_scene == null or current_scene.name != "ExpeditionLoop":
+	var loop_scene: Node = scene_manager.get_active_scene()
+	if loop_scene == null or loop_scene.name != "ExpeditionLoop":
 		printerr("FAIL: did not return to expedition loop")
 		quit(1)
 		return
@@ -100,12 +104,18 @@ func _on_battle_finished(summary: Dictionary, game_state: Node, expedition: Node
 		return
 	_stage = "exit expedition"
 	root.set_meta("smoke_auto_exit", true)
-	change_scene_to_file("res://scenes/expedition/expedition_result.tscn")
+	var result_nav: Dictionary = scene_manager.go_expedition_result("manual")
+	if not bool(result_nav.get("ok", false)):
+		printerr("FAIL: go_expedition_result failed")
+		quit(1)
+		return
 	for _i in 120:
 		await process_frame
-		if current_scene != null and current_scene.name == "ExpeditionResult":
+		var active: Node = scene_manager.get_active_scene()
+		if active != null and active.name == "ExpeditionResult":
 			break
-	if current_scene == null or current_scene.name != "ExpeditionResult":
+	var result_scene: Node = scene_manager.get_active_scene()
+	if result_scene == null or result_scene.name != "ExpeditionResult":
 		printerr("FAIL: did not reach expedition result")
 		quit(1)
 		return
@@ -118,11 +128,12 @@ func _on_battle_finished(summary: Dictionary, game_state: Node, expedition: Node
 		quit(1)
 		return
 	_stage = "return hub"
-	if current_scene.has_method("_on_return_pressed"):
-		current_scene.call("_on_return_pressed")
+	if result_scene.has_method("_on_return_pressed"):
+		result_scene.call("_on_return_pressed")
 	for _i in 120:
 		await process_frame
-		if current_scene != null and str(current_scene.scene_file_path).ends_with("cave_hub.tscn"):
+		var active: Node = scene_manager.get_active_scene()
+		if active != null and str(active.scene_file_path).ends_with("cave_hub.tscn"):
 			break
 	_finished = true
 	print("PASS: expedition smoke test completed full loop")

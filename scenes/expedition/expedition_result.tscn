@@ -187,7 +187,7 @@ offset_left = 20.0
 offset_top = 250.0
 offset_right = 296.0
 offset_bottom = 310.0
-text = "此行山高路远，所得皆已带回洞府。"
+text = "此行山高路远，所得皆已带回观中。"
 label_settings = ExtResource("12_body")
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -331,7 +331,7 @@ offset_left = 12.0
 offset_right = -12.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "历练收获已存入洞府，气血、法力与伤势状态已完成结算。"
+text = "巡山收获已存入观中，气血、法力与伤势状态已完成结算。"
 label_settings = ExtResource("12_body")
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -352,7 +352,7 @@ theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("ReturnNormal")
 theme_override_styles/pressed = SubResource("ReturnHover")
 theme_override_styles/hover = SubResource("ReturnHover")
-text = "返回洞府"
+text = "返回观中"
 
 [node name="ExpeditionLogPanel" parent="." unique_id=2147483647 instance=ExtResource("15_log_panel")]
 unique_name_in_owner = true
@@ -363,4 +363,3 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-

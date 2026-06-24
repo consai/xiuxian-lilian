@@ -588,7 +588,7 @@ items:
         args:
           - 12
   - id: "items_AlchemyNotes_JuQi"
-    name: "炼丹心得(聚气丹)"
+    name: "炼丹小札(聚气丹)"
     type: "典籍"
     primary_type: "书籍"
     secondary_type: "心得"
@@ -597,7 +597,7 @@ items:
     ling_shi: 0
     stackable: true
     max_stack: 99
-    desc: "师父留下的聚气丹批注。研读后可增加该丹方熟练度。"
+    desc: "清铃观炉边的小札，记着聚气丹火候。研读后可增加该丹方熟练度。"
     icon: "res://assets/art/ui_new/gongfa.png"
     use_effect:
       - op: "alchemy_mastery"

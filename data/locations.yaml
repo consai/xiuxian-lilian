@@ -17,6 +17,7 @@ locations:
     monsters:
       - "qinglan_wolf"
       - "ironback_bear"
+      - "qinglan_boss"
     materials:
       - id: "lingcao"
         name: "灵草"
@@ -149,11 +150,12 @@ locations:
       - "qinglan_mountain__deep_rest"
       - "qinglan_mountain__wandering_cultivator"
       - "qinglan_mountain__local_elite"
+      - "qinglan_mountain__local_boss"
 
   wild_wolf_valley:
     name: "野狼谷"
-    subtitle: "狼嚎穿谷，师父失踪线索所在"
-    desc: "青岚山外围狼患巢穴，适合炼气期修士调查剧情。"
+    subtitle: "狼嚎穿谷，清铃观巡山旧路"
+    desc: "青岚山外围狼患巢穴，适合炼气期修士巡山采药。"
     danger: 1
     min_difficulty: 1
     max_difficulty: 6
@@ -196,6 +198,7 @@ locations:
     monsters:
       - "poison_marsh_serpent"
       - "rot_armor_crocodile"
+      - "blackwater_boss"
     materials:
       - id: "lingcao"
         name: "灵草"
@@ -366,3 +369,4 @@ locations:
       - "blackwater_marsh__deep_rest"
       - "blackwater_marsh__wandering_cultivator"
       - "blackwater_marsh__local_elite"
+      - "blackwater_marsh__local_boss"

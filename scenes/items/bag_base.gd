@@ -246,6 +246,7 @@ func _create_slot_view() -> ItemView:
 func _hide_slot(view: ItemView) -> void:
 	if view == null:
 		return
+	view.name = "BagSlot"
 	_clear_hover_tip(view)
 	view.set_meta("bag_entry_index", -1)
 	view.set_meta("bag_entry_cache_key", "")
@@ -259,6 +260,7 @@ func _hide_slot(view: ItemView) -> void:
 func _bind_entry(view: ItemView, entry: Dictionary, index: int) -> void:
 	if view == null:
 		return
+	view.name = _entry_node_name(entry)
 	view.set_meta("bag_entry_index", index)
 	var cache_key := _entry_cache_key(entry)
 	var view_cache_key := str(view.get_meta("bag_entry_cache_key", ""))
@@ -288,6 +290,18 @@ func _bind_entry(view: ItemView, entry: Dictionary, index: int) -> void:
 		view.clear_info_entry()
 	view.set_click_enabled(true)
 	_bind_hover_tip(view, data.get("hover_payload", {}) as Dictionary)
+
+
+func _entry_node_name(entry: Dictionary) -> String:
+	var kind := str(entry.get("kind", EnumRewardKind.LABEL_ITEM))
+	var id_text := str(entry.get("id", "")).strip_edges()
+	if kind == EnumRewardKind.LABEL_ITEM and id_text == "items_AlchemyNotes_JuQi":
+		return "TutorialAlchemyNotesItem"
+	if kind == EnumRewardKind.LABEL_ITEM and id_text != "":
+		return "BagItem_%s" % id_text
+	if kind == EnumRewardKind.LABEL_EQUIP and id_text != "":
+		return "BagEquip_%s" % id_text
+	return "BagEntry"
 
 
 func _on_slot_view_clicked(view: ItemView) -> void:

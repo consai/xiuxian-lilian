@@ -166,6 +166,7 @@ func _bootstrap_savedata() -> void:
 
 func new_game() -> void:
 	DataStore.reset_all()
+	DataStore.start_tutorial()
 	var root := JsonLoader._read_json_root_object(SIM_PATH)
 	var initial := root.get("initial_player", {}) as Dictionary
 	day = 1

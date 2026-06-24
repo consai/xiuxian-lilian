@@ -2,6 +2,7 @@ extends SceneTree
 
 const StoryPlayerScript := preload("res://scripts/story/story_player.gd")
 const StoryValidatorScript := preload("res://scripts/story/story_validator.gd")
+const EnumCharacterPortraitScript := preload("res://scripts/enum/enum_character_portrait.gd")
 const STORY_PATH := "res://data/stories/prologue_fragment.yaml"
 const TUTORIAL_STORY_PATH := "res://data/stories/prologue_tutorial.yaml"
 
@@ -14,6 +15,14 @@ func _init() -> void:
 
 
 func _run_all() -> void:
+	_run("character portraits load", func() -> void:
+		EnumCharacterPortraitScript.assert_assets_loadable()
+		_expect_eq(
+			EnumCharacterPortraitScript.portrait_for_speaker("炼丹小札"),
+			EnumCharacterPortraitScript.PATH_MASTER,
+			"guide speaker portrait"
+		)
+	)
 	var story := _load_story()
 	_run("sample story validates", func() -> void:
 		_expect_true(StoryValidatorScript.collect_errors(story).is_empty(), "sample validation")
@@ -40,19 +49,40 @@ func _run_all() -> void:
 		var nodes := tutorial_story.get("nodes", {}) as Dictionary
 		_expect_false(nodes.has("start_plain"), "tutorial does not require plain cultivation")
 		_expect_eq(
-			str((((nodes.get("select_recipe", {}) as Dictionary).get("commands", []) as Array)[0] as Dictionary).get("target", "")),
-			"RecipeOption",
-			"tutorial highlights recipe selection"
+			str((((nodes.get("preview_alchemy", {}) as Dictionary).get("commands", []) as Array)[0] as Dictionary).get("target", "")),
+			"TutorialPreviewClickArea",
+			"tutorial highlights alchemy preview area"
+		)
+		_expect_eq(str((nodes.get("home", {}) as Dictionary).get("next", "")), "open_backpack", "tutorial opens backpack before alchemy")
+		_expect_eq(
+			str((((nodes.get("open_backpack", {}) as Dictionary).get("commands", []) as Array)[0] as Dictionary).get("target", "")),
+			"BackpackButton",
+			"tutorial highlights backpack"
+		)
+		_expect_eq(
+			str((((nodes.get("close_backpack", {}) as Dictionary).get("commands", []) as Array)[1] as Dictionary).get("event", "")),
+			"tutorial.backpack_closed",
+			"tutorial waits for backpack close"
 		)
 	)
-	_run("new and legacy saves keep tutorial completed by default", func() -> void:
+	_run("new game starts tutorial while reset and legacy saves stay completed", func() -> void:
 		var store := root.get_node("DataStore")
+		var game := root.get_node("GameState")
 		store.reset_savedata()
-		_expect_true(bool((store.savedata.get("tutorial", {}) as Dictionary).get("completed", false)), "new save tutorial completed")
+		_expect_true(bool((store.savedata.get("tutorial", {}) as Dictionary).get("completed", false)), "plain reset tutorial completed")
+		game.new_game()
+		var new_tutorial := store.savedata.get("tutorial", {}) as Dictionary
+		_expect_eq(str(new_tutorial.get("step", "")), "T00", "new game tutorial step")
+		_expect_false(bool(new_tutorial.get("completed", true)), "new game tutorial not completed")
+		_expect_false(bool(new_tutorial.get("skipped", true)), "new game tutorial not skipped")
 		var legacy: Dictionary = store.export_savedata()
 		legacy.erase("tutorial")
 		var merged: Dictionary = store.coalesce_savedata(legacy)
 		_expect_true(bool((merged.get("tutorial", {}) as Dictionary).get("completed", false)), "legacy tutorial completed")
+		var skipped: Dictionary = store.coalesce_savedata({"tutorial": {"step": "T10", "completed": false, "skipped": true}})
+		var skipped_tutorial := skipped.get("tutorial", {}) as Dictionary
+		_expect_true(bool(skipped_tutorial.get("skipped", false)), "skipped tutorial remains skipped")
+		_expect_false(bool(skipped_tutorial.get("completed", true)), "skipped tutorial not completed")
 	)
 	_run("line advances to choice", func() -> void:
 		var player = StoryPlayerScript.new()

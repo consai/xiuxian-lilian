@@ -115,7 +115,7 @@ offset_left = 24.0
 offset_top = 76.0
 offset_right = 416.0
 offset_bottom = 104.0
-text = "踏入洞府，开启修行之路"
+text = "回到小道观，开启今日修行"
 label_settings = ExtResource("5_label20")
 horizontal_alignment = 1
 

@@ -13,7 +13,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/components/breakthrough_path_button.tscn" id="11_path"]
 [ext_resource type="Texture2D" uid="uid://bdmliptsqhrxy" path="res://assets/art/ui_new/headlabel.png" id="12_headlabel"]
 [ext_resource type="Texture2D" uid="uid://ddhp6fnyychy1" path="res://assets/art/ui_new/tup.png" id="13_breakthrough"]
-[ext_resource type="Texture2D" uid="uid://10mdce84j7yj" path="res://assets/art/ui_new/dazuoxiaoren.png" id="14_meditator"]
+[ext_resource type="Texture2D" uid="uid://db6yxps2ypebg" path="res://assets/art/characters/001_cutout_483x512.png" id="14_meditator"]
 [ext_resource type="Texture2D" uid="uid://ctw0jxkm6iryg" path="res://assets/art/ui_new/xiuwei.png" id="15_cultivation"]
 [ext_resource type="Texture2D" uid="uid://cdlm3pk6bsyvj" path="res://assets/art/ui_new/liandan.png" id="16_alchemy"]
 [ext_resource type="Texture2D" uid="uid://qs2mgjhtoxqu" path="res://assets/art/ui_new/xingjing.png" id="17_mind"]

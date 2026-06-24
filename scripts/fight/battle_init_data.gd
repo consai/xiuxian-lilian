@@ -900,7 +900,7 @@ static func sample_for_editor() -> Dictionary:
 	var out := {
 		"player": {
 			"name": "清风剑仙",
-			"icon": "jueshe/sprite_002.png",
+			"icon": "characters/001_cutout_483x512.png",
 			"hp": 60.0,
 			"mp": 30.0,
 			"attrs": FightAttr.from_stat_block({
@@ -932,7 +932,7 @@ static func sample_for_editor() -> Dictionary:
 		},
 		"enemy": {
 			"name": "赤焰妖狼",
-			"icon": "jueshe/sprite_003.png",
+			"icon": "characters/003_cutout_407x512.png",
 			"hp": 100.0,
 			"mp": 50.0,
 			"ai": {

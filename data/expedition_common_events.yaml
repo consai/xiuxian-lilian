@@ -281,6 +281,26 @@ events:
     conditions: []
     duration_days: 3
     results: []
+  qinglan_mountain__local_boss:
+    type: "boss"
+    mode: "auto"
+    name: "赤焰妖王"
+    desc: "山脊尽头热浪翻涌，赤焰妖王踞在焦黑岩台上俯视来者。"
+    risk_text: "首领"
+    weight: 5
+    once_per_expedition: true
+    effects: []
+    id: "qinglan_mountain__local_boss"
+    template_id: "local_boss"
+    location_id: "qinglan_mountain"
+    tags:
+      - "resource"
+      - "boss"
+    conditions:
+      - type: "difficulty_at_least"
+        value: 5
+    duration_days: 4
+    results: []
   blackwater_marsh__travel:
     type: "travel"
     mode: "auto"
@@ -561,4 +581,24 @@ events:
       - "elite"
     conditions: []
     duration_days: 3
+    results: []
+  blackwater_marsh__local_boss:
+    type: "boss"
+    mode: "auto"
+    name: "黑潭腐蛟"
+    desc: "黑水深处鼓起巨大的涡旋，腐蛟带着毒雾昂首出潭。"
+    risk_text: "首领"
+    weight: 5
+    once_per_expedition: true
+    effects: []
+    id: "blackwater_marsh__local_boss"
+    template_id: "local_boss"
+    location_id: "blackwater_marsh"
+    tags:
+      - "resource"
+      - "boss"
+    conditions:
+      - type: "difficulty_at_least"
+        value: 5
+    duration_days: 4
     results: []

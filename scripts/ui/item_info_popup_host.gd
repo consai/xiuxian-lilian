@@ -46,6 +46,8 @@ func show_payload(payload: Dictionary) -> void:
 
 
 func hide_popup() -> void:
+	if _is_tutorial_notes_use_pending():
+		return
 	_current_payload = {}
 	if _popup != null:
 		_popup.visible = false
@@ -94,6 +96,13 @@ func _emit_use_tip(text: String, tone: String) -> void:
 
 func is_open() -> bool:
 	return _popup != null and _popup.visible
+
+
+func _is_tutorial_notes_use_pending() -> bool:
+	return (
+		str(_current_payload.get("item_id", "")).strip_edges() == TUTORIAL_ALCHEMY_NOTES_ITEM_ID
+		and TutorialService.is_waiting_for_any(["tutorial.alchemy_notes_used"])
+	)
 
 
 func _input(event: InputEvent) -> void:

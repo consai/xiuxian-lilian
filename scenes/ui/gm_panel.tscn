@@ -224,7 +224,7 @@ theme_override_constants/separation = 8
 unique_name_in_owner = true
 script = ExtResource("8_auto")
 layout_mode = 2
-text = "洞府"
+text = "小道观"
 
 
 [node name="WorldMapButton" type="Button" parent="Panel/Scroll/Content/SceneRow"]

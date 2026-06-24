@@ -192,6 +192,11 @@ func close_popups() -> void:
 
 
 func _on_return_pressed() -> void:
+	if TutorialService.is_waiting_for_any([
+		"tutorial.wolf_valley_selected",
+		"tutorial.expedition_started",
+	]):
+		return
 	return_requested.emit()
 	SceneManager.go_hub()
 

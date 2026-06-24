@@ -2,11 +2,10 @@ extends Control
 
 const AlchemyServiceScript := preload("res://scripts/sim/alchemy_service.gd")
 const SELECTION_MODES := ["lowest", "highest"]
-const TUTORIAL_RECIPE_ID := "recipe.juqi"
+const TUTORIAL_RECIPE_INDEX := 0
 const TUTORIAL_STRATEGY_ID := "steady"
 const TUTORIAL_SELECTION_MODE := "lowest"
 const TUTORIAL_BREW_LOCK_EVENTS := [
-	"tutorial.alchemy_recipe_selected",
 	"tutorial.alchemy_preview_acknowledged",
 ]
 
@@ -20,7 +19,7 @@ const TUTORIAL_BREW_LOCK_EVENTS := [
 @onready var _result_label: Label = %ResultLabel
 @onready var _brew_button: Button = %BrewButton
 @onready var _player_label: Label = $PlayerChip/Text
-@onready var _probability_card: PanelContainer = $StrategyPanel/StrategyContent/ProbabilityCard
+@onready var _tutorial_preview_click_area: Control = %TutorialPreviewClickArea
 @onready var _material_slots: Array[ItemView] = [%MaterialSlot0, %MaterialSlot1, %MaterialSlot2]
 @onready var _pill_preview: ItemView = %PillPreviewSlot
 @onready var _batch_popup: AlchemyBatchPopup = %BatchPopup
@@ -46,7 +45,7 @@ func _ready() -> void:
 	_recipe_option.item_selected.connect(_on_recipe_selected)
 	_strategy_option.item_selected.connect(func(_index: int) -> void: _refresh())
 	_selection_option.item_selected.connect(func(_index: int) -> void: _refresh())
-	_probability_card.gui_input.connect(_on_preview_area_gui_input)
+	_tutorial_preview_click_area.gui_input.connect(_on_preview_area_gui_input)
 	%CloseButton.pressed.connect(_on_close_pressed)
 	_brew_button.pressed.connect(_on_brew_pressed)
 	_batch_popup.confirmed.connect(_on_batch_confirmed)
@@ -140,7 +139,7 @@ func _preview() -> Dictionary:
 	var strategy_id := ""
 	var selection_mode := ""
 	if _is_tutorial_alchemy_forced():
-		recipe_id = TUTORIAL_RECIPE_ID
+		recipe_id = str(_tutorial_recipe().get("id", ""))
 		strategy_id = TUTORIAL_STRATEGY_ID
 		selection_mode = TUTORIAL_SELECTION_MODE
 	else:
@@ -156,11 +155,15 @@ func _selected_recipe() -> Dictionary:
 	if _recipes.is_empty():
 		return {}
 	if _is_tutorial_alchemy_forced():
-		for recipe_v in _recipes:
-			if str((recipe_v as Dictionary).get("id", "")) == TUTORIAL_RECIPE_ID:
-				return recipe_v as Dictionary
+		return _tutorial_recipe()
 	var index := clampi(_recipe_option.selected, 0, _recipes.size() - 1)
 	return _recipes[index] as Dictionary
+
+
+func _tutorial_recipe() -> Dictionary:
+	if _recipes.is_empty():
+		return {}
+	return _recipes[clampi(TUTORIAL_RECIPE_INDEX, 0, _recipes.size() - 1)] as Dictionary
 
 
 func _format_ingredients(rows: Array) -> String:
@@ -274,6 +277,8 @@ func _start_brew(batch_count: int, preview: Dictionary) -> void:
 
 
 func _on_close_pressed() -> void:
+	if _is_tutorial_alchemy_forced():
+		return
 	SceneManager.go_hub()
 
 
@@ -281,15 +286,16 @@ func _is_tutorial_alchemy_forced() -> bool:
 	if not TutorialService.is_active():
 		return false
 	var flags := (DataStore.savedata.get("tutorial", {}) as Dictionary).get("flags", {}) as Dictionary
-	return bool(flags.get("tutorial.alchemy_notes_used", false)) and not bool(
-		flags.get("tutorial.alchemy_completed", false)
+	return (
+		not bool(flags.get("tutorial.alchemy_completed", false))
+		and (bool(flags.get("tutorial.alchemy_opened", false)) or bool(flags.get("tutorial.alchemy_notes_used", false)))
 	)
 
 
 func _setup_tutorial_alchemy() -> void:
 	_select_option_by_id(_strategies, "id", TUTORIAL_STRATEGY_ID, _strategy_option)
 	_selection_option.select(0)
-	_recipe_option.select(0)
+	_recipe_option.select(clampi(TUTORIAL_RECIPE_INDEX, 0, maxi(0, _recipes.size() - 1)))
 	_recipe_option.disabled = false
 	_strategy_option.disabled = true
 	_selection_option.disabled = true
@@ -298,7 +304,7 @@ func _setup_tutorial_alchemy() -> void:
 func _on_recipe_selected(index: int) -> void:
 	if index < 0 or index >= _recipes.size():
 		return
-	if str((_recipes[index] as Dictionary).get("id", "")) == TUTORIAL_RECIPE_ID:
+	if TutorialService.is_waiting_for_any(["tutorial.alchemy_recipe_selected"]) and index == TUTORIAL_RECIPE_INDEX:
 		TutorialService.game_event("tutorial.alchemy_recipe_selected")
 		call_deferred("_refresh")
 		return
@@ -306,7 +312,12 @@ func _on_recipe_selected(index: int) -> void:
 
 
 func _tutorial_brew_locked() -> bool:
-	if not _is_tutorial_alchemy_forced():
+	_tutorial_preview_click_area.mouse_filter = (
+		Control.MOUSE_FILTER_STOP
+		if TutorialService.is_waiting_for_any(["tutorial.alchemy_preview_acknowledged"])
+		else Control.MOUSE_FILTER_IGNORE
+	)
+	if not _is_tutorial_alchemy_forced() and not TutorialService.is_waiting_for_any(TUTORIAL_BREW_LOCK_EVENTS):
 		return false
 	var flags := (DataStore.savedata.get("tutorial", {}) as Dictionary).get("flags", {}) as Dictionary
 	for event_id in TUTORIAL_BREW_LOCK_EVENTS:

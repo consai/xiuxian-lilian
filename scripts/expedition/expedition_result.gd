@@ -180,14 +180,14 @@ func _render_outcome_summary(reason: String) -> void:
 		var lost := _loot_lost_rows()
 		if not lost.is_empty():
 			lines.append("战败途中遗失部分战利品。")
-		lines.append("伤势加重，需回洞府静养。")
+		lines.append("伤势加重，需回观中静养。")
 	if int(_result.get("instability_reduced", 0)) > 0:
 		lines.append("战斗压实境界：虚浮 -%d，当前 %d。" % [
 			int(_result.get("instability_reduced", 0)),
 			int(_result.get("cultivation_instability", 0)),
 		])
 	if lines.is_empty():
-		message.text = "此行山高路远，所得皆已带回洞府。"
+		message.text = "此行山高路远，所得皆已带回观中。"
 	else:
 		message.text = "\n".join(lines)
 

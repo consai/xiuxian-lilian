@@ -30,7 +30,7 @@ const MODE_IDS := EnumCultivationMode.MODE_IDS
 @onready var _method_picker: LoadoutSelectionPopup = %MethodPicker
 
 var _mode_id := EnumCultivationMode.LABEL_CYCLE
-var _months := 0
+var _months := 1
 var _selected_pill_id := ""
 
 
@@ -117,8 +117,9 @@ func _sync_day_slider() -> void:
 	var max_months := maxi(min_months, GameState.max_cultivation_months(_mode_id, _selected_pill_id))
 	_day_slider.min_value = float(min_months)
 	_day_slider.max_value = float(max_months)
+	# 未选择或越界时回落到最短可选月数（默认 1 月）
 	if _months < min_months:
-		_months = max_months
+		_months = min_months
 	_months = clampi(_months, min_months, max_months)
 	if int(round(_day_slider.value)) != _months:
 		_day_slider.set_value_no_signal(float(_months))
@@ -294,6 +295,11 @@ func _on_start_pressed() -> void:
 
 
 func _on_close_pressed() -> void:
+	if TutorialService.is_waiting_for_any([
+		"tutorial.pill_mode_selected",
+		"tutorial.cultivation_result_shown",
+	]):
+		return
 	var nav: Dictionary = SceneManager.go_hub()
 	if not bool(nav.get("ok", false)):
-		push_warning(str(nav.get("error", "无法返回洞府")))
+		push_warning(str(nav.get("error", "无法返回观中")))

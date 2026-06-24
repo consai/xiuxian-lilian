@@ -37,7 +37,7 @@ func _ready() -> void:
 		return
 	if pivot_to_center:
 		_target.resized.connect(_center_pivot)
-		_center_pivot()
+		call_deferred("_center_pivot")
 	if _target is BaseButton:
 		_base_button = _target as BaseButton
 		# _base_button.button_down.connect(_on_button_down)
@@ -71,7 +71,10 @@ func _exit_tree() -> void:
 
 func _center_pivot() -> void:
 	if is_instance_valid(_target) and pivot_to_center:
-		_target.pivot_offset = _target.size * 0.5
+		var new_pivot := _target.size * 0.5
+		if new_pivot == _target.pivot_offset:
+			return
+		_target.pivot_offset = new_pivot
 
 
 func _on_button_down() -> void:

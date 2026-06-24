@@ -58,6 +58,10 @@ func _scene_manager() -> Node:
 	return root.get_node("SceneManager")
 
 
+func _active_scene() -> Node:
+	return _scene_manager().get_active_scene()
+
+
 func _expedition() -> Node:
 	return root.get_node("ExpeditionState")
 
@@ -318,7 +322,7 @@ func _run_async(name: String, stage: String) -> void:
 			var pending_v: Variant = root.get_node("DataStore").battle_runtime().get("pending_init", {})
 			_expect_false((pending_v as Dictionary).is_empty(), "pending init written")
 		"expedition_overlay_fight_enter":
-			_overlay_loop_instance_id = current_scene.get_instance_id()
+			_overlay_loop_instance_id = _active_scene().get_instance_id()
 			var overlay_data: Dictionary = BattleInitData.sample_for_editor()
 			var overlay_nav: Dictionary = _scene_manager().go_fight(overlay_data, "expedition")
 			_expect_true(bool(overlay_nav.get("ok", false)), "expedition overlay fight ok")
@@ -340,7 +344,7 @@ func _finish_async_stage() -> void:
 	match _async_stage:
 		"start_expedition":
 			_expect_eq(
-				str(current_scene.scene_file_path),
+				str(_active_scene().scene_file_path),
 				"res://scenes/expedition/expedition_loop.tscn",
 				"expedition loop scene"
 			)
@@ -350,11 +354,11 @@ func _finish_async_stage() -> void:
 				_quit_failures()
 		"expedition_overlay_fight_enter":
 			_expect_eq(
-				str(current_scene.scene_file_path),
+				str(_active_scene().scene_file_path),
 				"res://scenes/fightScene.tscn",
 				"overlay fight scene active"
 			)
-			_expect_eq(current_scene.get_instance_id(), current_scene.get_instance_id(), "fight scene loaded")
+			_expect_eq(_active_scene().get_instance_id(), _active_scene().get_instance_id(), "fight scene loaded")
 			var loop_node := _find_expedition_loop_node()
 			_expect_true(loop_node != null, "expedition loop kept in tree")
 			if loop_node != null:
@@ -365,18 +369,18 @@ func _finish_async_stage() -> void:
 				_quit_failures()
 		"expedition_overlay_fight_resume":
 			_expect_eq(
-				str(current_scene.scene_file_path),
+				str(_active_scene().scene_file_path),
 				"res://scenes/expedition/expedition_loop.tscn",
 				"resumed expedition loop scene"
 			)
-			_expect_eq(current_scene.get_instance_id(), _overlay_loop_instance_id, "resumed same expedition loop instance")
+			_expect_eq(_active_scene().get_instance_id(), _overlay_loop_instance_id, "resumed same expedition loop instance")
 			if _failures.is_empty():
 				_run_async("go_hub switches to hub scene", "go_hub")
 			else:
 				_quit_failures()
 		"go_hub":
 			_expect_eq(
-				str(current_scene.scene_file_path),
+				str(_active_scene().scene_file_path),
 				"res://scenes/sim/cave_hub.tscn",
 				"hub scene"
 			)
@@ -386,7 +390,7 @@ func _finish_async_stage() -> void:
 				_quit_failures()
 		"go_fight":
 			_expect_eq(
-				str(current_scene.scene_file_path),
+				str(_active_scene().scene_file_path),
 				"res://scenes/fightScene.tscn",
 				"fight scene"
 			)
@@ -429,7 +433,10 @@ func _expect_neq(actual: Variant, expected: Variant, label: String) -> void:
 
 
 func _find_expedition_loop_node() -> Node:
-	for child in root.get_children():
+	var scene_root: Node = _scene_manager().get_scene_root()
+	if scene_root == null:
+		return null
+	for child in scene_root.get_children():
 		if child == null:
 			continue
 		if str(child.scene_file_path) == "res://scenes/expedition/expedition_loop.tscn":

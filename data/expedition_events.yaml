@@ -1,5 +1,28 @@
 schema_version: 2
 events:
+  tutorial_valley_herbs:
+    id: "tutorial_valley_herbs"
+    location_id: "wild_wolf_valley"
+    type: "gather"
+    name: "崖边灵草"
+    desc: "石缝间有几株冒头的灵草，正是今日要采的。"
+    risk_text: "安全"
+    weight: 1
+    once_per_expedition: false
+    effects: []
+    success_text: "你小心采下灵草，收进背篓。"
+    empty_text: "灵草尚嫩，你只记下位置，改日再来。"
+    tags:
+      - "gather"
+      - "story"
+    conditions: []
+    results:
+      - type: "rewards"
+        rewards:
+          - kind: "item"
+            id: "items_LingCao"
+            min: 1
+            max: 1
   qinglan_fog:
     id: "qinglan_fog"
     location_id: "wild_wolf_valley"
@@ -153,7 +176,9 @@ events:
     effects: []
     tags:
       - "boss"
-    conditions: []
+    conditions:
+      - type: "difficulty_at_least"
+        value: 5
     results:
       - type: "drop"
         drop_pool: "monster:qinglan_boss"

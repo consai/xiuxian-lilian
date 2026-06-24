@@ -2,12 +2,13 @@ extends Node
 
 const STORY_ID := "prologue_tutorial"
 const MAIN_MENU_SCENE := "res://scenes/ui/main_menu.tscn"
-const TUTORIAL_ENABLED := false
+const TUTORIAL_ENABLED := true
 
 
 func _ready() -> void:
 	StoryDirector.story_finished.connect(_on_story_finished)
 	get_tree().scene_changed.connect(_on_scene_changed)
+	SceneManager.active_scene_changed.connect(_on_scene_changed)
 	call_deferred("_ensure_started")
 
 
@@ -27,6 +28,23 @@ func is_active() -> bool:
 	return not bool(tutorial.get("completed", false)) and not bool(tutorial.get("skipped", false))
 
 
+## 首次历练路线图：教程未完成且尚未赢下引导战斗时使用固定三节点地图。
+func should_use_tutorial_expedition_map() -> bool:
+	if not is_active():
+		return false
+	var flags := (DataStore.savedata.get("tutorial", {}) as Dictionary).get("flags", {}) as Dictionary
+	return not bool(flags.get("tutorial.first_battle_won", false))
+
+
+func is_waiting_for_any(event_ids: Array) -> bool:
+	if not is_active():
+		return false
+	for event_id_v in event_ids:
+		if StoryDirector.is_waiting_for(str(event_id_v)):
+			return true
+	return false
+
+
 func _ensure_started() -> void:
 	if not TUTORIAL_ENABLED:
 		_stop_active_tutorial()
@@ -38,7 +56,7 @@ func _ensure_started() -> void:
 
 
 func _is_main_menu_scene() -> bool:
-	var scene := get_tree().current_scene
+	var scene := SceneManager.get_active_scene()
 	return scene != null and scene.scene_file_path == MAIN_MENU_SCENE
 
 
@@ -47,7 +65,7 @@ func _stop_active_tutorial() -> void:
 		StoryDirector.skip_active()
 
 
-func _on_scene_changed() -> void:
+func _on_scene_changed(_scene: Node = null) -> void:
 	call_deferred("_ensure_started")
 
 
@@ -69,23 +87,24 @@ func _set_step_for_event(event_id: String) -> void:
 		"tutorial.cultivation_completed": "T02",
 		"tutorial.pill_mode_selected": "T02",
 		"tutorial.alchemy_opened": "T09",
-		"tutorial.alchemy_notes_backpack_opened": "T09",
-		"tutorial.alchemy_notes_item_opened": "T09",
-		"tutorial.alchemy_notes_used": "T09",
+		"tutorial.alchemy_notes_backpack_opened": "T08",
+		"tutorial.alchemy_notes_item_opened": "T08",
+		"tutorial.alchemy_notes_used": "T08",
+		"tutorial.backpack_closed": "T08",
 		"tutorial.alchemy_recipe_selected": "T09",
 		"tutorial.alchemy_preview_acknowledged": "T09",
 		"tutorial.alchemy_started": "T09",
-		"tutorial.alchemy_result_shown": "T10",
+		"tutorial.alchemy_result_shown": "T09",
 		"tutorial.alchemy_completed": "T10",
 		"tutorial.attributes_opened": "T03",
 		"tutorial.attributes_closed": "T03",
-		"tutorial.world_map_opened": "T04",
+		"tutorial.world_map_opened": "T03",
 		"tutorial.wolf_valley_selected": "T04",
-		"tutorial.expedition_started": "T05",
-		"tutorial.first_battle_won": "T07",
-		"tutorial.expedition_returned": "T08",
-		"tutorial.result_closed": "T09",
-		"tutorial.backpack_opened": "T10",
+		"tutorial.expedition_started": "T04",
+		"tutorial.first_battle_won": "T05",
+		"tutorial.expedition_returned": "T06",
+		"tutorial.result_closed": "T07",
+		"tutorial.backpack_opened": "T08",
 	}
 	if not steps.has(event_id):
 		return

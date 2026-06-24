@@ -40,6 +40,7 @@ func _run_all() -> void:
 	_run("alchemy recipe mastery improves outcomes and rewards failure", _test_alchemy_recipe_mastery)
 	_run("alchemy steady strategy beats supreme on success rate", _test_alchemy_steady_strategy_ordering)
 	_run("alchemy batch count respects inventory and furnace", _test_alchemy_batch_count)
+	_run("pre-foundation resource loop stays bounded", _test_pre_foundation_resource_loop)
 	_run("battle runtime deducts inventory", _test_battle_runtime_deducts_inventory)
 	_run("transfer item respects stack cap", _test_transfer_item_stack_cap)
 	_run("expedition events build valid battle data", _test_expedition_events_build_valid_battle_data)
@@ -594,6 +595,94 @@ func _test_alchemy_recipe_mastery() -> void:
 		int(failed.get("mastery_gain", 0)),
 		int(succeeded.get("mastery_gain", 0)),
 		"failure grants more recipe mastery"
+	)
+
+
+func _test_pre_foundation_resource_loop() -> void:
+	var state := _state()
+	for item_id in [
+		"items_LingCao",
+		"items_LingGuo",
+		"items_YaoDan",
+		"items_JuQiDan",
+		"items_JuQiDan_Low",
+		"items_JuQiDan_High",
+		"items_JuQiDan_Supreme",
+		"items_WasteDan",
+	]:
+		state.inventory.erase(item_id)
+	var settlement := {
+		"settlement_id": "test-pre-foundation-loop",
+		"elapsed_days": GameTimeServiceScript.days_per_month(),
+		"start_day": state.day,
+		"exit_reason": "manual",
+		"hp": state.hp,
+		"mp": state.mp,
+		"items": [],
+		"loot": [
+			{"kind": "item", "id": "items_LingCao", "count": 4},
+			{"kind": "item", "id": "items_LingGuo", "count": 2},
+			{"kind": "item", "id": "items_YaoDan", "count": 1},
+		],
+		"loot_lost": [],
+		"stats": {"steps": 5, "battles": 3, "wins": 3, "losses": 0, "max_difficulty": 4},
+		"location_name": "测试山林",
+	}
+	var settled: Dictionary = state.settle_expedition(settlement)
+	_expect_true(bool(settled.get("ok", false)), "resource expedition settlement succeeds")
+	_expect_eq(int(state.inventory.get("items_LingCao", 0)), 4, "expedition brings enough lingcao")
+	_expect_eq(int(state.inventory.get("items_LingGuo", 0)), 2, "expedition brings enough lingguo")
+	_expect_eq(int(state.inventory.get("items_YaoDan", 0)), 1, "expedition brings one yaodan gate")
+	var preview: Dictionary = state.preview_alchemy("recipe.juqi", "steady", "lowest")
+	_expect_true(bool(preview.get("ok", false)), "juqi preview succeeds from expedition loot")
+	var success_probability := float(preview.get("success_probability", 0.0))
+	_expect_true(
+		success_probability >= 0.45 and success_probability <= 0.70,
+		"starter steady juqi success stays readable: %.3f" % success_probability
+	)
+	_expect_eq(state.max_alchemy_batch_count(preview), 1, "yaodan gates juqi batch explosion")
+	var forced_preview := preview.duplicate(true)
+	forced_preview["base_score"] = 55.0
+	var forced_strategy := forced_preview.get("strategy", {}) as Dictionary
+	forced_strategy["spread"] = 0
+	forced_strategy["spread_down"] = 0
+	forced_strategy["spread_up"] = 0
+	forced_preview["strategy"] = forced_strategy
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 42
+	var rolled: Dictionary = AlchemyServiceScript.roll(forced_preview, rng)
+	var brew: Dictionary = state._apply_alchemy_brew_result("recipe.juqi", "steady", rolled)
+	_expect_true(bool(brew.get("succeeded", false)), "juqi brew applies successful result: %s" % str(brew))
+	var pill_id := str(brew.get("product_id", ""))
+	_expect_true(state.is_cultivation_pill(pill_id), "juqi output is a cultivation pill")
+	var one_month := GameTimeServiceScript.days_per_month()
+	var normal: Dictionary = state.preview_cultivation_session("cycle", one_month)
+	var pill: Dictionary = state.preview_cultivation_session("pill", one_month, pill_id)
+	_expect_true(bool(pill.get("ok", false)), "crafted juqi pill can be cultivated")
+	_expect_gt(
+		int(pill.get("estimated_cultivation", 0)),
+		int(normal.get("estimated_cultivation", 0)) * 4,
+		"crafted juqi pill accelerates cultivation"
+	)
+	var pill_before := int(state.inventory.get(pill_id, 0))
+	var cultivated: Dictionary = state.cultivate_session("pill", one_month, pill_id)
+	_expect_true(bool(cultivated.get("ok", false)), "crafted juqi pill cultivation succeeds")
+	_expect_eq(int(state.inventory.get(pill_id, 0)), pill_before - 1, "crafted pill is consumed")
+	_expect_eq(
+		int(cultivated.get("instability_gained", 0)),
+		state.cultivation_pill_instability(pill_id),
+		"crafted pill keeps instability cost"
+	)
+	state.realm_index = 8
+	state._sync_realm()
+	state.cultivation = state.breakthrough_at
+	_grant_foundation_knowledge_gate(state)
+	var breakthrough: Dictionary = state.preview_breakthrough()
+	_expect_true(bool(breakthrough.get("ok", false)), "foundation preview after resource loop")
+	_expect_true(not bool(breakthrough.get("can_attempt", true)), "one resource loop does not complete foundation prep")
+	_expect_true(
+		int(breakthrough.get("total", 0)) < int(breakthrough.get("min_total", 0)),
+		"foundation prep still needs repeated accumulation"
 	)
 
 

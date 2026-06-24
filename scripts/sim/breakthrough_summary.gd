@@ -224,4 +224,4 @@ func _on_start_pressed() -> void:
 func _on_close_pressed() -> void:
 	var nav: Dictionary = SceneManager.go_hub()
 	if not bool(nav.get("ok", false)):
-		push_warning(str(nav.get("error", "无法返回洞府")))
+		push_warning(str(nav.get("error", "无法返回观中")))

@@ -12,9 +12,7 @@ extends Control
 @onready var _rest_button: TextureButton = %RestButton
 @onready var _expedition_object_button: TextureButton = %ExpeditionObjectButton
 @onready var _backpack_button: TextureButton = %BackpackButton
-@onready var _cultivate_button: TextureButton = %CultivateButton
 @onready var _knowledge_study_button: TextureButton = %KnowledgeStudyButton
-@onready var _expedition_button: TextureButton = %ExpeditionButton
 @onready var _attributes_button: TextureButton = %btnattrs
 @onready var _save_button: Button = %SaveButton
 
@@ -34,10 +32,8 @@ func _connect_actions() -> void:
 	_rest_button.pressed.connect(_on_rest)
 	_expedition_object_button.pressed.connect(_on_encounter)
 	_backpack_button.pressed.connect(_on_backpack)
-	_cultivate_button.pressed.connect(_on_cultivate)
 	_knowledge_study_button.pressed.connect(_on_knowledge_study)
 	_breakthrough_button.pressed.connect(_on_breakthrough)
-	_expedition_button.pressed.connect(_on_encounter)
 	_attributes_button.pressed.connect(_on_character_attributes)
 	_save_button.pressed.connect(_toggle_save_slots)
 	_save_slots_overlay.closed.connect(_on_save_slots_closed)
@@ -78,7 +74,7 @@ func _resolve_message(message: String) -> String:
 		return "上次所得：" + "、".join(rewards)
 	if not GameState.activity_log.is_empty():
 		return str((GameState.activity_log.back() as Dictionary).get("text", ""))
-	return "可随时外出历练。"
+	return "可随时出门巡山。"
 
 
 func _on_alchemy() -> void:
@@ -108,7 +104,7 @@ func _on_rest() -> void:
 
 func _on_encounter() -> void:
 	if ExpeditionState.active:
-		_refresh("当前仍在历练中，请先完成或结算后再操作。")
+		_refresh("当前仍在巡山中，请先完成或结算后再操作。")
 		return
 	var nav: Dictionary = SceneManager.go_world_map()
 	if not bool(nav.get("ok", false)):

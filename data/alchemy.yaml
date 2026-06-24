@@ -129,7 +129,7 @@ recipes:
   - id: "recipe.juqi"
     name: "聚气丹方"
     pill_name: "聚气丹"
-    difficulty: 45
+    difficulty: 38
     base_yield: 2
     minimum_level: 1
     ingredients:

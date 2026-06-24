@@ -5,7 +5,7 @@ monsters:
     species: "beast"
     tags:
       - "beast"
-    icon: "jueshe/sprite_003.png"
+    icon: "characters/003_cutout_407x512.png"
     hp: 75
     mp: 30
     attrs:
@@ -50,7 +50,7 @@ monsters:
     tags:
       - "elite"
       - "beast"
-    icon: "jueshe/sprite_001.png"
+    icon: "characters/005_cutout_311x512.png"
     hp: 165
     mp: 55
     attrs:
@@ -96,7 +96,7 @@ monsters:
     tags:
       - "elite"
       - "beast"
-    icon: "jueshe/sprite_001.png"
+    icon: "characters/006_cutout_427x512.png"
     hp: 145
     mp: 70
     attrs:
@@ -142,7 +142,7 @@ monsters:
     tags:
       - "boss"
       - "beast"
-    icon: "jueshe/sprite_000.png"
+    icon: "characters/004_cutout_502x512.png"
     hp: 240
     mp: 100
     attrs:
@@ -188,7 +188,7 @@ monsters:
     species: "beast"
     tags:
       - "beast"
-    icon: "jueshe/sprite_001.png"
+    icon: "characters/003_cutout_407x512.png"
     hp: 95
     mp: 40
     attrs:
@@ -231,7 +231,7 @@ monsters:
     tags:
       - "elite"
       - "beast"
-    icon: "jueshe/sprite_000.png"
+    icon: "characters/004_cutout_502x512.png"
     hp: 190
     mp: 70
     attrs:
@@ -260,6 +260,53 @@ monsters:
           id: "items_YaoDan"
           min: 2
           max: 3
+          weight: 4
+        - kind: "item"
+          id: "items_XuanJin"
+          min: 1
+          max: 2
+          weight: 2
+        - kind: "item"
+          id: "items_PoJingDan"
+          min: 1
+          max: 1
+          weight: 1
+
+  blackwater_boss:
+    name: "黑潭腐蛟"
+    species: "boss"
+    tags:
+      - "boss"
+      - "beast"
+    icon: "characters/006_cutout_427x512.png"
+    hp: 255
+    mp: 110
+    attrs:
+      hp_max: 255
+      mp_max: 110
+      shield: 20
+      physical_atk: 36
+      magic_atk: 39
+      physical_def: 27
+      magic_def: 32
+      spd: 96
+      accuracy: 112
+      evasion: 100
+      control_power: 95
+      control_resist: 105
+      crit: 10
+      crit_damage: 160
+    skills:
+      - 3
+      - 2
+      - 1
+      - 0
+    drops:
+      entries:
+        - kind: "item"
+          id: "items_YaoDan"
+          min: 2
+          max: 4
           weight: 4
         - kind: "item"
           id: "items_XuanJin"

@@ -64,6 +64,11 @@ static func roll_event_for_node(
 		visited_once: Array,
 		rng: RandomNumberGenerator
 ) -> Dictionary:
+	var fixed_event_id := str(node.get("fixed_event_id", "")).strip_edges()
+	if fixed_event_id != "":
+		var fixed_event := by_id(fixed_event_id)
+		if not fixed_event.is_empty():
+			return _materialize_event_for_context(location, node, fixed_event, rng)
 	var candidates := candidates_for_node(location, node, visited_once)
 	var pick := _weighted_pick(candidates, rng)
 	if not pick.is_empty():
@@ -553,16 +558,11 @@ static func _scale_enemy_for_difficulty_and_group(
 	var enemy := base.duplicate(true)
 	var attrs := (enemy.get("attrs", {}) as Dictionary).duplicate(true)
 	var difficulty_scale := _enemy_difficulty_scale(event)
-	var hp_scale := 1.0
-	var atk_scale := 1.0
-	if count > 1:
-		hp_scale = 0.55 if count <= 2 else 0.35
-		atk_scale = 0.42 if count <= 2 else 0.30
 	if attrs.has(FightAttr.HP_MAX):
-		attrs[FightAttr.HP_MAX] = maxf(1.0, float(attrs[FightAttr.HP_MAX]) * difficulty_scale * hp_scale)
+		attrs[FightAttr.HP_MAX] = maxf(1.0, float(attrs[FightAttr.HP_MAX]) * difficulty_scale)
 	for key in [FightAttr.PHYSICAL_ATK, FightAttr.MAGIC_ATK]:
 		if attrs.has(key):
-			attrs[key] = maxf(1.0, float(attrs[key]) * difficulty_scale * atk_scale)
+			attrs[key] = maxf(1.0, float(attrs[key]) * difficulty_scale)
 	for key in [FightAttr.PHYSICAL_DEF, FightAttr.MAGIC_DEF]:
 		if attrs.has(key):
 			attrs[key] = maxf(0.0, float(attrs[key]) * (1.0 + (difficulty_scale - 1.0) * 0.65))
@@ -572,7 +572,7 @@ static func _scale_enemy_for_difficulty_and_group(
 	enemy["attrs"] = attrs
 	if attrs.has(FightAttr.HP_MAX):
 		enemy["hp"] = float(attrs[FightAttr.HP_MAX])
-	var skill_effect_scale := _enemy_skill_effect_scale(event, atk_scale, count)
+	var skill_effect_scale := _enemy_skill_effect_scale(event)
 	enemy["skills"] = _scale_enemy_skill_slots(enemy.get("skills", []), skill_effect_scale)
 	var base_name := str(base.get("name", "敌人")).strip_edges()
 	if count > 1:
@@ -590,7 +590,7 @@ static func _enemy_difficulty_scale(event: Dictionary) -> float:
 	return clampf(1.0 + float(steps) * 0.12, 0.5, 2.5)
 
 
-static func _enemy_skill_effect_scale(event: Dictionary, atk_scale: float, count: int) -> float:
+static func _enemy_skill_effect_scale(event: Dictionary) -> float:
 	if event.has("enemy_skill_effect_scale"):
 		return clampf(float(event.get("enemy_skill_effect_scale", 1.0)), 0.1, 1.0)
 	var event_type := str(event.get("type", "")).strip_edges()
@@ -602,8 +602,6 @@ static func _enemy_skill_effect_scale(event: Dictionary, atk_scale: float, count
 		scale = clampf(0.55 + float(difficulty) * 0.05, 0.65, 0.95)
 	else:
 		scale = clampf(0.30 + float(difficulty) * 0.05, 0.35, 0.85)
-	if count > 1:
-		scale = minf(scale, atk_scale)
 	return scale
 
 

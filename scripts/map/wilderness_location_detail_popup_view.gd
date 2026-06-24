@@ -55,6 +55,8 @@ func _on_enter_pressed() -> void:
 
 
 func _on_close_pressed() -> void:
+	if TutorialService.is_waiting_for_any(["tutorial.expedition_started"]):
+		return
 	hide_popup()
 	closed.emit()
 

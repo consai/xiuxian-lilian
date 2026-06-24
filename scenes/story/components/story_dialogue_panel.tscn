@@ -1,7 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Theme" path="res://ui/theme_tuhuang.tres" id="1_theme"]
-[ext_resource type="Texture2D" path="res://assets/art/ui_new/dazuoxiaoren.png" id="2_portrait"]
+[ext_resource type="Texture2D" uid="uid://cta2iv7f5q3jk" path="res://assets/art/characters/004_cutout_502x512.png" id="2_portrait"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="3_name"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/28.tres" id="4_body"]
 
@@ -44,7 +44,7 @@ corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
 [node name="StoryDialoguePanel" type="Control"]
-custom_minimum_size = Vector2(1200, 232)
+custom_minimum_size = Vector2(0, 232)
 theme = ExtResource("1_theme")
 
 [node name="Panel" type="Panel" parent="."]
@@ -78,7 +78,7 @@ offset_right = -18.0
 offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 2
-modulate = Color(0.713726, 0.843137, 0.839216, 0.92)
+modulate = Color(1, 1, 1, 1)
 texture = ExtResource("2_portrait")
 expand_mode = 1
 stretch_mode = 5
@@ -99,30 +99,42 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "师父残念"
+text = "炼丹小札"
 label_settings = ExtResource("3_name")
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="DialogueLabel" type="Label" parent="."]
 unique_name_in_owner = true
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 offset_left = 214.0
 offset_top = 88.0
-offset_right = 1140.0
-offset_bottom = 184.0
-text = "洞府禁制尚在。先确认自己还能引气入体。"
+offset_right = -60.0
+offset_bottom = -48.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "小道观晨钟已响。先确认自己还能引气入体。"
 label_settings = ExtResource("4_body")
 horizontal_alignment = 0
 vertical_alignment = 1
 autowrap_mode = 2
 
 [node name="ContinueIndicator" type="Label" parent="."]
-layout_mode = 0
-offset_left = 1126.0
-offset_top = 174.0
-offset_right = 1174.0
-offset_bottom = 222.0
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -74.0
+offset_top = -58.0
+offset_right = -26.0
+offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
 theme_override_colors/font_color = Color(0.513726, 0.462745, 0.247059, 1)
 theme_override_font_sizes/font_size = 34
 text = "⌄"

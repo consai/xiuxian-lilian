@@ -38,8 +38,8 @@ var enemy := RealmBalanceServiceScript.benchmark_enemy_attrs("qi_normal")
 
 ## 后续配置一个新境界
 
-1. 在 `data/simulation.json` 增加境界层级，用 `major_realm` 指向大境界 ID。
-2. 在 `data/realm_balance.json > major_realms` 确认这个大境界存在，并配置内容系数与目标战斗时长。
+1. 在 `data/simulation.yaml` 增加境界层级，用 `major_realm` 指向大境界 ID。
+2. 在 `data/realm_balance.yaml > major_realms` 确认这个大境界存在，并配置内容系数与目标战斗时长。
 3. 在 `standard_players` 增加该阶段的标准玩家，例如 `core_early`、`core_mature`。
 4. 在 `benchmark_enemies` 增加普通、精英、跨境界标杆敌人。
 5. 用 `tests/run_balance_v1_tests.gd` 的模式扩展新的胜率与时长验收。
@@ -52,6 +52,16 @@ var enemy := RealmBalanceServiceScript.benchmark_enemy_attrs("qi_normal")
 - 速度现在由身法主导、神识辅助，避免肉身同时支撑气血、物攻、物防和出手频率。
 - 每个小境界仍提供：气血 +6、法力 +6、物攻 +1.8、法攻 +1.92、物防 +1.2、法防 +1.44、速度 +3。
 - 现有练气/筑基平衡测试仍使用御气弹、练气普通敌、练气精英敌和筑基普通敌作为首版纵切。
+
+## PM-201 基准复核记录
+
+2026-06-24 运行 `tests/run_balance_v1_tests.gd` 通过，未调参。
+
+| 场景 | 胜率 | 平均时长 | 胜利气血余量 | 验收 |
+|---|---:|---:|---:|---|
+| 练气初期 vs 普通敌 | 0.800 | 8.72 秒 | 0.260 | 通过 |
+| 练气初期 vs 精英敌 | 0.425 | 8.72 秒 | 0.171 | 通过 |
+| 练气成型 vs 筑基普通敌 | 0.050 | 5.83 秒 | 0.108 | 通过 |
 
 ## 设计原则
 

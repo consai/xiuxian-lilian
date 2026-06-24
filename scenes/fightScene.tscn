@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://dr8mq2yvaep1a" path="res://assets/art/ui_new/sprite_006.png" id="2_rpgid"]
 [ext_resource type="StyleBox" uid="uid://djo82jeb3from" path="res://ui/progress_blue_back.tres" id="3_eiqso"]
 [ext_resource type="StyleBox" uid="uid://bf4cmu4wbkhii" path="res://ui/progress_blue_fill.tres" id="4_fbi8s"]
-[ext_resource type="Texture2D" uid="uid://db4kxr0kfsyt" path="res://assets/art/jueshe/sprite_002.png" id="5_0naaa"]
+[ext_resource type="Texture2D" uid="uid://db6yxps2ypebg" path="res://assets/art/characters/001_cutout_483x512.png" id="5_0naaa"]
 [ext_resource type="LabelSettings" uid="uid://dg7uds3ec0xtu" path="res://ui/ziti_new/22.tres" id="6_dlkp7"]
 [ext_resource type="Texture2D" uid="uid://dyt1550r3j3nt" path="res://assets/art/ui_new/shengming.png" id="7_j6srn"]
 [ext_resource type="Texture2D" uid="uid://b2rlinwudsv5b" path="res://assets/art/ui_new/hudun_icon.png" id="7_x82jq"]
@@ -13,10 +13,10 @@
 [ext_resource type="Texture2D" uid="uid://di6wqkkk0t4tl" path="res://assets/art/ui_new/fali.png" id="8_mh2b2"]
 [ext_resource type="Texture2D" uid="uid://cb0y0hjmgauls" path="res://assets/art/ui_new/flag.png" id="9_mh2b2"]
 [ext_resource type="Texture2D" uid="uid://drq6walh54ag4" path="res://assets/art/ui_new/btn_back.png" id="10_ropvy"]
-[ext_resource type="Texture2D" uid="uid://d3k3cbpmvev6h" path="res://assets/art/jueshe/sprite_003.png" id="11_fax1c"]
+[ext_resource type="Texture2D" uid="uid://c0splu5su3u3u" path="res://assets/art/characters/003_cutout_407x512.png" id="11_fax1c"]
 [ext_resource type="LabelSettings" uid="uid://bjruoad7rxryl" path="res://ui/ziti_new/25.tres" id="11_kccqe"]
 [ext_resource type="PackedScene" uid="uid://jcty6ipi0vb2" path="res://scenes/items/skill.tscn" id="12_s4dxh"]
-[ext_resource type="Texture2D" uid="uid://b1ct8d33ujqhh" path="res://assets/art/jueshe/sprite_001.png" id="15_6irjl"]
+[ext_resource type="Texture2D" uid="uid://c0splu5su3u3u" path="res://assets/art/characters/003_cutout_407x512.png" id="15_6irjl"]
 [ext_resource type="Texture2D" uid="uid://bx7npswbxtpka" path="res://assets/art/ui_new/shanghai.png" id="15_748tr"]
 [ext_resource type="LabelSettings" uid="uid://dknyivqhm6bby" path="res://ui/ziti_new/13.tres" id="16_3s5lo"]
 [ext_resource type="Script" uid="uid://c7coyqbwftwuy" path="res://scripts/fight/fight_vfx_manager.gd" id="17_vfxmgr"]
@@ -690,6 +690,7 @@ grow_vertical = 2
 [node name="sprite_left" parent="center" unique_id=1019927927 instance=ExtResource("30_enemy_slot")]
 unique_name_in_owner = true
 position = Vector2(-358, 6)
+flip_sprite_horizontal = false
 
 [node name="sprite_right" type="Sprite2D" parent="center" unique_id=1778740699]
 unique_name_in_owner = true

@@ -243,6 +243,15 @@ offset_bottom = 34.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="TutorialPreviewClickArea" type="Control" parent="FurnaceArea" unique_id=1755060390]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 95.0
+offset_top = 74.0
+offset_right = 357.0
+offset_bottom = 336.0
+mouse_filter = 2
+
 [node name="MaterialTitle" type="PanelContainer" parent="FurnaceArea" unique_id=199371310]
 layout_mode = 0
 offset_left = 142.0
@@ -370,4 +379,3 @@ text = "开炉炼制"
 [node name="BatchPopup" parent="." unique_id=97140122 instance=ExtResource("13_batch_popup")]
 unique_name_in_owner = true
 layout_mode = 1
-

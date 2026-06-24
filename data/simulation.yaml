@@ -135,8 +135,8 @@ realms:
     major_realm: "tribulation"
     breakthrough_at: 288300
 initial_player:
-  name: "清风剑仙"
-  icon: "jueshe/sprite_002.png"
+  name: "小观主"
+  icon: "characters/001_cutout_483x512.png"
   foundations:
     body: 16
     spirit: 16

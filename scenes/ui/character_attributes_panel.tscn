@@ -3,7 +3,7 @@
 [ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
 [ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="2_bg"]
 [ext_resource type="Texture2D" uid="uid://8mwstvi8kywh" path="res://assets/art/ui_new/btn_close.png" id="3_close"]
-[ext_resource type="Texture2D" uid="uid://cf8g208mj4li2" path="res://assets/art/jueshe/sprite_000.png" id="4_portrait"]
+[ext_resource type="Texture2D" uid="uid://db6yxps2ypebg" path="res://assets/art/characters/001_cutout_483x512.png" id="4_portrait"]
 [ext_resource type="Texture2D" uid="uid://cjfih161xnbaq" path="res://assets/art/character_panel_icons/attr_attack.png" id="5_attack"]
 [ext_resource type="Texture2D" uid="uid://dy6ggx1qxjufr" path="res://assets/art/character_panel_icons/attr_defense.png" id="6_defense"]
 [ext_resource type="Texture2D" uid="uid://cbg6ja2ub58dk" path="res://assets/art/character_panel_icons/attr_speed.png" id="7_speed"]

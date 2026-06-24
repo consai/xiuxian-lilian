@@ -9,7 +9,7 @@ const STAGE_TEXTS := [
 const MODE_STAGE_TITLES := {
 	"cycle": "灵气沿经脉运转",
 	"insight": "沉入功法参悟",
-	"breathing": "吸纳洞府灵气",
+	"breathing": "吸纳观中清气",
 }
 
 const QI_RING_BREATH := [
@@ -166,4 +166,4 @@ func _on_result_confirmed() -> void:
 	TutorialService.game_event("tutorial.cultivation_completed")
 	var nav: Dictionary = SceneManager.go_hub()
 	if not bool(nav.get("ok", false)):
-		push_warning(str(nav.get("error", "无法返回洞府")))
+		push_warning(str(nav.get("error", "无法返回观中")))

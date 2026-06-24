@@ -62,7 +62,7 @@ offset_left = 24.0
 offset_top = 16.0
 offset_right = 616.0
 offset_bottom = 52.0
-text = "洞府存档"
+text = "观中存档"
 label_settings = ExtResource("3_label24")
 horizontal_alignment = 1
 

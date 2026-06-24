@@ -206,4 +206,4 @@ func _on_return_pressed() -> void:
 	TutorialService.game_event("tutorial.alchemy_completed")
 	var nav: Dictionary = SceneManager.go_hub()
 	if not bool(nav.get("ok", false)):
-		push_warning(str(nav.get("error", "无法返回洞府")))
+		push_warning(str(nav.get("error", "无法返回观中")))

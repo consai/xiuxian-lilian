@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bwekah2swk2g3"]
 
 [ext_resource type="Script" uid="uid://b78pr71mqdsih" path="res://scripts/fight/interval_track_view.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://db4kxr0kfsyt" path="res://assets/art/jueshe/sprite_002.png" id="2_avatar"]
+[ext_resource type="Texture2D" uid="uid://db6yxps2ypebg" path="res://assets/art/characters/001_cutout_483x512.png" id="2_avatar"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_track"]
 bg_color = Color(0.45882353, 0.28627452, 0.25882354, 1)

@@ -1,10 +1,10 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://botxl3lr3ii67"]
 
-[ext_resource type="Script" path="res://scripts/story/story_guide_mask.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://c0dx77igycdho" path="res://scripts/story/story_guide_mask.gd" id="1_script"]
 
-[node name="StoryGuideMask" type="Control"]
+[node name="StoryGuideMask" type="Control" unique_id=948078339]
 visible = false
-layout_mode = 1
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -13,22 +13,22 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_script")
 
-[node name="Top" type="ColorRect" parent="."]
+[node name="Top" type="ColorRect" parent="." unique_id=996273642]
 layout_mode = 0
 mouse_filter = 0
 color = Color(0.03137255, 0.03137255, 0.03137255, 0.62)
 
-[node name="Bottom" type="ColorRect" parent="."]
+[node name="Bottom" type="ColorRect" parent="." unique_id=89004542]
 layout_mode = 0
 mouse_filter = 0
 color = Color(0.03137255, 0.03137255, 0.03137255, 0.62)
 
-[node name="Left" type="ColorRect" parent="."]
+[node name="Left" type="ColorRect" parent="." unique_id=1958591856]
 layout_mode = 0
 mouse_filter = 0
 color = Color(0.03137255, 0.03137255, 0.03137255, 0.62)
 
-[node name="Right" type="ColorRect" parent="."]
+[node name="Right" type="ColorRect" parent="." unique_id=842650965]
 layout_mode = 0
 mouse_filter = 0
 color = Color(0.03137255, 0.03137255, 0.03137255, 0.62)

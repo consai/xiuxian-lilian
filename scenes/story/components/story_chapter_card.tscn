@@ -52,7 +52,7 @@ horizontal_alignment = 1
 [node name="SubtitleLabel" type="Label" parent="Panel/Content"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "洞府禁制尚在，而山外的风已经变了。"
+text = "小道观晨钟已响，而山外的风已经变了。"
 label_settings = ExtResource("4_subtitle")
 horizontal_alignment = 1
 autowrap_mode = 2

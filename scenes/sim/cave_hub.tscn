@@ -2,18 +2,9 @@
 
 [ext_resource type="Script" uid="uid://bx25wapjm1qf6" path="res://scripts/sim/cave_hub.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_theme"]
-[ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="3_bg"]
-[ext_resource type="Texture2D" uid="uid://dnrmhlg66g75h" path="res://assets/art/ui_new/liandanlu.png" id="4_furnace"]
-[ext_resource type="Texture2D" uid="uid://drd2jhm2t3gw4" path="res://assets/art/ui_new/chuwuxiang.png" id="5_chest"]
-[ext_resource type="Texture2D" uid="uid://dhw6jh6dgsxnt" path="res://assets/art/ui_new/deng.png" id="6_lamp"]
-[ext_resource type="Texture2D" uid="uid://dvjjp7ysrp4v8" path="res://assets/art/ui_new/dazuo.png" id="7_mat"]
-[ext_resource type="Texture2D" uid="uid://cgisif14cejwm" path="res://assets/art/ui_new/xiuxi.png" id="8_bed"]
-[ext_resource type="Texture2D" uid="uid://p7i7o8jqh8xt" path="res://assets/art/ui_new/beibao.png" id="9_bag"]
+[ext_resource type="Texture2D" uid="uid://076r2vdowmtu" path="res://assets/art/back/main_cave.png" id="3_64eam"]
 [ext_resource type="Texture2D" uid="uid://dq4k3ybmxqrut" path="res://assets/art/ui_new/btn_mihuang.png" id="11_small_button"]
 [ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="12_av2rb"]
-[ext_resource type="Texture2D" uid="uid://c3f3nny73kvhg" path="res://assets/art/ui_new/btn_lv.png" id="12_green_button"]
-[ext_resource type="Texture2D" uid="uid://hwomn6aon70a" path="res://assets/art/ui_new/btn_huang.png" id="13_yellow_button"]
-[ext_resource type="Texture2D" uid="uid://gyhsfoix048v" path="res://assets/art/ui_new/btn_lan.png" id="14_blue_button"]
 [ext_resource type="Texture2D" uid="uid://bm2vyd4mxlsaj" path="res://assets/art/ui_new/btn_mihuang_da.png" id="15_message_back"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="16_label20"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="17_label24"]
@@ -53,7 +44,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("3_bg")
+texture = ExtResource("3_64eam")
 expand_mode = 1
 stretch_mode = 6
 
@@ -71,7 +62,7 @@ offset_left = 22.0
 offset_top = 12.0
 offset_right = 232.0
 offset_bottom = 45.0
-text = "清风洞府"
+text = "清铃观"
 label_settings = ExtResource("18_label28")
 horizontal_alignment = 1
 
@@ -88,14 +79,13 @@ horizontal_alignment = 1
 
 [node name="SaveButton" type="Button" parent="ProfilePanel" unique_id=1418512808]
 unique_name_in_owner = true
-script = ExtResource("12_av2rb")
 layout_mode = 0
 offset_left = 72.0
 offset_top = 84.0
 offset_right = 180.0
 offset_bottom = 108.0
 text = "存档"
-
+script = ExtResource("12_av2rb")
 
 [node name="StatusPanel" type="Panel" parent="." unique_id=144307130]
 layout_mode = 1
@@ -123,82 +113,13 @@ label_settings = ExtResource("16_label20")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Furnace" type="TextureRect" parent="." unique_id=2146814888]
-layout_mode = 0
-offset_left = 100.0
-offset_top = 424.0
-offset_right = 269.0
-offset_bottom = 599.0
-mouse_filter = 2
-texture = ExtResource("4_furnace")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Chest" type="TextureRect" parent="." unique_id=931958143]
-layout_mode = 0
-offset_left = 359.0
-offset_top = 404.0
-offset_right = 488.0
-offset_bottom = 532.0
-mouse_filter = 2
-texture = ExtResource("5_chest")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Lamp" type="TextureRect" parent="." unique_id=88140575]
-layout_mode = 0
-offset_left = 515.0
-offset_top = 408.0
-offset_right = 582.0
-offset_bottom = 494.0
-mouse_filter = 2
-texture = ExtResource("6_lamp")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Mat" type="TextureRect" parent="." unique_id=129589927]
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -13.0
-offset_top = -299.0
-offset_right = 148.0
-offset_bottom = -204.0
-grow_horizontal = 2
-grow_vertical = 0
-mouse_filter = 2
-texture = ExtResource("7_mat")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Bed" type="TextureRect" parent="." unique_id=1845389963]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -281.0
-offset_top = -345.0
-offset_right = -96.0
-offset_bottom = -206.0
-grow_horizontal = 0
-grow_vertical = 0
-mouse_filter = 2
-texture = ExtResource("8_bed")
-expand_mode = 1
-stretch_mode = 5
-
 [node name="FurnaceButton" type="TextureButton" parent="." unique_id=781328250]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 116.0
-offset_top = 350.0
-offset_right = 242.0
-offset_bottom = 416.0
+offset_left = 240.0
+offset_top = 200.0
+offset_right = 300.0
+offset_bottom = 240.0
 texture_normal = ExtResource("11_small_button")
 ignore_texture_size = true
 stretch_mode = 0
@@ -219,10 +140,10 @@ vertical_alignment = 1
 [node name="StorageButton" type="TextureButton" parent="." unique_id=2024447570]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 369.0
-offset_top = 335.0
-offset_right = 495.0
-offset_bottom = 401.0
+offset_left = 605.0
+offset_top = 176.0
+offset_right = 665.0
+offset_bottom = 216.0
 texture_normal = ExtResource("11_small_button")
 ignore_texture_size = true
 stretch_mode = 0
@@ -248,9 +169,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_top = -382.0
-offset_right = 126.0
-offset_bottom = -316.0
+offset_left = -241.0
+offset_top = -682.0
+offset_right = -181.0
+offset_bottom = -642.0
 grow_horizontal = 2
 grow_vertical = 0
 texture_normal = ExtResource("11_small_button")
@@ -278,10 +200,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -248.0
-offset_top = -417.0
-offset_right = -122.0
-offset_bottom = -351.0
+offset_left = -555.0
+offset_top = -591.0
+offset_right = -495.0
+offset_bottom = -551.0
 grow_horizontal = 0
 grow_vertical = 0
 texture_normal = ExtResource("11_small_button")
@@ -309,10 +231,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -350.0
-offset_top = -596.0
-offset_right = -224.0
-offset_bottom = -530.0
+offset_left = -551.0
+offset_top = -316.0
+offset_right = -491.0
+offset_bottom = -276.0
 grow_horizontal = 0
 grow_vertical = 0
 texture_normal = ExtResource("11_small_button")
@@ -332,25 +254,6 @@ label_settings = ExtResource("17_label24")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="BackpackButton" type="TextureButton" parent="." unique_id=1155588514]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -116.0
-offset_top = -130.0
-offset_right = -21.0
-offset_bottom = -39.0
-grow_horizontal = 0
-grow_vertical = 0
-texture_normal = ExtResource("9_bag")
-ignore_texture_size = true
-stretch_mode = 5
-script = ExtResource("12_av2rb")
-
 [node name="BottomActions" type="HBoxContainer" parent="." unique_id=720273206]
 layout_mode = 1
 anchors_preset = 12
@@ -366,37 +269,16 @@ grow_vertical = 0
 theme_override_constants/separation = 25
 alignment = 1
 
-[node name="CultivateButton" type="TextureButton" parent="BottomActions" unique_id=1149458252]
+[node name="KnowledgeStudyButton" type="TextureButton" parent="BottomActions" unique_id=854695360]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(128.315, 76.08)
+custom_minimum_size = Vector2(90, 76.08)
 layout_mode = 2
-texture_normal = ExtResource("12_green_button")
+texture_normal = ExtResource("11_small_button")
 ignore_texture_size = true
 stretch_mode = 5
 script = ExtResource("12_av2rb")
 
-[node name="Label" type="Label" parent="BottomActions/CultivateButton" unique_id=246962866]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "修炼"
-label_settings = ExtResource("18_label28")
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="KnowledgeStudyButton" type="TextureButton" parent="BottomActions"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(128.315, 76.08)
-layout_mode = 2
-texture_normal = ExtResource("12_green_button")
-ignore_texture_size = true
-stretch_mode = 5
-script = ExtResource("12_av2rb")
-
-[node name="Label" type="Label" parent="BottomActions/KnowledgeStudyButton"]
+[node name="Label" type="Label" parent="BottomActions/KnowledgeStudyButton" unique_id=4403463]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -410,9 +292,9 @@ vertical_alignment = 1
 
 [node name="BreakthroughButton" type="TextureButton" parent="BottomActions" unique_id=154044267]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(128.315, 76.08)
+custom_minimum_size = Vector2(90, 76.08)
 layout_mode = 2
-texture_normal = ExtResource("13_yellow_button")
+texture_normal = ExtResource("11_small_button")
 ignore_texture_size = true
 stretch_mode = 5
 script = ExtResource("12_av2rb")
@@ -429,32 +311,11 @@ label_settings = ExtResource("18_label28")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ExpeditionButton" type="TextureButton" parent="BottomActions" unique_id=897574208]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(128.315, 76.08)
-layout_mode = 2
-texture_normal = ExtResource("14_blue_button")
-ignore_texture_size = true
-stretch_mode = 5
-script = ExtResource("12_av2rb")
-
-[node name="Label" type="Label" parent="BottomActions/ExpeditionButton" unique_id=548210536]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "历练"
-label_settings = ExtResource("18_label28")
-horizontal_alignment = 1
-vertical_alignment = 1
-
 [node name="btnattrs" type="TextureButton" parent="BottomActions" unique_id=229591886]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(128.315, 76.08)
+custom_minimum_size = Vector2(90, 76.08)
 layout_mode = 2
-texture_normal = ExtResource("14_blue_button")
+texture_normal = ExtResource("11_small_button")
 ignore_texture_size = true
 stretch_mode = 5
 script = ExtResource("12_av2rb")
@@ -467,6 +328,27 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "属性"
+label_settings = ExtResource("18_label28")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BackpackButton" type="TextureButton" parent="BottomActions" unique_id=546934326]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 76.08)
+layout_mode = 2
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="BottomActions/BackpackButton" unique_id=211143304]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "背包"
 label_settings = ExtResource("18_label28")
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -499,7 +381,7 @@ offset_left = 16.0
 offset_right = -16.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "洞府清幽，宜静心修行。"
+text = "小道观晨风正好，今日宜早课巡山。"
 label_settings = ExtResource("16_label20")
 horizontal_alignment = 1
 vertical_alignment = 1

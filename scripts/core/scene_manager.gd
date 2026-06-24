@@ -1,5 +1,7 @@
 extends Node
 
+signal active_scene_changed(scene: Node)
+
 const MAIN_MENU := "main_menu"
 const HUB := "hub"
 const WORLD_MAP := "world_map"
@@ -44,10 +46,19 @@ const SCENE_PATHS := {
 
 const _BLOCKED_EXPEDITION_ACTIVE := "当前仍在历练中，请先完成或结算后再操作。"
 
-## 叠在当前场景上的战斗/面板浮层，避免 change_scene 销毁底层界面。
+## 叠在当前场景上的战斗/面板浮层，避免切场景销毁底层界面。
 var _fight_overlay: Node = null
 var _panel_overlay: Node = null
 var _scene_underlay: Node = null
+## 无专属 Host 的可导航场景与浮层统一挂在此节点下，不直接挂 root。
+var _scene_root: Node = null
+## ponytail: Godot 要求 current_scene 必须是 root 子节点；改由本字段追踪可导航场景。
+var _active_scene: Node = null
+
+
+func _ready() -> void:
+	_ensure_scene_root()
+	call_deferred("_adopt_boot_scene")
 
 
 func _game_state() -> Node:
@@ -67,6 +78,68 @@ func _autoload(node_name: String) -> Node:
 	if loop is SceneTree:
 		return (loop as SceneTree).root.get_node_or_null(node_name)
 	return null
+
+
+## 返回 SceneManager 下的场景容器，供剧情引导等跨层查找节点。
+func get_scene_root() -> Node:
+	_ensure_scene_root()
+	return _scene_root
+
+
+func _ensure_scene_root() -> void:
+	if _scene_root != null and is_instance_valid(_scene_root):
+		return
+	_scene_root = Node.new()
+	_scene_root.name = "SceneRoot"
+	add_child(_scene_root)
+
+
+## 返回当前可交互的主场景或浮层（战斗/全屏面板）；背包弹窗时仍返回底层场景。
+func get_active_scene() -> Node:
+	if _fight_overlay != null and is_instance_valid(_fight_overlay):
+		return _fight_overlay
+	if _panel_overlay != null and is_instance_valid(_panel_overlay):
+		if _scene_underlay != null and is_instance_valid(_scene_underlay) and _scene_underlay.visible:
+			return _scene_underlay
+		return _panel_overlay
+	if _active_scene != null and is_instance_valid(_active_scene):
+		return _active_scene
+	return get_tree().current_scene
+
+
+func _set_active_scene(scene: Node) -> void:
+	_active_scene = scene
+	active_scene_changed.emit(scene)
+
+
+## 启动时把 project.godot 配置的 main_scene 从 root 收编到 SceneRoot。
+func _adopt_boot_scene() -> void:
+	var current := get_tree().current_scene
+	if current == null:
+		return
+	if current.get_parent() == get_tree().root:
+		current.get_parent().remove_child(current)
+		_scene_root.add_child(current)
+	_set_active_scene(current)
+
+
+func _load_main_scene(path: String) -> void:
+	_ensure_scene_root()
+	var packed := load(path) as PackedScene
+	if packed == null:
+		push_error("SceneManager: failed to load %s" % path)
+		_data_store().scene_runtime()["transitioning"] = false
+		return
+	var new_scene: Node = packed.instantiate()
+	if new_scene == null:
+		push_error("SceneManager: failed to instantiate %s" % path)
+		_data_store().scene_runtime()["transitioning"] = false
+		return
+	var old_scene := get_active_scene()
+	if old_scene != null and is_instance_valid(old_scene) and old_scene.get_parent() == _scene_root:
+		old_scene.queue_free()
+	_scene_root.add_child(new_scene)
+	_set_active_scene(new_scene)
 
 
 func go_to(scene_id: String, payload: Dictionary = {}, options: Dictionary = {}) -> Dictionary:
@@ -277,7 +350,6 @@ func dismiss_panel_popup() -> Dictionary:
 		if not underlay.visible:
 			underlay.visible = true
 			underlay.process_mode = Node.PROCESS_MODE_INHERIT
-		get_tree().current_scene = underlay
 		if underlay.has_method("resume_after_panel"):
 			underlay.call("resume_after_panel")
 	if _fight_overlay == null:
@@ -354,7 +426,7 @@ func _perform_transition(scene_id: String, payload: Dictionary, record_history: 
 		var history: Array = history_v as Array if history_v is Array else []
 		history.append(scene_id)
 		scene_rt["history"] = history
-	get_tree().call_deferred("change_scene_to_file", path)
+	call_deferred("_load_main_scene", path)
 	call_deferred("_release_transition_lock")
 	return {"ok": true, "scene_id": scene_id, "path": path}
 
@@ -369,7 +441,7 @@ func _can_overlay_fight_on_expedition_loop(source: String) -> bool:
 		return false
 	if _fight_overlay != null or _panel_overlay != null:
 		return false
-	var underlay := get_tree().current_scene
+	var underlay := get_active_scene()
 	if underlay == null:
 		return false
 	return str(underlay.scene_file_path) == str(SCENE_PATHS.get(EXPEDITION_LOOP, ""))
@@ -388,7 +460,7 @@ func _push_fight_overlay() -> Dictionary:
 	var path := str(SCENE_PATHS.get(FIGHT, ""))
 	if path == "":
 		return {"ok": false, "error": "unknown_scene_id:%s" % FIGHT}
-	var underlay := get_tree().current_scene
+	var underlay := get_active_scene()
 	if underlay == null:
 		return {"ok": false, "error": "no_current_scene"}
 	var packed := load(path)
@@ -403,8 +475,7 @@ func _push_fight_overlay() -> Dictionary:
 	_scene_underlay.visible = false
 	_scene_underlay.process_mode = Node.PROCESS_MODE_DISABLED
 	_fight_overlay = overlay
-	get_tree().root.add_child(_fight_overlay)
-	get_tree().current_scene = _fight_overlay
+	_scene_root.add_child(_fight_overlay)
 	call_deferred("_release_transition_lock")
 	return {"ok": true, "scene_id": FIGHT, "path": path, "overlay": true}
 
@@ -422,7 +493,6 @@ func _restore_scene_underlay() -> void:
 		return
 	_scene_underlay.visible = true
 	_scene_underlay.process_mode = Node.PROCESS_MODE_INHERIT
-	get_tree().current_scene = _scene_underlay
 
 
 func _discard_scene_underlay() -> void:
@@ -448,7 +518,7 @@ func _can_overlay_panel_on_expedition_loop() -> bool:
 	var expedition := _expedition_state()
 	if expedition == null or not expedition.active:
 		return false
-	var underlay := get_tree().current_scene
+	var underlay := get_active_scene()
 	if underlay == null:
 		return false
 	return str(underlay.scene_file_path) == str(SCENE_PATHS.get(EXPEDITION_LOOP, ""))
@@ -461,7 +531,7 @@ func _push_panel_popup(scene_id: String, payload: Dictionary) -> Dictionary:
 	var path := str(SCENE_PATHS.get(scene_id, ""))
 	if path == "":
 		return {"ok": false, "error": "unknown_scene_id:%s" % scene_id}
-	var underlay := get_tree().current_scene
+	var underlay := get_active_scene()
 	if underlay == null:
 		return {"ok": false, "error": "no_current_scene"}
 	var packed := load(path)
@@ -486,8 +556,7 @@ func _push_panel_popup(scene_id: String, payload: Dictionary) -> Dictionary:
 		_panel_overlay.set_offsets_preset(Control.PRESET_FULL_RECT)
 		_scene_underlay.add_child(_panel_overlay)
 	else:
-		get_tree().root.add_child(_panel_overlay)
-		get_tree().current_scene = _panel_overlay
+		_scene_root.add_child(_panel_overlay)
 	call_deferred("_release_transition_lock")
 	return {"ok": true, "scene_id": scene_id, "path": path, "popup": true}
 

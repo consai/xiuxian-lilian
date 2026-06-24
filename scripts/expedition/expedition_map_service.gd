@@ -8,6 +8,38 @@ const DEFAULT_MIDDLE_LAYERS := 8
 const ROUTE_LANE_COUNT := 3
 const MIN_ROUTE_CROSSES := 2
 const MAX_ROUTE_CROSSES := 3
+## 节点数不超过此值时历练路线图使用紧凑横向布局（新手三节点地图）。
+const COMPACT_MAP_NODE_LIMIT := 3
+const COMPACT_MAP_WIDTH := 480.0
+const COMPACT_MAP_HEIGHT := 280.0
+const COMPACT_NODE_GAP := 140.0
+
+
+static func is_compact_map(nodes: Array) -> bool:
+	return nodes.size() <= COMPACT_MAP_NODE_LIMIT
+
+
+## 新手引导首次历练：起点 → 采集 → 怪物，单线三路节点。
+static func generate_tutorial(location: Dictionary) -> Dictionary:
+	var difficulty := maxi(1, int(location.get("min_difficulty", 1)))
+	var nodes: Array = []
+	var edges: Array = []
+	var start_node := _make_node("start", 0, 0, EnumExpeditionNodeTypeScript.ID_START, difficulty, "启程")
+	nodes.append(start_node)
+	var gather_node := _make_node("tutorial_gather", 1, 0, EnumExpeditionNodeTypeScript.ID_GATHER, difficulty, "安全")
+	gather_node["fixed_event_id"] = "tutorial_valley_herbs"
+	nodes.append(gather_node)
+	var battle_node := _make_node("tutorial_battle", 2, 0, EnumExpeditionNodeTypeScript.ID_BATTLE, difficulty, "普通")
+	battle_node["label"] = "怪物"
+	battle_node["fixed_event_id"] = "qinglan_wolf"
+	nodes.append(battle_node)
+	edges.append({"from": "start", "to": "tutorial_gather"})
+	edges.append({"from": "tutorial_gather", "to": "tutorial_battle"})
+	return {
+		"nodes": nodes,
+		"edges": edges,
+		"start_node_id": str(start_node.get("id", "")),
+	}
 
 
 static func generate(location: Dictionary, seed_value: int) -> Dictionary:

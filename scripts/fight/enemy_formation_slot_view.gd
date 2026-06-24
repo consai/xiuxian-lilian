@@ -6,6 +6,9 @@ extends Node2D
 const _SWORD_ICON := preload("res://assets/art/ui_new/item_jian.png")
 const _SHIELD_ICON := preload("res://assets/art/ui_new/hudun_icon.png")
 
+## 敌人站位朝左，立绘需水平翻转；玩家复用本场景时关闭。
+@export var flip_sprite_horizontal := true
+
 @onready var _intent_badge: Control = %IntentBadge
 @onready var _intent_icon: TextureRect = %IntentIcon
 @onready var _intent_damage: Label = %IntentDamage
@@ -14,6 +17,15 @@ const _SHIELD_ICON := preload("res://assets/art/ui_new/hudun_icon.png")
 @onready var hp_bar: ProgressBar = %HpBar
 @onready var name_label: Label = %Name
 @onready var _buff_status: BuffStatusBar = %BuffStatusBar
+
+
+func _ready() -> void:
+	_apply_sprite_flip()
+
+
+func _apply_sprite_flip() -> void:
+	if sprite != null:
+		sprite.flip_h = flip_sprite_horizontal
 
 
 func actor_sprite() -> Sprite2D:

@@ -26,6 +26,10 @@ func reset_savedata() -> void:
 	savedata = _default_savedata()
 
 
+func start_tutorial() -> void:
+	savedata["tutorial"] = _default_tutorial_savedata()
+
+
 func coalesce_savedata(data: Dictionary) -> Dictionary:
 	var out := _default_savedata()
 	for key in data.keys():
@@ -420,7 +424,7 @@ func _default_totals() -> Dictionary:
 
 func _default_tutorial_savedata() -> Dictionary:
 	return {
-		"chapter": "prologue_lost_master",
+		"chapter": "prologue_morning_practice",
 		"step": "T00",
 		"completed": false,
 		"skipped": false,

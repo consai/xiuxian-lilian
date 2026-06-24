@@ -119,7 +119,7 @@ horizontal_alignment = 1
 [node name="FlavorLabel" type="Label" parent="Dialog/KnowledgeScroll/Content" unique_id=831046085]
 unique_name_in_owner = true
 layout_mode = 2
-text = "洞府灵气汇入丹田，气海比此前更加充盈。"
+text = "观中清气汇入丹田，气海比此前更加充盈。"
 label_settings = ExtResource("8_small")
 horizontal_alignment = 1
 autowrap_mode = 3
@@ -149,4 +149,4 @@ offset_bottom = 529.0
 unique_name_in_owner = true
 custom_minimum_size = Vector2(280, 64)
 layout_mode = 2
-text = "返回洞府"
+text = "返回观中"

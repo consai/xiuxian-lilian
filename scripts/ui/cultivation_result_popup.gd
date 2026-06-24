@@ -101,7 +101,7 @@ static func _result_flavor(mode_id: String) -> String:
 		"insight":
 			return "心神沉入功法脉络，往日晦涩之处逐渐明朗。"
 		"breathing":
-			return "洞府灵气汇入丹田，气海比此前更加充盈。"
+			return "观中清气汇入丹田，气海比此前更加充盈。"
 		"pill":
 			return "药力如潮涌入经脉，修为骤增，气息却也多了几分虚浮。"
 		_:

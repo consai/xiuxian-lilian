@@ -4,8 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/story/components/story_control_button.tscn" id="4_control"]
 [ext_resource type="PackedScene" path="res://scenes/story/components/story_focus_prompt.tscn" id="6_prompt"]
 [ext_resource type="PackedScene" path="res://scenes/story/components/story_dialogue_panel.tscn" id="7_dialogue"]
-[ext_resource type="PackedScene" path="res://scenes/story/components/story_focus_ring.tscn" id="8_focus_ring"]
-[ext_resource type="PackedScene" path="res://scenes/story/components/story_guide_mask.tscn" id="8_guide_mask"]
+[ext_resource type="PackedScene" uid="uid://botxl3lr3ii67" path="res://scenes/story/components/story_guide_mask.tscn" id="8_guide_mask"]
 [ext_resource type="PackedScene" path="res://scenes/story/components/story_choice_panel.tscn" id="9_choice_panel"]
 [ext_resource type="PackedScene" path="res://scenes/story/components/story_history_panel.tscn" id="10_history"]
 [ext_resource type="PackedScene" path="res://scenes/story/components/story_skip_confirm.tscn" id="11_skip"]
@@ -37,6 +36,7 @@ script = ExtResource("14_presenter")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1540449560]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -48,14 +48,7 @@ color = Color(0.03137255, 0.03137255, 0.03137255, 0.62)
 
 [node name="GuideMask" parent="." unique_id=1920096844 instance=ExtResource("8_guide_mask")]
 unique_name_in_owner = true
-
-[node name="FocusRing" parent="." unique_id=1214565169 instance=ExtResource("8_focus_ring")]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 583.0
-offset_top = 397.0
-offset_right = 731.0
-offset_bottom = 525.0
+layout_mode = 1
 
 [node name="FocusPrompt" parent="." unique_id=837878454 instance=ExtResource("6_prompt")]
 unique_name_in_owner = true
@@ -79,7 +72,13 @@ offset_bottom = -20.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="AdvanceOverlay" type="ColorRect" parent="."]
+[node name="SpeakerLabel" parent="DialoguePanel/NamePlate" index="0"]
+text = "师父残念"
+
+[node name="DialogueLabel" parent="DialoguePanel" index="3"]
+text = "洞府禁制尚在。先确认自己还能引气入体。"
+
+[node name="AdvanceOverlay" type="ColorRect" parent="." unique_id=302392809]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -88,7 +87,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 color = Color(0, 0, 0, 0)
 
 [node name="StoryControls" type="HBoxContainer" parent="." unique_id=1978989229]
@@ -129,11 +127,18 @@ color = Color(0.180392, 0.137255, 0.0901961, 0.42)
 
 [node name="ChoicePanel" parent="." unique_id=309864618 instance=ExtResource("9_choice_panel")]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 866.0
-offset_top = 260.0
-offset_right = 1242.0
-offset_bottom = 474.0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -414.0
+offset_top = -107.0
+offset_right = -38.0
+offset_bottom = 107.0
+grow_horizontal = 0
+grow_vertical = 2
 
 [node name="ChoiceA" parent="ChoicePanel/Choices" index="0"]
 theme_override_styles/normal = SubResource("Style_selected")
@@ -202,5 +207,5 @@ offset_bottom = 165.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[editable path="ChoicePanel"]
 [editable path="DialoguePanel"]
+[editable path="ChoicePanel"]

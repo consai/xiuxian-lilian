@@ -166,3 +166,9 @@ static var TYPE_LABELS := { ... }
 
 - **仅单个脚本使用的 UI 局部状态**（如面板当前 Tab、一次性动画阶段）可留在该脚本内部 `enum`，不必强行抽到 `scripts/enum/`。
 - 新增枚举时，在 `scripts/enum/` 新建文件并注册 `class_name`；旧代码中的魔法值应逐步迁移，而非与新枚举并存两套约定。
+
+
+
+历史godot执行时的错误:
+Godot 校验刚才是 PowerShell 引号吃掉了 $env:，不是项目错误。我换一种引号跑同一个启动检查。
+引号还是被外层剥了，我不套二层 PowerShell 了，直接在当前 shell 里设置环境变量再跑。

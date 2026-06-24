@@ -34,6 +34,8 @@ func _ready() -> void:
 	_auto_advance_timer.timeout.connect(_on_auto_advance_timeout)
 	if not ExpeditionState.log_updated.is_connected(_refresh_log_display):
 		ExpeditionState.log_updated.connect(_refresh_log_display)
+	if not ExpeditionState.runtime_vitals_changed.is_connected(_on_runtime_vitals_changed):
+		ExpeditionState.runtime_vitals_changed.connect(_on_runtime_vitals_changed)
 	(%ExitButton as Button).pressed.connect(_on_exit_pressed)
 	(%StatusToggleButton as Button).pressed.connect(_on_info_toggle_pressed)
 	(%bag as Button).pressed.connect(_on_bag_pressed)
@@ -108,6 +110,15 @@ func _refresh_event_presentation() -> void:
 			if not card.chosen.is_connected(_on_event_chosen):
 				card.chosen.connect(_on_event_chosen)
 			card.disabled = _locked
+
+
+## 背包用药等局内状态变化：立即刷新左上角气血/法力，并展示用药反馈。
+func _on_runtime_vitals_changed(feedback: String = "") -> void:
+	_refresh_status_panel()
+	var text := feedback.strip_edges()
+	if text != "":
+		(%Feedback as Label).text = text
+		DataStore.ui_runtime()["expedition_bag_feedback"] = ""
 
 
 func _refresh_status_panel() -> void:
@@ -403,8 +414,17 @@ func _resize_map_world() -> void:
 	if _map_world == null or not is_inside_tree():
 		return
 	var viewport_size := get_viewport_rect().size
-	var target_width := maxf(1500.0, viewport_size.x * 1.55)
-	var target_height := maxf(500.0, viewport_size.y - 260.0)
+	var compact := ExpeditionMapServiceScript.is_compact_map(ExpeditionState.map_nodes)
+	var target_width := (
+		ExpeditionMapServiceScript.COMPACT_MAP_WIDTH
+		if compact
+		else maxf(1500.0, viewport_size.x * 1.55)
+	)
+	var target_height := (
+		ExpeditionMapServiceScript.COMPACT_MAP_HEIGHT
+		if compact
+		else maxf(500.0, viewport_size.y - 260.0)
+	)
 	_map_world.custom_minimum_size = Vector2(target_width, target_height)
 	if _map_scroll != null:
 		_map_scroll.scroll_horizontal = clampi(
@@ -596,6 +616,7 @@ func _refresh_map_display() -> void:
 		if view == null:
 			continue
 		var node_id := str(node.get("id", ""))
+		view.name = "TutorialNextMapNode" if available.find(node_id) == 0 else "MapNode_%s" % node_id
 		var state := "locked"
 		if node_id == current:
 			state = "pending_battle" if _is_pending_battle_dismissed() else "current"
@@ -619,6 +640,7 @@ func _clear_generated_map_nodes() -> void:
 		if child == _map_node_template:
 			child.visible = false
 			continue
+		child.name = "MapNodeQueuedFree"
 		child.queue_free()
 
 

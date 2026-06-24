@@ -239,7 +239,7 @@ func _navigate(nav: Dictionary, fallback_error: String) -> bool:
 
 func _go_hub() -> void:
 	visible = false
-	_navigate(SceneManager.go_hub({"allow_active_expedition": true}), "无法返回洞府")
+	_navigate(SceneManager.go_hub({"allow_active_expedition": true}), "无法返回观中")
 
 
 func _go_world_map() -> void:
@@ -310,7 +310,7 @@ func _build_gm_battle_init(monster_id: String, count: int) -> Dictionary:
 func _new_game() -> void:
 	GameState.new_game()
 	visible = false
-	_navigate(SceneManager.go_hub(), "无法返回洞府")
+	_navigate(SceneManager.go_hub(), "无法返回观中")
 
 
 func _grant_dao_knowledge() -> void:
