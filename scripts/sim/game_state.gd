@@ -321,7 +321,7 @@ func alchemy_strategies() -> Array:
 	return AlchemyServiceScript.all_strategies()
 
 
-func preview_alchemy(recipe_id: String, strategy_id: String = "standard", selection_mode: String = "lowest") -> Dictionary:
+func preview_alchemy(recipe_id: String, strategy_id: String = "steady", selection_mode: String = "lowest") -> Dictionary:
 	return AlchemyServiceScript.preview(
 		recipe_id,
 		strategy_id,
@@ -340,7 +340,7 @@ func max_alchemy_batch_count(preview: Dictionary) -> int:
 
 func brew_alchemy(
 	recipe_id: String,
-	strategy_id: String = "standard",
+	strategy_id: String = "steady",
 	selection_mode: String = "lowest",
 	seed_override: int = -1
 ) -> Dictionary:
@@ -349,7 +349,7 @@ func brew_alchemy(
 
 func brew_alchemy_batches(
 	recipe_id: String,
-	strategy_id: String = "standard",
+	strategy_id: String = "steady",
 	selection_mode: String = "lowest",
 	batch_count: int = 1,
 	seed_override: int = -1

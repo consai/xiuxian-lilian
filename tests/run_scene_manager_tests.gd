@@ -158,11 +158,11 @@ func _test_alchemy_panel() -> void:
 
 func _test_alchemy_progress() -> void:
 	_reset_game()
-	var invalid: Dictionary = _scene_manager().go_alchemy_progress({"recipe_id": "", "strategy_id": "standard", "days": 2})
+	var invalid: Dictionary = _scene_manager().go_alchemy_progress({"recipe_id": "", "strategy_id": "steady", "days": 2})
 	_expect_false(bool(invalid.get("ok", true)), "empty recipe rejected")
 	var nav: Dictionary = _scene_manager().go_alchemy_progress({
 		"recipe_id": "recipe.huiqi",
-		"strategy_id": "standard",
+		"strategy_id": "steady",
 		"selection_mode": "lowest",
 		"days": 1,
 		"recipe_name": "回气丹方",

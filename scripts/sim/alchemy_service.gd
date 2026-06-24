@@ -20,7 +20,7 @@ static func default_state() -> Dictionary:
 		"owned_furnaces": {"furnace.old_copper": {"durability": 30}},
 		"equipped_furnace": "furnace.old_copper",
 		"last_recipe": "recipe.huiqi",
-		"last_strategy": "standard",
+		"last_strategy": "steady",
 		"total_batches": 0,
 		"recipe_mastery": {},
 	}
@@ -38,7 +38,11 @@ static func normalize_state(raw: Variant) -> Dictionary:
 			out["owned_furnaces"] = (src.get("owned_furnaces") as Dictionary).duplicate(true)
 		out["equipped_furnace"] = str(src.get("equipped_furnace", out["equipped_furnace"]))
 		out["last_recipe"] = str(src.get("last_recipe", out["last_recipe"]))
-		out["last_strategy"] = str(src.get("last_strategy", out["last_strategy"]))
+		var last_strategy := str(src.get("last_strategy", out["last_strategy"]))
+		# 循方炼制已移除，旧存档回落到稳守炉火
+		if last_strategy == "standard":
+			last_strategy = "steady"
+		out["last_strategy"] = last_strategy
 		out["total_batches"] = maxi(0, int(src.get("total_batches", 0)))
 		if src.get("recipe_mastery") is Dictionary:
 			var mastery: Dictionary = {}

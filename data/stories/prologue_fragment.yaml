@@ -4,7 +4,7 @@ entry: "wake"
 nodes:
   wake:
     type: "line"
-    speaker: "炼丹小札"
+    speaker: ""
     text: "小道观晨钟已响。先确认自己还能引气入体。"
     next: "first_choice"
     meta:
@@ -32,7 +32,7 @@ nodes:
         next: "master_answer"
   master_answer:
     type: "line"
-    speaker: "炼丹小札"
+    speaker: ""
     text: "早课之后去青岚山巡一圈，记得带回炉边要用的灵草。"
     next: "guide_cultivate"
   guide_cultivate:

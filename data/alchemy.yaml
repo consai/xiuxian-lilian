@@ -1,13 +1,5 @@
 schema_version: 1
 strategies:
-  - id: "standard"
-    name: "循方炼制"
-    score: 0
-    spread: 12
-    days: 0
-    yield: 0
-    safety: 0
-    description: "按丹方稳步炼制，收益与风险均衡。"
   - id: "steady"
     name: "稳守炉火"
     score: 7

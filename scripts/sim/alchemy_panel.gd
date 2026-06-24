@@ -69,7 +69,7 @@ func _bind_option_menus(options: Array) -> void:
 
 func _select_saved_defaults() -> void:
 	var last_recipe := str(GameState.alchemy.get("last_recipe", "recipe.huiqi"))
-	var last_strategy := str(GameState.alchemy.get("last_strategy", "standard"))
+	var last_strategy := str(GameState.alchemy.get("last_strategy", "steady"))
 	_select_option_by_id(_recipes, "id", last_recipe, _recipe_option)
 	_select_option_by_id(_strategies, "id", last_strategy, _strategy_option)
 

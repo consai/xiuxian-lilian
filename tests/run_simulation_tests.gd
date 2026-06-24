@@ -458,7 +458,7 @@ func _test_battle_runtime_deducts_inventory() -> void:
 func _test_alchemy_preview_and_brew() -> void:
 	var state := _state()
 	state.inventory["items_LingCao"] = 4
-	var preview: Dictionary = state.preview_alchemy("recipe.huiqi", "standard", "lowest")
+	var preview: Dictionary = state.preview_alchemy("recipe.huiqi", "steady", "lowest")
 	_expect_true(bool(preview.get("ok", false)), "alchemy preview succeeds")
 	var total_probability := 0.0
 	for value_v in (preview.get("probabilities", {}) as Dictionary).values():
@@ -467,7 +467,7 @@ func _test_alchemy_preview_and_brew() -> void:
 	_expect_eq(str(((preview.get("ingredients", []) as Array)[0] as Dictionary).get("id", "")), "items_LingCao", "lowest quality selected")
 	var grass_before := int(state.inventory.get("items_LingCao", 0))
 	var day_before: int = int(state.day)
-	var result: Dictionary = state.brew_alchemy("recipe.huiqi", "standard", "lowest", 42)
+	var result: Dictionary = state.brew_alchemy("recipe.huiqi", "steady", "lowest", 42)
 	_expect_true(bool(result.get("ok", false)), "alchemy brew succeeds")
 	_expect_eq(int(state.inventory.get("items_LingCao", 0)), grass_before - 2, "alchemy consumes exact ingredients")
 	_expect_eq(state.day, day_before + int(preview.get("days", 1)), "alchemy advances configured days")
@@ -484,13 +484,13 @@ func _test_alchemy_preview_and_brew() -> void:
 func _test_alchemy_batch_count() -> void:
 	var state := _state()
 	state.inventory["items_LingCao"] = 6
-	var preview: Dictionary = state.preview_alchemy("recipe.huiqi", "standard", "lowest")
+	var preview: Dictionary = state.preview_alchemy("recipe.huiqi", "steady", "lowest")
 	_expect_true(bool(preview.get("ok", false)), "batch preview succeeds")
 	_expect_eq(state.max_alchemy_batch_count(preview), 3, "batch count limited by herb stock")
 	var grass_before := int(state.inventory.get("items_LingCao", 0))
 	var day_before: int = int(state.day)
 	var batches_before := int(state.alchemy.get("total_batches", 0))
-	var result: Dictionary = state.brew_alchemy_batches("recipe.huiqi", "standard", "lowest", 2, 42)
+	var result: Dictionary = state.brew_alchemy_batches("recipe.huiqi", "steady", "lowest", 2, 42)
 	_expect_true(bool(result.get("ok", false)), "batch brew succeeds")
 	_expect_eq(int(result.get("batch_count", 0)), 2, "batch brew reports count")
 	_expect_eq(int(state.inventory.get("items_LingCao", 0)), grass_before - 4, "batch brew consumes ingredients per batch")
@@ -526,11 +526,11 @@ func _test_alchemy_steady_strategy_ordering() -> void:
 func _test_alchemy_recipe_mastery() -> void:
 	var state := _state()
 	state.inventory["items_LingCao"] = 20
-	var novice: Dictionary = state.preview_alchemy("recipe.huiqi", "standard", "lowest")
+	var novice: Dictionary = state.preview_alchemy("recipe.huiqi", "supreme", "lowest")
 	var alchemy_state: Dictionary = state.alchemy.duplicate(true)
 	alchemy_state["recipe_mastery"] = {"recipe.huiqi": 1000}
 	state.alchemy = alchemy_state
-	var mastered: Dictionary = state.preview_alchemy("recipe.huiqi", "standard", "lowest")
+	var mastered: Dictionary = state.preview_alchemy("recipe.huiqi", "supreme", "lowest")
 	_expect_gt(
 		float(mastered.get("base_score", 0.0)),
 		float(novice.get("base_score", 0.0)),
