@@ -183,3 +183,172 @@ events:
       - type: "drop"
         drop_pool: "monster:qinglan_boss"
         rolls: 4
+  mist_creek_chain_tracks:
+    id: "mist_creek_chain_tracks"
+    location_id: "mist_hidden_valley"
+    type: "decision"
+    mode: "decision"
+    name: "溪边阵纹"
+    desc: "溪边青石浮出断续阵纹，雾气正从纹路深处涌出。"
+    risk_text: "抉择"
+    weight: 12
+    once_per_expedition: false
+    options:
+      - id: "trace"
+        label: "追查阵纹"
+        desc: "顺着阵纹深入雾中，可能触动禁制。"
+        risk_text: "消耗"
+        trigger_event: "mist_creek_chain_fog_test"
+        results: []
+      - id: "gather_first"
+        label: "先采药"
+        desc: "记下阵纹方向，先采几株雾隐草。"
+        risk_text: "安全"
+        effects: []
+        results:
+          - type: "rewards"
+            rewards:
+              - kind: "item"
+                id: "items_MistHerb"
+                min: 1
+                max: 2
+    tags:
+      - "decision"
+      - "chain"
+    conditions: []
+    results: []
+  mist_creek_chain_fog_test:
+    id: "mist_creek_chain_fog_test"
+    location_id: "mist_hidden_valley"
+    type: "hazard"
+    name: "雾阵试身"
+    desc: "雾阵牵动新筑道基，你必须稳住大周天才能继续前行。"
+    risk_text: "消耗"
+    weight: 10
+    once_per_expedition: false
+    effects:
+      - type: "drain_mp_percent"
+        value: 0.18
+        feedback: "你以筑基真元稳住阵纹，法力损耗 {amount} 点。"
+    tags:
+      - "hazard"
+      - "chain"
+    conditions: []
+    results:
+      - type: "effects"
+        effects:
+          - type: "drain_mp_percent"
+            value: 0.18
+            feedback: "你以筑基真元稳住阵纹，法力损耗 {amount} 点。"
+  mist_creek_chain_marten_battle:
+    id: "mist_creek_chain_marten_battle"
+    location_id: "mist_hidden_valley"
+    type: "battle"
+    mode: "auto"
+    name: "守药灵鼬"
+    desc: "几只雾溪灵鼬从药圃边窜出，试图把你赶离阵纹。"
+    risk_text: "普通"
+    weight: 18
+    enemy_pool: "mist_marten"
+    drop_pool: "monster:mist_marten"
+    enemy_count: 2
+    once_per_expedition: false
+    effects: []
+    tags:
+      - "battle"
+      - "chain"
+    conditions: []
+    results:
+      - type: "drop"
+        drop_pool: "monster:mist_marten"
+        rolls: 2
+  mist_creek_chain_choice:
+    id: "mist_creek_chain_choice"
+    location_id: "mist_hidden_valley"
+    type: "decision"
+    mode: "decision"
+    name: "困阵采药人"
+    desc: "一名采药人被残阵困在溪心石上，脚边散落着几枚阵核碎片。"
+    risk_text: "抉择"
+    weight: 9
+    once_per_expedition: false
+    options:
+      - id: "rescue"
+        label: "救人稳阵"
+        desc: "耗费法力救人，换取一枚清脉丹和安全指引。"
+        risk_text: "稳健"
+        effects:
+          - type: "drain_mp_percent"
+            value: 0.12
+        results:
+          - type: "rewards"
+            rewards:
+              - kind: "item"
+                id: "items_QingMaiDan"
+                min: 1
+                max: 1
+      - id: "break_seal"
+        label: "强行破阵"
+        desc: "夺取阵核碎片，但会惊动藤甲守卫。"
+        risk_text: "精英"
+        trigger_event: "mist_creek_chain_guard_elite"
+        results:
+          - type: "rewards"
+            rewards:
+              - kind: "item"
+                id: "items_ArrayCoreShard"
+                min: 1
+                max: 1
+    tags:
+      - "decision"
+      - "chain"
+    conditions: []
+    results: []
+  mist_creek_chain_guard_elite:
+    id: "mist_creek_chain_guard_elite"
+    location_id: "mist_hidden_valley"
+    type: "elite"
+    name: "藤甲守卫"
+    desc: "藤蔓自阵眼攀出，披甲守卫拖着沉重脚步逼近。"
+    risk_text: "精英"
+    weight: 12
+    enemy_pool: "vine_armor_guard"
+    drop_pool: "monster:vine_armor_guard"
+    once_per_expedition: true
+    effects: []
+    tags:
+      - "elite"
+      - "chain"
+    conditions: []
+    results:
+      - type: "drop"
+        drop_pool: "monster:vine_armor_guard"
+        rolls: 3
+  mist_creek_chain_seal_core:
+    id: "mist_creek_chain_seal_core"
+    location_id: "mist_hidden_valley"
+    type: "boss"
+    name: "封溪阵灵"
+    desc: "阵眼彻底亮起，封溪阵灵镇住溪水，等待能破阵的筑基修士。"
+    risk_text: "首领"
+    weight: 6
+    enemy_pool: "sealed_creek_boss"
+    drop_pool: "monster:sealed_creek_boss"
+    once_per_expedition: true
+    effects: []
+    tags:
+      - "boss"
+      - "chain"
+    conditions:
+      - type: "difficulty_at_least"
+        value: 6
+    results:
+      - type: "drop"
+        drop_pool: "monster:sealed_creek_boss"
+        rolls: 4
+      - type: "rewards"
+        rewards:
+          - kind: "item"
+            id: "book_method_hunyuan_2"
+            min: 1
+            max: 1

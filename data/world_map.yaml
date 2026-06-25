@@ -136,6 +136,40 @@ wilderness_regions:
       - "tianhe_ferry"
     sub_locations: []
     expedition_location_id: "blackwater_marsh"
+  mist_hidden_valley:
+    name: "雾隐溪谷"
+    danger: 3
+    min_difficulty: 4
+    max_difficulty: 8
+    recommended_realm: "筑基初期"
+    environment_tags:
+      - "溪谷"
+      - "雾瘴"
+      - "残阵"
+    preview_rewards:
+      - "雾隐草"
+      - "阵核碎片"
+      - "筑基丹药材料"
+    polygon:
+      -
+        - 390
+        - 245
+      -
+        - 560
+        - 245
+      -
+        - 560
+        - 345
+      -
+        - 390
+        - 345
+    near_city:
+      - "yunlan_city"
+      - "tianhe_ferry"
+    sub_locations:
+      - "mist_creek_herb_garden"
+      - "sealed_creek_ruins"
+    expedition_location_id: "mist_hidden_valley"
 wilderness_locations:
   wild_wolf_valley:
     name: "野狼谷"
@@ -199,3 +233,43 @@ wilderness_locations:
       - "秘境入口"
       - "剑冢试炼"
     expedition_location_id: "qinglan_mountain"
+  mist_creek_herb_garden:
+    name: "雾溪药圃"
+    danger: 2
+    recommended_realm: "筑基初期"
+    environment_tags:
+      - "药圃"
+      - "雾溪"
+      - "灵草"
+    preview_rewards:
+      - "雾隐草"
+      - "灵果"
+    position:
+      - 430
+      - 292
+    parent_region: "mist_hidden_valley"
+    reveal_radius: 120
+    services:
+      - "采集"
+      - "炼丹材料"
+    expedition_location_id: "mist_hidden_valley"
+  sealed_creek_ruins:
+    name: "封溪残阵"
+    danger: 4
+    recommended_realm: "筑基初期"
+    environment_tags:
+      - "残阵"
+      - "阵灵"
+      - "禁制"
+    preview_rewards:
+      - "阵核碎片"
+      - "筑基功法"
+    position:
+      - 530
+      - 312
+    parent_region: "mist_hidden_valley"
+    reveal_radius: 100
+    services:
+      - "残阵调查"
+      - "精英遭遇"
+    expedition_location_id: "mist_hidden_valley"

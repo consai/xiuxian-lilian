@@ -318,3 +318,140 @@ monsters:
           min: 1
           max: 1
           weight: 1
+
+  mist_marten:
+    name: "雾溪灵鼬"
+    species: "beast"
+    tags:
+      - "beast"
+    icon: "characters/003_cutout_407x512.png"
+    hp: 145
+    mp: 75
+    attrs:
+      hp_max: 145
+      mp_max: 75
+      shield: 0
+      physical_atk: 31
+      magic_atk: 33
+      physical_def: 22
+      magic_def: 26
+      spd: 118
+      accuracy: 112
+      evasion: 116
+      control_power: 72
+      control_resist: 78
+      crit: 8
+      crit_damage: 150
+    skills:
+      - 1
+      - 0
+    drops:
+      entries:
+        - kind: "item"
+          id: "items_MistHerb"
+          min: 1
+          max: 2
+          weight: 4
+        - kind: "item"
+          id: "items_YaoDan"
+          min: 1
+          max: 2
+          weight: 3
+        - kind: "item"
+          id: "items_QingMaiDan"
+          min: 1
+          max: 1
+          weight: 1
+
+  vine_armor_guard:
+    name: "藤甲守卫"
+    species: "elite"
+    tags:
+      - "elite"
+      - "construct"
+    icon: "characters/005_cutout_311x512.png"
+    hp: 260
+    mp: 100
+    attrs:
+      hp_max: 260
+      mp_max: 100
+      shield: 36
+      physical_atk: 38
+      magic_atk: 40
+      physical_def: 36
+      magic_def: 42
+      spd: 82
+      accuracy: 114
+      evasion: 82
+      control_power: 90
+      control_resist: 145
+      crit: 8
+      crit_damage: 155
+    skills:
+      - 3
+      - 2
+      - 0
+    drops:
+      entries:
+        - kind: "item"
+          id: "items_ArrayCoreShard"
+          min: 1
+          max: 1
+          weight: 3
+        - kind: "item"
+          id: "book_skill_blood_strike"
+          min: 1
+          max: 1
+          weight: 1
+        - kind: "item"
+          id: "book_method_vajra_2"
+          min: 1
+          max: 1
+          weight: 1
+
+  sealed_creek_boss:
+    name: "封溪阵灵"
+    species: "boss"
+    tags:
+      - "boss"
+      - "construct"
+    icon: "characters/006_cutout_427x512.png"
+    hp: 380
+    mp: 150
+    attrs:
+      hp_max: 380
+      mp_max: 150
+      shield: 45
+      physical_atk: 43
+      magic_atk: 48
+      physical_def: 38
+      magic_def: 46
+      spd: 96
+      accuracy: 122
+      evasion: 94
+      control_power: 118
+      control_resist: 135
+      crit: 10
+      crit_damage: 160
+    skills:
+      - 3
+      - 2
+      - 1
+      - 0
+    drops:
+      entries:
+        - kind: "item"
+          id: "items_ArrayCoreShard"
+          min: 1
+          max: 2
+          weight: 4
+        - kind: "item"
+          id: "book_skill_five_phase_burst"
+          min: 1
+          max: 1
+          weight: 2
+        - kind: "item"
+          id: "book_method_hunyuan_2"
+          min: 1
+          max: 1
+          weight: 2

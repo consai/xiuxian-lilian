@@ -30,3 +30,27 @@ effects:
     stackGroup: "pm204_escape_evasion"
     stackPolicy: "add_capped"
     cap: 0.12
+  - skillId: "foundation.dao_base"
+    level: 1
+    effectId: "max_health"
+    base: 18
+    operation: "add_flat"
+    stackGroup: "p3_dao_base_health"
+    stackPolicy: "add_capped"
+    cap: 60
+  - skillId: "cultivation.great_cycle"
+    level: 2
+    effectId: "max_mana"
+    base: 24
+    operation: "add_flat"
+    stackGroup: "p3_great_cycle_mana"
+    stackPolicy: "add_capped"
+    cap: 90
+  - skillId: "body.jade"
+    level: 1
+    effectId: "physical_defense"
+    base: 0.06
+    operation: "add_percent"
+    stackGroup: "p3_jade_defense"
+    stackPolicy: "add_capped"
+    cap: 0.18

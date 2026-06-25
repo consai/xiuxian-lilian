@@ -34,6 +34,7 @@ func _run_all() -> void:
 	_run("common event duration advances days", _test_common_event_duration_advances_days)
 	_run("decision event exposes options", _test_decision_event_exposes_options)
 	_run("common decision choice resolves", _test_common_decision_choice_resolves)
+	_run("p3 mist valley chain exposes next goals", _test_p3_mist_valley_chain)
 	_run("non battle events advance expedition", _test_non_battle_events_advance)
 	_run("manual exit keeps all loot", _test_manual_exit_keeps_all_loot)
 	_run("defeat exit drops session loot and injury", _test_defeat_exit_drops_session_loot_and_injury)
@@ -303,6 +304,13 @@ func _test_qi_expedition_combat_bands_are_readable() -> void:
 			"boss": "blackwater_boss",
 			"max_difficulty": 5,
 		},
+		{
+			"location": "mist_hidden_valley",
+			"normal": "mist_marten",
+			"elite": "vine_armor_guard",
+			"boss": "sealed_creek_boss",
+			"max_difficulty": 8,
+		},
 	]
 	for spec_v in specs:
 		var spec := spec_v as Dictionary
@@ -487,6 +495,27 @@ func _test_common_decision_choice_resolves() -> void:
 	expedition.phase = "choosing"
 	var result: Dictionary = expedition.choose_event(choice_id)
 	_expect_true(bool(result.get("ok", false)), "common decision choice resolves")
+
+
+func _test_p3_mist_valley_chain() -> void:
+	var location := LocationServiceScript.by_id("mist_hidden_valley")
+	_expect_true(not location.is_empty(), "p3 location exists")
+	var pool := location.get("event_pool", []) as Array
+	for event_id in [
+		"mist_creek_chain_tracks",
+		"mist_creek_chain_choice",
+		"mist_creek_chain_seal_core",
+	]:
+		_expect_true(pool.has(event_id), "p3 chain includes %s" % event_id)
+	var tracks := ExpeditionEventServiceScript.by_id("mist_creek_chain_tracks")
+	_expect_true(ExpeditionEventServiceScript.is_decision_event(tracks), "p3 chain starts with decision")
+	var trace := ExpeditionEventServiceScript.find_decision_option(tracks, "trace")
+	_expect_eq(str(trace.get("trigger_event", "")), "mist_creek_chain_fog_test", "trace option triggers fog test")
+	var seal := ExpeditionEventServiceScript.by_id("mist_creek_chain_seal_core")
+	_expect_eq(str(seal.get("enemy_pool", "")), "sealed_creek_boss", "p3 chain boss uses sealed creek boss")
+	var rewards := (seal.get("results", []) as Array)[1] as Dictionary
+	var reward := (rewards.get("rewards", []) as Array)[0] as Dictionary
+	_expect_eq(str(reward.get("id", "")), "book_method_hunyuan_2", "p3 chain points to foundation method")
 
 
 func _test_non_battle_events_advance() -> void:

@@ -312,7 +312,7 @@ P2 通过标准：
 
 - `docs/project-management/p2-playtest-notes.md`
 
-## 待启动：P3 内容扩展
+## 已完成：P3 内容扩展
 
 启动条件：
 
@@ -327,7 +327,11 @@ P3 通过标准：
 - 玩家完成筑基前目标后，有 1 条新的短期目标和 1 条中期目标。
 - 只扩到筑基初期可继续玩，不做金丹完整版本。
 
-### [ ] PM-301：新区域最小内容包
+验收记录：
+
+- 2026-06-25：P3 最小内容包「雾隐溪谷」已落地；自动回归通过，配置路径与可复测路线记录见 `docs/project-management/p3-playtest-notes.md`。
+
+### [x] PM-301：新区域最小内容包
 
 描述：新增 1 个筑基初期可去的区域，包含城市 / 野外入口、基础地点、普通 / 精英 / Boss 遭遇。
 
@@ -347,7 +351,11 @@ P3 通过标准：
 - `tests/run_world_map_tests.gd`
 - `tests/run_config_validation_tests.gd`
 
-### [ ] PM-302：区域事件链
+任务备注：
+
+- 2026-06-25：新增雾隐溪谷、雾溪药圃、封溪残阵和三类筑基初期敌人；`run_config_validation_tests.gd`、`run_world_map_tests.gd`、`run_expedition_tests.gd` 通过。
+
+### [x] PM-302：区域事件链
 
 描述：给新区域做一条 5-7 步事件链，提供探索目标和阶段奖励。
 
@@ -365,7 +373,11 @@ P3 通过标准：
 - `scripts/expedition`
 - `tests/run_expedition_tests.gd`
 
-### [ ] PM-303：筑基初期技能 / 功法扩展
+任务备注：
+
+- 2026-06-25：新增「雾溪封阵」6 步链路，覆盖起点选择、法力消耗、普通战、分支奖励、精英战和 Boss 奖励；`run_expedition_tests.gd` 已覆盖关键节点和下一目标。
+
+### [x] PM-303：筑基初期技能 / 功法扩展
 
 描述：补一小组筑基初期技能、功法和知识节点，延续 P2 的稳健 / 输出两种倾向。
 
@@ -385,7 +397,11 @@ P3 通过标准：
 - `tests/run_dao_knowledge_tests.gd`
 - `tests/run_balance_v1_tests.gd`
 
-### [ ] PM-304：炼丹与突破辅助扩展
+任务备注：
+
+- 2026-06-25：复用现有筑基技能 / 功法作为雾隐溪谷奖励投放，并补齐 `foundation.dao_base`、`cultivation.great_cycle`、`body.jade` 三个知识效果；`run_dao_knowledge_tests.gd` 与 `run_balance_v1_tests.gd` 通过。
+
+### [x] PM-304：炼丹与突破辅助扩展
 
 描述：新增 2-3 个围绕筑基初期的丹方和突破辅助道具，服务资源消耗和中期目标。
 
@@ -404,7 +420,11 @@ P3 通过标准：
 - `scripts/sim/alchemy_service.gd`
 - `tests/run_simulation_tests.gd`
 
-### [ ] PM-305：人物与敌人资产扩展
+任务备注：
+
+- 2026-06-25：新增雾隐草、优品雾隐草、阵核碎片、清脉丹、固本道基丹和对应丹方；旧存档炼丹状态会合并默认已知丹方；`run_simulation_tests.gd` 通过。
+
+### [x] PM-305：人物与敌人资产扩展
 
 描述：补 P3 内容需要的最低人物表现，不做全量美术库。
 
@@ -423,7 +443,11 @@ P3 通过标准：
 - `data/stories`
 - `scenes/fightScene.tscn`
 
-### [ ] PM-306：P3 回归与手动验收
+任务备注：
+
+- 2026-06-25：采药人 NPC 与雾溪灵鼬、藤甲守卫、封溪阵灵均接入现有风格占位立绘；`run_story_tests.gd` 覆盖映射和资源可加载性。
+
+### [x] PM-306：P3 回归与手动验收
 
 描述：把 P3 新增内容跑一轮自动回归和手动路线，确认没有破坏 P0-P2。
 
@@ -436,6 +460,10 @@ P3 通过标准：
 产物：
 
 - `docs/project-management/p3-playtest-notes.md`
+
+任务备注：
+
+- 2026-06-25：P3 自动回归已完成；手动路线以配置路径核对和可复测清单记录，图形化长时点击游玩留到下一轮 polish。
 
 ## 暂缓任务
 

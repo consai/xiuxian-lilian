@@ -15,6 +15,7 @@ const PATH_GATHERER := "characters/006_cutout_427x512.png"
 const SPEAKER_PORTRAITS: Dictionary = {
 	"小观主": PATH_PLAYER,
 	"炼丹小札": PATH_MASTER,
+	"雾溪采药人": PATH_GATHERER,
 }
 
 # 怪物 id -> 立绘（敌人临时复用角色图，后续可拆独立怪物美术）
@@ -25,6 +26,9 @@ const MONSTER_PORTRAITS: Dictionary = {
 	"qinglan_boss": PATH_CORGI,
 	"poison_marsh_serpent": PATH_FOX,
 	"rot_armor_crocodile": PATH_MASTER,
+	"mist_marten": PATH_FOX,
+	"vine_armor_guard": PATH_CORGI,
+	"sealed_creek_boss": PATH_MASTER,
 }
 
 

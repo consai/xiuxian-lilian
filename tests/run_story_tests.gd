@@ -22,6 +22,26 @@ func _run_all() -> void:
 			EnumCharacterPortraitScript.PATH_MASTER,
 			"guide speaker portrait"
 		)
+		_expect_eq(
+			EnumCharacterPortraitScript.portrait_for_speaker("雾溪采药人"),
+			EnumCharacterPortraitScript.PATH_GATHERER,
+			"p3 gatherer portrait"
+		)
+		_expect_eq(
+			EnumCharacterPortraitScript.portrait_for_monster("mist_marten"),
+			EnumCharacterPortraitScript.PATH_FOX,
+			"p3 normal enemy portrait"
+		)
+		_expect_eq(
+			EnumCharacterPortraitScript.portrait_for_monster("vine_armor_guard"),
+			EnumCharacterPortraitScript.PATH_CORGI,
+			"p3 elite enemy portrait"
+		)
+		_expect_eq(
+			EnumCharacterPortraitScript.portrait_for_monster("sealed_creek_boss"),
+			EnumCharacterPortraitScript.PATH_MASTER,
+			"p3 boss portrait"
+		)
 	)
 	var story := _load_story()
 	_run("sample story validates", func() -> void:

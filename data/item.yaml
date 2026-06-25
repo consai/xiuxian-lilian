@@ -93,6 +93,42 @@ items:
     max_stack: 999
     desc: "蕴含特殊灵纹的矿材，价值较高。"
     icon: "res://assets/art/ui_new/lingshi.png"
+  - id: "items_MistHerb"
+    name: "雾隐草"
+    type: "材料"
+    primary_type: "道具"
+    secondary_type: "药材"
+    quality: 2
+    tier: 2
+    ling_shi: 42
+    stackable: true
+    max_stack: 999
+    desc: "雾隐溪谷特产灵草，药性清凉，适合梳理筑基后的灵脉。"
+    icon: "res://assets/art/ui_new/item_cao.png"
+  - id: "items_MistHerb_Fine"
+    name: "上等雾隐草"
+    type: "材料"
+    primary_type: "道具"
+    secondary_type: "药材"
+    quality: 3
+    tier: 2
+    ling_shi: 76
+    stackable: true
+    max_stack: 999
+    desc: "药性更纯的雾隐草，可提高筑基丹药品质。"
+    icon: "res://assets/art/ui_new/item_cao.png"
+  - id: "items_ArrayCoreShard"
+    name: "阵核碎片"
+    type: "材料"
+    primary_type: "道具"
+    secondary_type: "阵材"
+    quality: 3
+    tier: 2
+    ling_shi: 110
+    stackable: true
+    max_stack: 999
+    desc: "封溪残阵中剥落的核心碎片，可用来稳固道基。"
+    icon: "res://assets/art/ui_new/item_baozhu.png"
   - id: "items_HuiQiDan"
     name: "回气丹"
     type: "丹药"
@@ -203,6 +239,53 @@ items:
       - op: "mp"
         args:
           - 25
+  - id: "items_QingMaiDan"
+    name: "清脉丹"
+    type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
+    quality: 2
+    tier: 2
+    ling_shi: 72
+    stackable: true
+    max_stack: 99
+    desc: "筑基初期常用丹药，可在战斗中回灵并略微疗伤。"
+    icon: "res://assets/art/ui_new/hulu.png"
+    fight_id: 9005
+    fight_cd: 5
+    fight_effect:
+      - type: "restore_mp"
+        value: 35
+        target: "self"
+      - type: "heal"
+        value: 12
+        target: "self"
+    use_effect:
+      - op: "mp"
+        args:
+          - 35
+      - op: "hp"
+        args:
+          - 12
+  - id: "items_GuBenDaoJiDan"
+    name: "固本道基丹"
+    type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
+    quality: 2
+    tier: 2
+    ling_shi: 120
+    stackable: true
+    max_stack: 99
+    desc: "筑基后稳固道基的修炼丹药。需在修炼界面打坐炼化。"
+    icon: "res://assets/art/ui_new/hulu.png"
+    use_effect:
+      - op: "pill_cultivation"
+        args:
+          - 13
+      - op: "instability"
+        args:
+          - 10
   - id: "items_QingFengJian"
     name: "青锋剑"
     type: "法宝"
@@ -623,3 +706,117 @@ items:
       - op: "instability"
         args:
           - 12
+  - id: "items_QingMaiDan_Low"
+    name: "下品清脉丹"
+    type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
+    quality: 1
+    tier: 2
+    ling_shi: 50
+    stackable: true
+    max_stack: 99
+    desc: "药力稍弱的清脉丹。"
+    icon: "res://assets/art/ui_new/hulu.png"
+    use_effect:
+      - op: "mp"
+        args:
+          - 28
+      - op: "hp"
+        args:
+          - 8
+  - id: "items_QingMaiDan_High"
+    name: "上品清脉丹"
+    type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
+    quality: 3
+    tier: 2
+    ling_shi: 108
+    stackable: true
+    max_stack: 99
+    desc: "药力充盈的清脉丹。"
+    icon: "res://assets/art/ui_new/hulu.png"
+    use_effect:
+      - op: "mp"
+        args:
+          - 45
+      - op: "hp"
+        args:
+          - 16
+  - id: "items_QingMaiDan_Supreme"
+    name: "极品清脉丹"
+    type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
+    quality: 4
+    tier: 2
+    ling_shi: 160
+    stackable: true
+    max_stack: 99
+    desc: "几无杂质的极品清脉丹。"
+    icon: "res://assets/art/ui_new/hulu.png"
+    use_effect:
+      - op: "mp"
+        args:
+          - 58
+      - op: "hp"
+        args:
+          - 22
+  - id: "items_GuBenDaoJiDan_Low"
+    name: "下品固本道基丹"
+    type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
+    quality: 1
+    tier: 2
+    ling_shi: 84
+    stackable: true
+    max_stack: 99
+    desc: "药力稍弱的固本道基丹。需打坐炼化。"
+    icon: "res://assets/art/ui_new/hulu.png"
+    use_effect:
+      - op: "pill_cultivation"
+        args:
+          - 11
+      - op: "instability"
+        args:
+          - 10
+  - id: "items_GuBenDaoJiDan_High"
+    name: "上品固本道基丹"
+    type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
+    quality: 3
+    tier: 2
+    ling_shi: 180
+    stackable: true
+    max_stack: 99
+    desc: "药力充盈的固本道基丹。需打坐炼化。"
+    icon: "res://assets/art/ui_new/hulu.png"
+    use_effect:
+      - op: "pill_cultivation"
+        args:
+          - 16
+      - op: "instability"
+        args:
+          - 10
+  - id: "items_GuBenDaoJiDan_Supreme"
+    name: "极品固本道基丹"
+    type: "丹药"
+    primary_type: "消耗品"
+    secondary_type: "丹药"
+    quality: 4
+    tier: 2
+    ling_shi: 260
+    stackable: true
+    max_stack: 99
+    desc: "几无杂质的极品固本道基丹。需打坐炼化，适合筑基初期稳固根基。"
+    icon: "res://assets/art/ui_new/hulu.png"
+    use_effect:
+      - op: "pill_cultivation"
+        args:
+          - 20
+      - op: "instability"
+        args:
+          - 10

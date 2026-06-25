@@ -16,7 +16,14 @@ static func default_state() -> Dictionary:
 	return {
 		"level": 1,
 		"xp": 0,
-		"known_recipes": ["recipe.huiqi", "recipe.huiling", "recipe.liaoshang", "recipe.juqi"],
+		"known_recipes": [
+			"recipe.huiqi",
+			"recipe.huiling",
+			"recipe.liaoshang",
+			"recipe.juqi",
+			"recipe.qingmai",
+			"recipe.guben",
+		],
 		"owned_furnaces": {"furnace.old_copper": {"durability": 30}},
 		"equipped_furnace": "furnace.old_copper",
 		"last_recipe": "recipe.huiqi",
@@ -33,7 +40,10 @@ static func normalize_state(raw: Variant) -> Dictionary:
 		out["level"] = clampi(int(src.get("level", 1)), 1, 10)
 		out["xp"] = maxi(0, int(src.get("xp", 0)))
 		if src.get("known_recipes") is Array:
-			out["known_recipes"] = (src.get("known_recipes") as Array).duplicate()
+			out["known_recipes"] = _merge_known_recipes(
+				out.get("known_recipes", []) as Array,
+				src.get("known_recipes") as Array
+			)
 		if src.get("owned_furnaces") is Dictionary:
 			out["owned_furnaces"] = (src.get("owned_furnaces") as Dictionary).duplicate(true)
 		out["equipped_furnace"] = str(src.get("equipped_furnace", out["equipped_furnace"]))
@@ -54,6 +64,15 @@ static func normalize_state(raw: Variant) -> Dictionary:
 					MAX_RECIPE_MASTERY
 				)
 			out["recipe_mastery"] = mastery
+	return out
+
+
+static func _merge_known_recipes(defaults: Array, saved: Array) -> Array:
+	var out := defaults.duplicate()
+	for recipe_id_v in saved:
+		var recipe_id := str(recipe_id_v)
+		if recipe_id != "" and recipe_id not in out:
+			out.append(recipe_id)
 	return out
 
 

@@ -22,6 +22,7 @@ func _initialize() -> void:
 	failed += _run("method_slot_weights", _test_method_slot_weights)
 	failed += _run("knowledge_level_effects", _test_knowledge_level_effects)
 	failed += _run("pm204_starter_pool", _test_pm204_starter_pool)
+	failed += _run("p3_foundation_growth_hooks", _test_p3_foundation_growth_hooks)
 	quit(1 if failed > 0 else 0)
 
 
@@ -215,6 +216,32 @@ func _test_pm204_starter_pool() -> void:
 		push_error("starter pool should contain a defensive tendency")
 	_assert_damage_budget_near("qi", 1)
 	_assert_damage_budget_near("foundation", 2)
+
+
+func _test_p3_foundation_growth_hooks() -> void:
+	var required := [
+		"foundation.dao_base",
+		"cultivation.great_cycle",
+		"body.jade",
+	]
+	for skill_id in required:
+		if DaoTreeServiceScript.skill_by_id(skill_id).is_empty():
+			push_error("%s should exist for p3 foundation growth" % skill_id)
+		if KnowledgeEffectServiceScript.effects_for_skill(skill_id).is_empty():
+			push_error("%s should have a visible knowledge effect" % skill_id)
+	var savedata := {"knowledge": {}}
+	KnowledgeServiceScript.grant_level(savedata, "foundation.dao_base", 1)
+	KnowledgeServiceScript.grant_level(savedata, "cultivation.great_cycle", 2)
+	KnowledgeServiceScript.grant_level(savedata, "body.jade", 1)
+	var mods := KnowledgeEffectServiceScript.build_modifiers(savedata)
+	var flat := mods.get("flat", {}) as Dictionary
+	var percent := mods.get("percent", {}) as Dictionary
+	if float(flat.get(FightAttr.HP_MAX, 0.0)) <= 0.0:
+		push_error("foundation.dao_base should add hp")
+	if float(flat.get(FightAttr.MP_MAX, 0.0)) <= 0.0:
+		push_error("cultivation.great_cycle should add mp")
+	if float(percent.get(FightAttr.PHYSICAL_DEF, 0.0)) <= 0.0:
+		push_error("body.jade should add physical defense")
 
 
 func _first_damage_value(runtime: Dictionary) -> float:

@@ -121,6 +121,10 @@ func _test_travel_discovers_nearby_regions() -> void:
 		"blackwater_marsh" in (map_data.get("discovered_regions", []) as Array),
 		"blackwater discovered after arriving at yunlan"
 	)
+	_expect_true(
+		"mist_hidden_valley" in (map_data.get("discovered_regions", []) as Array),
+		"mist hidden valley discovered after arriving at yunlan"
+	)
 
 
 func _test_wilderness_entry_requires_nearby_city() -> void:
@@ -137,6 +141,9 @@ func _test_wilderness_entry_requires_nearby_city() -> void:
 	map_data["current_city_id"] = "yunlan_city"
 	var marsh := WorldMapServiceScript.can_enter_wilderness("blackwater_marsh", map_data)
 	_expect_true(bool(marsh.get("ok", false)), "blackwater enterable from yunlan")
+	var mist := WorldMapServiceScript.can_enter_wilderness("mist_hidden_valley", map_data)
+	_expect_true(bool(mist.get("ok", false)), "mist valley enterable from yunlan")
+	_expect_eq(str(mist.get("location_id", "")), "mist_hidden_valley", "mist valley maps to expedition location")
 
 
 func _expect_true(value: bool, message: String) -> void:
