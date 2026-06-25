@@ -18,11 +18,8 @@ monsters:
       magic_def: 19.2
       spd: 92
       accuracy: 85
-      evasion: 92
       control_power: 45
       control_resist: 55
-      crit: 5
-      crit_damage: 150
     skills:
       - 1
       - 0
@@ -63,11 +60,8 @@ monsters:
       magic_def: 28.3
       spd: 86
       accuracy: 96
-      evasion: 78
       control_power: 65
       control_resist: 110
-      crit: 8
-      crit_damage: 155
     skills:
       - 3
       - 2
@@ -109,11 +103,8 @@ monsters:
       magic_def: 25.2
       spd: 96
       accuracy: 98
-      evasion: 90
       control_power: 70
       control_resist: 75
-      crit: 8
-      crit_damage: 150
     skills:
       - 3
       - 1
@@ -155,11 +146,8 @@ monsters:
       magic_def: 28.8
       spd: 105
       accuracy: 110
-      evasion: 105
       control_power: 90
       control_resist: 95
-      crit: 12
-      crit_damage: 165
     skills:
       - 3
       - 1
@@ -201,11 +189,8 @@ monsters:
       magic_def: 18
       spd: 98
       accuracy: 96
-      evasion: 102
       control_power: 55
       control_resist: 60
-      crit: 6
-      crit_damage: 150
     skills: []
     drops:
       entries:
@@ -244,11 +229,8 @@ monsters:
       magic_def: 30
       spd: 82
       accuracy: 100
-      evasion: 75
       control_power: 70
       control_resist: 120
-      crit: 8
-      crit_damage: 160
     skills:
       - 3
       - 2
@@ -291,11 +273,8 @@ monsters:
       magic_def: 32
       spd: 96
       accuracy: 112
-      evasion: 100
       control_power: 95
       control_resist: 105
-      crit: 10
-      crit_damage: 160
     skills:
       - 3
       - 2
@@ -337,11 +316,8 @@ monsters:
       magic_def: 26
       spd: 118
       accuracy: 112
-      evasion: 116
       control_power: 72
       control_resist: 78
-      crit: 8
-      crit_damage: 150
     skills:
       - 1
       - 0
@@ -382,11 +358,8 @@ monsters:
       magic_def: 42
       spd: 82
       accuracy: 114
-      evasion: 82
       control_power: 90
       control_resist: 145
-      crit: 8
-      crit_damage: 155
     skills:
       - 3
       - 2
@@ -428,11 +401,8 @@ monsters:
       magic_def: 46
       spd: 96
       accuracy: 122
-      evasion: 94
       control_power: 118
       control_resist: 135
-      crit: 10
-      crit_damage: 160
     skills:
       - 3
       - 2

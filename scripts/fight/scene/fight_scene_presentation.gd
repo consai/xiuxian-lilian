@@ -53,7 +53,6 @@ func run_presentation(
 		"来源": BattleDebugLog.side_label(source_id),
 		"目标": BattleDebugLog.side_label(target_id),
 		"伤害": report.get("damage", 0.0),
-		"暴击": report.get("is_crit", false),
 		"特效类型": vfx_type_from_cfg(cfg),
 	})
 	BattleDebugLog.log_domain(ctx.domain, "表现前")
@@ -118,7 +117,6 @@ func play_combat_vfx(
 		"source_id": source_id,
 		"target_id": target_id,
 		"damage_value": float(result.get("damage", 0.0)),
-		"is_crit": bool(result.get("is_crit", false)),
 		"skill_type": vfx_type_from_cfg(cfg),
 		"extra": extra,
 	})

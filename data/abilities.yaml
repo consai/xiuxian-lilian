@@ -2,14 +2,13 @@ schemaVersion: 4
 configId: "abilities"
 metadata:
   name: "技能配置"
-  description: "技能自身配置学习门槛，知识提供门槛后的效果成长"
+  description: "技能自身配置学习门槛"
   abilityCount: 45
 rules:
   knowledgeTreeConfigId: "dao_tree"
   cultivationMethodConfigId: "cultivation_methods"
   learningPolicy: "ability_config_knowledge_requirements"
-  knowledgeMasteryFormula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-  effectFormula: "base + knowledgeGrowth * weightedKnowledgeMastery, then apply scalingMode and clamps"
+  effectFormula: "base with scalingMode and clamps"
   types:
     - "combat_active"
     - "combat_passive"
@@ -40,7 +39,6 @@ rules:
     specialPolicy: "quality_3_or_above_may_require_knowledge"
     maxKnowledgeRequirements: 2
     maxRequirementLevel: 2
-    note: "知识仍可参与 knowledgeScaling 成长，但下品与中品技能学习不被知识卡住。"
 abilities:
   - id: "ability.combat.qi_bolt"
     name: "御气弹"
@@ -56,16 +54,6 @@ abilities:
       - "filler"
     vfx:
       preset: "qi_bolt_projectile"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "spell.projectile"
-          requiredLevel: 1
-          scalingWeight: 3
-        - skillId: "foundation.control"
-          requiredLevel: 1
-          scalingWeight: 1
     combat:
       target: "enemy"
       castTime: 0.8
@@ -79,7 +67,6 @@ abilities:
     effects:
       - effectId: "damage_spiritual"
         base: 40
-        knowledgeGrowth: 18
         operation: "add_flat"
         target: "enemy"
         stackGroup: "damage_spiritual"
@@ -102,21 +89,11 @@ abilities:
     realm: "qi"
     tier: 1
     quality: 1
-    description: "短暂借风护身，获得闪避与灵力护盾。"
+    description: "短暂借风护身，提升出手速度并获得灵力护盾。"
     tags:
       - "mobility"
       - "shield"
       - "defense"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "spell.escape"
-          requiredLevel: 1
-          scalingWeight: 3
-        - skillId: "cultivation.cycle"
-          requiredLevel: 1
-          scalingWeight: 1
     combat:
       target: "position"
       castTime: 0.8
@@ -130,7 +107,6 @@ abilities:
     effects:
       - effectId: "dash_distance"
         base: 5
-        knowledgeGrowth: 1.2
         operation: "add_flat"
         target: "self"
         stackGroup: "dash_distance"
@@ -138,7 +114,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "evasion_window"
         base: 0.15
-        knowledgeGrowth: 0.06
         operation: "add_percent"
         target: "self"
         stackGroup: "evasion_window"
@@ -148,7 +123,6 @@ abilities:
         clampMax: 0.6
       - effectId: "shield_spiritual"
         base: 28
-        knowledgeGrowth: 8
         operation: "add_flat"
         target: "self"
         stackGroup: "shield_spiritual"
@@ -179,16 +153,6 @@ abilities:
       - "execute"
     vfx:
       preset: "sword_qi_projectile"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "sword.qi"
-          requiredLevel: 1
-          scalingWeight: 3
-        - skillId: "sword.weapon"
-          requiredLevel: 2
-          scalingWeight: 1
     combat:
       target: "enemy_lowest_hp"
       castTime: 0.8
@@ -202,7 +166,6 @@ abilities:
     effects:
       - effectId: "damage_sword"
         base: 54
-        knowledgeGrowth: 22
         operation: "add_flat"
         target: "enemy_lowest_hp"
         stackGroup: "damage_sword"
@@ -210,7 +173,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "armor_pierce"
         base: 0.08
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "enemy_lowest_hp"
         stackGroup: "armor_pierce"
@@ -242,16 +204,6 @@ abilities:
       - "body"
       - "melee"
       - "control"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "body.bone"
-          requiredLevel: 2
-          scalingWeight: 2
-        - skillId: "body.recovery"
-          requiredLevel: 2
-          scalingWeight: 1
     combat:
       target: "enemy_front"
       castTime: 0.8
@@ -265,7 +217,6 @@ abilities:
     effects:
       - effectId: "damage_physical"
         base: 75
-        knowledgeGrowth: 28
         operation: "add_flat"
         target: "enemy_front"
         stackGroup: "damage_physical"
@@ -273,7 +224,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "stagger_power"
         base: 0.15
-        knowledgeGrowth: 0.06
         operation: "add_percent"
         target: "enemy_front"
         stackGroup: "stagger_power"
@@ -304,16 +254,6 @@ abilities:
       - "spell"
       - "area"
       - "wave_clear"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "spell.five_phase"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "spell.elements"
-          requiredLevel: 3
-          scalingWeight: 1
     combat:
       target: "enemies_all"
       castTime: 1.2
@@ -327,7 +267,6 @@ abilities:
     effects:
       - effectId: "damage_elemental"
         base: 95
-        knowledgeGrowth: 34
         operation: "add_flat"
         target: "enemies_all"
         stackGroup: "damage_elemental"
@@ -335,7 +274,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "elemental_vulnerability"
         base: 0.1
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "enemies_all"
         stackGroup: "elemental_vulnerability"
@@ -369,16 +307,6 @@ abilities:
       - "talisman"
       - "control"
       - "seal"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "talisman.seal"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "spirit.sense"
-          requiredLevel: 2
-          scalingWeight: 1
     combat:
       target: "enemy_priority"
       castTime: 1.1
@@ -392,7 +320,6 @@ abilities:
     effects:
       - effectId: "control_duration"
         base: 2
-        knowledgeGrowth: 0.5
         operation: "add_flat"
         target: "enemy_priority"
         stackGroup: "control_duration"
@@ -400,7 +327,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "spirit_suppression"
         base: 0.12
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         target: "enemy_priority"
         stackGroup: "spirit_suppression"
@@ -433,16 +359,6 @@ abilities:
     tags:
       - "spell"
       - "thunder"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "spell.thunder"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "cultivation.core_fire"
-          requiredLevel: 2
-          scalingWeight: 1
     combat:
       target: "enemy"
       castTime: 1
@@ -456,7 +372,6 @@ abilities:
     effects:
       - effectId: "damage_thunder"
         base: 150
-        knowledgeGrowth: 45
         operation: "add_flat"
         target: "enemy"
         stackGroup: "damage_thunder"
@@ -464,7 +379,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "stun_chance"
         base: 0.12
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         target: "enemy"
         stackGroup: "stun_chance"
@@ -493,19 +407,6 @@ abilities:
       - "sword"
       - "formation"
       - "area"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "sword.formation"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "formation.array"
-          requiredLevel: 2
-          scalingWeight: 2
-        - skillId: "spirit.sense"
-          requiredLevel: 3
-          scalingWeight: 1
     combat:
       target: "area"
       castTime: 2
@@ -519,7 +420,6 @@ abilities:
     effects:
       - effectId: "damage_sword_area"
         base: 180
-        knowledgeGrowth: 50
         operation: "add_flat"
         target: "area"
         stackGroup: "damage_sword_area"
@@ -527,7 +427,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "array_duration"
         base: 6
-        knowledgeGrowth: 1.5
         operation: "add_flat"
         target: "area"
         stackGroup: "array_duration"
@@ -553,16 +452,6 @@ abilities:
     tags:
       - "spirit"
       - "area"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "spirit.soul"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "talisman.curse"
-          requiredLevel: 1
-          scalingWeight: 1
     combat:
       target: "area"
       castTime: 0.8
@@ -576,7 +465,6 @@ abilities:
     effects:
       - effectId: "damage_spirit"
         base: 130
-        knowledgeGrowth: 42
         operation: "add_flat"
         target: "area"
         stackGroup: "damage_spirit"
@@ -584,7 +472,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "delay_special_action_chance"
         base: 0.2
-        knowledgeGrowth: 0.06
         operation: "add_percent"
         target: "area"
         stackGroup: "delay_special_action_chance"
@@ -612,16 +499,6 @@ abilities:
     tags:
       - "body"
       - "area"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "body.dharma_form"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "spell.domain"
-          requiredLevel: 2
-          scalingWeight: 1
     combat:
       target: "area"
       castTime: 1.5
@@ -635,7 +512,6 @@ abilities:
     effects:
       - effectId: "damage_physical_area"
         base: 320
-        knowledgeGrowth: 75
         operation: "add_flat"
         target: "area"
         stackGroup: "damage_physical_area"
@@ -643,7 +519,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "knockdown_duration"
         base: 1.5
-        knowledgeGrowth: 0.4
         operation: "add_flat"
         target: "area"
         stackGroup: "knockdown_duration"
@@ -669,16 +544,6 @@ abilities:
     tags:
       - "spirit"
       - "control"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "spirit.dream"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "spirit.inner_demon"
-          requiredLevel: 3
-          scalingWeight: 1
     combat:
       target: "enemy"
       castTime: 1.8
@@ -692,7 +557,6 @@ abilities:
     effects:
       - effectId: "control_duration"
         base: 4
-        knowledgeGrowth: 1
         operation: "add_flat"
         target: "enemy"
         stackGroup: "control_duration"
@@ -700,7 +564,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "damage_spirit"
         base: 180
-        knowledgeGrowth: 55
         operation: "add_flat"
         target: "enemy"
         stackGroup: "damage_spirit"
@@ -726,16 +589,6 @@ abilities:
     tags:
       - "sword"
       - "void"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "sword.void_cut"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "spell.void"
-          requiredLevel: 2
-          scalingWeight: 2
     combat:
       target: "line"
       castTime: 1.2
@@ -749,7 +602,6 @@ abilities:
     effects:
       - effectId: "damage_void"
         base: 480
-        knowledgeGrowth: 105
         operation: "add_flat"
         target: "line"
         stackGroup: "damage_void"
@@ -757,7 +609,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "space_pierce"
         base: 0.3
-        knowledgeGrowth: 0.08
         operation: "add_percent"
         target: "line"
         stackGroup: "space_pierce"
@@ -785,16 +636,6 @@ abilities:
     tags:
       - "curse"
       - "spirit"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "talisman.true_name"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "spirit.void_thought"
-          requiredLevel: 2
-          scalingWeight: 1
     combat:
       target: "enemy"
       castTime: 2
@@ -808,7 +649,6 @@ abilities:
     effects:
       - effectId: "damage_spirit_over_time"
         base: 0.22
-        knowledgeGrowth: 0.07
         operation: "add_percent"
         target: "enemy"
         stackGroup: "damage_spirit_over_time"
@@ -818,7 +658,6 @@ abilities:
         clampMax: 1
       - effectId: "healing_reduction"
         base: 0.25
-        knowledgeGrowth: 0.06
         operation: "add_percent"
         target: "enemy"
         stackGroup: "healing_reduction"
@@ -847,19 +686,6 @@ abilities:
       - "law"
       - "control"
       - "area"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "spell.law"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "talisman.command"
-          requiredLevel: 3
-          scalingWeight: 2
-        - skillId: "heaven.law_seed"
-          requiredLevel: 2
-          scalingWeight: 1
     combat:
       target: "area"
       castTime: 2.5
@@ -873,7 +699,6 @@ abilities:
     effects:
       - effectId: "control_duration"
         base: 5
-        knowledgeGrowth: 1.1
         operation: "add_flat"
         target: "area"
         stackGroup: "control_duration"
@@ -881,7 +706,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "law_suppression"
         base: 0.3
-        knowledgeGrowth: 0.08
         operation: "add_percent"
         target: "area"
         stackGroup: "law_suppression"
@@ -910,19 +734,6 @@ abilities:
       - "sword"
       - "law"
       - "ultimate"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "sword.heaven_cut"
-          requiredLevel: 3
-          scalingWeight: 4
-        - skillId: "sword.dao"
-          requiredLevel: 4
-          scalingWeight: 2
-        - skillId: "heaven.law_mastery"
-          requiredLevel: 3
-          scalingWeight: 2
     combat:
       target: "line"
       castTime: 4
@@ -936,7 +747,6 @@ abilities:
     effects:
       - effectId: "damage_law"
         base: 1600
-        knowledgeGrowth: 300
         operation: "add_flat"
         target: "line"
         stackGroup: "damage_law"
@@ -944,7 +754,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "law_pierce"
         base: 0.5
-        knowledgeGrowth: 0.08
         operation: "add_percent"
         target: "line"
         stackGroup: "law_pierce"
@@ -973,19 +782,6 @@ abilities:
       - "spell"
       - "tribulation"
       - "ultimate"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "spell.cataclysm"
-          requiredLevel: 3
-          scalingWeight: 4
-        - skillId: "heaven.tribulation"
-          requiredLevel: 3
-          scalingWeight: 2
-        - skillId: "spell.world"
-          requiredLevel: 3
-          scalingWeight: 1
     combat:
       target: "area"
       castTime: 5
@@ -999,7 +795,6 @@ abilities:
     effects:
       - effectId: "damage_tribulation"
         base: 1400
-        knowledgeGrowth: 280
         operation: "add_flat"
         target: "area"
         stackGroup: "damage_tribulation"
@@ -1007,7 +802,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "tribulation_mark"
         base: 0.35
-        knowledgeGrowth: 0.08
         operation: "add_percent"
         target: "area"
         stackGroup: "tribulation_mark"
@@ -1033,16 +827,6 @@ abilities:
     quality: 1
     description: "铁骨"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "body.bone"
-          requiredLevel: 1
-          scalingWeight: 3
-        - skillId: "body.tempering"
-          requiredLevel: 2
-          scalingWeight: 1
     combat:
       target: "enemy"
       castTime: 0
@@ -1054,7 +838,6 @@ abilities:
     effects:
       - effectId: "physical_resistance"
         base: 0.05
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         target: "self"
         stackGroup: "physical_resistance"
@@ -1076,16 +859,6 @@ abilities:
     quality: 4
     description: "剑心通明"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "sword.heart"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "spirit.soul"
-          requiredLevel: 2
-          scalingWeight: 1
     combat:
       target: "enemy"
       castTime: 0
@@ -1095,19 +868,17 @@ abilities:
       activation: "equipped"
       powerScale: 1
     effects:
-      - effectId: "critical_chance"
+      - effectId: "damage_bonus"
         base: 0.08
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         target: "self"
-        stackGroup: "critical_chance"
+        stackGroup: "damage_bonus"
         stackPolicy: "ability_instance"
         scalingMode: "positive"
         clampMin: 0
         clampMax: 0.6
       - effectId: "weakness_detection"
         base: 0.1
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "self"
         stackGroup: "weakness_detection"
@@ -1133,16 +904,6 @@ abilities:
     quality: 3
     description: "固魂守一"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "spirit.soul"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "spirit.inner_demon"
-          requiredLevel: 2
-          scalingWeight: 1
     combat:
       target: "enemy"
       castTime: 0
@@ -1154,7 +915,6 @@ abilities:
     effects:
       - effectId: "soul_resistance"
         base: 0.12
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "self"
         stackGroup: "soul_resistance"
@@ -1180,16 +940,6 @@ abilities:
     quality: 4
     description: "滴血不灭"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "body.regeneration"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "body.recovery"
-          requiredLevel: 4
-          scalingWeight: 1
     combat:
       target: "enemy"
       castTime: 0
@@ -1201,7 +951,6 @@ abilities:
     effects:
       - effectId: "health_regen"
         base: 0.12
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "self"
         stackGroup: "health_regen"
@@ -1211,7 +960,6 @@ abilities:
         clampMax: 0.8
       - effectId: "fatal_resistance"
         base: 0.06
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         target: "self"
         stackGroup: "fatal_resistance"
@@ -1237,16 +985,6 @@ abilities:
     quality: 4
     description: "人兵相契"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "sword.unity"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "artifact.life_bound"
-          requiredLevel: 3
-          scalingWeight: 2
     combat:
       target: "enemy"
       castTime: 0
@@ -1258,7 +996,6 @@ abilities:
     effects:
       - effectId: "weapon_damage"
         base: 0.22
-        knowledgeGrowth: 0.06
         operation: "add_percent"
         target: "self"
         stackGroup: "weapon_damage"
@@ -1268,7 +1005,6 @@ abilities:
         clampMax: 1.2
       - effectId: "weapon_loss_resistance"
         base: 0.4
-        knowledgeGrowth: 0.1
         operation: "add_percent"
         target: "self"
         stackGroup: "weapon_loss_resistance"
@@ -1294,16 +1030,6 @@ abilities:
     quality: 4
     description: "不坏道心"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "spirit.dao_heart"
-          requiredLevel: 3
-          scalingWeight: 3
-        - skillId: "heaven.causality"
-          requiredLevel: 3
-          scalingWeight: 1
     combat:
       target: "enemy"
       castTime: 0
@@ -1315,7 +1041,6 @@ abilities:
     effects:
       - effectId: "mental_resistance"
         base: 0.35
-        knowledgeGrowth: 0.08
         operation: "add_percent"
         target: "self"
         stackGroup: "mental_resistance"
@@ -1325,7 +1050,6 @@ abilities:
         clampMax: 0.9
       - effectId: "control_resistance"
         base: 0.2
-        knowledgeGrowth: 0.06
         operation: "add_percent"
         target: "self"
         stackGroup: "control_resistance"
@@ -1351,16 +1075,6 @@ abilities:
     quality: 4
     description: "万劫不坏"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "body.tribulation_body"
-          requiredLevel: 3
-          scalingWeight: 3
-        - skillId: "heaven.thunder_body"
-          requiredLevel: 4
-          scalingWeight: 2
     combat:
       target: "enemy"
       castTime: 0
@@ -1372,7 +1086,6 @@ abilities:
     effects:
       - effectId: "tribulation_resistance"
         base: 0.4
-        knowledgeGrowth: 0.08
         operation: "add_percent"
         target: "self"
         stackGroup: "tribulation_resistance"
@@ -1382,7 +1095,6 @@ abilities:
         clampMax: 0.9
       - effectId: "all_resistance"
         base: 0.12
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "self"
         stackGroup: "all_resistance"
@@ -1410,16 +1122,6 @@ abilities:
     tags:
       - "sword"
       - "domain"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "sword.domain"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "spell.domain"
-          requiredLevel: 2
-          scalingWeight: 1
     combat:
       target: "area"
       castTime: 0
@@ -1433,7 +1135,6 @@ abilities:
     effects:
       - effectId: "sword_damage"
         base: 0.25
-        knowledgeGrowth: 0.06
         operation: "add_percent"
         target: "self"
         stackGroup: "sword_damage"
@@ -1443,7 +1144,6 @@ abilities:
         clampMax: 2
       - effectId: "enemy_slow"
         base: 0.15
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "area"
         stackGroup: "enemy_slow"
@@ -1471,16 +1171,6 @@ abilities:
     tags:
       - "spell"
       - "domain"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "spell.domain"
-          requiredLevel: 2
-          scalingWeight: 2
-        - skillId: "spell.thunder"
-          requiredLevel: 4
-          scalingWeight: 3
     combat:
       target: "area"
       castTime: 0
@@ -1494,7 +1184,6 @@ abilities:
     effects:
       - effectId: "thunder_damage"
         base: 0.28
-        knowledgeGrowth: 0.07
         operation: "add_percent"
         target: "self"
         stackGroup: "thunder_damage"
@@ -1504,7 +1193,6 @@ abilities:
         clampMax: 2
       - effectId: "enemy_special_action_slow"
         base: 0.18
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "area"
         stackGroup: "enemy_special_action_slow"
@@ -1532,16 +1220,6 @@ abilities:
     tags:
       - "body"
       - "transform"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "body.dharma_form"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "body.jade"
-          requiredLevel: 4
-          scalingWeight: 1
     combat:
       target: "enemy"
       castTime: 0
@@ -1555,7 +1233,6 @@ abilities:
     effects:
       - effectId: "max_health"
         base: 0.3
-        knowledgeGrowth: 0.08
         operation: "add_percent"
         target: "self"
         stackGroup: "max_health"
@@ -1565,7 +1242,6 @@ abilities:
         clampMax: 2
       - effectId: "melee_damage"
         base: 0.22
-        knowledgeGrowth: 0.06
         operation: "add_percent"
         target: "self"
         stackGroup: "melee_damage"
@@ -1593,16 +1269,6 @@ abilities:
     tags:
       - "spirit"
       - "transform"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "spirit.primordial"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "spirit.split"
-          requiredLevel: 3
-          scalingWeight: 1
     combat:
       target: "enemy"
       castTime: 0
@@ -1616,7 +1282,6 @@ abilities:
     effects:
       - effectId: "spirit_power"
         base: 0.3
-        knowledgeGrowth: 0.08
         operation: "add_percent"
         target: "self"
         stackGroup: "spirit_power"
@@ -1626,7 +1291,6 @@ abilities:
         clampMax: 2
       - effectId: "physical_resistance"
         base: -0.35
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "self"
         stackGroup: "physical_resistance"
@@ -1654,16 +1318,6 @@ abilities:
     tags:
       - "law"
       - "domain"
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "heaven.law_mastery"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "spell.law"
-          requiredLevel: 3
-          scalingWeight: 2
     combat:
       target: "area"
       castTime: 0
@@ -1677,7 +1331,6 @@ abilities:
     effects:
       - effectId: "law_power"
         base: 0.35
-        knowledgeGrowth: 0.08
         operation: "add_percent"
         target: "self"
         stackGroup: "law_power"
@@ -1687,7 +1340,6 @@ abilities:
         clampMax: 2
       - effectId: "enemy_law_resistance"
         base: -0.2
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "area"
         stackGroup: "enemy_law_resistance"
@@ -1713,21 +1365,10 @@ abilities:
     quality: 1
     description: "灵气亲和"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "cultivation.qi_sense"
-          requiredLevel: 1
-          scalingWeight: 3
-        - skillId: "foundation.breathing"
-          requiredLevel: 2
-          scalingWeight: 1
     combat: null
     effects:
       - effectId: "cultivation_speed"
         base: 0.05
-        knowledgeGrowth: 0.025
         operation: "add_percent"
         target: "self"
         stackGroup: "cultivation_speed"
@@ -1749,18 +1390,10 @@ abilities:
     quality: 1
     description: "经脉通识"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "foundation.meridians"
-          requiredLevel: 1
-          scalingWeight: 3
     combat: null
     effects:
       - effectId: "injury_diagnosis"
         base: 0.15
-        knowledgeGrowth: 0.06
         operation: "add_percent"
         target: "self"
         stackGroup: "injury_diagnosis"
@@ -1782,21 +1415,10 @@ abilities:
     quality: 1
     description: "鉴宝师"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "world.appraisal"
-          requiredLevel: 1
-          scalingWeight: 3
-        - skillId: "foundation.literacy"
-          requiredLevel: 2
-          scalingWeight: 1
     combat: null
     effects:
       - effectId: "appraisal_accuracy"
         base: 0.15
-        knowledgeGrowth: 0.06
         operation: "add_percent"
         target: "self"
         stackGroup: "appraisal_accuracy"
@@ -1818,21 +1440,10 @@ abilities:
     quality: 1
     description: "灵植师"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "alchemy.herbs"
-          requiredLevel: 1
-          scalingWeight: 3
-        - skillId: "world.gathering"
-          requiredLevel: 1
-          scalingWeight: 1
     combat: null
     effects:
       - effectId: "herb_yield"
         base: 0.12
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         target: "self"
         stackGroup: "herb_yield"
@@ -1854,21 +1465,10 @@ abilities:
     quality: 2
     description: "炼器师"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "artifact.smelting"
-          requiredLevel: 2
-          scalingWeight: 2
-        - skillId: "artifact.materials"
-          requiredLevel: 3
-          scalingWeight: 2
     combat: null
     effects:
       - effectId: "craft_quality"
         base: 0.12
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         target: "self"
         stackGroup: "craft_quality"
@@ -1878,7 +1478,6 @@ abilities:
         clampMax: 2
       - effectId: "material_efficiency"
         base: 0.08
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "self"
         stackGroup: "material_efficiency"
@@ -1900,21 +1499,10 @@ abilities:
     quality: 2
     description: "炼丹师"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "alchemy.furnace"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "alchemy.herbs"
-          requiredLevel: 3
-          scalingWeight: 1
     combat: null
     effects:
       - effectId: "pill_quality"
         base: 0.12
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         target: "self"
         stackGroup: "pill_quality"
@@ -1924,7 +1512,6 @@ abilities:
         clampMax: 2
       - effectId: "alchemy_success"
         base: 0.1
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "self"
         stackGroup: "alchemy_success"
@@ -1946,21 +1533,10 @@ abilities:
     quality: 2
     description: "阵法师"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "formation.array"
-          requiredLevel: 2
-          scalingWeight: 2
-        - skillId: "formation.runes"
-          requiredLevel: 3
-          scalingWeight: 2
     combat: null
     effects:
       - effectId: "formation_power"
         base: 0.12
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         target: "self"
         stackGroup: "formation_power"
@@ -1970,7 +1546,6 @@ abilities:
         clampMax: 2
       - effectId: "formation_setup_speed"
         base: 0.1
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "self"
         stackGroup: "formation_setup_speed"
@@ -1992,21 +1567,10 @@ abilities:
     quality: 2
     description: "符师"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "talisman.script"
-          requiredLevel: 3
-          scalingWeight: 2
-        - skillId: "talisman.activation"
-          requiredLevel: 3
-          scalingWeight: 2
     combat: null
     effects:
       - effectId: "talisman_quality"
         base: 0.12
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         target: "self"
         stackGroup: "talisman_quality"
@@ -2016,7 +1580,6 @@ abilities:
         clampMax: 2
       - effectId: "talisman_activation_speed"
         base: 0.1
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "self"
         stackGroup: "talisman_activation_speed"
@@ -2038,21 +1601,10 @@ abilities:
     quality: 2
     description: "御兽师"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "world.beast"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "talisman.seal"
-          requiredLevel: 2
-          scalingWeight: 1
     combat: null
     effects:
       - effectId: "beast_growth"
         base: 0.12
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         target: "self"
         stackGroup: "beast_growth"
@@ -2062,7 +1614,6 @@ abilities:
         clampMax: 2
       - effectId: "beast_capacity"
         base: 1
-        knowledgeGrowth: 1
         operation: "add_flat"
         target: "self"
         stackGroup: "beast_capacity"
@@ -2082,21 +1633,10 @@ abilities:
     quality: 3
     description: "堪舆师"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "world.geomancy"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "formation.array"
-          requiredLevel: 3
-          scalingWeight: 1
     combat: null
     effects:
       - effectId: "spirit_vein_detection"
         base: 0.18
-        knowledgeGrowth: 0.06
         operation: "add_percent"
         target: "self"
         stackGroup: "spirit_vein_detection"
@@ -2106,7 +1646,6 @@ abilities:
         clampMax: 2
       - effectId: "rare_find_chance"
         base: 0.08
-        knowledgeGrowth: 0.035
         operation: "add_percent"
         target: "self"
         stackGroup: "rare_find_chance"
@@ -2132,21 +1671,10 @@ abilities:
     quality: 4
     description: "虚空行者"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "world.void_survival"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "body.void_body"
-          requiredLevel: 2
-          scalingWeight: 2
     combat: null
     effects:
       - effectId: "void_survival"
         base: 0.3
-        knowledgeGrowth: 0.08
         operation: "add_percent"
         target: "self"
         stackGroup: "void_survival"
@@ -2156,7 +1684,6 @@ abilities:
         clampMax: 2
       - effectId: "void_travel_speed"
         base: 0.15
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         target: "self"
         stackGroup: "void_travel_speed"
@@ -2182,21 +1709,10 @@ abilities:
     quality: 4
     description: "宗门执掌"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "world.civilization"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "world.trade"
-          requiredLevel: 4
-          scalingWeight: 1
     combat: null
     effects:
       - effectId: "settlement_output"
         base: 0.2
-        knowledgeGrowth: 0.06
         operation: "add_percent"
         target: "self"
         stackGroup: "settlement_output"
@@ -2206,7 +1722,6 @@ abilities:
         clampMax: 2
       - effectId: "governance_efficiency"
         base: 0.15
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         target: "self"
         stackGroup: "governance_efficiency"
@@ -2232,21 +1747,10 @@ abilities:
     quality: 4
     description: "应劫宗师"
     tags: []
-    knowledgeScaling:
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
-      knowledge:
-        - skillId: "heaven.tribulation"
-          requiredLevel: 3
-          scalingWeight: 3
-        - skillId: "heaven.astrology"
-          requiredLevel: 4
-          scalingWeight: 1
     combat: null
     effects:
       - effectId: "tribulation_forecast"
         base: 0.35
-        knowledgeGrowth: 0.08
         operation: "add_percent"
         target: "self"
         stackGroup: "tribulation_forecast"
@@ -2256,7 +1760,6 @@ abilities:
         clampMax: 2
       - effectId: "ascension_success"
         base: 0.1
-        knowledgeGrowth: 0.04
         operation: "add_percent"
         target: "self"
         stackGroup: "ascension_success"
@@ -2285,19 +1788,6 @@ abilities:
       - "sword"
       - "spirit"
       - "ranged"
-    knowledgeScaling:
-      knowledge:
-        - skillId: "foundation.nascent_theory"
-          requiredLevel: 2
-          scalingWeight: 2
-        - skillId: "spirit.split"
-          requiredLevel: 2
-          scalingWeight: 2
-        - skillId: "sword.qi"
-          requiredLevel: 4
-          scalingWeight: 1
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
     combat:
       target: "enemy"
       castTime: 1
@@ -2311,7 +1801,6 @@ abilities:
     effects:
       - effectId: "damage_spirit_sword"
         base: 240
-        knowledgeGrowth: 65
         operation: "add_flat"
         target: "enemy"
         stackGroup: "damage_spirit_sword"
@@ -2319,7 +1808,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "remote_control_range"
         base: 0.18
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         target: "self"
         stackGroup: "remote_control_range"
@@ -2347,16 +1835,6 @@ abilities:
     tags:
       - "talisman"
       - "command"
-    knowledgeScaling:
-      knowledge:
-        - skillId: "talisman.soul_seal"
-          requiredLevel: 2
-          scalingWeight: 3
-        - skillId: "spirit.split"
-          requiredLevel: 2
-          scalingWeight: 1
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
     combat:
       target: "controlled_entity"
       castTime: 0.6
@@ -2370,7 +1848,6 @@ abilities:
     effects:
       - effectId: "controlled_entity_damage"
         base: 0.25
-        knowledgeGrowth: 0.07
         operation: "add_percent"
         target: "controlled_entity"
         stackGroup: "controlled_entity_damage"
@@ -2380,7 +1857,6 @@ abilities:
         clampMax: 2
       - effectId: "command_duration"
         base: 8
-        knowledgeGrowth: 2
         operation: "add_flat"
         target: "controlled_entity"
         stackGroup: "command_duration"
@@ -2407,19 +1883,6 @@ abilities:
       - "sword"
       - "law"
       - "area"
-    knowledgeScaling:
-      knowledge:
-        - skillId: "sword.dao"
-          requiredLevel: 3
-          scalingWeight: 3
-        - skillId: "spell.world"
-          requiredLevel: 2
-          scalingWeight: 1
-        - skillId: "heaven.dao_fruit"
-          requiredLevel: 3
-          scalingWeight: 2
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
     combat:
       target: "area"
       castTime: 3
@@ -2433,7 +1896,6 @@ abilities:
     effects:
       - effectId: "damage_law_area"
         base: 900
-        knowledgeGrowth: 190
         operation: "add_flat"
         target: "area"
         stackGroup: "damage_law_area"
@@ -2441,7 +1903,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "law_pierce"
         base: 0.35
-        knowledgeGrowth: 0.07
         operation: "add_percent"
         target: "area"
         stackGroup: "law_pierce"
@@ -2470,19 +1931,6 @@ abilities:
       - "world"
       - "control"
       - "area"
-    knowledgeScaling:
-      knowledge:
-        - skillId: "spell.world"
-          requiredLevel: 3
-          scalingWeight: 3
-        - skillId: "formation.cave_heaven"
-          requiredLevel: 3
-          scalingWeight: 2
-        - skillId: "heaven.law_mastery"
-          requiredLevel: 2
-          scalingWeight: 1
-      formula: "sum(clamp((effective_level - requiredLevel) / (5 - requiredLevel), 0, 1) * normalized(scalingWeight))"
-      bonusFormula: "scale effect magnitude by knowledgeBonusMax * weightedKnowledgeMastery"
     combat:
       target: "area"
       castTime: 3.5
@@ -2496,7 +1944,6 @@ abilities:
     effects:
       - effectId: "control_duration"
         base: 7
-        knowledgeGrowth: 1.2
         operation: "add_flat"
         target: "area"
         stackGroup: "control_duration"
@@ -2504,7 +1951,6 @@ abilities:
         scalingMode: "positive"
       - effectId: "enemy_all_resistance"
         base: -0.22
-        knowledgeGrowth: 0.05
         operation: "add_percent"
         target: "area"
         stackGroup: "enemy_all_resistance"

@@ -73,16 +73,13 @@ func _run_all() -> void:
 			"TutorialPreviewClickArea",
 			"tutorial highlights alchemy preview area"
 		)
-		_expect_eq(str((nodes.get("home", {}) as Dictionary).get("next", "")), "open_backpack", "tutorial opens backpack before alchemy")
+		_expect_eq(str((nodes.get("home", {}) as Dictionary).get("next", "")), "open_alchemy", "tutorial goes straight to alchemy after home")
+		_expect_false(nodes.has("open_backpack"), "tutorial no longer opens backpack")
+		_expect_false(nodes.has("close_backpack"), "tutorial no longer closes backpack")
 		_expect_eq(
-			str((((nodes.get("open_backpack", {}) as Dictionary).get("commands", []) as Array)[0] as Dictionary).get("target", "")),
-			"BackpackButton",
-			"tutorial highlights backpack"
-		)
-		_expect_eq(
-			str((((nodes.get("close_backpack", {}) as Dictionary).get("commands", []) as Array)[1] as Dictionary).get("event", "")),
-			"tutorial.backpack_closed",
-			"tutorial waits for backpack close"
+			str((((nodes.get("open_alchemy", {}) as Dictionary).get("commands", []) as Array)[0] as Dictionary).get("target", "")),
+			"FurnaceButton",
+			"tutorial highlights furnace after returning home"
 		)
 	)
 	_run("new game starts tutorial while reset and legacy saves stay completed", func() -> void:

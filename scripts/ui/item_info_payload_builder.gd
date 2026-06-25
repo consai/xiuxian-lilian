@@ -208,6 +208,8 @@ static func _format_learning_lines(def: ItemDef) -> Array[String]:
 			lines,
 			CultivationMethodServiceScript.unmet_learning_requirement_lines(method, savedata, major_realm)
 		)
+	if not lines.is_empty():
+		lines.append(StringsZh.getp("item_info.learn_hub_hint", "在洞府底部「研读」使用"))
 	return lines
 
 

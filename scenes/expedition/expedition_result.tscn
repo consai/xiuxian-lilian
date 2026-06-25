@@ -317,12 +317,13 @@ text = "查看历练记录"
 [node name="RulePanel" type="Panel" parent="Dialog" unique_id=407967364]
 layout_mode = 0
 offset_left = 28.0
-offset_top = 536.0
+offset_top = 528.0
 offset_right = 942.0
-offset_bottom = 584.0
+offset_bottom = 592.0
 theme_override_styles/panel = SubResource("PanelInset")
 
 [node name="RuleLabel" type="Label" parent="Dialog/RulePanel" unique_id=545564445]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -331,10 +332,11 @@ offset_left = 12.0
 offset_right = -12.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "巡山收获已存入观中，气血、法力与伤势状态已完成结算。"
+text = "战败只遗失本次部分战利品；回观中点「休息」可恢复气血法力并减轻伤势。丹药、研读、技能入口都在洞府。"
 label_settings = ExtResource("12_body")
 horizontal_alignment = 1
 vertical_alignment = 1
+autowrap_mode = 2
 
 [node name="ReturnButton" type="Button" parent="Dialog" unique_id=1053941849]
 unique_name_in_owner = true

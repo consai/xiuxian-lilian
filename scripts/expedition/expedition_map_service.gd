@@ -166,6 +166,9 @@ static func _available_node_types(location: Dictionary) -> Array:
 		if not event_v is Dictionary:
 			continue
 		var type_id := EnumExpeditionNodeTypeScript.from_event(event_v as Dictionary)
+		# 首领节点仅出现在路线图终点，中途层不纳入可选类型。
+		if type_id == EnumExpeditionNodeTypeScript.ID_BOSS:
+			continue
 		if not out.has(type_id):
 			out.append(type_id)
 	if out.is_empty():
@@ -178,7 +181,9 @@ static func _pick_node_type(available_types: Array, layer: int, rng: RandomNumbe
 	for type_v in available_types:
 		var type_id := str(type_v)
 		var weight := _type_weight(type_id)
-		if layer <= 1 and type_id in [EnumExpeditionNodeTypeScript.ID_ELITE, EnumExpeditionNodeTypeScript.ID_BOSS]:
+		if type_id == EnumExpeditionNodeTypeScript.ID_BOSS:
+			weight = 0
+		elif layer <= 1 and type_id == EnumExpeditionNodeTypeScript.ID_ELITE:
 			weight = 0
 		for _i in weight:
 			weighted.append(type_id)

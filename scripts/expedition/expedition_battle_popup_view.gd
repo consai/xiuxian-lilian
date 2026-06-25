@@ -71,10 +71,7 @@ func apply_event(event: Dictionary, _depth: int = 0) -> void:
 			float(attrs.get(FightAttr.PHYSICAL_DEF, 0.0)),
 			float(attrs.get(FightAttr.MAGIC_DEF, 0.0)),
 		],
-		"速度  %.0f    暴击  %.0f%%" % [
-			float(attrs.get(FightAttr.SPD, 0.0)),
-			float(attrs.get(FightAttr.CRIT, 0.0)),
-		],
+		"速度  %.0f" % float(attrs.get(FightAttr.SPD, 0.0)),
 	])
 	_stats_label.text = "\n".join(stat_lines)
 

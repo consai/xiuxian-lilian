@@ -36,13 +36,6 @@ for (const ability of config.abilities) {
     errors.push(`${ability.id}: 普通技能不得配置知识学习门槛`);
   }
   if (learningKnowledge.length > maxLearningRequirements) errors.push(`${ability.id}: 除境界外学习门槛最多 ${maxLearningRequirements} 个`);
-  if (!ability.knowledgeScaling?.knowledge?.length) errors.push(`${ability.id}: 没有成长知识`);
-  for (const req of ability.knowledgeScaling?.knowledge ?? []) {
-    const source = knowledge.get(req.skillId);
-    if (!source) errors.push(`${ability.id}: 未知知识 ${req.skillId}`);
-    else if (realmOrder.get(source.realm) > realmOrder.get(ability.realm)) errors.push(`${ability.id}: 引用了高于技能境界的知识 ${req.skillId}`);
-    if (req.requiredLevel < 1 || req.requiredLevel >= 5) errors.push(`${ability.id}: 知识门槛必须在 1..4 ${req.skillId}`);
-  }
   for (const gate of learningKnowledge) {
     const source = knowledge.get(gate.skillId);
     if (!source) errors.push(`${ability.id}: 学习门槛引用未知知识 ${gate.skillId}`);
@@ -51,6 +44,7 @@ for (const ability of config.abilities) {
   }
   for (const effect of ability.effects ?? []) {
     if ("masteryGrowth" in effect) errors.push(`${ability.id}: 禁止使用 masteryGrowth ${effect.effectId}`);
+    if ("knowledgeGrowth" in effect) errors.push(`${ability.id}: 禁止使用 knowledgeGrowth ${effect.effectId}`);
     if (!effectIds.has(effect.effectId)) errors.push(`${ability.id}: 效果未登记 ${effect.effectId}`);
     if (!effect.stackGroup || !effect.stackPolicy || !effect.scalingMode) errors.push(`${ability.id}: 效果执行字段不完整 ${effect.effectId}`);
     if (ability.type === "general_passive" && effect.stackPolicy !== "highest") errors.push(`${ability.id}: 通用被动效果必须取最高 ${effect.effectId}`);

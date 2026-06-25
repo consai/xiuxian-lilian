@@ -7,14 +7,11 @@ const HP_MAX := "hp_max"
 const MP_MAX := "mp_max"
 const SHIELD := "shield"
 const SPD := "spd"
-const CRIT := "crit"
-const CRIT_DAMAGE := "crit_damage"
 const PHYSICAL_ATK := "physical_atk"
 const MAGIC_ATK := "magic_atk"
 const PHYSICAL_DEF := "physical_def"
 const MAGIC_DEF := "magic_def"
 const ACCURACY := "accuracy"
-const EVASION := "evasion"
 const CONTROL_POWER := "control_power"
 const CONTROL_RESIST := "control_resist"
 const HP_REGEN := "hp_regen"
@@ -37,8 +34,8 @@ const CORE_KEYS: Array[String] = [
 ]
 
 const ALL_KEYS: Array[String] = [
-	HP_MAX, MP_MAX, SHIELD, SPD, CRIT, CRIT_DAMAGE,
-	PHYSICAL_ATK, MAGIC_ATK, PHYSICAL_DEF, MAGIC_DEF, ACCURACY, EVASION,
+	HP_MAX, MP_MAX, SHIELD, SPD,
+	PHYSICAL_ATK, MAGIC_ATK, PHYSICAL_DEF, MAGIC_DEF, ACCURACY,
 	CONTROL_POWER, CONTROL_RESIST, HP_REGEN, MP_REGEN, CARRY,
 	DAMAGE_BONUS, COMBAT_MP_RESTORE_2S,
 	DAMAGE_TAKEN,
@@ -49,14 +46,11 @@ const TEST_DEFAULTS: Dictionary = {
 	MP_MAX: 100.0,
 	SHIELD: 0.0,
 	SPD: 100.0,
-	CRIT: 100.0,
-	CRIT_DAMAGE: 100.0,
 	PHYSICAL_ATK: 100.0,
 	MAGIC_ATK: 100.0,
 	PHYSICAL_DEF: 100.0,
 	MAGIC_DEF: 100.0,
 	ACCURACY: 100.0,
-	EVASION: 100.0,
 	CONTROL_POWER: 100.0,
 	CONTROL_RESIST: 100.0,
 	HP_REGEN: 0.0,
@@ -163,15 +157,10 @@ static func build_combatant_row(
 	return row
 
 
-static func roll_crit(crit_rate_percent: float) -> bool:
-	var rate := clampf(crit_rate_percent / 100.0, 0.0, 1.0)
-	return randf() < rate
-
-
-static func hit_chance(attacker: Dictionary, defender: Dictionary, bonus: float = 0.0) -> float:
+## 命中概率：仅由攻击方命中评分决定，已移除闪避对抗项。
+static func hit_chance(attacker: Dictionary, _defender: Dictionary, bonus: float = 0.0) -> float:
 	var accuracy := maxf(0.0, get_attr(attacker, ACCURACY, 100.0))
-	var evasion := maxf(0.0, get_attr(defender, EVASION, 100.0))
-	var chance := 0.85 + (accuracy - evasion) / (accuracy + evasion + HIT_CONSTANT) + bonus
+	var chance := 0.85 + accuracy / (accuracy + HIT_CONSTANT) + bonus
 	return clampf(chance, 0.35, 0.98)
 
 
@@ -192,12 +181,6 @@ static func control_chance(
 
 static func roll_control(attacker: Dictionary, defender: Dictionary, base_chance: float) -> bool:
 	return randf() < control_chance(attacker, defender, base_chance)
-
-
-static func apply_crit_multiplier(damage: float, crit_damage_percent: float, is_crit: bool) -> float:
-	if not is_crit:
-		return damage
-	return damage * maxf(1.0, crit_damage_percent / 100.0)
 
 
 static func damage_after_defense(raw_damage: float, defense: float) -> float:
@@ -222,14 +205,12 @@ static func defense_for(attrs: Dictionary, damage_type: String) -> float:
 	return get_attr(attrs, PHYSICAL_DEF)
 
 
-## 普攻使用物理攻防与软减伤，可暴击。
+## 普攻使用物理攻防与软减伤。
 static func calc_basic_damage(attacker: Dictionary, defender: Dictionary) -> Dictionary:
 	var raw := attack_for(attacker, DAMAGE_PHYSICAL)
 	var dmg := damage_after_defense(raw, defense_for(defender, DAMAGE_PHYSICAL))
 	dmg *= 1.0 + maxf(0.0, get_attr(attacker, DAMAGE_BONUS, 0.0))
-	var crit := roll_crit(get_attr(attacker, CRIT))
-	dmg = apply_crit_multiplier(dmg, get_attr(attacker, CRIT_DAMAGE), crit)
-	return {"damage": dmg, "is_crit": crit, "damage_type": DAMAGE_PHYSICAL}
+	return {"damage": dmg, "damage_type": DAMAGE_PHYSICAL}
 
 
 ## 技能伤害段： [code]max(1, atk * power_scale + flat - def)[/code]。
@@ -249,12 +230,10 @@ static func calc_skill_damage(
 		dmg = damage_after_defense(raw, effective_defense)
 	dmg *= 1.0 + maxf(0.0, get_attr(attacker, DAMAGE_BONUS, 0.0))
 	dmg *= 1.0 + maxf(-0.75, get_attr(defender, DAMAGE_TAKEN, 0.0))
-	var crit := roll_crit(get_attr(attacker, CRIT))
-	dmg = apply_crit_multiplier(dmg, get_attr(attacker, CRIT_DAMAGE), crit)
-	return {"damage": dmg, "is_crit": crit, "damage_type": resolved_type}
+	return {"damage": dmg, "damage_type": resolved_type}
 
 
-## 意图预览：按非暴击期望伤害估算，避免随机波动。
+## 意图预览：按期望伤害估算，避免随机波动。
 static func estimate_basic_damage(attacker: Dictionary, defender: Dictionary) -> float:
 	var raw := attack_for(attacker, DAMAGE_PHYSICAL)
 	var dmg := damage_after_defense(raw, defense_for(defender, DAMAGE_PHYSICAL))

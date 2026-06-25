@@ -9,6 +9,7 @@ const _ICON_ROW_EXTRA := 34.0
 
 @onready var _icon: TextureRect = %Icon
 @onready var _title: Label = %Title
+@onready var _header: HBoxContainer = %Header
 @onready var _body: Label = %Body
 @onready var _footer: Label = %Footer
 @onready var _panel: PanelContainer = %Panel
@@ -39,6 +40,7 @@ func apply_payload(payload: Dictionary) -> void:
 	else:
 		_icon.texture = null
 		_icon.visible = false
+	_header.visible = _title.visible or _icon.visible
 
 	var body_lines: PackedStringArray = []
 	var lines_v: Variant = payload.get("lines", [])
@@ -54,6 +56,9 @@ func apply_payload(payload: Dictionary) -> void:
 	_footer.text = footer
 	_footer.visible = footer != ""
 
+	# 先撑到最大宽，等一帧后 Label autowrap 才能给出准确最小尺寸
+	_apply_panel_width(_MAX_WIDTH)
+
 
 func show_at_anchor(anchor: Control, show_token: int, token_check: Callable) -> void:
 	if anchor == null or not is_instance_valid(anchor):
@@ -63,21 +68,23 @@ func show_at_anchor(anchor: Control, show_token: int, token_check: Callable) -> 
 	visible = false
 	modulate.a = 0.0
 
-	_apply_panel_width(_MAX_WIDTH)
+	# 内容已在 apply_payload 设完，延迟一帧再量宽并刷新背景框
 	await get_tree().process_frame
 	if not _can_present(anchor, show_token, generation, token_check):
 		return
 
-	var panel_width := _compute_panel_width()
-	_apply_panel_width(panel_width)
+	_refresh_background_size()
+	# 收窄宽度后 Label 会二次换行撑高，再等一帧取最终尺寸
 	await get_tree().process_frame
 	if not _can_present(anchor, show_token, generation, token_check):
 		return
 
-	_finalize_layout()
+	_refresh_background_size()
 	_place_near_pointer(anchor)
 	visible = true
 	modulate.a = 1.0
+	# 展示后按最终尺寸再校正一次坐标，避免长文本挡住鼠标
+	_place_near_pointer(anchor)
 
 
 func hide_immediate() -> void:
@@ -87,7 +94,7 @@ func hide_immediate() -> void:
 
 
 func _can_present(
-		anchor: Control,
+		_anchor: Control,
 		show_token: int,
 		generation: int,
 		token_check: Callable
@@ -143,7 +150,10 @@ func _compute_panel_width() -> float:
 	return width
 
 
-func _finalize_layout() -> void:
+## 根据 Label 实测尺寸收敛面板宽度，并同步根节点与 Panel 背景框大小
+func _refresh_background_size() -> void:
+	var panel_width := _compute_panel_width()
+	_apply_panel_width(panel_width)
 	_panel.reset_size()
 	var panel_size := _panel.get_combined_minimum_size()
 	if panel_size.x <= 1.0 or panel_size.y <= 1.0:
@@ -199,6 +209,7 @@ func _place_near_pointer(anchor: Control) -> void:
 		viewport_rect.position.y + MARGIN,
 		viewport_rect.position.y + viewport_rect.size.y - panel_size.y - MARGIN
 	)
+	pos = _avoid_cursor_overlap(pos, panel_size, mouse, viewport_rect, CURSOR_GAP, MARGIN)
 	global_position = pos
 
 
@@ -228,5 +239,40 @@ func _avoid_anchor_overlap(
 		pos.y = above_anchor_y
 	else:
 		pos.y = below_anchor_y
+
+	return pos
+
+
+## 面板仍盖住鼠标时偏移，避免长文本 tooltip 挡住指针
+func _avoid_cursor_overlap(
+	pos: Vector2,
+	panel_size: Vector2,
+	mouse: Vector2,
+	viewport_rect: Rect2,
+	gap: float,
+	margin: float
+) -> Vector2:
+	var tip_rect := Rect2(pos, panel_size)
+	if not tip_rect.has_point(mouse):
+		return pos
+
+	var above_y := mouse.y - gap - panel_size.y
+	if above_y >= viewport_rect.position.y + margin:
+		pos.y = above_y
+	else:
+		pos.y = mouse.y + gap
+
+	tip_rect = Rect2(pos, panel_size)
+	if not tip_rect.has_point(mouse):
+		return pos
+
+	var right_x := mouse.x + gap
+	if right_x + panel_size.x <= viewport_rect.end.x - margin:
+		pos.x = right_x
+		return pos
+
+	var left_x := mouse.x - gap - panel_size.x
+	if left_x >= viewport_rect.position.x + margin:
+		pos.x = left_x
 
 	return pos

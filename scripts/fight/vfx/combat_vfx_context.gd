@@ -6,7 +6,6 @@ extends RefCounted
 var host: Node
 var source_id: String = ""
 var target_id: String = ""
-var is_crit: bool = false
 var settings: CombatVfxSettings
 var overrides: Dictionary = {}
 var actors: Dictionary = {} # unit_id -> CombatActorVfx
@@ -107,8 +106,6 @@ func resolve_anchor(actor_vfx: CombatActorVfx, anchor_name: String) -> Variant:
 				squash = Vector2(squash.y, squash.x)
 			return actor_vfx.get_rest_scale() * squash
 		"hit_flash":
-			if is_crit:
-				return settings.hit_crit_flash_color
 			return settings.hit_flash_color
 		_:
 			push_warning("CombatVfxContext: 未知 anchor '%s'" % anchor_name)

@@ -157,7 +157,6 @@ func play_event(event: BattleVfxEvent) -> void:
 		"目标": BattleDebugLog.side_label(event.target_id),
 		"类型": BattleDebugLog.skill_type_label(event.skill_type),
 		"伤害": event.damage_value,
-		"暴击": event.is_crit,
 	})
 	event_started.emit(event)
 	await _play_sequence_event(event)
@@ -263,7 +262,6 @@ func _build_context(event: BattleVfxEvent) -> CombatVfxContext:
 	ctx.host = self
 	ctx.source_id = event.source_id
 	ctx.target_id = event.target_id
-	ctx.is_crit = event.is_crit
 	if settings == null:
 		settings = CombatVfxSettings.new()
 	ctx.settings = settings
@@ -357,14 +355,12 @@ func demo_play_sample_queue() -> void:
 		"source_id": "player",
 		"target_id": "enemy",
 		"damage_value": 42,
-		"is_crit": false,
 		"extra": {"vfx": {"preset": "melee_default"}},
 	})
 	enqueue_dict({
 		"source_id": "player",
 		"target_id": "enemy",
 		"damage_value": 88,
-		"is_crit": true,
 		"extra": {"vfx": {"preset": "ranged_default"}},
 	})
 	play_queue()

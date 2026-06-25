@@ -6,8 +6,6 @@ const PopupScene := preload("res://scenes/ui/item_info_popup.tscn")
 const BuilderScript := preload("res://scripts/ui/item_info_payload_builder.gd")
 const TipIntentScript := preload("res://scripts/ui/tips/core/tip_intent.gd")
 
-const TUTORIAL_ALCHEMY_NOTES_ITEM_ID := "items_AlchemyNotes_JuQi"
-
 var _popup: ItemInfoPopupView
 var _current_payload: Dictionary = {}
 
@@ -40,14 +38,9 @@ func show_payload(payload: Dictionary) -> void:
 	_current_payload = payload.duplicate(true)
 	_popup.apply_payload(_current_payload)
 	_popup.visible = true
-	var item_id := str(_current_payload.get("item_id", "")).strip_edges()
-	if item_id == TUTORIAL_ALCHEMY_NOTES_ITEM_ID:
-		TutorialService.game_event("tutorial.alchemy_notes_item_opened")
 
 
 func hide_popup() -> void:
-	if _is_tutorial_notes_use_pending():
-		return
 	_current_payload = {}
 	if _popup != null:
 		_popup.visible = false
@@ -64,8 +57,6 @@ func _on_use_requested() -> void:
 		var message := str(result.get("message", "")).strip_edges()
 		if message != "":
 			_emit_use_success_tip(message)
-		if item_id == TUTORIAL_ALCHEMY_NOTES_ITEM_ID:
-			TutorialService.game_event("tutorial.alchemy_notes_used")
 		hide_popup()
 		return
 	var error_text := str(result.get("error", "无法使用该物品")).strip_edges()
@@ -96,13 +87,6 @@ func _emit_use_tip(text: String, tone: String) -> void:
 
 func is_open() -> bool:
 	return _popup != null and _popup.visible
-
-
-func _is_tutorial_notes_use_pending() -> bool:
-	return (
-		str(_current_payload.get("item_id", "")).strip_edges() == TUTORIAL_ALCHEMY_NOTES_ITEM_ID
-		and TutorialService.is_waiting_for_any(["tutorial.alchemy_notes_used"])
-	)
 
 
 func _input(event: InputEvent) -> void:

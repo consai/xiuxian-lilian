@@ -139,7 +139,7 @@ func _refresh_filter_buttons() -> void:
 		button.theme_type_variation = "TabActive" if str(pair[1]) == _skill_filter else "TabIdle"
 
 
-func _skill_meta(ability: Dictionary, runtime: Dictionary, ability_id: String) -> String:
+func _skill_meta(ability: Dictionary, _runtime: Dictionary, _ability_id: String) -> String:
 	var parts: PackedStringArray = []
 	var realm := str(ability.get("realm", "")).strip_edges()
 	if realm != "":
@@ -158,19 +158,15 @@ func _skill_meta(ability: Dictionary, runtime: Dictionary, ability_id: String) -
 		var cooldown := float(combat.get("cooldown", 0.0))
 		if cooldown > 0.0:
 			parts.append("冷却 %ss" % _fmt_num(cooldown))
-	var mastery := AbilityServiceScript.knowledge_mastery_ratio(ability_id, GameState.to_dict())
-	if mastery > 0.0:
-		parts.append("知识 %.0f%%" % (mastery * 100.0))
 	if parts.is_empty():
 		parts.append("学习后生效")
 	return "    ".join(parts)
 
 
-func _skill_brief_effect(ability: Dictionary, runtime: Dictionary, ability_id: String) -> String:
-	var mastery := AbilityServiceScript.knowledge_mastery_ratio(ability_id, GameState.to_dict())
+func _skill_brief_effect(ability: Dictionary, runtime: Dictionary, _ability_id: String) -> String:
 	var lines := HoverTipEffectFormatter.format_lines(runtime.get("effects", []))
 	if lines.is_empty():
-		lines = HoverTipEffectFormatter.format_raw_ability_lines(ability.get("effects", []), mastery)
+		lines = HoverTipEffectFormatter.format_raw_ability_lines(ability.get("effects", []))
 	if not lines.is_empty():
 		return str(lines[0])
 	var desc := str(ability.get("description", "")).strip_edges()

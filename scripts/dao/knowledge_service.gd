@@ -232,8 +232,11 @@ static func related_abilities(skill_id: String) -> Array:
 	var out: Array = []
 	for ability_v in AbilityServiceScript.all_abilities():
 		var ability := ability_v as Dictionary
-		for row_v in (ability.get("knowledgeScaling", {}) as Dictionary).get("knowledge", []) as Array:
-			if row_v is Dictionary and str((row_v as Dictionary).get("skillId", "")) == skill_id:
+		for row_v in (ability.get("learningRequirements", {}) as Dictionary).get("knowledge", []) as Array:
+			if not row_v is Dictionary:
+				continue
+			var sid := str((row_v as Dictionary).get("skillId", (row_v as Dictionary).get("id", "")))
+			if sid == skill_id:
 				out.append(ability.duplicate(true))
 				break
 	return out

@@ -74,6 +74,7 @@ func _render() -> void:
 	_render_loot_items()
 	_render_lost_loot_items()
 	_render_outcome_summary(reason)
+	_render_rule_hint(reason)
 
 
 func _kept_loot_rows() -> Array:
@@ -182,10 +183,15 @@ func _render_outcome_summary(reason: String) -> void:
 	if reason == "defeated":
 		var lost := _loot_lost_rows()
 		if not lost.is_empty():
-			lines.append("战败途中遗失部分战利品。")
-		lines.append("伤势加重，需回观中静养。")
+			lines.append("战败途中遗失部分战利品，其余收获已保留。")
+		else:
+			lines.append("本次无额外战利品遗失。")
+		lines.append("伤势加重：回观中「休息」可减轻伤势（每次约减 2 日）。")
+		lines.append("先休息，再去「研读」典籍或配置「技能」；缺丹药去「炼丹」。")
 	elif reason == "fled":
-		lines.append("战中遁走，略感气息紊乱，需短暂调息。")
+		lines.append("战中遁走，略感气息紊乱；回观中「休息」可快速调息。")
+	elif reason == "manual":
+		lines.append("平安返程，所得已清点入库。")
 	if int(_result.get("instability_reduced", 0)) > 0:
 		lines.append("战斗压实境界：虚浮 -%d，当前 %d。" % [
 			int(_result.get("instability_reduced", 0)),
@@ -195,6 +201,23 @@ func _render_outcome_summary(reason: String) -> void:
 		message.text = "此行山高路远，所得皆已带回观中。"
 	else:
 		message.text = "\n".join(lines)
+
+
+## PM-401：按返程原因展示下一步恢复指引（战败 / 遁走 / 主动返程文案不同）。
+func _render_rule_hint(reason: String) -> void:
+	var rule := %RuleLabel as Label
+	if rule == null:
+		return
+	match reason:
+		"defeated":
+			rule.text = (
+				"战败只遗失本次部分战利品；回观中点「休息」恢复气血法力并减轻伤势。"
+				+ "缺丹药去「炼丹」，典籍在底部「研读」，战术调整点「技能」。"
+			)
+		"fled":
+			rule.text = "战中遁走代价较轻；回观中「休息」调息后再出发，必要时「炼丹」补给。"
+		_:
+			rule.text = "平安返程：所得已入库。可在洞府「炼丹」「研读」或配置「技能」后再出门。"
 
 
 func _event_log_entries() -> Array:

@@ -295,8 +295,6 @@ func _bind_entry(view: ItemView, entry: Dictionary, index: int) -> void:
 func _entry_node_name(entry: Dictionary) -> String:
 	var kind := str(entry.get("kind", EnumRewardKind.LABEL_ITEM))
 	var id_text := str(entry.get("id", "")).strip_edges()
-	if kind == EnumRewardKind.LABEL_ITEM and id_text == "items_AlchemyNotes_JuQi":
-		return "TutorialAlchemyNotesItem"
 	if kind == EnumRewardKind.LABEL_ITEM and id_text != "":
 		return "BagItem_%s" % id_text
 	if kind == EnumRewardKind.LABEL_EQUIP and id_text != "":

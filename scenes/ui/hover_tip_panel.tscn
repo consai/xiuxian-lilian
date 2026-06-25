@@ -30,11 +30,13 @@ layout_mode = 2
 theme_override_constants/separation = 4
 
 [node name="Header" type="HBoxContainer" parent="Panel/Margin/VBox"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="Icon" type="TextureRect" parent="Panel/Margin/VBox/Header"]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
 mouse_filter = 2
@@ -43,23 +45,24 @@ stretch_mode = 5
 
 [node name="Title" type="Label" parent="Panel/Margin/VBox/Header"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
-text = "技能名称"
 label_settings = ExtResource("3_title")
 vertical_alignment = 1
 
 [node name="Body" type="Label" parent="Panel/Margin/VBox"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.4117647, 0.3019608, 0.27450982, 1)
-text = "描述行"
 label_settings = ExtResource("4_body")
 autowrap_mode = 3
 
 [node name="Footer" type="Label" parent="Panel/Margin/VBox"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.5372549, 0.42745098, 0.3882353, 1)

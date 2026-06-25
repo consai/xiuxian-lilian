@@ -46,8 +46,6 @@ hover:
       atk: "攻击"
       def: "防御"
       spd: "速度"
-      crit: "暴击"
-      crit_damage: "暴击伤害"
 item_info:
   type: "类型：{value}"
   type_equip: "法宝"
@@ -68,11 +66,15 @@ item_info:
   use_fight_prefix: "战斗使用：{value}"
   fight_mp_cost: "战斗消耗：法力 {value}"
   fight_cd: "战斗冷却：{value} 秒"
+  learn_ability: "研读习得：技能 {value}"
+  learn_method: "研读习得：功法 {value}"
+  learn_req_header: "学习条件："
+  learn_hub_hint: "在洞府底部「研读」使用"
+  use_study: "研读"
 combat:
   float:
     basic_attack: "普攻"
     damage: "-{value}"
-    crit: "-{value}！"
     heal: "+{value}"
     mp_cost: "-{value} MP"
     mp_gain: "+{value} MP"

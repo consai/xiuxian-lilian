@@ -280,7 +280,7 @@ func _is_tutorial_alchemy_forced() -> bool:
 	var flags := (DataStore.savedata.get("tutorial", {}) as Dictionary).get("flags", {}) as Dictionary
 	return (
 		not bool(flags.get("tutorial.alchemy_completed", false))
-		and (bool(flags.get("tutorial.alchemy_opened", false)) or bool(flags.get("tutorial.alchemy_notes_used", false)))
+		and bool(flags.get("tutorial.alchemy_opened", false))
 	)
 
 

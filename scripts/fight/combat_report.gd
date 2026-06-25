@@ -5,7 +5,6 @@ const KEY_DAMAGE := "damage"
 const KEY_RAW_DAMAGE := "raw_damage"
 const KEY_HP_DAMAGE := "hp_damage"
 const KEY_SHIELD_ABSORBED := "shield_absorbed"
-const KEY_IS_CRIT := "is_crit"
 const KEY_HEAL := "heal"
 const KEY_MP_GAIN := "mp_gain"
 const KEY_BUFF_NAMES := "buff_names"
@@ -19,7 +18,6 @@ static func empty_fx_report() -> Dictionary:
 		KEY_DAMAGE: 0.0,
 		KEY_RAW_DAMAGE: 0.0,
 		KEY_HP_DAMAGE: 0.0,
-		KEY_IS_CRIT: false,
 		KEY_HEAL: 0.0,
 		KEY_MP_GAIN: 0.0,
 		KEY_SHIELD_ABSORBED: 0.0,
@@ -36,7 +34,6 @@ static func normalize_report(raw: Dictionary) -> Dictionary:
 	out[KEY_RAW_DAMAGE] = float(raw.get(KEY_RAW_DAMAGE, out[KEY_DAMAGE]))
 	out[KEY_HP_DAMAGE] = float(raw.get(KEY_HP_DAMAGE, maxf(0.0, out[KEY_RAW_DAMAGE] - float(raw.get(KEY_SHIELD_ABSORBED, 0.0))))
 	)
-	out[KEY_IS_CRIT] = bool(raw.get(KEY_IS_CRIT, false))
 	out[KEY_HEAL] = float(raw.get(KEY_HEAL, 0.0))
 	out[KEY_MP_GAIN] = float(raw.get(KEY_MP_GAIN, 0.0))
 	out[KEY_SHIELD_ABSORBED] = float(raw.get(KEY_SHIELD_ABSORBED, 0.0))

@@ -14,15 +14,12 @@ const DEFAULT_ATTRIBUTE_FORMULA := {
 	FightAttr.MAGIC_DEF: {"base": 0.0, "scale": {"spirit": 1.2, "sense": 1.2}},
 	FightAttr.SPD: {"base": 50.0, "scale": {"sense": 3.0, "body": 2.0}},
 	FightAttr.ACCURACY: {"base": 50.0, "scale": {"sense": 3.0, "agility": 1.0}},
-	FightAttr.EVASION: {"base": 50.0, "scale": {"agility": 3.0, "sense": 1.0}},
 	FightAttr.CONTROL_POWER: {"base": 0.0, "scale": {"sense": 3.0, "spirit": 1.0}},
 	FightAttr.CONTROL_RESIST: {"base": 0.0, "scale": {"sense": 2.0, "body": 1.0}},
 	FightAttr.HP_REGEN: {"base": 0.5, "scale": {"body": 0.05}},
 	FightAttr.MP_REGEN: {"base": 0.5, "scale": {"spirit": 0.04, "sense": 0.01}},
 	FightAttr.CARRY: {"base": 20.0, "scale": {"body": 2.0}},
 	FightAttr.SHIELD: {"base": 0.0, "scale": {}},
-	FightAttr.CRIT: {"base": 10.0, "scale": {}},
-	FightAttr.CRIT_DAMAGE: {"base": 150.0, "scale": {}},
 }
 
 const DEFAULT_REALM_FLAT_PER_LAYER := {

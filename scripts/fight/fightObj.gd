@@ -7,8 +7,6 @@ const ATTR_HP_MAX := FightAttr.HP_MAX
 const ATTR_MP_MAX := FightAttr.MP_MAX
 const ATTR_SHIELD := FightAttr.SHIELD
 const ATTR_SPD := FightAttr.SPD
-const ATTR_CRIT := FightAttr.CRIT
-const ATTR_CRIT_DAMAGE := FightAttr.CRIT_DAMAGE
 const ATTR_PHYSICAL_ATK := FightAttr.PHYSICAL_ATK
 const ATTR_MAGIC_ATK := FightAttr.MAGIC_ATK
 const ATTR_PHYSICAL_DEF := FightAttr.PHYSICAL_DEF
@@ -415,10 +413,6 @@ func _apply_buff_tick_effects(tick_effects: Array, stacks: int, buff_id: String 
 				change_mp(scaled)
 
 
-func is_crit(crit: float) -> bool:
-	return FightAttr.roll_crit(crit)
-
-
 ## 普攻数据结算（无前后摇）。
 static func resolve_basic_attack(attacker: FightObj, defender: FightObj) -> Dictionary:
 	if not FightAttr.roll_hit(attacker.attrs, defender.attrs):
@@ -695,28 +689,7 @@ static func merged_slot_runtime_cfg(slot: Dictionary, base_cfg: Dictionary) -> D
 		cfg["power"] = float(cfg.get("power", 1000.0)) * float(slot.get("power_scale", 1.0))
 	elif slot.has("power"):
 		cfg["power"] = slot["power"]
-	var effect_scale := float(slot.get("effect_value_scale", slot.get("damage_scale", 1.0)))
-	if not is_equal_approx(effect_scale, 1.0):
-		cfg["effects"] = _scaled_runtime_effects(
-			cfg.get("effects", cfg.get("fight_effect", [])),
-			effect_scale
-		)
 	return cfg
-
-
-static func _scaled_runtime_effects(raw: Variant, scale: float) -> Array:
-	var out: Array = []
-	if not raw is Array:
-		return out
-	for eff_v in raw as Array:
-		if not eff_v is Dictionary:
-			continue
-		var eff := (eff_v as Dictionary).duplicate(true)
-		var effect_type := str(eff.get("type", "")).strip_edges().to_lower()
-		if effect_type in ["damage", "heal", "shield", "restore_mp"] and eff.has("value"):
-			eff["value"] = float(eff.get("value", 0.0)) * scale
-		out.append(eff)
-	return out
 
 
 func can_pay_costs(cfg: Dictionary) -> bool:
@@ -781,7 +754,6 @@ static func _merge_use_success(fx_report: Dictionary) -> Dictionary:
 		CombatReportScript.KEY_DAMAGE: float(normalized.get(CombatReportScript.KEY_DAMAGE, 0.0)),
 		CombatReportScript.KEY_RAW_DAMAGE: float(normalized.get(CombatReportScript.KEY_RAW_DAMAGE, 0.0)),
 		CombatReportScript.KEY_HP_DAMAGE: float(normalized.get(CombatReportScript.KEY_HP_DAMAGE, 0.0)),
-		CombatReportScript.KEY_IS_CRIT: bool(fx_report.get(CombatReportScript.KEY_IS_CRIT, false)),
 		CombatReportScript.KEY_HEAL: float(normalized.get(CombatReportScript.KEY_HEAL, 0.0)),
 		CombatReportScript.KEY_MP_GAIN: float(normalized.get(CombatReportScript.KEY_MP_GAIN, 0.0)),
 		CombatReportScript.KEY_SHIELD_ABSORBED: float(normalized.get(CombatReportScript.KEY_SHIELD_ABSORBED, 0.0)),
@@ -840,8 +812,6 @@ func _apply_effects_with_routing(cfg: Dictionary, default_target: FightObj = nul
 					float(eff.get("armor_pierce", 0.0))
 				)
 				var dmg := float(hit.get("damage", 0.0))
-				if bool(hit.get("is_crit", false)):
-					report[CombatReportScript.KEY_IS_CRIT] = true
 				var absorbed := target.be_attacked(dmg)
 				report[CombatReportScript.KEY_SHIELD_ABSORBED] = float(
 					report[CombatReportScript.KEY_SHIELD_ABSORBED]

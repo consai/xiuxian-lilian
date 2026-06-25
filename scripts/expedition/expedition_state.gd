@@ -1017,13 +1017,13 @@ func map_snapshot() -> Dictionary:
 	}
 
 
-## 身法越高，战中逃跑额外成功率略增（ponytail: 待 escape_success 养成接入后替换）。
+## 出手速度越高，战中逃跑额外成功率略增（ponytail: 待 escape_success 养成接入后替换）。
 func _escape_bonus_from_player(player: Dictionary) -> float:
 	var attrs_v: Variant = player.get("attrs", {})
 	if not attrs_v is Dictionary:
 		return 0.0
-	var evasion := FightAttr.get_attr(attrs_v as Dictionary, FightAttr.EVASION, 100.0)
-	return clampf(evasion / 2500.0, 0.0, 0.12)
+	var spd := FightAttr.get_attr(attrs_v as Dictionary, FightAttr.SPD, 100.0)
+	return clampf(spd / 2500.0, 0.0, 0.12)
 
 
 func _complete_current_node() -> void:

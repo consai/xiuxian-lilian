@@ -187,8 +187,6 @@ func _op_impact(ctx: CombatVfxContext) -> void:
 		target_vfx.stop_idle()
 		target_vfx.kill_hit_tween()
 		await _run_steps(ctx, hit_steps)
-	if ctx.is_crit:
-		await _op_screen_shake(ctx)
 
 
 func _op_projectile(ctx: CombatVfxContext, step: Dictionary) -> void:

@@ -2,7 +2,7 @@ buffs:
   ability_evasion_window:
     name: "流风护身"
     icon: "ui_new/skill_03.png"
-    desc: "身形随风而动，短时间提高闪避。"
+    desc: "身形随风而动，短时间提高出手速度。"
     duration: 0
     max_stacks: 1
     ticktime: 1

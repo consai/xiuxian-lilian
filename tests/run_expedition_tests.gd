@@ -38,7 +38,7 @@ func _run_all() -> void:
 	_run("non battle events advance expedition", _test_non_battle_events_advance)
 	_run("manual exit keeps all loot", _test_manual_exit_keeps_all_loot)
 	_run("defeat exit drops session loot and injury", _test_defeat_exit_drops_session_loot_and_injury)
-	_run("defeat loot drops fixed thirty percent", _test_defeat_loot_drops_fixed_thirty_percent)
+	_run("defeat loot drops fixed twenty percent", _test_defeat_loot_drops_fixed_twenty_percent)
 	_run("elapsed days track expedition days", _test_elapsed_days_track_expedition_days)
 	_run("quiet days advance time without logs", _test_quiet_days_advance_without_logs)
 	_run("battle node builds unchanged battle init", _test_battle_node_builds_unchanged_battle_init)
@@ -147,6 +147,14 @@ func _test_expedition_map_is_longer_and_ends_with_boss() -> void:
 	var exit_node := ExpeditionMapServiceScript.node_by_id(map_data.get("nodes", []) as Array, "exit")
 	_expect_eq(str(exit_node.get("type", "")), "boss", "exit node is always boss")
 	_expect_true(int(exit_node.get("layer", 0)) >= 9, "route has at least eight middle layers before boss")
+	for node_v in map_data.get("nodes", []) as Array:
+		var node := node_v as Dictionary
+		if str(node.get("id", "")) == "exit":
+			continue
+		_expect_true(
+			str(node.get("type", "")) != "boss",
+			"middle route node %s is not boss" % str(node.get("id", ""))
+		)
 
 
 func _test_expedition_map_has_three_lanes_and_limited_crosses() -> void:
@@ -408,11 +416,17 @@ func _test_group_battles_keep_full_monster_attrs() -> void:
 	)
 	var enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
 	_expect_eq(enemies.size(), 4, "difficulty six common battle forms a larger group")
+	var single_event := event.duplicate(true)
+	single_event["enemy_count"] = 1
+	var single_enemy := ExpeditionEventServiceScript.build_battle_enemies(single_event)[0] as Dictionary
+	var single_attrs := single_enemy.get("attrs", {}) as Dictionary
+	var single_atk := float(single_attrs.get(FightAttr.PHYSICAL_ATK, 0.0))
+	var single_hp := float(single_enemy.get("hp", 0.0))
 	for enemy_v in enemies:
 		var enemy := enemy_v as Dictionary
-		_expect_true(float(enemy.get("hp", 0.0)) >= 75.0, "group enemy keeps full hp")
+		_expect_near(float(enemy.get("hp", 0.0)), single_hp, "group count does not reduce per-enemy hp")
 		var attrs := enemy.get("attrs", {}) as Dictionary
-		_expect_true(float(attrs.get("physical_atk", 0.0)) >= 21.0, "group enemy keeps full attack")
+		_expect_near(float(attrs.get(FightAttr.PHYSICAL_ATK, 0.0)), single_atk, "group count does not reduce per-enemy atk")
 		var slots := enemy.get("skills", []) as Array
 		var found_active_skill := false
 		for slot_v in slots:
@@ -588,18 +602,18 @@ func _test_defeat_exit_drops_session_loot_and_injury() -> void:
 	var loot_total := 0
 	for r in loot_arr:
 		loot_total += int((r as Dictionary).get("count", 0))
-	_expect_eq(loot_total, 3, "defeat keeps seventy percent of rounded session loot")
+	_expect_eq(loot_total, 4, "defeat keeps eighty percent of rounded session loot")
 	var lost_total := 0
 	for r in finish.get("loot_lost", []) as Array:
 		lost_total += int((r as Dictionary).get("count", 0))
-	_expect_eq(lost_total, 2, "defeat drops thirty percent of rounded session loot")
+	_expect_eq(lost_total, 1, "defeat drops twenty percent of rounded session loot")
 	game.settle_expedition(finish)
 	_expect_eq(_inventory_total(game.inventory), inv_before + loot_total, "kept session loot merged on settle")
-	_expect_near(game.hp, FightAttr.get_attr(game.attrs, FightAttr.HP_MAX) * 0.25, "defeat hp floor")
-	_expect_eq(game.injury_days, 3, "defeat injury applied after elapsed reduction")
+	_expect_near(game.hp, FightAttr.get_attr(game.attrs, FightAttr.HP_MAX) * 0.4, "defeat hp floor")
+	_expect_eq(game.injury_days, 2, "defeat injury applied after elapsed reduction")
 
 
-func _test_defeat_loot_drops_fixed_thirty_percent() -> void:
+func _test_defeat_loot_drops_fixed_twenty_percent() -> void:
 	var loot_a: Array = [
 		{"kind": "item", "id": "items_LingCao", "count": 6},
 		{"kind": "item", "id": "items_HuiQiDan", "count": 4},
@@ -608,15 +622,15 @@ func _test_defeat_loot_drops_fixed_thirty_percent() -> void:
 	_expect_eq(
 		loss_a.get("lost", []),
 		[
-			{"kind": "item", "id": "items_LingCao", "count": 2, "source": "session_loot"},
+			{"kind": "item", "id": "items_LingCao", "count": 1, "source": "session_loot"},
 			{"kind": "item", "id": "items_HuiQiDan", "count": 1, "source": "session_loot"},
 		],
-		"defeat drops fixed thirty percent across loot stacks"
+		"defeat drops fixed twenty percent across loot stacks"
 	)
 	var remaining := 0
 	for r in loot_a:
 		remaining += int((r as Dictionary).get("count", 0))
-	_expect_eq(remaining, 7, "session loot keeps seventy percent")
+	_expect_eq(remaining, 8, "session loot keeps eighty percent")
 
 
 func _test_elapsed_days_track_expedition_days() -> void:

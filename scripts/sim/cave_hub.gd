@@ -63,12 +63,7 @@ func _resolve_message(message: String) -> String:
 	if message != "":
 		return message
 	if not GameState.last_expedition_summary.is_empty():
-		var summary := GameState.last_expedition_summary
-		var stats := summary.get("stats", {}) as Dictionary
-		return "上次历练：最高难度 %d，耗时 %s" % [
-			maxi(int(stats.get("max_difficulty", 0)), int(stats.get("max_depth", 0))),
-			str(summary.get("duration_label", GameState.time_duration_label(int(summary.get("elapsed_days", 1))))),
-		]
+		return _last_expedition_message(GameState.last_expedition_summary)
 	if not GameState.last_rewards.is_empty():
 		var rewards: PackedStringArray = []
 		for reward in GameState.last_rewards:
@@ -77,6 +72,26 @@ func _resolve_message(message: String) -> String:
 	if not GameState.activity_log.is_empty():
 		return str((GameState.activity_log.back() as Dictionary).get("text", ""))
 	return "可随时出门巡山。"
+
+
+## PM-401：上次战败时洞府首屏提示恢复路径（休息 / 炼丹 / 研读 / 技能）。
+func _last_expedition_message(summary: Dictionary) -> String:
+	var stats := summary.get("stats", {}) as Dictionary
+	var peak := maxi(int(stats.get("max_difficulty", 0)), int(stats.get("max_depth", 0)))
+	var duration := str(summary.get(
+		"duration_label",
+		GameState.time_duration_label(int(summary.get("elapsed_days", 1)))
+	))
+	var exit_reason := str(summary.get("exit_reason", "manual"))
+	if exit_reason == "defeated":
+		return (
+			"上次战败撤退（最高难度 %d，耗时 %s）：建议先「休息」清伤势，"
+			% [peak, duration]
+			+ "再「炼丹」补给或「研读」/「技能」调整后再出发。"
+		)
+	if exit_reason == "fled":
+		return "上次战中遁走（最高难度 %d，耗时 %s）：可「休息」调息后再出门。" % [peak, duration]
+	return "上次历练：最高难度 %d，耗时 %s" % [peak, duration]
 
 
 func _on_alchemy() -> void:
@@ -107,7 +122,7 @@ func _on_skills() -> void:
 
 func _on_rest() -> void:
 	GameState.rest()
-	_refresh("静养一日，气血与法力恢复，伤势减轻。")
+	_refresh("静养一日，气血与法力恢复，伤势减轻约 2 日。")
 
 
 func _on_encounter() -> void:
@@ -136,8 +151,6 @@ func _on_character_attributes() -> void:
 
 
 func _on_backpack() -> void:
-	TutorialService.game_event("tutorial.alchemy_notes_backpack_opened")
-	TutorialService.game_event("tutorial.backpack_opened")
 	var nav: Dictionary = SceneManager.go_backpack_panel()
 	if not bool(nav.get("ok", false)):
 		_refresh(str(nav.get("error", "无法打开背包")))

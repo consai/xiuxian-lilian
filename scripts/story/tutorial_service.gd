@@ -87,10 +87,6 @@ func _set_step_for_event(event_id: String) -> void:
 		"tutorial.cultivation_completed": "T02",
 		"tutorial.pill_mode_selected": "T02",
 		"tutorial.alchemy_opened": "T09",
-		"tutorial.alchemy_notes_backpack_opened": "T08",
-		"tutorial.alchemy_notes_item_opened": "T08",
-		"tutorial.alchemy_notes_used": "T08",
-		"tutorial.backpack_closed": "T08",
 		"tutorial.alchemy_recipe_selected": "T09",
 		"tutorial.alchemy_preview_acknowledged": "T09",
 		"tutorial.alchemy_started": "T09",
@@ -104,7 +100,6 @@ func _set_step_for_event(event_id: String) -> void:
 		"tutorial.first_battle_won": "T05",
 		"tutorial.expedition_returned": "T06",
 		"tutorial.result_closed": "T07",
-		"tutorial.backpack_opened": "T08",
 	}
 	if not steps.has(event_id):
 		return

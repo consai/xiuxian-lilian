@@ -31,7 +31,6 @@ const EFFECT_TO_FIGHT := {
 	"magic_attack": {FightAttrScript.MAGIC_ATK: true},
 	"physical_defense": {FightAttrScript.PHYSICAL_DEF: true},
 	"magic_defense": {FightAttrScript.MAGIC_DEF: true},
-	"evasion": {FightAttrScript.EVASION: true},
 	"accuracy": {FightAttrScript.ACCURACY: true},
 	"damage_bonus": {FightAttrScript.DAMAGE_BONUS: true},
 	"sword_damage": {FightAttrScript.DAMAGE_BONUS: true},
@@ -46,12 +45,11 @@ const EFFECT_TO_FIGHT := {
 	"spiritual_resistance": {FightAttrScript.MAGIC_DEF: true},
 	"all_resistance": {FightAttrScript.PHYSICAL_DEF: true, FightAttrScript.MAGIC_DEF: true},
 	"mental_resistance": {FightAttrScript.MAGIC_DEF: true},
-	"evasion_window": {FightAttrScript.EVASION: true},
 }
 
 const COMBAT_MODIFIER_EFFECTS := {
 	"evasion_window": {
-		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumCombatTarget.LABEL_SELF, "stat": FightAttrScript.EVASION,
+		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumCombatTarget.LABEL_SELF, "stat": FightAttrScript.SPD,
 		"duration": 2.0, "name": "流风护身", "percent": true,
 	},
 	"elemental_vulnerability": {
@@ -121,18 +119,14 @@ static func resolve_method_modifiers(effects: Array, mastery: float, knowledge_b
 	return {"flat": flat, "percent": percent}
 
 
-static func resolve_combat_effects(effect_rows: Array, knowledge_mastery: float = 0.0) -> Array:
+static func resolve_combat_effects(effect_rows: Array) -> Array:
 	var out: Array = []
 	for effect_v in effect_rows:
 		if not effect_v is Dictionary:
 			continue
 		var effect := effect_v as Dictionary
 		var effect_id := str(effect.get("effectId", ""))
-		var base := float(effect.get("base", 0.0))
-		var growth := float(effect.get("knowledgeGrowth", 0.0))
-		var magnitude := base + growth * clampf(knowledge_mastery, 0.0, 1.0)
-		if str(effect.get("scalingMode", "positive")) == "magnitude" and base < 0.0:
-			magnitude = base - absf(growth) * clampf(knowledge_mastery, 0.0, 1.0)
+		var magnitude := float(effect.get("base", 0.0))
 		if effect.has("clampMin"):
 			magnitude = maxf(magnitude, float(effect["clampMin"]))
 		if effect.has("clampMax"):

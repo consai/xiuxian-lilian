@@ -22,7 +22,6 @@ func ensure_unit(unit_id: String) -> void:
 		"damage_taken": 0.0,
 		"heal": 0.0,
 		"shield_absorbed": 0.0,
-		"crits": 0,
 		"by_action_kind": {},
 	}
 
@@ -51,15 +50,12 @@ func record_entry(entry: Dictionary) -> void:
 		var hp_damage := float(report.get(CombatReportScript.KEY_HP_DAMAGE, 0.0))
 		var heal := float(report.get(CombatReportScript.KEY_HEAL, 0.0))
 		var shield_abs := float(report.get(CombatReportScript.KEY_SHIELD_ABSORBED, 0.0))
-		var is_crit := bool(report.get(CombatReportScript.KEY_IS_CRIT, false))
 
 		if src != "":
 			var src_row := _by_unit.get(src, {}) as Dictionary
 			src_row["damage_dealt"] = float(src_row.get("damage_dealt", 0.0)) + maxf(0.0, hp_damage)
 			src_row["heal"] = float(src_row.get("heal", 0.0)) + maxf(0.0, heal)
 			src_row["shield_absorbed"] = float(src_row.get("shield_absorbed", 0.0)) + maxf(0.0, shield_abs)
-			if is_crit:
-				src_row["crits"] = int(src_row.get("crits", 0)) + 1
 			_by_unit[src] = src_row
 
 		if tgt != "":

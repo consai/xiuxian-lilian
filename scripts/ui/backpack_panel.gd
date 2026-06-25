@@ -53,16 +53,9 @@ func _on_expedition_entry_right_clicked(entry: Dictionary) -> void:
 
 
 func _go_back() -> void:
-	if TutorialService.is_waiting_for_any([
-		"tutorial.alchemy_notes_item_opened",
-		"tutorial.alchemy_notes_used",
-	]):
-		return
 	var popup_active := SceneManager.is_panel_popup_active()
 	if popup_active:
 		SceneManager.dismiss_panel_popup()
-	if not _expedition_mode:
-		TutorialService.game_event("tutorial.backpack_closed")
 	if popup_active:
 		return
 	SceneManager.go_back()

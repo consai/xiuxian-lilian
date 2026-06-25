@@ -549,6 +549,7 @@ static func _battle_enemy_count(event: Dictionary) -> int:
 	return clampi(1 + int(floor(float(difficulty) / 2.0)), 1, 4)
 
 
+## 按节点难度缩放单怪属性；count 仅用于命名与速度错位，不再按人数削弱攻防。
 static func _scale_enemy_for_difficulty_and_group(
 		base: Dictionary,
 		event: Dictionary,
@@ -572,8 +573,6 @@ static func _scale_enemy_for_difficulty_and_group(
 	enemy["attrs"] = attrs
 	if attrs.has(FightAttr.HP_MAX):
 		enemy["hp"] = float(attrs[FightAttr.HP_MAX])
-	var skill_effect_scale := _enemy_skill_effect_scale(event)
-	enemy["skills"] = _scale_enemy_skill_slots(enemy.get("skills", []), skill_effect_scale)
 	var base_name := str(base.get("name", "敌人")).strip_edges()
 	if count > 1:
 		enemy["name"] = "%s·%d" % [base_name, index + 1]
@@ -588,36 +587,6 @@ static func _enemy_difficulty_scale(event: Dictionary) -> float:
 	var min_difficulty := maxi(1, int(location.get("min_difficulty", 1)))
 	var steps := maxi(0, difficulty - min_difficulty)
 	return clampf(1.0 + float(steps) * 0.12, 0.5, 2.5)
-
-
-static func _enemy_skill_effect_scale(event: Dictionary) -> float:
-	if event.has("enemy_skill_effect_scale"):
-		return clampf(float(event.get("enemy_skill_effect_scale", 1.0)), 0.1, 1.0)
-	var event_type := str(event.get("type", "")).strip_edges()
-	if event_type == "boss":
-		return 1.0
-	var difficulty := maxi(1, int(event.get("difficulty", 1)))
-	var scale := 1.0
-	if event_type == "elite":
-		scale = clampf(0.55 + float(difficulty) * 0.05, 0.65, 0.95)
-	else:
-		scale = clampf(0.30 + float(difficulty) * 0.05, 0.35, 0.85)
-	return scale
-
-
-static func _scale_enemy_skill_slots(raw: Variant, effect_scale: float) -> Array:
-	var out: Array = []
-	if not raw is Array:
-		return out
-	for slot_v in raw as Array:
-		if not slot_v is Dictionary:
-			continue
-		var slot := (slot_v as Dictionary).duplicate(true)
-		var skill_id := int(slot.get("id", -1))
-		if skill_id > 0 and effect_scale < 1.0 and not slot.has("effect_value_scale"):
-			slot["effect_value_scale"] = clampf(effect_scale, 0.1, 1.0)
-		out.append(slot)
-	return out
 
 
 static func _apply_effects(
@@ -725,6 +694,10 @@ static func _filter_candidates(location: Dictionary, visited_once: Array, contex
 		var check_context := context.duplicate(true)
 		check_context["location"] = location
 		if not ConditionServiceScript.all_met(event.get("conditions", []) as Array, check_context):
+			continue
+		# 首领战仅能在路线图终点节点触发，途中随机事件与中途节点不得抽到首领。
+		var node_type := str(check_context.get("node_type", "")).strip_edges()
+		if str(event.get("type", "")).strip_edges() == "boss" and node_type != EnumExpeditionNodeTypeScript.ID_BOSS:
 			continue
 		out.append(event)
 	return out

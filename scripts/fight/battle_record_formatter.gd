@@ -25,7 +25,6 @@ func format_entry(entry: Dictionary, names: Dictionary = {}) -> String:
 	var hp_damage := float(report.get(CombatReportScript.KEY_HP_DAMAGE, 0.0))
 	var heal := float(report.get(CombatReportScript.KEY_HEAL, 0.0))
 	var shield_abs := float(report.get(CombatReportScript.KEY_SHIELD_ABSORBED, 0.0))
-	var is_crit := bool(report.get(CombatReportScript.KEY_IS_CRIT, false))
 	var missed := bool(report.get(CombatReportScript.KEY_MISSED, false))
 	var resisted := bool(report.get(CombatReportScript.KEY_CONTROL_RESISTED, false))
 
@@ -73,14 +72,11 @@ func format_entry(entry: Dictionary, names: Dictionary = {}) -> String:
 
 	var tail: PackedStringArray = PackedStringArray()
 	if missed:
-		tail.append("闪避")
+		tail.append("未命中")
 	if resisted:
 		tail.append("抵抗")
 	if hp_damage > 0.0:
-		var dmg_txt := "-%d" % int(round(hp_damage))
-		if is_crit:
-			dmg_txt = "%s(暴击)" % dmg_txt
-		tail.append(dmg_txt)
+		tail.append("-%d" % int(round(hp_damage)))
 	if heal > 0.0:
 		tail.append("+%d" % int(round(heal)))
 	if shield_abs > 0.0 and hp_damage <= 0.0:
@@ -140,13 +136,11 @@ func _format_stats_block(stats: Dictionary) -> String:
 	var taken := int(round(float(stats.get("damage_taken", 0.0))))
 	var heal := int(round(float(stats.get("heal", 0.0))))
 	var shield_abs := int(round(float(stats.get("shield_absorbed", 0.0))))
-	var crits := int(stats.get("crits", 0))
 	var lines: PackedStringArray = PackedStringArray()
 	lines.append("造成伤害：%d" % dmg)
 	lines.append("承受伤害：%d" % taken)
 	lines.append("治疗量：%d" % heal)
 	lines.append("护盾吸收：%d" % shield_abs)
-	lines.append("暴击次数：%d" % crits)
 	return "\n".join(lines)
 
 

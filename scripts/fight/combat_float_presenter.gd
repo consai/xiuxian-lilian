@@ -26,7 +26,7 @@ static func build_spawns(
 	if not suppress_skill_line and not is_basic_attack:
 		_append_spawn(out, skill_name, source_id, "skill", 2)
 	if bool(report.get(CombatReportScript.KEY_MISSED, false)):
-		_append_spawn(out, "闪避", target_id, "buff_expire", 8)
+		_append_spawn(out, "未命中", target_id, "buff_expire", 8)
 	if bool(report.get(CombatReportScript.KEY_CONTROL_RESISTED, false)):
 		_append_spawn(out, "抵抗", target_id, "buff_expire", 8)
 	_append_shield_spawn(out, target_id, float(report.get("shield_absorbed", 0.0)))
@@ -34,7 +34,6 @@ static func build_spawns(
 		out,
 		target_id,
 		float(report.get("damage", 0.0)),
-		bool(report.get("is_crit", false)),
 		damage_suffix
 	)
 
@@ -132,18 +131,16 @@ static func _append_damage_spawn(
 		out: Array,
 		target_id: String,
 		damage: float,
-		is_crit: bool,
 		damage_suffix: String
 ) -> void:
 	if damage <= 0.0:
 		return
-	var tone := "crit" if is_crit else "damage"
-	var dmg_tpl := StringsZh.getp("combat.float.crit", "-%d！") if is_crit else StringsZh.getp("combat.float.damage", "-%d")
+	var dmg_tpl := StringsZh.getp("combat.float.damage", "-%d")
 	var dmg_text := StringsZh.format_template(dmg_tpl, {"value": int(roundf(damage))})
 	var suffix := damage_suffix.strip_edges()
 	if suffix != "":
 		dmg_text = "%s %s" % [dmg_text, suffix]
-	_append_spawn(out, dmg_text, target_id, tone, 7)
+	_append_spawn(out, dmg_text, target_id, "damage", 7)
 
 
 static func _display_name(unit_id: String, names: Dictionary) -> String:

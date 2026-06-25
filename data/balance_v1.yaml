@@ -31,11 +31,8 @@ benchmark_enemies:
     magic_def: 19
     spd: 92
     accuracy: 88
-    evasion: 92
     control_power: 50
     control_resist: 60
-    crit: 5
-    crit_damage: 150
   qi_elite:
     hp_max: 260
     mp_max: 80
@@ -45,11 +42,8 @@ benchmark_enemies:
     magic_def: 22
     spd: 98
     accuracy: 95
-    evasion: 98
     control_power: 80
     control_resist: 90
-    crit: 7
-    crit_damage: 155
   foundation_normal:
     hp_max: 310
     mp_max: 100
@@ -59,11 +53,8 @@ benchmark_enemies:
     magic_def: 31
     spd: 108
     accuracy: 115
-    evasion: 110
     control_power: 105
     control_resist: 110
-    crit: 10
-    crit_damage: 160
 encounter_bands:
   normal:
     strength_min: 80

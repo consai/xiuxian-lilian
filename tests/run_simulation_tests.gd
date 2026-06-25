@@ -784,9 +784,9 @@ func _test_expedition_defeat_settlement() -> void:
 	var result: Dictionary = state.settle_expedition(finish)
 	_expect_true(bool(result.get("ok", false)), "settlement ok")
 	_expect_eq(state.day, 31, "expedition consumes rule duration")
-	_expect_near(state.hp, FightAttr.get_attr(state.attrs, FightAttr.HP_MAX) * 0.25, "loss hp floor")
+	_expect_near(state.hp, FightAttr.get_attr(state.attrs, FightAttr.HP_MAX) * 0.4, "loss hp floor")
 	_expect_near(state.mp, 12.0, "mp persisted")
-	_expect_eq(state.injury_days, 3, "loss applies three injury days")
+	_expect_eq(state.injury_days, 2, "loss applies two injury days")
 
 
 func _test_save_round_trip() -> void:

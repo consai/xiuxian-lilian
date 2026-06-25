@@ -343,7 +343,7 @@ texture = ExtResource("13_dodge")
 text = "轻身术"
 
 [node name="MetaLabel" parent="Panel/SkillsCard/SkillsContainer/Skill4" index="3" unique_id=489324522]
-text = "提升闪避率"
+text = "提升身法"
 
 [node name="Skill5" parent="Panel/SkillsCard/SkillsContainer" unique_id=1205814697 instance=ExtResource("6_skill")]
 layout_mode = 2

@@ -25,8 +25,7 @@ func _init() -> void:
 	_run("physical and magic damage use matching defense", _test_damage_types_use_matching_defense)
 	_run("true damage bypasses defense", _test_true_damage_bypasses_defense)
 	_run("non mana ability costs are paid", _test_non_mana_ability_costs_are_paid)
-	_run("skill slot scales runtime effects", _test_skill_slot_scales_runtime_effects)
-	_run("accuracy and evasion affect hit chance", _test_accuracy_evasion_hit_chance)
+	_run("accuracy affects hit chance", _test_accuracy_hit_chance)
 	_run("control attributes affect status chance", _test_control_attributes_status_chance)
 	_run("effect scaling uses combat attributes", _test_effect_scaling)
 	_run("action progress advances from current speed", _test_action_progress_uses_current_speed)
@@ -42,9 +41,8 @@ func _init() -> void:
 	_run("qi and foundation active abilities resolve effects", _test_v1_abilities_resolve_effects)
 	_run("PM-206 projectile presets are bound", _test_pm206_projectile_presets_are_bound)
 	_run("melee strike point works across formation slot parents", _test_melee_strike_across_formation_slots)
-	_run("knowledge growth interpolates from base to maximum", _test_knowledge_growth)
 	_run("intent preview subtracts defender shield", _test_intent_preview_subtracts_shield)
-	_run("intent preview honors slot effect scale", _test_intent_preview_honors_slot_effect_scale)
+	_run("intent preview matches use_skill damage", _test_intent_preview_matches_use_skill_damage)
 	_run("intent preview enemy_lowest_hp shows damage", _test_intent_preview_enemy_lowest_hp_shows_damage)
 	_run("escape chance rises with player speed over max enemy", _test_escape_chance_speed_ratio)
 	_run("escape success ends battle", _test_escape_success_ends_battle)
@@ -181,8 +179,6 @@ func _test_damage_types_use_matching_defense() -> void:
 	var attacker := {
 		FightAttr.PHYSICAL_ATK: 100.0,
 		FightAttr.MAGIC_ATK: 100.0,
-		FightAttr.CRIT: 0.0,
-		FightAttr.CRIT_DAMAGE: 150.0,
 	}
 	var defender := {
 		FightAttr.PHYSICAL_DEF: 100.0,
@@ -198,8 +194,6 @@ func _test_true_damage_bypasses_defense() -> void:
 	var attacker := {
 		FightAttr.PHYSICAL_ATK: 100.0,
 		FightAttr.MAGIC_ATK: 80.0,
-		FightAttr.CRIT: 0.0,
-		FightAttr.CRIT_DAMAGE: 150.0,
 	}
 	var defender := {
 		FightAttr.PHYSICAL_DEF: 999.0,
@@ -217,54 +211,19 @@ func _test_non_mana_ability_costs_are_paid() -> void:
 	player.mp = 20.0
 	player.skills = [{"id": int(skill.get("id", -1)), "cd": 0.0, "cd_total": float(skill.get("cd", 0.0))}]
 	var enemy := _make_unit(100.0, 100.0)
-	enemy.attrs[FightAttr.EVASION] = 0.0
 	player.attrs[FightAttr.ACCURACY] = 999.0
 	var used := player.use_skill(int(skill.get("id", -1)), {int(skill.get("id", -1)): skill}, enemy)
 	_expect_true(bool(used.get("ok", false)), "stamina-cost skill resolves")
 	_expect_near(player.mp, 2.0, "stamina-cost skill consumes shared combat resource")
 
 
-func _test_skill_slot_scales_runtime_effects() -> void:
-	var unscaled := _make_unit(100.0, 100.0)
-	var scaled := _make_unit(100.0, 100.0)
-	scaled.skills = [{"id": 1, "cd": 0.0, "effect_value_scale": 0.45}]
-	for unit in [unscaled, scaled]:
-		unit.attrs[FightAttr.MAGIC_ATK] = 10.0
-		unit.attrs[FightAttr.ACCURACY] = 999.0
-	var unscaled_target := _make_unit(200.0, 100.0)
-	var scaled_target := _make_unit(200.0, 100.0)
-	for target in [unscaled_target, scaled_target]:
-		target.attrs[FightAttr.HP_MAX] = 200.0
-		target.attrs[FightAttr.MAGIC_DEF] = 24.0
-		target.attrs[FightAttr.EVASION] = 0.0
-	var cfg := {
-		1: {
-			"mp_cost": 0.0,
-			"cd": 0.0,
-			"power": 1000.0,
-			"effects": [
-				{"type": EnumCombatEffectType.LABEL_DAMAGE, "value": 40.0, "damage_type": FightAttr.DAMAGE_MAGIC, "can_miss": false},
-			],
-		},
-	}
-	var raw_hit := unscaled.use_skill(1, cfg, unscaled_target)
-	var scaled_hit := scaled.use_skill(1, cfg, scaled_target)
-	_expect_true(bool(raw_hit.get("ok", false)), "unscaled skill resolves")
-	_expect_true(bool(scaled_hit.get("ok", false)), "scaled skill resolves")
-	_expect_true(
-		float(scaled_hit.get("damage", 0.0)) < float(raw_hit.get("damage", 0.0)) * 0.65,
-		"slot effect scale lowers fixed damage"
-	)
-
-
-func _test_accuracy_evasion_hit_chance() -> void:
+func _test_accuracy_hit_chance() -> void:
 	var accurate := {FightAttr.ACCURACY: 300.0}
-	var evasive := {FightAttr.EVASION: 300.0}
-	var normal := {FightAttr.ACCURACY: 100.0, FightAttr.EVASION: 100.0}
-	_expect_near(FightAttr.hit_chance(normal, normal), 0.85, "equal rating hit chance")
+	var low := {FightAttr.ACCURACY: 50.0}
+	var normal := {FightAttr.ACCURACY: 100.0}
+	_expect_near(FightAttr.hit_chance(normal, {}), 0.85 + 100.0 / 300.0, "baseline hit chance")
 	_expect_true(
-		FightAttr.hit_chance(accurate, {FightAttr.EVASION: 50.0})
-		> FightAttr.hit_chance({FightAttr.ACCURACY: 50.0}, evasive),
+		FightAttr.hit_chance(accurate, {}) > FightAttr.hit_chance(low, {}),
 		"accuracy should improve hit chance"
 	)
 
@@ -330,9 +289,7 @@ func _test_one_player_can_fight_multiple_enemies() -> void:
 	player.attrs[FightObjScript.ATTR_PHYSICAL_ATK] = 200.0
 	player.attrs[FightAttr.ACCURACY] = 999.0
 	var first := _make_unit(1.0, 80.0)
-	first.attrs[FightAttr.EVASION] = 0.0
 	var second := _make_unit(40.0, 80.0)
-	second.attrs[FightAttr.EVASION] = 0.0
 	var domain := BattleDomainServiceScript.new()
 	domain.start_battle_many(player, [first, second], {}, 200.0)
 	domain.enter_paused(EnumBattleSide.PLAYER)
@@ -517,7 +474,7 @@ func _test_method_mp_recovery() -> void:
 
 
 func _test_pierce_and_vulnerability() -> void:
-	var attacker := {FightAttr.MAGIC_ATK: 100.0, FightAttr.CRIT: 0.0}
+	var attacker := {FightAttr.MAGIC_ATK: 100.0}
 	var defender := {FightAttr.MAGIC_DEF: 100.0, FightAttr.DAMAGE_TAKEN: 0.2}
 	var normal := FightAttr.calc_skill_damage(attacker, defender, 1.0, 0.0, FightAttr.DAMAGE_MAGIC)
 	var pierced := FightAttr.calc_skill_damage(attacker, defender, 1.0, 0.0, FightAttr.DAMAGE_MAGIC, 0.5)
@@ -527,14 +484,14 @@ func _test_pierce_and_vulnerability() -> void:
 
 func _test_runtime_modifier_expires() -> void:
 	var unit := _make_unit()
-	var before := unit.get_attr(FightAttr.EVASION)
+	var before := unit.get_attr(FightAttr.ACCURACY)
 	_expect_true(
-		unit.add_runtime_modifier_buff("test_evasion", 1.0, {FightAttr.EVASION: 20.0}),
+		unit.add_runtime_modifier_buff("test_accuracy", 1.0, {FightAttr.ACCURACY: 20.0}),
 		"runtime modifier applies"
 	)
-	_expect_near(unit.get_attr(FightAttr.EVASION), before + 20.0, "runtime modifier changes stat")
+	_expect_near(unit.get_attr(FightAttr.ACCURACY), before + 20.0, "runtime modifier changes stat")
 	unit.tick_buffs(1.0)
-	_expect_near(unit.get_attr(FightAttr.EVASION), before, "runtime modifier expires")
+	_expect_near(unit.get_attr(FightAttr.ACCURACY), before, "runtime modifier expires")
 
 
 func _test_v1_abilities_resolve_effects() -> void:
@@ -592,19 +549,6 @@ func _test_pm206_projectile_presets_are_bound() -> void:
 	_expect_eq(EnumBattleVfxSkillType.from_label("shield"), EnumBattleVfxSkillType.Type.BUFF, "shield skill type")
 
 
-func _test_knowledge_growth() -> void:
-	var rows := [{
-		"effectId": "damage_spiritual",
-		"base": 40.0,
-		"knowledgeGrowth": 18.0,
-		"target": EnumCombatTarget.LABEL_ENEMY,
-	}]
-	var base := EffectResolverScript.resolve_combat_effects(rows, 0.0)
-	var full := EffectResolverScript.resolve_combat_effects(rows, 1.0)
-	_expect_near(float((base[0] as Dictionary)["value"]), 40.0, "threshold knowledge uses base")
-	_expect_near(float((full[0] as Dictionary)["value"]), 58.0, "full knowledge adds growth")
-
-
 func _test_intent_preview_subtracts_shield() -> void:
 	AbilityServiceScript.reload()
 	var attacker := _make_unit()
@@ -649,12 +593,12 @@ func _test_intent_preview_enemy_lowest_hp_shows_damage() -> void:
 	_expect_true(int(row.get("estimated_damage", 0)) > 0, "enemy_lowest_hp estimates positive damage")
 
 
-func _test_intent_preview_honors_slot_effect_scale() -> void:
+func _test_intent_preview_matches_use_skill_damage() -> void:
 	var attacker := _make_unit()
-	attacker.skills = [{"id": 1, "cd": 0.0, "effect_value_scale": 0.45}]
-	attacker.attrs[FightObjScript.ATTR_MAGIC_ATK] = 10.0
+	attacker.skills = [{"id": 1, "cd": 0.0}]
+	attacker.attrs[FightObjScript.ATTR_MAGIC_ATK] = 30.0
 	var defender := _make_unit()
-	defender.attrs[FightObjScript.ATTR_MAGIC_DEF] = 24.0
+	defender.attrs[FightObjScript.ATTR_MAGIC_DEF] = 20.0
 	var cfg := {
 		"power": 1000.0,
 		"effects": [
@@ -663,29 +607,16 @@ func _test_intent_preview_honors_slot_effect_scale() -> void:
 				"value": 40.0,
 				"damage_type": FightAttr.DAMAGE_MAGIC,
 				"target": EnumCombatTarget.LABEL_ENEMY,
+				"can_miss": false,
 			},
 		],
 	}
 	var row := EnemyIntentPreviewScript.enrich_skill_row({}, attacker, defender, cfg, 1)
 	var estimated := int(row.get("estimated_damage", -1))
-	var merged := FightObjScript.merged_slot_runtime_cfg(attacker.skills[0], cfg)
-	var effect := (merged.get("effects", []) as Array)[0] as Dictionary
-	var expected := int(roundf(FightAttr.estimate_skill_damage(
-		attacker.attrs,
-		defender.attrs,
-		float(merged.get("power", 1000.0)) / 1000.0,
-		float(effect.get("value", 0.0)),
-		FightAttr.DAMAGE_MAGIC,
-	)))
-	_expect_eq(estimated, expected, "intent preview uses slot effect scale")
-	var unscaled := int(roundf(FightAttr.estimate_skill_damage(
-		attacker.attrs,
-		defender.attrs,
-		1.0,
-		40.0,
-		FightAttr.DAMAGE_MAGIC,
-	)))
-	_expect_true(estimated < unscaled, "scaled preview lower than base skill cfg")
+	var used := attacker.use_skill(1, {1: cfg}, defender)
+	_expect_true(bool(used.get("ok", false)), "skill resolves for intent parity check")
+	var actual := int(roundf(float(used.get("hp_damage", used.get("damage", 0.0)))))
+	_expect_eq(estimated, actual, "intent preview matches use_skill hp damage")
 
 
 func _test_escape_chance_speed_ratio() -> void:
@@ -735,8 +666,6 @@ func _make_unit(hp: float = 100.0, spd: float = 100.0, skill_cd: float = 0.0) ->
 			FightObjScript.ATTR_PHYSICAL_DEF: 0.0,
 			FightObjScript.ATTR_MAGIC_DEF: 0.0,
 			FightObjScript.ATTR_SPD: spd,
-			FightObjScript.ATTR_CRIT: 0.0,
-			FightObjScript.ATTR_CRIT_DAMAGE: 150.0,
 		},
 		"skills": [{"id": 1, "cd": skill_cd, "cd_total": 5.0}],
 		"equips": [],

@@ -5,26 +5,21 @@ nodes:
   empty_cave:
     type: "line"
     speaker: ""
-    text: "山风从清铃观檐角吹过，铜铃叮当响了三声。你从蒲团上坐起来，尾巴还压着半张炼丹小札。"
+    text: "山风从清铃观檐角吹过，铜铃叮当响了三声。你从蒲团上坐起来，尾巴还压着一卷修炼小札。"
     meta:
       narration: true
     next: "jade_message"
   jade_message:
     type: "line"
     speaker: ""
-    text: "小道观晨光正好，丹炉冷着，药架也空了些。小札第一页写着：先闭关一个月，再下山看看山路。"
+    text: "小道观晨光正好，丹炉冷着，药架也空了些。小札第一页写着：先闭关一天，再下山看看山路。"
     meta:
       narration: true
     next: "master_confession"
   master_confession:
     type: "line"
-    speaker: "炼丹小札"
-    text: "聚气丹能帮你快些引气，但药力来得急。闭关之后若灵气浮躁，就去巡山压一压。"
-    next: "master_last_trip"
-  master_last_trip:
-    type: "line"
-    speaker: ""
-    text: "你把小背篓挂好，又摸了摸炉边瓷盏。若一切顺利，这个月末观里该有第一缕药香。"
+    speaker: "修炼小札"
+    text: "聚气丹能帮你快些引气，但药力来得急。闭关之后若灵气浮躁，就去巡山,战斗时灵气运转之间会变得更平稳。"
     next: "open_pill_cultivation"
   open_pill_cultivation:
     type: "command"
@@ -40,7 +35,7 @@ nodes:
     commands:
       - type: "guide_focus"
         target: "PillButton"
-        reason: "闭关以月为单位结算。\n选择【丹药炼化】，用聚气丹完成首月修炼"
+        reason: "选择【丹药炼化】，用聚气丹完成首次修炼"
       - type: "await_game_event"
         event: "tutorial.pill_mode_selected"
     next: "start_pill"
@@ -49,14 +44,14 @@ nodes:
     commands:
       - type: "guide_focus"
         target: "StartButton"
-        reason: "开始闭关一个月"
+        reason: "开始闭关"
       - type: "await_game_event"
         event: "tutorial.cultivation_result_shown"
     next: "pill_result"
   pill_result:
     type: "line"
     speaker: ""
-    text: "一个月闭关后，聚气丹化开的灵气像热乎乎的云，把经脉塞得鼓鼓的。可云气有些飘，光靠坐着不容易压稳。"
+    text: "一次闭关后，聚气丹化开的灵气像热乎乎的云，把经脉塞得鼓鼓的。运气时有些飘忽，需要战斗来压稳灵气。该去巡山了。"
     meta:
       narration: true
     next: "return_pill"
@@ -65,7 +60,7 @@ nodes:
     commands:
       - type: "guide_focus"
         target: "ConfirmButton"
-        reason: "确认闭关结果，准备出门巡山压稳灵气"
+        reason: "确认闭关结果，准备出门巡山"
       - type: "await_game_event"
         event: "tutorial.cultivation_completed"
     next: "open_map"
@@ -74,7 +69,7 @@ nodes:
     commands:
       - type: "guide_focus"
         target: "ExpeditionObjectButton"
-        reason: "出门巡山：压稳灵气，并采些炼丹灵草"
+        reason: "出门巡山：并采些炼丹灵草"
       - type: "await_game_event"
         event: "tutorial.world_map_opened"
     next: "choose_wolf_valley"
@@ -92,7 +87,7 @@ nodes:
     commands:
       - type: "guide_focus"
         target: "EnterButton"
-        reason: "背上小篓，出门巡山"
+        reason: "背上小背篓，出门巡山"
       - type: "await_game_event"
         event: "tutorial.expedition_started"
     next: "mountain"
@@ -108,7 +103,7 @@ nodes:
     commands:
       - type: "guide_focus"
         target: "TutorialNextMapNode"
-        reason: "沿路线先前往采集点采药，再迎战拦路的野狼"
+        reason: "你听到几声嚎叫, 顺着声音走去, 发现了一群野狼."
       - type: "await_game_event"
         event: "tutorial.first_battle_won"
     next: "battle_press"
@@ -133,7 +128,7 @@ nodes:
     commands:
       - type: "guide_focus"
         target: "ReturnButton"
-        reason: "查看灵气压稳与材料收获，返回小道观"
+        reason: "查看巡山收获，返回小道观"
       - type: "await_game_event"
         event: "tutorial.result_closed"
     next: "home"
@@ -143,25 +138,7 @@ nodes:
     text: "山门风铃又响了一声。小背篓里的灵草带着露水，丹炉也该重新热起来了。"
     meta:
       narration: true
-    next: "open_backpack"
-  open_backpack:
-    type: "command"
-    commands:
-      - type: "guide_focus"
-        target: "BackpackButton"
-        reason: "打开背包，确认巡山带回来的灵草"
-      - type: "await_game_event"
-        event: "tutorial.backpack_opened"
-    next: "close_backpack"
-  close_backpack:
-    type: "command"
-    commands:
-      - type: "guide_focus"
-        target: "CloseButton"
-        reason: "灵草已经收好，先合上背包再操作丹炉"
-      - type: "await_game_event"
-        event: "tutorial.backpack_closed"
-    next: "open_alchemy"
+    next: "open_alchemy" 
   open_alchemy:
     type: "command"
     commands:
@@ -192,7 +169,7 @@ nodes:
   alchemy_result:
     type: "line"
     speaker: ""
-    text: "炉火一跳，第一炉丹药滚进瓷盏。小道观里有了药香，也有了明天的早课。"
+    text: "炉火一跳，第一炉丹药滚进瓷盏。小道观里终于有药香。"
     meta:
       narration: true
     next: "finish_alchemy"
@@ -207,8 +184,8 @@ nodes:
     next: "last_words"
   last_words:
     type: "line"
-    speaker: "炼丹小札"
-    text: "今日早课已毕。明日是继续打坐，还是再去巡山，就由小观主自己安排。"
+    speaker: "修炼小札"
+    text: "接下来是打坐修炼，还是再去巡山，就由小观主自己安排了。"
     next: "chapter_end"
   chapter_end:
     type: "end"

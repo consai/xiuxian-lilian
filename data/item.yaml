@@ -180,7 +180,7 @@ items:
     ling_shi: 40
     stackable: true
     max_stack: 99
-    desc: "用于治疗伤势的基础丹药。"
+    desc: "用于恢复气血的基础丹药。"
     icon: "res://assets/art/ui_new/hulu.png"
     use_effect:
       - op: "hp"
@@ -249,7 +249,7 @@ items:
     ling_shi: 72
     stackable: true
     max_stack: 99
-    desc: "筑基初期常用丹药，可在战斗中回灵并略微疗伤。"
+    desc: "筑基初期常用丹药，可在战斗中回灵并略微恢复气血。"
     icon: "res://assets/art/ui_new/hulu.png"
     fight_id: 9005
     fight_cd: 5
@@ -594,7 +594,7 @@ items:
     ling_shi: 26
     stackable: true
     max_stack: 99
-    desc: "药力稍弱的疗伤丹。"
+    desc: "药力稍弱，可恢复一定气血。"
     icon: "res://assets/art/ui_new/hulu.png"
     use_effect:
       - op: "hp"
@@ -610,7 +610,7 @@ items:
     ling_shi: 64
     stackable: true
     max_stack: 99
-    desc: "药力充盈的疗伤丹。"
+    desc: "药力充盈，可恢复较多气血。"
     icon: "res://assets/art/ui_new/hulu.png"
     use_effect:
       - op: "hp"
@@ -626,7 +626,7 @@ items:
     ling_shi: 104
     stackable: true
     max_stack: 99
-    desc: "几无杂质的极品疗伤丹。"
+    desc: "几无杂质，可大幅恢复气血。"
     icon: "res://assets/art/ui_new/hulu.png"
     use_effect:
       - op: "hp"

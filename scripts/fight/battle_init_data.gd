@@ -906,10 +906,7 @@ static func sample_for_editor() -> Dictionary:
 			"icon": "characters/001_cutout_483x512.png",
 			"hp": 60.0,
 			"mp": 30.0,
-			"attrs": FightAttr.from_stat_block({
-				FightAttr.CRIT: 10.0,
-				FightAttr.CRIT_DAMAGE: 150.0,
-			}),
+			"attrs": FightAttr.from_stat_block({}),
 			"skills": [
 				{"id": 1, "cd": 0.0},
 				{"id": -1, "cd": 0.0},
@@ -972,8 +969,6 @@ static func sample_for_editor() -> Dictionary:
 				FightAttr.MP_MAX: 50.0,
 				FightAttr.PHYSICAL_ATK: 80.0,
 				FightAttr.MAGIC_ATK: 80.0,
-				FightAttr.CRIT: 5.0,
-				FightAttr.CRIT_DAMAGE: 150.0,
 			}),
 			"skills": [
 				{"id": 3, "cd": 0.0},

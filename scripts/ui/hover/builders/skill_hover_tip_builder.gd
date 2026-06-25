@@ -76,7 +76,6 @@ static func build_ability(ability_id: String, savedata: Dictionary, icon: Textur
 	var title := str(ability.get("name", ability_id)).strip_edges()
 	var quality := clampi(int(ability.get("quality", 1)), EnumQuality.Type.LOW, EnumQuality.Type.SUPREME)
 	var tier := EnumItemTier.clamp_tier(int(ability.get("tier", 1)))
-	var mastery := AbilityService.knowledge_mastery_ratio(ability_id, savedata)
 	var lines: Array[String] = []
 	var desc := str(ability.get("description", "")).strip_edges()
 	if desc != "":
@@ -102,11 +101,9 @@ static func build_ability(ability_id: String, savedata: Dictionary, icon: Textur
 		var cast_time := float(combat.get("castTime", 0.0))
 		if cast_time > 0.0:
 			lines.append("施放：%s秒" % _fmt_num(cast_time))
-	if mastery > 0.0:
-		lines.append("知识加成：%.0f%%" % (mastery * 100.0))
 	var effect_lines := HoverTipEffectFormatter.format_lines(runtime.get("effects", []))
 	if effect_lines.is_empty():
-		effect_lines = HoverTipEffectFormatter.format_raw_ability_lines(ability.get("effects", []), mastery)
+		effect_lines = HoverTipEffectFormatter.format_raw_ability_lines(ability.get("effects", []))
 	for effect_line in effect_lines:
 		lines.append(effect_line)
 	var tags_v: Variant = ability.get("tags", [])

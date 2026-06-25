@@ -1936,12 +1936,12 @@ methods:
         masteryWeight: 1
         gainFromCultivation: true
     effects:
-      - effectId: "critical_chance"
+      - effectId: "damage_bonus"
         base: 0.088
         knowledgeScales:
           - "sword.intent"
         operation: "add_percent"
-        stackGroup: "critical_chance"
+        stackGroup: "damage_bonus"
         stackPolicy: "add_capped"
         activation: "active_method"
         cap: 0.75
@@ -7069,12 +7069,12 @@ methods:
           valueType: "ratio"
           displayPriority: 2
         masteryGrowth: 0.092
-      - effectId: "evasion"
+      - effectId: "accuracy"
         base: 0.166
         knowledgeScales:
           - "spell.escape"
         operation: "add_percent"
-        stackGroup: "evasion"
+        stackGroup: "accuracy"
         stackPolicy: "add_capped"
         activation: "active_method"
         cap: 2
@@ -7563,11 +7563,6 @@ effectCatalog:
     defaultTarget: "self"
     runtimeKey: "craft_quality"
     description: "功法效果属性 craft_quality，具体结算由 Godot 运行时映射。"
-  critical_chance:
-    category: "offense"
-    defaultTarget: "self"
-    runtimeKey: "critical_chance"
-    description: "功法效果属性 critical_chance，具体结算由 Godot 运行时映射。"
   cultivation_speed:
     category: "cultivation"
     defaultTarget: "self"
@@ -7668,11 +7663,6 @@ effectCatalog:
     defaultTarget: "self"
     runtimeKey: "escape_success"
     description: "功法效果属性 escape_success，具体结算由 Godot 运行时映射。"
-  evasion:
-    category: "survival"
-    defaultTarget: "self"
-    runtimeKey: "evasion"
-    description: "功法效果属性 evasion，具体结算由 Godot 运行时映射。"
   evil_bane:
     category: "offense"
     defaultTarget: "self"

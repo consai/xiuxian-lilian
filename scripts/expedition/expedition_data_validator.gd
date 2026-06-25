@@ -144,7 +144,7 @@ static func _validate_monster(monster: Dictionary, monster_id: String) -> Packed
 	for key in [
 		FightAttr.PHYSICAL_ATK, FightAttr.MAGIC_ATK,
 		FightAttr.PHYSICAL_DEF, FightAttr.MAGIC_DEF,
-		FightAttr.ACCURACY, FightAttr.EVASION,
+		FightAttr.ACCURACY,
 		FightAttr.CONTROL_POWER, FightAttr.CONTROL_RESIST,
 	]:
 		if not attrs.has(key):
@@ -219,7 +219,7 @@ static func _validate_v1_enemy_attrs(event: Dictionary, event_id: String) -> Pac
 	for key in [
 		FightAttr.PHYSICAL_ATK, FightAttr.MAGIC_ATK,
 		FightAttr.PHYSICAL_DEF, FightAttr.MAGIC_DEF,
-		FightAttr.ACCURACY, FightAttr.EVASION,
+		FightAttr.ACCURACY,
 		FightAttr.CONTROL_POWER, FightAttr.CONTROL_RESIST,
 	]:
 		if not attrs.has(key):

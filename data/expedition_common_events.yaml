@@ -24,7 +24,7 @@ events:
     name: "雾林寻药"
     desc: "湿润林地间浮着淡淡药香，几株灵草在晨露中泛起微光。"
     risk_text: "安全"
-    weight: 24
+    weight: 30
     once_per_expedition: false
     effects: []
     success_text: "你依照药性小心采下，收得{loot}。"
@@ -70,7 +70,7 @@ events:
     name: "灵泉纳气"
     desc: "石隙间涌出一线清泉，泉畔灵气澄澈，正宜吐纳。"
     risk_text: "安全"
-    weight: 16
+    weight: 18
     once_per_expedition: false
     effects:
       - type: "restore_mp_percent"
@@ -93,7 +93,7 @@ events:
     name: "岩洞疗伤"
     desc: "你在背风岩洞中点起微火，借着片刻安宁处理伤势。"
     risk_text: "安全"
-    weight: 12
+    weight: 14
     once_per_expedition: false
     effects:
       - type: "heal_hp_percent"

@@ -336,7 +336,6 @@ func resolve_player_skill(skill_id: int) -> Dictionary:
 	BattleDebugLog.write("行动", "玩家技能结算完成", {
 		"技能ID": skill_id,
 		"伤害": result.get("damage", 0.0),
-		"暴击": result.get("is_crit", false),
 		"玩家": BattleDebugLog.log_unit(player, "player"),
 		"敌方": BattleDebugLog.log_unit(enemy, "enemy"),
 	})
@@ -391,7 +390,6 @@ func resolve_enemy_skill(skill_id: int) -> Dictionary:
 	BattleDebugLog.write("行动", "敌方技能结算完成", {
 		"技能ID": skill_id,
 		"伤害": result.get("damage", 0.0),
-		"暴击": result.get("is_crit", false),
 		"敌方": BattleDebugLog.log_unit(enemy, "enemy"),
 		"玩家": BattleDebugLog.log_unit(player, "player"),
 	})
@@ -577,7 +575,6 @@ func _resolve_basic(side: String) -> Dictionary:
 	BattleDebugLog.write("行动", "普攻结算完成", {
 		"出手方": BattleDebugLog.side_label(side),
 		"伤害": report.get("damage", 0.0),
-		"暴击": report.get("is_crit", false),
 		"攻击方": BattleDebugLog.log_unit(attacker, side),
 		"防守方": BattleDebugLog.log_unit(defender, "defender"),
 	})

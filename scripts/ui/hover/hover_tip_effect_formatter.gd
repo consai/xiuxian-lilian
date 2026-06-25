@@ -107,26 +107,27 @@ static func _target_label(target_key: String) -> String:
 			return StringsZh.getp("hover.target.default", "目标")
 
 
-static func format_raw_ability_lines(effects_v: Variant, knowledge_mastery: float = 0.0) -> Array[String]:
+static func format_raw_ability_lines(effects_v: Variant, mastery: float = -1.0) -> Array[String]:
 	var out: Array[String] = []
 	if not effects_v is Array:
 		return out
 	for eff_v in effects_v as Array:
 		if not eff_v is Dictionary:
 			continue
-		var line := _format_raw_ability_effect(eff_v as Dictionary, knowledge_mastery)
+		var line := _format_raw_ability_effect(eff_v as Dictionary, mastery)
 		if line != "":
 			out.append(line)
 	return out
 
 
-static func _format_raw_ability_effect(effect: Dictionary, knowledge_mastery: float) -> String:
+static func _format_raw_ability_effect(effect: Dictionary, mastery: float = -1.0) -> String:
 	var effect_id := str(effect.get("effectId", "")).strip_edges()
 	if effect_id == "":
 		return ""
-	var base := float(effect.get("base", 0.0))
-	var growth := float(effect.get("knowledgeGrowth", effect.get("masteryGrowth", 0.0)))
-	var value := base + growth * clampf(knowledge_mastery, 0.0, 1.0)
+	var value := float(effect.get("base", 0.0))
+	# 功法效果仍按熟练度插值 masteryGrowth；技能已移除 knowledgeScaling，不再传 mastery。
+	if mastery >= 0.0:
+		value += float(effect.get("masteryGrowth", 0.0)) * clampf(mastery, 0.0, 1.0)
 	var operation := str(effect.get("operation", "add_flat"))
 	var attrs: Dictionary = effect.get("attributes", {}) as Dictionary
 	var target := _target_label(str(effect.get("target", attrs.get("target", ""))))
@@ -224,14 +225,13 @@ static func _effect_id_label(effect_id: String) -> String:
 		"magic_attack": "法术攻击",
 		"physical_defense": "物理防御",
 		"magic_defense": "法术防御",
-		"evasion": "闪避",
 		"accuracy": "命中",
 		"damage_bonus": "伤害加成",
 		"armor_pierce": "护甲穿透",
 		"space_pierce": "空间穿透",
 		"law_pierce": "法则穿透",
 		"dash_distance": "位移距离",
-		"evasion_window": "闪避窗口",
+		"evasion_window": "借势提速",
 		"array_duration": "阵法持续",
 		"control_duration": "控制时长",
 		"stun_chance": "麻痹概率",
@@ -399,13 +399,10 @@ static func _attr_label(key: String) -> String:
 		FightAttr.PHYSICAL_DEF: "物防",
 		FightAttr.MAGIC_DEF: "法防",
 		FightAttr.ACCURACY: "命中",
-		FightAttr.EVASION: "闪避",
 		FightAttr.SPD: "速度",
 		FightAttr.HP_MAX: "气血上限",
 		FightAttr.MP_MAX: "法力上限",
 		FightAttr.SHIELD: "护盾",
-		FightAttr.CRIT: "暴击",
-		FightAttr.CRIT_DAMAGE: "暴伤",
 		FightAttr.CONTROL_POWER: "控制",
 		FightAttr.CONTROL_RESIST: "控制抵抗",
 		FightAttr.HP_REGEN: "气血回复",

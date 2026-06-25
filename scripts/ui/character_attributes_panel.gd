@@ -101,8 +101,7 @@ func _bind_combat_stats() -> void:
 	_set_stat_slot(_speed, "物防", "%.0f" % FightAttr.get_attr(attrs, FightAttr.PHYSICAL_DEF))
 	_set_stat_slot(_crit, "法防", "%.0f" % FightAttr.get_attr(attrs, FightAttr.MAGIC_DEF))
 	_set_stat_slot(_crit_damage, "出手", "%.0f" % FightAttr.get_attr(attrs, FightAttr.SPD))
-	_shield.visible = true
-	_set_stat_slot(_shield, "暴击", "%.0f%%" % FightAttr.get_attr(attrs, FightAttr.CRIT))
+	_shield.visible = false
 
 
 func _set_stat_slot(panel: Panel, title: String, value_text: String) -> void:
@@ -161,10 +160,7 @@ func _foundation_text() -> String:
 		],
 		"",
 		"辅助",
-		"命中 %.0f    闪避 %.0f" % [
-			FightAttr.get_attr(attrs, FightAttr.ACCURACY),
-			FightAttr.get_attr(attrs, FightAttr.EVASION),
-		],
+		"命中 %.0f" % FightAttr.get_attr(attrs, FightAttr.ACCURACY),
 		"气血恢复 %.1f    法力恢复 %.1f" % [
 			FightAttr.get_attr(attrs, FightAttr.HP_REGEN),
 			FightAttr.get_attr(attrs, FightAttr.MP_REGEN),

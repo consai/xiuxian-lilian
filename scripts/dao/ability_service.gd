@@ -142,32 +142,7 @@ static func unmet_learning_requirement_lines(
 	return lines
 
 
-static func knowledge_mastery_ratio(ability_id: String, savedata: Dictionary) -> float:
-	var ability := by_id(ability_id)
-	if ability.is_empty():
-		return 0.0
-	var rows: Array = (ability.get("knowledgeScaling", {}) as Dictionary).get("knowledge", []) as Array
-	if rows.is_empty():
-		return 0.0
-	var weighted := 0.0
-	var total_weight := 0.0
-	for row_v in rows:
-		if not row_v is Dictionary:
-			continue
-		var row := row_v as Dictionary
-		var sid := str(row.get("skillId", ""))
-		var required := int(row.get("requiredLevel", 1))
-		var weight := float(row.get("scalingWeight", 1))
-		total_weight += weight
-		var effective := KnowledgeServiceScript.effective_level(savedata, sid)
-		var mastery := clampf((effective - float(required)) / maxf(1.0, 5.0 - float(required)), 0.0, 1.0)
-		weighted += mastery * weight
-	if total_weight <= 0.0:
-		return 0.0
-	return clampf(weighted / total_weight, 0.0, 1.0)
-
-
-static func to_runtime_dict(ability_id: String, savedata: Dictionary) -> Dictionary:
+static func to_runtime_dict(ability_id: String, _savedata: Dictionary) -> Dictionary:
 	var combat_id := combat_id_for(ability_id)
 	if combat_id < 0 and ability_id != BASIC_STRIKE_ID:
 		return {}
@@ -176,7 +151,6 @@ static func to_runtime_dict(ability_id: String, savedata: Dictionary) -> Diction
 	var ability := by_id(ability_id)
 	if ability.is_empty():
 		return {}
-	var knowledge_ratio := knowledge_mastery_ratio(ability_id, savedata)
 	var combat: Dictionary = ability.get("combat", {}) as Dictionary
 	var costs := _runtime_costs(combat)
 	var mp_cost := _total_runtime_cost(costs)
@@ -217,9 +191,7 @@ static func to_runtime_dict(ability_id: String, savedata: Dictionary) -> Diction
 		"vfx_type": vfx_type,
 		"vfx": vfx,
 		"tags": tags,
-		"effects": EffectResolverScript.resolve_combat_effects(
-			ability.get("effects", []) as Array, knowledge_ratio
-		),
+		"effects": EffectResolverScript.resolve_combat_effects(ability.get("effects", []) as Array),
 	}
 	if icon_path != "":
 		out["icon"] = icon_path
@@ -251,7 +223,6 @@ static func _basic_strike_row() -> Dictionary:
 		"effects": [{
 			"effectId": "damage_physical",
 			"base": 12,
-			"knowledgeGrowth": 0,
 			"operation": "add_flat",
 			"target": EnumCombatTarget.LABEL_ENEMY,
 		}],
