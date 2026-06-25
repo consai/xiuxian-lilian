@@ -190,7 +190,7 @@ recipes:
     name: "固本道基丹方"
     pill_name: "固本道基丹"
     difficulty: 50
-    base_yield: 1
+    base_yield: 2
     minimum_level: 1
     ingredients:
       - family: "雾隐草"

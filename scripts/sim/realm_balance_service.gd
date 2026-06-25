@@ -107,6 +107,10 @@ static func benchmark_enemy_attrs(enemy_id: String) -> Dictionary:
 	return (attrs_v as Dictionary).duplicate(true) if attrs_v is Dictionary else {}
 
 
+## 相对配置表「月修为」换算为「日修为」的倍率（当前为原月增量的 1/10）。
+const DAILY_CULTIVATION_GAIN_SCALE := 0.1
+
+
 static func base_monthly_cultivation_gain(realm_row: Dictionary) -> int:
 	var progression := bundle().get("cultivation_progression", {}) as Dictionary
 	var table := progression.get("base_monthly_gain_by_realm", {}) as Dictionary
@@ -119,6 +123,78 @@ static func base_monthly_cultivation_gain(realm_row: Dictionary) -> int:
 	var phase := _realm_phase(realm_row)
 	var major_table := major_table_v as Dictionary
 	return maxi(1, int(major_table.get(phase, major_table.get("single", 20))))
+
+
+## 闭关按天结算时的境界基础修为（由月配置 × DAILY_CULTIVATION_GAIN_SCALE）。
+static func base_daily_cultivation_gain(realm_row: Dictionary) -> int:
+	return maxi(1, int(round(float(base_monthly_cultivation_gain(realm_row)) * DAILY_CULTIVATION_GAIN_SCALE)))
+
+
+static func cultivation_pill_balance() -> Dictionary:
+	var progression := bundle().get("cultivation_progression", {}) as Dictionary
+	var row_v: Variant = progression.get("cultivation_pill_balance", {})
+	return (row_v as Dictionary).duplicate(true) if row_v is Dictionary else {}
+
+
+## 道具阶位对应的大境界 id（与 EnumItemTier 一致，配置见 cultivation_pill_balance.tier_major_realm）。
+static func major_realm_id_for_item_tier(tier: int) -> String:
+	var table := cultivation_pill_balance().get("tier_major_realm", {}) as Dictionary
+	var key := str(EnumItemTier.clamp_tier(tier))
+	if table.has(key):
+		return str(table[key]).strip_edges()
+	var realms := major_realms()
+	var index := EnumItemTier.clamp_tier(tier) - 1
+	if index >= 0 and index < realms.size():
+		return str((realms[index] as Dictionary).get("id", "qi")).strip_edges()
+	return "qi"
+
+
+## 修炼丹品质档位：炼丹产物以 id 后缀区分，中品无后缀（练气聚气丹中品 quality 仍为 1）。
+static func cultivation_pill_quality_band(item_id: String) -> String:
+	var id := item_id.strip_edges()
+	if id.ends_with("_Low"):
+		return "low"
+	if id.ends_with("_High"):
+		return "high"
+	if id.ends_with("_Supreme"):
+		return "supreme"
+	return "medium"
+
+
+static func cultivation_pill_quality_band_multiplier(band: String) -> float:
+	var table := cultivation_pill_balance().get("quality_band_multiplier", {}) as Dictionary
+	var key := band.strip_edges().to_lower()
+	if key == "":
+		key = "medium"
+	return float(table.get(key, table.get("medium", 1.0)))
+
+
+## 指定大境界、参考小境界（默认 early）下的修炼丹中品日修为。
+static func cultivation_pill_medium_gain(major_realm_id: String, phase: String = "") -> int:
+	var balance := cultivation_pill_balance()
+	var anchor_realm := str(balance.get("anchor_realm", "qi")).strip_edges()
+	var reference_phase := phase.strip_edges()
+	if reference_phase == "":
+		reference_phase = str(balance.get("reference_phase", "early")).strip_edges()
+	var anchor_gain := _major_realm_monthly_gain(anchor_realm, reference_phase)
+	var target_gain := _major_realm_monthly_gain(major_realm_id.strip_edges(), reference_phase)
+	var anchor_medium := int(balance.get("medium_cultivation_gain", 100))
+	if anchor_gain <= 0 or target_gain <= 0:
+		return maxi(1, anchor_medium)
+	return maxi(1, int(round(float(anchor_medium) * float(target_gain) / float(anchor_gain))))
+
+
+## 按道具阶位与品质档位计算「丹药炼化」日修为（配置公式落地）。
+static func cultivation_pill_gain_for_tier(tier: int, quality_band: String, phase: String = "") -> int:
+	var major_id := major_realm_id_for_item_tier(tier)
+	var medium := cultivation_pill_medium_gain(major_id, phase)
+	var mult := cultivation_pill_quality_band_multiplier(quality_band)
+	return maxi(1, int(round(float(medium) * mult)))
+
+
+## 按物品 id 与阶位计算修炼丹日修为（品质档位由 id 后缀推断）。
+static func cultivation_pill_gain_for_item(item_id: String, tier: int, phase: String = "") -> int:
+	return cultivation_pill_gain_for_tier(tier, cultivation_pill_quality_band(item_id), phase)
 
 
 static func acceptance() -> Dictionary:
@@ -192,6 +268,11 @@ static func collect_config_errors(simulation_realms: Array = []) -> PackedString
 		for foundation_key in ["body", "spirit", "sense", "agility"]:
 			if not (row.get("foundations", {}) as Dictionary).has(foundation_key):
 				errors.append("standard_players.%s 缺少根基 %s" % [profile_id, foundation_key])
+	var pill_balance := cultivation_pill_balance()
+	if pill_balance.is_empty():
+		errors.append("cultivation_progression 缺少 cultivation_pill_balance")
+	elif int(pill_balance.get("medium_cultivation_gain", 0)) <= 0:
+		errors.append("cultivation_pill_balance.medium_cultivation_gain 必须大于 0")
 	return errors
 
 
@@ -226,3 +307,10 @@ static func _realm_phase(realm_row: Dictionary) -> String:
 			return "mid"
 		return "late"
 	return "single"
+
+
+static func _major_realm_monthly_gain(major_realm_id: String, phase: String) -> int:
+	return base_monthly_cultivation_gain({
+		"major_realm": major_realm_id.strip_edges(),
+		"id": "%s_%s" % [major_realm_id.strip_edges(), phase.strip_edges()],
+	})

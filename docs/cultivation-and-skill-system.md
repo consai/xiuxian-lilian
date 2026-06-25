@@ -76,6 +76,45 @@
 - 最终速度低于 0.5：按 0.5 结算，防止负数或零收益。
 - 最终速度超过 10.0：按 10.0 结算；更高爆发应走丹药、特殊事件或后续境界规则。
 
+## 修炼丹（丹药炼化）
+
+配置锚点与公式见 `data/realm_balance.yaml > cultivation_progression.cultivation_pill_balance`。运行时推导见 `RealmBalanceService.cultivation_pill_gain_for_item()`。
+
+```text
+中品日修为 = round(anchor_medium × 大境界月基础修为[reference_phase] / 炼气月基础修为[reference_phase])
+
+日修为 = round(中品日修为 × quality_band_multiplier[band])
+```
+
+| 参数 | 当前值 | 说明 |
+|---|---:|---|
+| `anchor_realm` | `qi` | 锚定大境界 |
+| `reference_phase` | `early` | 取各境界 `base_monthly_gain_by_realm` 的哪一档 |
+| `medium_cultivation_gain` | 100 | 练气期中品聚气丹日修为 |
+| `quality_band_multiplier.low` | 0.85 | 下品（id 后缀 `_Low`） |
+| `quality_band_multiplier.medium` | 1.00 | 中品（无后缀，如 `items_JuQiDan`） |
+| `quality_band_multiplier.high` | 1.25 | 上品（`_High`） |
+| `quality_band_multiplier.supreme` | 1.55 | 极品（`_Supreme`） |
+
+道具 `tier`（`EnumItemTier`）经 `tier_major_realm` 映射到大境界。新增修炼丹时：`pill_cultivation` 必须等于 `RealmBalanceService.cultivation_pill_gain_for_item(item_id, tier)`，配置校验会自动核对。
+
+相对同境界日常修炼（日修为 = 月修为 × 0.1、速度 1.0）的加速比在各境界恒定：
+
+```text
+加速比 ≈ medium_cultivation_gain / (炼气月基础修为 × DAILY_CULTIVATION_GAIN_SCALE) = 100 / 3 ≈ 33×
+```
+
+| 大境界 | tier | 月基础(early) | 中品丹药 | 相对日修为加速 |
+|---|---:|---:|---:|---:|
+| 炼气 | 1 | 30 | 100 | 33× |
+| 筑基 | 2 | 100 | 333 | 33× |
+| 金丹 | 3 | 300 | 1000 | 33× |
+
+### 失败状态
+
+- `item.yaml` 中 `pill_cultivation` 与公式不一致：启动配置校验报错。
+- 背包无修炼丹或不足闭关天数：丹药炼化模式不可选。
+
 ## 战斗配置
 
 玩家可配置：

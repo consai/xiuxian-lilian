@@ -43,8 +43,8 @@ const MODE_CONFIG: Dictionary = {
 	},
 	LABEL_PILL: {
 		"name": "丹药炼化",
-		"description": "服用修炼丹药后打坐炼化，修为增长极快，但会使灵力驳杂。",
-		"cultivation_multiplier": 10.0,
+		"description": "服用修炼丹药后打坐炼化，获得丹药修为，但会使灵力驳杂。",
+		"cultivation_multiplier": 1.0,
 		"knowledge_multiplier": 0.8,
 		"mastery_multiplier": 0.8,
 	},

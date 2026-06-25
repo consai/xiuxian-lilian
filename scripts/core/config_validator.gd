@@ -28,6 +28,7 @@ static func collect_all_errors(config_manager: Node, game_state: Node = null) ->
 	errors.append_array(KnowledgeEffectServiceScript.collect_config_errors())
 	errors.append_array(_validate_learning_book_coverage(config_manager))
 	errors.append_array(_validate_item_alias_targets(config_manager))
+	errors.append_array(_validate_cultivation_pill_gains(config_manager))
 	errors.append_array(ExpeditionDataValidatorScript.collect_errors(game_state))
 	errors.append_array(WorldMapDataValidatorScript.collect_errors())
 	return errors
@@ -182,6 +183,29 @@ static func _validate_item_alias_targets(config_manager: Node) -> PackedStringAr
 			continue
 		if config_manager.item_def_by_id(target_id) == null:
 			errors.append("物品别名 %s 指向了不存在的目标 %s" % [alias_id, target_id])
+	return errors
+
+
+static func _validate_cultivation_pill_gains(config_manager: Node) -> PackedStringArray:
+	var errors: PackedStringArray = []
+	for item_v in config_manager.items():
+		if not item_v is ItemDef:
+			continue
+		var item := item_v as ItemDef
+		if not item.is_cultivation_pill():
+			continue
+		var expected := RealmBalanceServiceScript.cultivation_pill_gain_for_item(item.id, item.tier)
+		var actual := int(round(item.get_use_effect_amount("pill_cultivation")))
+		if actual != expected:
+			errors.append(
+				"修炼丹 %s 的 pill_cultivation 应为 %d（tier=%d band=%s），实际为 %d" % [
+					item.id,
+					expected,
+					item.tier,
+					RealmBalanceServiceScript.cultivation_pill_quality_band(item.id),
+					actual,
+				]
+			)
 	return errors
 
 

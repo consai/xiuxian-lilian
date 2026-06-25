@@ -90,11 +90,11 @@ func _save_service() -> Node:
 func _test_new_game_and_daily_activities() -> void:
 	var state := _state()
 	_expect_eq(state.day, 1, "new game day")
-	_expect_eq(state.cultivate(), 80, "healthy cultivate gain")
-	_expect_eq(state.day, 1 + GameTimeServiceScript.days_per_month(), "cultivate advances one month")
+	_expect_eq(state.cultivate(), 8, "healthy cultivate gain")
+	_expect_eq(state.day, 2, "cultivate advances one day")
 	state.injury_days = 3
-	_expect_eq(state.cultivate(), 40, "injured cultivate gain")
-	_expect_eq(state.injury_days, 0, "cultivation duration clears injury")
+	_expect_eq(state.cultivate(), 4, "injured cultivate gain")
+	_expect_eq(state.injury_days, 2, "cultivation reduces injury by one day")
 	state.hp = 1.0
 	state.rest()
 	_expect_near(state.hp, FightAttr.get_attr(state.attrs, FightAttr.HP_MAX), "rest hp")
@@ -226,7 +226,7 @@ func _test_knowledge_effects_feed_attrs() -> void:
 
 func _test_cultivation_methods() -> void:
 	var state := _state()
-	_expect_eq(state.cultivate(), 80, "starter main method enables cultivation")
+	_expect_eq(state.cultivate(), 8, "starter main method enables cultivation")
 	var before_mp := FightAttr.get_attr(state.attrs, FightAttr.MP_MAX)
 	state.cultivate()
 	_expect_gt(
@@ -249,10 +249,10 @@ func _test_cultivation_methods() -> void:
 
 func _test_cultivation_sessions() -> void:
 	var state := _state()
-	var three_months := GameTimeServiceScript.days_per_month() * 3
-	var balanced_preview: Dictionary = state.preview_cultivation_session("cycle", three_months)
-	var breathing_preview: Dictionary = state.preview_cultivation_session("breathing", three_months)
-	var insight_preview: Dictionary = state.preview_cultivation_session("insight", three_months)
+	var session_days := GameTimeServiceScript.days_per_month() * 3
+	var balanced_preview: Dictionary = state.preview_cultivation_session("cycle", session_days)
+	var breathing_preview: Dictionary = state.preview_cultivation_session("breathing", session_days)
+	var insight_preview: Dictionary = state.preview_cultivation_session("insight", session_days)
 	_expect_true(bool(balanced_preview.get("ok", false)), "balanced cultivation preview")
 	_expect_gt(
 		int(breathing_preview.get("estimated_cultivation", 0)),
@@ -264,10 +264,10 @@ func _test_cultivation_sessions() -> void:
 		int(insight_preview.get("estimated_cultivation", 0)),
 		"insight estimates less cultivation"
 	)
-	var result: Dictionary = state.cultivate_session("insight", three_months)
+	var result: Dictionary = state.cultivate_session("insight", session_days)
 	_expect_true(bool(result.get("ok", false)), "insight session succeeds")
-	_expect_eq(state.day, 1 + three_months, "three month session advances calendar days")
-	_expect_eq(int(result.get("cultivation_gained", 0)), 201, "insight session cultivation")
+	_expect_eq(state.day, 1 + session_days, "multi-day session advances calendar days")
+	_expect_eq(int(result.get("cultivation_gained", 0)), 630, "insight session cultivation")
 	_expect_gt(float(result.get("mastery_gained", 0.0)), 0.06, "insight gains extra mastery")
 	_expect_true(not (result.get("knowledge_gains", []) as Array).is_empty(), "session reports knowledge gains")
 
@@ -275,26 +275,26 @@ func _test_cultivation_sessions() -> void:
 func _test_pill_cultivation_preview() -> void:
 	var state := _state()
 	state.inventory.erase("items_JuQiDan")
-	var one_month := GameTimeServiceScript.days_per_month()
-	var missing: Dictionary = state.preview_cultivation_session("pill", one_month)
+	var one_day := 1
+	var missing: Dictionary = state.preview_cultivation_session("pill", one_day)
 	_expect_true(not bool(missing.get("ok", true)), "pill preview blocked without cultivation pill")
 	_expect_true(
 		str(missing.get("error", "")).contains("丹药"),
 		"pill preview explains missing cultivation pill"
 	)
 	state.inventory["items_JuQiDan"] = 3
-	var three_months := one_month * 3
-	var selected: Dictionary = state.preview_cultivation_session("pill", three_months, "items_JuQiDan")
+	var three_days := 3
+	var selected: Dictionary = state.preview_cultivation_session("pill", three_days, "items_JuQiDan")
 	_expect_true(bool(selected.get("ok", false)), "pill preview accepts selected pill")
 	_expect_eq(str(selected.get("pill_id", "")), "items_JuQiDan", "pill preview preserves selected pill")
-	_expect_eq((selected.get("pill_ids", []) as Array).size(), 3, "pill preview plans one pill per month")
+	_expect_eq((selected.get("pill_ids", []) as Array).size(), 3, "pill preview plans one pill per day")
 
 
 func _test_pill_cultivation_and_instability() -> void:
 	var state := _state()
-	var one_month := GameTimeServiceScript.days_per_month()
-	var normal: Dictionary = state.preview_cultivation_session("cycle", one_month)
-	var pill: Dictionary = state.preview_cultivation_session("pill", one_month)
+	var one_day := 1
+	var normal: Dictionary = state.preview_cultivation_session("cycle", one_day)
+	var pill: Dictionary = state.preview_cultivation_session("pill", one_day)
 	_expect_true(bool(pill.get("ok", false)), "starter pill enables pill cultivation")
 	_expect_gt(
 		int(pill.get("estimated_cultivation", 0)),
@@ -302,12 +302,12 @@ func _test_pill_cultivation_and_instability() -> void:
 		"pill cultivation is significantly faster"
 	)
 	var pills_before := int(state.inventory.get("items_JuQiDan", 0))
-	var result: Dictionary = state.cultivate_session("pill", one_month)
+	var result: Dictionary = state.cultivate_session("pill", one_day)
 	_expect_eq(int(state.inventory.get("items_JuQiDan", 0)), pills_before - 1, "pill cultivation consumes pill")
 	_expect_eq(int(result.get("instability_gained", 0)), 12, "pill cultivation adds instability")
 	var settlement := {
 		"settlement_id": "test-pill-instability",
-		"elapsed_days": one_month,
+		"elapsed_days": GameTimeServiceScript.days_per_month(),
 		"start_day": state.day,
 		"exit_reason": "manual",
 		"hp": state.hp,
@@ -552,10 +552,27 @@ func _test_alchemy_steady_strategy_ordering() -> void:
 		float(supreme.get("base_score", 0.0)),
 		"steady raises base score above supreme"
 	)
+	var steady_probs := steady.get("probabilities", {}) as Dictionary
+	var supreme_probs := supreme.get("probabilities", {}) as Dictionary
+	var steady_mid_or_better := (
+		float(steady_probs.get("medium", 0.0))
+		+ float(steady_probs.get("high", 0.0))
+		+ float(steady_probs.get("supreme", 0.0))
+	)
+	var supreme_mid_or_better := (
+		float(supreme_probs.get("medium", 0.0))
+		+ float(supreme_probs.get("high", 0.0))
+		+ float(supreme_probs.get("supreme", 0.0))
+	)
 	_expect_gt(
-		float(steady.get("success_probability", 0.0)),
-		float(supreme.get("success_probability", 0.0)),
-		"higher base score strategy should not have lower success rate"
+		float(steady_probs.get("low", 0.0)),
+		float(supreme_probs.get("low", 0.0)),
+		"steady keeps more outcomes at low quality"
+	)
+	_expect_gt(
+		supreme_mid_or_better,
+		steady_mid_or_better,
+		"supreme chases mid-or-better quality"
 	)
 
 
@@ -577,10 +594,11 @@ func _test_alchemy_recipe_mastery() -> void:
 		20.0,
 		"maximum recipe mastery grants twenty outcome score"
 	)
+	_expect_near(float(mastered.get("success_probability", 0.0)), 1.0, "alchemy always succeeds")
 	_expect_gt(
-		float(mastered.get("success_probability", 0.0)),
-		float(novice.get("success_probability", 0.0)),
-		"recipe mastery raises success probability"
+		float(mastered.get("high_quality_probability", 0.0)),
+		float(novice.get("high_quality_probability", 0.0)),
+		"recipe mastery raises high-quality probability"
 	)
 	var novice_probabilities := novice.get("probabilities", {}) as Dictionary
 	var mastered_probabilities := mastered.get("probabilities", {}) as Dictionary
@@ -615,22 +633,23 @@ func _test_alchemy_recipe_mastery() -> void:
 	)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 1
-	var forced_failure := novice.duplicate(true)
-	forced_failure["base_score"] = 0.0
-	(forced_failure.get("strategy", {}) as Dictionary)["spread"] = 0
-	var failed: Dictionary = AlchemyServiceScript.roll(forced_failure, rng)
-	_expect_true(not bool(failed.get("succeeded", true)), "none result counts as failure")
-	_expect_eq(str(failed.get("outcome_name", "")), "炼制失败", "failure outcome label")
+	var forced_low := novice.duplicate(true)
+	forced_low["base_score"] = 0.0
+	(forced_low.get("strategy", {}) as Dictionary)["spread"] = 0
+	var low_result: Dictionary = AlchemyServiceScript.roll(forced_low, rng)
+	_expect_true(bool(low_result.get("succeeded", false)), "worst score still yields low-quality pill")
+	_expect_eq(str(low_result.get("quality", "")), "low", "worst score maps to low quality")
+	_expect_eq(str(low_result.get("outcome_name", "")), "炼制成功", "guaranteed success outcome label")
 	var forced_success := novice.duplicate(true)
 	forced_success["base_score"] = 55.0
 	(forced_success.get("strategy", {}) as Dictionary)["spread"] = 0
 	var succeeded: Dictionary = AlchemyServiceScript.roll(forced_success, rng)
 	_expect_true(bool(succeeded.get("succeeded", false)), "low or better counts as success")
 	_expect_eq(str(succeeded.get("outcome_name", "")), "炼制成功", "success outcome label")
-	_expect_gt(
-		int(failed.get("mastery_gain", 0)),
+	_expect_eq(
+		int(low_result.get("mastery_gain", 0)),
 		int(succeeded.get("mastery_gain", 0)),
-		"failure grants more recipe mastery"
+		"success outcomes grant the same recipe mastery"
 	)
 
 
@@ -672,10 +691,7 @@ func _test_pre_foundation_resource_loop() -> void:
 	var preview: Dictionary = state.preview_alchemy("recipe.juqi", "steady", "lowest")
 	_expect_true(bool(preview.get("ok", false)), "juqi preview succeeds from expedition loot")
 	var success_probability := float(preview.get("success_probability", 0.0))
-	_expect_true(
-		success_probability >= 0.45 and success_probability <= 0.70,
-		"starter steady juqi success stays readable: %.3f" % success_probability
-	)
+	_expect_near(success_probability, 1.0, "alchemy preview always shows full success rate")
 	_expect_eq(state.max_alchemy_batch_count(preview), 1, "yaodan gates juqi batch explosion")
 	var forced_preview := preview.duplicate(true)
 	forced_preview["base_score"] = 55.0
@@ -691,9 +707,9 @@ func _test_pre_foundation_resource_loop() -> void:
 	_expect_true(bool(brew.get("succeeded", false)), "juqi brew applies successful result: %s" % str(brew))
 	var pill_id := str(brew.get("product_id", ""))
 	_expect_true(state.is_cultivation_pill(pill_id), "juqi output is a cultivation pill")
-	var one_month := GameTimeServiceScript.days_per_month()
-	var normal: Dictionary = state.preview_cultivation_session("cycle", one_month)
-	var pill: Dictionary = state.preview_cultivation_session("pill", one_month, pill_id)
+	var one_day := 1
+	var normal: Dictionary = state.preview_cultivation_session("cycle", one_day)
+	var pill: Dictionary = state.preview_cultivation_session("pill", one_day, pill_id)
 	_expect_true(bool(pill.get("ok", false)), "crafted juqi pill can be cultivated")
 	_expect_gt(
 		int(pill.get("estimated_cultivation", 0)),
@@ -701,7 +717,7 @@ func _test_pre_foundation_resource_loop() -> void:
 		"crafted juqi pill accelerates cultivation"
 	)
 	var pill_before := int(state.inventory.get(pill_id, 0))
-	var cultivated: Dictionary = state.cultivate_session("pill", one_month, pill_id)
+	var cultivated: Dictionary = state.cultivate_session("pill", one_day, pill_id)
 	_expect_true(bool(cultivated.get("ok", false)), "crafted juqi pill cultivation succeeds")
 	_expect_eq(int(state.inventory.get(pill_id, 0)), pill_before - 1, "crafted pill is consumed")
 	_expect_eq(

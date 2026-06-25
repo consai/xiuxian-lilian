@@ -340,9 +340,7 @@ theme_override_styles/panel = SubResource("Style_probability")
 [node name="ProbabilityLabel" type="Label" parent="StrategyPanel/StrategyContent/ProbabilityCard" unique_id=869609852]
 unique_name_in_owner = true
 layout_mode = 2
-text = "成丹概率
-无产物    5.0%
-废丹     15.0%
+text = "成丹品质概率
 下品     35.0%
 中品     25.0%
 上品     15.0%

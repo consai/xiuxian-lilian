@@ -108,14 +108,13 @@ func _refresh() -> void:
 	_refresh_pill_preview(preview.get("recipe", {}) as Dictionary)
 	var strategy := preview.get("strategy", {}) as Dictionary
 	_detail_label.text = (
-		"当前丹方熟练度 %d/1000（品质分 %+.1f）\n成功率 %.1f%% · 上品以上 %.1f%% · 基础成丹分 %.1f\n"
+		"当前丹方熟练度 %d/1000（品质分 %+.1f）\n上品以上 %.1f%% · 基础成丹分 %.1f\n"
 		+ "药材品质 %.2f（%+.1f） · 属性辅助 %+.1f\n"
 		+ "基础产量 %d · 多丹概率 %.1f%%（最多 +%d） · 节省药材概率 %.1f%%\n"
 		+ "预计耗时 %s\n\n%s"
 	) % [
 		int(preview.get("recipe_mastery", 0)),
 		float(preview.get("mastery_score", 0.0)),
-		float(preview.get("success_probability", 0.0)) * 100.0,
 		float(preview.get("high_quality_probability", 0.0)) * 100.0,
 		float(preview.get("base_score", 0.0)),
 		float(preview.get("average_quality", 1.0)),
@@ -216,15 +215,8 @@ func _refresh_pill_preview(recipe: Dictionary) -> void:
 
 
 func _format_probabilities(probabilities: Dictionary) -> String:
-	var failure := (
-		float(probabilities.get(EnumAlchemyQuality.LABEL_NONE, 0.0))
-		+ float(probabilities.get(EnumAlchemyQuality.LABEL_WASTE, 0.0))
-	)
-	var lines: PackedStringArray = [
-		"炼制成功 %.1f%% · 失败 %.1f%%" % [(1.0 - failure) * 100.0, failure * 100.0],
-		"下品及以上视为成功",
-	]
-	for quality_label in EnumAlchemyQuality.ALL_LABELS:
+	var lines: PackedStringArray = ["成丹品质概率"]
+	for quality_label in EnumAlchemyQuality.SUCCESS_LABELS:
 		lines.append("%s  %5.1f%%" % [
 			EnumAlchemyQuality.display_name(quality_label),
 			float(probabilities.get(quality_label, 0.0)) * 100.0,

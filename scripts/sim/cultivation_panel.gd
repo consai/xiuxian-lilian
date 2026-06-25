@@ -30,7 +30,7 @@ const MODE_IDS := EnumCultivationMode.MODE_IDS
 @onready var _method_picker: LoadoutSelectionPopup = %MethodPicker
 
 var _mode_id := EnumCultivationMode.LABEL_CYCLE
-var _months := 1
+var _days := 1
 var _selected_pill_id := ""
 
 
@@ -98,7 +98,7 @@ func _refresh() -> void:
 		var pill_name := ConfigManager.get_item_display_name(pill_id)
 		meta_text += "\n消耗%s x%d · 灵力驳杂 +%d" % [
 			pill_name,
-			_months,
+			_days,
 			int(preview.get("instability_gain", 0)),
 		]
 	meta_text += "\n\n世界时间将在闭关期间正常流逝。"
@@ -113,29 +113,29 @@ func _refresh() -> void:
 
 
 func _sync_day_slider() -> void:
-	var min_months := GameState.min_cultivation_months()
-	var max_months := maxi(min_months, GameState.max_cultivation_months(_mode_id, _selected_pill_id))
-	_day_slider.min_value = float(min_months)
-	_day_slider.max_value = float(max_months)
-	# 未选择或越界时回落到最短可选月数（默认 1 月）
-	if _months < min_months:
-		_months = min_months
-	_months = clampi(_months, min_months, max_months)
-	if int(round(_day_slider.value)) != _months:
-		_day_slider.set_value_no_signal(float(_months))
-	_day_max_button.disabled = max_months <= min_months
+	var min_days := GameState.min_cultivation_days()
+	var max_days := maxi(min_days, GameState.max_cultivation_days(_mode_id, _selected_pill_id))
+	_day_slider.min_value = float(min_days)
+	_day_slider.max_value = float(max_days)
+	# 未选择或越界时回落到最短可选天数（默认 1 天）
+	if _days < min_days:
+		_days = min_days
+	_days = clampi(_days, min_days, max_days)
+	if int(round(_day_slider.value)) != _days:
+		_day_slider.set_value_no_signal(float(_days))
+	_day_max_button.disabled = max_days <= min_days
 	_day_count_label.text = "闭关 %s" % GameState.time_duration_label(_cultivation_days())
 
 
 func _cultivation_days() -> int:
-	return _months * GameTimeService.days_per_month()
+	return _days
 
 
 func _on_day_slider_changed(value: float) -> void:
-	var new_months := int(round(value))
-	if new_months == _months:
+	var new_days := int(round(value))
+	if new_days == _days:
 		return
-	_months = new_months
+	_days = new_days
 	_day_count_label.text = "闭关 %s" % GameState.time_duration_label(_cultivation_days())
 	_refresh()
 
@@ -164,11 +164,11 @@ func _format_mode_description(mode: Dictionary, preview: Dictionary) -> String:
 	var pill_id := str(preview.get("pill_id", ""))
 	if pill_id == "":
 		return "点击选择修炼丹药后打坐炼化，修为增长极快，但会使灵力驳杂。"
-	var multiplier: float = GameState.cultivation_pill_multiplier(pill_id)
+	var gain: int = GameState.cultivation_pill_gain(pill_id)
 	var pill_name := ConfigManager.get_item_display_name(pill_id)
-	return "炼化【%s】，修为增长约为普通周天的 %.0f 倍，但会使灵力驳杂。" % [
+	return "炼化【%s】，直接增加 %d 点修为，但会使灵力驳杂。" % [
 		pill_name,
-		multiplier,
+		gain,
 	]
 
 
@@ -196,26 +196,28 @@ func _format_cultivation_formula(preview: Dictionary) -> String:
 		return ""
 	var speed_part := int(formula.get("speed_part", 0))
 	var method_gain := int(formula.get("method_base_gain", 0))
-	var monthly := int(formula.get("monthly_total", speed_part + method_gain))
-	var months := int(formula.get("months", 1))
-	var monthly_gains := formula.get("monthly_gains", []) as Array
+	var daily := int(formula.get("daily_total", speed_part + method_gain))
+	var days := int(formula.get("days", 1))
+	var daily_gains := formula.get("daily_gains", []) as Array
 	var injury_mult := float(formula.get("injury_multiplier", 1.0))
+	var is_pill := bool(formula.get("is_pill_mode", false))
+	var gain_label := "丹药 %d" % speed_part if is_pill else "每日 %d" % speed_part
 	if injury_mult < 1.0:
-		return "每月 %d + 功法 %d = %d（受伤 ×%.1f）" % [
-			speed_part, method_gain, monthly, injury_mult,
+		return "%s + 功法 %d = %d（受伤 ×%.1f）" % [
+			gain_label, method_gain, daily, injury_mult,
 		]
-	if months > 1:
+	if days > 1:
 		var uniform := true
-		for gain_v in monthly_gains:
-			if int(gain_v) != monthly:
+		for gain_v in daily_gains:
+			if int(gain_v) != daily:
 				uniform = false
 				break
 		if uniform:
-			return "每月 %d + 功法 %d = %d × %d月" % [
-				speed_part, method_gain, monthly, months,
+			return "%s + 功法 %d = %d × %d天" % [
+				gain_label, method_gain, daily, days,
 			]
-		return "合计 +%d（各月受伤状态不同）" % int(preview.get("estimated_cultivation", 0))
-	return "每月 %d + 功法 %d = %d" % [speed_part, method_gain, monthly]
+		return "合计 +%d（各天受伤状态不同）" % int(preview.get("estimated_cultivation", 0))
+	return "%s + 功法 %d = %d" % [gain_label, method_gain, daily]
 
 
 func _format_knowledge_routes(rows: Array) -> String:

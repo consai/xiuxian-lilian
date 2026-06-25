@@ -202,7 +202,7 @@ static func base_cultivation_gain_breakdown(method_id: String) -> Dictionary:
 	var major_id := str(method.get("realm", "")).strip_edges()
 	if major_id == "":
 		return {"gain": 0}
-	var realm_base := RealmBalanceService.base_monthly_cultivation_gain({
+	var realm_base := RealmBalanceService.base_daily_cultivation_gain({
 		"major_realm": major_id,
 		"id": "%s_early" % major_id,
 	})

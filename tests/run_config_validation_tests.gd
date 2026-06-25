@@ -20,6 +20,7 @@ func _run_all() -> void:
 	_run("config validator reports no errors on boot data", _test_config_has_no_errors)
 	_run("realm balance covers simulation realms", _test_realm_balance_covers_simulation_realms)
 	_run("realm cultivation thresholds follow formula", _test_realm_threshold_formula)
+	_run("cultivation pill gains follow realm balance formula", _test_cultivation_pill_gain_formula)
 	_run("item categories expose primary and secondary labels", _test_item_categories)
 	_run("location service reads cached config", _test_location_service_cached)
 	_run("modular location validator rejects legacy fields", _test_modular_location_validator_rejects_legacy_fields)
@@ -61,7 +62,7 @@ func _test_realm_balance_covers_simulation_realms() -> void:
 	var qi := RealmBalanceServiceScript.major_realm_by_id("qi")
 	_expect_eq(str(qi.get("name", "")), "炼气", "qi realm configured")
 	var mods := RealmBalanceServiceScript.realm_flat_modifiers(2)
-	_expect_near(float(mods.get(FightAttr.HP_MAX, 0.0)), 12.0, "realm layer hp modifier")
+	_expect_near(float(mods.get(FightAttr.HP_MAX, 0.0)), 60.0, "realm layer hp modifier")
 
 
 func _test_realm_threshold_formula() -> void:
@@ -75,6 +76,29 @@ func _test_realm_threshold_formula() -> void:
 			300 * order * order,
 			"%s breakthrough_at formula" % str(realm.get("id", ""))
 		)
+
+
+func _test_cultivation_pill_gain_formula() -> void:
+	_expect_eq(
+		RealmBalanceServiceScript.cultivation_pill_medium_gain("qi"),
+		100,
+		"qi medium pill anchor"
+	)
+	_expect_eq(
+		RealmBalanceServiceScript.cultivation_pill_medium_gain("foundation"),
+		333,
+		"foundation medium pill scales with monthly gain"
+	)
+	_expect_eq(
+		RealmBalanceServiceScript.cultivation_pill_gain_for_item("items_JuQiDan", EnumItemTier.Type.QI),
+		100,
+		"juqi medium band"
+	)
+	_expect_eq(
+		RealmBalanceServiceScript.cultivation_pill_gain_for_item("items_GuBenDaoJiDan", EnumItemTier.Type.FOUNDATION),
+		333,
+		"guben medium band"
+	)
 
 
 func _test_item_categories() -> void:

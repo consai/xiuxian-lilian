@@ -305,7 +305,7 @@ static func format_use_effect_lines(use_effect: Array) -> Array[String]:
 			"pill_cultivation":
 				if amount != 0.0:
 					lines.append(StringsZh.format_template(
-						StringsZh.getp("item_info.use_pill_cultivation", "使用效果：修炼「丹药炼化」修为约 ×{value}"),
+						StringsZh.getp("item_info.use_pill_cultivation", "使用效果：修炼「丹药炼化」修为 +{value}"),
 						{"value": _fmt_num(amount)}
 					))
 			"injury":

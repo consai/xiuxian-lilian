@@ -8,6 +8,7 @@ const MASTERY_EXTRA_PILL_CHANCE_MAX := 0.75
 const MASTERY_SECOND_EXTRA_PILL_CHANCE_MAX := 0.30
 const MASTERY_COST_SAVE_CHANCE_MAX := 0.35
 const FAILURE_MASTERY_MULTIPLIER := 1.5
+const DEFAULT_BASE_YIELD := 2
 const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
 const EnumActivityTimeScript := preload("res://scripts/enum/enum_activity_time.gd")
 
@@ -185,7 +186,7 @@ static func preview(
 	)
 	var days := maxi(1, activity_days + int(strategy.get("days", 0)))
 	var product_count := maxi(1, int(round(
-		float(recipe.get("base_yield", 1))
+		float(recipe.get("base_yield", DEFAULT_BASE_YIELD))
 		* (1.0 + float(furnace.get("refinement", 0.0)) + float(strategy.get("yield", 0.0)))
 	)))
 	return {
@@ -318,31 +319,24 @@ static func roll(preview_data: Dictionary, rng: RandomNumberGenerator) -> Dictio
 	if not bool(preview_data.get("ok", false)):
 		return {"ok": false, "error": str(preview_data.get("error", "炼制条件不足"))}
 	var strategy := preview_data.get("strategy", {}) as Dictionary
-	var furnace := preview_data.get("furnace", {}) as Dictionary
 	var spread_bounds := _strategy_spread_bounds(strategy)
 	var spread_down: int = spread_bounds[0]
 	var spread_up: int = spread_bounds[1]
 	var score := float(preview_data.get("base_score", 0.0))
 	score += rng.randi_range(-spread_down, spread_up) + rng.randi_range(-spread_down, spread_up)
 	var quality := _quality_for_score(score)
-	var safety := clampf(float(furnace.get("safety", 0.0)) + float(strategy.get("safety", 0.0)), 0.0, 1.0)
-	if quality == EnumAlchemyQuality.LABEL_NONE and rng.randf() < safety:
-		quality = EnumAlchemyQuality.LABEL_WASTE
+	# 必成丹：无产物与废丹统一降为下品，不再产出废丹
+	if quality in [EnumAlchemyQuality.LABEL_NONE, EnumAlchemyQuality.LABEL_WASTE]:
+		quality = EnumAlchemyQuality.LABEL_LOW
 	var recipe := preview_data.get("recipe", {}) as Dictionary
-	var product_id := ""
-	var count := 0
+	var product_id := str((recipe.get("products", {}) as Dictionary).get(quality, ""))
 	var extra_pills := 0
-	if quality == EnumAlchemyQuality.LABEL_WASTE:
-		product_id = "items_WasteDan"
-		count = 1
-	elif quality not in [EnumAlchemyQuality.LABEL_NONE, EnumAlchemyQuality.LABEL_WASTE]:
-		product_id = str((recipe.get("products", {}) as Dictionary).get(quality, ""))
-		count = int(preview_data.get("product_count", 1))
-		if rng.randf() < float(preview_data.get("extra_pill_chance", 0.0)):
+	var count := int(preview_data.get("product_count", DEFAULT_BASE_YIELD))
+	if rng.randf() < float(preview_data.get("extra_pill_chance", 0.0)):
+		extra_pills += 1
+		if rng.randf() < float(preview_data.get("second_extra_pill_chance", 0.0)):
 			extra_pills += 1
-			if rng.randf() < float(preview_data.get("second_extra_pill_chance", 0.0)):
-				extra_pills += 1
-		count += extra_pills
+	count += extra_pills
 	var consumed_ingredients := _roll_consumed_ingredients(
 		preview_data.get("ingredients", []) as Array,
 		float(preview_data.get("cost_save_chance", 0.0)),
@@ -480,7 +474,7 @@ static func _strategy_spread_bounds(strategy: Dictionary) -> Array:
 	]
 
 
-static func _probabilities(base_score: float, spread_down: int, spread_up: int, safety: float) -> Dictionary:
+static func _probabilities(base_score: float, spread_down: int, spread_up: int, _safety: float) -> Dictionary:
 	var counts := EnumAlchemyQuality.empty_probability_counts()
 	var span := spread_down + spread_up + 1
 	var total := float(span * span)
@@ -488,9 +482,14 @@ static func _probabilities(base_score: float, spread_down: int, spread_up: int, 
 		for second in range(-spread_down, spread_up + 1):
 			var quality := _quality_for_score(base_score + first + second)
 			counts[quality] = float(counts[quality]) + 1.0
-	var convertible := float(counts[EnumAlchemyQuality.LABEL_NONE]) * clampf(safety, 0.0, 1.0)
-	counts[EnumAlchemyQuality.LABEL_NONE] = float(counts[EnumAlchemyQuality.LABEL_NONE]) - convertible
-	counts[EnumAlchemyQuality.LABEL_WASTE] = float(counts[EnumAlchemyQuality.LABEL_WASTE]) + convertible
+	# ponytail: 失败/废丹概率并入下品，预览与 roll 必成丹一致；safety 参数保留签名兼容
+	var failure_mass := (
+		float(counts[EnumAlchemyQuality.LABEL_NONE])
+		+ float(counts[EnumAlchemyQuality.LABEL_WASTE])
+	)
+	counts[EnumAlchemyQuality.LABEL_NONE] = 0.0
+	counts[EnumAlchemyQuality.LABEL_WASTE] = 0.0
+	counts[EnumAlchemyQuality.LABEL_LOW] = float(counts[EnumAlchemyQuality.LABEL_LOW]) + failure_mass
 	for key in counts.keys():
 		counts[key] = float(counts[key]) / total
 	return counts

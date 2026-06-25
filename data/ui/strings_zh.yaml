@@ -61,7 +61,7 @@ item_info:
   use_heart_demon: "使用效果：心魔 {value}"
   use_cultivation: "使用效果：修为 +{value}"
   use_instability: "使用效果：灵力驳杂 {value}"
-  use_pill_cultivation: "使用效果：修炼「丹药炼化」修为约 ×{value}"
+  use_pill_cultivation: "使用效果：修炼「丹药炼化」修为 +{value}"
   use_injury: "使用效果：缩短伤势 {value} 日"
   use_sell_only: "使用效果：无药效，仅可出售"
   use_alchemy_mastery: "使用效果：{recipe} 熟练度 +{value}"
