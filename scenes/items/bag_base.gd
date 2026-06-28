@@ -4,7 +4,7 @@ extends Control
 ## 储物/背包公用组件：无物品时不显示占位格；有物品时视口内最多 [member max_slots_show] 格，滚动时动态换绑数据。
 
 const ItemScene := preload("res://scenes/items/item.tscn")
-const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
+const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 const ItemDefScript := preload("res://scripts/core/item_def.gd")
 const ItemInfoPayloadBuilderScript := preload("res://scripts/ui/item_info_payload_builder.gd")
 const HoverTipSourceScript := preload("res://scripts/ui/hover/hover_tip_source.gd")
@@ -579,7 +579,7 @@ func _entry_view_data(entry: Dictionary, cache_key: String = "") -> Dictionary:
 		var equip_cfg := ConfigManager.equip_by_id(int(entry.get("id", -1)))
 		if item_name == "":
 			item_name = str(equip_cfg.get("name", "法宝"))
-		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
+		icon = ZhandouInitDataScript._resolve_icon_texture(equip_cfg)
 		if quality == "":
 			quality = EnumQuality.display_label(int(equip_cfg.get("quality", 1)))
 		tier = maxi(1, int(equip_cfg.get("tier", tier)))

@@ -58,17 +58,17 @@ func _test_realm_multiplier() -> void:
 
 func _test_activity_days() -> void:
 	_expect_eq(
-		GameTimeServiceScript.days_for_activity(EnumActivityTimeScript.LABEL_ALCHEMY, "qi"),
+		GameTimeServiceScript.days_for_activity(EnumActivityTimeScript.LABEL_LIANDAN, "qi"),
 		7,
 		"qi alchemy days"
 	)
 	_expect_eq(
-		GameTimeServiceScript.days_for_activity(EnumActivityTimeScript.LABEL_ALCHEMY, "foundation"),
+		GameTimeServiceScript.days_for_activity(EnumActivityTimeScript.LABEL_LIANDAN, "foundation"),
 		14,
 		"foundation alchemy days"
 	)
 	_expect_eq(
-		GameTimeServiceScript.days_for_activity(EnumActivityTimeScript.LABEL_EXPEDITION, "qi"),
+		GameTimeServiceScript.days_for_activity(EnumActivityTimeScript.LABEL_LILIAN, "qi"),
 		30,
 		"qi expedition days"
 	)

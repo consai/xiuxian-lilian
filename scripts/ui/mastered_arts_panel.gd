@@ -1,10 +1,10 @@
 extends Control
 
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
-const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
-const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
+const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
-const MethodRowScene := preload("res://scenes/ui/components/loadout_method_row.tscn")
+const MethodRowScene := preload("res://scenes/ui/components/peizhi_gongfa_hang.tscn")
 const SkillRowScene := preload("res://scenes/ui/components/mastered_skill_row.tscn")
 
 const FILTER_ALL := "all"
@@ -30,7 +30,7 @@ var _skill_filter := FILTER_ALL
 
 func _ready() -> void:
 	_close_button.pressed.connect(_go_back)
-	_configure_button.pressed.connect(func() -> void: SceneManager.go_combat_loadout_panel())
+	_configure_button.pressed.connect(func() -> void: SceneManager.go_zhandou_peizhi_mianban())
 	_filter_all.pressed.connect(_set_skill_filter.bind(FILTER_ALL))
 	_filter_active.pressed.connect(_set_skill_filter.bind(FILTER_ACTIVE))
 	_filter_upkeep.pressed.connect(_set_skill_filter.bind(FILTER_UPKEEP))
@@ -58,14 +58,14 @@ func _bind_methods() -> void:
 		var method_id := str(method_id_v).strip_edges()
 		if method_id == "":
 			continue
-		var method := CultivationMethodServiceScript.by_id(method_id)
+		var method := XiulianMethodServiceScript.by_id(method_id)
 		if method.is_empty():
 			continue
 		count += 1
 		var row := MethodRowScene.instantiate() as Control
 		var icon := _method_icon(method)
 		row.get_node("%TypeLabel").text = _method_type_label(method)
-		var family := CultivationMethodServiceScript.family_by_id(str(method.get("familyId", "")))
+		var family := XiulianMethodServiceScript.family_by_id(str(method.get("familyId", "")))
 		var name_label := row.get_node("%NameLabel") as Label
 		name_label.text = str(method.get("name", method_id))
 		name_label.add_theme_color_override(
@@ -197,7 +197,7 @@ func _add_empty_skill_row() -> void:
 
 
 func _method_type_label(method: Dictionary) -> String:
-	var family := CultivationMethodServiceScript.family_by_id(str(method.get("familyId", "")))
+	var family := XiulianMethodServiceScript.family_by_id(str(method.get("familyId", "")))
 	var role := str(family.get("role", "")).strip_edges()
 	if bool(method.get("is_movement", false)) or str(method.get("slot_type", "")) == "movement" \
 			or role.find("身法") >= 0 or role.find("遁法") >= 0:
@@ -212,10 +212,10 @@ func _method_meta(method: Dictionary, method_id: String) -> String:
 	var realm := str(method.get("realm", "")).strip_edges()
 	if realm != "":
 		parts.append("境界 %s" % DaoTreeServiceScript.realm_display_name(realm))
-	var family := CultivationMethodServiceScript.family_by_id(str(method.get("familyId", "")))
+	var family := XiulianMethodServiceScript.family_by_id(str(method.get("familyId", "")))
 	parts.append(EnumItemTier.label(_entry_tier(method)))
 	parts.append(EnumQuality.display_label(_entry_quality(method, family)))
-	var mastery := CultivationMethodServiceScript.method_mastery(GameState.to_dict(), method_id)
+	var mastery := XiulianMethodServiceScript.method_mastery(GameState.to_dict(), method_id)
 	parts.append("熟练 %.0f%%" % (mastery * 100.0))
 	var practice: Dictionary = method.get("practice", {}) as Dictionary
 	if not practice.is_empty():
@@ -226,7 +226,7 @@ func _method_meta(method: Dictionary, method_id: String) -> String:
 func _method_brief_effect(method: Dictionary, method_id: String) -> String:
 	var lines := HoverTipEffectFormatter.format_raw_ability_lines(
 		method.get("effects", []),
-		CultivationMethodServiceScript.method_mastery_value_ratio(GameState.to_dict(), method_id)
+		XiulianMethodServiceScript.method_mastery_value_ratio(GameState.to_dict(), method_id)
 	)
 	if not lines.is_empty():
 		return str(lines[0])
@@ -244,14 +244,14 @@ func _method_icon(method: Dictionary) -> Texture2D:
 	if method.has("icon") and method.get("icon") != null:
 		return _entry_icon(method)
 	if _method_type_label(method) == "身法":
-		return BattleInitDataScript._resolve_icon_texture({"icon": "ui_new/skill_04.png"})
-	return BattleInitDataScript._resolve_icon_texture({"icon": "ui_new/gongfa.png"})
+		return ZhandouInitDataScript._resolve_icon_texture({"icon": "ui_new/skill_04.png"})
+	return ZhandouInitDataScript._resolve_icon_texture({"icon": "ui_new/gongfa.png"})
 
 
 func _entry_icon(entry: Dictionary) -> Texture2D:
 	if entry.is_empty() or not entry.has("icon") or entry.get("icon") == null:
 		return null
-	return BattleInitDataScript._resolve_icon_texture(entry)
+	return ZhandouInitDataScript._resolve_icon_texture(entry)
 
 
 func _set_icon(icon: TextureRect, texture: Texture2D) -> void:

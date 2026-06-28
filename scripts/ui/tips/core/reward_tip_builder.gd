@@ -45,7 +45,7 @@ static func cultivation_result(result: Dictionary, source: String = "cultivation
 		var method_id := str(result.get("method_id", ""))
 		var method_name := ""
 		if method_id != "":
-			var method_def := CultivationMethodService.by_id(method_id)
+			var method_def := XiulianMethodService.by_id(method_id)
 			method_name = str(method_def.get("name", method_id))
 		if method_name.strip_edges() == "":
 			method_name = "功法"
@@ -74,14 +74,14 @@ static func cultivation_result(result: Dictionary, source: String = "cultivation
 	return out
 
 
-static func alchemy_result(result: Dictionary, source: String = "alchemy") -> Array:
+static func liandan_result(result: Dictionary, source: String = "liandan") -> Array:
 	var out: Array = []
 	var xp := int(result.get("xp", 0))
 	if xp > 0:
-		out.append(growth("炼丹经验", xp, source, "alchemy_xp"))
+		out.append(growth("炼丹经验", xp, source, "liandan_xp"))
 	var mastery := int(result.get("mastery_gain", 0))
 	if mastery > 0:
-		out.append(growth("丹方经验", mastery, source, "alchemy_mastery"))
+		out.append(growth("丹方经验", mastery, source, "liandan_mastery"))
 	var product_id := str(result.get("product_id", "")).strip_edges()
 	var added := int(result.get("added", result.get("count", 0)))
 	if product_id != "" and added > 0:

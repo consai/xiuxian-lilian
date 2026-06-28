@@ -6,30 +6,29 @@ extends RefCounted
 const PATH := "res://data/realm_balance.yaml"
 
 const DEFAULT_ATTRIBUTE_FORMULA := {
-	FightAttr.HP_MAX: {"base": 50.0, "scale": {"body": 5.0}},
-	FightAttr.MP_MAX: {"base": 50.0, "scale": {"spirit": 5.0}},
-	FightAttr.PHYSICAL_ATK: {"base": 0.0, "scale": {"body": 3.0}},
-	FightAttr.MAGIC_ATK: {"base": 0.0, "scale": {"spirit": 2.4, "sense": 0.8}},
-	FightAttr.PHYSICAL_DEF: {"base": 0.0, "scale": {"body": 2.0}},
-	FightAttr.MAGIC_DEF: {"base": 0.0, "scale": {"spirit": 1.2, "sense": 1.2}},
-	FightAttr.SPD: {"base": 50.0, "scale": {"sense": 3.0, "body": 2.0}},
-	FightAttr.ACCURACY: {"base": 50.0, "scale": {"sense": 3.0, "agility": 1.0}},
-	FightAttr.CONTROL_POWER: {"base": 0.0, "scale": {"sense": 3.0, "spirit": 1.0}},
-	FightAttr.CONTROL_RESIST: {"base": 0.0, "scale": {"sense": 2.0, "body": 1.0}},
-	FightAttr.HP_REGEN: {"base": 0.5, "scale": {"body": 0.05}},
-	FightAttr.MP_REGEN: {"base": 0.5, "scale": {"spirit": 0.04, "sense": 0.01}},
-	FightAttr.CARRY: {"base": 20.0, "scale": {"body": 2.0}},
-	FightAttr.SHIELD: {"base": 0.0, "scale": {}},
+	ZhandouAttr.HP_MAX: {"base": 50.0, "scale": {"body": 5.0}},
+	ZhandouAttr.MP_MAX: {"base": 50.0, "scale": {"spirit": 5.0}},
+	ZhandouAttr.PHYSICAL_ATK: {"base": 0.0, "scale": {"body": 3.0}},
+	ZhandouAttr.MAGIC_ATK: {"base": 0.0, "scale": {"spirit": 2.4, "sense": 0.8}},
+	ZhandouAttr.PHYSICAL_DEF: {"base": 0.0, "scale": {"body": 2.0}},
+	ZhandouAttr.MAGIC_DEF: {"base": 0.0, "scale": {"spirit": 1.2, "sense": 1.2}},
+	ZhandouAttr.SPD: {"base": 50.0, "scale": {"sense": 3.0, "body": 2.0}},
+	ZhandouAttr.CONTROL_POWER: {"base": 0.0, "scale": {"sense": 3.0, "spirit": 1.0}},
+	ZhandouAttr.CONTROL_RESIST: {"base": 0.0, "scale": {"sense": 2.0, "body": 1.0}},
+	ZhandouAttr.HP_REGEN: {"base": 0.5, "scale": {"body": 0.05}},
+	ZhandouAttr.MP_REGEN: {"base": 0.5, "scale": {"spirit": 0.04, "sense": 0.01}},
+	ZhandouAttr.CARRY: {"base": 20.0, "scale": {"body": 2.0}},
+	ZhandouAttr.SHIELD: {"base": 0.0, "scale": {}},
 }
 
 const DEFAULT_REALM_FLAT_PER_LAYER := {
-	FightAttr.HP_MAX: 6.0,
-	FightAttr.MP_MAX: 6.0,
-	FightAttr.PHYSICAL_ATK: 1.8,
-	FightAttr.MAGIC_ATK: 1.92,
-	FightAttr.PHYSICAL_DEF: 1.2,
-	FightAttr.MAGIC_DEF: 1.44,
-	FightAttr.SPD: 3.0,
+	ZhandouAttr.HP_MAX: 6.0,
+	ZhandouAttr.MP_MAX: 6.0,
+	ZhandouAttr.PHYSICAL_ATK: 1.8,
+	ZhandouAttr.MAGIC_ATK: 1.92,
+	ZhandouAttr.PHYSICAL_DEF: 1.2,
+	ZhandouAttr.MAGIC_DEF: 1.44,
+	ZhandouAttr.SPD: 3.0,
 }
 
 static var _bundle: Dictionary = {}
@@ -215,10 +214,10 @@ static func build_standard_player_attrs(profile_id: String, include_realm: bool 
 	var attrs := build_base_combat_attrs(foundations)
 	for key in flat.keys():
 		var stat := str(key)
-		attrs[stat] = FightAttr.get_attr(attrs, stat) + float(flat[key])
-	for key in FightAttr.ALL_KEYS:
+		attrs[stat] = ZhandouAttr.get_attr(attrs, stat) + float(flat[key])
+	for key in ZhandouAttr.ALL_KEYS:
 		if not attrs.has(key):
-			attrs[key] = FightAttr.get_attr(FightAttr.TEST_DEFAULTS, key, 0.0)
+			attrs[key] = ZhandouAttr.get_attr(ZhandouAttr.TEST_DEFAULTS, key, 0.0)
 	return attrs
 
 
@@ -251,7 +250,7 @@ static func collect_config_errors(simulation_realms: Array = []) -> PackedString
 			errors.append("simulation.realm %s 引用了未配置的大境界 %s" % [
 				str((realm_v as Dictionary).get("id", "")), major,
 			])
-	for stat in [FightAttr.HP_MAX, FightAttr.MP_MAX, FightAttr.PHYSICAL_ATK, FightAttr.MAGIC_ATK, FightAttr.PHYSICAL_DEF, FightAttr.MAGIC_DEF, FightAttr.SPD]:
+	for stat in [ZhandouAttr.HP_MAX, ZhandouAttr.MP_MAX, ZhandouAttr.PHYSICAL_ATK, ZhandouAttr.MAGIC_ATK, ZhandouAttr.PHYSICAL_DEF, ZhandouAttr.MAGIC_DEF, ZhandouAttr.SPD]:
 		if not _formula_table().has(stat):
 			errors.append("combat_attribute_formula 缺少核心属性 %s" % stat)
 	for key in ["normal", "elite", "boss"]:

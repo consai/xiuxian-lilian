@@ -15,7 +15,7 @@ major_realm_multipliers:
   tribulation: 256
 activity_base_days:
   cultivate: 7
-  expedition: 30
+  lilian: 30
   travel_short: 3
   travel_mid: 15
   travel_long: 90
@@ -23,9 +23,9 @@ activity_base_days:
   self_study: 7
   skill_basic: 30
   skill_advanced: 180
-  alchemy: 7
+  liandan: 7
   crafting: 30
-  breakthrough: 30
+  tupo: 30
 rank_multipliers:
   first: 1
   second: 2

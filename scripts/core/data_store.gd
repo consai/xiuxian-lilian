@@ -2,8 +2,7 @@ extends Node
 
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
-const AlchemyServiceScript := preload("res://scripts/sim/alchemy_service.gd")
-
+const LiandanServiceScript := preload("res://scripts/sim/liandan_service.gd")
 const SAVEDATA_SCHEMA_VERSION := 2
 const RUNDATA_SCHEMA_VERSION := 1
 
@@ -75,6 +74,15 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 	out["auto_battle_rules"] = (rules_v as Dictionary).duplicate(true) if rules_v is Dictionary else {}
 	if not out.get("totals") is Dictionary:
 		out["totals"] = _default_totals()
+	else:
+		var totals := (out["totals"] as Dictionary).duplicate(true)
+		if totals.has("expeditions") and not totals.has("lilian_count"):
+			totals["lilian_count"] = int(totals.get("expeditions", 0))
+			totals.erase("expeditions")
+		if totals.has("expedition_steps") and not totals.has("lilian_steps"):
+			totals["lilian_steps"] = int(totals.get("expedition_steps", 0))
+			totals.erase("expedition_steps")
+		out["totals"] = totals
 	out["map"] = _coalesce_map_savedata(out.get("map", {}))
 	out["foundations"] = CharacterStatsScript.normalize_foundations(out.get("foundations", {}))
 	out["aptitudes"] = CharacterStatsScript.normalize_aptitudes(out.get("aptitudes", {}))
@@ -93,7 +101,14 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 		"nascent": maxi(0, int(quality.get("nascent", 0))),
 	}
 	out["breakthrough_attempt_cooldown_days"] = maxi(0, int(out.get("breakthrough_attempt_cooldown_days", 0)))
-	out["alchemy"] = AlchemyServiceScript.normalize_state(out.get("alchemy", {}))
+	var liandan_raw: Variant = out.get("liandan", out.get("alchemy", {}))
+	out["liandan"] = LiandanServiceScript.normalize_state(liandan_raw)
+	if out.has("alchemy"):
+		out.erase("alchemy")
+	var weituo_raw: Variant = out.get("weituo", out.get("commissions", {}))
+	out["weituo"] = WeituoService.coalesce_savedata(weituo_raw)
+	if out.has("commissions"):
+		out.erase("commissions")
 	out["story"] = _coalesce_story_savedata(out.get("story", {}))
 	if data.has("tutorial"):
 		out["tutorial"] = _coalesce_tutorial_savedata(data.get("tutorial", {}))
@@ -107,18 +122,18 @@ func reset_rundata() -> void:
 	rundata = {
 		"game": {
 			"last_rewards": [],
-			"last_expedition_summary": {},
-			"last_settled_expedition_id": "",
+			"last_lilian_summary": {},
+			"last_settled_lilian_id": "",
 			"active_save_slot": 0,
 		},
-		"expedition": _default_expedition(),
-		"battle": {
+		"lilian": _default_lilian(),
+		"zhandou": {
 			"pending_init": {},
 		},
 		"scene": _default_scene(),
 		"ui": {
-			"breakthrough_summary": {},
-			"expedition_exit_reason": "manual",
+			"tupo_zongjie": {},
+			"lilian_exit_reason": "manual",
 		},
 		"map": _default_map_runtime(),
 		"story": {
@@ -158,14 +173,35 @@ func game_runtime() -> Dictionary:
 	return rundata["game"] as Dictionary
 
 
-func expedition_runtime() -> Dictionary:
+func lilian_runtime() -> Dictionary:
 	ensure_initialized()
-	return rundata["expedition"] as Dictionary
+	if not rundata.has("lilian") and rundata.has("expedition"):
+		rundata["lilian"] = rundata["expedition"]
+		rundata.erase("expedition")
+	if not rundata.has("lilian"):
+		rundata["lilian"] = _default_lilian()
+	# ponytail: 读档/热重载时合并旧 game 摘要键名
+	var game_rt_v: Variant = rundata.get("game", {})
+	if game_rt_v is Dictionary:
+		var game_rt := game_rt_v as Dictionary
+		if game_rt.has("last_expedition_summary") and not game_rt.has("last_lilian_summary"):
+			game_rt["last_lilian_summary"] = game_rt.get("last_expedition_summary", {})
+			game_rt.erase("last_expedition_summary")
+		if game_rt.has("last_settled_expedition_id") and not game_rt.has("last_settled_lilian_id"):
+			game_rt["last_settled_lilian_id"] = game_rt.get("last_settled_expedition_id", "")
+			game_rt.erase("last_settled_expedition_id")
+		rundata["game"] = game_rt
+	return rundata["lilian"] as Dictionary
 
 
-func battle_runtime() -> Dictionary:
+func zhandou_runtime() -> Dictionary:
 	ensure_initialized()
-	return rundata["battle"] as Dictionary
+	if not rundata.has("zhandou") and rundata.has("battle"):
+		rundata["zhandou"] = rundata["battle"]
+		rundata.erase("battle")
+	if not rundata.has("zhandou"):
+		rundata["zhandou"] = {"pending_init": {}}
+	return rundata["zhandou"] as Dictionary
 
 
 func ui_runtime() -> Dictionary:
@@ -242,58 +278,58 @@ func clear_scene_payload(scene_id: String) -> void:
 	scene_runtime()["payloads"] = payloads
 
 
-func reset_expedition_runtime() -> void:
+func reset_lilian_runtime() -> void:
 	ensure_initialized()
-	rundata["expedition"] = _default_expedition()
+	rundata["lilian"] = _default_lilian()
 
 
-func set_battle_pending_init(envelope: Dictionary) -> void:
+func set_zhandou_pending_init(envelope: Dictionary) -> void:
 	ensure_initialized()
-	battle_runtime()["pending_init"] = envelope.duplicate(true)
+	zhandou_runtime()["pending_init"] = envelope.duplicate(true)
 
 
-func take_battle_pending_init() -> Dictionary:
+func take_zhandou_pending_init() -> Dictionary:
 	ensure_initialized()
-	var envelope_v: Variant = battle_runtime().get("pending_init", {})
-	battle_runtime()["pending_init"] = {}
+	var envelope_v: Variant = zhandou_runtime().get("pending_init", {})
+	zhandou_runtime()["pending_init"] = {}
 	if envelope_v is Dictionary:
 		return envelope_v as Dictionary
 	return {}
 
 
-func set_ui_expedition_exit_reason(reason: String) -> void:
+func set_ui_lilian_exit_reason(reason: String) -> void:
 	ensure_initialized()
-	set_scene_payload("expedition_result", {"reason": reason})
-	ui_runtime()["expedition_exit_reason"] = reason
+	set_scene_payload("lilian_jiesuan", {"reason": reason})
+	ui_runtime()["lilian_exit_reason"] = reason
 
 
-func peek_ui_expedition_exit_reason(default_reason: String = "manual") -> String:
+func peek_ui_lilian_exit_reason(default_reason: String = "manual") -> String:
 	ensure_initialized()
-	var payload := peek_scene_payload("expedition_result")
+	var payload := peek_scene_payload("lilian_jiesuan")
 	if not payload.is_empty():
 		return str(payload.get("reason", default_reason))
-	return str(ui_runtime().get("expedition_exit_reason", default_reason))
+	return str(ui_runtime().get("lilian_exit_reason", default_reason))
 
 
-func clear_ui_expedition_exit_reason() -> void:
+func clear_ui_lilian_exit_reason() -> void:
 	ensure_initialized()
-	clear_scene_payload("expedition_result")
-	ui_runtime()["expedition_exit_reason"] = "manual"
+	clear_scene_payload("lilian_jiesuan")
+	ui_runtime()["lilian_exit_reason"] = "manual"
 
 
-func set_ui_breakthrough_summary(summary: Dictionary) -> void:
+func set_ui_tupo_zongjie(summary: Dictionary) -> void:
 	ensure_initialized()
-	set_scene_payload("breakthrough_summary", summary)
-	ui_runtime()["breakthrough_summary"] = summary.duplicate(true)
+	set_scene_payload("tupo_zongjie", summary)
+	ui_runtime()["tupo_zongjie"] = summary.duplicate(true)
 
 
-func take_ui_breakthrough_summary() -> Dictionary:
+func take_ui_tupo_zongjie() -> Dictionary:
 	ensure_initialized()
-	var summary := take_scene_payload("breakthrough_summary")
-	ui_runtime()["breakthrough_summary"] = {}
+	var summary := take_scene_payload("tupo_zongjie")
+	ui_runtime()["tupo_zongjie"] = {}
 	if not summary.is_empty():
 		return summary
-	var summary_v: Variant = ui_runtime().get("breakthrough_summary", {})
+	var summary_v: Variant = ui_runtime().get("tupo_zongjie", {})
 	if summary_v is Dictionary:
 		return summary_v as Dictionary
 	return {}
@@ -359,7 +395,8 @@ func _default_savedata() -> Dictionary:
 			"nascent": 0,
 		},
 		"breakthrough_attempt_cooldown_days": 0,
-		"alchemy": AlchemyServiceScript.default_state(),
+		"liandan": LiandanServiceScript.default_state(),
+		"weituo": WeituoService.default_savedata(),
 		"story": {
 			"completed": [],
 			"flags": {},
@@ -416,8 +453,8 @@ func _default_totals() -> Dictionary:
 		"wins": 0,
 		"losses": 0,
 		"items_gained": 0,
-		"expeditions": 0,
-		"expedition_steps": 0,
+		"lilian_count": 0,
+		"lilian_steps": 0,
 		"max_difficulty": 0,
 	}
 
@@ -532,7 +569,7 @@ static func _normalize_ability_slots(raw: Variant) -> Array:
 	return slots.slice(0, 5)
 
 
-func _default_expedition() -> Dictionary:
+func _default_lilian() -> Dictionary:
 	return {
 		"active": false,
 		"phase": "idle",
@@ -564,6 +601,6 @@ func _default_expedition() -> Dictionary:
 		"event_log": [],
 		"player_snapshot": {},
 		"pending_exit_reason": "",
-		"expedition_id": "",
+		"lilian_id": "",
 		"start_day": 0,
 	}

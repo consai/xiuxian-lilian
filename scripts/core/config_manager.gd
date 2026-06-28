@@ -18,24 +18,24 @@ var _cities_by_id: Dictionary = {}
 var _world_routes: Array = []
 var _wilderness_regions_by_id: Dictionary = {}
 var _wilderness_locations_by_id: Dictionary = {}
-var _common_expedition_events_by_id: Dictionary = {}
-var _expedition_events_by_id: Dictionary = {}
-var _expedition_rules: Dictionary = {}
+var _lilian_common_events_by_id: Dictionary = {}
+var _lilian_events_by_id: Dictionary = {}
+var _lilian_rules: Dictionary = {}
 const ConfigValidatorScript := preload("res://scripts/core/config_validator.gd")
 
 
 func _ready() -> void:
 	reload_all()
-	call_deferred("_validate_expedition_data")
+	call_deferred("_validate_lilian_data")
 
 
 func reload_all() -> void:
 	const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
-	const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+	const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 	const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 	const KnowledgeEffectServiceScript := preload("res://scripts/dao/knowledge_effect_service.gd")
 	DaoTreeServiceScript.reload()
-	CultivationMethodServiceScript.reload()
+	XiulianMethodServiceScript.reload()
 	AbilityServiceScript.reload()
 	KnowledgeEffectServiceScript.reload()
 	_load_items_local()
@@ -45,12 +45,12 @@ func reload_all() -> void:
 	_load_monsters_local()
 	_load_locations_local()
 	_load_world_map_local()
-	_load_expedition_events_local()
-	_load_expedition_rules_local()
+	_load_lilian_events_local()
+	_load_lilian_rules_local()
 	_validate_all_config()
 
 
-func _validate_expedition_data() -> void:
+func _validate_lilian_data() -> void:
 	_validate_all_config()
 
 
@@ -196,9 +196,9 @@ func all_wilderness_location_ids() -> Array:
 	return (_wilderness_locations_by_id.keys() as Array).duplicate()
 
 
-func expedition_event_by_id(event_id: String) -> Dictionary:
+func lilian_event_by_id(event_id: String) -> Dictionary:
 	var eid := event_id.strip_edges()
-	var row_v: Variant = _expedition_events_by_id.get(eid)
+	var row_v: Variant = _lilian_events_by_id.get(eid)
 	if not row_v is Dictionary:
 		return {}
 	var row := (row_v as Dictionary).duplicate(true)
@@ -206,9 +206,9 @@ func expedition_event_by_id(event_id: String) -> Dictionary:
 	return row
 
 
-func common_expedition_event_by_id(event_id: String) -> Dictionary:
+func lilian_common_event_by_id(event_id: String) -> Dictionary:
 	var eid := event_id.strip_edges()
-	var row_v: Variant = _common_expedition_events_by_id.get(eid)
+	var row_v: Variant = _lilian_common_events_by_id.get(eid)
 	if not row_v is Dictionary:
 		return {}
 	var row := (row_v as Dictionary).duplicate(true)
@@ -303,16 +303,16 @@ func _monster_drop_pool(monster: Dictionary) -> Dictionary:
 	return {}
 
 
-func all_common_expedition_event_ids() -> Array:
-	return (_common_expedition_events_by_id.keys() as Array).duplicate()
+func all_lilian_common_event_ids() -> Array:
+	return (_lilian_common_events_by_id.keys() as Array).duplicate()
 
 
-func all_expedition_event_ids() -> Array:
-	return (_expedition_events_by_id.keys() as Array).duplicate()
+func all_lilian_event_ids() -> Array:
+	return (_lilian_events_by_id.keys() as Array).duplicate()
 
 
-func expedition_rules() -> Dictionary:
-	return _expedition_rules.duplicate(true)
+func lilian_rules() -> Dictionary:
+	return _lilian_rules.duplicate(true)
 
 
 func all_skill_ids() -> Array:
@@ -552,28 +552,28 @@ func _load_world_map_local() -> void:
 				_wilderness_locations_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
 
 
-func _load_expedition_events_local() -> void:
-	_common_expedition_events_by_id.clear()
-	_expedition_events_by_id.clear()
-	var common_root := JsonLoader._read_json_root_object("res://data/expedition_common_events.yaml")
+func _load_lilian_events_local() -> void:
+	_lilian_common_events_by_id.clear()
+	_lilian_events_by_id.clear()
+	var common_root := JsonLoader._read_json_root_object("res://data/lilian_common_events.yaml")
 	var common_v: Variant = common_root.get("events", {})
 	if common_v is Dictionary:
 		for key in (common_v as Dictionary).keys():
 			var row_v: Variant = (common_v as Dictionary)[key]
 			if row_v is Dictionary:
-				_common_expedition_events_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
-	var root := JsonLoader._read_json_root_object("res://data/expedition_events.yaml")
+				_lilian_common_events_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
+	var root := JsonLoader._read_json_root_object("res://data/lilian_events.yaml")
 	var raw_v: Variant = root.get("map_events", root.get("events", {}))
 	if not raw_v is Dictionary:
 		return
 	for key in (raw_v as Dictionary).keys():
 		var row_v: Variant = (raw_v as Dictionary)[key]
 		if row_v is Dictionary:
-			_expedition_events_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
+			_lilian_events_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
 
 
-func _load_expedition_rules_local() -> void:
-	_expedition_rules = JsonLoader._read_json_root_object("res://data/expedition_rules.yaml").duplicate(true)
+func _load_lilian_rules_local() -> void:
+	_lilian_rules = JsonLoader._read_json_root_object("res://data/lilian_rules.yaml").duplicate(true)
 
 
 func _load_skills_local() -> void:

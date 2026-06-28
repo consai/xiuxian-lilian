@@ -660,12 +660,12 @@
       "description": "功法效果属性 evil_bane，具体结算由 Godot 运行时映射。"
     },
     {
-      "id": "expedition_capacity",
+      "id": "lilian_capacity",
       "category": "exploration",
       "defaultTarget": "self",
       "valueType": "ratio",
       "defaultStackPolicy": "highest",
-      "description": "功法效果属性 expedition_capacity，具体结算由 Godot 运行时映射。"
+      "description": "功法效果属性 lilian_capacity，具体结算由 Godot 运行时映射。"
     },
     {
       "id": "exploration_safety",

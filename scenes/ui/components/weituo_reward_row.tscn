@@ -1,0 +1,55 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/components/weituo_reward_row.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/art/ui_new/item_cao.png" id="2_icon"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/16.tres" id="3_small"]
+
+[sub_resource type="StyleBoxFlat" id="RewardSlot"]
+bg_color = Color(0.98, 0.89, 0.72, 0.82)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.36, 0.19, 0.82)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxEmpty" id="Empty"]
+
+[sub_resource type="StyleBoxEmpty" id="Focus"]
+
+[node name="WeituoRewardRow" type="PanelContainer"]
+custom_minimum_size = Vector2(74, 76)
+script = ExtResource("1_script")
+theme_override_styles/panel = SubResource("RewardSlot")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(42, 42)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("2_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "灵草"
+label_settings = ExtResource("3_small")
+horizontal_alignment = 1
+
+[node name="CountLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "10"
+label_settings = ExtResource("3_small")
+horizontal_alignment = 2
+

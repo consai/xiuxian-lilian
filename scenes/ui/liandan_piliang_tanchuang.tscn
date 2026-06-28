@@ -1,0 +1,169 @@
+[gd_scene format=3 uid="uid://bi634vsmiednp"]
+
+[ext_resource type="Script" uid="uid://dthw0djv4gpn6" path="res://scripts/ui/liandan_piliang_tanchuang.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_theme"]
+[ext_resource type="Texture2D" uid="uid://hwomn6aon70a" path="res://assets/art/ui_new/btn_huang.png" id="3_cancel"]
+[ext_resource type="Texture2D" uid="uid://c3f3nny73kvhg" path="res://assets/art/ui_new/btn_lv.png" id="4_confirm"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="5_title"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="6_body"]
+
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="7_auto"]
+
+[sub_resource type="StyleBoxFlat" id="PopupStyle"]
+bg_color = Color(1, 0.945, 0.835, 0.99)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.31, 0.19, 0.12, 1)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0.12, 0.07, 0.03, 0.4)
+shadow_size = 12
+
+[node name="LiandanPiliangTanchuang" type="Control" unique_id=1591834492]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Dimmer" type="ColorRect" parent="." unique_id=444413635]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.06, 0.03, 0.48)
+
+[node name="Panel" type="Panel" parent="." unique_id=56707743]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -190.0
+offset_right = 280.0
+offset_bottom = 190.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("PopupStyle")
+
+[node name="Title" type="Label" parent="Panel" unique_id=319225902]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 24.0
+offset_right = 532.0
+offset_bottom = 62.0
+text = "炼制数量"
+label_settings = ExtResource("5_title")
+horizontal_alignment = 1
+
+[node name="SummaryLabel" type="Label" parent="Panel" unique_id=1967409958]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 36.0
+offset_top = 78.0
+offset_right = 524.0
+offset_bottom = 132.0
+text = "回气丹方
+每炉 1 日 · 最多可炼 5 炉"
+label_settings = ExtResource("6_body")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="CountLabel" type="Label" parent="Panel" unique_id=137620363]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 36.0
+offset_top = 142.0
+offset_right = 524.0
+offset_bottom = 172.0
+text = "1 炉（共 1 日）"
+label_settings = ExtResource("6_body")
+horizontal_alignment = 1
+
+[node name="SliderRow" type="HBoxContainer" parent="Panel" unique_id=496191702]
+layout_mode = 0
+offset_left = 36.0
+offset_top = 184.0
+offset_right = 524.0
+offset_bottom = 224.0
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="CountSlider" type="HSlider" parent="Panel/SliderRow" unique_id=1419458843]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 10.0
+value = 1.0
+
+[node name="MaxButton" type="Button" parent="Panel/SliderRow" unique_id=728968061]
+unique_name_in_owner = true
+script = ExtResource("7_auto")
+custom_minimum_size = Vector2(72, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "最大"
+
+
+[node name="CancelButton" type="TextureButton" parent="Panel" unique_id=63768504]
+unique_name_in_owner = true
+script = ExtResource("7_auto")
+layout_mode = 0
+offset_left = 52.0
+offset_top = 252.0
+offset_right = 232.0
+offset_bottom = 308.0
+texture_normal = ExtResource("3_cancel")
+ignore_texture_size = true
+stretch_mode = 5
+
+
+[node name="Label" type="Label" parent="Panel/CancelButton" unique_id=363251897]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "取消"
+label_settings = ExtResource("6_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ConfirmButton" type="TextureButton" parent="Panel" unique_id=108094872]
+unique_name_in_owner = true
+script = ExtResource("7_auto")
+layout_mode = 0
+offset_left = 328.0
+offset_top = 252.0
+offset_right = 508.0
+offset_bottom = 308.0
+texture_normal = ExtResource("4_confirm")
+ignore_texture_size = true
+stretch_mode = 5
+
+
+[node name="Label" type="Label" parent="Panel/ConfirmButton" unique_id=1217881110]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "确认炼制"
+label_settings = ExtResource("6_body")
+horizontal_alignment = 1
+vertical_alignment = 1

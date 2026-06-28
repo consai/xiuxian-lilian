@@ -6,14 +6,21 @@ param(
 $ErrorActionPreference = "Stop"
 $ProjectRoot = Split-Path $PSScriptRoot -Parent
 $runner = Join-Path $PSScriptRoot "run_tests.ps1"
+$validate = Join-Path $ProjectRoot "tools" "validate.ps1"
 . (Join-Path $PSScriptRoot "test_dir_cleanup.ps1")
 
+& $validate
+if ($LASTEXITCODE -ne 0) {
+	Write-Host "Suite stopped at config validators (exit $LASTEXITCODE)."
+	exit $LASTEXITCODE
+}
+
 $scripts = @(
-	"res://tests/run_battle_domain_tests.gd",
+	"res://tests/run_zhandou_domain_tests.gd",
 	"res://tests/run_game_time_tests.gd",
 	"res://tests/run_simulation_tests.gd",
-	"res://tests/run_expedition_tests.gd",
-	"res://tests/run_expedition_smoke.gd",
+	"res://tests/run_lilian_tests.gd",
+	"res://tests/run_lilian_smoke.gd",
 	"res://tests/run_scene_manager_tests.gd",
 	"res://tests/run_contract_tests.gd",
 	"res://tests/run_config_validation_tests.gd",

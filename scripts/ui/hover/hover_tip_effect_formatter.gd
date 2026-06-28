@@ -68,15 +68,10 @@ static func _format_buff_effect(effect: Dictionary, target_label: String) -> Str
 				continue
 			var buff_cfg := ConfigManager.buff_by_id(buff_id)
 			var buff_name := str(buff_cfg.get("name", buff_id)).strip_edges()
-			var line := StringsZh.format_template(
+			return StringsZh.format_template(
 				StringsZh.getp("hover.skill.effect_buff", "对{target}施加 {name}"),
 				{"target": target_label, "name": buff_name}
 			)
-			if effect.has("control_chance"):
-				line += "（基础成功率 %d%%，受神识影响）" % int(
-					roundf(float(effect.get("control_chance", 1.0)) * 100.0)
-				)
-			return line
 	return StringsZh.format_template(
 		StringsZh.getp("hover.skill.effect_buff_plain", "对{target}施加状态"),
 		{"target": target_label}
@@ -157,12 +152,9 @@ static func _format_timed_modifier_effect(effect: Dictionary, target_label: Stri
 static func _format_control_effect(effect: Dictionary, target_label: String) -> String:
 	var name := str(effect.get("name", "控制")).strip_edges()
 	var duration := float(effect.get("duration", 0.0))
-	var chance := float(effect.get("control_chance", 0.0))
 	var line := "对%s施加 %s" % [target_label, name]
 	if duration > 0.0:
 		line += " %s 秒" % _fmt_num(duration)
-	if chance > 0.0:
-		line += "（基础成功率 %d%%）" % int(roundf(chance * 100.0))
 	return line
 
 
@@ -225,7 +217,6 @@ static func _effect_id_label(effect_id: String) -> String:
 		"magic_attack": "法术攻击",
 		"physical_defense": "物理防御",
 		"magic_defense": "法术防御",
-		"accuracy": "命中",
 		"damage_bonus": "伤害加成",
 		"armor_pierce": "护甲穿透",
 		"space_pierce": "空间穿透",
@@ -264,7 +255,7 @@ static func _humanize_effect_id(effect_id: String) -> String:
 		"contract": "契约",
 		"conversion": "转化",
 		"craft": "炼制",
-		"critical": "暴击",
+		"critical": "强击",
 		"cultivation": "修炼",
 		"curse": "咒法",
 		"damage": "伤害",
@@ -283,9 +274,9 @@ static func _humanize_effect_id(effect_id: String) -> String:
 		"energy": "能量",
 		"environment": "环境",
 		"escape": "脱离",
-		"evasion": "闪避",
+		"evasion": "借势",
 		"evil": "破邪",
-		"expedition": "探险",
+		"lilian": "历练",
 		"exploration": "探索",
 		"fatal": "濒死",
 		"find": "发现",
@@ -394,22 +385,21 @@ static func _effect_value_label(effect: Dictionary, value: float) -> String:
 
 static func _attr_label(key: String) -> String:
 	var labels := {
-		FightAttr.PHYSICAL_ATK: "物攻",
-		FightAttr.MAGIC_ATK: "法攻",
-		FightAttr.PHYSICAL_DEF: "物防",
-		FightAttr.MAGIC_DEF: "法防",
-		FightAttr.ACCURACY: "命中",
-		FightAttr.SPD: "速度",
-		FightAttr.HP_MAX: "气血上限",
-		FightAttr.MP_MAX: "法力上限",
-		FightAttr.SHIELD: "护盾",
-		FightAttr.CONTROL_POWER: "控制",
-		FightAttr.CONTROL_RESIST: "控制抵抗",
-		FightAttr.HP_REGEN: "气血回复",
-		FightAttr.MP_REGEN: "法力回复",
-		FightAttr.CARRY: "携带",
-		FightAttr.DAMAGE_BONUS: "伤害加成",
-		FightAttr.DAMAGE_TAKEN: "承伤",
-		FightAttr.COMBAT_MP_RESTORE_2S: "战斗回蓝",
+		ZhandouAttr.PHYSICAL_ATK: "物攻",
+		ZhandouAttr.MAGIC_ATK: "法攻",
+		ZhandouAttr.PHYSICAL_DEF: "物防",
+		ZhandouAttr.MAGIC_DEF: "法防",
+		ZhandouAttr.SPD: "速度",
+		ZhandouAttr.HP_MAX: "气血上限",
+		ZhandouAttr.MP_MAX: "法力上限",
+		ZhandouAttr.SHIELD: "护盾",
+		ZhandouAttr.CONTROL_POWER: "控制",
+		ZhandouAttr.CONTROL_RESIST: "控制抵抗",
+		ZhandouAttr.HP_REGEN: "气血回复",
+		ZhandouAttr.MP_REGEN: "法力回复",
+		ZhandouAttr.CARRY: "携带",
+		ZhandouAttr.DAMAGE_BONUS: "伤害加成",
+		ZhandouAttr.DAMAGE_TAKEN: "承伤",
+		ZhandouAttr.COMBAT_MP_RESTORE_2S: "战斗回蓝",
 	}
 	return str(labels.get(key, key))

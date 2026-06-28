@@ -1,0 +1,462 @@
+[gd_scene format=3 uid="uid://o7pt8kaue6ba"]
+
+[ext_resource type="Script" path="res://scripts/sim/dongfu.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_theme"]
+[ext_resource type="Texture2D" uid="uid://076r2vdowmtu" path="res://assets/art/back/main_cave.png" id="3_64eam"]
+[ext_resource type="Texture2D" uid="uid://dq4k3ybmxqrut" path="res://assets/art/ui_new/btn_mihuang.png" id="11_small_button"]
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="12_av2rb"]
+[ext_resource type="Texture2D" uid="uid://bm2vyd4mxlsaj" path="res://assets/art/ui_new/btn_mihuang_da.png" id="15_message_back"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="16_label20"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="17_label24"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="18_label28"]
+[ext_resource type="PackedScene" path="res://scenes/sim/beibao_fuceng.tscn" id="19_breup"]
+[ext_resource type="PackedScene" path="res://scenes/sim/cundang_fuceng.tscn" id="20_save"]
+[ext_resource type="PackedScene" path="res://scenes/ui/weituo_board_panel.tscn" id="21_weituo"]
+
+[sub_resource type="StyleBoxFlat" id="Style_panel"]
+bg_color = Color(1, 0.933333, 0.823529, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.333333, 0.196078, 0.184314, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0.258824, 0.145098, 0.105882, 0.3)
+shadow_size = 8
+
+[node name="CaveHub" type="Control" unique_id=1187446055]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=962241750]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_64eam")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ProfilePanel" type="Panel" parent="." unique_id=240799206]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 16.0
+offset_right = 270.0
+offset_bottom = 112.0
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="Title" type="Label" parent="ProfilePanel" unique_id=2141488932]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 12.0
+offset_right = 232.0
+offset_bottom = 45.0
+text = "清铃观"
+label_settings = ExtResource("18_label28")
+horizontal_alignment = 1
+
+[node name="RealmLabel" type="Label" parent="ProfilePanel" unique_id=1463564457]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 53.0
+offset_right = 236.0
+offset_bottom = 82.0
+text = "炼气一层 · 修为 0/100"
+label_settings = ExtResource("16_label20")
+horizontal_alignment = 1
+
+[node name="SaveButton" type="Button" parent="ProfilePanel" unique_id=1418512808]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 72.0
+offset_top = 84.0
+offset_right = 180.0
+offset_bottom = 108.0
+text = "存档"
+script = ExtResource("12_av2rb")
+
+[node name="StatusPanel" type="Panel" parent="." unique_id=144307130]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 402.0
+offset_top = 16.0
+offset_right = -402.0
+offset_bottom = 83.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="StatusLabel" type="Label" parent="StatusPanel" unique_id=193195899]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_right = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "第 1 日  |  灵石 0  |  气血 100/100  |  法力 100/100"
+label_settings = ExtResource("16_label20")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FurnaceButton" type="TextureButton" parent="." unique_id=781328250]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 240.0
+offset_top = 200.0
+offset_right = 300.0
+offset_bottom = 240.0
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="FurnaceButton" unique_id=974668784]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "炼丹"
+label_settings = ExtResource("17_label24")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StorageButton" type="TextureButton" parent="." unique_id=2024447570]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 605.0
+offset_top = 176.0
+offset_right = 665.0
+offset_bottom = 216.0
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="StorageButton" unique_id=531631224]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "储物"
+label_settings = ExtResource("17_label24")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CultivateObjectButton" type="TextureButton" parent="." unique_id=1442375708]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -241.0
+offset_top = -682.0
+offset_right = -181.0
+offset_bottom = -642.0
+grow_horizontal = 2
+grow_vertical = 0
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="CultivateObjectButton" unique_id=927340752]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "修炼"
+label_settings = ExtResource("17_label24")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BreakthroughButton" type="TextureButton" parent="." unique_id=878898824]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -180.0
+offset_top = -695.0
+offset_right = -120.0
+offset_bottom = -655.0
+grow_horizontal = 2
+grow_vertical = 0
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="BreakthroughButton" unique_id=1825780279]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "突破"
+label_settings = ExtResource("17_label24")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RestButton" type="TextureButton" parent="." unique_id=1299526767]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -555.0
+offset_top = -591.0
+offset_right = -495.0
+offset_bottom = -551.0
+grow_horizontal = 0
+grow_vertical = 0
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="RestButton" unique_id=386144629]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "休息"
+label_settings = ExtResource("17_label24")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LilianObjectButton" type="TextureButton" parent="." unique_id=416321749]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -551.0
+offset_top = -316.0
+offset_right = -491.0
+offset_bottom = -276.0
+grow_horizontal = 0
+grow_vertical = 0
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="LilianObjectButton" unique_id=330289364]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "历练"
+label_settings = ExtResource("17_label24")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BottomActions" type="HBoxContainer" parent="." unique_id=720273206]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 326.0
+offset_top = -112.0
+offset_right = -304.0
+offset_bottom = -34.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 25
+alignment = 1
+
+[node name="WeituoBoardButton" type="TextureButton" parent="BottomActions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 76.08)
+layout_mode = 2
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="BottomActions/WeituoBoardButton"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "委托榜"
+label_settings = ExtResource("18_label28")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="KnowledgeStudyButton" type="TextureButton" parent="BottomActions" unique_id=854695360]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 76.08)
+layout_mode = 2
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="BottomActions/KnowledgeStudyButton" unique_id=4403463]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "研读"
+label_settings = ExtResource("18_label28")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="btnattrs" type="TextureButton" parent="BottomActions" unique_id=229591886]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 76.08)
+layout_mode = 2
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="BottomActions/btnattrs" unique_id=461312723]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "属性"
+label_settings = ExtResource("18_label28")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BeibaoButton" type="TextureButton" parent="BottomActions" unique_id=546934326]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 76.08)
+layout_mode = 2
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="BottomActions/BeibaoButton" unique_id=211143304]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "背包"
+label_settings = ExtResource("18_label28")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Skills" type="TextureButton" parent="BottomActions" unique_id=1170860733]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 76.08)
+layout_mode = 2
+texture_normal = ExtResource("11_small_button")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("12_av2rb")
+
+[node name="Label" type="Label" parent="BottomActions/Skills" unique_id=835979666]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "技能"
+label_settings = ExtResource("18_label28")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MessageBack" type="NinePatchRect" parent="." unique_id=452448490]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = -102.0
+offset_right = -987.0
+offset_bottom = -9.0
+grow_horizontal = 2
+grow_vertical = 0
+texture = ExtResource("15_message_back")
+patch_margin_left = 134
+patch_margin_top = 17
+patch_margin_right = 52
+patch_margin_bottom = 20
+
+[node name="MessageLabel" type="Label" parent="MessageBack" unique_id=1365221689]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_right = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "小道观晨风正好，今日宜早课巡山。"
+label_settings = ExtResource("16_label20")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="InventoryOverlay" parent="." unique_id=484445740 instance=ExtResource("19_breup")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="SaveSlotsOverlay" parent="." unique_id=1076859842 instance=ExtResource("20_save")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="WeituoBoardPanel" parent="." instance=ExtResource("21_weituo")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

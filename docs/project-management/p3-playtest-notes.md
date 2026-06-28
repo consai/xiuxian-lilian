@@ -19,7 +19,7 @@
 
 - `tests/run_config_validation_tests.gd`
 - `tests/run_world_map_tests.gd`
-- `tests/run_expedition_tests.gd`
+- `tests/run_lilian_tests.gd`
 - `tests/run_simulation_tests.gd`
 - `tests/run_dao_knowledge_tests.gd`
 - `tests/run_balance_v1_tests.gd`

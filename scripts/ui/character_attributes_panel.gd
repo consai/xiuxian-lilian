@@ -1,6 +1,6 @@
 extends Control
 
-const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
+const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const BTN_ACTIVE := preload("res://assets/art/ui_new/btn_lv.png")
 const BTN_INACTIVE := preload("res://assets/art/ui_new/btn_mihuang.png")
@@ -23,8 +23,8 @@ enum Tab { ATTRIBUTES, EXPERIENCE, STATISTICS }
 @onready var _attack: Panel = %Attack
 @onready var _defense: Panel = %Defense
 @onready var _speed: Panel = %Speed
-@onready var _crit: Panel = %Crit
-@onready var _crit_damage: Panel = %CritDamage
+@onready var _magic_def: Panel = %MagicDef
+@onready var _action_spd: Panel = %ActionSpd
 @onready var _shield: Panel = %Shield
 @onready var _attributes_heading: Label = $Panel/AttributesCard/Heading
 @onready var _attributes_card: Panel = %AttributesCard
@@ -45,7 +45,7 @@ func _ready() -> void:
 	_attributes_tab.pressed.connect(func() -> void: _select_tab(Tab.ATTRIBUTES))
 	_experience_tab.pressed.connect(func() -> void: _select_tab(Tab.EXPERIENCE))
 	_statistics_tab.pressed.connect(func() -> void: _select_tab(Tab.STATISTICS))
-	_loadout_tab.pressed.connect(func() -> void: SceneManager.go_combat_loadout_panel())
+	_loadout_tab.pressed.connect(func() -> void: SceneManager.go_zhandou_peizhi_mianban())
 	_mastered_arts_tab.pressed.connect(func() -> void: SceneManager.go_mastered_arts_panel())
 	_experience_tab.pressed.connect(func() -> void: SceneManager.go_dao_tree_panel())
 	_select_tab(Tab.ATTRIBUTES)
@@ -79,12 +79,12 @@ func _bind_identity() -> void:
 	else:
 		_injury_label.text = "伤势：%s" % GameState.time_duration_label(GameState.injury_days)
 	_stone_label.text = "灵石 %d" % GameState.ling_stones
-	_portrait.texture = BattleInitDataScript._resolve_icon_texture({"icon": GameState.player_icon})
+	_portrait.texture = ZhandouInitDataScript._resolve_icon_texture({"icon": GameState.player_icon})
 
 
 func _bind_vitals() -> void:
-	var hp_max := FightAttr.get_attr(GameState.attrs, FightAttr.HP_MAX, 100.0)
-	var mp_max := FightAttr.get_attr(GameState.attrs, FightAttr.MP_MAX, 100.0)
+	var hp_max := ZhandouAttr.get_attr(GameState.attrs, ZhandouAttr.HP_MAX, 100.0)
+	var mp_max := ZhandouAttr.get_attr(GameState.attrs, ZhandouAttr.MP_MAX, 100.0)
 	_hp_bar.max_value = hp_max
 	_hp_bar.value = GameState.hp
 	_hp_value.text = "%.0f/%.0f" % [GameState.hp, hp_max]
@@ -96,11 +96,11 @@ func _bind_vitals() -> void:
 func _bind_combat_stats() -> void:
 	var attrs := GameState.attrs
 	_attributes_heading.text = "战斗面板"
-	_set_stat_slot(_attack, "物攻", "%.0f" % FightAttr.get_attr(attrs, FightAttr.PHYSICAL_ATK))
-	_set_stat_slot(_defense, "法攻", "%.0f" % FightAttr.get_attr(attrs, FightAttr.MAGIC_ATK))
-	_set_stat_slot(_speed, "物防", "%.0f" % FightAttr.get_attr(attrs, FightAttr.PHYSICAL_DEF))
-	_set_stat_slot(_crit, "法防", "%.0f" % FightAttr.get_attr(attrs, FightAttr.MAGIC_DEF))
-	_set_stat_slot(_crit_damage, "出手", "%.0f" % FightAttr.get_attr(attrs, FightAttr.SPD))
+	_set_stat_slot(_attack, "物攻", "%.0f" % ZhandouAttr.get_attr(attrs, ZhandouAttr.PHYSICAL_ATK))
+	_set_stat_slot(_defense, "法攻", "%.0f" % ZhandouAttr.get_attr(attrs, ZhandouAttr.MAGIC_ATK))
+	_set_stat_slot(_speed, "物防", "%.0f" % ZhandouAttr.get_attr(attrs, ZhandouAttr.PHYSICAL_DEF))
+	_set_stat_slot(_magic_def, "法防", "%.0f" % ZhandouAttr.get_attr(attrs, ZhandouAttr.MAGIC_DEF))
+	_set_stat_slot(_action_spd, "出手", "%.0f" % ZhandouAttr.get_attr(attrs, ZhandouAttr.SPD))
 	_shield.visible = false
 
 
@@ -160,12 +160,11 @@ func _foundation_text() -> String:
 		],
 		"",
 		"辅助",
-		"命中 %.0f" % FightAttr.get_attr(attrs, FightAttr.ACCURACY),
 		"气血恢复 %.1f    法力恢复 %.1f" % [
-			FightAttr.get_attr(attrs, FightAttr.HP_REGEN),
-			FightAttr.get_attr(attrs, FightAttr.MP_REGEN),
+			ZhandouAttr.get_attr(attrs, ZhandouAttr.HP_REGEN),
+			ZhandouAttr.get_attr(attrs, ZhandouAttr.MP_REGEN),
 		],
-		"负重 %.0f" % FightAttr.get_attr(attrs, FightAttr.CARRY),
+		"负重 %.0f" % ZhandouAttr.get_attr(attrs, ZhandouAttr.CARRY),
 	])
 
 
@@ -189,7 +188,7 @@ func _statistics_text() -> String:
 			int(totals.get("losses", 0)),
 		],
 		"历练 %d 次，最高难度 %d" % [
-			int(totals.get("expeditions", 0)),
+			int(totals.get("lilian_count", 0)),
 			maxi(int(totals.get("max_difficulty", 0)), int(totals.get("max_depth", 0))),
 		],
 		"获得物品 %d 件" % int(totals.get("items_gained", 0)),

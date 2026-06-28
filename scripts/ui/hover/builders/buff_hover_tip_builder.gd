@@ -55,7 +55,7 @@ static func build(buff_id: String, icon: Texture2D = null) -> Dictionary:
 	if icon != null:
 		payload_fields["icon"] = icon
 	elif cfg.has("icon"):
-		var tex := BattleInitData._resolve_icon_texture(cfg)
+		var tex := ZhandouInitData._resolve_icon_texture(cfg)
 		if tex != null:
 			payload_fields["icon"] = tex
 	return HoverTipPayload.make(payload_fields)

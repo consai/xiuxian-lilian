@@ -3,20 +3,20 @@ class_name MethodHoverTipBuilder
 
 ## 根据功法配置构建 Hover Tip 载荷。
 
-const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
-const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
+const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 
 
 static func build(method_id: String, savedata: Dictionary, icon: Texture2D = null) -> Dictionary:
-	var method := CultivationMethodServiceScript.by_id(method_id)
+	var method := XiulianMethodServiceScript.by_id(method_id)
 	if method.is_empty():
 		return {}
-	var family := CultivationMethodServiceScript.family_by_id(str(method.get("familyId", "")))
+	var family := XiulianMethodServiceScript.family_by_id(str(method.get("familyId", "")))
 	var quality := clampi(int(method.get("quality", family.get("quality", 1))), EnumQuality.Type.LOW, EnumQuality.Type.SUPREME)
 	var tier := EnumItemTier.clamp_tier(int(method.get("tier", 1)))
-	var mastery := CultivationMethodServiceScript.method_mastery(savedata, method_id)
-	var knowledge_bonus := CultivationMethodServiceScript.knowledge_mastery_for_method(savedata, method_id)
+	var mastery := XiulianMethodServiceScript.method_mastery(savedata, method_id)
+	var knowledge_bonus := XiulianMethodServiceScript.knowledge_mastery_for_method(savedata, method_id)
 	var lines: Array[String] = []
 	var desc := str(method.get("description", "")).strip_edges()
 	if desc != "":
@@ -43,7 +43,7 @@ static func build(method_id: String, savedata: Dictionary, icon: Texture2D = nul
 	lines.append("熟练：%s%%" % _fmt_num(mastery * 100.0))
 	if knowledge_bonus > 0.0:
 		lines.append("知识反哺：+%s%%" % _fmt_num(knowledge_bonus * 100.0))
-	var mastery_ratio := CultivationMethodServiceScript.method_mastery_value_ratio(savedata, method_id)
+	var mastery_ratio := XiulianMethodServiceScript.method_mastery_value_ratio(savedata, method_id)
 	for effect_line in HoverTipEffectFormatter.format_raw_ability_lines(method.get("effects", []), mastery_ratio):
 		lines.append(effect_line)
 	var knowledge_line := _knowledge_line(method_id)
@@ -57,14 +57,14 @@ static func build(method_id: String, savedata: Dictionary, icon: Texture2D = nul
 	if icon != null:
 		payload_fields["icon"] = icon
 	elif method.has("icon"):
-		var tex := BattleInitDataScript._resolve_icon_texture(method)
+		var tex := ZhandouInitDataScript._resolve_icon_texture(method)
 		if tex != null:
 			payload_fields["icon"] = tex
 	return HoverTipPayload.make(payload_fields)
 
 
 static func method_type_label(method: Dictionary) -> String:
-	var family := CultivationMethodServiceScript.family_by_id(str(method.get("familyId", "")))
+	var family := XiulianMethodServiceScript.family_by_id(str(method.get("familyId", "")))
 	var role := str(family.get("role", "")).strip_edges()
 	if bool(method.get("is_movement", false)) or str(method.get("slot_type", "")) == "movement" \
 			or role.find("身法") >= 0 or role.find("遁法") >= 0:
@@ -75,7 +75,7 @@ static func method_type_label(method: Dictionary) -> String:
 
 
 static func _knowledge_line(method_id: String) -> String:
-	var rows := CultivationMethodServiceScript.resolved_knowledge(method_id)
+	var rows := XiulianMethodServiceScript.resolved_knowledge(method_id)
 	var names: PackedStringArray = []
 	for row_v in rows:
 		if not row_v is Dictionary:

@@ -1,0 +1,11 @@
+{
+  "name": "xiuxian-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "node tools/validate-all.mjs",
+    "validate:dao-tree": "node tools/dao/validate-dao-tree.mjs",
+    "validate:methods": "node tools/dao/validate-xiulian-methods.mjs",
+    "validate:abilities": "node tools/dao/validate-abilities.mjs"
+  }
+}

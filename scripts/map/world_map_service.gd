@@ -1,7 +1,7 @@
 class_name WorldMapService
 extends RefCounted
 
-const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
+const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
 const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
 
 const ROUTE_KEY_SEP := "|"
@@ -58,17 +58,17 @@ static func route_key(from_id: String, to_id: String) -> String:
 	return "%s%s%s" % [ids[0], ROUTE_KEY_SEP, ids[1]]
 
 
-static func expedition_location_id_for_region(region_id: String) -> String:
+static func lilian_location_id_for_region(region_id: String) -> String:
 	var region := wilderness_region_by_id(region_id)
-	var configured := str(region.get("expedition_location_id", "")).strip_edges()
+	var configured := str(region.get("lilian_location_id", "")).strip_edges()
 	if configured != "":
 		return configured
 	return region_id
 
 
-static func expedition_location_id_for_wilderness_location(location_id: String) -> String:
+static func lilian_location_id_for_wilderness_location(location_id: String) -> String:
 	var row := wilderness_location_by_id(location_id)
-	var configured := str(row.get("expedition_location_id", "")).strip_edges()
+	var configured := str(row.get("lilian_location_id", "")).strip_edges()
 	if configured != "":
 		return configured
 	return location_id
@@ -82,12 +82,12 @@ static func can_enter_wilderness(region_id: String, map_data: Dictionary) -> Dic
 	var current_city := str(map_data.get("current_city_id", ""))
 	if not can_enter_region_from_city(region_id, current_city):
 		return {"ok": false, "error": region_entry_city_hint(region_id)}
-	var expedition_id := expedition_location_id_for_region(region_id)
-	if expedition_id == "":
+	var lilian_id := lilian_location_id_for_region(region_id)
+	if lilian_id == "":
 		return {"ok": false, "error": "尚未开放"}
-	if not LocationServiceScript.has_location(expedition_id):
+	if not DidianServiceScript.has_location(lilian_id):
 		return {"ok": false, "error": "尚未开放"}
-	return {"ok": true, "location_id": expedition_id}
+	return {"ok": true, "location_id": lilian_id}
 
 
 static func can_enter_region_from_city(region_id: String, city_id: String) -> bool:
@@ -121,12 +121,12 @@ static func can_enter_wilderness_location(location_id: String, map_data: Diction
 		return {"ok": false, "error": "该地点已消失"}
 	if not is_discovered(map_data, location_id, "location"):
 		return {"ok": false, "error": "尚未发现该地点"}
-	var expedition_id := expedition_location_id_for_wilderness_location(location_id)
-	if expedition_id == "":
+	var lilian_id := lilian_location_id_for_wilderness_location(location_id)
+	if lilian_id == "":
 		return {"ok": false, "error": "尚未开放"}
-	if not LocationServiceScript.has_location(expedition_id):
+	if not DidianServiceScript.has_location(lilian_id):
 		return {"ok": false, "error": "尚未开放"}
-	return {"ok": true, "location_id": expedition_id}
+	return {"ok": true, "location_id": lilian_id}
 
 
 static func build_travel_preview(from_id: String, to_id: String, map_data: Dictionary) -> Dictionary:
@@ -361,7 +361,7 @@ static func clamp_difficulty_options(
 	min_difficulty: int,
 	max_difficulty: int
 ) -> Dictionary:
-	var location := LocationServiceScript.by_id(location_id)
+	var location := DidianServiceScript.by_id(location_id)
 	if location.is_empty():
 		return {"ok": false, "error": "未知地点"}
 	var loc_min := maxi(1, int(location.get("min_difficulty", 1)))

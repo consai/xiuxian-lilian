@@ -1,9 +1,9 @@
 class_name EnumCharacterPortrait
 extends RefCounted
 
-## 首批正式角色立绘路径；icon 字段与 BattleInitData 共用 assets/art/ 前缀约定。
+## 首批正式角色立绘路径；icon 字段与 ZhandouInitData 共用 assets/art/ 前缀约定。
 
-const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
+const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 
 const PATH_PLAYER := "characters/001_cutout_483x512.png"
 const PATH_FOX := "characters/003_cutout_407x512.png"
@@ -36,7 +36,7 @@ static func texture(path: String) -> Texture2D:
 	var trimmed := path.strip_edges()
 	if trimmed == "":
 		return null
-	return BattleInitDataScript._resolve_icon_texture({"icon": trimmed})
+	return ZhandouInitDataScript._resolve_icon_texture({"icon": trimmed})
 
 
 static func portrait_for_speaker(speaker: String) -> String:

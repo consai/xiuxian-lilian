@@ -88,18 +88,18 @@ static func build_combat_attrs(
 	})
 	for key in flat_modifiers.keys():
 		var stat := str(key)
-		attrs[stat] = FightAttr.get_attr(attrs, stat) + _number(flat_modifiers[key], 0.0)
+		attrs[stat] = ZhandouAttr.get_attr(attrs, stat) + _number(flat_modifiers[key], 0.0)
 	for key in percent_modifiers.keys():
 		var stat := str(key)
-		attrs[stat] = FightAttr.get_attr(attrs, stat) * (1.0 + _number(percent_modifiers[key], 0.0))
+		attrs[stat] = ZhandouAttr.get_attr(attrs, stat) * (1.0 + _number(percent_modifiers[key], 0.0))
 	return finalize_combat_attrs(attrs)
 
 
 static func finalize_combat_attrs(raw: Dictionary) -> Dictionary:
 	var out := raw.duplicate(true)
-	for key in FightAttr.ALL_KEYS:
+	for key in ZhandouAttr.ALL_KEYS:
 		if not out.has(key):
-			out[key] = FightAttr.get_attr(FightAttr.TEST_DEFAULTS, key, 0.0)
+			out[key] = ZhandouAttr.get_attr(ZhandouAttr.TEST_DEFAULTS, key, 0.0)
 	return out
 
 

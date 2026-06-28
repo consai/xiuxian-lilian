@@ -1,7 +1,7 @@
 class_name EffectResolver
 extends RefCounted
 
-const FightAttrScript := preload("res://scripts/fight/fight_attr.gd")
+const ZhandouAttrScript := preload("res://scripts/zhandou/zhandou_attr.gd")
 
 const EFFECT_TO_FIGHT := {
 	"damage_spiritual": {"type": EnumCombatEffectType.LABEL_DAMAGE, "damage_type": "magic"},
@@ -22,65 +22,66 @@ const EFFECT_TO_FIGHT := {
 	"shield_spiritual": {"type": EnumCombatEffectType.LABEL_SHIELD},
 	"heal_hp": {"type": EnumCombatEffectType.LABEL_HEAL},
 	"restore_mana": {"type": EnumCombatEffectType.LABEL_RESTORE_MP},
-	"mana_regen": {FightAttrScript.MP_REGEN: true},
-	"max_mana": {FightAttrScript.MP_MAX: true},
-	"max_hp": {FightAttrScript.HP_MAX: true},
-	"max_health": {FightAttrScript.HP_MAX: true},
-	"health_regen": {FightAttrScript.HP_REGEN: true},
-	"physical_attack": {FightAttrScript.PHYSICAL_ATK: true},
-	"magic_attack": {FightAttrScript.MAGIC_ATK: true},
-	"physical_defense": {FightAttrScript.PHYSICAL_DEF: true},
-	"magic_defense": {FightAttrScript.MAGIC_DEF: true},
-	"accuracy": {FightAttrScript.ACCURACY: true},
-	"damage_bonus": {FightAttrScript.DAMAGE_BONUS: true},
-	"sword_damage": {FightAttrScript.DAMAGE_BONUS: true},
-	"spell_damage": {FightAttrScript.DAMAGE_BONUS: true},
-	"thunder_damage": {FightAttrScript.DAMAGE_BONUS: true},
-	"melee_damage": {FightAttrScript.DAMAGE_BONUS: true},
-	"spirit_power": {FightAttrScript.DAMAGE_BONUS: true},
-	"poison_power": {FightAttrScript.DAMAGE_BONUS: true},
-	"curse_power": {FightAttrScript.DAMAGE_BONUS: true},
-	"tribulation_damage": {FightAttrScript.DAMAGE_BONUS: true},
-	"physical_resistance": {FightAttrScript.PHYSICAL_DEF: true},
-	"spiritual_resistance": {FightAttrScript.MAGIC_DEF: true},
-	"all_resistance": {FightAttrScript.PHYSICAL_DEF: true, FightAttrScript.MAGIC_DEF: true},
-	"mental_resistance": {FightAttrScript.MAGIC_DEF: true},
+	"mana_regen": {ZhandouAttrScript.MP_REGEN: true},
+	"max_mana": {ZhandouAttrScript.MP_MAX: true},
+	"max_hp": {ZhandouAttrScript.HP_MAX: true},
+	"max_health": {ZhandouAttrScript.HP_MAX: true},
+	"health_regen": {ZhandouAttrScript.HP_REGEN: true},
+	"physical_attack": {ZhandouAttrScript.PHYSICAL_ATK: true},
+	"magic_attack": {ZhandouAttrScript.MAGIC_ATK: true},
+	"physical_defense": {ZhandouAttrScript.PHYSICAL_DEF: true},
+	"magic_defense": {ZhandouAttrScript.MAGIC_DEF: true},
+	"damage_bonus": {ZhandouAttrScript.DAMAGE_BONUS: true},
+	"sword_damage": {ZhandouAttrScript.DAMAGE_BONUS: true},
+	"spell_damage": {ZhandouAttrScript.DAMAGE_BONUS: true},
+	"thunder_damage": {ZhandouAttrScript.DAMAGE_BONUS: true},
+	"melee_damage": {ZhandouAttrScript.DAMAGE_BONUS: true},
+	"spirit_power": {ZhandouAttrScript.DAMAGE_BONUS: true},
+	"poison_power": {ZhandouAttrScript.DAMAGE_BONUS: true},
+	"curse_power": {ZhandouAttrScript.DAMAGE_BONUS: true},
+	"tribulation_damage": {ZhandouAttrScript.DAMAGE_BONUS: true},
+	"physical_resistance": {ZhandouAttrScript.PHYSICAL_DEF: true},
+	"spiritual_resistance": {ZhandouAttrScript.MAGIC_DEF: true},
+	"all_resistance": {ZhandouAttrScript.PHYSICAL_DEF: true, ZhandouAttrScript.MAGIC_DEF: true},
+	"mental_resistance": {ZhandouAttrScript.MAGIC_DEF: true},
+	# 知识/功法被动：与战斗内 evasion_window 短时提速同属性，永久叠到出手速度
+	"evasion_window": {ZhandouAttrScript.SPD: true},
 }
 
 const COMBAT_MODIFIER_EFFECTS := {
 	"evasion_window": {
-		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumCombatTarget.LABEL_SELF, "stat": FightAttrScript.SPD,
+		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumZhandouTarget.LABEL_SELF, "stat": ZhandouAttrScript.SPD,
 		"duration": 2.0, "name": "流风护身", "percent": true,
 	},
 	"elemental_vulnerability": {
-		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumCombatTarget.LABEL_ENEMY, "stat": FightAttrScript.DAMAGE_TAKEN,
+		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumZhandouTarget.LABEL_ENEMY, "stat": ZhandouAttrScript.DAMAGE_TAKEN,
 		"duration": 5.0, "name": "五行易伤",
 	},
 	"spirit_suppression": {
-		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumCombatTarget.LABEL_ENEMY, "stat": FightAttrScript.CONTROL_RESIST,
+		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumZhandouTarget.LABEL_ENEMY, "stat": ZhandouAttrScript.CONTROL_RESIST,
 		"duration": 4.0, "name": "神识压制", "negative": true, "percent": true,
 	},
 	"enemy_all_resistance": {
-		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumCombatTarget.LABEL_ENEMY, "stat": FightAttrScript.DAMAGE_TAKEN,
+		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumZhandouTarget.LABEL_ENEMY, "stat": ZhandouAttrScript.DAMAGE_TAKEN,
 		"duration": 6.0, "name": "抗性崩解", "invert_negative": true,
 	},
 	"tribulation_mark": {
-		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumCombatTarget.LABEL_ENEMY, "stat": FightAttrScript.DAMAGE_TAKEN,
+		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumZhandouTarget.LABEL_ENEMY, "stat": ZhandouAttrScript.DAMAGE_TAKEN,
 		"duration": 10.0, "name": "劫痕",
 	},
 	"healing_reduction": {
-		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumCombatTarget.LABEL_ENEMY, "stat": FightAttrScript.HP_REGEN,
+		"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER, "target": EnumZhandouTarget.LABEL_ENEMY, "stat": ZhandouAttrScript.HP_REGEN,
 		"duration": 8.0, "name": "疗愈阻断", "negative": true, "percent": true,
 	},
 }
 
 const COMBAT_CONTROL_EFFECTS := {
-	"stagger_power": {"duration": 0.6, "chance": 0.65, "name": "踉跄"},
-	"control_duration": {"duration_from_value": true, "chance": 0.75, "name": "封印"},
-	"stun_chance": {"duration": 1.0, "chance_from_value": true, "name": "麻痹"},
-	"delay_special_action_chance": {"duration": 0.4, "chance_from_value": true, "name": "延缓"},
-	"knockdown_duration": {"duration_from_value": true, "chance": 0.7, "name": "击倒"},
-	"law_suppression": {"duration": 1.5, "chance_from_value": true, "name": "律令压制"},
+	"stagger_power": {"duration": 0.6, "name": "踉跄"},
+	"control_duration": {"duration_from_value": true, "name": "封印"},
+	"stun_chance": {"duration": 1.0, "name": "麻痹"},
+	"delay_special_action_chance": {"duration": 0.4, "duration_from_value": true, "name": "延缓"},
+	"knockdown_duration": {"duration_from_value": true, "name": "击倒"},
+	"law_suppression": {"duration": 1.5, "duration_from_value": true, "name": "律令压制"},
 }
 
 const PRESENTATION_ONLY_EFFECTS := {
@@ -137,7 +138,7 @@ static func resolve_combat_effects(effect_rows: Array) -> Array:
 			var row := {
 				"type": str(map.get("type", EnumCombatEffectType.LABEL_DAMAGE)),
 				"value": magnitude,
-				"target": str(effect.get("target", EnumCombatTarget.LABEL_ENEMY)),
+				"target": str(effect.get("target", EnumZhandouTarget.LABEL_ENEMY)),
 			}
 			if map.has("damage_type"):
 				row["damage_type"] = str(map["damage_type"])
@@ -153,7 +154,7 @@ static func resolve_combat_effects(effect_rows: Array) -> Array:
 				"type": EnumCombatEffectType.LABEL_TIMED_MODIFIER,
 				"id": "ability_%s" % effect_id,
 				"name": str(modifier.get("name", effect_id)),
-				"target": str(modifier.get("target", effect.get("target", EnumCombatTarget.LABEL_ENEMY))),
+				"target": str(modifier.get("target", effect.get("target", EnumZhandouTarget.LABEL_ENEMY))),
 				"duration": float(modifier.get("duration", 3.0)),
 			}
 			if bool(modifier.get("percent", false)):
@@ -169,9 +170,8 @@ static func resolve_combat_effects(effect_rows: Array) -> Array:
 				"type": EnumCombatEffectType.LABEL_CONTROL,
 				"id": "ability_%s" % effect_id,
 				"name": str(control.get("name", effect_id)),
-				"target": str(effect.get("target", EnumCombatTarget.LABEL_ENEMY)),
+				"target": str(effect.get("target", EnumZhandouTarget.LABEL_ENEMY)),
 				"duration": magnitude if bool(control.get("duration_from_value", false)) else float(control.get("duration", 0.5)),
-				"control_chance": magnitude if bool(control.get("chance_from_value", false)) else float(control.get("chance", 0.75)),
 			})
 			continue
 		if effect_id == "armor_pierce":

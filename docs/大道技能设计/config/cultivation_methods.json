@@ -8239,14 +8239,14 @@
           }
         },
         {
-          "effectId": "expedition_capacity",
+          "effectId": "lilian_capacity",
           "base": 0.18,
           "knowledgeScales": [
             "spirit.split"
           ],
           "masteryGrowth": 0.025,
           "operation": "add_percent",
-          "stackGroup": "expedition_capacity",
+          "stackGroup": "lilian_capacity",
           "stackPolicy": "highest",
           "activation": "active_method",
           "cap": 2,
@@ -8711,14 +8711,14 @@
           }
         },
         {
-          "effectId": "expedition_capacity",
+          "effectId": "lilian_capacity",
           "base": 0.35,
           "knowledgeScales": [
             "heaven.astrology"
           ],
           "masteryGrowth": 0.04,
           "operation": "add_percent",
-          "stackGroup": "expedition_capacity",
+          "stackGroup": "lilian_capacity",
           "stackPolicy": "highest",
           "activation": "active_method",
           "cap": 2,
@@ -10951,11 +10951,11 @@
       "runtimeKey": "evil_bane",
       "description": "功法效果属性 evil_bane，具体结算由 Godot 运行时映射。"
     },
-    "expedition_capacity": {
+    "lilian_capacity": {
       "category": "exploration",
       "defaultTarget": "self",
-      "runtimeKey": "expedition_capacity",
-      "description": "功法效果属性 expedition_capacity，具体结算由 Godot 运行时映射。"
+      "runtimeKey": "lilian_capacity",
+      "description": "功法效果属性 lilian_capacity，具体结算由 Godot 运行时映射。"
     },
     "exploration_safety": {
       "category": "utility",

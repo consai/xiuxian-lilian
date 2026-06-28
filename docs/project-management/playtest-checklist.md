@@ -24,7 +24,7 @@
 - 战斗中不能通过背包绕过丹药使用限制。
 - 历练胜利返回不重新生成地图。
 - 战败 / 撤退只结算一次。
-- 结算后 `GameState.last_expedition_summary` 有摘要，`ExpeditionState.active` 为 false。
+- 结算后 `GameState.last_lilian_summary` 有摘要，`LilianState.active` 为 false。
 - 回洞府后可再次进入世界地图。
 
 ## 失败记录

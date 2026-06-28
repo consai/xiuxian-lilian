@@ -1,21 +1,21 @@
 class_name ScenePayload
 extends RefCounted
 
-const SCENE_EXPEDITION_RESULT := "expedition_result"
-const SCENE_BREAKTHROUGH_SUMMARY := "breakthrough_summary"
+const SCENE_LILIAN_JIESUAN := "lilian_jiesuan"
+const SCENE_TUPO_ZONGJIE := "tupo_zongjie"
 
 
-static func expedition_result(reason: String) -> Dictionary:
+static func lilian_jiesuan(reason: String) -> Dictionary:
 	var payload := {"reason": reason}
-	var errors := collect_errors(SCENE_EXPEDITION_RESULT, payload)
+	var errors := collect_errors(SCENE_LILIAN_JIESUAN, payload)
 	if not errors.is_empty():
 		return {}
 	return payload
 
 
-static func breakthrough_summary(summary: Dictionary) -> Dictionary:
+static func tupo_zongjie(summary: Dictionary) -> Dictionary:
 	var payload := summary.duplicate(true)
-	var errors := collect_errors(SCENE_BREAKTHROUGH_SUMMARY, payload)
+	var errors := collect_errors(SCENE_TUPO_ZONGJIE, payload)
 	if not errors.is_empty():
 		return {}
 	return payload
@@ -36,14 +36,14 @@ static func validate(scene_id: String, data: Dictionary) -> bool:
 static func collect_errors(scene_id: String, data: Dictionary) -> PackedStringArray:
 	var errors: PackedStringArray = []
 	match scene_id:
-		SCENE_EXPEDITION_RESULT:
-			var reason := str(data.get("reason", ExpeditionResult.EXIT_MANUAL))
-			if reason not in ExpeditionResult.VALID_EXIT_REASONS:
-				errors.append("expedition_result.reason 无效: %s" % reason)
-		SCENE_BREAKTHROUGH_SUMMARY:
+		SCENE_LILIAN_JIESUAN:
+			var reason := str(data.get("reason", LilianResult.EXIT_MANUAL))
+			if reason not in LilianResult.VALID_EXIT_REASONS:
+				errors.append("lilian_jiesuan.reason 无效: %s" % reason)
+		SCENE_TUPO_ZONGJIE:
 			var mode := str(data.get("mode", "result")).strip_edges()
 			if mode == "panel":
 				return errors
 			if str(data.get("new_realm", "")).strip_edges() == "":
-				errors.append("breakthrough_summary 缺少 new_realm")
+				errors.append("tupo_zongjie 缺少 new_realm")
 	return errors

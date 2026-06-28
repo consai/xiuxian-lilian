@@ -89,8 +89,8 @@ func _run_scenario(config: Dictionary, player_id: String, enemy_id: String) -> D
 
 
 func _simulate(player_attrs: Dictionary, enemy_attrs: Dictionary) -> Dictionary:
-	var player_hp := float(player_attrs[FightAttr.HP_MAX])
-	var player_mp := float(player_attrs[FightAttr.MP_MAX])
+	var player_hp := float(player_attrs[ZhandouAttr.HP_MAX])
+	var player_mp := float(player_attrs[ZhandouAttr.MP_MAX])
 	var enemy_hp := float(enemy_attrs["hp_max"])
 	var player_progress := 0.0
 	var enemy_progress := 0.0
@@ -100,34 +100,32 @@ func _simulate(player_attrs: Dictionary, enemy_attrs: Dictionary) -> Dictionary:
 	while elapsed < TIME_LIMIT and player_hp > 0.0 and enemy_hp > 0.0:
 		elapsed += STEP
 		skill_cd = maxf(0.0, skill_cd - STEP)
-		player_progress += CombatBalance.action_progress_rate_from_spd(float(player_attrs[FightAttr.SPD])) * STEP
-		enemy_progress += CombatBalance.action_progress_rate_from_spd(float(enemy_attrs["spd"])) * STEP
-		if player_progress >= CombatBalance.ACTION_PROGRESS_MAX:
-			player_progress -= CombatBalance.ACTION_PROGRESS_MAX
+		player_progress += ZhandouBalance.action_progress_rate_from_spd(float(player_attrs[ZhandouAttr.SPD])) * STEP
+		enemy_progress += ZhandouBalance.action_progress_rate_from_spd(float(enemy_attrs["spd"])) * STEP
+		if player_progress >= ZhandouBalance.ACTION_PROGRESS_MAX:
+			player_progress -= ZhandouBalance.ACTION_PROGRESS_MAX
 			var use_skill := skill_cd <= 0.0 and player_mp >= float(skill["mp_cost"])
-			if FightAttr.roll_hit(player_attrs, enemy_attrs):
-				var hit := FightAttr.calc_skill_damage(
-					player_attrs,
-					enemy_attrs,
-					float(skill["power"]) / 1000.0 if use_skill else 1.0,
-					float(((skill["effects"] as Array)[0] as Dictionary)["value"]) if use_skill else 0.0,
-					FightAttr.DAMAGE_MAGIC if use_skill else FightAttr.DAMAGE_PHYSICAL
-				)
-				enemy_hp -= float(hit["damage"])
+			var hit := ZhandouAttr.calc_skill_damage(
+				player_attrs,
+				enemy_attrs,
+				float(skill["power"]) / 1000.0 if use_skill else 1.0,
+				float(((skill["effects"] as Array)[0] as Dictionary)["value"]) if use_skill else 0.0,
+				ZhandouAttr.DAMAGE_MAGIC if use_skill else ZhandouAttr.DAMAGE_PHYSICAL
+			)
+			enemy_hp -= float(hit["damage"])
 			if use_skill:
 				player_mp -= float(skill["mp_cost"])
 				skill_cd = float(skill["cd"])
 		if enemy_hp <= 0.0:
 			break
-		if enemy_progress >= CombatBalance.ACTION_PROGRESS_MAX:
-			enemy_progress -= CombatBalance.ACTION_PROGRESS_MAX
-			if FightAttr.roll_hit(enemy_attrs, player_attrs):
-				player_hp -= float(FightAttr.calc_basic_damage(enemy_attrs, player_attrs)["damage"])
+		if enemy_progress >= ZhandouBalance.ACTION_PROGRESS_MAX:
+			enemy_progress -= ZhandouBalance.ACTION_PROGRESS_MAX
+			player_hp -= float(ZhandouAttr.calc_basic_damage(enemy_attrs, player_attrs)["damage"])
 	return {
 		"win": enemy_hp <= 0.0 and player_hp > 0.0,
 		"duration": elapsed,
-		"hp_ratio": maxf(0.0, player_hp) / float(player_attrs[FightAttr.HP_MAX]),
-		"mp_ratio": maxf(0.0, player_mp) / float(player_attrs[FightAttr.MP_MAX]),
+		"hp_ratio": maxf(0.0, player_hp) / float(player_attrs[ZhandouAttr.HP_MAX]),
+		"mp_ratio": maxf(0.0, player_mp) / float(player_attrs[ZhandouAttr.MP_MAX]),
 	}
 
 

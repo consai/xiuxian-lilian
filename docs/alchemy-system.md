@@ -381,7 +381,7 @@ pill.juqi.supreme
 
 ### 结算服务边界
 
-建议新增独立 `AlchemyService`，只负责：
+建议新增独立 `LiandanService`，只负责：
 
 - 校验丹方、药材、丹炉与策略；
 - 生成概率预览；

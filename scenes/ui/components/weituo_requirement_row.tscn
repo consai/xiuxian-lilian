@@ -1,0 +1,62 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/components/weituo_requirement_row.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/art/ui_new/item_cao.png" id="2_icon"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="3_body"]
+
+[sub_resource type="StyleBoxFlat" id="RequirementPanel"]
+bg_color = Color(0.98, 0.9, 0.75, 0.7)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.58, 0.4, 0.23, 0.75)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="WeituoRequirementRow" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 58)
+script = ExtResource("1_script")
+theme_override_styles/panel = SubResource("RequirementPanel")
+
+[node name="HBox" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="HBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(42, 42)
+layout_mode = 2
+texture = ExtResource("2_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="HBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+text = "清心草"
+label_settings = ExtResource("3_body")
+vertical_alignment = 1
+
+[node name="CountLabel" type="Label" parent="HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "3/3"
+label_settings = ExtResource("3_body")
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="HBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(44, 0)
+layout_mode = 2
+text = "√"
+label_settings = ExtResource("3_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+

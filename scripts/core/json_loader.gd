@@ -3,18 +3,18 @@ extends RefCounted
 
 const ITEMS_PATH := "res://data/item.yaml"
 const DAO_TREE_PATH := "res://data/dao_tree.yaml"
-const CULTIVATION_METHODS_PATH := "res://data/cultivation_methods.yaml"
+const XIULIAN_METHODS_PATH := "res://data/xiulian_methods.yaml"
 const KNOWLEDGE_EFFECTS_PATH := "res://data/knowledge_effects.yaml"
 const ABILITIES_PATH := "res://data/abilities.yaml"
 const EFFECT_CATALOG_PATH := "res://data/effect_catalog.yaml"
 const EQUIPS_PATH := "res://data/equip.yaml"
 const BUFFS_PATH := "res://data/buff.yaml"
-const COMBAT_VFX_INDEX_PATH := "res://data/combat/vfx_index.yaml"
-const COMBAT_FLOAT_STYLES_PATH := "res://data/combat/float_styles.yaml"
-const COMBAT_VFX_PRESETS_DIR := "res://data/combat/presets"
+const ZHANDOU_VFX_INDEX_PATH := "res://data/zhandou/vfx_index.yaml"
+const ZHANDOU_FLOAT_STYLES_PATH := "res://data/zhandou/float_styles.yaml"
+const ZHANDOU_VFX_PRESETS_DIR := "res://data/zhandou/presets"
 const ItemDefScript = preload("res://scripts/core/item_def.gd")
-const EquipDefScript = preload("res://scripts/fight/equip_def.gd")
-const BuffDefScript = preload("res://scripts/fight/buff_def.gd")
+const EquipDefScript = preload("res://scripts/zhandou/equip_def.gd")
+const BuffDefScript = preload("res://scripts/zhandou/buff_def.gd")
 
 ## 配置文件中的文档用元数据键（加载后剔除）。
 const JSON_COMMENT_KEYS: Array[String] = ["_comment", "_说明", "_doc", "_备注"]
@@ -307,7 +307,7 @@ static func _append_generated_ability_books(
 		existing_ids: Dictionary,
 		existing_targets: Dictionary
 ) -> void:
-	var bundle := _read_json_root_object(ABILITIES_PATH)
+	var bundle := load_abilities_bundle()
 	var abilities_v: Variant = bundle.get("abilities", [])
 	if not abilities_v is Array:
 		return
@@ -332,7 +332,7 @@ static func _append_generated_method_books(
 		existing_ids: Dictionary,
 		existing_targets: Dictionary
 ) -> void:
-	var bundle := _read_json_root_object(CULTIVATION_METHODS_PATH)
+	var bundle := _read_json_root_object(XIULIAN_METHODS_PATH)
 	var methods_v: Variant = bundle.get("methods", [])
 	if not methods_v is Array:
 		return
@@ -480,7 +480,7 @@ static func load_buffs() -> Array:
 			continue
 		var row := (row_v as Dictionary).duplicate(true)
 		row["id"] = bid
-		_validate_combat_effects_schema(
+		_validate_zhandou_effects_schema(
 			row.get("tick_effects", []),
 			"buff config buffs['%s'].tick_effects" % bid,
 			false
@@ -491,7 +491,7 @@ static func load_buffs() -> Array:
 	return out
 
 
-static func _validate_combat_effects_schema(raw: Variant, path_label: String, allow_target: bool) -> void:
+static func _validate_zhandou_effects_schema(raw: Variant, path_label: String, allow_target: bool) -> void:
 	if raw == null:
 		return
 	if not raw is Array:
@@ -511,7 +511,7 @@ static func _validate_combat_effects_schema(raw: Variant, path_label: String, al
 			push_error("JsonLoader: %s[%d].type '%s' is unsupported" % [path_label, i, etype])
 		if allow_target and item.has("target"):
 			var target := str(item.get("target", "")).strip_edges().to_lower()
-			if target != "" and not EnumCombatTarget.is_valid_label(target):
+			if target != "" and not EnumZhandouTarget.is_valid_label(target):
 				push_error("JsonLoader: %s[%d].target '%s' is unsupported" % [path_label, i, target])
 		if EnumCombatEffectType.requires_value(etype) and not item.has("value"):
 			push_error("JsonLoader: %s[%d].value is required for type '%s'" % [path_label, i, etype])
@@ -534,7 +534,7 @@ static func strip_json_comments(variant: Variant) -> Variant:
 	return variant
 
 
-static func normalize_combat_vfx_preset_id(ref: String) -> String:
+static func normalize_zhandou_vfx_preset_id(ref: String) -> String:
 	var s := ref.strip_edges()
 	if s == "":
 		return ""
@@ -551,31 +551,31 @@ static func normalize_combat_vfx_preset_id(ref: String) -> String:
 	return s
 
 
-static func combat_vfx_preset_path(preset_id: String) -> String:
-	var id := normalize_combat_vfx_preset_id(preset_id)
+static func zhandou_vfx_preset_path(preset_id: String) -> String:
+	var id := normalize_zhandou_vfx_preset_id(preset_id)
 	if id == "":
 		return ""
-	return "%s/%s.yaml" % [COMBAT_VFX_PRESETS_DIR, id]
+	return "%s/%s.yaml" % [ZHANDOU_VFX_PRESETS_DIR, id]
 
 
-static func load_combat_float_styles() -> Dictionary:
-	var raw: Variant = _read_config_variant(COMBAT_FLOAT_STYLES_PATH)
+static func load_zhandou_float_styles() -> Dictionary:
+	var raw: Variant = _read_config_variant(ZHANDOU_FLOAT_STYLES_PATH)
 	if raw == null or not raw is Dictionary:
 		return {"version": 1, "jitter_x": 18.0, "max_per_unit_per_frame": 6, "styles": {}}
 	return strip_json_comments(raw) as Dictionary
 
 
-static func load_combat_vfx_index() -> Dictionary:
-	var raw: Variant = _read_config_variant(COMBAT_VFX_INDEX_PATH)
+static func load_zhandou_vfx_index() -> Dictionary:
+	var raw: Variant = _read_config_variant(ZHANDOU_VFX_INDEX_PATH)
 	if raw == null or not raw is Dictionary:
 		return {"version": 1, "default": "melee_default", "impact_preset": "hit_default", "preset_dir": "presets"}
 	return strip_json_comments(raw) as Dictionary
 
 
-static func load_combat_vfx_preset_file(preset_ref: String) -> Dictionary:
-	var path := combat_vfx_preset_path(preset_ref)
+static func load_zhandou_vfx_preset_file(preset_ref: String) -> Dictionary:
+	var path := zhandou_vfx_preset_path(preset_ref)
 	if path == "" or not FileAccess.file_exists(path):
-		push_warning("JsonLoader: combat vfx preset not found: %s" % path)
+		push_warning("JsonLoader: zhandou vfx preset not found: %s" % path)
 		return {}
 	var raw: Variant = _read_config_variant(path)
 	if raw == null or not raw is Dictionary:
@@ -587,8 +587,8 @@ static func load_dao_tree() -> Dictionary:
 	return _read_json_root_object(DAO_TREE_PATH)
 
 
-static func load_cultivation_methods_bundle() -> Dictionary:
-	return _read_json_root_object(CULTIVATION_METHODS_PATH)
+static func load_xiulian_methods_bundle() -> Dictionary:
+	return _read_json_root_object(XIULIAN_METHODS_PATH)
 
 
 static func load_knowledge_effects_bundle() -> Dictionary:
@@ -596,17 +596,51 @@ static func load_knowledge_effects_bundle() -> Dictionary:
 
 
 static func load_abilities_bundle() -> Dictionary:
-	return _read_json_root_object(ABILITIES_PATH)
+	var bundle := _read_json_root_object(ABILITIES_PATH)
+	var merged: Array = []
+	var tables_v: Variant = bundle.get("abilityTables", {})
+	if tables_v is Dictionary and not (tables_v as Dictionary).is_empty():
+		for type_name in _ability_table_load_order(bundle, tables_v as Dictionary):
+			merged.append_array(_load_ability_table_rows(str(type_name), tables_v as Dictionary))
+	else:
+		# ponytail: 兼容仍内联 abilities 的旧版单文件
+		var legacy_v: Variant = bundle.get("abilities", [])
+		if legacy_v is Array:
+			merged = (legacy_v as Array).duplicate(true)
+	bundle["abilities"] = merged
+	var meta_v: Variant = bundle.get("metadata", {})
+	if meta_v is Dictionary:
+		(meta_v as Dictionary)["abilityCount"] = merged.size()
+	return bundle
+
+
+static func _ability_table_load_order(bundle: Dictionary, tables: Dictionary) -> Array:
+	var rules_v: Variant = bundle.get("rules", {})
+	if rules_v is Dictionary:
+		var types_v: Variant = (rules_v as Dictionary).get("types", [])
+		if types_v is Array and not (types_v as Array).is_empty():
+			return types_v as Array
+	return tables.keys()
+
+
+static func _load_ability_table_rows(type_name: String, tables: Dictionary) -> Array:
+	var rel := str(tables.get(type_name, "")).strip_edges()
+	if rel == "":
+		rel = "abilities/%s.yaml" % type_name
+	var path := rel if rel.begins_with("res://") else "res://data/%s" % rel.trim_prefix("/")
+	var table := _read_json_root_object(path)
+	var rows_v: Variant = table.get("abilities", [])
+	return (rows_v as Array).duplicate(true) if rows_v is Array else []
 
 
 static func load_effect_catalog() -> Dictionary:
 	return _read_json_root_object(EFFECT_CATALOG_PATH)
 
 
-static func load_combat_vfx_presets() -> Dictionary:
-	var index := load_combat_vfx_index()
+static func load_zhandou_vfx_presets() -> Dictionary:
+	var index := load_zhandou_vfx_index()
 	var names: Array = []
-	var dir := DirAccess.open(COMBAT_VFX_PRESETS_DIR)
+	var dir := DirAccess.open(ZHANDOU_VFX_PRESETS_DIR)
 	if dir != null:
 		dir.list_dir_begin()
 		var fn := dir.get_next()

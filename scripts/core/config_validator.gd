@@ -1,11 +1,11 @@
 class_name ConfigValidator
 extends RefCounted
 
-const ExpeditionDataValidatorScript := preload("res://scripts/expedition/expedition_data_validator.gd")
+const LilianDataValidatorScript := preload("res://scripts/lilian/lilian_data_validator.gd")
 const WorldMapDataValidatorScript := preload("res://scripts/map/world_map_data_validator.gd")
 const SceneManagerScript := preload("res://scripts/core/scene_manager.gd")
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
-const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const KnowledgeEffectServiceScript := preload("res://scripts/dao/knowledge_effect_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
@@ -19,7 +19,7 @@ static func collect_all_errors(config_manager: Node, game_state: Node = null) ->
 		return errors
 	errors.append_array(_validate_unique_ids(config_manager))
 	errors.append_array(_validate_scene_paths())
-	errors.append_array(_validate_expedition_rules(config_manager))
+	errors.append_array(_validate_lilian_rules(config_manager))
 	errors.append_array(_validate_realm_balance())
 	errors.append_array(_validate_location_preview_rewards(config_manager))
 	errors.append_array(_validate_v1_abilities())
@@ -29,7 +29,7 @@ static func collect_all_errors(config_manager: Node, game_state: Node = null) ->
 	errors.append_array(_validate_learning_book_coverage(config_manager))
 	errors.append_array(_validate_item_alias_targets(config_manager))
 	errors.append_array(_validate_cultivation_pill_gains(config_manager))
-	errors.append_array(ExpeditionDataValidatorScript.collect_errors(game_state))
+	errors.append_array(LilianDataValidatorScript.collect_errors(game_state))
 	errors.append_array(WorldMapDataValidatorScript.collect_errors())
 	return errors
 
@@ -39,7 +39,7 @@ static func _validate_arts_quality_and_tier() -> PackedStringArray:
 	for ability_v in AbilityServiceScript.all_abilities():
 		if ability_v is Dictionary:
 			errors.append_array(_validate_quality_tier_row(ability_v as Dictionary, "技能"))
-	for method_v in CultivationMethodServiceScript.all_methods():
+	for method_v in XiulianMethodServiceScript.all_methods():
 		if method_v is Dictionary:
 			errors.append_array(_validate_quality_tier_row(method_v as Dictionary, "功法"))
 	for skill_v in DaoTreeServiceScript.config().get("skills", []) as Array:
@@ -129,7 +129,7 @@ static func _validate_combat_costs(ability: Dictionary, combat: Dictionary) -> P
 
 static func _validate_method_stack_policies() -> PackedStringArray:
 	var errors: PackedStringArray = []
-	for method_v in CultivationMethodServiceScript.all_methods():
+	for method_v in XiulianMethodServiceScript.all_methods():
 		var method := method_v as Dictionary
 		if not method.get("tags") is Array:
 			errors.append("功法 %s tags 必须是数组" % str(method.get("id", "")))
@@ -164,7 +164,7 @@ static func _validate_learning_book_coverage(config_manager: Node) -> PackedStri
 		if ability_id == "" or ability_books.has(ability_id):
 			continue
 		errors.append("技能 %s 缺少学习道具配置" % ability_id)
-	for method_v in CultivationMethodServiceScript.all_methods():
+	for method_v in XiulianMethodServiceScript.all_methods():
 		var method := method_v as Dictionary
 		var method_id := str(method.get("id", "")).strip_edges()
 		if method_id == "" or method_books.has(method_id):
@@ -216,8 +216,8 @@ static func _validate_unique_ids(config_manager: Node) -> PackedStringArray:
 	errors.append_array(_validate_no_duplicate_dict_keys(config_manager.all_equip_ids(), "法宝"))
 	errors.append_array(_validate_no_duplicate_dict_keys(config_manager.all_buff_ids(), "Buff"))
 	errors.append_array(_validate_no_duplicate_dict_keys(config_manager.all_location_ids(), "地点"))
-	errors.append_array(_validate_no_duplicate_dict_keys(config_manager.all_common_expedition_event_ids(), "公共历练事件"))
-	errors.append_array(_validate_no_duplicate_dict_keys(config_manager.all_expedition_event_ids(), "远征事件"))
+	errors.append_array(_validate_no_duplicate_dict_keys(config_manager.all_lilian_common_event_ids(), "公共历练事件"))
+	errors.append_array(_validate_no_duplicate_dict_keys(config_manager.all_lilian_event_ids(), "远征事件"))
 	return errors
 
 
@@ -257,9 +257,9 @@ static func _validate_scene_paths() -> PackedStringArray:
 	return errors
 
 
-static func _validate_expedition_rules(config_manager: Node) -> PackedStringArray:
+static func _validate_lilian_rules(config_manager: Node) -> PackedStringArray:
 	var errors: PackedStringArray = []
-	var rules: Dictionary = config_manager.expedition_rules()
+	var rules: Dictionary = config_manager.lilian_rules()
 	if rules.is_empty():
 		errors.append("远征规则为空")
 		return errors

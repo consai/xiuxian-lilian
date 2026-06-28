@@ -1,0 +1,537 @@
+[gd_scene format=3 uid="uid://dxsvsh7kwu621"]
+
+[ext_resource type="Script" path="res://scripts/sim/tupo_zongjie.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
+[ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://c3f3nny73kvhg" path="res://assets/art/ui_new/btn_lv.png" id="4_green"]
+[ext_resource type="Texture2D" uid="uid://8mwstvi8kywh" path="res://assets/art/ui_new/btn_close.png" id="5_close"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="6_title"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="7_head"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="8_text"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="9_small"]
+[ext_resource type="PackedScene" uid="uid://ctsdqs84m306f" path="res://scenes/ui/components/tupo_value_row.tscn" id="10_row"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/tupo_path_button.tscn" id="11_path"]
+[ext_resource type="Texture2D" uid="uid://bdmliptsqhrxy" path="res://assets/art/ui_new/headlabel.png" id="12_headlabel"]
+[ext_resource type="Texture2D" uid="uid://ddhp6fnyychy1" path="res://assets/art/ui_new/tup.png" id="13_breakthrough"]
+[ext_resource type="Texture2D" uid="uid://db6yxps2ypebg" path="res://assets/art/characters/001_cutout_483x512.png" id="14_meditator"]
+[ext_resource type="Texture2D" uid="uid://ctw0jxkm6iryg" path="res://assets/art/ui_new/xiuwei.png" id="15_cultivation"]
+[ext_resource type="Texture2D" uid="uid://cdlm3pk6bsyvj" path="res://assets/art/ui_new/liandan.png" id="16_alchemy"]
+[ext_resource type="Texture2D" uid="uid://qs2mgjhtoxqu" path="res://assets/art/ui_new/xingjing.png" id="17_mind"]
+[ext_resource type="Texture2D" uid="uid://d22p6kbkdt0xc" path="res://assets/art/ui_new/gengu.png" id="18_bone"]
+[ext_resource type="Texture2D" uid="uid://dscpl4c82v8iw" path="res://assets/art/ui_new/qiyun.png" id="19_luck"]
+[ext_resource type="Texture2D" uid="uid://0861fa5a5myi" path="res://assets/art/ui_new/gongfa.png" id="20_method"]
+[ext_resource type="Texture2D" uid="uid://cm3ndcqb2rpty" path="res://assets/art/ui_new/qitia.png" id="21_other"]
+[ext_resource type="Texture2D" uid="uid://botslvvwakrxs" path="res://assets/art/ui_new/xiulian.png" id="22_practice"]
+
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="23_auto"]
+
+[sub_resource type="StyleBoxFlat" id="Style_inner"]
+bg_color = Color(1, 0.94, 0.82, 0.78)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.58, 0.42, 0.24, 0.48)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="Style_panel"]
+bg_color = Color(0.96, 0.88, 0.71, 0.94)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.34, 0.23, 0.13, 0.82)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0.2, 0.12, 0.05, 0.22)
+shadow_size = 6
+
+[sub_resource type="StyleBoxFlat" id="Style_progress_bg"]
+bg_color = Color(0.48, 0.38, 0.25, 0.35)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[sub_resource type="StyleBoxFlat" id="Style_progress_fill"]
+bg_color = Color(0.42, 0.62, 0.25, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[node name="BreakthroughSummary" type="Control" unique_id=563446010]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1153120961]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="WarmOverlay" type="ColorRect" parent="." unique_id=158888683]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 0.83, 0.53, 0.35)
+
+[node name="PlayerCard" type="PanelContainer" parent="." unique_id=2113487517]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 18.0
+offset_right = 238.0
+offset_bottom = 100.0
+theme_override_styles/panel = SubResource("Style_inner")
+
+[node name="Margin" type="MarginContainer" parent="PlayerCard" unique_id=1653930481]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 8
+
+[node name="PlayerInfoLabel" type="Label" parent="PlayerCard/Margin" unique_id=586568967]
+unique_name_in_owner = true
+layout_mode = 2
+text = "云游散人
+炼气三层"
+label_settings = ExtResource("8_text")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeadLabel" type="TextureRect" parent="." unique_id=2131597877]
+layout_mode = 0
+offset_left = 455.0
+offset_top = 1.0
+offset_right = 825.0
+offset_bottom = 117.0
+mouse_filter = 2
+texture = ExtResource("12_headlabel")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="HeadLabel" unique_id=727432414]
+layout_mode = 0
+offset_top = 32.0
+offset_right = 370.0
+offset_bottom = 73.0
+text = "境 界 突 破"
+label_settings = ExtResource("6_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Currency" type="PanelContainer" parent="." unique_id=21065772]
+layout_mode = 0
+offset_left = 986.0
+offset_top = 18.0
+offset_right = 1162.0
+offset_bottom = 70.0
+theme_override_styles/panel = SubResource("Style_inner")
+
+[node name="LingStonesLabel" type="Label" parent="Currency" unique_id=1997627798]
+unique_name_in_owner = true
+layout_mode = 2
+text = "灵石  128"
+label_settings = ExtResource("8_text")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="TextureButton" parent="." unique_id=1858959142]
+unique_name_in_owner = true
+script = ExtResource("23_auto")
+layout_mode = 0
+offset_left = 1185.0
+offset_top = 16.0
+offset_right = 1249.0
+offset_bottom = 80.0
+texture_normal = ExtResource("5_close")
+ignore_texture_size = true
+stretch_mode = 5
+
+
+[node name="LeftPanel" type="PanelContainer" parent="." unique_id=920557966]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 28.0
+offset_top = 132.0
+offset_right = 362.0
+offset_bottom = 655.0
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="LeftMargin" type="MarginContainer" parent="LeftPanel" unique_id=1668916918]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 14
+
+[node name="LeftVBox" type="VBoxContainer" parent="LeftPanel/LeftMargin" unique_id=1632565772]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Heading" type="Label" parent="LeftPanel/LeftMargin/LeftVBox" unique_id=340208257]
+layout_mode = 2
+text = "突破值构成"
+label_settings = ExtResource("7_head")
+horizontal_alignment = 1
+
+[node name="Divider" type="HSeparator" parent="LeftPanel/LeftMargin/LeftVBox" unique_id=1002352297]
+layout_mode = 2
+
+[node name="Cultivation" parent="LeftPanel/LeftMargin/LeftVBox" unique_id=344181125 instance=ExtResource("10_row")]
+layout_mode = 2
+
+[node name="Icon" parent="LeftPanel/LeftMargin/LeftVBox/Cultivation" index="0" unique_id=1703979905]
+texture = ExtResource("15_cultivation")
+
+[node name="Pills" parent="LeftPanel/LeftMargin/LeftVBox" unique_id=1585090522 instance=ExtResource("10_row")]
+layout_mode = 2
+
+[node name="Icon" parent="LeftPanel/LeftMargin/LeftVBox/Pills" index="0" unique_id=1703979905]
+texture = ExtResource("16_alchemy")
+
+[node name="Name" parent="LeftPanel/LeftMargin/LeftVBox/Pills" index="1" unique_id=758432420]
+text = "丹药"
+
+[node name="Value" parent="LeftPanel/LeftMargin/LeftVBox/Pills" index="2" unique_id=427981122]
+text = "0"
+
+[node name="Mind" parent="LeftPanel/LeftMargin/LeftVBox" unique_id=1991817774 instance=ExtResource("10_row")]
+layout_mode = 2
+
+[node name="Icon" parent="LeftPanel/LeftMargin/LeftVBox/Mind" index="0" unique_id=1703979905]
+texture = ExtResource("17_mind")
+
+[node name="Name" parent="LeftPanel/LeftMargin/LeftVBox/Mind" index="1" unique_id=758432420]
+text = "心境"
+
+[node name="Value" parent="LeftPanel/LeftMargin/LeftVBox/Mind" index="2" unique_id=427981122]
+text = "0"
+
+[node name="RootBone" parent="LeftPanel/LeftMargin/LeftVBox" unique_id=1178865271 instance=ExtResource("10_row")]
+layout_mode = 2
+
+[node name="Icon" parent="LeftPanel/LeftMargin/LeftVBox/RootBone" index="0" unique_id=1703979905]
+texture = ExtResource("18_bone")
+
+[node name="Name" parent="LeftPanel/LeftMargin/LeftVBox/RootBone" index="1" unique_id=758432420]
+text = "根骨"
+
+[node name="Value" parent="LeftPanel/LeftMargin/LeftVBox/RootBone" index="2" unique_id=427981122]
+text = "0"
+
+[node name="Luck" parent="LeftPanel/LeftMargin/LeftVBox" unique_id=428530195 instance=ExtResource("10_row")]
+layout_mode = 2
+
+[node name="Icon" parent="LeftPanel/LeftMargin/LeftVBox/Luck" index="0" unique_id=1703979905]
+texture = ExtResource("19_luck")
+
+[node name="Name" parent="LeftPanel/LeftMargin/LeftVBox/Luck" index="1" unique_id=758432420]
+text = "气运"
+
+[node name="Value" parent="LeftPanel/LeftMargin/LeftVBox/Luck" index="2" unique_id=427981122]
+text = "0"
+
+[node name="Method" parent="LeftPanel/LeftMargin/LeftVBox" unique_id=815591075 instance=ExtResource("10_row")]
+layout_mode = 2
+
+[node name="Icon" parent="LeftPanel/LeftMargin/LeftVBox/Method" index="0" unique_id=1703979905]
+texture = ExtResource("20_method")
+
+[node name="Name" parent="LeftPanel/LeftMargin/LeftVBox/Method" index="1" unique_id=758432420]
+text = "特殊功法"
+
+[node name="Value" parent="LeftPanel/LeftMargin/LeftVBox/Method" index="2" unique_id=427981122]
+text = "0"
+
+[node name="Other" parent="LeftPanel/LeftMargin/LeftVBox" unique_id=266491324 instance=ExtResource("10_row")]
+layout_mode = 2
+
+[node name="Icon" parent="LeftPanel/LeftMargin/LeftVBox/Other" index="0" unique_id=1703979905]
+texture = ExtResource("21_other")
+
+[node name="Name" parent="LeftPanel/LeftMargin/LeftVBox/Other" index="1" unique_id=758432420]
+text = "其他"
+
+[node name="Value" parent="LeftPanel/LeftMargin/LeftVBox/Other" index="2" unique_id=427981122]
+text = "0"
+
+[node name="TotalLabel" type="Label" parent="LeftPanel/LeftMargin/LeftVBox" unique_id=470665607]
+unique_name_in_owner = true
+layout_mode = 2
+text = "突破值总计       0"
+label_settings = ExtResource("7_head")
+horizontal_alignment = 1
+
+[node name="Glow" type="TextureRect" parent="." unique_id=1820820117]
+layout_mode = 0
+offset_left = 500.0
+offset_top = 120.0
+offset_right = 780.0
+offset_bottom = 400.0
+mouse_filter = 2
+texture = ExtResource("13_breakthrough")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Player" type="TextureRect" parent="." unique_id=1103351405]
+layout_mode = 0
+offset_left = 522.0
+offset_top = 270.0
+offset_right = 758.0
+offset_bottom = 492.0
+texture = ExtResource("14_meditator")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="RealmPanel" type="PanelContainer" parent="." unique_id=316235380]
+layout_mode = 0
+offset_left = 424.0
+offset_top = 480.0
+offset_right = 856.0
+offset_bottom = 538.0
+theme_override_styles/panel = SubResource("Style_inner")
+
+[node name="RealmLabel" type="Label" parent="RealmPanel" unique_id=376146417]
+unique_name_in_owner = true
+layout_mode = 2
+text = "—   →   —"
+label_settings = ExtResource("7_head")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ValuePanel" type="PanelContainer" parent="." unique_id=8602530]
+layout_mode = 0
+offset_left = 392.0
+offset_top = 548.0
+offset_right = 888.0
+offset_bottom = 652.0
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="ValueVBox" type="VBoxContainer" parent="ValuePanel" unique_id=1214290594]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ValueLabel" type="Label" parent="ValuePanel/ValueVBox" unique_id=1029653087]
+unique_name_in_owner = true
+layout_mode = 2
+text = "突破值     0 / 0"
+label_settings = ExtResource("7_head")
+horizontal_alignment = 1
+
+[node name="ValueProgress" type="ProgressBar" parent="ValuePanel/ValueVBox" unique_id=1974634639]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+theme_override_styles/background = SubResource("Style_progress_bg")
+theme_override_styles/fill = SubResource("Style_progress_fill")
+value = 0.0
+show_percentage = false
+
+[node name="WarningLabel" type="Label" parent="ValuePanel/ValueVBox" unique_id=919197763]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.64, 0.14, 0.08, 1)
+text = "突破值过低，无法突破"
+label_settings = ExtResource("8_text")
+horizontal_alignment = 1
+
+[node name="RightPanel" type="PanelContainer" parent="." unique_id=74307015]
+layout_mode = 0
+offset_left = 918.0
+offset_top = 148.0
+offset_right = 1250.0
+offset_bottom = 655.0
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="RightMargin" type="MarginContainer" parent="RightPanel" unique_id=956166801]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="RightVBox" type="VBoxContainer" parent="RightPanel/RightMargin" unique_id=1285915562]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Heading" type="Label" parent="RightPanel/RightMargin/RightVBox" unique_id=1335392162]
+layout_mode = 2
+text = "突破效果"
+label_settings = ExtResource("7_head")
+horizontal_alignment = 1
+
+[node name="TierResultLabel" type="Label" parent="RightPanel/RightMargin/RightVBox" unique_id=872198071]
+unique_name_in_owner = true
+layout_mode = 2
+text = "—"
+label_settings = ExtResource("6_title")
+horizontal_alignment = 1
+
+[node name="TierEffectLabel" type="Label" parent="RightPanel/RightMargin/RightVBox" unique_id=1874718311]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+label_settings = ExtResource("7_head")
+horizontal_alignment = 1
+autowrap_mode = 1
+
+[node name="ExplainLabel" type="Label" parent="RightPanel/RightMargin/RightVBox" unique_id=662554281]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "突破值达到 1200 可尝试突破
+
+突破失败将有几率境界不稳
+
+建议提升突破值后再进行突破"
+label_settings = ExtResource("9_small")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="PathsPanel" type="PanelContainer" parent="." unique_id=1777440415]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 286.0
+offset_top = 666.0
+offset_right = 914.0
+offset_bottom = 786.0
+theme_override_styles/panel = SubResource("Style_inner")
+
+[node name="PathsVBox" type="VBoxContainer" parent="PathsPanel" unique_id=721190586]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Heading" type="Label" parent="PathsPanel/PathsVBox" unique_id=1914570338]
+layout_mode = 2
+text = "提升途径"
+label_settings = ExtResource("8_text")
+horizontal_alignment = 1
+
+[node name="Paths" type="HBoxContainer" parent="PathsPanel/PathsVBox" unique_id=1679143746]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 8
+
+[node name="Practice" parent="PathsPanel/PathsVBox/Paths" unique_id=299621876 instance=ExtResource("11_path")]
+layout_mode = 2
+
+[node name="Icon" parent="PathsPanel/PathsVBox/Paths/Practice/Button" index="0"]
+texture = ExtResource("22_practice")
+
+[node name="Alchemy" parent="PathsPanel/PathsVBox/Paths" unique_id=1737505294 instance=ExtResource("11_path")]
+layout_mode = 2
+
+[node name="Icon" parent="PathsPanel/PathsVBox/Paths/Alchemy/Button" index="0"]
+texture = ExtResource("16_alchemy")
+
+[node name="Label" parent="PathsPanel/PathsVBox/Paths/Alchemy" index="1"]
+text = "炼丹"
+
+[node name="Mind" parent="PathsPanel/PathsVBox/Paths" unique_id=970346343 instance=ExtResource("11_path")]
+layout_mode = 2
+
+[node name="Icon" parent="PathsPanel/PathsVBox/Paths/Mind/Button" index="0"]
+texture = ExtResource("17_mind")
+
+[node name="Label" parent="PathsPanel/PathsVBox/Paths/Mind" index="1"]
+text = "修心"
+
+[node name="Bone" parent="PathsPanel/PathsVBox/Paths" unique_id=1563883551 instance=ExtResource("11_path")]
+layout_mode = 2
+
+[node name="Icon" parent="PathsPanel/PathsVBox/Paths/Bone/Button" index="0"]
+texture = ExtResource("18_bone")
+
+[node name="Label" parent="PathsPanel/PathsVBox/Paths/Bone" index="1"]
+text = "锻骨"
+
+[node name="Luck" parent="PathsPanel/PathsVBox/Paths" unique_id=1293167787 instance=ExtResource("11_path")]
+layout_mode = 2
+
+[node name="Icon" parent="PathsPanel/PathsVBox/Paths/Luck/Button" index="0"]
+texture = ExtResource("19_luck")
+
+[node name="Label" parent="PathsPanel/PathsVBox/Paths/Luck" index="1"]
+text = "气运"
+
+[node name="Method" parent="PathsPanel/PathsVBox/Paths" unique_id=389350612 instance=ExtResource("11_path")]
+layout_mode = 2
+
+[node name="Icon" parent="PathsPanel/PathsVBox/Paths/Method/Button" index="0"]
+texture = ExtResource("20_method")
+
+[node name="Label" parent="PathsPanel/PathsVBox/Paths/Method" index="1"]
+text = "功法"
+
+[node name="Other" parent="PathsPanel/PathsVBox/Paths" unique_id=1333322445 instance=ExtResource("11_path")]
+layout_mode = 2
+
+[node name="Icon" parent="PathsPanel/PathsVBox/Paths/Other/Button" index="0"]
+texture = ExtResource("21_other")
+
+[node name="Label" parent="PathsPanel/PathsVBox/Paths/Other" index="1"]
+text = "其他"
+
+[node name="StartButton" type="TextureButton" parent="." unique_id=95008596]
+unique_name_in_owner = true
+script = ExtResource("23_auto")
+layout_mode = 0
+offset_left = 956.0
+offset_top = 674.0
+offset_right = 1218.0
+offset_bottom = 768.0
+texture_normal = ExtResource("4_green")
+ignore_texture_size = true
+stretch_mode = 5
+
+
+[node name="StartLabel" type="Label" parent="StartButton" unique_id=356307112]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "开始突破"
+label_settings = ExtResource("7_head")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[editable path="LeftPanel/LeftMargin/LeftVBox/Cultivation"]
+[editable path="LeftPanel/LeftMargin/LeftVBox/Pills"]
+[editable path="LeftPanel/LeftMargin/LeftVBox/Mind"]
+[editable path="LeftPanel/LeftMargin/LeftVBox/RootBone"]
+[editable path="LeftPanel/LeftMargin/LeftVBox/Luck"]
+[editable path="LeftPanel/LeftMargin/LeftVBox/Method"]
+[editable path="LeftPanel/LeftMargin/LeftVBox/Other"]
+[editable path="PathsPanel/PathsVBox/Paths/Practice"]
+[editable path="PathsPanel/PathsVBox/Paths/Alchemy"]
+[editable path="PathsPanel/PathsVBox/Paths/Mind"]
+[editable path="PathsPanel/PathsVBox/Paths/Bone"]
+[editable path="PathsPanel/PathsVBox/Paths/Luck"]
+[editable path="PathsPanel/PathsVBox/Paths/Method"]
+[editable path="PathsPanel/PathsVBox/Paths/Other"]

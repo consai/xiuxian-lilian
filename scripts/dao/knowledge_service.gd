@@ -2,7 +2,7 @@ class_name KnowledgeService
 extends RefCounted
 
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
-const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 
 const KNOWLEDGE_KEY := "knowledge"
@@ -204,9 +204,9 @@ static func meets_knowledge_requirements(savedata: Dictionary, requirements: Arr
 static func list_growth_routes(savedata: Dictionary, skill_id: String) -> Array:
 	var sid := skill_id.strip_edges()
 	var out: Array = []
-	for method_v in CultivationMethodServiceScript.all_methods():
+	for method_v in XiulianMethodServiceScript.all_methods():
 		var method := method_v as Dictionary
-		for row_v in CultivationMethodServiceScript.resolved_knowledge(str(method.get("id", ""))) as Array:
+		for row_v in XiulianMethodServiceScript.resolved_knowledge(str(method.get("id", ""))) as Array:
 			if not row_v is Dictionary:
 				continue
 			var row := row_v as Dictionary
@@ -215,7 +215,7 @@ static func list_growth_routes(savedata: Dictionary, skill_id: String) -> Array:
 			if not bool(row.get("gainFromCultivation", true)):
 				continue
 			var status := "available"
-			if not CultivationMethodServiceScript.can_learn(method, savedata):
+			if not XiulianMethodServiceScript.can_learn(method, savedata):
 				status = "locked"
 			elif not (savedata.get("unlocked_methods", []) as Array).has(str(method.get("id", ""))):
 				status = "missing"
@@ -244,9 +244,9 @@ static func related_abilities(skill_id: String) -> Array:
 
 static func related_methods(skill_id: String) -> Array:
 	var out: Array = []
-	for method_v in CultivationMethodServiceScript.all_methods():
+	for method_v in XiulianMethodServiceScript.all_methods():
 		var method := method_v as Dictionary
-		for row_v in CultivationMethodServiceScript.resolved_knowledge(str(method.get("id", ""))) as Array:
+		for row_v in XiulianMethodServiceScript.resolved_knowledge(str(method.get("id", ""))) as Array:
 			if row_v is Dictionary and str((row_v as Dictionary).get("skillId", "")) == skill_id:
 				out.append(method.duplicate(true))
 				break
@@ -269,7 +269,7 @@ static func related_method_families(skill_id: String) -> Array:
 		if seen.has(family_id):
 			continue
 		seen[family_id] = true
-		var family := CultivationMethodServiceScript.family_by_id(family_id)
+		var family := XiulianMethodServiceScript.family_by_id(family_id)
 		out.append(family if not family.is_empty() else {"name": str(method.get("name", ""))})
 	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return str(a.get("name", "")) < str(b.get("name", ""))

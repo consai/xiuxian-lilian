@@ -81,7 +81,7 @@ static func resolve_modifiers(savedata: Dictionary, rows: Array) -> Dictionary:
 		var values := resolved.get("percent", {}) as Dictionary if operation == "add_percent" \
 			else resolved.get("flat", {}) as Dictionary
 		if effect_id == "combat_mp_restore_2s":
-			values = {FightAttr.COMBAT_MP_RESTORE_2S: value}
+			values = {ZhandouAttr.COMBAT_MP_RESTORE_2S: value}
 			operation = "add_flat"
 		for attr_key in values.keys():
 			var aggregate_key := "%s|%s|%s" % [operation, group_id, str(attr_key)]

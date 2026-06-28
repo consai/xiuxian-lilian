@@ -2,9 +2,9 @@ class_name ItemInfoPayloadBuilder
 extends RefCounted
 
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
-const AlchemyServiceScript := preload("res://scripts/sim/alchemy_service.gd")
-const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
-const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+const LiandanServiceScript := preload("res://scripts/sim/liandan_service.gd")
+const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
+const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const ItemDefScript := preload("res://scripts/core/item_def.gd")
 
 
@@ -91,7 +91,7 @@ static func from_equip_id(equip_id: int) -> Dictionary:
 	return {
 		"title": title,
 		"title_color": EnumQuality.get_color(quality),
-		"icon": BattleInitDataScript._resolve_icon_texture(cfg),
+		"icon": ZhandouInitDataScript._resolve_icon_texture(cfg),
 		"quality": quality_label,
 		"tier": tier,
 		"meta": StringsZh.format_template(
@@ -198,7 +198,7 @@ static func _format_learning_lines(def: ItemDef) -> Array[String]:
 			AbilityServiceScript.unmet_learning_requirement_lines(ability, savedata, major_realm)
 		)
 	elif def.learn_method_id != "":
-		var method := CultivationMethodServiceScript.by_id(def.learn_method_id)
+		var method := XiulianMethodServiceScript.by_id(def.learn_method_id)
 		var name := str(method.get("name", def.learn_method_id))
 		lines.append(StringsZh.format_template(
 			StringsZh.getp("item_info.learn_method", "研读习得：功法 {value}"),
@@ -206,7 +206,7 @@ static func _format_learning_lines(def: ItemDef) -> Array[String]:
 		))
 		_append_unmet_learning_req_lines(
 			lines,
-			CultivationMethodServiceScript.unmet_learning_requirement_lines(method, savedata, major_realm)
+			XiulianMethodServiceScript.unmet_learning_requirement_lines(method, savedata, major_realm)
 		)
 	if not lines.is_empty():
 		lines.append(StringsZh.getp("item_info.learn_hub_hint", "在洞府底部「研读」使用"))
@@ -323,7 +323,7 @@ static func format_use_effect_lines(use_effect: Array) -> Array[String]:
 				var mastery_gain := 180.0
 				if args_v is Array and not (args_v as Array).is_empty():
 					var args := args_v as Array
-					var recipe := AlchemyServiceScript.recipe_by_id(str(args[0]))
+					var recipe := LiandanServiceScript.recipe_by_id(str(args[0]))
 					recipe_name = str(recipe.get("pill_name", recipe.get("name", "丹方")))
 					if args.size() > 1:
 						mastery_gain = float(args[1])
@@ -360,7 +360,7 @@ static func learning_book_condition_unmet(def: ItemDef) -> bool:
 			return false
 		if (savedata.get("unlocked_methods", []) as Array).has(method_id):
 			return false
-		return CultivationMethodServiceScript.learning_condition_unmet(method_id, savedata, major_realm)
+		return XiulianMethodServiceScript.learning_condition_unmet(method_id, savedata, major_realm)
 	var ability_id := def.learn_ability_id.strip_edges()
 	if ability_id == "" or AbilityServiceScript.by_id(ability_id).is_empty():
 		return false

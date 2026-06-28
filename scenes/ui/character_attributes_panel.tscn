@@ -7,8 +7,6 @@
 [ext_resource type="Texture2D" uid="uid://cjfih161xnbaq" path="res://assets/art/character_panel_icons/attr_attack.png" id="5_attack"]
 [ext_resource type="Texture2D" uid="uid://dy6ggx1qxjufr" path="res://assets/art/character_panel_icons/attr_defense.png" id="6_defense"]
 [ext_resource type="Texture2D" uid="uid://cbg6ja2ub58dk" path="res://assets/art/character_panel_icons/attr_speed.png" id="7_speed"]
-[ext_resource type="Texture2D" uid="uid://cojrouwtu26e8" path="res://assets/art/character_panel_icons/attr_crit.png" id="8_crit"]
-[ext_resource type="Texture2D" uid="uid://bwjmrnski8b3" path="res://assets/art/character_panel_icons/attr_crit_damage.png" id="9_crit_damage"]
 [ext_resource type="Texture2D" uid="uid://b0eogowyswdu7" path="res://assets/art/character_panel_icons/attr_shield.png" id="10_shield"]
 [ext_resource type="StyleBox" path="res://ui/hp_bar_back.tres" id="12_na8bq"]
 [ext_resource type="StyleBox" path="res://ui/hp_bar_fill.tres" id="13_o1ncj"]
@@ -501,7 +499,7 @@ label_settings = ExtResource("23_body")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Crit" type="Panel" parent="Panel/AttributesCard" unique_id=1926747794]
+[node name="MagicDef" type="Panel" parent="Panel/AttributesCard" unique_id=1926747794]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 165.0
@@ -510,29 +508,29 @@ offset_right = 305.0
 offset_bottom = 370.0
 theme_override_styles/panel = SubResource("SlotPanel")
 
-[node name="Icon" type="TextureRect" parent="Panel/AttributesCard/Crit" unique_id=874961126]
+[node name="Icon" type="TextureRect" parent="Panel/AttributesCard/MagicDef" unique_id=874961126]
 layout_mode = 0
 offset_left = 10.0
 offset_top = 19.0
 offset_right = 60.0
 offset_bottom = 69.0
-texture = ExtResource("8_crit")
+texture = ExtResource("10_shield")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="Panel/AttributesCard/Crit" unique_id=593107476]
+[node name="Label" type="Label" parent="Panel/AttributesCard/MagicDef" unique_id=593107476]
 layout_mode = 0
 offset_left = 65.0
 offset_top = 13.0
 offset_right = 132.0
 offset_bottom = 77.0
-text = "暴击
-10%"
+text = "法防
+100"
 label_settings = ExtResource("23_body")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CritDamage" type="Panel" parent="Panel/AttributesCard" unique_id=1340533017]
+[node name="ActionSpd" type="Panel" parent="Panel/AttributesCard" unique_id=1340533017]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 15.0
@@ -541,24 +539,24 @@ offset_right = 155.0
 offset_bottom = 470.0
 theme_override_styles/panel = SubResource("SlotPanel")
 
-[node name="Icon" type="TextureRect" parent="Panel/AttributesCard/CritDamage" unique_id=2059693763]
+[node name="Icon" type="TextureRect" parent="Panel/AttributesCard/ActionSpd" unique_id=2059693763]
 layout_mode = 0
 offset_left = 10.0
 offset_top = 19.0
 offset_right = 60.0
 offset_bottom = 69.0
-texture = ExtResource("9_crit_damage")
+texture = ExtResource("7_speed")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="Panel/AttributesCard/CritDamage" unique_id=1071310151]
+[node name="Label" type="Label" parent="Panel/AttributesCard/ActionSpd" unique_id=1071310151]
 layout_mode = 0
 offset_left = 60.0
 offset_top = 13.0
 offset_right = 137.0
 offset_bottom = 77.0
-text = "暴伤
-150%"
+text = "出手
+100"
 label_settings = ExtResource("23_body")
 horizontal_alignment = 1
 vertical_alignment = 1

@@ -1,7 +1,7 @@
 extends Control
 
 const PlayerAutoBattleServiceScript := preload("res://scripts/sim/player_auto_battle_service.gd")
-const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
+const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 const ROW_SCENE := preload("res://scenes/ui/components/strategy_skill_row.tscn")
 
 const MODE_ROWS := [
@@ -255,7 +255,7 @@ func _strategy_icon(strategy: Dictionary) -> Texture2D:
 func _entry_icon(entry: Dictionary) -> Texture2D:
 	if entry.is_empty() or not entry.has("icon") or entry.get("icon") == null:
 		return null
-	return BattleInitDataScript._resolve_icon_texture(entry)
+	return ZhandouInitDataScript._resolve_icon_texture(entry)
 
 
 func _preset_name(preset: String) -> String:

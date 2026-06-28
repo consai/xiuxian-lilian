@@ -1,0 +1,161 @@
+[gd_scene format=3 uid="uid://88uebn5ox4qs"]
+
+[ext_resource type="Script" uid="uid://dr5uu18bkkf8b" path="res://scripts/ui/components/weituo_card.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://db6yxps2ypebg" path="res://assets/art/characters/001_cutout_483x512.png" id="2_portrait"]
+[ext_resource type="Texture2D" uid="uid://dn1c6tu04lqhi" path="res://assets/art/ui_new/item_cao.png" id="3_leaf"]
+[ext_resource type="Texture2D" uid="uid://c76pqy6eaf2sc" path="res://assets/art/ui_new/shuijing.png" id="4_crystal"]
+[ext_resource type="Texture2D" uid="uid://dxu12rycrumfv" path="res://assets/art/ui_new/lingshi.png" id="5_coin"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="6_title"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="7_body"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="8_small"]
+
+[sub_resource type="StyleBoxFlat" id="CardNormal"]
+bg_color = Color(1, 0.92, 0.76, 0.78)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.52, 0.34, 0.19, 0.82)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="CardHover"]
+bg_color = Color(1, 0.94, 0.78, 0.9)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.42, 0.56, 0.32, 0.95)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="BadgeGreen"]
+bg_color = Color(0.55, 0.68, 0.36, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="WeituoCard" type="Button" unique_id=1790545650]
+custom_minimum_size = Vector2(0, 146)
+theme_override_styles/normal = SubResource("CardNormal")
+theme_override_styles/pressed = SubResource("CardHover")
+theme_override_styles/hover = SubResource("CardHover")
+theme_override_styles/focus = SubResource("CardHover")
+script = ExtResource("1_script")
+
+[node name="Portrait" type="TextureRect" parent="." unique_id=2124828308]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 16.0
+offset_top = -56.0
+offset_right = 126.0
+offset_bottom = 58.0
+grow_vertical = 2
+texture = ExtResource("2_portrait")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextBox" type="VBoxContainer" parent="." unique_id=623967933]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 144.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+
+[node name="TitleRow" type="HBoxContainer" parent="TextBox" unique_id=139392510]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="TextBox/TitleRow" unique_id=1469543339]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "采药急件"
+label_settings = ExtResource("6_title")
+
+[node name="StateBadge" type="Label" parent="TextBox/TitleRow" unique_id=1806083822]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(86, 32)
+layout_mode = 2
+theme_override_styles/normal = SubResource("BadgeGreen")
+text = "可接受"
+label_settings = ExtResource("7_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="IssuerLabel" type="Label" parent="TextBox" unique_id=820941451]
+unique_name_in_owner = true
+layout_mode = 2
+text = "急需一批草药，烦请道友相助。"
+label_settings = ExtResource("8_small")
+autowrap_mode = 2
+
+[node name="SummaryLabel" type="Label" parent="TextBox" unique_id=1576228943]
+unique_name_in_owner = true
+layout_mode = 2
+text = "清心草 3/3 · 灵芝 2/2"
+label_settings = ExtResource("8_small")
+
+[node name="RewardPreview" type="HBoxContainer" parent="TextBox" unique_id=984642988]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="RewardLeaf" type="HBoxContainer" parent="TextBox/RewardPreview" unique_id=708763474]
+layout_mode = 2
+
+[node name="Icon" type="TextureRect" parent="TextBox/RewardPreview/RewardLeaf" unique_id=437705785]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+texture = ExtResource("3_leaf")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Count" type="Label" parent="TextBox/RewardPreview/RewardLeaf" unique_id=1542620500]
+layout_mode = 2
+text = "10"
+label_settings = ExtResource("8_small")
+
+[node name="RewardCrystal" type="HBoxContainer" parent="TextBox/RewardPreview" unique_id=1652281323]
+layout_mode = 2
+
+[node name="Icon" type="TextureRect" parent="TextBox/RewardPreview/RewardCrystal" unique_id=314791662]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+texture = ExtResource("4_crystal")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Count" type="Label" parent="TextBox/RewardPreview/RewardCrystal" unique_id=1664697627]
+layout_mode = 2
+text = "20"
+label_settings = ExtResource("8_small")
+
+[node name="RewardCoin" type="HBoxContainer" parent="TextBox/RewardPreview" unique_id=1276635059]
+layout_mode = 2
+
+[node name="Icon" type="TextureRect" parent="TextBox/RewardPreview/RewardCoin" unique_id=1204758940]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+texture = ExtResource("5_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Count" type="Label" parent="TextBox/RewardPreview/RewardCoin" unique_id=2118428253]
+layout_mode = 2
+text = "500"
+label_settings = ExtResource("8_small")

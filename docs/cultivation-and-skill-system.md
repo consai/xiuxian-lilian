@@ -18,7 +18,7 @@
 修炼时必须选择一部当前修炼功法；只有这部功法的修炼效果参与本次修炼。战斗配置中的功法只在战斗中生效：
 按 `combat_mp_restore_2s` 每 2 秒恢复法力，并提供常驻属性与伤害加成。
 
-功法配置位于 `data/cultivation_methods.yaml`。
+功法配置位于 `data/xiulian_methods.yaml`。
 
 ## 修炼速度构成
 

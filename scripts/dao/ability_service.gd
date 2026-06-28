@@ -5,7 +5,7 @@ const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 
-const PATH := "res://data/abilities.yaml"
+const PATH := "res://data/abilities.yaml"  # 索引；分表见 abilityTables
 const BASIC_STRIKE_ID := "ability.combat.basic_strike"
 
 static var _bundle: Dictionary = {}
@@ -31,10 +31,20 @@ static func reload() -> void:
 			continue
 		_abilities_by_id[aid] = ability
 		var atype := str(ability.get("type", ""))
-		if atype in ["combat_active", "combat_upkeep"]:
+		if uses_combat_skill_slot(atype):
 			_combat_id_by_ability[aid] = next_id
 			_ability_by_combat_id[next_id] = ability
 			next_id += 1
+
+
+## 需编入战斗技能栏的类型（主动施放或手动开关的持续技）。
+static func uses_combat_skill_slot(ability_type: String) -> bool:
+	return ability_type in ["combat_active", "combat_upkeep"]
+
+
+## 学会后常驻生效、不占技能栏的类型。
+static func is_always_active_passive(ability_type: String) -> bool:
+	return ability_type in ["combat_passive", "general_passive"]
 
 
 static func bundle() -> Dictionary:
@@ -178,6 +188,8 @@ static func to_runtime_dict(ability_id: String, _savedata: Dictionary) -> Dictio
 	var out := {
 		"id": combat_id,
 		"ability_id": ability_id,
+		"ability_type": str(ability.get("type", "")),
+		"activation": str(combat.get("activation", "cast")),
 		"name": str(ability.get("name", "")),
 		"desc": str(ability.get("description", "")),
 		"costs": costs,
@@ -219,12 +231,12 @@ static func _basic_strike_row() -> Dictionary:
 		"realm": "qi",
 		"description": "基础近战攻击。",
 		"tags": ["attack", "physical"],
-		"combat": {"target": EnumCombatTarget.LABEL_ENEMY, "castTime": 0.0, "cooldown": 0.0, "costs": []},
+		"combat": {"target": EnumZhandouTarget.LABEL_ENEMY, "castTime": 0.0, "cooldown": 0.0, "costs": []},
 		"effects": [{
 			"effectId": "damage_physical",
 			"base": 12,
 			"operation": "add_flat",
-			"target": EnumCombatTarget.LABEL_ENEMY,
+			"target": EnumZhandouTarget.LABEL_ENEMY,
 		}],
 		"learningRequirements": {"realm": "qi", "knowledge": []},
 	}
@@ -252,7 +264,7 @@ static func _basic_strike_runtime() -> Dictionary:
 			"type": EnumCombatEffectType.LABEL_DAMAGE,
 			"damage_type": "physical",
 			"value": 12.0,
-			"target": EnumCombatTarget.LABEL_ENEMY,
+			"target": EnumZhandouTarget.LABEL_ENEMY,
 		}],
 	}
 

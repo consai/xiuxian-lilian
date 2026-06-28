@@ -78,7 +78,21 @@ async function normalizeBundle(fileName) {
   await writeYaml(file, config);
 }
 
+async function normalizeAbilities() {
+  const indexFile = path.join(dataDir, "abilities.yaml");
+  const index = await readYaml(indexFile);
+  walkRealmFields(index);
+  await writeYaml(indexFile, index);
+  const tables = index.abilityTables ?? {};
+  for (const rel of Object.values(tables)) {
+    const file = path.join(dataDir, String(rel).replace(/^\//, ""));
+    const table = await readYaml(file);
+    walkRealmFields(table);
+    await writeYaml(file, table);
+  }
+}
+
 await normalizeDaoTree();
-await normalizeBundle("cultivation_methods.yaml");
-await normalizeBundle("abilities.yaml");
+await normalizeBundle("xiulian_methods.yaml");
+await normalizeAbilities();
 console.log("Normalized dao config files.");

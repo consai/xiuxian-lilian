@@ -55,10 +55,10 @@ func _connect_buttons() -> void:
 	%HubButton.pressed.connect(_go_hub)
 	%WorldMapButton.pressed.connect(_go_world_map)
 	%AttributesButton.pressed.connect(_go_attributes)
-	%BackpackButton.pressed.connect(_go_backpack)
-	%StartExpeditionButton.pressed.connect(_start_expedition)
-	%ForceSettleButton.pressed.connect(_force_settle_expedition)
-	%ResetExpeditionButton.pressed.connect(_reset_expedition)
+	%BeibaoButton.pressed.connect(_go_beibao)
+	%StartLilianButton.pressed.connect(_start_lilian)
+	%ForceSettleButton.pressed.connect(_force_settle_lilian)
+	%ResetLilianButton.pressed.connect(_reset_lilian)
 	%StartGmBattleButton.pressed.connect(_start_gm_battle)
 	%NewGameButton.pressed.connect(_new_game)
 	if has_node("%DaoKnowledgeButton"):
@@ -113,12 +113,12 @@ func _build_monster_options() -> void:
 
 func _bind_status() -> void:
 	var scene_id := str(DataStore.scene_runtime().get("current_id", "unknown"))
-	var expedition_text := "无"
-	if ExpeditionState.active:
-		expedition_text = "%s · %s · 第 %d 步" % [
-			ExpeditionState.location_id,
-			ExpeditionState.phase,
-			ExpeditionState.steps,
+	var lilian_text := "无"
+	if LilianState.active:
+		lilian_text = "%s · %s · 第 %d 步" % [
+			LilianState.location_id,
+			LilianState.phase,
+			LilianState.steps,
 		]
 	_status_label.text = "场景 %s | %s %s | 修为 %d/%d | 灵石 %d | 历练 %s" % [
 		scene_id,
@@ -127,7 +127,7 @@ func _bind_status() -> void:
 		GameState.cultivation,
 		GameState.breakthrough_at,
 		GameState.ling_stones,
-		expedition_text,
+		lilian_text,
 	]
 
 
@@ -239,7 +239,7 @@ func _navigate(nav: Dictionary, fallback_error: String) -> bool:
 
 func _go_hub() -> void:
 	visible = false
-	_navigate(SceneManager.go_hub({"allow_active_expedition": true}), "无法返回观中")
+	_navigate(SceneManager.go_hub({"allow_active_lilian": true}), "无法返回观中")
 
 
 func _go_world_map() -> void:
@@ -252,38 +252,38 @@ func _go_attributes() -> void:
 	_navigate(SceneManager.go_character_attributes_panel(), "无法打开人物属性")
 
 
-func _go_backpack() -> void:
+func _go_beibao() -> void:
 	visible = false
-	_navigate(SceneManager.go_backpack_panel(), "无法打开背包")
+	_navigate(SceneManager.go_beibao_panel(), "无法打开背包")
 
 
-func _start_expedition() -> void:
+func _start_lilian() -> void:
 	if _location_option.item_count <= 0:
 		_flash("没有可用历练地点")
 		return
 	var location_id := str(_location_option.get_item_metadata(_location_option.selected))
 	visible = false
-	_navigate(SceneManager.start_expedition(location_id), "无法开始历练")
+	_navigate(SceneManager.start_lilian(location_id), "无法开始历练")
 
 
-func _force_settle_expedition() -> void:
-	if not ExpeditionState.active:
+func _force_settle_lilian() -> void:
+	if not LilianState.active:
 		_flash("当前没有进行中的历练")
 		return
 	visible = false
-	_navigate(SceneManager.go_expedition_result("manual"), "无法进入历练结算")
+	_navigate(SceneManager.go_lilian_jiesuan("manual"), "无法进入历练结算")
 
 
-func _reset_expedition() -> void:
-	if not ExpeditionState.active:
+func _reset_lilian() -> void:
+	if not LilianState.active:
 		_flash("当前没有进行中的历练")
 		return
-	ExpeditionState.reset()
+	LilianState.reset()
 	_flash("历练状态已重置")
 
 
 func _start_gm_battle() -> void:
-	if ExpeditionState.active:
+	if LilianState.active:
 		_flash("历练中不能创建 GM 战斗，请先结算或重置历练")
 		return
 	if _monster_option.item_count <= 0:
@@ -295,12 +295,12 @@ func _start_gm_battle() -> void:
 	if battle_data.is_empty():
 		_flash("创建战斗失败：敌人配置无效")
 		return
-	var errors := BattleInitData.collect_errors(battle_data)
+	var errors := ZhandouInitData.collect_errors(battle_data)
 	if not errors.is_empty():
 		_flash("创建战斗失败：%s" % errors[0])
 		return
 	visible = false
-	_navigate(SceneManager.go_fight(battle_data, "gm_panel"), "无法进入 GM 战斗")
+	_navigate(SceneManager.go_zhandou(battle_data, "gm_panel"), "无法进入 GM 战斗")
 
 
 func _build_gm_battle_init(monster_id: String, count: int) -> Dictionary:

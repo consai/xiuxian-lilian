@@ -8,7 +8,7 @@
 
 - 引擎：Godot 4.6，GL Compatibility，窗口基准 `1280x800`。
 - 入口：`project.godot` 指向 `scenes/ui/main_menu.tscn`。
-- 运行状态：统一经 `DataStore` / `GameState` / `ExpeditionState` 等 Autoload 管理。
+- 运行状态：统一经 `DataStore` / `GameState` / `LilianState` 等 Autoload 管理。
 - 配置数据：主数据在 `data/*.yaml`，大道技能试验资料在 `docs/大道技能设计/config`。
 - 场景组织：全屏 / 可导航场景登记在 `SceneManager.SCENE_PATHS`；复用 UI 优先拆成 `.tscn` 子场景。
 - 枚举：离散类型集中在 `scripts/enum/enum_*.gd`，通过 `class_name` 访问。
@@ -21,7 +21,7 @@
 | 核心状态与配置 | 已有统一存档、运行时、配置加载和校验入口 | `scripts/core`, `scripts/sim/game_state.gd`, `scripts/core/config_manager.gd` |
 | 场景导航 | 已有集中式 SceneManager，并支持历练中的战斗 / 面板浮层 | `scripts/core/scene_manager.gd` |
 | 洞府与成长 | 已有修炼、属性、突破、炼丹、背包、功法面板 | `scenes/sim`, `scripts/sim`, `scenes/ui` |
-| 历练 | 已有地图节点、事件、战斗接入、结算和日志 | `scenes/expedition`, `scripts/expedition`, `docs/expedition-system.md` |
+| 历练 | 已有地图节点、事件、战斗接入、结算和日志 | `scenes/expedition`, `scripts/expedition`, `docs/lilian-system.md` |
 | 战斗 | 已有战斗域、AI、VFX、浮字、战报、结果浮层 | `scenes/fight*`, `scripts/fight` |
 | 世界地图 | 已有城市、野外区域、地点详情、旅行确认 | `scenes/map`, `scripts/map`, `docs/world-map-module-design.md` |
 | 大道 / 功法 / 技能 | 已有知识树、功法、技能、自动战斗配置 | `scripts/dao`, `data/dao_tree.yaml`, `data/abilities.yaml` |

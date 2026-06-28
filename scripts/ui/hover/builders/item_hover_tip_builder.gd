@@ -49,7 +49,7 @@ static func build(fight_item_id: int, icon: Texture2D = null, count: int = -1) -
 	if icon != null:
 		payload_fields["icon"] = icon
 	else:
-		var tex := BattleInitData._resolve_icon_texture(cfg)
+		var tex := ZhandouInitData._resolve_icon_texture(cfg)
 		if tex != null:
 			payload_fields["icon"] = tex
 	return HoverTipPayload.make(payload_fields)

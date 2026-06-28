@@ -20,7 +20,7 @@
 ```mermaid
 flowchart LR
   Hub[洞府 cave_hub] -->|大境界可突破| Panel[突破面板 breakthrough_panel]
-  Panel -->|开始突破| Resolve[BreakthroughService.resolve]
+  Panel -->|开始突破| Resolve[TupoService.resolve]
   Resolve -->|成功| Summary[突破摘要 breakthrough_summary]
   Resolve -->|失败| Hub
   Summary --> Hub
@@ -39,7 +39,7 @@ flowchart LR
 
 ## 2. 突破值七项构成
 
-每项由 `BreakthroughService` 从存档与配置实时计算，**不单独持久化总和**（避免与分项不同步）。
+每项由 `TupoService` 从存档与配置实时计算，**不单独持久化总和**（避免与分项不同步）。
 
 | UI 名称 | 配置键 | 主要数据来源 | 计算要点 |
 |---------|--------|--------------|----------|
@@ -132,8 +132,8 @@ flowchart LR
 
 ### 场景流改造
 
-1. `cave_hub`：`can_breakthrough()` 为真时，点击突破 → `SceneManager.go_breakthrough_panel()`（不再直接 `GameState.breakthrough()`）。
-2. 面板确认后调用 `GameState.attempt_major_breakthrough()` → 内部 `BreakthroughService.resolve()`。
+1. `cave_hub`：`can_breakthrough()` 为真时，点击突破 → `SceneManager.go_tupo_mianban()`（不再直接 `GameState.breakthrough()`）。
+2. 面板确认后调用 `GameState.attempt_major_breakthrough()` → 内部 `TupoService.resolve()`。
 3. 成功 → 现有 `breakthrough_summary`；失败 → 回洞府并刷新 debuff 文案。
 
 ---
@@ -145,7 +145,7 @@ flowchart LR
 | 模块 | 路径 | 职责 |
 |------|------|------|
 | 规则表 | `data/breakthrough_rules.json` | 分项上限、大境界门槛与品质区间 |
-| 计算服务 | `scripts/sim/breakthrough_service.gd` | 分项聚合、档位判定、结算预览 |
+| 计算服务 | `scripts/sim/tupo_service.gd` | 分项聚合、档位判定、结算预览 |
 | 状态写入 | `scripts/sim/game_state.gd` | `attempt_major_breakthrough()`、`can_breakthrough()` 扩展 |
 | 突破面板 | `scenes/sim/breakthrough_panel.tscn` + `.gd` | 数据绑定与按钮 |
 | 洞府入口 | `scripts/sim/cave_hub.gd` | 跳转突破面板 |
@@ -154,16 +154,16 @@ flowchart LR
 
 ```gdscript
 # 分项明细 + 总计
-BreakthroughService.compute_breakdown(savedata, target_major_realm) -> Dictionary
+TupoService.compute_breakdown(savedata, target_major_realm) -> Dictionary
 
 # 当前是否可尝试（修为达标 + 大境界 + 总分 ≥ min_total）
-BreakthroughService.can_attempt(savedata, realms, realm_index) -> Dictionary
+TupoService.can_attempt(savedata, realms, realm_index) -> Dictionary
 
 # 预览品质档与成功率
-BreakthroughService.evaluate_tier(total, transition_id) -> Dictionary
+TupoService.evaluate_tier(total, transition_id) -> Dictionary
 
 # 执行突破：{ ok, success, tier, old_realm, new_realm, growth, error }
-BreakthroughService.resolve(savedata, realms, realm_index, rng) -> Dictionary
+TupoService.resolve(savedata, realms, realm_index, rng) -> Dictionary
 ```
 
 `compute_breakdown` 返回示例：
@@ -202,7 +202,7 @@ BreakthroughService.resolve(savedata, realms, realm_index, rng) -> Dictionary
 
 | 阶段 | 内容 |
 |------|------|
-| **P0** | 规则表 + `BreakthroughService` + 洞府跳转 + 面板只读展示 + 大境界结算写 `realm_quality` |
+| **P0** | 规则表 + `TupoService` + 洞府跳转 + 面板只读展示 + 大境界结算写 `realm_quality` |
 | **P1** | 破境丹写入 `breakthrough_bonuses.pills`；功法表 `breakthrough_bonus`；失败 debuff |
 | **P2** | 仪表动画、提升途径跳转、突破摘要展示品质、perks 与主要缺口 |
 | **P3** | 金丹/元婴独有机制（丹纹、元婴法相等） |

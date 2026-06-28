@@ -43,12 +43,12 @@
 | 步骤 | 剧情节点 | 玩家行为 | 教学目标 | 完成事件 |
 |---|---|---|---|---|
 | T00 | 风铃醒来 | 阅读开场，看到小道观 | 建立身份和据点 | 进入主界面 |
-| T01 | 首月闭关 | 打开修炼界面 | 认识闭关入口 | `tutorial.cultivation_panel_opened` |
+| T01 | 首月闭关 | 打开修炼界面 | 认识闭关入口 | `tutorial.xiulian_mianban_opened` |
 | T02 | 丹药炼化 | 选择丹药炼化并开始闭关 | 理解修炼按月结算 | `tutorial.cultivation_completed` |
 | T03 | 出门巡山 | 打开历练入口和地点选择 | 理解巡山目的 | `tutorial.world_map_opened` |
-| T04 | 选择旧路 | 选择新手地点并出发 | 认识地点选择 | `tutorial.expedition_started` |
+| T04 | 选择旧路 | 选择新手地点并出发 | 认识地点选择 | `tutorial.lilian_started` |
 | T05 | 路线图历练 | 在路线图选择节点，直到首战胜利 | 认识路线图和战斗压气 | `tutorial.first_battle_won` |
-| T06 | 主动返程 | 点击返程 | 理解保住收获 | `tutorial.expedition_returned` |
+| T06 | 主动返程 | 点击返程 | 理解保住收获 | `tutorial.lilian_returned` |
 | T07 | 回观结算 | 关闭结算回据点 | 理解奖励正式带回 | `tutorial.result_closed` |
 | T08 | 背包整理 | 打开背包查看灵草，然后关闭背包 | 认识背包和面板退出 | `tutorial.backpack_closed` |
 | T09 | 第一炉丹 | 打开丹炉并炼制聚气丹 | 理解材料变丹药 | `tutorial.alchemy_completed` |
@@ -111,7 +111,7 @@
 **输入**：玩家进入历练路线图。
 **输出**：引导玩家点击可前往节点，遇到事件/战斗正常处理，直到首战胜利。
 **失败状态**：只高亮旧 `EventCards`，玩家不知道要点路线图节点。
-**涉及**：`expedition_loop.tscn`、`ExpeditionState.settle_pending_battle()`、`prologue_tutorial.yaml`。
+**涉及**：`expedition_loop.tscn`、`LilianState.settle_pending_battle()`、`prologue_tutorial.yaml`。
 
 ### 5.4 背包关闭
 
@@ -119,7 +119,7 @@
 **输入**：玩家打开背包查看首战带回的灵草。
 **输出**：下一步先等待 `tutorial.backpack_closed`，再引导 `FurnaceButton`。
 **失败状态**：背包未关闭时高亮丹炉。
-**涉及**：`backpack_panel.gd`、`TutorialService`、`prologue_tutorial.yaml`。
+**涉及**：`beibao_panel.gd`、`TutorialService`、`prologue_tutorial.yaml`。
 
 ### 5.5 Esc / 关闭键护栏
 

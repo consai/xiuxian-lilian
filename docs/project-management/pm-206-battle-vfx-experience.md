@@ -73,9 +73,9 @@
 
 调参杠杆：
 
-- `CombatVfxSettings.melee_*`
-- `CombatVfxSettings.hit_*`
-- `CombatVfxSettings.crit_*`
+- `ZhandouVfxSettings.melee_*`
+- `ZhandouVfxSettings.hit_*`
+- `ZhandouVfxSettings.crit_*`
 - `data/combat/float_styles.yaml` 的 `damage / crit`
 
 ### 4.2 弹道 / 法术远程
@@ -109,10 +109,10 @@
 
 调参杠杆：
 
-- `CombatVfxSettings.ranged_*`
-- `CombatVfxSettings.projectile_*`
-- `CombatProjectileVfx.visual_size`
-- `CombatProjectileVfx.visual_color`
+- `ZhandouVfxSettings.ranged_*`
+- `ZhandouVfxSettings.projectile_*`
+- `ZhandouProjectileVfx.visual_size`
+- `ZhandouProjectileVfx.visual_color`
 
 ### 4.3 护盾 / 防御状态
 
@@ -148,7 +148,7 @@
 
 - `status_cast` 或 `shield_cast.yaml`
 - `data/combat/float_styles.yaml` 的 `shield`
-- `CombatVfxSettings.ranged_recoil_*` 可复用为施法收势
+- `ZhandouVfxSettings.ranged_recoil_*` 可复用为施法收势
 
 ### 4.4 治疗 / 回蓝
 
@@ -199,7 +199,7 @@
 输出：
 
 - 不播放完整施法动作。
-- 使用 `CombatFloatPresenter.build_buff_tick_spawns()` 生成状态名与伤害。
+- 使用 `ZhandouFloatPresenter.build_buff_tick_spawns()` 生成状态名与伤害。
 - 可选新增 `dot_tick.yaml`，只做轻微闪色或短促抖动。
 
 成功标准：
@@ -216,7 +216,7 @@
 调参杠杆：
 
 - `data/combat/float_styles.yaml` 的 `buff_add / damage`
-- `CombatFloatLayer.max_per_unit_per_frame`
+- `ZhandouFloatLayer.max_per_unit_per_frame`
 - 可选 `dot_tick.yaml`
 
 ## 5. 最小实现清单
@@ -229,7 +229,7 @@
   - `流风步`：`status_cast` 或 `shield_cast`
   - 战斗丹药：`status_cast`
   - `buff_dot` 跳伤：浮字优先，必要时 `hit_only`
-- 确认 `FightScenePresentation.vfx_type_from_cfg()` 对 `heal / buff / shield` 不误判成近战。
+- 确认 `ZhandouChangjingPresentation.vfx_type_from_cfg()` 对 `heal / buff / shield` 不误判成近战。
 - 确认浮字优先级：暴击伤害 > 普通伤害 > 状态新增 / 治疗 / 护盾 > 技能名。
 - 低配降级先用现有参数：
   - `idle_enabled = false`
@@ -253,7 +253,7 @@
 ## 7. UI 遮挡规则
 
 - 特效节点应挂在战斗角色层或现有 projectile parent，不挂到 HUD 顶层。
-- 浮字层继续使用 `CombatFloatLayer`，不要直接把 Label 动态塞进战斗主场景。
+- 浮字层继续使用 `ZhandouFloatLayer`，不要直接把 Label 动态塞进战斗主场景。
 - 血条、行动条、战斗日志必须始终在视觉上可读。
 - 弹道飞行路径只允许穿过中间战场区域；若实际截图显示遮挡，优先降低弧高或改直线。
 
@@ -281,7 +281,7 @@
 
 ## 10. 测试建议
 
-- 配置校验：确保新增 preset 文件能被 `CombatVfxPresetLibrary` 找到。
+- 配置校验：确保新增 preset 文件能被 `ZhandouVfxPresetLibrary` 找到。
 - Headless 冒烟：跑战斗域测试，确认表现配置不影响结算。
 - 手动截图：普通战、弹道、护盾、治疗、DOT、低配各截一张。
 
@@ -313,7 +313,7 @@
 - 不做序列帧播放器。
 - 不做粒子系统。
 - 不做新的 VFX registry。
-- 不重写 `FightVfxManager`。
+- 不重写 `ZhandouVfxManager`。
 
 ### 11.3 新增 preset
 

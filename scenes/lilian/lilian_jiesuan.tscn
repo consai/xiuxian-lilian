@@ -1,0 +1,367 @@
+[gd_scene format=3 uid="uid://bs8uku854l12v"]
+
+[ext_resource type="Script" path="res://scripts/lilian/lilian_jiesuan.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_theme"]
+[ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="3_bg"]
+[ext_resource type="Texture2D" uid="uid://byo31enqsiwst" path="res://assets/art/ui_new/img_suc.png" id="4_success"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="9_title"]
+[ext_resource type="Script" path="res://scripts/ui/components/long_press_scroll_container.gd" id="9_lpsc"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="10_h2"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="11_h3"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="12_body"]
+[ext_resource type="FontFile" uid="uid://btkp4vukwqrul" path="res://assets/art/AlimamaDaoLiTi.ttf" id="14_font"]
+[ext_resource type="PackedScene" path="res://scenes/lilian/lilian_rizhi_mianban.tscn" id="15_log_panel"]
+[ext_resource type="PackedScene" uid="uid://bx04spldnbiyv" path="res://scenes/items/item.tscn" id="16_item"]
+
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="17_auto"]
+
+[sub_resource type="StyleBoxFlat" id="PanelMain"]
+bg_color = Color(1, 0.945, 0.835, 0.985)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.31, 0.19, 0.12, 1)
+corner_radius_top_left = 25
+corner_radius_top_right = 25
+corner_radius_bottom_right = 25
+corner_radius_bottom_left = 25
+shadow_color = Color(0.12, 0.07, 0.03, 0.45)
+shadow_size = 16
+
+[sub_resource type="StyleBoxFlat" id="TitleBack"]
+bg_color = Color(0.91, 0.72, 0.48, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.4, 0.25, 0.14, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="PanelInset"]
+bg_color = Color(1, 0.965, 0.89, 0.76)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.57, 0.38, 0.22, 0.88)
+corner_radius_top_left = 17
+corner_radius_top_right = 17
+corner_radius_bottom_right = 17
+corner_radius_bottom_left = 17
+
+[sub_resource type="StyleBoxFlat" id="ReturnNormal"]
+bg_color = Color(0.61, 0.7, 0.39, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.24, 0.2, 0.11, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0.2, 0.12, 0.06, 0.28)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="ReturnHover"]
+bg_color = Color(0.72, 0.8, 0.48, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.24, 0.2, 0.11, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0.2, 0.12, 0.06, 0.34)
+shadow_size = 6
+
+[node name="LilianResult" type="Control" unique_id=628558094]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=2020712540]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Dimmer" type="ColorRect" parent="." unique_id=911093068]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.12, 0.08, 0.04, 0.42)
+
+[node name="Dialog" type="Panel" parent="." unique_id=7758297]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -485.0
+offset_top = -335.0
+offset_right = 485.0
+offset_bottom = 335.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("PanelMain")
+
+[node name="TitleBack" type="Panel" parent="Dialog" unique_id=1676747872]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 240.0
+offset_top = -16.0
+offset_right = -240.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("TitleBack")
+
+[node name="Title" type="Label" parent="Dialog/TitleBack" unique_id=1544955969]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "历练结算 · 主动返程"
+label_settings = ExtResource("9_title")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="OutcomeCard" type="Panel" parent="Dialog" unique_id=605795194]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 80.0
+offset_right = 344.0
+offset_bottom = 520.0
+theme_override_styles/panel = SubResource("PanelInset")
+
+[node name="Heading" type="Label" parent="Dialog/OutcomeCard" unique_id=1708560408]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 304.0
+offset_bottom = 46.0
+text = "满载而归"
+label_settings = ExtResource("10_h2")
+horizontal_alignment = 1
+
+[node name="SuccessIcon" type="TextureRect" parent="Dialog/OutcomeCard" unique_id=2055560051]
+layout_mode = 0
+offset_left = 62.0
+offset_top = 58.0
+offset_right = 254.0
+offset_bottom = 242.0
+texture = ExtResource("4_success")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ResultMessage" type="Label" parent="Dialog/OutcomeCard" unique_id=1254079714]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 20.0
+offset_top = 250.0
+offset_right = 296.0
+offset_bottom = 310.0
+text = "此行山高路远，所得皆已带回观中。"
+label_settings = ExtResource("12_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="DetailCard" type="Panel" parent="Dialog" unique_id=331816958]
+layout_mode = 0
+offset_left = 360.0
+offset_top = 80.0
+offset_right = 942.0
+offset_bottom = 520.0
+theme_override_styles/panel = SubResource("PanelInset")
+
+[node name="Heading" type="Label" parent="Dialog/DetailCard" unique_id=1668617340]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 566.0
+offset_bottom = 46.0
+text = "本次历练记录"
+label_settings = ExtResource("10_h2")
+horizontal_alignment = 1
+
+[node name="TopDivider" type="HSeparator" parent="Dialog/DetailCard" unique_id=1851778595]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 52.0
+offset_right = 558.0
+offset_bottom = 56.0
+
+[node name="Scroll" type="ScrollContainer" parent="Dialog/DetailCard" unique_id=1935539412]
+script = ExtResource("9_lpsc")
+layout_mode = 0
+offset_left = 28.0
+offset_top = 68.0
+offset_right = 554.0
+offset_bottom = 372.0
+horizontal_scroll_mode = 0
+
+[node name="VBox" type="VBoxContainer" parent="Dialog/DetailCard/Scroll" unique_id=1935539413]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Body" type="RichTextLabel" parent="Dialog/DetailCard/Scroll/VBox" unique_id=1776452034]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/default_color = Color(0.333333, 0.196078, 0.184314, 1)
+theme_override_colors/font_shadow_color = Color(1, 0.95, 0.82, 0.75)
+theme_override_constants/line_separation = 7
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_fonts/normal_font = ExtResource("14_font")
+theme_override_font_sizes/normal_font_size = 20
+text = "最高难度 4，事件 8 个，消耗 12 日
+战斗 3 场，胜 3，负 0
+最终气血 82，法力 46"
+fit_content = true
+
+[node name="LootHeading" type="Label" parent="Dialog/DetailCard/Scroll/VBox" unique_id=1935539414]
+unique_name_in_owner = true
+layout_mode = 2
+text = "获得道具"
+label_settings = ExtResource("11_h3")
+
+[node name="LootItems" type="GridContainer" parent="Dialog/DetailCard/Scroll/VBox" unique_id=1935539415]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 5
+
+[node name="LootItemTemplate" parent="Dialog/DetailCard/Scroll/VBox/LootItems" unique_id=1935539416 instance=ExtResource("16_item")]
+visible = false
+layout_mode = 2
+
+[node name="LootEmpty" type="Label" parent="Dialog/DetailCard/Scroll/VBox" unique_id=1935539417]
+unique_name_in_owner = true
+layout_mode = 2
+text = "无收获"
+label_settings = ExtResource("12_body")
+horizontal_alignment = 1
+
+[node name="LootLostHeading" type="Label" parent="Dialog/DetailCard/Scroll/VBox" unique_id=1935539418]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.28, 0.22, 1)
+text = "战败掉落"
+label_settings = ExtResource("11_h3")
+
+[node name="LootLostItems" type="GridContainer" parent="Dialog/DetailCard/Scroll/VBox" unique_id=1935539419]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 5
+
+[node name="LootLostItemTemplate" parent="Dialog/DetailCard/Scroll/VBox/LootLostItems" unique_id=1935539420 instance=ExtResource("16_item")]
+visible = false
+layout_mode = 2
+modulate = Color(0.82, 0.62, 0.62, 1)
+
+[node name="LogButton" type="Button" parent="Dialog/DetailCard" unique_id=2147483646]
+unique_name_in_owner = true
+script = ExtResource("17_auto")
+layout_mode = 0
+offset_left = 140.0
+offset_top = 384.0
+offset_right = 440.0
+offset_bottom = 432.0
+theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
+theme_override_colors/font_hover_color = Color(0.2, 0.14, 0.08, 1)
+theme_override_fonts/font = ExtResource("14_font")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("ReturnNormal")
+theme_override_styles/pressed = SubResource("ReturnHover")
+theme_override_styles/hover = SubResource("ReturnHover")
+text = "查看历练记录"
+
+
+[node name="RulePanel" type="Panel" parent="Dialog" unique_id=407967364]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 528.0
+offset_right = 942.0
+offset_bottom = 592.0
+theme_override_styles/panel = SubResource("PanelInset")
+
+[node name="RuleLabel" type="Label" parent="Dialog/RulePanel" unique_id=545564445]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_right = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "战败只遗失本次部分战利品；回观中点「休息」可恢复气血法力并减轻伤势。丹药、研读、技能入口都在洞府。"
+label_settings = ExtResource("12_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="ReturnButton" type="Button" parent="Dialog" unique_id=1053941849]
+unique_name_in_owner = true
+script = ExtResource("17_auto")
+layout_mode = 0
+offset_left = 365.0
+offset_top = 596.0
+offset_right = 605.0
+offset_bottom = 652.0
+focus_neighbor_top = NodePath("../DetailCard/Scroll")
+theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
+theme_override_colors/font_hover_color = Color(0.2, 0.14, 0.08, 1)
+theme_override_fonts/font = ExtResource("14_font")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("ReturnNormal")
+theme_override_styles/pressed = SubResource("ReturnHover")
+theme_override_styles/hover = SubResource("ReturnHover")
+text = "返回观中"
+
+[node name="LilianRizhiMianban" parent="." unique_id=2147483647 instance=ExtResource("15_log_panel")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

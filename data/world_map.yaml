@@ -104,7 +104,7 @@ wilderness_regions:
       - "wild_wolf_valley"
       - "spirit_spring_valley"
       - "ancient_sword_tomb"
-    expedition_location_id: "qinglan_mountain"
+    lilian_location_id: "qinglan_mountain"
   blackwater_marsh:
     name: "黑水沼泽"
     danger: 2
@@ -135,7 +135,7 @@ wilderness_regions:
       - "yunlan_city"
       - "tianhe_ferry"
     sub_locations: []
-    expedition_location_id: "blackwater_marsh"
+    lilian_location_id: "blackwater_marsh"
   mist_hidden_valley:
     name: "雾隐溪谷"
     danger: 3
@@ -169,7 +169,7 @@ wilderness_regions:
     sub_locations:
       - "mist_creek_herb_garden"
       - "sealed_creek_ruins"
-    expedition_location_id: "mist_hidden_valley"
+    lilian_location_id: "mist_hidden_valley"
 wilderness_locations:
   wild_wolf_valley:
     name: "野狼谷"
@@ -192,7 +192,7 @@ wilderness_locations:
     services:
       - "剧情"
       - "狼患调查"
-    expedition_location_id: "wild_wolf_valley"
+    lilian_location_id: "wild_wolf_valley"
   spirit_spring_valley:
     name: "灵泉谷"
     danger: 1
@@ -212,7 +212,7 @@ wilderness_locations:
     services:
       - "采集"
       - "恢复"
-    expedition_location_id: "qinglan_mountain"
+    lilian_location_id: "qinglan_mountain"
   ancient_sword_tomb:
     name: "古剑冢"
     danger: 3
@@ -232,7 +232,7 @@ wilderness_locations:
     services:
       - "秘境入口"
       - "剑冢试炼"
-    expedition_location_id: "qinglan_mountain"
+    lilian_location_id: "qinglan_mountain"
   mist_creek_herb_garden:
     name: "雾溪药圃"
     danger: 2
@@ -252,7 +252,7 @@ wilderness_locations:
     services:
       - "采集"
       - "炼丹材料"
-    expedition_location_id: "mist_hidden_valley"
+    lilian_location_id: "mist_hidden_valley"
   sealed_creek_ruins:
     name: "封溪残阵"
     danger: 4
@@ -272,4 +272,4 @@ wilderness_locations:
     services:
       - "残阵调查"
       - "精英遭遇"
-    expedition_location_id: "mist_hidden_valley"
+    lilian_location_id: "mist_hidden_valley"

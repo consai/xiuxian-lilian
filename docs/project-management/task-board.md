@@ -10,7 +10,7 @@
 
 验收：
 
-- 历练战斗通过 `SceneManager.go_fight(..., "expedition")` 进入浮层。
+- 历练战斗通过 `SceneManager.go_zhandou(..., "expedition")` 进入浮层。
 - 胜利后恢复原历练界面，不重建历练状态。
 - 战败 / 撤退进入历练结算。
 - 背包 / 策略面板关闭后恢复历练界面。
@@ -18,13 +18,13 @@
 涉及文件：
 
 - `scripts/core/scene_manager.gd`
-- `scripts/expedition/expedition_battle_flow.gd`
-- `scripts/expedition/expedition_loop.gd`
-- `scripts/ui/backpack_panel.gd`
+- `scripts/lilian/lilian_battle_flow.gd`
+- `scripts/lilian/expedition_loop.gd`
+- `scripts/ui/beibao_panel.gd`
 
 ### [x] PM-002：补齐历练背包验收
 
-描述：确认历练运行时背包只改 `DataStore.expedition_runtime()`，结算后再投影回存档。
+描述：确认历练运行时背包只改 `DataStore.lilian_runtime()`，结算后再投影回存档。
 
 验收：
 
@@ -35,9 +35,9 @@
 
 涉及文件：
 
-- `scripts/expedition/expedition_state.gd`
-- `scripts/expedition/expedition_reward_service.gd`
-- `tests/run_expedition_tests.gd`
+- `scripts/lilian/lilian_state.gd`
+- `scripts/lilian/lilian_reward_service.gd`
+- `tests/run_lilian_tests.gd`
 
 ### [x] PM-003：跑通场景导航回归
 
@@ -61,7 +61,7 @@
 验收：
 
 - `tests/run_config_validation_tests.gd` 通过。
-- `data/locations.yaml`、`data/expedition_events.yaml`、`data/monsters.yaml`、`data/item.yaml` 的 P0 引用无错误。
+- `data/locations.yaml`、`data/lilian_events.yaml`、`data/monsters.yaml`、`data/item.yaml` 的 P0 引用无错误。
 - 新增配置不需要手动进游戏才发现坏引用。
 
 涉及文件：
@@ -90,7 +90,7 @@
 
 - `tests/run_story_tests.gd` 通过。
 - `tests/run_scene_manager_tests.gd` 通过。
-- `tests/run_expedition_tests.gd` 的 P1 教程路线图、首战绑定、奖励结算相关用例通过；整套测试仍有强制节点类型的旧假设失败，另行修。
+- `tests/run_lilian_tests.gd` 的 P1 教程路线图、首战绑定、奖励结算相关用例通过；整套测试仍有强制节点类型的旧假设失败，另行修。
 
 ### [x] PM-101：新局教程状态审计
 
@@ -122,7 +122,7 @@
 
 涉及文件：
 
-- `scripts/expedition/expedition_state.gd`
+- `scripts/lilian/lilian_state.gd`
 - `scripts/story/story_director.gd`
 - `scripts/story/tutorial_service.gd`
 
@@ -167,7 +167,7 @@
 
 P2 通过标准：
 
-- `tests/run_balance_v1_tests.gd`、`tests/run_config_validation_tests.gd`、`tests/run_expedition_tests.gd` 通过。
+- `tests/run_balance_v1_tests.gd`、`tests/run_config_validation_tests.gd`、`tests/run_lilian_tests.gd` 通过。
 - 30-60 分钟手动游玩能看到修炼、历练、炼丹、突破预览四条短期目标。
 - 同境界普通战斗不秒杀、不拖沓；精英战有失败风险但不是纯看运气。
 - 筑基前资源不会必然卡死，也不会无限膨胀。
@@ -207,12 +207,12 @@ P2 通过标准：
 
 - `data/monsters.yaml`
 - `data/locations.yaml`
-- `data/expedition_events.yaml`
-- `tests/run_expedition_tests.gd`
+- `data/lilian_events.yaml`
+- `tests/run_lilian_tests.gd`
 
 任务备注：
 
-- 2026-06-24：青岚山脉、野狼谷、黑水沼泽均接入普通 / 精英 / Boss 遭遇；Boss 事件改为高难度检查点。`run_config_validation_tests.gd` 与 `run_expedition_tests.gd` 通过。
+- 2026-06-24：青岚山脉、野狼谷、黑水沼泽均接入普通 / 精英 / Boss 遭遇；Boss 事件改为高难度检查点。`run_config_validation_tests.gd` 与 `run_lilian_tests.gd` 通过。
 
 ### [x] PM-203：筑基前资源循环校准
 
@@ -228,11 +228,11 @@ P2 通过标准：
 涉及文件：
 
 - `data/item.yaml`
-- `data/alchemy.yaml`
-- `data/expedition_rules.yaml`
-- `data/breakthrough_rules.yaml`
-- `scripts/sim/alchemy_service.gd`
-- `scripts/sim/breakthrough_service.gd`
+- `data/liandan.yaml`
+- `data/lilian_rules.yaml`
+- `data/tupo_rules.yaml`
+- `scripts/sim/liandan_service.gd`
+- `scripts/sim/tupo_service.gd`
 
 任务备注：
 
@@ -252,14 +252,14 @@ P2 通过标准：
 涉及文件：
 
 - `data/abilities.yaml`
-- `data/cultivation_methods.yaml`
+- `data/xiulian_methods.yaml`
 - `data/knowledge_effects.yaml`
 - `data/dao_tree.yaml`
 - `tests/run_dao_knowledge_tests.gd`
 
 任务备注：
 
-- 2026-06-24：新手默认技能组保持御气弹 / 流风步 / 破空剑气，补齐输出与防御标签；破空剑气基准伤害从 55 收敛到 54，使练气同阶伤害贴近 `realm_balance.yaml` 预算。新增练气知识效果与 PM-204 回归，知识成长会影响运行时技能数值和派生属性。`validate-abilities.mjs`、`validate-cultivation-methods.mjs`、`run_dao_knowledge_tests.gd`、`run_config_validation_tests.gd`、`run_battle_domain_tests.gd`、`run_simulation_tests.gd`、`run_balance_v1_tests.gd` 通过。
+- 2026-06-24：新手默认技能组保持御气弹 / 流风步 / 破空剑气，补齐输出与防御标签；破空剑气基准伤害从 55 收敛到 54，使练气同阶伤害贴近 `realm_balance.yaml` 预算。新增练气知识效果与 PM-204 回归，知识成长会影响运行时技能数值和派生属性。`validate-abilities.mjs`、`validate-xiulian-methods.mjs`、`run_dao_knowledge_tests.gd`、`run_config_validation_tests.gd`、`run_zhandou_domain_tests.gd`、`run_simulation_tests.gd`、`run_balance_v1_tests.gd` 通过。
 
 ### [x] PM-205：突破前目标可读性
 
@@ -275,7 +275,7 @@ P2 通过标准：
 
 - `scenes/sim/breakthrough_summary.tscn`
 - `scripts/sim/breakthrough_summary.gd`
-- `data/breakthrough_rules.yaml`
+- `data/tupo_rules.yaml`
 - `docs/breakthrough-system.md`
 
 任务备注：
@@ -318,7 +318,7 @@ P2 通过标准：
 
 - PM-207 完成。
 - P2 手动验收没有阻塞级数值、资源、战斗问题。
-- `run_config_validation_tests.gd`、`run_expedition_tests.gd`、`run_balance_v1_tests.gd` 通过。
+- `run_config_validation_tests.gd`、`run_lilian_tests.gd`、`run_balance_v1_tests.gd` 通过。
 
 P3 通过标准：
 
@@ -353,7 +353,7 @@ P3 通过标准：
 
 任务备注：
 
-- 2026-06-25：新增雾隐溪谷、雾溪药圃、封溪残阵和三类筑基初期敌人；`run_config_validation_tests.gd`、`run_world_map_tests.gd`、`run_expedition_tests.gd` 通过。
+- 2026-06-25：新增雾隐溪谷、雾溪药圃、封溪残阵和三类筑基初期敌人；`run_config_validation_tests.gd`、`run_world_map_tests.gd`、`run_lilian_tests.gd` 通过。
 
 ### [x] PM-302：区域事件链
 
@@ -368,14 +368,14 @@ P3 通过标准：
 
 涉及文件：
 
-- `data/expedition_events.yaml`
-- `data/expedition_common_events.yaml`
+- `data/lilian_events.yaml`
+- `data/lilian_common_events.yaml`
 - `scripts/expedition`
-- `tests/run_expedition_tests.gd`
+- `tests/run_lilian_tests.gd`
 
 任务备注：
 
-- 2026-06-25：新增「雾溪封阵」6 步链路，覆盖起点选择、法力消耗、普通战、分支奖励、精英战和 Boss 奖励；`run_expedition_tests.gd` 已覆盖关键节点和下一目标。
+- 2026-06-25：新增「雾溪封阵」6 步链路，覆盖起点选择、法力消耗、普通战、分支奖励、精英战和 Boss 奖励；`run_lilian_tests.gd` 已覆盖关键节点和下一目标。
 
 ### [x] PM-303：筑基初期技能 / 功法扩展
 
@@ -391,7 +391,7 @@ P3 通过标准：
 涉及文件：
 
 - `data/abilities.yaml`
-- `data/cultivation_methods.yaml`
+- `data/xiulian_methods.yaml`
 - `data/dao_tree.yaml`
 - `data/knowledge_effects.yaml`
 - `tests/run_dao_knowledge_tests.gd`
@@ -414,10 +414,10 @@ P3 通过标准：
 
 涉及文件：
 
-- `data/alchemy.yaml`
+- `data/liandan.yaml`
 - `data/item.yaml`
 - `data/locations.yaml`
-- `scripts/sim/alchemy_service.gd`
+- `scripts/sim/liandan_service.gd`
 - `tests/run_simulation_tests.gd`
 
 任务备注：
@@ -453,7 +453,7 @@ P3 通过标准：
 
 验收：
 
-- `run_config_validation_tests.gd`、`run_world_map_tests.gd`、`run_expedition_tests.gd`、`run_simulation_tests.gd` 通过。
+- `run_config_validation_tests.gd`、`run_world_map_tests.gd`、`run_lilian_tests.gd`、`run_simulation_tests.gd` 通过。
 - 手动路线：筑基前目标完成 -> 发现新区域 -> 完成事件链关键节点 -> 获得新功法 / 丹方目标。
 - 输出 P3 验收记录。
 
@@ -516,7 +516,7 @@ P3 通过标准：
 验收：
 
 - `run_config_validation_tests.gd` 通过。
-- `run_expedition_tests.gd` 通过。
+- `run_lilian_tests.gd` 通过。
 - `run_balance_v1_tests.gd` 通过。
 - 手动路线确认普通战不卡死，精英 / Boss 压力合理。
 
@@ -542,7 +542,7 @@ P3 通过标准：
 
 - `data/item.yaml`
 - `data/locations.yaml`
-- `data/expedition_events.yaml`
+- `data/lilian_events.yaml`
 
 ### [ ] PM-502：丹药与丹方扩容
 
@@ -556,7 +556,7 @@ P3 通过标准：
 
 涉及文件：
 
-- `data/alchemy.yaml`
+- `data/liandan.yaml`
 - `data/item.yaml`
 - `tests/run_simulation_tests.gd`
 
@@ -583,7 +583,7 @@ P3 通过标准：
 验收：
 
 - `run_config_validation_tests.gd` 通过。
-- `run_expedition_tests.gd` 通过。
+- `run_lilian_tests.gd` 通过。
 - `run_simulation_tests.gd` 通过。
 
 ## 暂缓任务

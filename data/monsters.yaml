@@ -1,4 +1,4 @@
-schema_version: 1
+﻿schema_version: 1
 monsters:
   qinglan_wolf:
     name: "青牙狼"
@@ -17,7 +17,6 @@ monsters:
       physical_def: 16
       magic_def: 19.2
       spd: 92
-      accuracy: 85
       control_power: 45
       control_resist: 55
     skills:
@@ -59,7 +58,6 @@ monsters:
       physical_def: 23.6
       magic_def: 28.3
       spd: 86
-      accuracy: 96
       control_power: 65
       control_resist: 110
     skills:
@@ -102,7 +100,6 @@ monsters:
       physical_def: 21
       magic_def: 25.2
       spd: 96
-      accuracy: 98
       control_power: 70
       control_resist: 75
     skills:
@@ -145,7 +142,6 @@ monsters:
       physical_def: 24
       magic_def: 28.8
       spd: 105
-      accuracy: 110
       control_power: 90
       control_resist: 95
     skills:
@@ -188,7 +184,6 @@ monsters:
       physical_def: 15
       magic_def: 18
       spd: 98
-      accuracy: 96
       control_power: 55
       control_resist: 60
     skills: []
@@ -228,7 +223,6 @@ monsters:
       physical_def: 25
       magic_def: 30
       spd: 82
-      accuracy: 100
       control_power: 70
       control_resist: 120
     skills:
@@ -272,7 +266,6 @@ monsters:
       physical_def: 27
       magic_def: 32
       spd: 96
-      accuracy: 112
       control_power: 95
       control_resist: 105
     skills:
@@ -315,7 +308,6 @@ monsters:
       physical_def: 22
       magic_def: 26
       spd: 118
-      accuracy: 112
       control_power: 72
       control_resist: 78
     skills:
@@ -357,7 +349,6 @@ monsters:
       physical_def: 36
       magic_def: 42
       spd: 82
-      accuracy: 114
       control_power: 90
       control_resist: 145
     skills:
@@ -400,7 +391,6 @@ monsters:
       physical_def: 38
       magic_def: 46
       spd: 96
-      accuracy: 122
       control_power: 118
       control_resist: 135
     skills:

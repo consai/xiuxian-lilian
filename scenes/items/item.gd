@@ -131,7 +131,7 @@ static func apply_item_id(view: ItemView, item_id: String, count: int = 0, optio
 static func apply_reward_row(view: ItemView, row: Dictionary, options: Dictionary = {}) -> void:
 	if view == null or not row is Dictionary:
 		return
-	const BattleInitDataScript := preload("res://scripts/fight/battle_init_data.gd")
+	const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 	var click: bool = bool(options.get("click_enabled", true))
 	var show_info: bool = bool(options.get("show_info_on_click", true))
 	var show_name: bool = bool(options.get("show_name", true))
@@ -154,7 +154,7 @@ static func apply_reward_row(view: ItemView, row: Dictionary, options: Dictionar
 		var equip_cfg := ConfigManager.equip_by_id(int(row.get("id", -1)))
 		if item_name == "":
 			item_name = str(equip_cfg.get("name", "法宝"))
-		icon = BattleInitDataScript._resolve_icon_texture(equip_cfg)
+		icon = ZhandouInitDataScript._resolve_icon_texture(equip_cfg)
 		if quality == "":
 			quality = EnumQuality.display_label(int(equip_cfg.get("quality", 1)))
 		tier = maxi(1, int(equip_cfg.get("tier", tier)))

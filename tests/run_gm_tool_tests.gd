@@ -85,7 +85,7 @@ func _test_battle_builder_enemy_kind_and_count() -> void:
 	_expect_true(not init_data.is_empty(), "gm battle init built")
 	_expect_eq((init_data.get("enemies", []) as Array).size(), 3, "gm battle enemy count")
 	_expect_eq(str(((init_data.get("enemies", []) as Array)[0] as Dictionary).get("name", "")), "青牙狼·1", "gm battle enemy kind")
-	var errors := BattleInitData.collect_errors(init_data)
+	var errors := ZhandouInitData.collect_errors(init_data)
 	_expect_true(errors.is_empty(), "gm battle init valid: %s" % str(errors))
 
 	var boss_init: Dictionary = GmBattleBuilderScript.build(

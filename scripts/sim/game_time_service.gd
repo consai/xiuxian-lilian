@@ -31,7 +31,13 @@ static func realm_multiplier(major_realm_id: String) -> float:
 static func activity_base_days(activity_id: String) -> int:
 	var table_v: Variant = _root().get("activity_base_days", {})
 	var table := table_v as Dictionary if table_v is Dictionary else {}
-	return maxi(1, int(table.get(activity_id.strip_edges(), 1)))
+	var key := activity_id.strip_edges()
+	# ponytail: 旧存档/配置仍可能用 alchemy、breakthrough 键
+	if key == "alchemy":
+		key = "liandan"
+	elif key == "breakthrough":
+		key = "tupo"
+	return maxi(1, int(table.get(key, 1)))
 
 
 static func suggested_activity_days(

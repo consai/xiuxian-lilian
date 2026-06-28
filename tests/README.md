@@ -5,7 +5,7 @@ Use the PowerShell wrappers so isolated runtime directories are removed automati
 ## Single test
 
 ```powershell
-.\tests\run_tests.ps1 -Script res://tests/run_battle_domain_tests.gd
+.\tests\run_tests.ps1 -Script res://tests/run_zhandou_domain_tests.gd
 ```
 
 Each run uses a unique `.godot_test_appdata_<id>` / `.godot_test_local_<id>` pair by default, so parallel runs do not fight over the same `godot.log`. Both directories are deleted when the script exits `0`. Failed runs keep them for inspection.
@@ -16,13 +16,22 @@ Optional stable suffix (for debugging a specific run):
 .\tests\run_tests.ps1 -Script res://tests/run_scene_manager_tests.gd -AppDataSuffix "_scene"
 ```
 
+## Config validators
+
+```powershell
+.\tools\validate.ps1
+# 或 npm run validate
+```
+
+校验大道树、功法、技能 YAML（Node，无需 Godot）。
+
 ## Full suite
 
 ```powershell
 .\tests\run_all_tests.ps1
 ```
 
-Runs every headless test script in sequence. When all pass, deletes every `.godot_test_*` directory under the project root.
+先跑 `tools/validate.ps1`，再按序跑全部 headless 测试；全部通过后会删除项目根下每个 `.godot_test_*` 目录。
 
 ## Godot executable
 
@@ -33,7 +42,7 @@ Set `GODOT_BIN` to override the default lookup (`C:\Godot_v4.6.2-stable_win64_co
 ```powershell
 $env:APPDATA="$PWD\.godot_test_appdata"
 $env:LOCALAPPDATA="$PWD\.godot_test_local"
-C:\Godot_v4.6.2-stable_win64_console.exe --headless --path $PWD --script res://tests/run_battle_domain_tests.gd
+C:\Godot_v4.6.2-stable_win64_console.exe --headless --path $PWD --script res://tests/run_zhandou_domain_tests.gd
 ```
 
 Manual runs do not auto-clean. Prefer `run_tests.ps1` or `run_all_tests.ps1`.

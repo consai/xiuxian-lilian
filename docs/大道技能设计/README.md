@@ -12,14 +12,18 @@
 - [1v5 多波战斗技能设计](docs/1v5多波战斗技能设计.md)
 - [功法与技能配置规划方案](docs/功法与技能配置规划方案.md)
 - [统一效果属性目录](config/effect_catalog.json)
-- [一致性校验器](scripts/validate-dao-tree.mjs)
+- [一致性校验器](tools/dao/validate-dao-tree.mjs)
 
 运行校验：
 
 ```powershell
-node scripts/validate-dao-tree.mjs
-node scripts/validate-cultivation-methods.mjs
-node scripts/validate-abilities.mjs
+npm run validate
+# 或
+.\tools\validate.ps1
+# 单项
+node tools/dao/validate-dao-tree.mjs
+node tools/dao/validate-xiulian-methods.mjs
+node tools/dao/validate-abilities.mjs
 ```
 
 本项目只负责系统设计与配置交付，不包含游戏运行时代码。最终配置为 UTF-8 JSON，可由 Godot

@@ -241,42 +241,42 @@ layout_mode = 2
 text = "人物属性"
 
 
-[node name="BackpackButton" type="Button" parent="Panel/Scroll/Content/SceneRow"]
+[node name="BeibaoButton" type="Button" parent="Panel/Scroll/Content/SceneRow"]
 unique_name_in_owner = true
 script = ExtResource("8_auto")
 layout_mode = 2
 text = "背包"
 
 
-[node name="ExpeditionTitle" type="Label" parent="Panel/Scroll/Content"]
+[node name="LilianTitle" type="Label" parent="Panel/Scroll/Content"]
 layout_mode = 2
 text = "历练"
 label_settings = ExtResource("5_body")
 
-[node name="ExpeditionRow" type="HBoxContainer" parent="Panel/Scroll/Content"]
+[node name="LilianRow" type="HBoxContainer" parent="Panel/Scroll/Content"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="LocationOption" type="OptionButton" parent="Panel/Scroll/Content/ExpeditionRow"]
+[node name="LocationOption" type="OptionButton" parent="Panel/Scroll/Content/LilianRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="StartExpeditionButton" type="Button" parent="Panel/Scroll/Content/ExpeditionRow"]
+[node name="StartLilianButton" type="Button" parent="Panel/Scroll/Content/LilianRow"]
 unique_name_in_owner = true
 script = ExtResource("8_auto")
 layout_mode = 2
 text = "开始历练"
 
 
-[node name="ForceSettleButton" type="Button" parent="Panel/Scroll/Content/ExpeditionRow"]
+[node name="ForceSettleButton" type="Button" parent="Panel/Scroll/Content/LilianRow"]
 unique_name_in_owner = true
 script = ExtResource("8_auto")
 layout_mode = 2
 text = "强制结算"
 
 
-[node name="ResetExpeditionButton" type="Button" parent="Panel/Scroll/Content/ExpeditionRow"]
+[node name="ResetLilianButton" type="Button" parent="Panel/Scroll/Content/LilianRow"]
 unique_name_in_owner = true
 script = ExtResource("8_auto")
 layout_mode = 2

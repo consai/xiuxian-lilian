@@ -8,7 +8,7 @@ const TipPolicyEngineScript := preload("res://scripts/ui/tips/core/tip_policy_en
 const TipRouterScript := preload("res://scripts/ui/tips/core/tip_router.gd")
 const TipBusScript := preload("res://scripts/ui/tips/core/tip_bus.gd")
 const BarTipPresenterScript := preload("res://scripts/ui/tips/presenter/bar_tip_presenter.gd")
-const CombatBlockPresenterScript := preload("res://scripts/ui/tips/presenter/combat_block_presenter.gd")
+const ZhandouBlockPresenterScript := preload("res://scripts/ui/tips/presenter/zhandou_block_presenter.gd")
 const RewardTipPresenterScript := preload("res://scripts/ui/tips/presenter/reward_tip_presenter.gd")
 const TipBarScene := preload("res://scenes/ui/tip_bar.tscn")
 const RewardTipLayerScene := preload("res://scenes/ui/reward_tip_layer.tscn")
@@ -60,7 +60,7 @@ func _setup_tip_runtime() -> void:
 	var bar_presenter := BarTipPresenterScript.new()
 	bar_presenter.setup(bar_root)
 	_router.register_presenter(TipIntentScript.CHANNEL_BAR, bar_presenter)
-	_router.register_presenter(TipIntentScript.CHANNEL_COMBAT_BLOCK, CombatBlockPresenterScript.new())
+	_router.register_presenter(TipIntentScript.CHANNEL_COMBAT_BLOCK, ZhandouBlockPresenterScript.new())
 	var reward_root := RewardTipLayerScene.instantiate() as Control
 	add_child(reward_root)
 	var reward_presenter := RewardTipPresenterScript.new()

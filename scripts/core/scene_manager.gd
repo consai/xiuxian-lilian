@@ -5,49 +5,49 @@ signal active_scene_changed(scene: Node)
 const MAIN_MENU := "main_menu"
 const HUB := "hub"
 const WORLD_MAP := "world_map"
-const EXPEDITION_LOOP := "expedition_loop"
-const EXPEDITION_RESULT := "expedition_result"
-const FIGHT := "fight"
-const BREAKTHROUGH_SUMMARY := "breakthrough_summary"
-const CULTIVATION_PANEL := "cultivation_panel"
-const CULTIVATION_PROGRESS := "cultivation_progress"
+const LILIAN_XUNHUAN := "lilian_xunhuan"
+const LILIAN_JIESUAN := "lilian_jiesuan"
+const ZHANDOU_CHANGJING := "zhandou_changjing"
+const TUPO_ZONGJIE := "tupo_zongjie"
+const XIULIAN_MIANBAN := "xiulian_mianban"
+const XIULIAN_JINDU_QUANPING := "xiulian_jindu_quanping"
 const KNOWLEDGE_STUDY_PANEL := "knowledge_study_panel"
-const ALCHEMY_PANEL := "alchemy_panel"
-const ALCHEMY_PROGRESS := "alchemy_progress"
-const ALCHEMY_RESULT := "alchemy_result"
+const LIANDAN_MIANBAN := "liandan_mianban"
+const LIANDAN_JINDU_QUANPING := "liandan_jindu_quanping"
+const LIANDAN_JIEGUO_TANCHUANG := "liandan_jieguo_tanchuang"
 const CHARACTER_ATTRIBUTES_PANEL := "character_attributes_panel"
 const MASTERED_ARTS_PANEL := "mastered_arts_panel"
-const COMBAT_LOADOUT_PANEL := "combat_loadout_panel"
+const ZHANDOU_PEIZHI_MIANBAN := "zhandou_peizhi_mianban"
 const SKILL_RELEASE_STRATEGY_PANEL := "skill_release_strategy_panel"
-const BACKPACK_PANEL := "backpack_panel"
+const BEIBAO_PANEL := "beibao_panel"
 const DAO_TREE_PANEL := "dao_tree_panel"
 
 const SCENE_PATHS := {
 	MAIN_MENU: "res://scenes/ui/main_menu.tscn",
-	HUB: "res://scenes/sim/cave_hub.tscn",
+	HUB: "res://scenes/sim/dongfu.tscn",
 	WORLD_MAP: "res://scenes/map/map.tscn",
-	EXPEDITION_LOOP: "res://scenes/expedition/expedition_loop.tscn",
-	EXPEDITION_RESULT: "res://scenes/expedition/expedition_result.tscn",
-	FIGHT: "res://scenes/fightScene.tscn",
-	BREAKTHROUGH_SUMMARY: "res://scenes/sim/breakthrough_summary.tscn",
-	CULTIVATION_PANEL: "res://scenes/sim/cultivation_panel.tscn",
-	CULTIVATION_PROGRESS: "res://scenes/sim/cultivation_progress_fullscreen.tscn",
+	LILIAN_XUNHUAN: "res://scenes/lilian/lilian_xunhuan.tscn",
+	LILIAN_JIESUAN: "res://scenes/lilian/lilian_jiesuan.tscn",
+	ZHANDOU_CHANGJING: "res://scenes/zhandou/zhandou_changjing.tscn",
+	TUPO_ZONGJIE: "res://scenes/sim/tupo_zongjie.tscn",
+	XIULIAN_MIANBAN: "res://scenes/sim/xiulian_mianban.tscn",
+	XIULIAN_JINDU_QUANPING: "res://scenes/sim/xiulian_jindu_quanping.tscn",
 	KNOWLEDGE_STUDY_PANEL: "res://scenes/ui/knowledge_study_panel.tscn",
-	ALCHEMY_PANEL: "res://scenes/sim/alchemy_panel.tscn",
-	ALCHEMY_PROGRESS: "res://scenes/sim/alchemy_progress_fullscreen.tscn",
-	ALCHEMY_RESULT: "res://scenes/sim/alchemy_result_popup.tscn",
+	LIANDAN_MIANBAN: "res://scenes/sim/liandan_mianban.tscn",
+	LIANDAN_JINDU_QUANPING: "res://scenes/sim/liandan_jindu_quanping.tscn",
+	LIANDAN_JIEGUO_TANCHUANG: "res://scenes/sim/liandan_jieguo_tanchuang.tscn",
 	CHARACTER_ATTRIBUTES_PANEL: "res://scenes/ui/character_attributes_panel.tscn",
 	MASTERED_ARTS_PANEL: "res://scenes/ui/mastered_arts_panel.tscn",
-	COMBAT_LOADOUT_PANEL: "res://scenes/ui/combat_loadout_panel.tscn",
+	ZHANDOU_PEIZHI_MIANBAN: "res://scenes/ui/zhandou_peizhi_mianban.tscn",
 	SKILL_RELEASE_STRATEGY_PANEL: "res://scenes/ui/skill_release_strategy_panel.tscn",
-	BACKPACK_PANEL: "res://scenes/ui/backpack_panel.tscn",
+	BEIBAO_PANEL: "res://scenes/ui/beibao_panel.tscn",
 	DAO_TREE_PANEL: "res://scenes/ui/dao_tree_panel.tscn",
 }
 
-const _BLOCKED_EXPEDITION_ACTIVE := "当前仍在历练中，请先完成或结算后再操作。"
+const _BLOCKED_LILIAN_ACTIVE := "当前仍在历练中，请先完成或结算后再操作。"
 
 ## 叠在当前场景上的战斗/面板浮层，避免切场景销毁底层界面。
-var _fight_overlay: Node = null
+var _zhandou_overlay: Node = null
 var _panel_overlay: Node = null
 var _scene_underlay: Node = null
 ## 无专属 Host 的可导航场景与浮层统一挂在此节点下，不直接挂 root。
@@ -65,8 +65,8 @@ func _game_state() -> Node:
 	return _autoload("GameState")
 
 
-func _expedition_state() -> Node:
-	return _autoload("ExpeditionState")
+func _lilian_state() -> Node:
+	return _autoload("LilianState")
 
 
 func _data_store() -> Node:
@@ -96,8 +96,8 @@ func _ensure_scene_root() -> void:
 
 ## 返回当前可交互的主场景或浮层（战斗/全屏面板）；背包弹窗时仍返回底层场景。
 func get_active_scene() -> Node:
-	if _fight_overlay != null and is_instance_valid(_fight_overlay):
-		return _fight_overlay
+	if _zhandou_overlay != null and is_instance_valid(_zhandou_overlay):
+		return _zhandou_overlay
 	if _panel_overlay != null and is_instance_valid(_panel_overlay):
 		if _scene_underlay != null and is_instance_valid(_scene_underlay) and _scene_underlay.visible:
 			return _scene_underlay
@@ -159,55 +159,55 @@ func go_world_map() -> Dictionary:
 	return go_to(WORLD_MAP)
 
 
-func start_expedition(location_id: String, seed_override: int = -1) -> Dictionary:
-	var expedition := _expedition_state()
+func start_lilian(location_id: String, seed_override: int = -1) -> Dictionary:
+	var lilian := _lilian_state()
 	var game_state := _game_state()
-	if expedition == null or game_state == null:
-		return {"ok": false, "error": "缺少 GameState 或 ExpeditionState"}
+	if lilian == null or game_state == null:
+		return {"ok": false, "error": "缺少 GameState 或 LilianState"}
 	var preflight := _preflight_transition()
 	if not bool(preflight.get("ok", false)):
 		return preflight
-	var started: Dictionary = expedition.start(location_id, game_state, seed_override)
+	var started: Dictionary = lilian.start(location_id, game_state, seed_override)
 	if not bool(started.get("ok", false)):
 		return started
 	var tutorial := _autoload("TutorialService")
 	if tutorial != null and tutorial.has_method("game_event"):
-		tutorial.call("game_event", "tutorial.expedition_started")
-	var nav := go_expedition_loop()
+		tutorial.call("game_event", "tutorial.lilian_started")
+	var nav := go_lilian_xunhuan()
 	if not bool(nav.get("ok", false)):
-		expedition.reset()
+		lilian.reset()
 	return nav
 
 
-func go_expedition_loop() -> Dictionary:
-	return go_to(EXPEDITION_LOOP)
+func go_lilian_xunhuan() -> Dictionary:
+	return go_to(LILIAN_XUNHUAN)
 
 
-func go_expedition_result(reason: String = "manual") -> Dictionary:
-	_discard_expedition_fight_stack()
-	var payload := ScenePayload.expedition_result(reason)
+func go_lilian_jiesuan(reason: String = "manual") -> Dictionary:
+	_discard_lilian_zhandou_stack()
+	var payload := ScenePayload.lilian_jiesuan(reason)
 	if payload.is_empty():
-		return {"ok": false, "error": "invalid_expedition_result_payload"}
-	return go_to(EXPEDITION_RESULT, payload)
+		return {"ok": false, "error": "invalid_lilian_jiesuan_payload"}
+	return go_to(LILIAN_JIESUAN, payload)
 
 
-func go_breakthrough_panel() -> Dictionary:
-	return go_to(BREAKTHROUGH_SUMMARY, {"mode": "panel"})
+func go_tupo_mianban() -> Dictionary:
+	return go_to(TUPO_ZONGJIE, {"mode": "panel"})
 
 
-func go_cultivation_panel() -> Dictionary:
-	return go_to(CULTIVATION_PANEL)
+func go_xiulian_mianban() -> Dictionary:
+	return go_to(XIULIAN_MIANBAN)
 
 
 func go_knowledge_study_panel() -> Dictionary:
 	return go_to(KNOWLEDGE_STUDY_PANEL)
 
 
-func go_alchemy_panel() -> Dictionary:
-	return go_to(ALCHEMY_PANEL)
+func go_liandan_mianban() -> Dictionary:
+	return go_to(LIANDAN_MIANBAN)
 
 
-func go_alchemy_progress(session: Dictionary) -> Dictionary:
+func go_liandan_jindu_quanping(session: Dictionary) -> Dictionary:
 	var payload := session.duplicate(true)
 	if str(payload.get("recipe_id", "")).strip_edges() == "":
 		return {"ok": false, "error": "缺少丹方"}
@@ -215,31 +215,31 @@ func go_alchemy_progress(session: Dictionary) -> Dictionary:
 		return {"ok": false, "error": "缺少炼制策略"}
 	if int(payload.get("days", 0)) <= 0:
 		return {"ok": false, "error": "炼制天数无效"}
-	return go_to(ALCHEMY_PROGRESS, payload)
+	return go_to(LIANDAN_JINDU_QUANPING, payload)
 
 
-func go_alchemy_result(result: Dictionary) -> Dictionary:
+func go_liandan_jieguo_tanchuang(result: Dictionary) -> Dictionary:
 	if not bool(result.get("ok", false)):
 		return {"ok": false, "error": str(result.get("error", "炼丹结果无效"))}
-	return go_to(ALCHEMY_RESULT, result.duplicate(true))
+	return go_to(LIANDAN_JIEGUO_TANCHUANG, result.duplicate(true))
 
 
-func go_cultivation_progress(session: Dictionary) -> Dictionary:
+func go_xiulian_jindu_quanping(session: Dictionary) -> Dictionary:
 	var payload := session.duplicate(true)
 	if str(payload.get("mode_id", "")).strip_edges() == "":
 		return {"ok": false, "error": "缺少修炼方式"}
 	if int(payload.get("days", 0)) <= 0:
 		return {"ok": false, "error": "闭关天数无效"}
-	return go_to(CULTIVATION_PROGRESS, payload)
+	return go_to(XIULIAN_JINDU_QUANPING, payload)
 
 
-func go_breakthrough_summary(summary: Dictionary) -> Dictionary:
+func go_tupo_zongjie(summary: Dictionary) -> Dictionary:
 	var payload := summary.duplicate(true)
 	payload["mode"] = "result"
-	var validated := ScenePayload.breakthrough_summary(payload)
+	var validated := ScenePayload.tupo_zongjie(payload)
 	if validated.is_empty():
-		return {"ok": false, "error": "invalid_breakthrough_summary_payload"}
-	return go_to(BREAKTHROUGH_SUMMARY, validated)
+		return {"ok": false, "error": "invalid_tupo_zongjie_payload"}
+	return go_to(TUPO_ZONGJIE, validated)
 
 
 func go_character_attributes_panel() -> Dictionary:
@@ -250,27 +250,27 @@ func go_mastered_arts_panel() -> Dictionary:
 	return go_to(MASTERED_ARTS_PANEL)
 
 
-func go_combat_loadout_panel() -> Dictionary:
-	if _can_overlay_panel_on_expedition_loop():
-		return _push_panel_popup(COMBAT_LOADOUT_PANEL, {})
-	return go_to(COMBAT_LOADOUT_PANEL)
+func go_zhandou_peizhi_mianban() -> Dictionary:
+	if _can_overlay_panel_on_lilian_xunhuan():
+		return _push_panel_popup(ZHANDOU_PEIZHI_MIANBAN, {})
+	return go_to(ZHANDOU_PEIZHI_MIANBAN)
 
 
 func go_skill_release_strategy_panel() -> Dictionary:
-	if _can_overlay_panel_on_expedition_loop():
+	if _can_overlay_panel_on_lilian_xunhuan():
 		return _push_panel_popup(SKILL_RELEASE_STRATEGY_PANEL, {})
 	return go_to(SKILL_RELEASE_STRATEGY_PANEL)
 
 
 ## 背包统一以弹窗叠在当前场景上打开，不切场景、不压栈。
-func go_backpack_panel(payload: Dictionary = {}) -> Dictionary:
+func go_beibao_panel(payload: Dictionary = {}) -> Dictionary:
 	var merged := payload.duplicate(true)
-	if _should_use_expedition_bag_context():
-		merged["context"] = "expedition"
+	if _should_use_lilian_bag_context():
+		merged["context"] = "lilian"
 	var preflight := _preflight_panel_popup()
 	if not bool(preflight.get("ok", false)):
 		return preflight
-	return _push_panel_popup(BACKPACK_PANEL, merged)
+	return _push_panel_popup(BEIBAO_PANEL, merged)
 
 
 func go_dao_tree_panel() -> Dictionary:
@@ -304,40 +304,40 @@ func go_back(fallback_scene_id: String = HUB, options: Dictionary = {}) -> Dicti
 	return _perform_transition(target_id, {}, false)
 
 
-func go_fight(battle_data: Dictionary, source: String = "scene_manager") -> Dictionary:
-	var merged := BattleInitData.merge_skill_cfg_from_tables(battle_data)
-	var errors := BattleInitData.collect_errors(merged)
+func go_zhandou(battle_data: Dictionary, source: String = "scene_manager") -> Dictionary:
+	var merged := ZhandouInitData.merge_skill_cfg_from_tables(battle_data)
+	var errors := ZhandouInitData.collect_errors(merged)
 	if not errors.is_empty():
 		return {"ok": false, "error": errors[0]}
 	var preflight := _preflight_transition()
 	if not bool(preflight.get("ok", false)):
 		return preflight
-	BattleInitData.set_pending(get_tree(), merged, source)
+	ZhandouInitData.set_pending(get_tree(), merged, source)
 	var nav: Dictionary
-	if _can_overlay_fight_on_expedition_loop(source):
-		nav = _push_fight_overlay()
+	if _can_overlay_zhandou_on_lilian_xunhuan(source):
+		nav = _push_zhandou_overlay()
 	else:
-		nav = _perform_transition(FIGHT, {}, true)
+		nav = _perform_transition(ZHANDOU_CHANGJING, {}, true)
 	if not bool(nav.get("ok", false)):
-		_data_store().battle_runtime()["pending_init"] = {}
+		_data_store().zhandou_runtime()["pending_init"] = {}
 	return nav
 
 
 ## 历练战斗胜利后：移除战斗叠层并恢复历练界面（不重新加载场景）。
-func resume_expedition_after_fight() -> Dictionary:
-	if _fight_overlay == null or _scene_underlay == null:
-		return go_expedition_loop()
-	_remove_fight_overlay()
+func resume_lilian_after_zhandou() -> Dictionary:
+	if _zhandou_overlay == null or _scene_underlay == null:
+		return go_lilian_xunhuan()
+	_remove_zhandou_overlay()
 	_restore_scene_underlay()
 	if _scene_underlay.has_method("resume_after_battle"):
 		_scene_underlay.call("resume_after_battle")
-	return {"ok": true, "scene_id": EXPEDITION_LOOP, "resumed": true}
+	return {"ok": true, "scene_id": LILIAN_XUNHUAN, "resumed": true}
 
 
 ## 历练战斗战败/撤退结算：清掉叠层与历练界面后进入结算场景。
-func end_expedition_fight_and_go_result(reason: String = "defeated") -> Dictionary:
-	_discard_expedition_fight_stack()
-	return go_expedition_result(reason)
+func end_lilian_zhandou_and_go_jiesuan(reason: String = "defeated") -> Dictionary:
+	_discard_lilian_zhandou_stack()
+	return go_lilian_jiesuan(reason)
 
 
 ## 关闭面板弹窗并恢复底层场景。
@@ -352,7 +352,7 @@ func dismiss_panel_popup() -> Dictionary:
 			underlay.process_mode = Node.PROCESS_MODE_INHERIT
 		if underlay.has_method("resume_after_panel"):
 			underlay.call("resume_after_panel")
-	if _fight_overlay == null:
+	if _zhandou_overlay == null:
 		_scene_underlay = null
 	return {"ok": true, "resumed": true}
 
@@ -361,8 +361,8 @@ func is_panel_popup_active() -> bool:
 	return _panel_overlay != null and is_instance_valid(_panel_overlay)
 
 
-func is_expedition_fight_overlay_active() -> bool:
-	return _fight_overlay != null and is_instance_valid(_fight_overlay)
+func is_lilian_zhandou_overlay_active() -> bool:
+	return _zhandou_overlay != null and is_instance_valid(_zhandou_overlay)
 
 
 func take_payload(scene_id: String) -> Dictionary:
@@ -376,28 +376,28 @@ func peek_payload(scene_id: String) -> Dictionary:
 func _guard_enter(scene_id: String, options: Dictionary) -> Dictionary:
 	if not SCENE_PATHS.has(scene_id):
 		return {"ok": false, "error": "unknown_scene_id:%s" % scene_id}
-	var expedition := _expedition_state()
+	var lilian := _lilian_state()
 	match scene_id:
-		EXPEDITION_LOOP:
-			if expedition == null or not expedition.active:
+		LILIAN_XUNHUAN:
+			if lilian == null or not lilian.active:
 				return {"ok": false, "error": "没有进行中的历练"}
-			if expedition.should_go_to_result():
+			if lilian.should_go_to_result():
 				return {"ok": false, "error": "历练已进入结算流程"}
-		EXPEDITION_RESULT:
-			if expedition == null:
-				return {"ok": false, "error": "缺少 ExpeditionState"}
+		LILIAN_JIESUAN:
+			if lilian == null:
+				return {"ok": false, "error": "缺少 LilianState"}
 			var game_state := _game_state()
-			var has_summary := game_state != null and not (game_state.last_expedition_summary as Dictionary).is_empty()
-			if not expedition.active and not has_summary:
+			var has_summary := game_state != null and not (game_state.last_lilian_summary as Dictionary).is_empty()
+			if not lilian.active and not has_summary:
 				return {"ok": false, "error": "没有可结算的历练"}
 		WORLD_MAP:
-			if expedition != null and expedition.active:
-				return {"ok": false, "error": _BLOCKED_EXPEDITION_ACTIVE}
-		FIGHT:
-			return {"ok": false, "error": "战斗场景必须通过 go_fight() 进入"}
+			if lilian != null and lilian.active:
+				return {"ok": false, "error": _BLOCKED_LILIAN_ACTIVE}
+		ZHANDOU_CHANGJING:
+			return {"ok": false, "error": "战斗场景必须通过 go_zhandou() 进入"}
 		HUB:
-			if expedition != null and expedition.active and not bool(options.get("allow_active_expedition", false)):
-				return {"ok": false, "error": _BLOCKED_EXPEDITION_ACTIVE, "blocked": true}
+			if lilian != null and lilian.active and not bool(options.get("allow_active_lilian", false)):
+				return {"ok": false, "error": _BLOCKED_LILIAN_ACTIVE, "blocked": true}
 	return {"ok": true}
 
 
@@ -409,7 +409,7 @@ func _preflight_transition() -> Dictionary:
 
 
 func _perform_transition(scene_id: String, payload: Dictionary, record_history: bool) -> Dictionary:
-	_discard_expedition_fight_stack()
+	_discard_lilian_zhandou_stack()
 	var scene_rt: Dictionary = _data_store().scene_runtime()
 	if bool(scene_rt.get("transitioning", false)):
 		return {"ok": false, "error": "transition_in_progress"}
@@ -436,54 +436,54 @@ func _release_transition_lock() -> void:
 	_data_store().scene_runtime()["transitioning"] = false
 
 
-func _can_overlay_fight_on_expedition_loop(source: String) -> bool:
-	if not _is_expedition_fight_source(source):
+func _can_overlay_zhandou_on_lilian_xunhuan(source: String) -> bool:
+	if not _is_lilian_zhandou_source(source):
 		return false
-	if _fight_overlay != null or _panel_overlay != null:
+	if _zhandou_overlay != null or _panel_overlay != null:
 		return false
 	var underlay := get_active_scene()
 	if underlay == null:
 		return false
-	return str(underlay.scene_file_path) == str(SCENE_PATHS.get(EXPEDITION_LOOP, ""))
+	return str(underlay.scene_file_path) == str(SCENE_PATHS.get(LILIAN_XUNHUAN, ""))
 
 
-## 与 ExpeditionBattleFlow.is_expedition_source 保持一致，避免 SceneManager 与战斗出口脚本循环依赖。
-func _is_expedition_fight_source(source: String) -> bool:
+## 与 LilianBattleFlow.is_lilian_source 保持一致，避免 SceneManager 与战斗出口脚本循环依赖。
+func _is_lilian_zhandou_source(source: String) -> bool:
 	var trimmed := source.strip_edges()
-	return trimmed == "expedition" or trimmed.begins_with("expedition_")
+	return trimmed == "lilian" or trimmed.begins_with("lilian_")
 
 
-func _push_fight_overlay() -> Dictionary:
+func _push_zhandou_overlay() -> Dictionary:
 	var scene_rt: Dictionary = _data_store().scene_runtime()
 	if bool(scene_rt.get("transitioning", false)):
 		return {"ok": false, "error": "transition_in_progress"}
-	var path := str(SCENE_PATHS.get(FIGHT, ""))
+	var path := str(SCENE_PATHS.get(ZHANDOU_CHANGJING, ""))
 	if path == "":
-		return {"ok": false, "error": "unknown_scene_id:%s" % FIGHT}
+		return {"ok": false, "error": "unknown_scene_id:%s" % ZHANDOU_CHANGJING}
 	var underlay := get_active_scene()
 	if underlay == null:
 		return {"ok": false, "error": "no_current_scene"}
 	var packed := load(path)
 	if packed == null:
-		return {"ok": false, "error": "fight_scene_load_failed"}
+		return {"ok": false, "error": "zhandou_changjing_load_failed"}
 	var overlay: Node = packed.instantiate()
 	if overlay == null:
-		return {"ok": false, "error": "fight_scene_instantiate_failed"}
+		return {"ok": false, "error": "zhandou_changjing_instantiate_failed"}
 	scene_rt["transitioning"] = true
-	scene_rt["overlay_id"] = FIGHT
+	scene_rt["overlay_id"] = ZHANDOU_CHANGJING
 	_scene_underlay = underlay
 	_scene_underlay.visible = false
 	_scene_underlay.process_mode = Node.PROCESS_MODE_DISABLED
-	_fight_overlay = overlay
-	_scene_root.add_child(_fight_overlay)
+	_zhandou_overlay = overlay
+	_scene_root.add_child(_zhandou_overlay)
 	call_deferred("_release_transition_lock")
-	return {"ok": true, "scene_id": FIGHT, "path": path, "overlay": true}
+	return {"ok": true, "scene_id": ZHANDOU_CHANGJING, "path": path, "overlay": true}
 
 
-func _remove_fight_overlay() -> void:
-	if _fight_overlay != null and is_instance_valid(_fight_overlay):
-		_fight_overlay.queue_free()
-	_fight_overlay = null
+func _remove_zhandou_overlay() -> void:
+	if _zhandou_overlay != null and is_instance_valid(_zhandou_overlay):
+		_zhandou_overlay.queue_free()
+	_zhandou_overlay = null
 	_data_store().scene_runtime()["overlay_id"] = ""
 
 
@@ -501,27 +501,27 @@ func _discard_scene_underlay() -> void:
 	_scene_underlay = null
 
 
-func _should_use_expedition_bag_context() -> bool:
-	var expedition := _expedition_state()
-	return expedition != null and expedition.active
+func _should_use_lilian_bag_context() -> bool:
+	var lilian := _lilian_state()
+	return lilian != null and lilian.active
 
 
 func _preflight_panel_popup() -> Dictionary:
-	if _fight_overlay != null or _panel_overlay != null:
+	if _zhandou_overlay != null or _panel_overlay != null:
 		return {"ok": false, "error": "panel_popup_already_open"}
 	return _preflight_transition()
 
 
-func _can_overlay_panel_on_expedition_loop() -> bool:
+func _can_overlay_panel_on_lilian_xunhuan() -> bool:
 	if not _preflight_panel_popup().get("ok", false):
 		return false
-	var expedition := _expedition_state()
-	if expedition == null or not expedition.active:
+	var lilian := _lilian_state()
+	if lilian == null or not lilian.active:
 		return false
 	var underlay := get_active_scene()
 	if underlay == null:
 		return false
-	return str(underlay.scene_file_path) == str(SCENE_PATHS.get(EXPEDITION_LOOP, ""))
+	return str(underlay.scene_file_path) == str(SCENE_PATHS.get(LILIAN_XUNHUAN, ""))
 
 
 func _push_panel_popup(scene_id: String, payload: Dictionary) -> Dictionary:
@@ -545,7 +545,7 @@ func _push_panel_popup(scene_id: String, payload: Dictionary) -> Dictionary:
 		_data_store().set_scene_payload(scene_id, payload)
 	scene_rt["overlay_id"] = scene_id
 	_scene_underlay = underlay
-	var keep_underlay_visible := scene_id == BACKPACK_PANEL
+	var keep_underlay_visible := scene_id == BEIBAO_PANEL
 	if not keep_underlay_visible:
 		_scene_underlay.visible = false
 		_scene_underlay.process_mode = Node.PROCESS_MODE_DISABLED
@@ -565,11 +565,11 @@ func _remove_panel_overlay() -> void:
 	if _panel_overlay != null and is_instance_valid(_panel_overlay):
 		_panel_overlay.queue_free()
 	_panel_overlay = null
-	if _fight_overlay == null:
+	if _zhandou_overlay == null:
 		_data_store().scene_runtime()["overlay_id"] = ""
 
 
-func _discard_expedition_fight_stack() -> void:
-	_remove_fight_overlay()
+func _discard_lilian_zhandou_stack() -> void:
+	_remove_zhandou_overlay()
 	_remove_panel_overlay()
 	_discard_scene_underlay()

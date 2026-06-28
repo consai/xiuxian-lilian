@@ -1,0 +1,426 @@
+configId: "abilities.general_passive"
+type: "general_passive"
+metadata:
+  name: "技能·general_passive"
+  abilityCount: 13
+abilities:
+  - id: "ability.general.qi_absorption"
+    name: "灵气亲和"
+    type: "general_passive"
+    realm: "qi"
+    tier: 1
+    quality: 1
+    description: "灵气亲和"
+    tags: []
+    combat: null
+    effects:
+      - effectId: "cultivation_speed"
+        base: 0.05
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "cultivation_speed"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+    learningRequirements:
+      realm: "qi"
+      knowledge: []
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.general.meridian_knowledge"
+    name: "经脉通识"
+    type: "general_passive"
+    realm: "qi"
+    tier: 1
+    quality: 1
+    description: "经脉通识"
+    tags: []
+    combat: null
+    effects:
+      - effectId: "injury_diagnosis"
+        base: 0.15
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "injury_diagnosis"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+    learningRequirements:
+      realm: "qi"
+      knowledge: []
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.general.appraiser"
+    name: "鉴宝师"
+    type: "general_passive"
+    realm: "qi"
+    tier: 1
+    quality: 1
+    description: "鉴宝师"
+    tags: []
+    combat: null
+    effects:
+      - effectId: "appraisal_accuracy"
+        base: 0.15
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "appraisal_accuracy"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+    learningRequirements:
+      realm: "qi"
+      knowledge: []
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.general.herbalist"
+    name: "灵植师"
+    type: "general_passive"
+    realm: "qi"
+    tier: 1
+    quality: 1
+    description: "灵植师"
+    tags: []
+    combat: null
+    effects:
+      - effectId: "herb_yield"
+        base: 0.12
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "herb_yield"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+    learningRequirements:
+      realm: "qi"
+      knowledge: []
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.general.smith"
+    name: "炼器师"
+    type: "general_passive"
+    realm: "foundation"
+    tier: 2
+    quality: 2
+    description: "炼器师"
+    tags: []
+    combat: null
+    effects:
+      - effectId: "craft_quality"
+        base: 0.12
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "craft_quality"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+      - effectId: "material_efficiency"
+        base: 0.08
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "material_efficiency"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+    learningRequirements:
+      realm: "foundation"
+      knowledge: []
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.general.alchemist"
+    name: "炼丹师"
+    type: "general_passive"
+    realm: "foundation"
+    tier: 2
+    quality: 2
+    description: "炼丹师"
+    tags: []
+    combat: null
+    effects:
+      - effectId: "pill_quality"
+        base: 0.12
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "pill_quality"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+      - effectId: "alchemy_success"
+        base: 0.1
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "alchemy_success"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+    learningRequirements:
+      realm: "foundation"
+      knowledge: []
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.general.array_master"
+    name: "阵法师"
+    type: "general_passive"
+    realm: "foundation"
+    tier: 2
+    quality: 2
+    description: "阵法师"
+    tags: []
+    combat: null
+    effects:
+      - effectId: "formation_power"
+        base: 0.12
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "formation_power"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+      - effectId: "formation_setup_speed"
+        base: 0.1
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "formation_setup_speed"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+    learningRequirements:
+      realm: "foundation"
+      knowledge: []
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.general.talisman_master"
+    name: "符师"
+    type: "general_passive"
+    realm: "foundation"
+    tier: 2
+    quality: 2
+    description: "符师"
+    tags: []
+    combat: null
+    effects:
+      - effectId: "talisman_quality"
+        base: 0.12
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "talisman_quality"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+      - effectId: "talisman_activation_speed"
+        base: 0.1
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "talisman_activation_speed"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+    learningRequirements:
+      realm: "foundation"
+      knowledge: []
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.general.beast_master"
+    name: "御兽师"
+    type: "general_passive"
+    realm: "foundation"
+    tier: 2
+    quality: 2
+    description: "御兽师"
+    tags: []
+    combat: null
+    effects:
+      - effectId: "beast_growth"
+        base: 0.12
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "beast_growth"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+      - effectId: "beast_capacity"
+        base: 1
+        operation: "add_flat"
+        target: "self"
+        stackGroup: "beast_capacity"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+    learningRequirements:
+      realm: "foundation"
+      knowledge: []
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.general.geomancer"
+    name: "堪舆师"
+    type: "general_passive"
+    realm: "core"
+    tier: 3
+    quality: 3
+    description: "堪舆师"
+    tags: []
+    combat: null
+    effects:
+      - effectId: "spirit_vein_detection"
+        base: 0.18
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "spirit_vein_detection"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+      - effectId: "rare_find_chance"
+        base: 0.08
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "rare_find_chance"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+    learningRequirements:
+      realm: "core"
+      knowledge:
+        - skillId: "world.geomancy"
+          level: 2
+        - skillId: "formation.array"
+          level: 2
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.general.void_traveler"
+    name: "虚空行者"
+    type: "general_passive"
+    realm: "void"
+    tier: 6
+    quality: 4
+    description: "虚空行者"
+    tags: []
+    combat: null
+    effects:
+      - effectId: "void_survival"
+        base: 0.3
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "void_survival"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+      - effectId: "void_travel_speed"
+        base: 0.15
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "void_travel_speed"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+    learningRequirements:
+      realm: "void"
+      knowledge:
+        - skillId: "world.void_survival"
+          level: 2
+        - skillId: "body.void_body"
+          level: 2
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.general.sect_governor"
+    name: "宗门执掌"
+    type: "general_passive"
+    realm: "merge"
+    tier: 7
+    quality: 4
+    description: "宗门执掌"
+    tags: []
+    combat: null
+    effects:
+      - effectId: "settlement_output"
+        base: 0.2
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "settlement_output"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+      - effectId: "governance_efficiency"
+        base: 0.15
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "governance_efficiency"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+    learningRequirements:
+      realm: "merge"
+      knowledge:
+        - skillId: "world.civilization"
+          level: 2
+        - skillId: "world.trade"
+          level: 2
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.general.tribulation_scholar"
+    name: "应劫宗师"
+    type: "general_passive"
+    realm: "tribulation"
+    tier: 9
+    quality: 4
+    description: "应劫宗师"
+    tags: []
+    combat: null
+    effects:
+      - effectId: "tribulation_forecast"
+        base: 0.35
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "tribulation_forecast"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+      - effectId: "ascension_success"
+        base: 0.1
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "ascension_success"
+        stackPolicy: "highest"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 0.5
+    learningRequirements:
+      realm: "tribulation"
+      knowledge:
+        - skillId: "heaven.tribulation"
+          level: 2
+        - skillId: "heaven.astrology"
+          level: 2
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []

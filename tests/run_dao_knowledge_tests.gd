@@ -4,14 +4,14 @@ const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd"
 const KnowledgeStudyServiceScript := preload("res://scripts/dao/knowledge_study_service.gd")
 const KnowledgeEffectServiceScript := preload("res://scripts/dao/knowledge_effect_service.gd")
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
-const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 const RealmBalanceServiceScript := preload("res://scripts/sim/realm_balance_service.gd")
 
 
 func _initialize() -> void:
 	DaoTreeServiceScript.reload()
-	CultivationMethodServiceScript.reload()
+	XiulianMethodServiceScript.reload()
 	AbilityServiceScript.reload()
 	var failed := 0
 	failed += _run("prereqs_met", _test_prereqs)
@@ -82,7 +82,7 @@ func _test_cultivation_cycle() -> void:
 		"method_mastery": {},
 		"cultivation_method_slots": {"main": "method.hunyuan.1"},
 	}
-	var result := CultivationMethodServiceScript.apply_cultivation_cycle(savedata, 40.0)
+	var result := XiulianMethodServiceScript.apply_cultivation_cycle(savedata, 40.0)
 	if (result.get("knowledge", []) as Array).is_empty():
 		push_error("cultivation cycle should grant knowledge xp")
 
@@ -102,7 +102,7 @@ func _test_ability_learn() -> void:
 
 func _test_method_slot_weights() -> void:
 	var savedata := {"knowledge": {}, "method_mastery": {}}
-	var result := CultivationMethodServiceScript.build_modifiers({
+	var result := XiulianMethodServiceScript.build_modifiers({
 		"main": "method.hunyuan.1",
 		"support_1": "method.hunyuan.1",
 		"support_2": "method.vajra.1",
@@ -145,10 +145,10 @@ func _test_knowledge_level_effects() -> void:
 		{
 			"skillId": "foundation.breathing",
 			"level": 2,
-			"effectId": "accuracy",
+			"effectId": "damage_bonus",
 			"base": 0.1,
 			"operation": "add_percent",
-			"stackGroup": "test_breathing_accuracy",
+			"stackGroup": "test_breathing_damage_bonus",
 			"stackPolicy": "add_capped",
 			"cap": 0.5,
 		},
@@ -169,9 +169,9 @@ func _test_knowledge_level_effects() -> void:
 	var mods := KnowledgeEffectServiceScript.resolve_modifiers(savedata, rows)
 	var flat := mods.get("flat", {}) as Dictionary
 	var percent := mods.get("percent", {}) as Dictionary
-	if not is_equal_approx(float(flat.get(FightAttr.MP_MAX, 0.0)), 12.0):
+	if not is_equal_approx(float(flat.get(ZhandouAttr.MP_MAX, 0.0)), 12.0):
 		push_error("knowledge level effects should stack learned levels")
-	if not is_equal_approx(float(percent.get(FightAttr.ACCURACY, 0.0)), 0.1):
+	if not is_equal_approx(float(percent.get(ZhandouAttr.DAMAGE_BONUS, 0.0)), 0.1):
 		push_error("knowledge level percent effects should resolve")
 	if (mods.get("unmapped", []) as Array).is_empty():
 		push_error("unmapped knowledge effects should be reported")
@@ -199,7 +199,7 @@ func _test_pm204_starter_pool() -> void:
 			var effect := effect_v as Dictionary
 			if str(effect.get("type", "")) == EnumCombatEffectType.LABEL_DAMAGE:
 				has_output = true
-			if str(effect.get("target", "")) == EnumCombatTarget.LABEL_SELF:
+			if str(effect.get("target", "")) == EnumZhandouTarget.LABEL_SELF:
 				has_defense = true
 	var full_knowledge := {"knowledge": {}}
 	for skill_id in ["spell.projectile", "foundation.control"]:
@@ -236,11 +236,11 @@ func _test_p3_foundation_growth_hooks() -> void:
 	var mods := KnowledgeEffectServiceScript.build_modifiers(savedata)
 	var flat := mods.get("flat", {}) as Dictionary
 	var percent := mods.get("percent", {}) as Dictionary
-	if float(flat.get(FightAttr.HP_MAX, 0.0)) <= 0.0:
+	if float(flat.get(ZhandouAttr.HP_MAX, 0.0)) <= 0.0:
 		push_error("foundation.dao_base should add hp")
-	if float(flat.get(FightAttr.MP_MAX, 0.0)) <= 0.0:
+	if float(flat.get(ZhandouAttr.MP_MAX, 0.0)) <= 0.0:
 		push_error("cultivation.great_cycle should add mp")
-	if float(percent.get(FightAttr.PHYSICAL_DEF, 0.0)) <= 0.0:
+	if float(percent.get(ZhandouAttr.PHYSICAL_DEF, 0.0)) <= 0.0:
 		push_error("body.jade should add physical defense")
 
 

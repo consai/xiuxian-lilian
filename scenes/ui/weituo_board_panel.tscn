@@ -1,0 +1,551 @@
+[gd_scene format=3 uid="uid://dojmbf4eehqau"]
+
+[ext_resource type="Script" uid="uid://c16vdls6gvnf6" path="res://scripts/ui/weituo_board_panel.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_theme"]
+[ext_resource type="Texture2D" uid="uid://bdmliptsqhrxy" path="res://assets/art/ui_new/headlabel.png" id="4_title"]
+[ext_resource type="Texture2D" uid="uid://8mwstvi8kywh" path="res://assets/art/ui_new/btn_close.png" id="5_close"]
+[ext_resource type="PackedScene" uid="uid://88uebn5ox4qs" path="res://scenes/ui/components/weituo_card.tscn" id="6_card"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/weituo_requirement_row.tscn" id="7_req"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/weituo_reward_row.tscn" id="8_reward"]
+[ext_resource type="Texture2D" uid="uid://c3f3nny73kvhg" path="res://assets/art/ui_new/btn_lv.png" id="9_green_btn"]
+[ext_resource type="Texture2D" uid="uid://hwomn6aon70a" path="res://assets/art/ui_new/btn_huang.png" id="10_yellow_btn"]
+[ext_resource type="Texture2D" uid="uid://dq4k3ybmxqrut" path="res://assets/art/ui_new/btn_mihuang.png" id="11_cream_btn"]
+[ext_resource type="Texture2D" uid="uid://cta2iv7f5q3jk" path="res://assets/art/characters/004_cutout_502x512.png" id="12_portrait_b"]
+[ext_resource type="Texture2D" uid="uid://c65hej8mex8pv" path="res://assets/art/characters/005_cutout_311x512.png" id="13_portrait_c"]
+[ext_resource type="Texture2D" uid="uid://c76pqy6eaf2sc" path="res://assets/art/ui_new/shuijing.png" id="15_crystal"]
+[ext_resource type="Texture2D" uid="uid://dxu12rycrumfv" path="res://assets/art/ui_new/lingshi.png" id="16_coin"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="17_title_text"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="18_h1"]
+[ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="19_h2"]
+[ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="20_body"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="21_small"]
+[ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="22_press"]
+
+[sub_resource type="StyleBoxFlat" id="BoardPanel"]
+bg_color = Color(0.95, 0.82, 0.61, 0.96)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.31, 0.19, 0.12, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0.18, 0.09, 0.04, 0.38)
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="InnerPanel"]
+bg_color = Color(1, 0.91, 0.72, 0.73)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.55, 0.35, 0.18, 0.78)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="FilterNormal"]
+bg_color = Color(0.98, 0.89, 0.72, 0.72)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.52, 0.34, 0.19, 0.78)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="HintPanel"]
+bg_color = Color(1, 0.9, 0.7, 0.58)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.35, 0.18, 0.6)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="PopupPanel"]
+bg_color = Color(1, 0.92, 0.76, 0.98)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.31, 0.19, 0.12, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="WeituoBoardPanel" type="Control" unique_id=195298538]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Dimmer" type="ColorRect" parent="." unique_id=313402136]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.67, 0.58, 0.39, 0.18)
+
+[node name="Panel" type="Panel" parent="." unique_id=168215793]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -585.0
+offset_top = -340.0
+offset_right = 585.0
+offset_bottom = 340.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("BoardPanel")
+
+[node name="TitleBack" type="TextureRect" parent="Panel" unique_id=1269227864]
+layout_mode = 0
+offset_left = 392.0
+offset_top = -42.0
+offset_right = 778.0
+offset_bottom = 56.0
+texture = ExtResource("4_title")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="Panel/TitleBack" unique_id=1010659565]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "委 托 榜"
+label_settings = ExtResource("17_title_text")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="TextureButton" parent="Panel" unique_id=1240455284]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1102.0
+offset_top = 24.0
+offset_right = 1158.0
+offset_bottom = 80.0
+texture_normal = ExtResource("5_close")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("22_press")
+
+[node name="HeaderInfo" type="HBoxContainer" parent="Panel" unique_id=643959506]
+layout_mode = 0
+offset_left = 38.0
+offset_top = 46.0
+offset_right = 480.0
+offset_bottom = 80.0
+theme_override_constants/separation = 44
+
+[node name="ActiveLimitLabel" type="Label" parent="Panel/HeaderInfo" unique_id=1024202258]
+unique_name_in_owner = true
+layout_mode = 2
+text = "当前委托  2/3"
+label_settings = ExtResource("20_body")
+vertical_alignment = 1
+
+[node name="RefreshLabel" type="Label" parent="Panel/HeaderInfo" unique_id=1581042533]
+unique_name_in_owner = true
+layout_mode = 2
+text = "刷新：22:18:45"
+label_settings = ExtResource("20_body")
+vertical_alignment = 1
+
+[node name="FilterPanel" type="PanelContainer" parent="Panel" unique_id=10071662]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 96.0
+offset_right = 212.0
+offset_bottom = 619.0
+theme_override_styles/panel = SubResource("InnerPanel")
+
+[node name="Control" type="Control" parent="Panel/FilterPanel" unique_id=1797337392]
+layout_mode = 2
+
+[node name="FilterButtons" type="VBoxContainer" parent="Panel/FilterPanel/Control" unique_id=525305141]
+layout_mode = 0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = 170.0
+offset_bottom = 506.0
+theme_override_constants/separation = 18
+
+[node name="AllFilterButton" type="Button" parent="Panel/FilterPanel/Control/FilterButtons" unique_id=912403875]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+theme_override_styles/normal = SubResource("FilterNormal")
+text = "全部"
+
+[node name="AvailableFilterButton" type="Button" parent="Panel/FilterPanel/Control/FilterButtons" unique_id=182928713]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+theme_override_styles/normal = SubResource("FilterNormal")
+text = "可接受"
+
+[node name="ActiveFilterButton" type="Button" parent="Panel/FilterPanel/Control/FilterButtons" unique_id=1810170644]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+theme_override_styles/normal = SubResource("FilterNormal")
+text = "进行中"
+
+[node name="ReadyFilterButton" type="Button" parent="Panel/FilterPanel/Control/FilterButtons" unique_id=1941114779]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+theme_override_styles/normal = SubResource("FilterNormal")
+text = "可提交"
+
+[node name="CompletedFilterButton" type="Button" parent="Panel/FilterPanel/Control/FilterButtons" unique_id=189616713]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+theme_override_styles/normal = SubResource("FilterNormal")
+text = "已完成"
+
+[node name="ListPanel" type="PanelContainer" parent="Panel" unique_id=1161692969]
+layout_mode = 0
+offset_left = 224.0
+offset_top = 96.0
+offset_right = 748.0
+offset_bottom = 618.0
+theme_override_styles/panel = SubResource("InnerPanel")
+
+[node name="Control" type="Control" parent="Panel/ListPanel" unique_id=1982851617]
+layout_mode = 2
+
+[node name="WeituoScroll" type="ScrollContainer" parent="Panel/ListPanel/Control" unique_id=1538681303]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 8.0
+offset_top = 7.0
+offset_right = 512.0
+offset_bottom = 505.0
+horizontal_scroll_mode = 0
+
+[node name="WeituoList" type="VBoxContainer" parent="Panel/ListPanel/Control/WeituoScroll" unique_id=2030423672]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="CardHerb" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList" unique_id=599992283 instance=ExtResource("6_card")]
+layout_mode = 2
+
+[node name="CardPatrol" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList" unique_id=265798375 instance=ExtResource("6_card")]
+layout_mode = 2
+
+[node name="Portrait" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardPatrol" index="0" unique_id=2124828308]
+texture = ExtResource("12_portrait_b")
+
+[node name="TitleLabel" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardPatrol/TextBox/TitleRow" parent_id_path=PackedInt32Array(265798375, 139392510) index="0" unique_id=1469543339]
+text = "巡青岚山路"
+
+[node name="StateBadge" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardPatrol/TextBox/TitleRow" parent_id_path=PackedInt32Array(265798375, 139392510) index="1" unique_id=1806083822]
+text = "进行中"
+
+[node name="IssuerLabel" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardPatrol/TextBox" parent_id_path=PackedInt32Array(265798375, 623967933) index="1" unique_id=820941451]
+text = "青岚山路近日妖兽出没，烦请清理。"
+
+[node name="SummaryLabel" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardPatrol/TextBox" parent_id_path=PackedInt32Array(265798375, 623967933) index="2" unique_id=1576228943]
+text = "巡山进度 2/3"
+
+[node name="CardCollect" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList" unique_id=1233997766 instance=ExtResource("6_card")]
+layout_mode = 2
+
+[node name="Portrait" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardCollect" index="0" unique_id=2124828308]
+texture = ExtResource("13_portrait_c")
+
+[node name="TitleLabel" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardCollect/TextBox/TitleRow" parent_id_path=PackedInt32Array(1233997766, 139392510) index="0" unique_id=1469543339]
+text = "收集灵草"
+
+[node name="IssuerLabel" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardCollect/TextBox" parent_id_path=PackedInt32Array(1233997766, 623967933) index="1" unique_id=820941451]
+text = "听闻灵草可炼丹所用，望道友相助。"
+
+[node name="SummaryLabel" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardCollect/TextBox" parent_id_path=PackedInt32Array(1233997766, 623967933) index="2" unique_id=1576228943]
+text = "灵草 0/8"
+
+[node name="EmptyMore" type="PanelContainer" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList" unique_id=18740826]
+custom_minimum_size = Vector2(0, 62)
+layout_mode = 2
+theme_override_styles/panel = SubResource("HintPanel")
+
+[node name="Text" type="Label" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/EmptyMore" unique_id=1622491588]
+layout_mode = 2
+text = "今日暂无更多委托"
+label_settings = ExtResource("20_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DetailPanel" type="PanelContainer" parent="Panel" unique_id=1369834764]
+layout_mode = 0
+offset_left = 764.0
+offset_top = 96.0
+offset_right = 1142.0
+offset_bottom = 618.0
+theme_override_styles/panel = SubResource("InnerPanel")
+
+[node name="Control" type="Control" parent="Panel/DetailPanel" unique_id=467154270]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/DetailPanel/Control" unique_id=1178031761]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 11.0
+offset_top = 10.0
+offset_right = -5.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DetailVBox" type="VBoxContainer" parent="Panel/DetailPanel/Control/ScrollContainer" unique_id=1856911485]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DetailTitle" type="Label" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox" unique_id=479861028]
+unique_name_in_owner = true
+layout_mode = 2
+text = "采药急件"
+label_settings = ExtResource("18_h1")
+
+[node name="DetailIssuer" type="Label" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox" unique_id=1383862570]
+unique_name_in_owner = true
+layout_mode = 2
+text = "发布者：清风洞府"
+label_settings = ExtResource("20_body")
+
+[node name="DetailDesc" type="RichTextLabel" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox" unique_id=1361191646]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+bbcode_enabled = true
+text = "宗门药房急需一批草药，望道友相助。"
+fit_content = true
+scroll_active = false
+
+[node name="RequirementHeading" type="Label" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox" unique_id=1525535042]
+layout_mode = 2
+text = "需求物品"
+label_settings = ExtResource("19_h2")
+
+[node name="RequirementList" type="VBoxContainer" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox" unique_id=596684555]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RequirementLeaf" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RequirementList" unique_id=2009665862 instance=ExtResource("7_req")]
+layout_mode = 2
+
+[node name="RequirementMushroom" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RequirementList" unique_id=1576374671 instance=ExtResource("7_req")]
+layout_mode = 2
+
+[node name="NameLabel" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RequirementList/RequirementMushroom/HBox" index="1"]
+text = "灵芝"
+
+[node name="CountLabel" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RequirementList/RequirementMushroom/HBox" index="2"]
+text = "2/2"
+
+[node name="RewardHeading" type="Label" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox" unique_id=1541682465]
+layout_mode = 2
+text = "奖励预览"
+label_settings = ExtResource("19_h2")
+
+[node name="RewardList" type="HBoxContainer" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox" unique_id=1582220974]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="RewardLeaf" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList" unique_id=456530463 instance=ExtResource("8_reward")]
+layout_mode = 2
+
+[node name="RewardCrystal" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList" unique_id=1120164446 instance=ExtResource("8_reward")]
+layout_mode = 2
+
+[node name="Icon" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCrystal/VBox" index="0"]
+texture = ExtResource("15_crystal")
+
+[node name="NameLabel" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCrystal/VBox" index="1"]
+text = "晶石"
+
+[node name="CountLabel" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCrystal/VBox" index="2"]
+text = "20"
+
+[node name="RewardCoin" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList" unique_id=598914894 instance=ExtResource("8_reward")]
+layout_mode = 2
+
+[node name="Icon" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCoin/VBox" index="0"]
+texture = ExtResource("16_coin")
+
+[node name="NameLabel" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCoin/VBox" index="1"]
+text = "灵石"
+
+[node name="CountLabel" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCoin/VBox" index="2"]
+text = "500"
+
+[node name="StateHint" type="Label" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox" unique_id=1798437352]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "委托已完成，可提交奖励。"
+label_settings = ExtResource("20_body")
+vertical_alignment = 2
+autowrap_mode = 2
+
+[node name="ActionButtons" type="HBoxContainer" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox" unique_id=982250838]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="SubmitButton" type="TextureButton" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/ActionButtons" unique_id=1938947176]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 52)
+layout_mode = 2
+texture_normal = ExtResource("9_green_btn")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("22_press")
+
+[node name="Label" type="Label" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/ActionButtons/SubmitButton" unique_id=483565849]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "提交"
+label_settings = ExtResource("20_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AbandonButton" type="TextureButton" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/ActionButtons" unique_id=1214558325]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 52)
+layout_mode = 2
+texture_normal = ExtResource("10_yellow_btn")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("22_press")
+
+[node name="Label" type="Label" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/ActionButtons/AbandonButton" unique_id=1493509924]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "放弃"
+label_settings = ExtResource("20_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AcceptButton" type="TextureButton" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/ActionButtons" unique_id=1836989280]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 52)
+layout_mode = 2
+texture_normal = ExtResource("11_cream_btn")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("22_press")
+
+[node name="Label" type="Label" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/ActionButtons/AcceptButton" unique_id=1124724130]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "接受"
+label_settings = ExtResource("20_body")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FooterHint" type="Label" parent="Panel" unique_id=263761893]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 298.0
+offset_top = 630.0
+offset_right = 872.0
+offset_bottom = 662.0
+text = "完成委托可获得奖励，活跃度每日刷新。"
+label_settings = ExtResource("21_small")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ConfirmAbandonPopup" type="PanelContainer" parent="." unique_id=1012561409]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -190.0
+offset_top = -90.0
+offset_right = 190.0
+offset_bottom = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("PopupPanel")
+
+[node name="VBox" type="VBoxContainer" parent="ConfirmAbandonPopup" unique_id=404625851]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="ConfirmText" type="Label" parent="ConfirmAbandonPopup/VBox" unique_id=808146362]
+layout_mode = 2
+text = "放弃此委托？当前进度会清空。"
+label_settings = ExtResource("20_body")
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Buttons" type="HBoxContainer" parent="ConfirmAbandonPopup/VBox" unique_id=400799935]
+layout_mode = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="CancelAbandonButton" type="Button" parent="ConfirmAbandonPopup/VBox/Buttons" unique_id=855290420]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+text = "取消"
+
+[node name="ConfirmAbandonButton" type="Button" parent="ConfirmAbandonPopup/VBox/Buttons" unique_id=2103171783]
+custom_minimum_size = Vector2(120, 44)
+layout_mode = 2
+text = "放弃"
+
+[editable path="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardHerb"]
+[editable path="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardPatrol"]
+[editable path="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardCollect"]
+[editable path="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RequirementList/RequirementLeaf"]
+[editable path="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RequirementList/RequirementMushroom"]
+[editable path="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardLeaf"]
+[editable path="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCrystal"]
+[editable path="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCoin"]

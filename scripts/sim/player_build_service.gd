@@ -2,7 +2,7 @@ class_name PlayerBuildService
 extends RefCounted
 
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
-const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
 const TagServiceScript := preload("res://scripts/sim/tag_service.gd")
 
@@ -86,7 +86,7 @@ static func _equipped_methods(savedata: Dictionary) -> Array:
 	var out: Array = []
 	var slots := savedata.get("cultivation_method_slots", {}) as Dictionary
 	for key in ["main", "support_1", "support_2", "movement"]:
-		var row := CultivationMethodServiceScript.by_id(str(slots.get(key, "")))
+		var row := XiulianMethodServiceScript.by_id(str(slots.get(key, "")))
 		if not row.is_empty():
 			out.append(row)
 	return out

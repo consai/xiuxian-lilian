@@ -1,7 +1,7 @@
 class_name WorldMapDataValidator
 extends RefCounted
 
-const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
+const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
 const WorldMapServiceScript := preload("res://scripts/map/world_map_service.gd")
 
 
@@ -44,9 +44,9 @@ static func collect_errors() -> PackedStringArray:
 		var region := WorldMapServiceScript.wilderness_region_by_id(str(region_id))
 		if str(region.get("name", "")).strip_edges() == "":
 			errors.append("野外区域 %s 缺少 name" % region_id)
-		var expedition_id := str(region.get("expedition_location_id", "")).strip_edges()
-		if expedition_id != "" and not LocationServiceScript.has_location(expedition_id):
-			errors.append("野外区域 %s 的 expedition_location_id 不存在: %s" % [region_id, expedition_id])
+		var lilian_id := str(region.get("lilian_location_id", "")).strip_edges()
+		if lilian_id != "" and not DidianServiceScript.has_location(lilian_id):
+			errors.append("野外区域 %s 的 lilian_location_id 不存在: %s" % [region_id, lilian_id])
 		var min_difficulty := maxi(1, int(region.get("min_difficulty", 1)))
 		var max_difficulty := int(region.get("max_difficulty", 0))
 		if max_difficulty > 0 and max_difficulty < min_difficulty:
@@ -64,9 +64,9 @@ static func collect_errors() -> PackedStringArray:
 			errors.append("野外地点 %s 缺少 parent_region" % location_id)
 		elif parent not in region_ids:
 			errors.append("野外地点 %s 的 parent_region 不存在: %s" % [location_id, parent])
-		var expedition_id := str(row.get("expedition_location_id", "")).strip_edges()
-		if expedition_id != "" and not LocationServiceScript.has_location(expedition_id):
-			errors.append("野外地点 %s 的 expedition_location_id 不存在: %s" % [location_id, expedition_id])
+		var lilian_id := str(row.get("lilian_location_id", "")).strip_edges()
+		if lilian_id != "" and not DidianServiceScript.has_location(lilian_id):
+			errors.append("野外地点 %s 的 lilian_location_id 不存在: %s" % [location_id, lilian_id])
 		var pos_v: Variant = row.get("position", [])
 		if not pos_v is Array or (pos_v as Array).size() < 2:
 			errors.append("野外地点 %s 缺少有效 position" % location_id)

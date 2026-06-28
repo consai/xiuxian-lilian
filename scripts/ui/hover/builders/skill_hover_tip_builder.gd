@@ -62,7 +62,7 @@ static func build_from_runtime(cfg: Dictionary, icon: Texture2D = null) -> Dicti
 	if icon != null:
 		payload_fields["icon"] = icon
 	elif cfg.has("icon"):
-		var tex := BattleInitData._resolve_icon_texture(cfg)
+		var tex := ZhandouInitData._resolve_icon_texture(cfg)
 		if tex != null:
 			payload_fields["icon"] = tex
 	return HoverTipPayload.make(payload_fields)
@@ -80,7 +80,10 @@ static func build_ability(ability_id: String, savedata: Dictionary, icon: Textur
 	var desc := str(ability.get("description", "")).strip_edges()
 	if desc != "":
 		lines.append(desc)
-	lines.append("类型：%s" % ability_type_label(str(ability.get("type", ""))))
+	var ability_type := str(ability.get("type", ""))
+	lines.append("类型：%s" % ability_type_label(ability_type))
+	for policy_line in _ability_policy_lines(ability_type):
+		lines.append(policy_line)
 	var realm := str(ability.get("realm", "")).strip_edges()
 	if realm != "":
 		lines.append("境界：%s" % DaoTreeServiceScript.realm_display_name(realm))
@@ -122,7 +125,7 @@ static func build_ability(ability_id: String, savedata: Dictionary, icon: Textur
 	if icon != null:
 		payload_fields["icon"] = icon
 	elif not runtime.is_empty() and runtime.has("icon"):
-		var tex := BattleInitData._resolve_icon_texture(runtime)
+		var tex := ZhandouInitData._resolve_icon_texture(runtime)
 		if tex != null:
 			payload_fields["icon"] = tex
 	return HoverTipPayload.make(payload_fields)
@@ -133,13 +136,25 @@ static func ability_type_label(type_name: String) -> String:
 		"combat_active":
 			return "主动"
 		"combat_upkeep":
-			return "持续"
+			return "主动·持续"
 		"combat_passive":
 			return "战斗被动"
 		"general_passive":
 			return "通用被动"
 		_:
 			return "技能"
+
+
+static func _ability_policy_lines(type_name: String) -> Array[String]:
+	match type_name:
+		"combat_passive":
+			return ["生效：学会后立即生效（仅战斗属性，不占技能栏）"]
+		"general_passive":
+			return ["生效：学会后立即生效（通用加成，不占技能栏）"]
+		"combat_upkeep":
+			return ["操作：战斗中手动开关；开启消耗一次行动，关闭不消耗行动"]
+		_:
+			return []
 
 
 static func _tag_labels(tags: Array) -> Array[String]:

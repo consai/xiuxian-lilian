@@ -30,7 +30,6 @@ benchmark_enemies:
     physical_def: 16
     magic_def: 19
     spd: 92
-    accuracy: 88
     control_power: 50
     control_resist: 60
   qi_elite:
@@ -41,7 +40,6 @@ benchmark_enemies:
     physical_def: 18
     magic_def: 22
     spd: 98
-    accuracy: 95
     control_power: 80
     control_resist: 90
   foundation_normal:
@@ -52,7 +50,6 @@ benchmark_enemies:
     physical_def: 26
     magic_def: 31
     spd: 108
-    accuracy: 115
     control_power: 105
     control_resist: 110
 encounter_bands:

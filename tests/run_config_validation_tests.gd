@@ -1,9 +1,9 @@
 extends SceneTree
 
 const ConfigValidatorScript := preload("res://scripts/core/config_validator.gd")
-const ExpeditionDataValidatorScript := preload("res://scripts/expedition/expedition_data_validator.gd")
-const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
-const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
+const LilianDataValidatorScript := preload("res://scripts/lilian/lilian_data_validator.gd")
+const LilianEventServiceScript := preload("res://scripts/lilian/lilian_event_service.gd")
+const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
 const RealmBalanceServiceScript := preload("res://scripts/sim/realm_balance_service.gd")
 const TagServiceScript := preload("res://scripts/sim/tag_service.gd")
 const DropPoolServiceScript := preload("res://scripts/sim/drop_pool_service.gd")
@@ -62,7 +62,7 @@ func _test_realm_balance_covers_simulation_realms() -> void:
 	var qi := RealmBalanceServiceScript.major_realm_by_id("qi")
 	_expect_eq(str(qi.get("name", "")), "炼气", "qi realm configured")
 	var mods := RealmBalanceServiceScript.realm_flat_modifiers(2)
-	_expect_near(float(mods.get(FightAttr.HP_MAX, 0.0)), 60.0, "realm layer hp modifier")
+	_expect_near(float(mods.get(ZhandouAttr.HP_MAX, 0.0)), 60.0, "realm layer hp modifier")
 
 
 func _test_realm_threshold_formula() -> void:
@@ -116,7 +116,7 @@ func _test_item_categories() -> void:
 
 
 func _test_location_service_cached() -> void:
-	var location: Dictionary = LocationServiceScript.by_id("qinglan_mountain")
+	var location: Dictionary = DidianServiceScript.by_id("qinglan_mountain")
 	_expect_true(not location.is_empty(), "location loaded from cache")
 	_expect_eq(str(location.get("name", "")), "青岚山脉", "location name")
 
@@ -128,13 +128,13 @@ func _test_modular_location_validator_rejects_legacy_fields() -> void:
 		"event_pool": ["qinglan_wolf"],
 		"enemy_pools": {},
 		"drop_pools": {},
-		"expedition_mode": "resource",
+		"lilian_mode": "resource",
 		"common_event_generation": {},
 		"common_event_pool": [],
 		"map_event_pool": [],
 	}
-	var errors: PackedStringArray = ExpeditionDataValidatorScript._validate_location(legacy, "legacy_location")
-	_expect_true(_has_error_containing(errors, "旧字段 expedition_mode"), "rejects expedition_mode")
+	var errors: PackedStringArray = LilianDataValidatorScript._validate_location(legacy, "legacy_location")
+	_expect_true(_has_error_containing(errors, "旧字段 lilian_mode"), "rejects lilian_mode")
 	_expect_true(_has_error_containing(errors, "旧字段 common_event_generation"), "rejects generation")
 	_expect_true(_has_error_containing(errors, "旧字段 common_event_pool"), "rejects common pool")
 	_expect_true(_has_error_containing(errors, "旧字段 map_event_pool"), "rejects map pool")
@@ -142,7 +142,7 @@ func _test_modular_location_validator_rejects_legacy_fields() -> void:
 
 func _test_runtime_event_cache_does_not_pollute_config_validation() -> void:
 	var data_store := root.get_node("DataStore")
-	var runtime := data_store.expedition_runtime() as Dictionary
+	var runtime := data_store.lilian_runtime() as Dictionary
 	runtime["active"] = true
 	runtime["generated_events"] = {
 		"qinglan_wolf": {
@@ -156,7 +156,7 @@ func _test_runtime_event_cache_does_not_pollute_config_validation() -> void:
 		},
 	}
 	var errors: PackedStringArray = ConfigValidatorScript.collect_all_errors(_config_manager(), root.get_node("GameState"))
-	data_store.reset_expedition_runtime()
+	data_store.reset_lilian_runtime()
 	_expect_true(not _has_error_containing(errors, "qinglan_wolf 使用了旧字段 difficulty"), "runtime difficulty does not pollute static validation")
 	_expect_true(not _has_error_containing(errors, "qinglan_wolf 的 location_id"), "runtime location does not pollute static validation")
 
@@ -173,7 +173,7 @@ func _test_tag_service_aggregates_tags() -> void:
 
 
 func _test_drop_pool_service_deterministic() -> void:
-	var event := ExpeditionEventServiceScript.by_id("blackwater_marsh__gather_herbs")
+	var event := LilianEventServiceScript.by_id("blackwater_marsh__gather_herbs")
 	var rewards_a := DropPoolServiceScript.roll_event_rewards(event, _rng(9090))
 	var rewards_b := DropPoolServiceScript.roll_event_rewards(event, _rng(9090))
 	_expect_eq(rewards_a, rewards_b, "same seed same modular drop")

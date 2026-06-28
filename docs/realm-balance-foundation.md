@@ -12,7 +12,7 @@
 
 | 区块 | 用途 |
 |---|---|
-| `rules` | 记录防御、命中、控制和速度的全局常数。当前运行时常数仍在 `FightAttr` / `CombatBalance` 中定义，本区块是设计基准与后续迁移入口。 |
+| `rules` | 记录防御、命中、控制和速度的全局常数。当前运行时常数仍在 `ZhandouAttr` / `ZhandouBalance` 中定义，本区块是设计基准与后续迁移入口。 |
 | `major_realms` | 大境界顺序、内容系数与普通/精英/Boss 战目标时长。 |
 | `player_level_curve` | 人物内容等级、每级根基成长、大境界脉冲和标准面板生成规则。 |
 | `monster_design_baseline` | 怪物以标准玩家为母板时的强度换算、模板系数与 Boss 预算约束。 |

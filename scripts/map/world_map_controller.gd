@@ -5,7 +5,7 @@ signal wilderness_entry_requested(region_id: String)
 signal return_requested
 
 const WorldMapServiceScript := preload("res://scripts/map/world_map_service.gd")
-const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
+const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
 
 const _ROUTE_COLORS := {
 	"hidden": Color(0.48, 0.34, 0.2, 0.0),
@@ -147,9 +147,9 @@ func enter_wilderness(region_id: String, options: Dictionary = {}) -> void:
 	if not _apply_difficulty_override(location_id, options):
 		return
 	wilderness_entry_requested.emit(region_id)
-	var nav := SceneManager.start_expedition(location_id)
+	var nav := SceneManager.start_lilian(location_id)
 	if not bool(nav.get("ok", false)):
-		DataStore.expedition_runtime().erase("difficulty_override")
+		DataStore.lilian_runtime().erase("difficulty_override")
 
 
 func enter_wilderness_location(location_id: String, options: Dictionary = {}) -> void:
@@ -157,18 +157,18 @@ func enter_wilderness_location(location_id: String, options: Dictionary = {}) ->
 	var can_enter := WorldMapServiceScript.can_enter_wilderness_location(location_id, map_data)
 	if not bool(can_enter.get("ok", false)):
 		return
-	var expedition_id := str(can_enter.get("location_id", ""))
-	if not _apply_difficulty_override(expedition_id, options):
+	var lilian_id := str(can_enter.get("location_id", ""))
+	if not _apply_difficulty_override(lilian_id, options):
 		return
 	wilderness_entry_requested.emit(location_id)
-	var nav := SceneManager.start_expedition(expedition_id)
+	var nav := SceneManager.start_lilian(lilian_id)
 	if not bool(nav.get("ok", false)):
-		DataStore.expedition_runtime().erase("difficulty_override")
+		DataStore.lilian_runtime().erase("difficulty_override")
 
 
 func _apply_difficulty_override(location_id: String, options: Dictionary) -> bool:
 	if not options.has("min_difficulty") and not options.has("max_difficulty"):
-		DataStore.expedition_runtime().erase("difficulty_override")
+		DataStore.lilian_runtime().erase("difficulty_override")
 		return true
 	var clamped := WorldMapServiceScript.clamp_difficulty_options(
 		location_id,
@@ -177,7 +177,7 @@ func _apply_difficulty_override(location_id: String, options: Dictionary) -> boo
 	)
 	if not bool(clamped.get("ok", false)):
 		return false
-	DataStore.expedition_runtime()["difficulty_override"] = {
+	DataStore.lilian_runtime()["difficulty_override"] = {
 		"min_difficulty": int(clamped.get("min_difficulty", 1)),
 		"max_difficulty": int(clamped.get("max_difficulty", 1)),
 	}
@@ -194,7 +194,7 @@ func close_popups() -> void:
 func _on_return_pressed() -> void:
 	if TutorialService.is_waiting_for_any([
 		"tutorial.wolf_valley_selected",
-		"tutorial.expedition_started",
+		"tutorial.lilian_started",
 	]):
 		return
 	return_requested.emit()

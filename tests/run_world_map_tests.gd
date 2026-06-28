@@ -39,7 +39,7 @@ func _run(name: String, test: Callable) -> void:
 
 func _reset_game() -> void:
 	root.get_node("GameState").new_game()
-	root.get_node("ExpeditionState").reset()
+	root.get_node("LilianState").reset()
 	root.get_node("DataStore").reset_scene_runtime()
 
 
@@ -98,12 +98,12 @@ func _test_go_world_map_allowed() -> void:
 
 func _test_go_world_map_blocked() -> void:
 	_reset_game()
-	var expedition := root.get_node("ExpeditionState")
-	var started: Dictionary = expedition.start("qinglan_mountain", root.get_node("GameState"), 88)
+	var lilian := root.get_node("LilianState")
+	var started: Dictionary = lilian.start("qinglan_mountain", root.get_node("GameState"), 88)
 	_expect_true(bool(started.get("ok", false)), "expedition started")
 	var nav: Dictionary = root.get_node("SceneManager").go_world_map()
 	_expect_false(bool(nav.get("ok", true)), "world map blocked")
-	_expect_true(expedition.active, "expedition still active")
+	_expect_true(lilian.active, "expedition still active")
 
 
 func _test_travel_discovers_nearby_regions() -> void:

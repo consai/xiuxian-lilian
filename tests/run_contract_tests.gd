@@ -11,8 +11,8 @@ func _init() -> void:
 
 
 func _run_all() -> void:
-	_run("expedition result rejects missing settlement_id", _test_expedition_result_missing_id)
-	_run("expedition result accepts valid payload", _test_expedition_result_valid)
+	_run("expedition result rejects missing settlement_id", _test_lilian_jiesuan_missing_id)
+	_run("expedition result accepts valid payload", _test_lilian_jiesuan_valid)
 	_run("battle summary rejects invalid outcome", _test_battle_summary_invalid_outcome)
 	_run("reward entry rejects empty item id", _test_reward_entry_invalid)
 	_run("tip intent accepts reward channels", _test_tip_intent_reward_channels)
@@ -36,9 +36,9 @@ func _run(name: String, test: Callable) -> void:
 		print("PASS: %s" % name)
 
 
-func _test_expedition_result_missing_id() -> void:
-	var errors := ExpeditionResult.collect_errors({
-		"exit_reason": ExpeditionResult.EXIT_MANUAL,
+func _test_lilian_jiesuan_missing_id() -> void:
+	var errors := LilianResult.collect_errors({
+		"exit_reason": LilianResult.EXIT_MANUAL,
 		"elapsed_days": 1,
 		"stats": {},
 		"loot": [],
@@ -47,10 +47,10 @@ func _test_expedition_result_missing_id() -> void:
 	_expect_true(not errors.is_empty(), "missing settlement_id rejected")
 
 
-func _test_expedition_result_valid() -> void:
-	var errors := ExpeditionResult.collect_errors({
+func _test_lilian_jiesuan_valid() -> void:
+	var errors := LilianResult.collect_errors({
 		"settlement_id": "expedition_test_1",
-		"exit_reason": ExpeditionResult.EXIT_MANUAL,
+		"exit_reason": LilianResult.EXIT_MANUAL,
 		"elapsed_days": 1,
 		"stats": {"steps": 0},
 		"loot": [{"kind": "item", "id": "items_LingCao", "count": 1}],
@@ -60,7 +60,7 @@ func _test_expedition_result_valid() -> void:
 
 
 func _test_battle_summary_invalid_outcome() -> void:
-	var errors := BattleSummary.collect_errors({"outcome": "unknown"})
+	var errors := ZhandouSummary.collect_errors({"outcome": "unknown"})
 	_expect_true(not errors.is_empty(), "invalid outcome rejected")
 
 
@@ -87,7 +87,7 @@ func _test_reward_tip_builder_channels() -> void:
 
 
 func _test_scene_payload_invalid_reason() -> void:
-	var payload := ScenePayload.expedition_result("invalid_reason")
+	var payload := ScenePayload.lilian_jiesuan("invalid_reason")
 	_expect_true(payload.is_empty(), "invalid reason payload rejected")
 
 

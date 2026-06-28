@@ -1,19 +1,19 @@
 extends SceneTree
 
-const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
-const ExpeditionRewardServiceScript := preload("res://scripts/expedition/expedition_reward_service.gd")
+const LilianEventServiceScript := preload("res://scripts/lilian/lilian_event_service.gd")
+const LilianRewardServiceScript := preload("res://scripts/lilian/lilian_reward_service.gd")
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
-const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
+const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
 const KnowledgeEffectServiceScript := preload("res://scripts/dao/knowledge_effect_service.gd")
-const BreakthroughServiceScript := preload("res://scripts/sim/breakthrough_service.gd")
-const AlchemyServiceScript := preload("res://scripts/sim/alchemy_service.gd")
+const TupoServiceScript := preload("res://scripts/sim/tupo_service.gd")
+const LiandanServiceScript := preload("res://scripts/sim/liandan_service.gd")
 const PlayerAutoBattleServiceScript := preload("res://scripts/sim/player_auto_battle_service.gd")
 const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
-const EnemyAiPolicyPlayerAutoScript := preload("res://scripts/fight/ai/enemy_ai_policy_player_auto.gd")
-const EnemyAiContextScript := preload("res://scripts/fight/ai/enemy_ai_context.gd")
+const EnemyAiPolicyPlayerAutoScript := preload("res://scripts/zhandou/ai/enemy_ai_policy_player_auto.gd")
+const EnemyAiContextScript := preload("res://scripts/zhandou/ai/enemy_ai_context.gd")
 var _failures: Array[String] = []
 var _tests_run := 0
 
@@ -42,19 +42,19 @@ func _run_all() -> void:
 	_run("alchemy steady strategy beats supreme on success rate", _test_alchemy_steady_strategy_ordering)
 	_run("alchemy batch count respects inventory and furnace", _test_alchemy_batch_count)
 	_run("pre-foundation resource loop stays bounded", _test_pre_foundation_resource_loop)
-	_run("battle runtime deducts inventory", _test_battle_runtime_deducts_inventory)
+	_run("zhandou runtime deducts inventory", _test_zhandou_runtime_deducts_inventory)
 	_run("transfer item respects stack cap", _test_transfer_item_stack_cap)
-	_run("expedition events build valid battle data", _test_expedition_events_build_valid_battle_data)
+	_run("lilian events build valid battle data", _test_expedition_events_build_valid_battle_data)
 	_run("enemies preserve explicit combat attributes", _test_enemies_preserve_explicit_combat_attrs)
 	_run("reward pools produce legal rewards", _test_reward_pools)
-	_run("expedition defeat settlement persists runtime state", _test_expedition_defeat_settlement)
+	_run("lilian defeat settlement persists runtime state", _test_expedition_defeat_settlement)
 	_run("three save slots round trip", _test_save_round_trip)
 	_run("game state save and load via autoload", _test_game_state_save_load)
 	_run("find latest save slot", _test_find_latest_slot)
 	_run("bootstrap does not auto load save on startup", _test_bootstrap_savedata)
 	_run("auto save slot restrictions", _test_auto_save_slot_restrictions)
-	_run("expedition settlement auto saves", _test_expedition_settlement_auto_saves)
-	_run("save blocked during expedition", _test_save_blocked_during_expedition)
+	_run("lilian settlement auto saves", _test_lilian_jiesuan_auto_saves)
+	_run("save blocked during lilian", _test_save_blocked_during_expedition)
 	_run("save service rejects corrupt data", _test_corrupt_save)
 	if _failures.is_empty():
 		print("PASS: %d simulation tests" % _tests_run)
@@ -79,8 +79,8 @@ func _state() -> Node:
 	return state
 
 
-func _expedition() -> Node:
-	return root.get_node("ExpeditionState")
+func _lilian() -> Node:
+	return root.get_node("LilianState")
 
 
 func _save_service() -> Node:
@@ -97,24 +97,24 @@ func _test_new_game_and_daily_activities() -> void:
 	_expect_eq(state.injury_days, 2, "cultivation reduces injury by one day")
 	state.hp = 1.0
 	state.rest()
-	_expect_near(state.hp, FightAttr.get_attr(state.attrs, FightAttr.HP_MAX), "rest hp")
+	_expect_near(state.hp, ZhandouAttr.get_attr(state.attrs, ZhandouAttr.HP_MAX), "rest hp")
 	_expect_eq(state.injury_days, 0, "rest injury reduction")
 	state.new_game()
-	var base_hp_max: float = FightAttr.get_attr(state.attrs, FightAttr.HP_MAX)
+	var base_hp_max: float = ZhandouAttr.get_attr(state.attrs, ZhandouAttr.HP_MAX)
 	var base_body := float(state.foundations.get(CharacterStatsScript.BODY, 0.0))
 	state.cultivation = state.breakthrough_at
 	_expect_true(not state.can_breakthrough(), "same major realm does not need breakthrough")
 	_expect_eq(state._auto_advance_layers(), 1, "layer auto advance to qi 2")
 	_expect_eq(state.realm_name, "炼气二层", "auto advanced to qi layer 2")
 	_expect_true(
-		FightAttr.get_attr(state.attrs, FightAttr.HP_MAX) >= base_hp_max + 6.0,
+		ZhandouAttr.get_attr(state.attrs, ZhandouAttr.HP_MAX) >= base_hp_max + 6.0,
 		"layer advance raises hp max"
 	)
 	state.cultivation = state.breakthrough_at
 	_expect_eq(state._auto_advance_layers(), 1, "layer auto advance to qi 3")
 	_expect_eq(state.realm_name, "炼气三层", "auto advanced to qi layer 3")
 	_expect_true(
-		FightAttr.get_attr(state.attrs, FightAttr.HP_MAX) >= base_hp_max + 12.0,
+		ZhandouAttr.get_attr(state.attrs, ZhandouAttr.HP_MAX) >= base_hp_max + 12.0,
 		"second layer advance raises hp max"
 	)
 	state.realm_index = 8
@@ -127,7 +127,7 @@ func _test_new_game_and_daily_activities() -> void:
 	_expect_eq(state.realm_name, "筑基初期", "breakthrough to foundation")
 	_expect_near(float(state.foundations.get(CharacterStatsScript.BODY, 0.0)), base_body + 1.0, "breakthrough grows body")
 	_expect_true(
-		FightAttr.get_attr(state.attrs, FightAttr.HP_MAX) >= base_hp_max + 59.0,
+		ZhandouAttr.get_attr(state.attrs, ZhandouAttr.HP_MAX) >= base_hp_max + 59.0,
 		"major breakthrough raises hp max"
 	)
 
@@ -152,9 +152,9 @@ func _test_main_method_replacement_and_passive_practice() -> void:
 		"main method slot replaced"
 	)
 	var store := root.get_node("DataStore")
-	var mastery_before := CultivationMethodServiceScript.method_mastery(store.savedata, replacement_id)
+	var mastery_before := XiulianMethodServiceScript.method_mastery(store.savedata, replacement_id)
 	state.rest()
-	var mastery_after := CultivationMethodServiceScript.method_mastery(store.savedata, replacement_id)
+	var mastery_after := XiulianMethodServiceScript.method_mastery(store.savedata, replacement_id)
 	_expect_gt(mastery_after, mastery_before, "resting day passively practices current method")
 
 
@@ -182,13 +182,13 @@ func _test_foundations_derive_combat_attributes() -> void:
 		CharacterStatsScript.SENSE: 10,
 		CharacterStatsScript.AGILITY: 10,
 	})
-	_expect_near(FightAttr.get_attr(attrs, FightAttr.HP_MAX), 100.0, "derived hp")
-	_expect_near(FightAttr.get_attr(attrs, FightAttr.MP_MAX), 100.0, "derived mp")
-	_expect_near(FightAttr.get_attr(attrs, FightAttr.PHYSICAL_ATK), 30.0, "derived physical attack")
-	_expect_near(FightAttr.get_attr(attrs, FightAttr.MAGIC_ATK), 32.0, "derived magic attack")
-	_expect_near(FightAttr.get_attr(attrs, FightAttr.PHYSICAL_DEF), 20.0, "derived physical defense")
-	_expect_near(FightAttr.get_attr(attrs, FightAttr.MAGIC_DEF), 24.0, "derived magic defense")
-	_expect_near(FightAttr.get_attr(attrs, FightAttr.SPD), 100.0, "derived action speed")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.HP_MAX), 100.0, "derived hp")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.MP_MAX), 100.0, "derived mp")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.PHYSICAL_ATK), 30.0, "derived physical attack")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.MAGIC_ATK), 32.0, "derived magic attack")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.PHYSICAL_DEF), 20.0, "derived physical defense")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.MAGIC_DEF), 24.0, "derived magic defense")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.SPD), 100.0, "derived action speed")
 
 
 func _test_knowledge_effects_feed_attrs() -> void:
@@ -211,37 +211,37 @@ func _test_knowledge_effects_feed_attrs() -> void:
 	state.grant_knowledge("foundation.breathing", 2)
 	KnowledgeEffectServiceScript.replace_effects_for_tests([])
 	state.refresh_derived_attrs(true)
-	var baseline := FightAttr.get_attr(state.attrs, FightAttr.MP_MAX)
+	var baseline := ZhandouAttr.get_attr(state.attrs, ZhandouAttr.MP_MAX)
 	KnowledgeEffectServiceScript.replace_effects_for_tests(rows)
 	state.refresh_derived_attrs(true)
 	_expect_near(
-		FightAttr.get_attr(state.attrs, FightAttr.MP_MAX),
+		ZhandouAttr.get_attr(state.attrs, ZhandouAttr.MP_MAX),
 		baseline + 9.0,
 		"knowledge effect feeds GameState derived attrs"
 	)
 	KnowledgeEffectServiceScript.reload()
 	state.refresh_derived_attrs(true)
-	_expect_true(FightAttr.get_attr(state.attrs, FightAttr.MP_MAX) >= baseline, "production knowledge config restores safely")
+	_expect_true(ZhandouAttr.get_attr(state.attrs, ZhandouAttr.MP_MAX) >= baseline, "production knowledge config restores safely")
 
 
 func _test_cultivation_methods() -> void:
 	var state := _state()
 	_expect_eq(state.cultivate(), 8, "starter main method enables cultivation")
-	var before_mp := FightAttr.get_attr(state.attrs, FightAttr.MP_MAX)
+	var before_mp := ZhandouAttr.get_attr(state.attrs, ZhandouAttr.MP_MAX)
 	state.cultivate()
 	_expect_gt(
 		KnowledgeServiceScript.effective_level(state.to_dict(), "foundation.breathing"),
 		0.0,
 		"cultivation grants knowledge xp"
 	)
-	_expect_gt(FightAttr.get_attr(state.attrs, FightAttr.MP_MAX), 0.0, "method modifiers apply")
+	_expect_gt(ZhandouAttr.get_attr(state.attrs, ZhandouAttr.MP_MAX), 0.0, "method modifiers apply")
 	_expect_gt(before_mp, 0.0, "starter attrs initialized")
-	var sword_mods := CultivationMethodServiceScript.build_modifiers(
+	var sword_mods := XiulianMethodServiceScript.build_modifiers(
 		{"main": "method.taixu_sword.1"},
 		state.to_dict()
 	)
 	_expect_gt(
-		float((sword_mods.get("percent", {}) as Dictionary).get(FightAttr.DAMAGE_BONUS, 0.0)),
+		float((sword_mods.get("percent", {}) as Dictionary).get(ZhandouAttr.DAMAGE_BONUS, 0.0)),
 		0.0,
 		"combat method damage effects apply"
 	)
@@ -318,8 +318,8 @@ func _test_pill_cultivation_and_instability() -> void:
 		"stats": {"steps": 1, "battles": 1, "wins": 1, "losses": 0, "max_difficulty": 1},
 		"location_name": "测试山林",
 	}
-	var settled: Dictionary = state.settle_expedition(settlement)
-	_expect_true(bool(settled.get("ok", false)), "expedition settlement succeeds")
+	var settled: Dictionary = state.settle_lilian(settlement)
+	_expect_true(bool(settled.get("ok", false)), "lilian settlement succeeds")
 	_expect_eq(state.cultivation_instability, 2, "battle win presses instability")
 
 
@@ -381,7 +381,7 @@ func _test_player_auto_battle_rules() -> void:
 
 
 func _test_player_auto_policy_order() -> void:
-	var player := FightObj.new()
+	var player := ZhandouObj.new()
 	player.hp = 100.0
 	player.mp = 100.0
 	player.skills = [
@@ -389,7 +389,7 @@ func _test_player_auto_policy_order() -> void:
 		{"id": 2, "cd": 0.0},
 		{"id": 0, "cd": 0.0},
 	]
-	var enemy := FightObj.new()
+	var enemy := ZhandouObj.new()
 	enemy.hp = 100.0
 	enemy.mp = 100.0
 	var skill_cfg := {
@@ -446,7 +446,7 @@ func _test_inventory_and_battle_item_slots() -> void:
 	_expect_eq(str(state.item_slots[0]), "", "depleted slot cleared")
 
 
-func _test_battle_runtime_deducts_inventory() -> void:
+func _test_zhandou_runtime_deducts_inventory() -> void:
 	var state := _state()
 	state.inventory["items_FightTestDan"] = 3
 	state.item_slots = ["items_FightTestDan", ""]
@@ -468,7 +468,7 @@ func _test_battle_runtime_deducts_inventory() -> void:
 func _test_alchemy_preview_and_brew() -> void:
 	var state := _state()
 	state.inventory["items_LingCao"] = 4
-	var preview: Dictionary = state.preview_alchemy("recipe.huiqi", "steady", "lowest")
+	var preview: Dictionary = state.preview_liandan("recipe.huiqi", "steady", "lowest")
 	_expect_true(bool(preview.get("ok", false)), "alchemy preview succeeds")
 	var total_probability := 0.0
 	for value_v in (preview.get("probabilities", {}) as Dictionary).values():
@@ -477,12 +477,12 @@ func _test_alchemy_preview_and_brew() -> void:
 	_expect_eq(str(((preview.get("ingredients", []) as Array)[0] as Dictionary).get("id", "")), "items_LingCao", "lowest quality selected")
 	var grass_before := int(state.inventory.get("items_LingCao", 0))
 	var day_before: int = int(state.day)
-	var result: Dictionary = state.brew_alchemy("recipe.huiqi", "steady", "lowest", 42)
+	var result: Dictionary = state.brew_liandan("recipe.huiqi", "steady", "lowest", 42)
 	_expect_true(bool(result.get("ok", false)), "alchemy brew succeeds")
 	_expect_eq(int(state.inventory.get("items_LingCao", 0)), grass_before - 2, "alchemy consumes exact ingredients")
 	_expect_eq(state.day, day_before + int(preview.get("days", 1)), "alchemy advances configured days")
-	_expect_eq(int(state.alchemy.get("total_batches", 0)), 1, "alchemy batch count increments")
-	_expect_gt(int(state.alchemy.get("xp", 0)), 0, "alchemy grants xp")
+	_expect_eq(int(state.liandan.get("total_batches", 0)), 1, "alchemy batch count increments")
+	_expect_gt(int(state.liandan.get("xp", 0)), 0, "alchemy grants xp")
 	_expect_gt(int(result.get("mastery_gain", 0)), 0, "alchemy grants recipe mastery")
 	_expect_eq(
 		int(result.get("recipe_mastery", 0)),
@@ -491,8 +491,8 @@ func _test_alchemy_preview_and_brew() -> void:
 	)
 
 
-func _test_p3_alchemy_recipes() -> void:
-	var normalized := AlchemyServiceScript.normalize_state({"known_recipes": ["recipe.huiqi"]})
+func _test_p3_liandan_recipes() -> void:
+	var normalized := LiandanServiceScript.normalize_state({"known_recipes": ["recipe.huiqi"]})
 	_expect_true(
 		(normalized.get("known_recipes", []) as Array).has("recipe.qingmai"),
 		"old alchemy state gains p3 qingmai recipe"
@@ -504,14 +504,14 @@ func _test_p3_alchemy_recipes() -> void:
 	var state := _state()
 	state.inventory["items_MistHerb"] = 4
 	state.inventory["items_LingGuo"] = 2
-	var qingmai: Dictionary = state.preview_alchemy("recipe.qingmai", "steady", "lowest")
+	var qingmai: Dictionary = state.preview_liandan("recipe.qingmai", "steady", "lowest")
 	_expect_true(bool(qingmai.get("ok", false)), "qingmai preview succeeds with mist herb")
 	state.inventory["items_YaoDan"] = 1
 	state.inventory["items_ArrayCoreShard"] = 1
-	var guben: Dictionary = state.preview_alchemy("recipe.guben", "steady", "lowest")
+	var guben: Dictionary = state.preview_liandan("recipe.guben", "steady", "lowest")
 	_expect_true(bool(guben.get("ok", false)), "guben preview succeeds with p3 materials")
 	_expect_eq(
-		str(AlchemyServiceScript.recipe_preview_product_id(guben.get("recipe", {}) as Dictionary)),
+		str(LiandanServiceScript.recipe_preview_product_id(guben.get("recipe", {}) as Dictionary)),
 		"items_GuBenDaoJiDan",
 		"guben preview product resolves"
 	)
@@ -520,13 +520,13 @@ func _test_p3_alchemy_recipes() -> void:
 func _test_alchemy_batch_count() -> void:
 	var state := _state()
 	state.inventory["items_LingCao"] = 6
-	var preview: Dictionary = state.preview_alchemy("recipe.huiqi", "steady", "lowest")
+	var preview: Dictionary = state.preview_liandan("recipe.huiqi", "steady", "lowest")
 	_expect_true(bool(preview.get("ok", false)), "batch preview succeeds")
-	_expect_eq(state.max_alchemy_batch_count(preview), 3, "batch count limited by herb stock")
+	_expect_eq(state.max_liandan_batch_count(preview), 3, "batch count limited by herb stock")
 	var grass_before := int(state.inventory.get("items_LingCao", 0))
 	var day_before: int = int(state.day)
-	var batches_before := int(state.alchemy.get("total_batches", 0))
-	var result: Dictionary = state.brew_alchemy_batches("recipe.huiqi", "steady", "lowest", 2, 42)
+	var batches_before := int(state.liandan.get("total_batches", 0))
+	var result: Dictionary = state.brew_liandan_batches("recipe.huiqi", "steady", "lowest", 2, 42)
 	_expect_true(bool(result.get("ok", false)), "batch brew succeeds")
 	_expect_eq(int(result.get("batch_count", 0)), 2, "batch brew reports count")
 	_expect_eq(int(state.inventory.get("items_LingCao", 0)), grass_before - 4, "batch brew consumes ingredients per batch")
@@ -535,7 +535,7 @@ func _test_alchemy_batch_count() -> void:
 		day_before + int(preview.get("days", 1)) * 2,
 		"batch brew advances total days"
 	)
-	_expect_eq(int(state.alchemy.get("total_batches", 0)), batches_before + 2, "batch brew increments total batches")
+	_expect_eq(int(state.liandan.get("total_batches", 0)), batches_before + 2, "batch brew increments total batches")
 
 
 func _test_alchemy_steady_strategy_ordering() -> void:
@@ -543,8 +543,8 @@ func _test_alchemy_steady_strategy_ordering() -> void:
 	state.inventory["items_LingCao"] = 4
 	state.inventory["items_LingGuo"] = 2
 	state.inventory["items_YaoDan"] = 1
-	var steady: Dictionary = state.preview_alchemy("recipe.juqi", "steady", "lowest")
-	var supreme: Dictionary = state.preview_alchemy("recipe.juqi", "supreme", "lowest")
+	var steady: Dictionary = state.preview_liandan("recipe.juqi", "steady", "lowest")
+	var supreme: Dictionary = state.preview_liandan("recipe.juqi", "supreme", "lowest")
 	_expect_true(bool(steady.get("ok", false)), "steady preview succeeds")
 	_expect_true(bool(supreme.get("ok", false)), "supreme preview succeeds")
 	_expect_gt(
@@ -579,11 +579,11 @@ func _test_alchemy_steady_strategy_ordering() -> void:
 func _test_alchemy_recipe_mastery() -> void:
 	var state := _state()
 	state.inventory["items_LingCao"] = 20
-	var novice: Dictionary = state.preview_alchemy("recipe.huiqi", "supreme", "lowest")
-	var alchemy_state: Dictionary = state.alchemy.duplicate(true)
+	var novice: Dictionary = state.preview_liandan("recipe.huiqi", "supreme", "lowest")
+	var alchemy_state: Dictionary = state.liandan.duplicate(true)
 	alchemy_state["recipe_mastery"] = {"recipe.huiqi": 1000}
-	state.alchemy = alchemy_state
-	var mastered: Dictionary = state.preview_alchemy("recipe.huiqi", "supreme", "lowest")
+	state.liandan = alchemy_state
+	var mastered: Dictionary = state.preview_liandan("recipe.huiqi", "supreme", "lowest")
 	_expect_gt(
 		float(mastered.get("base_score", 0.0)),
 		float(novice.get("base_score", 0.0)),
@@ -620,7 +620,7 @@ func _test_alchemy_recipe_mastery() -> void:
 	guaranteed_mastery_benefits["second_extra_pill_chance"] = 1.0
 	guaranteed_mastery_benefits["cost_save_chance"] = 1.0
 	(guaranteed_mastery_benefits.get("strategy", {}) as Dictionary)["spread"] = 0
-	var mastery_benefit_result := AlchemyServiceScript.roll(
+	var mastery_benefit_result := LiandanServiceScript.roll(
 		guaranteed_mastery_benefits,
 		RandomNumberGenerator.new()
 	)
@@ -636,14 +636,14 @@ func _test_alchemy_recipe_mastery() -> void:
 	var forced_low := novice.duplicate(true)
 	forced_low["base_score"] = 0.0
 	(forced_low.get("strategy", {}) as Dictionary)["spread"] = 0
-	var low_result: Dictionary = AlchemyServiceScript.roll(forced_low, rng)
+	var low_result: Dictionary = LiandanServiceScript.roll(forced_low, rng)
 	_expect_true(bool(low_result.get("succeeded", false)), "worst score still yields low-quality pill")
 	_expect_eq(str(low_result.get("quality", "")), "low", "worst score maps to low quality")
 	_expect_eq(str(low_result.get("outcome_name", "")), "炼制成功", "guaranteed success outcome label")
 	var forced_success := novice.duplicate(true)
 	forced_success["base_score"] = 55.0
 	(forced_success.get("strategy", {}) as Dictionary)["spread"] = 0
-	var succeeded: Dictionary = AlchemyServiceScript.roll(forced_success, rng)
+	var succeeded: Dictionary = LiandanServiceScript.roll(forced_success, rng)
 	_expect_true(bool(succeeded.get("succeeded", false)), "low or better counts as success")
 	_expect_eq(str(succeeded.get("outcome_name", "")), "炼制成功", "success outcome label")
 	_expect_eq(
@@ -683,16 +683,16 @@ func _test_pre_foundation_resource_loop() -> void:
 		"stats": {"steps": 5, "battles": 3, "wins": 3, "losses": 0, "max_difficulty": 4},
 		"location_name": "测试山林",
 	}
-	var settled: Dictionary = state.settle_expedition(settlement)
-	_expect_true(bool(settled.get("ok", false)), "resource expedition settlement succeeds")
-	_expect_eq(int(state.inventory.get("items_LingCao", 0)), 4, "expedition brings enough lingcao")
-	_expect_eq(int(state.inventory.get("items_LingGuo", 0)), 2, "expedition brings enough lingguo")
-	_expect_eq(int(state.inventory.get("items_YaoDan", 0)), 1, "expedition brings one yaodan gate")
-	var preview: Dictionary = state.preview_alchemy("recipe.juqi", "steady", "lowest")
-	_expect_true(bool(preview.get("ok", false)), "juqi preview succeeds from expedition loot")
+	var settled: Dictionary = state.settle_lilian(settlement)
+	_expect_true(bool(settled.get("ok", false)), "resource lilian settlement succeeds")
+	_expect_eq(int(state.inventory.get("items_LingCao", 0)), 4, "lilian brings enough lingcao")
+	_expect_eq(int(state.inventory.get("items_LingGuo", 0)), 2, "lilian brings enough lingguo")
+	_expect_eq(int(state.inventory.get("items_YaoDan", 0)), 1, "lilian brings one yaodan gate")
+	var preview: Dictionary = state.preview_liandan("recipe.juqi", "steady", "lowest")
+	_expect_true(bool(preview.get("ok", false)), "juqi preview succeeds from lilian loot")
 	var success_probability := float(preview.get("success_probability", 0.0))
 	_expect_near(success_probability, 1.0, "alchemy preview always shows full success rate")
-	_expect_eq(state.max_alchemy_batch_count(preview), 1, "yaodan gates juqi batch explosion")
+	_expect_eq(state.max_liandan_batch_count(preview), 1, "yaodan gates juqi batch explosion")
 	var forced_preview := preview.duplicate(true)
 	forced_preview["base_score"] = 55.0
 	var forced_strategy := forced_preview.get("strategy", {}) as Dictionary
@@ -702,8 +702,8 @@ func _test_pre_foundation_resource_loop() -> void:
 	forced_preview["strategy"] = forced_strategy
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 42
-	var rolled: Dictionary = AlchemyServiceScript.roll(forced_preview, rng)
-	var brew: Dictionary = state._apply_alchemy_brew_result("recipe.juqi", "steady", rolled)
+	var rolled: Dictionary = LiandanServiceScript.roll(forced_preview, rng)
+	var brew: Dictionary = state._apply_liandan_brew_result("recipe.juqi", "steady", rolled)
 	_expect_true(bool(brew.get("succeeded", false)), "juqi brew applies successful result: %s" % str(brew))
 	var pill_id := str(brew.get("product_id", ""))
 	_expect_true(state.is_cultivation_pill(pill_id), "juqi output is a cultivation pill")
@@ -741,27 +741,27 @@ func _test_pre_foundation_resource_loop() -> void:
 func _test_expedition_events_build_valid_battle_data() -> void:
 	var state := _state()
 	for event_id in ["qinglan_wolf", "qinglan_serpent", "qinglan_boss"]:
-		var event := ExpeditionEventServiceScript.by_id(event_id)
-		var errors := BattleInitData.collect_errors(state.build_battle_init(event))
+		var event := LilianEventServiceScript.by_id(event_id)
+		var errors := ZhandouInitData.collect_errors(state.build_battle_init(event))
 		_expect_true(errors.is_empty(), "valid battle setup: %s" % str(errors))
 
 
 func _test_enemies_preserve_explicit_combat_attrs() -> void:
-	var enemy := ExpeditionEventServiceScript.build_battle_enemy(
-		ExpeditionEventServiceScript.by_id("qinglan_wolf")
+	var enemy := LilianEventServiceScript.build_battle_enemy(
+		LilianEventServiceScript.by_id("qinglan_wolf")
 	)
 	var attrs := enemy.get("attrs", {}) as Dictionary
-	_expect_near(FightAttr.get_attr(attrs, FightAttr.PHYSICAL_ATK), 21.0, "wolf physical attack")
-	_expect_near(FightAttr.get_attr(attrs, FightAttr.MAGIC_ATK), 22.4, "wolf magic attack")
-	_expect_near(FightAttr.get_attr(attrs, FightAttr.PHYSICAL_DEF), 16.0, "wolf physical defense")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.PHYSICAL_ATK), 21.0, "wolf physical attack")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.MAGIC_ATK), 22.4, "wolf magic attack")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.PHYSICAL_DEF), 16.0, "wolf physical defense")
 
 
 func _test_reward_pools() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 42
 	for event_id in ["qinglan_wolf", "qinglan_serpent", "qinglan_boss"]:
-		var event := ExpeditionEventServiceScript.by_id(event_id)
-		var rewards := ExpeditionRewardServiceScript.roll_event_rewards(event, rng)
+		var event := LilianEventServiceScript.by_id(event_id)
+		var rewards := LilianRewardServiceScript.roll_event_rewards(event, rng)
 		_expect_true(not rewards.is_empty(), "rewards should not be empty")
 		for reward_v in rewards:
 			var reward := reward_v as Dictionary
@@ -771,20 +771,20 @@ func _test_reward_pools() -> void:
 
 func _test_expedition_defeat_settlement() -> void:
 	var state := _state()
-	var expedition := _expedition()
-	expedition.start("qinglan_mountain", state, 9091)
-	expedition.current_choices = [ExpeditionEventServiceScript.by_id("qinglan_wolf")]
-	expedition.choose_event("qinglan_wolf")
-	expedition.receive_battle_summary({
+	var lilian := _lilian()
+	lilian.start("qinglan_mountain", state, 9091)
+	lilian.current_choices = [LilianEventServiceScript.by_id("qinglan_wolf")]
+	lilian.choose_event("qinglan_wolf")
+	lilian.receive_battle_summary({
 		"outcome": "loss",
 		"player_runtime": {"hp": 0.0, "mp": 12.0, "items": [{"id": 9001, "count": 1}, {"id": 9003, "count": 0}]},
 	})
-	expedition.settle_pending_battle()
-	var finish: Dictionary = expedition.finish("defeated")
-	var result: Dictionary = state.settle_expedition(finish)
+	lilian.settle_pending_battle()
+	var finish: Dictionary = lilian.finish("defeated")
+	var result: Dictionary = state.settle_lilian(finish)
 	_expect_true(bool(result.get("ok", false)), "settlement ok")
-	_expect_eq(state.day, 31, "expedition consumes rule duration")
-	_expect_near(state.hp, FightAttr.get_attr(state.attrs, FightAttr.HP_MAX) * 0.4, "loss hp floor")
+	_expect_eq(state.day, 31, "lilian consumes rule duration")
+	_expect_near(state.hp, ZhandouAttr.get_attr(state.attrs, ZhandouAttr.HP_MAX) * 0.4, "loss hp floor")
 	_expect_near(state.mp, 12.0, "mp persisted")
 	_expect_eq(state.injury_days, 2, "loss applies two injury days")
 
@@ -852,35 +852,35 @@ func _test_auto_save_slot_restrictions() -> void:
 	_expect_eq(int(info.get("day", 0)), 3, "auto slot day")
 
 
-func _test_expedition_settlement_auto_saves() -> void:
+func _test_lilian_jiesuan_auto_saves() -> void:
 	var state := _state()
-	var expedition := _expedition()
+	var lilian := _lilian()
 	state.new_game()
-	expedition.start("qinglan_mountain", state, 9092)
-	expedition.current_choices = [ExpeditionEventServiceScript.by_id("qinglan_wolf")]
-	expedition.choose_event("qinglan_wolf")
-	expedition.receive_battle_summary({
+	lilian.start("qinglan_mountain", state, 9092)
+	lilian.current_choices = [LilianEventServiceScript.by_id("qinglan_wolf")]
+	lilian.choose_event("qinglan_wolf")
+	lilian.receive_battle_summary({
 		"outcome": "loss",
 		"player_runtime": {"hp": 0.0, "mp": 12.0, "items": [{"id": 9001, "count": 1}, {"id": 9003, "count": 0}]},
 	})
-	expedition.settle_pending_battle()
-	var finish: Dictionary = expedition.finish("defeated")
-	state.settle_expedition(finish)
+	lilian.settle_pending_battle()
+	var finish: Dictionary = lilian.finish("defeated")
+	state.settle_lilian(finish)
 	var info: Dictionary = _save_service().slot_info(SaveService.AUTO_SAVE_SLOT)
-	_expect_true(bool(info.get("ok", false)), "expedition settlement auto-saves")
+	_expect_true(bool(info.get("ok", false)), "lilian settlement auto-saves")
 	_expect_eq(int(info.get("day", 0)), 31, "auto save reflects settled day")
 	_expect_eq(state.active_save_slot, SaveService.AUTO_SAVE_SLOT, "active slot is auto save")
 
 
-func _test_save_blocked_during_expedition() -> void:
+func _test_save_blocked_during_lilian() -> void:
 	var state := _state()
-	var expedition := _expedition()
+	var lilian := _lilian()
 	state.new_game()
-	var started: Dictionary = expedition.start("qinglan_mountain", state, 99)
-	_expect_true(bool(started.get("ok", false)), "expedition started")
+	var started: Dictionary = lilian.start("qinglan_mountain", state, 99)
+	_expect_true(bool(started.get("ok", false)), "lilian started")
 	var blocked: Dictionary = state.save_game(2)
 	_expect_true(not bool(blocked.get("ok", false)), "save blocked")
-	expedition.reset()
+	lilian.reset()
 
 
 func _test_corrupt_save() -> void:

@@ -1,27 +1,7 @@
 extends Node
 
-const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
-const CultivationMethodServiceScript := preload("res://scripts/sim/cultivation_method_service.gd")
-const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
-const KnowledgeStudyServiceScript := preload("res://scripts/dao/knowledge_study_service.gd")
-const KnowledgeEffectServiceScript := preload("res://scripts/dao/knowledge_effect_service.gd")
-const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
-const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const SIM_PATH := "res://data/simulation.yaml"
-const HUB_SCENE := "res://scenes/sim/cave_hub.tscn"
-const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
-const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
-const LocationServiceScript := preload("res://scripts/expedition/location_service.gd")
-const WorldMapServiceScript := preload("res://scripts/map/world_map_service.gd")
-const ExpeditionRulesServiceScript := preload("res://scripts/expedition/expedition_rules_service.gd")
-const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
-const PlayerAutoBattleServiceScript := preload("res://scripts/sim/player_auto_battle_service.gd")
-const BreakthroughServiceScript := preload("res://scripts/sim/breakthrough_service.gd")
-const AlchemyServiceScript := preload("res://scripts/sim/alchemy_service.gd")
-const PlayerBuildServiceScript := preload("res://scripts/sim/player_build_service.gd")
-const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
-const EnumActivityTimeScript := preload("res://scripts/enum/enum_activity_time.gd")
-const RewardTipBuilderScript := preload("res://scripts/ui/tips/core/reward_tip_builder.gd")
+const HUB_SCENE := "res://scenes/sim/dongfu.tscn"
 
 const INSTABILITY_REDUCTION_PER_WIN := 10
 const PASSIVE_METHOD_PRACTICE_RATIO := 0.25
@@ -58,11 +38,11 @@ var player_icon: String:
 	get: return str(DataStore.savedata.get("player_icon", ""))
 	set(value): DataStore.savedata["player_icon"] = value
 var foundations: Dictionary:
-	get: return DataStore.savedata.get("foundations", CharacterStatsScript.default_foundations()) as Dictionary
-	set(value): DataStore.savedata["foundations"] = CharacterStatsScript.normalize_foundations(value)
+	get: return DataStore.savedata.get("foundations", CharacterStats.default_foundations()) as Dictionary
+	set(value): DataStore.savedata["foundations"] = CharacterStats.normalize_foundations(value)
 var aptitudes: Dictionary:
-	get: return DataStore.savedata.get("aptitudes", CharacterStatsScript.default_aptitudes()) as Dictionary
-	set(value): DataStore.savedata["aptitudes"] = CharacterStatsScript.normalize_aptitudes(value)
+	get: return DataStore.savedata.get("aptitudes", CharacterStats.default_aptitudes()) as Dictionary
+	set(value): DataStore.savedata["aptitudes"] = CharacterStats.normalize_aptitudes(value)
 var attrs: Dictionary:
 	get: return DataStore.savedata.get("attrs", {}) as Dictionary
 	set(value): DataStore.savedata["attrs"] = value
@@ -114,9 +94,9 @@ var item_slots: Array:
 var inventory: Dictionary:
 	get: return DataStore.savedata.get("inventory", {}) as Dictionary
 	set(value): DataStore.savedata["inventory"] = value
-var alchemy: Dictionary:
-	get: return DataStore.savedata.get("alchemy", AlchemyServiceScript.default_state()) as Dictionary
-	set(value): DataStore.savedata["alchemy"] = AlchemyServiceScript.normalize_state(value)
+var liandan: Dictionary:
+	get: return DataStore.savedata.get("liandan", DataStore.savedata.get("alchemy", LiandanService.default_state())) as Dictionary
+	set(value): DataStore.savedata["liandan"] = LiandanService.normalize_state(value)
 var storage: Dictionary:
 	get: return DataStore.savedata.get("storage", {}) as Dictionary
 	set(value): DataStore.savedata["storage"] = value
@@ -132,12 +112,12 @@ var totals: Dictionary:
 var last_rewards: Array:
 	get: return DataStore.game_runtime().get("last_rewards", []) as Array
 	set(value): DataStore.game_runtime()["last_rewards"] = value
-var last_expedition_summary: Dictionary:
-	get: return DataStore.game_runtime().get("last_expedition_summary", {}) as Dictionary
-	set(value): DataStore.game_runtime()["last_expedition_summary"] = value
-var last_settled_expedition_id: String:
-	get: return str(DataStore.game_runtime().get("last_settled_expedition_id", ""))
-	set(value): DataStore.game_runtime()["last_settled_expedition_id"] = value
+var last_lilian_summary: Dictionary:
+	get: return DataStore.game_runtime().get("last_lilian_summary", {}) as Dictionary
+	set(value): DataStore.game_runtime()["last_lilian_summary"] = value
+var last_settled_lilian_id: String:
+	get: return str(DataStore.game_runtime().get("last_settled_lilian_id", ""))
+	set(value): DataStore.game_runtime()["last_settled_lilian_id"] = value
 var active_save_slot: int:
 	get: return int(DataStore.game_runtime().get("active_save_slot", 0))
 	set(value): DataStore.game_runtime()["active_save_slot"] = value
@@ -177,11 +157,11 @@ func new_game() -> void:
 	ling_stones = 0
 	player_name = str(initial.get("name", "修士"))
 	player_icon = str(initial.get("icon", ""))
-	foundations = initial.get("foundations", CharacterStatsScript.default_foundations()) as Dictionary
-	aptitudes = initial.get("aptitudes", CharacterStatsScript.default_aptitudes()) as Dictionary
+	foundations = initial.get("foundations", CharacterStats.default_foundations()) as Dictionary
+	aptitudes = initial.get("aptitudes", CharacterStats.default_aptitudes()) as Dictionary
 	refresh_derived_attrs(false)
-	hp = float(attrs.get(FightAttr.HP_MAX, 100.0))
-	mp = float(attrs.get(FightAttr.MP_MAX, 100.0))
+	hp = float(attrs.get(ZhandouAttr.HP_MAX, 100.0))
+	mp = float(attrs.get(ZhandouAttr.MP_MAX, 100.0))
 	unlocked_abilities = _initial_ability_ids(initial)
 	equipped_abilities = _initial_equipped_abilities(initial, unlocked_abilities)
 	unlocked_methods = _initial_method_ids(initial)
@@ -198,20 +178,20 @@ func new_game() -> void:
 	treasure_item_slots = (initial.get("treasure_item_slots", ["", ""]) as Array).duplicate(true)
 	item_slots = (initial.get("item_slots", ["", ""]) as Array).duplicate(true)
 	inventory = (initial.get("inventory", {}) as Dictionary).duplicate(true)
-	alchemy = AlchemyServiceScript.default_state()
+	liandan = LiandanService.default_state()
 	storage = (initial.get("storage", {}) as Dictionary).duplicate(true)
 	storage_equips = (initial.get("storage_equips", []) as Array).duplicate(true)
 	activity_log = []
 	totals = {
 		"battles": 0, "wins": 0, "losses": 0, "items_gained": 0,
-		"expeditions": 0, "expedition_steps": 0, "max_difficulty": 0,
+		"lilian_count": 0, "lilian_steps": 0, "max_difficulty": 0,
 	}
 	last_rewards = []
-	last_expedition_summary = {}
-	last_settled_expedition_id = ""
+	last_lilian_summary = {}
+	last_settled_lilian_id = ""
 	active_save_slot = 0
-	if ExpeditionState != null and ExpeditionState.has_method("reset"):
-		ExpeditionState.reset()
+	if LilianState != null and LilianState.has_method("reset"):
+		LilianState.reset()
 	_initialize_map_state()
 	_sync_realm()
 
@@ -247,11 +227,11 @@ func _initial_equipped_abilities(initial: Dictionary, unlocked: Array) -> Array:
 
 
 func _seed_starter_knowledge() -> void:
-	KnowledgeServiceScript.grant_level(DataStore.savedata, "foundation.breathing", 1)
+	KnowledgeService.grant_level(DataStore.savedata, "foundation.breathing", 1)
 
 
 func can_persist() -> bool:
-	return ExpeditionState == null or not ExpeditionState.active
+	return LilianState == null or not LilianState.active
 
 
 func save_game(slot: int) -> Dictionary:
@@ -299,34 +279,34 @@ func load_game(slot: int) -> Dictionary:
 
 func cultivate() -> int:
 	var result := cultivate_session(
-		EnumCultivationMode.LABEL_CYCLE,
+		EnumXiulianMode.LABEL_CYCLE,
 		min_cultivation_days()
 	)
 	return int(result.get("cultivation_gained", 0))
 
 
 func time_date_label(target_day: int) -> String:
-	return GameTimeServiceScript.date_label(target_day)
+	return GameTimeService.date_label(target_day)
 
 
 func time_duration_label(days_value: int) -> String:
-	return GameTimeServiceScript.duration_label(days_value)
+	return GameTimeService.duration_label(days_value)
 
 
-func alchemy_recipes() -> Array:
-	return AlchemyServiceScript.all_recipes()
+func liandan_recipes() -> Array:
+	return LiandanService.all_recipes()
 
 
-func alchemy_strategies() -> Array:
-	return AlchemyServiceScript.all_strategies()
+func liandan_strategies() -> Array:
+	return LiandanService.all_strategies()
 
 
-func preview_alchemy(recipe_id: String, strategy_id: String = "steady", selection_mode: String = "lowest") -> Dictionary:
-	return AlchemyServiceScript.preview(
+func preview_liandan(recipe_id: String, strategy_id: String = "steady", selection_mode: String = "lowest") -> Dictionary:
+	return LiandanService.preview(
 		recipe_id,
 		strategy_id,
 		selection_mode,
-		alchemy,
+		liandan,
 		inventory,
 		foundations,
 		aptitudes,
@@ -334,20 +314,20 @@ func preview_alchemy(recipe_id: String, strategy_id: String = "steady", selectio
 	)
 
 
-func max_alchemy_batch_count(preview: Dictionary) -> int:
-	return AlchemyServiceScript.max_batch_count(preview, inventory, alchemy)
+func max_liandan_batch_count(preview: Dictionary) -> int:
+	return LiandanService.max_batch_count(preview, inventory, liandan)
 
 
-func brew_alchemy(
+func brew_liandan(
 	recipe_id: String,
 	strategy_id: String = "steady",
 	selection_mode: String = "lowest",
 	seed_override: int = -1
 ) -> Dictionary:
-	return brew_alchemy_batches(recipe_id, strategy_id, selection_mode, 1, seed_override)
+	return brew_liandan_batches(recipe_id, strategy_id, selection_mode, 1, seed_override)
 
 
-func brew_alchemy_batches(
+func brew_liandan_batches(
 	recipe_id: String,
 	strategy_id: String = "steady",
 	selection_mode: String = "lowest",
@@ -357,10 +337,10 @@ func brew_alchemy_batches(
 	if not can_persist():
 		return {"ok": false, "error": "历练中无法炼丹"}
 	batch_count = maxi(1, batch_count)
-	var initial_preview := preview_alchemy(recipe_id, strategy_id, selection_mode)
+	var initial_preview := preview_liandan(recipe_id, strategy_id, selection_mode)
 	if not bool(initial_preview.get("ok", false)):
 		return initial_preview
-	var max_allowed := max_alchemy_batch_count(initial_preview)
+	var max_allowed := max_liandan_batch_count(initial_preview)
 	if batch_count > max_allowed:
 		return {"ok": false, "error": "药材或丹炉不足以连炼 %d 炉" % batch_count}
 	var rng := RandomNumberGenerator.new()
@@ -370,13 +350,13 @@ func brew_alchemy_batches(
 		rng.randomize()
 	var results: Array = []
 	for _index in batch_count:
-		var preview := preview_alchemy(recipe_id, strategy_id, selection_mode)
+		var preview := preview_liandan(recipe_id, strategy_id, selection_mode)
 		if not bool(preview.get("ok", false)):
 			break
-		var rolled := AlchemyServiceScript.roll(preview, rng)
+		var rolled := LiandanService.roll(preview, rng)
 		if not bool(rolled.get("ok", false)):
 			return rolled
-		var applied := _apply_alchemy_brew_result(recipe_id, strategy_id, rolled, batch_count > 1)
+		var applied := _apply_liandan_brew_result(recipe_id, strategy_id, rolled, batch_count > 1)
 		results.append(applied)
 	if results.is_empty():
 		return {"ok": false, "error": "炼制失败"}
@@ -384,12 +364,12 @@ func brew_alchemy_batches(
 	if results.size() == 1:
 		result = results[0] as Dictionary
 	else:
-		result = AlchemyServiceScript.aggregate_batch_results(results)
-		result["recipe_mastery"] = AlchemyServiceScript.mastery_for(alchemy, recipe_id)
-		result["alchemy_level"] = int(alchemy.get("level", 1))
-		result["alchemy_xp"] = int(alchemy.get("xp", 0))
-		var furnace_id := str(alchemy.get("equipped_furnace", ""))
-		var owned := alchemy.get("owned_furnaces", {}) as Dictionary
+		result = LiandanService.aggregate_batch_results(results)
+		result["recipe_mastery"] = LiandanService.mastery_for(liandan, recipe_id)
+		result["liandan_level"] = int(liandan.get("level", 1))
+		result["liandan_xp"] = int(liandan.get("xp", 0))
+		var furnace_id := str(liandan.get("equipped_furnace", ""))
+		var owned := liandan.get("owned_furnaces", {}) as Dictionary
 		var furnace_state := owned.get(furnace_id, {}) as Dictionary
 		result["furnace_durability"] = int(furnace_state.get("durability", 0))
 		_append_activity("连炼%d炉%s：%s" % [
@@ -397,12 +377,12 @@ func brew_alchemy_batches(
 			str(result.get("pill_name", "丹药")),
 			str(result.get("quality_summary", "")),
 		])
-	_emit_tip_intents(RewardTipBuilderScript.alchemy_result(result, "alchemy"))
+	_emit_tip_intents(RewardTipBuilder.liandan_result(result, "liandan"))
 	auto_save()
 	return result
 
 
-func _apply_alchemy_brew_result(
+func _apply_liandan_brew_result(
 	recipe_id: String,
 	strategy_id: String,
 	result: Dictionary,
@@ -410,33 +390,33 @@ func _apply_alchemy_brew_result(
 ) -> Dictionary:
 	for ingredient_v in result.get("ingredients", []) as Array:
 		var ingredient := ingredient_v as Dictionary
-		InventoryServiceScript.remove_item(
+		InventoryService.remove_item(
 			inventory,
 			str(ingredient.get("id", "")),
 			int(ingredient.get("count", 0))
 		)
 	var product_id := str(result.get("product_id", ""))
 	if product_id != "":
-		result["added"] = InventoryServiceScript.add_item(inventory, product_id, int(result.get("count", 0)))
+		result["added"] = InventoryService.add_item(inventory, product_id, int(result.get("count", 0)))
 	else:
 		result["added"] = 0
-	var next_alchemy := AlchemyServiceScript.apply_xp(alchemy, int(result.get("xp", 0)))
-	next_alchemy = AlchemyServiceScript.apply_recipe_mastery(
-		next_alchemy,
+	var next_liandan := LiandanService.apply_xp(liandan, int(result.get("xp", 0)))
+	next_liandan = LiandanService.apply_recipe_mastery(
+		next_liandan,
 		recipe_id,
 		int(result.get("mastery_gain", 0))
 	)
-	var furnace_id := str(next_alchemy.get("equipped_furnace", ""))
-	var owned := next_alchemy.get("owned_furnaces", {}) as Dictionary
+	var furnace_id := str(next_liandan.get("equipped_furnace", ""))
+	var owned := next_liandan.get("owned_furnaces", {}) as Dictionary
 	var furnace_state_v: Variant = owned.get(furnace_id, {})
 	var furnace_state := furnace_state_v as Dictionary if furnace_state_v is Dictionary else {}
 	furnace_state["durability"] = maxi(0, int(furnace_state.get("durability", 0)) - 1)
 	owned[furnace_id] = furnace_state
-	next_alchemy["owned_furnaces"] = owned
-	next_alchemy["last_recipe"] = recipe_id
-	next_alchemy["last_strategy"] = strategy_id
-	next_alchemy["total_batches"] = int(next_alchemy.get("total_batches", 0)) + 1
-	alchemy = next_alchemy
+	next_liandan["owned_furnaces"] = owned
+	next_liandan["last_recipe"] = recipe_id
+	next_liandan["last_strategy"] = strategy_id
+	next_liandan["total_batches"] = int(next_liandan.get("total_batches", 0)) + 1
+	liandan = next_liandan
 	var elapsed := int(result.get("days", 1))
 	_advance_time(elapsed, true, true)
 	if not defer_activity_log:
@@ -445,9 +425,9 @@ func _apply_alchemy_brew_result(
 		if int(result.get("added", 0)) > 0:
 			log_text += " x%d" % int(result.get("added", 0))
 		_append_activity(log_text)
-	result["alchemy_level"] = int(alchemy.get("level", 1))
-	result["alchemy_xp"] = int(alchemy.get("xp", 0))
-	result["recipe_mastery"] = AlchemyServiceScript.mastery_for(alchemy, recipe_id)
+	result["liandan_level"] = int(liandan.get("level", 1))
+	result["liandan_xp"] = int(liandan.get("xp", 0))
+	result["recipe_mastery"] = LiandanService.mastery_for(liandan, recipe_id)
 	result["furnace_durability"] = int(furnace_state.get("durability", 0))
 	return result
 
@@ -460,15 +440,15 @@ func min_cultivation_days() -> int:
 
 
 func max_cultivation_days_cap() -> int:
-	return CULTIVATION_MAX_YEARS * GameTimeServiceScript.days_per_year()
+	return CULTIVATION_MAX_YEARS * GameTimeService.days_per_year()
 
 
 func max_cultivation_days(
-	mode_id: String = EnumCultivationMode.LABEL_CYCLE,
+	mode_id: String = EnumXiulianMode.LABEL_CYCLE,
 	pill_id: String = ""
 ) -> int:
 	var cap := max_cultivation_days_cap()
-	if EnumCultivationMode.is_pill_mode(mode_id):
+	if EnumXiulianMode.is_pill_mode(mode_id):
 		var resolved_pill_id := resolve_cultivation_pill_id(pill_id)
 		if resolved_pill_id == "":
 			return min_cultivation_days()
@@ -480,50 +460,50 @@ func max_knowledge_study_days(skill_id: String = "") -> int:
 	var sid := skill_id.strip_edges()
 	var rank := 1.0
 	if sid != "":
-		var skill := DaoTreeServiceScript.skill_by_id(sid)
+		var skill := DaoTreeService.skill_by_id(sid)
 		rank = maxf(1.0, float(skill.get("rank", 1)))
-	var suggested := GameTimeServiceScript.suggested_activity_days(
-		EnumActivityTimeScript.LABEL_SELF_STUDY,
+	var suggested := GameTimeService.suggested_activity_days(
+		EnumActivityTime.LABEL_SELF_STUDY,
 		major_realm_id(),
 		rank
 	)
 	if sid == "":
 		return suggested
-	var gate := KnowledgeStudyServiceScript.can_study(DataStore.savedata, sid, major_realm_id())
+	var gate := KnowledgeStudyService.can_study(DataStore.savedata, sid, major_realm_id())
 	if not bool(gate.get("ok", false)):
 		return suggested
-	var entry := KnowledgeServiceScript.get_entry(DataStore.savedata, sid)
+	var entry := KnowledgeService.get_entry(DataStore.savedata, sid)
 	var current_level := int(entry.get("level", 0))
 	var policy := gate.get("policy", {}) as Dictionary
-	var skill := DaoTreeServiceScript.skill_by_id(sid)
+	var skill := DaoTreeService.skill_by_id(sid)
 	var target_level := mini(current_level + 1, int(skill.get("maxLevel", 5)))
 	if target_level <= current_level:
 		return suggested
-	var speed := DaoTreeServiceScript.training_speed(sid, foundations, aptitudes)
-	var required := DaoTreeServiceScript.required_xp_for_level(sid, target_level)
+	var speed := DaoTreeService.training_speed(sid, foundations, aptitudes)
+	var required := DaoTreeService.required_xp_for_level(sid, target_level)
 	var remaining := maxf(0.0, required - float(entry.get("xp", 0.0)))
 	var days_to_next := int(ceil(remaining / maxf(0.01, speed * float(policy.get("efficiency", 1.0)))))
 	return maxi(suggested, days_to_next)
 
 
 func studyable_knowledge() -> Array:
-	return KnowledgeStudyServiceScript.studyable_skills(DataStore.savedata, major_realm_id())
+	return KnowledgeStudyService.studyable_skills(DataStore.savedata, major_realm_id())
 
 
 func preview_knowledge_study(skill_id: String, days: int = 1) -> Dictionary:
 	var safe_days := clampi(days, 1, max_knowledge_study_days(skill_id))
-	var preview := KnowledgeStudyServiceScript.preview(
+	var preview := KnowledgeStudyService.preview(
 		DataStore.savedata,
 		skill_id,
 		safe_days,
 		major_realm_id()
 	)
 	if bool(preview.get("ok", false)):
-		preview["duration_label"] = GameTimeServiceScript.duration_label(safe_days)
+		preview["duration_label"] = GameTimeService.duration_label(safe_days)
 		preview["start_day"] = day
 		preview["end_day"] = day + safe_days
-		preview["start_date_label"] = GameTimeServiceScript.date_label(day)
-		preview["end_date_label"] = GameTimeServiceScript.date_label(day + safe_days)
+		preview["start_date_label"] = GameTimeService.date_label(day)
+		preview["end_date_label"] = GameTimeService.date_label(day + safe_days)
 	return preview
 
 
@@ -534,7 +514,7 @@ func study_knowledge(skill_id: String, days: int = 1) -> Dictionary:
 	if not bool(preview.get("ok", false)):
 		return preview
 	var safe_days := int(preview.get("days", 1))
-	var result := KnowledgeStudyServiceScript.apply_study(
+	var result := KnowledgeStudyService.apply_study(
 		DataStore.savedata,
 		skill_id,
 		safe_days,
@@ -545,7 +525,7 @@ func study_knowledge(skill_id: String, days: int = 1) -> Dictionary:
 	_advance_time(safe_days, true, true)
 	var skill_name := str(result.get("skill_name", skill_id))
 	var log_text := "自主研读%s：%s训练点 +%.1f" % [
-		GameTimeServiceScript.duration_label(safe_days),
+		GameTimeService.duration_label(safe_days),
 		skill_name,
 		float(result.get("xp", 0.0)),
 	]
@@ -553,15 +533,15 @@ func study_knowledge(skill_id: String, days: int = 1) -> Dictionary:
 		log_text += "，提升至%s级" % _roman_knowledge_level(int(result.get("level_after", 0)))
 	_append_activity(log_text)
 	result["days"] = safe_days
-	result["duration_label"] = GameTimeServiceScript.duration_label(safe_days)
+	result["duration_label"] = GameTimeService.duration_label(safe_days)
 	result["start_day"] = int(preview.get("start_day", day - safe_days))
 	result["end_day"] = day
-	result["start_date_label"] = str(preview.get("start_date_label", GameTimeServiceScript.date_label(day - safe_days)))
-	result["end_date_label"] = GameTimeServiceScript.date_label(day)
+	result["start_date_label"] = str(preview.get("start_date_label", GameTimeService.date_label(day - safe_days)))
+	result["end_date_label"] = GameTimeService.date_label(day)
 	return result
 
 
-func preview_cultivation_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: int = 1, pill_id: String = "") -> Dictionary:
+func preview_cultivation_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, days: int = 1, pill_id: String = "") -> Dictionary:
 	var mode := _cultivation_mode(mode_id)
 	var safe_days := clampi(
 		maxi(1, days),
@@ -570,7 +550,7 @@ func preview_cultivation_session(mode_id: String = EnumCultivationMode.LABEL_CYC
 	)
 	var resolved_pill_id := ""
 	var pill_ids: Array = []
-	if EnumCultivationMode.is_pill_mode(mode_id):
+	if EnumXiulianMode.is_pill_mode(mode_id):
 		resolved_pill_id = resolve_cultivation_pill_id(pill_id)
 		if resolved_pill_id == "":
 			return {
@@ -588,13 +568,13 @@ func preview_cultivation_session(mode_id: String = EnumCultivationMode.LABEL_CYC
 			}
 		for _day_index in safe_days:
 			pill_ids.append(resolved_pill_id)
-	var method_id := CultivationMethodServiceScript.active_cultivation_method_id(DataStore.savedata)
-	var method := CultivationMethodServiceScript.by_id(method_id)
+	var method_id := XiulianMethodService.active_cultivation_method_id(DataStore.savedata)
+	var method := XiulianMethodService.by_id(method_id)
 	var base_gain := RealmBalanceService.base_daily_cultivation_gain(_realm_row(realm_index))
-	var speed := CultivationMethodServiceScript.cultivation_session_speed(method_id, DataStore.savedata)
+	var speed := XiulianMethodService.cultivation_session_speed(method_id, DataStore.savedata)
 	if speed <= 0.0:
 		return {"ok": false, "error": "需要先选择当前修炼功法"}
-	var method_breakdown := CultivationMethodServiceScript.base_cultivation_gain_breakdown(method_id)
+	var method_breakdown := XiulianMethodService.base_cultivation_gain_breakdown(method_id)
 	var method_base_gain := int(method_breakdown.get("gain", 0))
 	var estimated_gain := 0
 	var remaining_injury := injury_days
@@ -603,7 +583,7 @@ func preview_cultivation_session(mode_id: String = EnumCultivationMode.LABEL_CYC
 	for _day_index in safe_days:
 		var speed_part := 0
 		var pill_gain := 0
-		if EnumCultivationMode.is_pill_mode(mode_id):
+		if EnumXiulianMode.is_pill_mode(mode_id):
 			# 丹药炼化：直接叠加丹药配置的修为数值，不再乘闭关倍率
 			pill_gain = cultivation_pill_gain(str(pill_ids[_day_index]))
 			speed_part = pill_gain
@@ -620,7 +600,7 @@ func preview_cultivation_session(mode_id: String = EnumCultivationMode.LABEL_CYC
 				"player_base": base_gain,
 				"speed": speed,
 				"mode_name": str(mode.get("name", "运转周天")),
-				"is_pill_mode": EnumCultivationMode.is_pill_mode(mode_id),
+				"is_pill_mode": EnumXiulianMode.is_pill_mode(mode_id),
 				"pill_gain": pill_gain,
 				"speed_part": speed_part,
 				"method_realm_base": int(method_breakdown.get("realm_base", 0)),
@@ -640,37 +620,37 @@ func preview_cultivation_session(mode_id: String = EnumCultivationMode.LABEL_CYC
 		"mode_id": mode_id,
 		"mode": mode.duplicate(true),
 		"days": safe_days,
-		"duration_label": GameTimeServiceScript.duration_label(safe_days),
+		"duration_label": GameTimeService.duration_label(safe_days),
 		"recommended_days": recommended_days,
-		"recommended_duration_label": GameTimeServiceScript.duration_label(recommended_days),
+		"recommended_duration_label": GameTimeService.duration_label(recommended_days),
 		"estimated_cultivation": estimated_gain,
 		"start_day": day,
 		"end_day": day + safe_days,
-		"start_date_label": GameTimeServiceScript.date_label(day),
-		"end_date_label": GameTimeServiceScript.date_label(day + safe_days),
+		"start_date_label": GameTimeService.date_label(day),
+		"end_date_label": GameTimeService.date_label(day + safe_days),
 		"method_id": method_id,
 		"method_name": str(method.get("name", "未选择修炼功法")),
-		"method_mastery": CultivationMethodServiceScript.method_mastery(DataStore.savedata, method_id),
-		"knowledge_rows": CultivationMethodServiceScript.resolved_knowledge(method_id),
+		"method_mastery": XiulianMethodService.method_mastery(DataStore.savedata, method_id),
+		"knowledge_rows": XiulianMethodService.resolved_knowledge(method_id),
 		"base_daily_gain": base_gain,
 		"cultivation_speed": speed,
 		"method_base_gain": method_base_gain,
 		"cultivation_formula": first_day_formula,
 		"pill_ids": pill_ids,
 		"pill_id": resolved_pill_id,
-		"instability_gain": _cultivation_pill_instability_total(pill_ids) if EnumCultivationMode.is_pill_mode(mode_id) else 0,
+		"instability_gain": _cultivation_pill_instability_total(pill_ids) if EnumXiulianMode.is_pill_mode(mode_id) else 0,
 		"cultivation_instability": cultivation_instability,
 	}
 
 
-func cultivate_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: int = 1, pill_id: String = "") -> Dictionary:
+func cultivate_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, days: int = 1, pill_id: String = "") -> Dictionary:
 	var preview := preview_cultivation_session(mode_id, days, pill_id)
 	if not bool(preview.get("ok", false)):
 		return preview
 	var mode: Dictionary = preview.get("mode", {}) as Dictionary
 	var safe_days := int(preview.get("days", 1))
 	var method_id := str(preview.get("method_id", ""))
-	var mastery_before := CultivationMethodServiceScript.method_mastery(DataStore.savedata, method_id)
+	var mastery_before := XiulianMethodService.method_mastery(DataStore.savedata, method_id)
 	var cultivation_before := cultivation
 	var realm_before := realm_name
 	var instability_before := cultivation_instability
@@ -679,12 +659,12 @@ func cultivate_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: 
 	var layer_advances := 0
 	for day_index in safe_days:
 		var base_gain := RealmBalanceService.base_daily_cultivation_gain(_realm_row(realm_index))
-		var speed := CultivationMethodServiceScript.cultivation_session_speed(method_id, DataStore.savedata)
-		var method_base_gain := CultivationMethodServiceScript.base_cultivation_gain(method_id)
+		var speed := XiulianMethodService.cultivation_session_speed(method_id, DataStore.savedata)
+		var method_base_gain := XiulianMethodService.base_cultivation_gain(method_id)
 		var raw_gain := 0
-		if EnumCultivationMode.is_pill_mode(mode_id):
+		if EnumXiulianMode.is_pill_mode(mode_id):
 			var active_pill_id := str(pill_ids[day_index])
-			InventoryServiceScript.remove_item(inventory, active_pill_id, 1)
+			InventoryService.remove_item(inventory, active_pill_id, 1)
 			raw_gain = cultivation_pill_gain(active_pill_id) + method_base_gain
 			cultivation_instability += cultivation_pill_instability(active_pill_id)
 		else:
@@ -693,7 +673,7 @@ func cultivate_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: 
 		var injury_multiplier := 0.5 if injury_days > 0 else 1.0
 		var gain := maxi(1, int(round(float(raw_gain) * injury_multiplier)))
 		cultivation += gain
-		var cycle := CultivationMethodServiceScript.apply_cultivation_cycle(
+		var cycle := XiulianMethodService.apply_cultivation_cycle(
 			DataStore.savedata,
 			float(base_gain) * speed,
 			float(mode["knowledge_multiplier"]),
@@ -719,7 +699,7 @@ func cultivate_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: 
 		knowledge_gains.append(row)
 	var gained := cultivation - cultivation_before
 	var activity_text := "闭关 %s：%s，修为 +%d" % [
-		GameTimeServiceScript.duration_label(safe_days),
+		GameTimeService.duration_label(safe_days),
 		str(mode["name"]),
 		gained,
 	]
@@ -733,18 +713,18 @@ func cultivate_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: 
 		"mode_id": mode_id,
 		"mode_name": str(mode["name"]),
 		"days": safe_days,
-		"duration_label": GameTimeServiceScript.duration_label(safe_days),
+		"duration_label": GameTimeService.duration_label(safe_days),
 		"start_day": int(preview.get("start_day", day - safe_days)),
 		"end_day": day,
-		"start_date_label": GameTimeServiceScript.date_label(int(preview.get("start_day", day - safe_days))),
-		"end_date_label": GameTimeServiceScript.date_label(day),
+		"start_date_label": GameTimeService.date_label(int(preview.get("start_day", day - safe_days))),
+		"end_date_label": GameTimeService.date_label(day),
 		"cultivation_gained": gained,
 		"cultivation": cultivation,
 		"breakthrough_at": breakthrough_at,
 		"method_id": method_id,
 		"method_name": str(preview.get("method_name", "")),
-		"mastery_gained": CultivationMethodServiceScript.method_mastery(DataStore.savedata, method_id) - mastery_before,
-		"method_mastery": CultivationMethodServiceScript.method_mastery(DataStore.savedata, method_id),
+		"mastery_gained": XiulianMethodService.method_mastery(DataStore.savedata, method_id) - mastery_before,
+		"method_mastery": XiulianMethodService.method_mastery(DataStore.savedata, method_id),
 		"knowledge_gains": knowledge_gains,
 		"layer_advances": layer_advances,
 		"realm_before": realm_before,
@@ -752,12 +732,12 @@ func cultivate_session(mode_id: String = EnumCultivationMode.LABEL_CYCLE, days: 
 		"instability_gained": cultivation_instability - instability_before,
 		"cultivation_instability": cultivation_instability,
 	}
-	_emit_tip_intents(RewardTipBuilderScript.cultivation_result(result, "cultivation"))
+	_emit_tip_intents(RewardTipBuilder.cultivation_result(result, "cultivation"))
 	return result
 
 
 func _cultivation_mode(mode_id: String) -> Dictionary:
-	return EnumCultivationMode.config(mode_id)
+	return EnumXiulianMode.config(mode_id)
 
 
 func resolve_cultivation_pill_id(preferred_id: String = "") -> String:
@@ -816,8 +796,8 @@ func _cultivation_pill_instability_total(pill_ids: Array) -> int:
 
 
 func rest() -> void:
-	hp = float(attrs.get(FightAttr.HP_MAX, 100.0))
-	mp = float(attrs.get(FightAttr.MP_MAX, 100.0))
+	hp = float(attrs.get(ZhandouAttr.HP_MAX, 100.0))
+	mp = float(attrs.get(ZhandouAttr.MP_MAX, 100.0))
 	injury_days = maxi(0, injury_days - maxi(0, int(_activity_cfg("rest").get("injury_recovery", 2))))
 	_finish_activity("休息：恢复气血与法力", false)
 
@@ -853,7 +833,7 @@ func grant_cultivation(amount: int) -> Dictionary:
 		"realm_before": realm_before,
 		"realm_name": realm_name,
 	}
-	_emit_tip_intents(RewardTipBuilderScript.cultivation_result(result, "grant_cultivation"))
+	_emit_tip_intents(RewardTipBuilder.cultivation_result(result, "grant_cultivation"))
 	return result
 
 
@@ -905,7 +885,7 @@ func advance_realm_to_index(target_index: int) -> Dictionary:
 
 ## 经 [method RewardService.apply_rewards] 发放奖励（物品、灵石等）。
 func grant_rewards(rewards: Array) -> Array:
-	return RewardServiceScript.apply_rewards(self, rewards, "grant_rewards")
+	return RewardService.apply_rewards(self, rewards, "grant_rewards")
 
 
 func can_breakthrough() -> bool:
@@ -929,7 +909,7 @@ func preview_breakthrough() -> Dictionary:
 	var realms := _realms()
 	if realms.is_empty():
 		return {"ok": false, "error": "境界表为空"}
-	return BreakthroughServiceScript.compute_breakdown(DataStore.savedata, realms, realm_index)
+	return TupoService.compute_breakdown(DataStore.savedata, realms, realm_index)
 
 
 func attempt_breakthrough() -> Dictionary:
@@ -938,9 +918,9 @@ func attempt_breakthrough() -> Dictionary:
 	var realms := _realms()
 	if realms.is_empty():
 		return {"ok": false, "error": "境界表为空"}
-	if not BreakthroughServiceScript.is_major_breakthrough(realms, realm_index):
+	if not TupoService.is_major_breakthrough(realms, realm_index):
 		return {"ok": false, "error": "同境界小层已自动提升，无需突破"}
-	var breakdown := BreakthroughServiceScript.compute_breakdown(DataStore.savedata, realms, realm_index)
+	var breakdown := TupoService.compute_breakdown(DataStore.savedata, realms, realm_index)
 	if not bool(breakdown.get("ok", false)):
 		return breakdown
 	if not bool(breakdown.get("can_attempt", false)):
@@ -948,7 +928,7 @@ func attempt_breakthrough() -> Dictionary:
 	var old_name := realm_name
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
-	var result := BreakthroughServiceScript.resolve(DataStore.savedata, realms, realm_index, rng)
+	var result := TupoService.resolve(DataStore.savedata, realms, realm_index, rng)
 	if not bool(result.get("ok", false)):
 		return result
 	if bool(result.get("success", false)):
@@ -974,7 +954,7 @@ func breakthrough() -> Dictionary:
 	var realms := _realms()
 	if realms.is_empty():
 		return {"ok": false, "error": "境界表为空"}
-	if not BreakthroughServiceScript.is_major_breakthrough(realms, realm_index):
+	if not TupoService.is_major_breakthrough(realms, realm_index):
 		return {"ok": false, "error": "同境界小层已自动提升，无需突破"}
 	var breakdown := preview_breakthrough()
 	if not bool(breakdown.get("ok", false)):
@@ -986,7 +966,7 @@ func breakthrough() -> Dictionary:
 	# 突破值未达新系统门槛时，沿用简易突破，确保修为达标后可跨入大境界。
 	var old_name := realm_name
 	realm_index += 1
-	var grown: Dictionary = CharacterStatsScript.normalize_foundations(foundations)
+	var grown: Dictionary = CharacterStats.normalize_foundations(foundations)
 	for key in grown.keys():
 		grown[key] = float(grown[key]) + 1.0
 	foundations = grown
@@ -998,8 +978,8 @@ func breakthrough() -> Dictionary:
 
 func _apply_breakthrough_vitals() -> void:
 	refresh_derived_attrs(false)
-	hp = float(attrs.get(FightAttr.HP_MAX, 100.0))
-	mp = float(attrs.get(FightAttr.MP_MAX, 100.0))
+	hp = float(attrs.get(ZhandouAttr.HP_MAX, 100.0))
+	mp = float(attrs.get(ZhandouAttr.MP_MAX, 100.0))
 
 
 func _breakthrough_result_dict(old_name: String, service_result: Dictionary) -> Dictionary:
@@ -1019,8 +999,8 @@ func _breakthrough_result_dict(old_name: String, service_result: Dictionary) -> 
 	return payload
 
 
-func begin_expedition(location_id: String) -> Dictionary:
-	var location := LocationServiceScript.by_id(location_id)
+func begin_lilian(location_id: String) -> Dictionary:
+	var location := DidianService.by_id(location_id)
 	if location.is_empty():
 		return {"ok": false, "error": "未知地点"}
 	return {"ok": true, "location": location}
@@ -1035,13 +1015,13 @@ func set_map_data(data: Dictionary) -> void:
 
 
 func discover_map_node(node_id: String, category: String) -> void:
-	set_map_data(WorldMapServiceScript.discover_map_node(map_data(), node_id, category))
+	set_map_data(WorldMapService.discover_map_node(map_data(), node_id, category))
 
 
 func travel_to_city(target_city_id: String, path: Array, total_days: int) -> Dictionary:
 	if target_city_id == "":
 		return {"ok": false, "error": "缺少目标城市"}
-	var preview := WorldMapServiceScript.build_travel_preview(current_city_id, target_city_id, map_data())
+	var preview := WorldMapService.build_travel_preview(current_city_id, target_city_id, map_data())
 	if not bool(preview.get("ok", false)):
 		return preview
 	var expected_path: Array = preview.get("path", []) as Array
@@ -1053,7 +1033,7 @@ func travel_to_city(target_city_id: String, path: Array, total_days: int) -> Dic
 	var elapsed := maxi(0, total_days)
 	if elapsed != int(preview.get("total_days", -1)):
 		return {"ok": false, "error": "旅行耗时已变化，请重新确认"}
-	var next_map := WorldMapServiceScript.discover_along_path(map_data(), path)
+	var next_map := WorldMapService.discover_along_path(map_data(), path)
 	next_map["current_city_id"] = target_city_id
 	set_map_data(next_map)
 	if elapsed > 0:
@@ -1061,8 +1041,8 @@ func travel_to_city(target_city_id: String, path: Array, total_days: int) -> Dic
 	activity_log.append({
 		"day": day,
 		"text": "旅行至%s，耗时 %s" % [
-			str(WorldMapServiceScript.city_by_id(target_city_id).get("name", target_city_id)),
-			GameTimeServiceScript.duration_label(elapsed),
+			str(WorldMapService.city_by_id(target_city_id).get("name", target_city_id)),
+			GameTimeService.duration_label(elapsed),
 		],
 	})
 	if activity_log.size() > 30:
@@ -1071,8 +1051,8 @@ func travel_to_city(target_city_id: String, path: Array, total_days: int) -> Dic
 		"ok": true,
 		"city_id": target_city_id,
 		"elapsed_days": elapsed,
-		"duration_label": GameTimeServiceScript.duration_label(elapsed),
-		"date_label": GameTimeServiceScript.date_label(day),
+		"duration_label": GameTimeService.duration_label(elapsed),
+		"date_label": GameTimeService.date_label(day),
 	}
 
 
@@ -1086,7 +1066,7 @@ func apply_battle_player_runtime(summary: Dictionary) -> void:
 		mp = float(runtime_summary.get("mp", mp))
 	var battle_items_v: Variant = runtime_summary.get("items", [])
 	if battle_items_v is Array:
-		InventoryServiceScript.sync_battle_item_counts(
+		InventoryService.sync_battle_item_counts(
 			inventory, item_slots, battle_items_v as Array
 		)
 
@@ -1101,7 +1081,7 @@ func _skills_include_id(skills: Array, skill_id: int) -> bool:
 
 
 func build_player_battle_snapshot(runtime: Dictionary) -> Dictionary:
-	var snapshot := PlayerBuildServiceScript.build_battle_snapshot(DataStore.savedata, runtime)
+	var snapshot := PlayerBuildService.build_battle_snapshot(DataStore.savedata, runtime)
 	snapshot["ai"] = resolved_auto_battle_rules()
 	return snapshot
 
@@ -1113,8 +1093,8 @@ func build_battle_init(event: Dictionary) -> Dictionary:
 		"inventory": inventory,
 		"item_slots": item_slots,
 	})
-	var enemy := ExpeditionEventServiceScript.build_battle_enemy(event)
-	var enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
+	var enemy := LilianEventService.build_battle_enemy(event)
+	var enemies := LilianEventService.build_battle_enemies(event)
 	return {
 		"player": player,
 		"enemy": enemy,
@@ -1125,18 +1105,18 @@ func build_battle_init(event: Dictionary) -> Dictionary:
 	}
 
 
-func settle_expedition(result: Dictionary) -> Dictionary:
+func settle_lilian(result: Dictionary) -> Dictionary:
 	if result.is_empty():
 		return {"ok": false, "error": "缺少历练结算数据"}
-	var result_errors := ExpeditionResult.collect_errors(result)
+	var result_errors := LilianResult.collect_errors(result)
 	if not result_errors.is_empty():
 		return {"ok": false, "error": result_errors[0]}
 	var settlement_id := str(result.get("settlement_id", "")).strip_edges()
 	if settlement_id == "":
 		return {"ok": false, "error": "缺少 settlement_id"}
-	if settlement_id == last_settled_expedition_id:
+	if settlement_id == last_settled_lilian_id:
 		return {"ok": false, "error": "duplicate", "duplicate": true}
-	last_settled_expedition_id = settlement_id
+	last_settled_lilian_id = settlement_id
 	var elapsed_days := maxi(1, int(result.get("elapsed_days", 1)))
 	var start_day := int(result.get("start_day", 0))
 	injury_days = maxi(0, injury_days - elapsed_days)
@@ -1144,11 +1124,11 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 	hp = float(result.get("hp", hp))
 	mp = float(result.get("mp", mp))
 	if exit_reason == "defeated":
-		var rules := ExpeditionRulesServiceScript.rules()
-		hp = maxf(hp, float(attrs.get(FightAttr.HP_MAX, 100.0)) * float(rules.get("defeat_hp_floor_ratio", 0.25)))
+		var rules := LilianRulesService.rules()
+		hp = maxf(hp, float(attrs.get(ZhandouAttr.HP_MAX, 100.0)) * float(rules.get("defeat_hp_floor_ratio", 0.25)))
 		injury_days = maxi(injury_days, int(rules.get("defeat_injury_days", 3)))
 	elif exit_reason == "fled":
-		var fled_rules := ExpeditionRulesServiceScript.rules()
+		var fled_rules := LilianRulesService.rules()
 		injury_days = maxi(injury_days, int(fled_rules.get("fled_injury_days", 1)))
 	for item_row_v in result.get("items", []) as Array:
 		if not item_row_v is Dictionary:
@@ -1162,7 +1142,7 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 			inventory[iid] = remaining
 		else:
 			inventory.erase(iid)
-	var applied_loot := RewardServiceScript.apply_rewards(self, result.get("loot", []) as Array, "expedition_settlement")
+	var applied_loot := RewardService.apply_rewards(self, result.get("loot", []) as Array, "lilian_jiesuan")
 	last_rewards = applied_loot if not applied_loot.is_empty() else (result.get("loot", []) as Array).duplicate(true)
 	for lost_v in result.get("loot_lost", []) as Array:
 		if not lost_v is Dictionary:
@@ -1170,7 +1150,7 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 		var lost := lost_v as Dictionary
 		if str(lost.get("source", "inventory")) == "session_loot":
 			continue
-		InventoryServiceScript.remove_item(
+		InventoryService.remove_item(
 			inventory,
 			str(lost.get("id", "")),
 			int(lost.get("count", 0))
@@ -1178,8 +1158,8 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 	for reward in last_rewards:
 		totals["items_gained"] = int(totals.get("items_gained", 0)) + int((reward as Dictionary).get("count", 0))
 	var stats := result.get("stats", {}) as Dictionary
-	totals["expeditions"] = int(totals.get("expeditions", 0)) + 1
-	totals["expedition_steps"] = int(totals.get("expedition_steps", 0)) + int(stats.get("steps", 0))
+	totals["lilian_count"] = int(totals.get("lilian_count", 0)) + 1
+	totals["lilian_steps"] = int(totals.get("lilian_steps", 0)) + int(stats.get("steps", 0))
 	var max_diff := maxi(int(stats.get("max_difficulty", 0)), int(stats.get("max_depth", 0)))
 	totals["max_difficulty"] = maxi(int(totals.get("max_difficulty", totals.get("max_depth", 0))), max_diff)
 	totals["battles"] = int(totals.get("battles", 0)) + int(stats.get("battles", 0))
@@ -1201,7 +1181,7 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 		reward_labels.append(reward_label(reward))
 	var peak_diff := maxi(int(stats.get("max_difficulty", 0)), int(stats.get("max_depth", 0)))
 	var log_text := "%s：%s历练，最高难度 %d，胜 %d 场" % [
-		GameTimeServiceScript.date_label(day - elapsed_days),
+		GameTimeService.date_label(day - elapsed_days),
 		location_name,
 		peak_diff,
 		int(stats.get("wins", 0)),
@@ -1217,11 +1197,12 @@ func settle_expedition(result: Dictionary) -> Dictionary:
 	activity_log.append({"day": day, "text": log_text})
 	if activity_log.size() > 30:
 		activity_log = activity_log.slice(activity_log.size() - 30)
-	last_settled_expedition_id = settlement_id
+	last_settled_lilian_id = settlement_id
 	result["instability_reduced"] = instability_reduced
 	result["cultivation_instability"] = cultivation_instability
-	last_expedition_summary = result.duplicate(true)
-	TutorialService.game_event("tutorial.expedition_returned")
+	last_lilian_summary = result.duplicate(true)
+	TutorialService.game_event("tutorial.lilian_returned")
+	WeituoService.record_lilian_result(result, DataStore.savedata)
 	auto_save()
 	return {
 		"ok": true,
@@ -1241,32 +1222,32 @@ func apply_dict(data: Dictionary) -> bool:
 		return false
 	refresh_derived_attrs(true)
 	var attrs_dict := attrs
-	hp = clampf(hp, 0.0, float(attrs_dict.get(FightAttr.HP_MAX, 100.0)))
-	mp = clampf(mp, 0.0, float(attrs_dict.get(FightAttr.MP_MAX, 100.0)))
+	hp = clampf(hp, 0.0, float(attrs_dict.get(ZhandouAttr.HP_MAX, 100.0)))
+	mp = clampf(mp, 0.0, float(attrs_dict.get(ZhandouAttr.MP_MAX, 100.0)))
 	if Engine.get_main_loop() is SceneTree:
-		var expedition := (Engine.get_main_loop() as SceneTree).root.get_node_or_null("ExpeditionState")
-		if expedition != null and expedition.has_method("reset"):
-			expedition.reset()
+		var lilian := (Engine.get_main_loop() as SceneTree).root.get_node_or_null("LilianState")
+		if lilian != null and lilian.has_method("reset"):
+			lilian.reset()
 	_initialize_map_state()
 	_sync_realm()
 	return true
 
 
 func refresh_derived_attrs(preserve_vital_ratio: bool = true) -> void:
-	var old_hp_max := maxf(1.0, float(attrs.get(FightAttr.HP_MAX, 100.0)))
-	var old_mp_max := maxf(1.0, float(attrs.get(FightAttr.MP_MAX, 100.0)))
+	var old_hp_max := maxf(1.0, float(attrs.get(ZhandouAttr.HP_MAX, 100.0)))
+	var old_mp_max := maxf(1.0, float(attrs.get(ZhandouAttr.MP_MAX, 100.0)))
 	var hp_ratio := clampf(hp / old_hp_max, 0.0, 1.0)
 	var mp_ratio := clampf(mp / old_mp_max, 0.0, 1.0)
-	var method_mods := CultivationMethodServiceScript.build_modifiers(
+	var method_mods := XiulianMethodService.build_modifiers(
 		cultivation_method_slots, DataStore.savedata
 	)
-	var knowledge_mods := KnowledgeEffectServiceScript.build_modifiers(DataStore.savedata)
+	var knowledge_mods := KnowledgeEffectService.build_modifiers(DataStore.savedata)
 	var flat_mods: Dictionary = (method_mods.get("flat", {}) as Dictionary).duplicate(true)
 	for key in (knowledge_mods.get("flat", {}) as Dictionary).keys():
 		var stat := str(key)
 		flat_mods[stat] = float(flat_mods.get(stat, 0.0)) \
 			+ float((knowledge_mods.get("flat", {}) as Dictionary)[stat])
-	var realm_mods := CharacterStatsScript.realm_flat_modifiers(realm_index)
+	var realm_mods := CharacterStats.realm_flat_modifiers(realm_index)
 	for key in realm_mods.keys():
 		var stat := str(key)
 		flat_mods[stat] = float(flat_mods.get(stat, 0.0)) + float(realm_mods[stat])
@@ -1275,14 +1256,14 @@ func refresh_derived_attrs(preserve_vital_ratio: bool = true) -> void:
 		var stat := str(key)
 		percent_mods[stat] = float(percent_mods.get(stat, 0.0)) \
 			+ float((knowledge_mods.get("percent", {}) as Dictionary)[stat])
-	attrs = CharacterStatsScript.build_combat_attrs(
+	attrs = CharacterStats.build_combat_attrs(
 		foundations,
 		flat_mods,
 		percent_mods
 	)
 	if preserve_vital_ratio:
-		hp = float(attrs.get(FightAttr.HP_MAX, 100.0)) * hp_ratio
-		mp = float(attrs.get(FightAttr.MP_MAX, 100.0)) * mp_ratio
+		hp = float(attrs.get(ZhandouAttr.HP_MAX, 100.0)) * hp_ratio
+		mp = float(attrs.get(ZhandouAttr.MP_MAX, 100.0)) * mp_ratio
 
 
 func major_realm_id() -> String:
@@ -1290,33 +1271,35 @@ func major_realm_id() -> String:
 
 
 func grant_knowledge(skill_id: String, level: int) -> void:
-	KnowledgeServiceScript.grant_level(DataStore.savedata, skill_id, level)
+	KnowledgeService.grant_level(DataStore.savedata, skill_id, level)
 
 
 func learn_ability(ability_id: String) -> Dictionary:
 	var aid := ability_id.strip_edges()
-	if AbilityServiceScript.by_id(aid).is_empty():
+	if AbilityService.by_id(aid).is_empty():
 		return {"ok": false, "error": "未知技能"}
-	if not AbilityServiceScript.can_learn(aid, DataStore.savedata, major_realm_id()):
+	if not AbilityService.can_learn(aid, DataStore.savedata, major_realm_id()):
 		return {"ok": false, "error": "尚未满足学习条件"}
 	if unlocked_abilities.has(aid):
 		return {"ok": false, "error": "已经掌握该技能"}
 	unlocked_abilities.append(aid)
-	var slots := equipped_abilities.duplicate(true)
-	for i in slots.size():
-		if str(slots[i]).strip_edges() == "":
-			slots[i] = aid
-			equipped_abilities = DataStore._normalize_ability_slots(slots)
-			return {"ok": true, "ability_id": aid}
-	equipped_abilities = DataStore._normalize_ability_slots(slots)
+	# 战斗被动/通用被动学会即生效，仅主动与持续技尝试填入战斗栏空槽
+	var ability_type := str(AbilityService.by_id(aid).get("type", ""))
+	if AbilityService.uses_combat_skill_slot(ability_type):
+		var slots := equipped_abilities.duplicate(true)
+		for i in slots.size():
+			if str(slots[i]).strip_edges() == "":
+				slots[i] = aid
+				equipped_abilities = DataStore._normalize_ability_slots(slots)
+				break
 	return {"ok": true, "ability_id": aid}
 
 
 func learn_method(method_id: String) -> Dictionary:
-	var row := CultivationMethodServiceScript.by_id(method_id)
+	var row := XiulianMethodService.by_id(method_id)
 	if row.is_empty():
 		return {"ok": false, "error": "未知功法"}
-	if not CultivationMethodServiceScript.can_learn(row, DataStore.savedata, major_realm_id()):
+	if not XiulianMethodService.can_learn(row, DataStore.savedata, major_realm_id()):
 		return {"ok": false, "error": "尚未满足学习条件"}
 	if unlocked_methods.has(method_id):
 		return {"ok": false, "error": "已经掌握该功法"}
@@ -1328,7 +1311,7 @@ func learn_method(method_id: String) -> Dictionary:
 
 func set_current_cultivation_method(method_id: String) -> Dictionary:
 	var id := method_id.strip_edges()
-	if not unlocked_methods.has(id) or CultivationMethodServiceScript.by_id(id).is_empty():
+	if not unlocked_methods.has(id) or XiulianMethodService.by_id(id).is_empty():
 		return {"ok": false, "error": "尚未掌握该功法"}
 	current_cultivation_method_id = id
 	return {"ok": true, "method_id": id}
@@ -1365,7 +1348,7 @@ func use_learning_book(item_id: String) -> Dictionary:
 	else:
 		return {"ok": false, "error": "该物品不是可学习典籍"}
 	if bool(result.get("ok", false)):
-		InventoryServiceScript.remove_item(inventory, item_id, 1)
+		InventoryService.remove_item(inventory, item_id, 1)
 	return result
 
 
@@ -1395,13 +1378,13 @@ func _use_alchemy_mastery_notes(item_id: String, def: ItemDef) -> Dictionary:
 			if args.size() > 1:
 				amount = int(args[1])
 		break
-	var before := AlchemyServiceScript.mastery_for(alchemy, recipe_id)
-	var next_alchemy := AlchemyServiceScript.apply_recipe_mastery(alchemy, recipe_id, amount)
-	alchemy = next_alchemy
-	var gained := AlchemyServiceScript.mastery_for(alchemy, recipe_id) - before
-	var recipe := AlchemyServiceScript.recipe_by_id(recipe_id)
+	var before := LiandanService.mastery_for(liandan, recipe_id)
+	var next_liandan := LiandanService.apply_recipe_mastery(liandan, recipe_id, amount)
+	liandan = next_liandan
+	var gained := LiandanService.mastery_for(liandan, recipe_id) - before
+	var recipe := LiandanService.recipe_by_id(recipe_id)
 	var recipe_name := str(recipe.get("pill_name", recipe.get("name", "丹方")))
-	InventoryServiceScript.remove_item(inventory, item_id, 1)
+	InventoryService.remove_item(inventory, item_id, 1)
 	return {
 		"ok": true,
 		"message": "研读心得，%s熟练度 +%d" % [recipe_name, gained],
@@ -1411,8 +1394,8 @@ func _use_alchemy_mastery_notes(item_id: String, def: ItemDef) -> Dictionary:
 
 
 func equip_method(slot_key: String, method_id: String) -> Dictionary:
-	var row := CultivationMethodServiceScript.by_id(method_id)
-	if not unlocked_methods.has(method_id) or not CultivationMethodServiceScript.can_equip(row, slot_key):
+	var row := XiulianMethodService.by_id(method_id)
+	if not unlocked_methods.has(method_id) or not XiulianMethodService.can_equip(row, slot_key):
 		return {"ok": false, "error": "该功法无法装备到此位置"}
 	var slots := cultivation_method_slots.duplicate(true)
 	for key in slots.keys():
@@ -1430,6 +1413,10 @@ func equip_ability(slot_index: int, ability_id: String) -> Dictionary:
 		return {"ok": false, "error": "无法配置该技能"}
 	if aid != "" and not unlocked_abilities.has(aid):
 		return {"ok": false, "error": "无法配置该技能"}
+	if aid != "":
+		var ability_type := str(AbilityService.by_id(aid).get("type", ""))
+		if not AbilityService.uses_combat_skill_slot(ability_type):
+			return {"ok": false, "error": "该技能学会后自动生效，无需编入战斗栏"}
 	var slots := DataStore._normalize_ability_slots(equipped_abilities)
 	var previous := slots.find(aid)
 	if previous >= 0:
@@ -1518,7 +1505,7 @@ func assign_item_slot(slot_index: int, item_id: String) -> Dictionary:
 
 
 func resolved_auto_battle_rules() -> Dictionary:
-	return PlayerAutoBattleServiceScript.normalize_rules(auto_battle_rules)
+	return PlayerAutoBattleService.normalize_rules(auto_battle_rules)
 
 
 func auto_battle_strategies() -> Array:
@@ -1527,7 +1514,7 @@ func auto_battle_strategies() -> Array:
 
 
 func set_auto_battle_strategies(strategies: Array) -> void:
-	auto_battle_rules = PlayerAutoBattleServiceScript.with_strategies(strategies)
+	auto_battle_rules = PlayerAutoBattleService.with_strategies(strategies)
 
 
 func append_auto_battle_strategy(strategy: Dictionary) -> void:
@@ -1568,7 +1555,7 @@ func _advance_time(days_value: int, reduce_injury: bool = true, passive_method: 
 	var elapsed := maxi(0, days_value)
 	var summary := {
 		"days": elapsed,
-		"method_id": CultivationMethodServiceScript.active_cultivation_method_id(DataStore.savedata),
+		"method_id": XiulianMethodService.active_cultivation_method_id(DataStore.savedata),
 		"mastery_gained": 0.0,
 		"knowledge": [],
 	}
@@ -1583,24 +1570,24 @@ func _advance_time(days_value: int, reduce_injury: bool = true, passive_method: 
 
 
 func _apply_passive_method_practice(days_value: int) -> Dictionary:
-	var method_id := CultivationMethodServiceScript.active_cultivation_method_id(DataStore.savedata)
-	var mastery_before := CultivationMethodServiceScript.method_mastery(DataStore.savedata, method_id)
+	var method_id := XiulianMethodService.active_cultivation_method_id(DataStore.savedata)
+	var mastery_before := XiulianMethodService.method_mastery(DataStore.savedata, method_id)
 	var summary := {
 		"days": maxi(0, days_value),
 		"method_id": method_id,
 		"mastery_gained": 0.0,
 		"knowledge": [],
 	}
-	var speed := CultivationMethodServiceScript.cultivation_session_speed(method_id, DataStore.savedata)
+	var speed := XiulianMethodService.cultivation_session_speed(method_id, DataStore.savedata)
 	if method_id == "" or speed <= 0.0:
 		return summary
 	var base_gain := RealmBalanceService.base_daily_cultivation_gain(_realm_row(realm_index))
-	var method_base_gain := CultivationMethodServiceScript.base_cultivation_gain(method_id)
+	var method_base_gain := XiulianMethodService.base_cultivation_gain(method_id)
 	var daily_xp := float(maxi(1, int(round(float(base_gain) * speed)) + method_base_gain))
 	var practice_xp := daily_xp * PASSIVE_METHOD_PRACTICE_RATIO
 	var knowledge_summary: Dictionary = {}
 	for _day_index in days_value:
-		var cycle := CultivationMethodServiceScript.apply_cultivation_cycle(
+		var cycle := XiulianMethodService.apply_cultivation_cycle(
 			DataStore.savedata,
 			practice_xp,
 			1.0,
@@ -1624,7 +1611,7 @@ func _apply_passive_method_practice(days_value: int) -> Dictionary:
 	for row in knowledge_summary.values():
 		knowledge_gains.append(row)
 	summary["knowledge"] = knowledge_gains
-	summary["mastery_gained"] = CultivationMethodServiceScript.method_mastery(
+	summary["mastery_gained"] = XiulianMethodService.method_mastery(
 		DataStore.savedata,
 		method_id
 	) - mastery_before
@@ -1745,5 +1732,5 @@ func _map_savedata() -> Dictionary:
 func _initialize_map_state() -> void:
 	var map_state := map_data()
 	if str(map_state.get("current_city_id", "")) == "":
-		map_state["current_city_id"] = WorldMapServiceScript.starter_city_id()
-	set_map_data(WorldMapServiceScript.apply_starter_discovery(map_data()))
+		map_state["current_city_id"] = WorldMapService.starter_city_id()
+	set_map_data(WorldMapService.apply_starter_discovery(map_data()))

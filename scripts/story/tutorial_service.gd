@@ -13,11 +13,16 @@ func _ready() -> void:
 
 
 func game_event(event_id: String) -> void:
-	if not is_active() or not StoryDirector.is_waiting_for(event_id):
+	if not is_active():
+		return
+	# 首战胜利标记决定历练是否仍用新手三节点图，须写入存档，不能仅依赖剧情层是否在等待。
+	if event_id == "tutorial.first_battle_won":
+		_set_step_for_event(event_id)
+		if LilianState != null:
+			LilianState.auto_advance = false
+	if not StoryDirector.is_waiting_for(event_id):
 		return
 	_set_step_for_event(event_id)
-	if event_id == "tutorial.first_battle_won" and ExpeditionState != null:
-		ExpeditionState.auto_advance = false
 	StoryDirector.notify_game_event(event_id)
 
 
@@ -29,7 +34,7 @@ func is_active() -> bool:
 
 
 ## 首次历练路线图：教程未完成且尚未赢下引导战斗时使用固定三节点地图。
-func should_use_tutorial_expedition_map() -> bool:
+func should_use_tutorial_lilian_map() -> bool:
 	if not is_active():
 		return false
 	var flags := (DataStore.savedata.get("tutorial", {}) as Dictionary).get("flags", {}) as Dictionary
@@ -51,8 +56,11 @@ func _ensure_started() -> void:
 		return
 	if _is_main_menu_scene():
 		return
-	if is_active() and not StoryDirector.is_active():
-		StoryDirector.start_story(STORY_ID)
+	if not is_active() or StoryDirector.is_active():
+		return
+	var started: Dictionary = StoryDirector.start_story(STORY_ID)
+	if not bool(started.get("ok", false)):
+		push_warning("TutorialService: failed to start %s: %s" % [STORY_ID, str(started.get("error", started.get("errors", "unknown")))])
 
 
 func _is_main_menu_scene() -> bool:
@@ -81,7 +89,7 @@ func _on_story_finished(story_id: String, result: String) -> void:
 
 func _set_step_for_event(event_id: String) -> void:
 	var steps := {
-		"tutorial.cultivation_panel_opened": "T01",
+		"tutorial.xiulian_mianban_opened": "T01",
 		"tutorial.cultivation_started": "T01",
 		"tutorial.cultivation_result_shown": "T02",
 		"tutorial.cultivation_completed": "T02",
@@ -96,9 +104,9 @@ func _set_step_for_event(event_id: String) -> void:
 		"tutorial.attributes_closed": "T03",
 		"tutorial.world_map_opened": "T03",
 		"tutorial.wolf_valley_selected": "T04",
-		"tutorial.expedition_started": "T04",
+		"tutorial.lilian_started": "T04",
 		"tutorial.first_battle_won": "T05",
-		"tutorial.expedition_returned": "T06",
+		"tutorial.lilian_returned": "T06",
 		"tutorial.result_closed": "T07",
 	}
 	if not steps.has(event_id):

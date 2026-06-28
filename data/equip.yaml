@@ -14,7 +14,6 @@ equips:
         value: 18
         scaling:
           magic_atk: 1.8
-        accuracy_bonus: 0.15
         target: "enemy"
   5002:
     name: "寒潭珠"
@@ -48,7 +47,6 @@ equips:
         value: 8
         scaling:
           magic_atk: 0.8
-        accuracy_bonus: 0.1
         target: "enemy"
       - type: "buff"
         modifiers:

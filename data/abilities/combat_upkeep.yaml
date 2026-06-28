@@ -1,0 +1,251 @@
+configId: "abilities.combat_upkeep"
+type: "combat_upkeep"
+metadata:
+  name: "技能·combat_upkeep"
+  abilityCount: 5
+abilities:
+  - id: "ability.upkeep.sword_domain"
+    name: "太虚剑域"
+    type: "combat_upkeep"
+    realm: "transform"
+    tier: 5
+    quality: 4
+    description: "太虚剑域"
+    tags:
+      - "sword"
+      - "domain"
+    combat:
+      target: "area"
+      castTime: 0
+      cooldown: 0
+      costs: []
+      upkeepCostsPerSecond:
+        - resource: "mana"
+          value: 18
+      activation: "toggle"
+      powerScale: 1
+    effects:
+      - effectId: "sword_damage"
+        base: 0.25
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "sword_damage"
+        stackPolicy: "ability_instance"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+      - effectId: "enemy_slow"
+        base: 0.15
+        operation: "add_percent"
+        target: "area"
+        stackGroup: "enemy_slow"
+        stackPolicy: "ability_instance"
+        scalingMode: "magnitude"
+        clampMin: -1
+        clampMax: 0
+    learningRequirements:
+      realm: "transform"
+      knowledge:
+        - skillId: "sword.domain"
+          level: 2
+        - skillId: "spell.domain"
+          level: 2
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.upkeep.thunder_domain"
+    name: "赤霄雷域"
+    type: "combat_upkeep"
+    realm: "transform"
+    tier: 5
+    quality: 4
+    description: "赤霄雷域"
+    tags:
+      - "spell"
+      - "domain"
+    combat:
+      target: "area"
+      castTime: 0
+      cooldown: 0
+      costs: []
+      upkeepCostsPerSecond:
+        - resource: "mana"
+          value: 22
+      activation: "toggle"
+      powerScale: 1
+    effects:
+      - effectId: "thunder_damage"
+        base: 0.28
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "thunder_damage"
+        stackPolicy: "ability_instance"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+      - effectId: "enemy_special_action_slow"
+        base: 0.18
+        operation: "add_percent"
+        target: "area"
+        stackGroup: "enemy_special_action_slow"
+        stackPolicy: "ability_instance"
+        scalingMode: "magnitude"
+        clampMin: -1
+        clampMax: 0
+    learningRequirements:
+      realm: "transform"
+      knowledge:
+        - skillId: "spell.domain"
+          level: 2
+        - skillId: "spell.thunder"
+          level: 2
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.upkeep.dharma_form"
+    name: "金刚法相"
+    type: "combat_upkeep"
+    realm: "transform"
+    tier: 5
+    quality: 4
+    description: "金刚法相"
+    tags:
+      - "body"
+      - "transform"
+    combat:
+      target: "enemy"
+      castTime: 0
+      cooldown: 0
+      costs: []
+      upkeepCostsPerSecond:
+        - resource: "stamina"
+          value: 20
+      activation: "toggle"
+      powerScale: 1
+    effects:
+      - effectId: "max_health"
+        base: 0.3
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "max_health"
+        stackPolicy: "ability_instance"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+      - effectId: "melee_damage"
+        base: 0.22
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "melee_damage"
+        stackPolicy: "ability_instance"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+    learningRequirements:
+      realm: "transform"
+      knowledge:
+        - skillId: "body.dharma_form"
+          level: 2
+        - skillId: "body.jade"
+          level: 2
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.upkeep.primordial_projection"
+    name: "元神出窍"
+    type: "combat_upkeep"
+    realm: "transform"
+    tier: 5
+    quality: 4
+    description: "元神出窍"
+    tags:
+      - "spirit"
+      - "transform"
+    combat:
+      target: "enemy"
+      castTime: 0
+      cooldown: 0
+      costs: []
+      upkeepCostsPerSecond:
+        - resource: "spirit"
+          value: 24
+      activation: "toggle"
+      powerScale: 1
+    effects:
+      - effectId: "spirit_power"
+        base: 0.3
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "spirit_power"
+        stackPolicy: "ability_instance"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+      - effectId: "physical_resistance"
+        base: -0.35
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "physical_resistance"
+        stackPolicy: "ability_instance"
+        scalingMode: "magnitude"
+        clampMin: -1
+        clampMax: 0
+    learningRequirements:
+      realm: "transform"
+      knowledge:
+        - skillId: "spirit.primordial"
+          level: 2
+        - skillId: "spirit.split"
+          level: 2
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []
+  - id: "ability.upkeep.law_field"
+    name: "法则领域"
+    type: "combat_upkeep"
+    realm: "merge"
+    tier: 7
+    quality: 4
+    description: "法则领域"
+    tags:
+      - "law"
+      - "domain"
+    combat:
+      target: "area"
+      castTime: 0
+      cooldown: 0
+      costs: []
+      upkeepCostsPerSecond:
+        - resource: "mana"
+          value: 55
+      activation: "toggle"
+      powerScale: 1
+    effects:
+      - effectId: "law_power"
+        base: 0.35
+        operation: "add_percent"
+        target: "self"
+        stackGroup: "law_power"
+        stackPolicy: "ability_instance"
+        scalingMode: "positive"
+        clampMin: 0
+        clampMax: 2
+      - effectId: "enemy_law_resistance"
+        base: -0.2
+        operation: "add_percent"
+        target: "area"
+        stackGroup: "enemy_law_resistance"
+        stackPolicy: "ability_instance"
+        scalingMode: "magnitude"
+        clampMin: -1
+        clampMax: 0
+    learningRequirements:
+      realm: "merge"
+      knowledge:
+        - skillId: "heaven.law_mastery"
+          level: 2
+        - skillId: "spell.law"
+          level: 2
+    trigger: {}
+    upgrade_options: []
+    evolution_conditions: []

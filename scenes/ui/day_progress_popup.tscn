@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://csqepj13yurbl"]
 
 [ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_t4umh"]
-[ext_resource type="Script" uid="uid://c5mvq2vhl1ced" path="res://scripts/ui/cultivation_result_popup.gd" id="2_0in08"]
+[ext_resource type="Script" uid="uid://c5mvq2vhl1ced" path="res://scripts/ui/xiulian_jieguo_tanchuang.gd" id="2_0in08"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpj" path="res://ui/ziti_new/20.tres" id="4_cpw4d"]
 [ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="5_p222j"]
 

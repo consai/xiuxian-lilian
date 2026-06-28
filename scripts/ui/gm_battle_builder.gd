@@ -1,7 +1,7 @@
 class_name GmBattleBuilder
 extends RefCounted
 
-const ExpeditionEventServiceScript := preload("res://scripts/expedition/expedition_event_service.gd")
+const LilianEventServiceScript := preload("res://scripts/lilian/lilian_event_service.gd")
 
 
 static func build(
@@ -31,7 +31,7 @@ static func build(
 		"name": "GM 战斗：%s" % str(monster.get("name", mid)),
 		"enemies": enemies,
 	}
-	var battle_enemies := ExpeditionEventServiceScript.build_battle_enemies(event)
+	var battle_enemies := LilianEventServiceScript.build_battle_enemies(event)
 	if battle_enemies.is_empty():
 		return {}
 	var runtime := {
@@ -47,7 +47,7 @@ static func build(
 		"player": player,
 		"enemy": battle_enemies[0],
 		"enemies": battle_enemies,
-		"enemy_formation": ExpeditionEventServiceScript.build_enemy_formation(event, battle_enemies),
+		"enemy_formation": LilianEventServiceScript.build_enemy_formation(event, battle_enemies),
 		"battle_time_limit": 200.0,
 		"auto_battle": {"player": bool(game_state.get("auto_battle_enabled")), "enemy": true},
 		"spd_jitter_ratio": 0.0,

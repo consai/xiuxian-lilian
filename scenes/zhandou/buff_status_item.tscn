@@ -1,0 +1,93 @@
+[gd_scene format=3 uid="uid://c31a28k8r6slg"]
+
+[ext_resource type="Script" path="res://scripts/zhandou/buff_status_item.gd" id="1_item"]
+[ext_resource type="LabelSettings" uid="uid://dknyivqhm6bby" path="res://ui/ziti_new/13.tres" id="2_time"]
+[ext_resource type="Script" path="res://scripts/ui/hover/hover_tip_source.gd" id="3_hover"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icon_back"]
+bg_color = Color(0.93333334, 0.8039216, 0.7019608, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.76862746, 0.5058824, 0.3882353, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="BuffStatusItem" type="VBoxContainer"]
+custom_minimum_size = Vector2(34, 52)
+theme_override_constants/separation = 2
+mouse_filter = 1
+script = ExtResource("1_item")
+
+[node name="HoverBoundary" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 32)
+mouse_filter = 0
+
+[node name="IconWrap" type="Panel" parent="HoverBoundary"]
+unique_name_in_owner = true
+layout_mode = 1
+offset_left = 1.0
+offset_right = 33.0
+offset_bottom = 32.0
+custom_minimum_size = Vector2(32, 32)
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_icon_back")
+
+[node name="Icon" type="TextureRect" parent="HoverBoundary/IconWrap"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = -2.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+custom_minimum_size = Vector2(28, 28)
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StacksLabel" type="Label" parent="HoverBoundary/IconWrap"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -18.0
+offset_top = -15.0
+offset_right = -2.0
+offset_bottom = -1.0
+grow_horizontal = 0
+grow_vertical = 0
+size_flags_horizontal = 8
+size_flags_vertical = 0
+theme_override_colors/font_color = Color(1, 0.9647059, 0.74509805, 1)
+theme_override_colors/font_outline_color = Color(0.33333334, 0.19607843, 0.18431373, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 11
+text = "2"
+horizontal_alignment = 2
+
+[node name="HoverTipSource" type="Node" parent="HoverBoundary"]
+unique_name_in_owner = true
+script = ExtResource("3_hover")
+target_path = NodePath("..")
+
+[node name="TimeLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+text = "6s"
+label_settings = ExtResource("2_time")
+horizontal_alignment = 1

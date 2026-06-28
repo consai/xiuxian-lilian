@@ -25,7 +25,7 @@ static func collect_errors(data: Dictionary) -> PackedStringArray:
 	if not attrs_v is Dictionary:
 		errors.append("player.attrs 必须是 Dictionary")
 	else:
-		errors.append_array(FightAttr.validate_core(attrs_v as Dictionary))
+		errors.append_array(ZhandouAttr.validate_core(attrs_v as Dictionary))
 	if not data.get("skills", []) is Array:
 		errors.append("player.skills 必须是 Array")
 	if not data.get("items", []) is Array:
