@@ -28,7 +28,7 @@ flowchart LR
 | # | 功能 | 简述 | 实现要点 |
 |---|------|------|----------|
 | F01 | 入口与互斥 | 洞府「外出历练」进世界地图；历练进行中禁止重复出发 | `cave_hub` → `SceneManager.go_world_map()`；`SceneManager` 拦截活跃历练 |
-| F02 | 地点选择与启程 | 地图弹窗展示危险度、推荐境界、预览奖励、探索深度档；确认后启程 | `world_map_controller.gd` 野外/地点弹窗 + `data/locations.yaml` |
+| F02 | 地点选择与启程 | 地图弹窗展示危险度、推荐境界、预览奖励、探索深度档；确认后启程 | `world_map_controller.gd` 野外/地点弹窗 + `data/didian.yaml` |
 | F03 | 启程 | 校验地点、快照玩家、初始化 RNG/统计/日志，并生成本局路线图 | `LilianState.start()` + `LilianMapService.generate()` |
 | F04 | 路线选择 | 玩家点击可达节点推进历练；不可跳层或重复访问已完成节点 | `choose_map_node()` + `current_available_nodes()` |
 | F05 | 节点事件解析 | 根据节点类型从地点事件池按权重抽事件，具体内容仍复用现有事件配置 | `LilianEventService.roll_event_for_node()` |
@@ -89,7 +89,7 @@ flowchart LR
 
 | 文件 | 内容 |
 |------|------|
-| `data/locations.yaml` | 地点元数据、难度范围、`event_pool`、地图材料池、地图怪物池与掉落池 |
+| `data/didian.yaml` | 地点元数据、难度范围、`event_pool`、地图材料池、地图怪物池与掉落池 |
 | `data/lilian_common_events.yaml` | 已绑定地点的通用事件模板（赶路、采集、恢复、普通战斗等） |
 | `data/lilian_events.yaml` | 与地图绑定的唯一事件（抉择、剧情战斗、精英、首领等） |
 | `data/lilian_rules.yaml` | 全局规则（遭遇概率、战败惩罚、自动推进间隔、奖励预算等） |

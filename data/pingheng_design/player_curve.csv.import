@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://b0tcqfbhdmol7"
+
+[deps]
+
+files=["res://data/pingheng_design/player_curve.phase.translation", "res://data/pingheng_design/player_curve.phase.translation", "res://data/pingheng_design/player_curve.realm.translation", "res://data/pingheng_design/player_curve.target.translation", "res://data/pingheng_design/player_curve.en.translation", "res://data/pingheng_design/player_curve.target.translation", "res://data/pingheng_design/player_curve.target.translation", "res://data/pingheng_design/player_curve.target.translation", "res://data/pingheng_design/player_curve.growth.translation", "res://data/pingheng_design/player_curve.stage.translation", "res://data/pingheng_design/player_curve.validation.translation"]
+
+source_file="res://data/pingheng_design/player_curve.csv"
+dest_files=["res://data/pingheng_design/player_curve.phase.translation", "res://data/pingheng_design/player_curve.phase.translation", "res://data/pingheng_design/player_curve.realm.translation", "res://data/pingheng_design/player_curve.target.translation", "res://data/pingheng_design/player_curve.en.translation", "res://data/pingheng_design/player_curve.target.translation", "res://data/pingheng_design/player_curve.target.translation", "res://data/pingheng_design/player_curve.target.translation", "res://data/pingheng_design/player_curve.growth.translation", "res://data/pingheng_design/player_curve.stage.translation", "res://data/pingheng_design/player_curve.validation.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

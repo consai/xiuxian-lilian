@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const dataDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../data");
-const indexPath = path.join(dataDir, "abilities.yaml");
+const indexPath = path.join(dataDir, "jineng.yaml");
 
 const DEFAULT_TABLE_TYPES = [
   "combat_active",
@@ -12,8 +12,15 @@ const DEFAULT_TABLE_TYPES = [
   "general_passive",
 ];
 
+const ABILITY_TABLE_FILES = {
+  combat_active: "jineng/zhandou_active.yaml",
+  combat_passive: "jineng/zhandou_passive.yaml",
+  combat_upkeep: "jineng/zhandou_upkeep.yaml",
+  general_passive: "jineng/tongyong_passive.yaml",
+};
+
 function resolveTablePath(relativePath, typeName) {
-  const rel = (relativePath || `abilities/${typeName}.yaml`).replace(/^\//, "");
+  const rel = (relativePath || ABILITY_TABLE_FILES[typeName] || `jineng/${typeName}.yaml`).replace(/^\//, "");
   return path.join(dataDir, rel);
 }
 

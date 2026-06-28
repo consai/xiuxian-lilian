@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://ca10didvwyvff"]
 
-[ext_resource type="Script" path="res://scripts/sim/xiulian_mianban.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://3t6blkicyihd" path="res://scripts/sim/xiulian_mianban.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_theme"]
 [ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="3_bg"]
 [ext_resource type="Texture2D" uid="uid://db6yxps2ypebg" path="res://assets/art/characters/001_cutout_483x512.png" id="4_meditator"]
@@ -14,9 +14,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/components/xiulian_primary_button.tscn" id="19_primary"]
 [ext_resource type="PackedScene" uid="uid://bx04spldnbiyv" path="res://scenes/items/item.tscn" id="20_item"]
 [ext_resource type="PackedScene" uid="uid://dgqc00b7e6pfa" path="res://scenes/ui/peizhi_beibao_tanchuang.tscn" id="21_pill_picker"]
-[ext_resource type="PackedScene" path="res://scenes/ui/peizhi_xuanze_tanchuang.tscn" id="23_method_picker"]
-
 [ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="22_auto"]
+[ext_resource type="PackedScene" path="res://scenes/ui/peizhi_xuanze_tanchuang.tscn" id="23_method_picker"]
 
 [sub_resource type="StyleBoxFlat" id="Style_float_card"]
 content_margin_left = 18.0
@@ -98,30 +97,6 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="Style_day_normal"]
-bg_color = Color(1, 0.92549, 0.760784, 0.98)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.25098, 0.160784, 0.0901961, 0.92)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-
-[sub_resource type="StyleBoxFlat" id="Style_day_hover"]
-bg_color = Color(0.866667, 0.898039, 0.666667, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.25098, 0.160784, 0.0901961, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
 
 [node name="CultivationPanel" type="Control" unique_id=668666561]
 layout_mode = 3
@@ -214,7 +189,6 @@ vertical_alignment = 1
 
 [node name="CloseButton" type="TextureButton" parent="." unique_id=114442987]
 unique_name_in_owner = true
-script = ExtResource("22_auto")
 layout_mode = 0
 offset_left = 1184.0
 offset_top = 17.0
@@ -223,7 +197,7 @@ offset_bottom = 83.0
 texture_normal = ExtResource("6_close")
 ignore_texture_size = true
 stretch_mode = 5
-
+script = ExtResource("22_auto")
 
 [node name="MeditationAura" type="Panel" parent="." unique_id=44545731]
 layout_mode = 0
@@ -277,13 +251,13 @@ text = "混元归一经"
 label_settings = ExtResource("16_head")
 horizontal_alignment = 1
 
-[node name="MethodChangeButton" type="Button" parent="MethodPanel/MethodContent"]
+[node name="MethodChangeButton" type="Button" parent="MethodPanel/MethodContent" unique_id=1014324648]
 unique_name_in_owner = true
-script = ExtResource("22_auto")
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "更换主修功法"
+script = ExtResource("22_auto")
 
 [node name="MasteryLabel" type="Label" parent="MethodPanel/MethodContent" unique_id=1532461028]
 unique_name_in_owner = true
@@ -347,36 +321,34 @@ mouse_filter = 2
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="DayCountLabel" type="Label" parent="PlanPanel/PlanContent/DaySelectRow"]
+[node name="DayCountLabel" type="Label" parent="PlanPanel/PlanContent/DaySelectRow" unique_id=1447839278]
 unique_name_in_owner = true
 layout_mode = 2
 text = "闭关 1 日"
 label_settings = ExtResource("17_text")
 horizontal_alignment = 1
 
-[node name="SliderRow" type="HBoxContainer" parent="PlanPanel/PlanContent/DaySelectRow"]
+[node name="SliderRow" type="HBoxContainer" parent="PlanPanel/PlanContent/DaySelectRow" unique_id=211610469]
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="DaySlider" type="HSlider" parent="PlanPanel/PlanContent/DaySelectRow/SliderRow"]
+[node name="DaySlider" type="HSlider" parent="PlanPanel/PlanContent/DaySelectRow/SliderRow" unique_id=1426985509]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 32)
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = 1.0
 max_value = 120.0
-step = 1.0
 value = 1.0
 
-[node name="DayMaxButton" type="Button" parent="PlanPanel/PlanContent/DaySelectRow/SliderRow"]
+[node name="DayMaxButton" type="Button" parent="PlanPanel/PlanContent/DaySelectRow/SliderRow" unique_id=1779764538]
 unique_name_in_owner = true
-script = ExtResource("22_auto")
 custom_minimum_size = Vector2(64, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "最大"
-
+script = ExtResource("22_auto")
 
 [node name="Divider" type="HSeparator" parent="PlanPanel/PlanContent" unique_id=1958102969]
 layout_mode = 2
@@ -427,8 +399,8 @@ autowrap_mode = 2
 [node name="FormulaLabel" type="Label" parent="PlanPanel/PlanContent" unique_id=1983726401]
 unique_name_in_owner = true
 layout_mode = 2
-label_settings = ExtResource("18_small")
 theme_override_colors/font_color = Color(0.45, 0.4, 0.34, 0.88)
+label_settings = ExtResource("18_small")
 horizontal_alignment = 1
 autowrap_mode = 2
 
@@ -496,6 +468,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(172, 68)
 layout_mode = 2
 size_flags_horizontal = 3
+theme = ExtResource("2_theme")
 text = "运转周天
 修为 100%"
 
@@ -569,7 +542,7 @@ visible = false
 layout_mode = 1
 mouse_filter = 2
 
-[node name="MethodPicker" parent="." instance=ExtResource("23_method_picker")]
+[node name="MethodPicker" parent="." unique_id=827576313 instance=ExtResource("23_method_picker")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -584,8 +557,8 @@ offset_right = 799.0
 offset_bottom = 772.0
 
 [editable path="PlanPanel/PlanContent/PillSelectRow/Choice/PillSlot"]
-[editable path="MethodPicker"]
 [editable path="ModePanel/ModeContent/ModeButtons/CycleButton"]
 [editable path="ModePanel/ModeContent/ModeButtons/InsightButton"]
 [editable path="ModePanel/ModeContent/ModeButtons/BreathingButton"]
 [editable path="ModePanel/ModeContent/ModeButtons/PillButton"]
+[editable path="MethodPicker"]

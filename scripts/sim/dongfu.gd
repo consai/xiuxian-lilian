@@ -194,6 +194,8 @@ func _on_weituo_submit(instance_id: String) -> void:
 		return
 	if _weituo_board.has_method("refresh"):
 		_weituo_board.refresh()
+	if _inventory_overlay.visible and _inventory_overlay.has_method("refresh"):
+		_inventory_overlay.refresh()
 	_refresh("委托完成，奖励已收入背包。")
 
 

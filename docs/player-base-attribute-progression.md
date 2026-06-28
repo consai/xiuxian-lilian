@@ -2,7 +2,7 @@
 
 > 目标：所有玩家、怪物、精英、Boss 的首版面板都以本文为基准生成。先定“同等级标准玩家”，再按遭遇强度带和怪物模板换算敌人。
 
-配置落点：`data/realm_balance.yaml > player_level_curve` 与 `monster_design_baseline`。
+配置落点：`data/jingjie_balance.yaml > player_level_curve` 与 `monster_design_baseline`。
 
 ---
 
@@ -22,7 +22,7 @@
 | 70-79 | 大乘 | 接近终局，装备、功法、道法组合要求很高 |
 | 80-90 | 渡劫 | 终局压力，天劫、因果、法则抗性成为主题 |
 
-当前 `data/simulation.yaml` 仍保留“炼气九层 / 筑基初中后期”等叙事层级；怪物与战斗面板制作时以本文的 `content level` 为主。
+当前 `data/moni.yaml` 仍保留“炼气九层 / 筑基初中后期”等叙事层级；怪物与战斗面板制作时以本文的 `content level` 为主。
 
 ---
 
@@ -94,7 +94,7 @@
 最终面板 = (基础面板 + 境界固定值 + 其他固定值) * (1 + 同类百分比之和)
 ```
 
-核心推导公式来自 `data/realm_balance.yaml > combat_attribute_formula`：
+核心推导公式来自 `data/jingjie_balance.yaml > combat_attribute_formula`：
 
 | 面板 | 公式 |
 |---|---|

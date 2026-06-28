@@ -129,7 +129,7 @@ static func is_combatant_row(row: Dictionary) -> bool:
 	return true
 
 
-## 将 [code]data/abilities.yaml[/code] 与可选的 [code]skill_cfg[/code] 覆盖合并进 [param data]。
+## 将 [code]data/jineng.yaml[/code] 与可选的 [code]skill_cfg[/code] 覆盖合并进 [param data]。
 static func merge_skill_cfg_from_tables(data: Dictionary) -> Dictionary:
 	var out := data.duplicate(true)
 	var partial: Dictionary = {}
@@ -898,7 +898,7 @@ static func _interval_cap(unit: ZhandouObj) -> float:
 	return ZhandouBalance.interval_cap_for(unit)
 
 
-## 编辑器直开战斗场景 / 测试进战用 stub；技能来自 [code]data/abilities.yaml[/code]，道具来自 [code]data/item.yaml[/code]（[code]items_FightTestDan[/code] / [code]fight_id=9001[/code]）。
+## 编辑器直开战斗场景 / 测试进战用 stub；技能来自 [code]data/jineng.yaml[/code]，道具来自 [code]data/item.yaml[/code]（[code]items_FightTestDan[/code] / [code]fight_id=9001[/code]）。
 static func sample_for_editor() -> Dictionary:
 	var out := {
 		"player": {

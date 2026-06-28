@@ -271,7 +271,9 @@ func _on_method_picked(entry_id: Variant) -> void:
 
 func _update_button_states() -> void:
 	for index in _mode_buttons.size():
-		_mode_buttons[index].modulate = Color(0.72, 0.9, 0.62) if MODE_IDS[index] == _mode_id else Color.WHITE
+		var selected: bool = MODE_IDS[index] == _mode_id
+		_mode_buttons[index].disabled = selected
+		_mode_buttons[index].modulate = Color.WHITE
 
 
 func _on_start_pressed() -> void:

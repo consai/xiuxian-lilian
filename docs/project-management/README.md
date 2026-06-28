@@ -24,8 +24,8 @@
 | 历练 | 已有地图节点、事件、战斗接入、结算和日志 | `scenes/expedition`, `scripts/expedition`, `docs/lilian-system.md` |
 | 战斗 | 已有战斗域、AI、VFX、浮字、战报、结果浮层 | `scenes/fight*`, `scripts/fight` |
 | 世界地图 | 已有城市、野外区域、地点详情、旅行确认 | `scenes/map`, `scripts/map`, `docs/world-map-module-design.md` |
-| 大道 / 功法 / 技能 | 已有知识树、功法、技能、自动战斗配置 | `scripts/dao`, `data/dao_tree.yaml`, `data/abilities.yaml` |
-| 剧情 / 新手引导 | 已有剧情播放、引导遮罩、教程服务和配置 | `scripts/story`, `scenes/story`, `data/stories` |
+| 大道 / 功法 / 技能 | 已有知识树、功法、技能、自动战斗配置 | `scripts/dao`, `data/dao_tree.yaml`, `data/jineng.yaml` |
+| 剧情 / 新手引导 | 已有剧情播放、引导遮罩、教程服务和配置 | `scripts/story`, `scenes/story`, `data/gushi` |
 | UI 提示 | 已有 Tips、HoverTip、道具详情等可复用浮层 | `scripts/ui/tips`, `scripts/ui/hover`, `scenes/ui` |
 
 ## 管理原则

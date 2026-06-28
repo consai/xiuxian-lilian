@@ -1,7 +1,7 @@
 class_name GameTimeService
 extends RefCounted
 
-const DATA_PATH := "res://data/time_rules.yaml"
+const DATA_PATH := "res://data/shijian_rules.yaml"
 
 
 static func calendar() -> Dictionary:

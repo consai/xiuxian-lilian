@@ -4,16 +4,9 @@
 [ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="2_theme"]
 [ext_resource type="Texture2D" uid="uid://bdmliptsqhrxy" path="res://assets/art/ui_new/headlabel.png" id="4_title"]
 [ext_resource type="Texture2D" uid="uid://8mwstvi8kywh" path="res://assets/art/ui_new/btn_close.png" id="5_close"]
-[ext_resource type="PackedScene" uid="uid://88uebn5ox4qs" path="res://scenes/ui/components/weituo_card.tscn" id="6_card"]
-[ext_resource type="PackedScene" path="res://scenes/ui/components/weituo_requirement_row.tscn" id="7_req"]
-[ext_resource type="PackedScene" path="res://scenes/ui/components/weituo_reward_row.tscn" id="8_reward"]
 [ext_resource type="Texture2D" uid="uid://c3f3nny73kvhg" path="res://assets/art/ui_new/btn_lv.png" id="9_green_btn"]
 [ext_resource type="Texture2D" uid="uid://hwomn6aon70a" path="res://assets/art/ui_new/btn_huang.png" id="10_yellow_btn"]
 [ext_resource type="Texture2D" uid="uid://dq4k3ybmxqrut" path="res://assets/art/ui_new/btn_mihuang.png" id="11_cream_btn"]
-[ext_resource type="Texture2D" uid="uid://cta2iv7f5q3jk" path="res://assets/art/characters/004_cutout_502x512.png" id="12_portrait_b"]
-[ext_resource type="Texture2D" uid="uid://c65hej8mex8pv" path="res://assets/art/characters/005_cutout_311x512.png" id="13_portrait_c"]
-[ext_resource type="Texture2D" uid="uid://c76pqy6eaf2sc" path="res://assets/art/ui_new/shuijing.png" id="15_crystal"]
-[ext_resource type="Texture2D" uid="uid://dxu12rycrumfv" path="res://assets/art/ui_new/lingshi.png" id="16_coin"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/34.tres" id="17_title_text"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="18_h1"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="19_h2"]
@@ -255,54 +248,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="CardHerb" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList" unique_id=599992283 instance=ExtResource("6_card")]
-layout_mode = 2
-
-[node name="CardPatrol" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList" unique_id=265798375 instance=ExtResource("6_card")]
-layout_mode = 2
-
-[node name="Portrait" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardPatrol" index="0" unique_id=2124828308]
-texture = ExtResource("12_portrait_b")
-
-[node name="TitleLabel" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardPatrol/TextBox/TitleRow" parent_id_path=PackedInt32Array(265798375, 139392510) index="0" unique_id=1469543339]
-text = "巡青岚山路"
-
-[node name="StateBadge" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardPatrol/TextBox/TitleRow" parent_id_path=PackedInt32Array(265798375, 139392510) index="1" unique_id=1806083822]
-text = "进行中"
-
-[node name="IssuerLabel" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardPatrol/TextBox" parent_id_path=PackedInt32Array(265798375, 623967933) index="1" unique_id=820941451]
-text = "青岚山路近日妖兽出没，烦请清理。"
-
-[node name="SummaryLabel" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardPatrol/TextBox" parent_id_path=PackedInt32Array(265798375, 623967933) index="2" unique_id=1576228943]
-text = "巡山进度 2/3"
-
-[node name="CardCollect" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList" unique_id=1233997766 instance=ExtResource("6_card")]
-layout_mode = 2
-
-[node name="Portrait" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardCollect" index="0" unique_id=2124828308]
-texture = ExtResource("13_portrait_c")
-
-[node name="TitleLabel" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardCollect/TextBox/TitleRow" parent_id_path=PackedInt32Array(1233997766, 139392510) index="0" unique_id=1469543339]
-text = "收集灵草"
-
-[node name="IssuerLabel" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardCollect/TextBox" parent_id_path=PackedInt32Array(1233997766, 623967933) index="1" unique_id=820941451]
-text = "听闻灵草可炼丹所用，望道友相助。"
-
-[node name="SummaryLabel" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardCollect/TextBox" parent_id_path=PackedInt32Array(1233997766, 623967933) index="2" unique_id=1576228943]
-text = "灵草 0/8"
-
-[node name="EmptyMore" type="PanelContainer" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList" unique_id=18740826]
-custom_minimum_size = Vector2(0, 62)
-layout_mode = 2
-theme_override_styles/panel = SubResource("HintPanel")
-
-[node name="Text" type="Label" parent="Panel/ListPanel/Control/WeituoScroll/WeituoList/EmptyMore" unique_id=1622491588]
-layout_mode = 2
-text = "今日暂无更多委托"
-label_settings = ExtResource("20_body")
-horizontal_alignment = 1
-vertical_alignment = 1
-
 [node name="DetailPanel" type="PanelContainer" parent="Panel" unique_id=1369834764]
 layout_mode = 0
 offset_left = 764.0
@@ -361,18 +306,6 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="RequirementLeaf" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RequirementList" unique_id=2009665862 instance=ExtResource("7_req")]
-layout_mode = 2
-
-[node name="RequirementMushroom" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RequirementList" unique_id=1576374671 instance=ExtResource("7_req")]
-layout_mode = 2
-
-[node name="NameLabel" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RequirementList/RequirementMushroom/HBox" index="1"]
-text = "灵芝"
-
-[node name="CountLabel" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RequirementList/RequirementMushroom/HBox" index="2"]
-text = "2/2"
-
 [node name="RewardHeading" type="Label" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox" unique_id=1541682465]
 layout_mode = 2
 text = "奖励预览"
@@ -382,33 +315,6 @@ label_settings = ExtResource("19_h2")
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 14
-
-[node name="RewardLeaf" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList" unique_id=456530463 instance=ExtResource("8_reward")]
-layout_mode = 2
-
-[node name="RewardCrystal" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList" unique_id=1120164446 instance=ExtResource("8_reward")]
-layout_mode = 2
-
-[node name="Icon" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCrystal/VBox" index="0"]
-texture = ExtResource("15_crystal")
-
-[node name="NameLabel" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCrystal/VBox" index="1"]
-text = "晶石"
-
-[node name="CountLabel" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCrystal/VBox" index="2"]
-text = "20"
-
-[node name="RewardCoin" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList" unique_id=598914894 instance=ExtResource("8_reward")]
-layout_mode = 2
-
-[node name="Icon" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCoin/VBox" index="0"]
-texture = ExtResource("16_coin")
-
-[node name="NameLabel" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCoin/VBox" index="1"]
-text = "灵石"
-
-[node name="CountLabel" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCoin/VBox" index="2"]
-text = "500"
 
 [node name="StateHint" type="Label" parent="Panel/DetailPanel/Control/ScrollContainer/DetailVBox" unique_id=1798437352]
 unique_name_in_owner = true
@@ -493,7 +399,7 @@ offset_left = 298.0
 offset_top = 630.0
 offset_right = 872.0
 offset_bottom = 662.0
-text = "完成委托可获得奖励，活跃度每日刷新。"
+text = "完成委托可获得奖励，委托榜每月刷新。"
 label_settings = ExtResource("21_small")
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -540,12 +446,3 @@ text = "取消"
 custom_minimum_size = Vector2(120, 44)
 layout_mode = 2
 text = "放弃"
-
-[editable path="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardHerb"]
-[editable path="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardPatrol"]
-[editable path="Panel/ListPanel/Control/WeituoScroll/WeituoList/CardCollect"]
-[editable path="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RequirementList/RequirementLeaf"]
-[editable path="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RequirementList/RequirementMushroom"]
-[editable path="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardLeaf"]
-[editable path="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCrystal"]
-[editable path="Panel/DetailPanel/Control/ScrollContainer/DetailVBox/RewardList/RewardCoin"]

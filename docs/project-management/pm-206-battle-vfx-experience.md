@@ -20,9 +20,9 @@
 
 - VFX 调度：`scripts/fight/fight_vfx_manager.gd`
 - 动作序列：`scripts/fight/vfx`
-- 预设配置：`data/combat/presets`
-- 预设索引：`data/combat/vfx_index.yaml`
-- 浮字样式：`data/combat/float_styles.yaml`
+- 预设配置：`data/zhandou/presets`
+- 预设索引：`data/zhandou/vfx_index.yaml`
+- 浮字样式：`data/zhandou/float_styles.yaml`
 - 战斗表现衔接：`scripts/fight/scene/fight_scene_presentation.gd`
 
 当前已有表现：
@@ -76,7 +76,7 @@
 - `ZhandouVfxSettings.melee_*`
 - `ZhandouVfxSettings.hit_*`
 - `ZhandouVfxSettings.crit_*`
-- `data/combat/float_styles.yaml` 的 `damage / crit`
+- `data/zhandou/float_styles.yaml` 的 `damage / crit`
 
 ### 4.2 弹道 / 法术远程
 
@@ -147,7 +147,7 @@
 调参杠杆：
 
 - `status_cast` 或 `shield_cast.yaml`
-- `data/combat/float_styles.yaml` 的 `shield`
+- `data/zhandou/float_styles.yaml` 的 `shield`
 - `ZhandouVfxSettings.ranged_recoil_*` 可复用为施法收势
 
 ### 4.4 治疗 / 回蓝
@@ -182,7 +182,7 @@
 
 调参杠杆：
 
-- `data/combat/float_styles.yaml` 的 `heal / mp_gain`
+- `data/zhandou/float_styles.yaml` 的 `heal / mp_gain`
 - `status_cast`
 
 ### 4.5 持续伤害 / 灼烧
@@ -215,7 +215,7 @@
 
 调参杠杆：
 
-- `data/combat/float_styles.yaml` 的 `buff_add / damage`
+- `data/zhandou/float_styles.yaml` 的 `buff_add / damage`
 - `ZhandouFloatLayer.max_per_unit_per_frame`
 - 可选 `dot_tick.yaml`
 
@@ -306,7 +306,7 @@
 
 - `scripts/fight/combat_projectile_vfx.gd`：把当前 `ColorRect` 占位弹道扩展为可选 `Texture2D`。无贴图时继续走 `ColorRect` fallback。
 - `scripts/fight/vfx/combat_action_executor.gd`：让 `op: "projectile"` 读取 step 上的 `texture`、`visual_size`、`rotation_offset_deg`、`use_bezier`。
-- `data/combat/presets`：新增两个 projectile preset，不新增管理器。
+- `data/zhandou/presets`：新增两个 projectile preset，不新增管理器。
 
 不新增内容：
 
@@ -317,7 +317,7 @@
 
 ### 11.3 新增 preset
 
-新增 `data/combat/presets/qi_bolt_projectile.yaml`：
+新增 `data/zhandou/presets/qi_bolt_projectile.yaml`：
 
 ```yaml
 _comment: "御气弹：施法动作 + 金色弹道 + 受击"
@@ -355,7 +355,7 @@ sequence:
           - op: "impact"
 ```
 
-新增 `data/combat/presets/sword_qi_projectile.yaml`：
+新增 `data/zhandou/presets/sword_qi_projectile.yaml`：
 
 ```yaml
 _comment: "破空剑气：高速飞剑 / 剑气弹道 + 受击"
@@ -396,7 +396,7 @@ sequence:
 
 ### 11.4 技能绑定
 
-在 `data/abilities.yaml` 只给首版常用技能补绑定：
+在 `data/jineng.yaml` 只给首版常用技能补绑定：
 
 ```yaml
 # 御气弹

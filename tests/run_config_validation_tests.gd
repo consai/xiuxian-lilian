@@ -56,7 +56,7 @@ func _test_config_has_no_errors() -> void:
 
 
 func _test_realm_balance_covers_simulation_realms() -> void:
-	var simulation := JsonLoader._read_json_root_object("res://data/simulation.yaml")
+	var simulation := JsonLoader._read_json_root_object("res://data/moni.yaml")
 	var errors := RealmBalanceServiceScript.collect_config_errors(simulation.get("realms", []) as Array)
 	_expect_true(errors.is_empty(), "realm balance errors: %s" % str(errors))
 	var qi := RealmBalanceServiceScript.major_realm_by_id("qi")
@@ -66,7 +66,7 @@ func _test_realm_balance_covers_simulation_realms() -> void:
 
 
 func _test_realm_threshold_formula() -> void:
-	var simulation := JsonLoader._read_json_root_object("res://data/simulation.yaml")
+	var simulation := JsonLoader._read_json_root_object("res://data/moni.yaml")
 	var realms := simulation.get("realms", []) as Array
 	for index in realms.size():
 		var realm := realms[index] as Dictionary

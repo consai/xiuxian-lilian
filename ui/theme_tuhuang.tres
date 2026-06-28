@@ -19,6 +19,7 @@ corner_radius_bottom_right = 13
 corner_radius_bottom_left = 13
 
 [sub_resource type="StyleBoxFlat" id="FocusRing"]
+bg_color = Color(0.4136957, 0.5617624, 0.29591966, 1)
 draw_center = false
 border_width_left = 2
 border_width_top = 2

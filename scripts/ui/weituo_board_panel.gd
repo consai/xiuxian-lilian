@@ -7,7 +7,7 @@ signal abandon_requested(instance_id: String)
 
 const CARD_SCENE_PATH := "res://scenes/ui/components/weituo_card.tscn"
 const REQUIREMENT_ROW_SCENE_PATH := "res://scenes/ui/components/weituo_requirement_row.tscn"
-const REWARD_ROW_SCENE_PATH := "res://scenes/ui/components/weituo_reward_row.tscn"
+const ITEM_SCENE_PATH := "res://scenes/items/item.tscn"
 
 const FILTER_ALL := "all"
 const FILTER_AVAILABLE := "available"
@@ -102,7 +102,7 @@ func set_filter(filter_id: String) -> void:
 	_update_filter_styles()
 	_apply_filter_visibility()
 	if _entries.is_empty():
-		show_empty_state("今日暂无合适委托。先修炼、巡山或整理背包。")
+		show_empty_state("本月暂无合适委托。先修炼、巡山或整理背包。")
 		return
 	if _visible_entries().is_empty():
 		_selected_key = ""
@@ -216,7 +216,7 @@ func _rebuild_cards() -> void:
 	_clear_children(_weituo_list)
 	_card_nodes.clear()
 	if _entries.is_empty():
-		show_empty_state("今日暂无合适委托。先修炼、巡山或整理背包。")
+		show_empty_state("本月暂无合适委托。先修炼、巡山或整理背包。")
 		return
 	for entry_v in _entries:
 		var entry := entry_v as Dictionary
@@ -243,9 +243,15 @@ func _rebuild_reward_rows(rewards: Array) -> void:
 	for reward_v in rewards:
 		if not reward_v is Dictionary:
 			continue
-		var row: Node = load(REWARD_ROW_SCENE_PATH).instantiate()
-		_reward_list.add_child(row)
-		row.bind(reward_v as Dictionary)
+		var item_row: Dictionary = (reward_v as Dictionary).duplicate()
+		if str(item_row.get("name", "")) == "":
+			item_row["name"] = str(item_row.get("display_name", ""))
+		var icon_path: String = str(item_row.get("icon_path", "")).strip_edges()
+		if icon_path != "" and not item_row.get("icon") is Texture2D:
+			item_row["icon"] = ItemDef.resolve_icon_texture(icon_path, null)
+		var item_slot: ItemView = load(ITEM_SCENE_PATH).instantiate() as ItemView
+		_reward_list.add_child(item_slot)
+		ItemView.apply_reward_row(item_slot, item_row, {"click_enabled": true, "show_info_on_click": true})
 
 
 func _apply_filter_visibility() -> void:

@@ -1,7 +1,7 @@
 class_name SkillDef
 extends RefCounted
 
-## 与 [code]data/abilities.yaml[/code] 中单条战斗技能配置对应。
+## 与 [code]data/jineng.yaml[/code] 中单条战斗技能配置对应。
 
 var id: int = 0
 var name: String = ""
@@ -11,7 +11,7 @@ var cd: float = 0.0
 var power: float = 1000.0
 var quality: int = 1
 var vfx_type: String = ""
-## 表现 preset 文件名（[code]data/combat/presets/xxx.yaml[/code]），或含 [code]preset[/code]/[code]overrides[/code] 的字典。
+## 表现 preset 文件名（[code]data/zhandou/presets/xxx.yaml[/code]），或含 [code]preset[/code]/[code]overrides[/code] 的字典。
 var vfx: Variant = ""
 var tags: Array = []
 var effects: Array = []

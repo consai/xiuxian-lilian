@@ -61,7 +61,7 @@
 验收：
 
 - `tests/run_config_validation_tests.gd` 通过。
-- `data/locations.yaml`、`data/lilian_events.yaml`、`data/monsters.yaml`、`data/item.yaml` 的 P0 引用无错误。
+- `data/didian.yaml`、`data/lilian_events.yaml`、`data/guaiwu.yaml`、`data/item.yaml` 的 P0 引用无错误。
 - 新增配置不需要手动进游戏才发现坏引用。
 
 涉及文件：
@@ -106,7 +106,7 @@
 
 - `scripts/core/data_store.gd`
 - `scripts/story/tutorial_service.gd`
-- `data/stories/prologue_tutorial.yaml`
+- `data/gushi/prologue_tutorial.yaml`
 
 ### [x] PM-102：第一场战斗奖励闭环
 
@@ -159,7 +159,7 @@
 - `scenes/sim/cave_hub.tscn`
 - `scripts/sim/cave_hub.gd`
 - `assets/art`
-- `data/stories/prologue_tutorial.yaml`
+- `data/gushi/prologue_tutorial.yaml`
 
 ## 当前冲刺：P2 数值与内容校准
 
@@ -174,17 +174,17 @@ P2 通过标准：
 
 ### [x] PM-201：平衡基准复核
 
-描述：把当前 `realm_balance.yaml` 的练气初期、练气成型、筑基初期基准和自动测试结果对齐，先确认目标线，不急着调内容。
+描述：把当前 `jingjie_balance.yaml` 的练气初期、练气成型、筑基初期基准和自动测试结果对齐，先确认目标线，不急着调内容。
 
 验收：
 
 - `run_balance_v1_tests.gd` 输出记录到任务备注或数值文档。
 - 普通敌胜率、普通战时长、精英胜率、跨境界压制都在 acceptance 范围内。
-- 如需调参，只改 `data/realm_balance.yaml` 或直接相关配置，不做新平衡系统。
+- 如需调参，只改 `data/jingjie_balance.yaml` 或直接相关配置，不做新平衡系统。
 
 涉及文件：
 
-- `data/realm_balance.yaml`
+- `data/jingjie_balance.yaml`
 - `tests/run_balance_v1_tests.gd`
 - `docs/realm-balance-foundation.md`
 
@@ -205,8 +205,8 @@ P2 通过标准：
 
 涉及文件：
 
-- `data/monsters.yaml`
-- `data/locations.yaml`
+- `data/guaiwu.yaml`
+- `data/didian.yaml`
 - `data/lilian_events.yaml`
 - `tests/run_lilian_tests.gd`
 
@@ -247,19 +247,19 @@ P2 通过标准：
 - 新手默认技能组能应对普通历练。
 - 至少有 2 种可理解的战斗倾向：稳健 / 输出。
 - 技能知识成长能在 UI 和战斗结果中被感知。
-- 同层技能强度差异控制在 `realm_balance.yaml` budgets 附近。
+- 同层技能强度差异控制在 `jingjie_balance.yaml` budgets 附近。
 
 涉及文件：
 
-- `data/abilities.yaml`
+- `data/jineng.yaml`
 - `data/xiulian_methods.yaml`
-- `data/knowledge_effects.yaml`
+- `data/zhishi_effects.yaml`
 - `data/dao_tree.yaml`
 - `tests/run_dao_knowledge_tests.gd`
 
 任务备注：
 
-- 2026-06-24：新手默认技能组保持御气弹 / 流风步 / 破空剑气，补齐输出与防御标签；破空剑气基准伤害从 55 收敛到 54，使练气同阶伤害贴近 `realm_balance.yaml` 预算。新增练气知识效果与 PM-204 回归，知识成长会影响运行时技能数值和派生属性。`validate-abilities.mjs`、`validate-xiulian-methods.mjs`、`run_dao_knowledge_tests.gd`、`run_config_validation_tests.gd`、`run_zhandou_domain_tests.gd`、`run_simulation_tests.gd`、`run_balance_v1_tests.gd` 通过。
+- 2026-06-24：新手默认技能组保持御气弹 / 流风步 / 破空剑气，补齐输出与防御标签；破空剑气基准伤害从 55 收敛到 54，使练气同阶伤害贴近 `jingjie_balance.yaml` 预算。新增练气知识效果与 PM-204 回归，知识成长会影响运行时技能数值和派生属性。`validate-abilities.mjs`、`validate-xiulian-methods.mjs`、`run_dao_knowledge_tests.gd`、`run_config_validation_tests.gd`、`run_zhandou_domain_tests.gd`、`run_simulation_tests.gd`、`run_balance_v1_tests.gd` 通过。
 
 ### [x] PM-205：突破前目标可读性
 
@@ -296,7 +296,7 @@ P2 通过标准：
 
 - `scripts/fight/vfx`
 - `scripts/fight/fight_vfx_manager.gd`
-- `data/combat/presets`
+- `data/zhandou/presets`
 
 ### [x] PM-207：P2 手动游玩验收
 
@@ -344,9 +344,9 @@ P3 通过标准：
 
 涉及文件：
 
-- `data/world_map.yaml`
-- `data/locations.yaml`
-- `data/monsters.yaml`
+- `data/shijie_map.yaml`
+- `data/didian.yaml`
+- `data/guaiwu.yaml`
 - `scenes/map`
 - `tests/run_world_map_tests.gd`
 - `tests/run_config_validation_tests.gd`
@@ -385,15 +385,15 @@ P3 通过标准：
 
 - 至少新增 2 个技能、2 个功法、3 个知识节点。
 - 新内容有学习条件和展示文案。
-- 技能强度贴近 `realm_balance.yaml` 预算，不压过全部旧技能。
+- 技能强度贴近 `jingjie_balance.yaml` 预算，不压过全部旧技能。
 - 默认练气技能仍可用，但筑基内容有升级价值。
 
 涉及文件：
 
-- `data/abilities.yaml`
+- `data/jineng.yaml`
 - `data/xiulian_methods.yaml`
 - `data/dao_tree.yaml`
-- `data/knowledge_effects.yaml`
+- `data/zhishi_effects.yaml`
 - `tests/run_dao_knowledge_tests.gd`
 - `tests/run_balance_v1_tests.gd`
 
@@ -416,7 +416,7 @@ P3 通过标准：
 
 - `data/liandan.yaml`
 - `data/item.yaml`
-- `data/locations.yaml`
+- `data/didian.yaml`
 - `scripts/sim/liandan_service.gd`
 - `tests/run_simulation_tests.gd`
 
@@ -439,8 +439,8 @@ P3 通过标准：
 
 - `assets/art/characters`
 - `assets/art`
-- `data/monsters.yaml`
-- `data/stories`
+- `data/guaiwu.yaml`
+- `data/gushi`
 - `scenes/fightScene.tscn`
 
 任务备注：
@@ -541,7 +541,7 @@ P3 通过标准：
 涉及文件：
 
 - `data/item.yaml`
-- `data/locations.yaml`
+- `data/didian.yaml`
 - `data/lilian_events.yaml`
 
 ### [ ] PM-502：丹药与丹方扩容
@@ -572,8 +572,8 @@ P3 通过标准：
 
 涉及文件：
 
-- `data/monsters.yaml`
-- `data/locations.yaml`
+- `data/guaiwu.yaml`
+- `data/didian.yaml`
 - `tests/run_config_validation_tests.gd`
 
 ### [ ] PM-504：配置回归

@@ -494,7 +494,7 @@ func _resolve_item_id_alias(item_id: String) -> String:
 
 func _load_locations_local() -> void:
 	_locations_by_id.clear()
-	var root := JsonLoader._read_json_root_object("res://data/locations.yaml")
+	var root := JsonLoader._read_json_root_object("res://data/didian.yaml")
 	var raw_v: Variant = root.get("locations", {})
 	if not raw_v is Dictionary:
 		return
@@ -506,7 +506,7 @@ func _load_locations_local() -> void:
 
 func _load_monsters_local() -> void:
 	_monsters_by_id.clear()
-	var root := JsonLoader._read_json_root_object("res://data/monsters.yaml")
+	var root := JsonLoader._read_json_root_object("res://data/guaiwu.yaml")
 	var raw_v: Variant = root.get("monsters", {})
 	if not raw_v is Dictionary:
 		return
@@ -522,7 +522,7 @@ func _load_world_map_local() -> void:
 	_world_routes.clear()
 	_wilderness_regions_by_id.clear()
 	_wilderness_locations_by_id.clear()
-	var root := JsonLoader._read_json_root_object("res://data/world_map.yaml")
+	var root := JsonLoader._read_json_root_object("res://data/shijie_map.yaml")
 	_world_map_meta = {
 		"schema_version": int(root.get("schema_version", 1)),
 		"starter_city_id": str(root.get("starter_city_id", "qingshi_market")),

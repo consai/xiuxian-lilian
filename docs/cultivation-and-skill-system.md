@@ -41,7 +41,7 @@
 
 | 构成 | 来源 | 建议范围 | 规则 |
 |---|---|---:|---|
-| 基础月修为 | `data/realm_balance.yaml > cultivation_progression.base_monthly_gain_by_realm` | 20–800 | 由当前境界决定，随小境界和大境界提升 |
+| 基础月修为 | `data/jingjie_balance.yaml > cultivation_progression.base_monthly_gain_by_realm` | 20–800 | 由当前境界决定，随小境界和大境界提升 |
 | 修炼速度基准 | 固定值 | 1 | 没有加成时按境界基础值修炼 |
 | 当前修炼功法效果加成 | `effectId: cultivation_speed` | 0–0.40 | 只有本次选择修炼的功法生效；战斗配置功法不生效 |
 | 主功法基础修为 | `method.practice.baseCultivationGain` | 0–200 | 高阶/高品质功法给固定月修为，放在乘法后相加 |
@@ -78,7 +78,7 @@
 
 ## 修炼丹（丹药炼化）
 
-配置锚点与公式见 `data/realm_balance.yaml > cultivation_progression.cultivation_pill_balance`。运行时推导见 `RealmBalanceService.cultivation_pill_gain_for_item()`。
+配置锚点与公式见 `data/jingjie_balance.yaml > cultivation_progression.cultivation_pill_balance`。运行时推导见 `RealmBalanceService.cultivation_pill_gain_for_item()`。
 
 ```text
 中品日修为 = round(anchor_medium × 大境界月基础修为[reference_phase] / 炼气月基础修为[reference_phase])

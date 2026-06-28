@@ -65,7 +65,7 @@ static func _validate_quality_tier_row(row: Dictionary, label: String) -> Packed
 
 
 static func _validate_realm_balance() -> PackedStringArray:
-	var simulation := JsonLoader._read_json_root_object("res://data/simulation.yaml")
+	var simulation := JsonLoader._read_json_root_object("res://data/moni.yaml")
 	var realms_v: Variant = simulation.get("realms", [])
 	var realms := realms_v as Array if realms_v is Array else []
 	return RealmBalanceServiceScript.collect_config_errors(realms)

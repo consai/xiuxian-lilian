@@ -3,8 +3,8 @@ extends SceneTree
 const StoryPlayerScript := preload("res://scripts/story/story_player.gd")
 const StoryValidatorScript := preload("res://scripts/story/story_validator.gd")
 const EnumCharacterPortraitScript := preload("res://scripts/enum/enum_character_portrait.gd")
-const STORY_PATH := "res://data/stories/prologue_fragment.yaml"
-const TUTORIAL_STORY_PATH := "res://data/stories/prologue_tutorial.yaml"
+const STORY_PATH := "res://data/gushi/prologue_fragment.yaml"
+const TUTORIAL_STORY_PATH := "res://data/gushi/prologue_tutorial.yaml"
 
 var _failures: Array[String] = []
 var _tests_run := 0

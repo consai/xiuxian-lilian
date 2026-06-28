@@ -79,7 +79,7 @@ async function normalizeBundle(fileName) {
 }
 
 async function normalizeAbilities() {
-  const indexFile = path.join(dataDir, "abilities.yaml");
+  const indexFile = path.join(dataDir, "jineng.yaml");
   const index = await readYaml(indexFile);
   walkRealmFields(index);
   await writeYaml(indexFile, index);

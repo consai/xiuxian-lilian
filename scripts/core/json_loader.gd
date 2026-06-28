@@ -4,14 +4,22 @@ extends RefCounted
 const ITEMS_PATH := "res://data/item.yaml"
 const DAO_TREE_PATH := "res://data/dao_tree.yaml"
 const XIULIAN_METHODS_PATH := "res://data/xiulian_methods.yaml"
-const KNOWLEDGE_EFFECTS_PATH := "res://data/knowledge_effects.yaml"
-const ABILITIES_PATH := "res://data/abilities.yaml"
-const EFFECT_CATALOG_PATH := "res://data/effect_catalog.yaml"
-const EQUIPS_PATH := "res://data/equip.yaml"
+const KNOWLEDGE_EFFECTS_PATH := "res://data/zhishi_effects.yaml"
+const ABILITIES_PATH := "res://data/jineng.yaml"
+const EFFECT_CATALOG_PATH := "res://data/xiaoguo_catalog.yaml"
+const EQUIPS_PATH := "res://data/zhuangbei.yaml"
 const BUFFS_PATH := "res://data/buff.yaml"
 const ZHANDOU_VFX_INDEX_PATH := "res://data/zhandou/vfx_index.yaml"
 const ZHANDOU_FLOAT_STYLES_PATH := "res://data/zhandou/float_styles.yaml"
 const ZHANDOU_VFX_PRESETS_DIR := "res://data/zhandou/presets"
+
+## 技能分表默认路径（类型键与文件名不一致时的兜底）。
+const ABILITY_TABLE_FILE_BY_TYPE := {
+	"combat_active": "jineng/zhandou_active.yaml",
+	"combat_passive": "jineng/zhandou_passive.yaml",
+	"combat_upkeep": "jineng/zhandou_upkeep.yaml",
+	"general_passive": "jineng/tongyong_passive.yaml",
+}
 const ItemDefScript = preload("res://scripts/core/item_def.gd")
 const EquipDefScript = preload("res://scripts/zhandou/equip_def.gd")
 const BuffDefScript = preload("res://scripts/zhandou/buff_def.gd")
@@ -626,7 +634,7 @@ static func _ability_table_load_order(bundle: Dictionary, tables: Dictionary) ->
 static func _load_ability_table_rows(type_name: String, tables: Dictionary) -> Array:
 	var rel := str(tables.get(type_name, "")).strip_edges()
 	if rel == "":
-		rel = "abilities/%s.yaml" % type_name
+		rel = str(ABILITY_TABLE_FILE_BY_TYPE.get(type_name, "jineng/%s.yaml" % type_name))
 	var path := rel if rel.begins_with("res://") else "res://data/%s" % rel.trim_prefix("/")
 	var table := _read_json_root_object(path)
 	var rows_v: Variant = table.get("abilities", [])

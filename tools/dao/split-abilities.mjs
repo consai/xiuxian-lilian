@@ -4,8 +4,15 @@ import { fileURLToPath } from "node:url";
 import { readYaml, writeYaml } from "./yaml-loader.mjs";
 
 const dataDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../data");
-const indexPath = path.join(dataDir, "abilities.yaml");
-const tablesDir = path.join(dataDir, "abilities");
+const indexPath = path.join(dataDir, "jineng.yaml");
+const tablesDir = path.join(dataDir, "jineng");
+
+const ABILITY_TABLE_FILES = {
+  combat_active: "zhandou_active.yaml",
+  combat_passive: "zhandou_passive.yaml",
+  combat_upkeep: "zhandou_upkeep.yaml",
+  general_passive: "tongyong_passive.yaml",
+};
 
 const source = await readYaml(indexPath);
 const types = source.rules?.types ?? [
@@ -21,8 +28,9 @@ await mkdir(tablesDir, { recursive: true });
 const abilityTables = {};
 for (const typeName of types) {
   const rows = allAbilities.filter((ability) => ability.type === typeName);
-  const tablePath = path.join(tablesDir, `${typeName}.yaml`);
-  abilityTables[typeName] = `abilities/${typeName}.yaml`;
+  const tableFile = ABILITY_TABLE_FILES[typeName] ?? `${typeName}.yaml`;
+  const tablePath = path.join(tablesDir, tableFile);
+  abilityTables[typeName] = `jineng/${tableFile}`;
   await writeYaml(tablePath, {
     configId: `abilities.${typeName}`,
     type: typeName,

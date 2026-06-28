@@ -29,6 +29,11 @@ static func active_limit() -> int:
 	return maxi(1, int(rules().get("active_limit", 3)))
 
 
+## 委托榜单次刷新展示的可接受委托数量（默认每月 3 个）。
+static func board_offer_count() -> int:
+	return maxi(1, int(rules().get("board_offer_count", 3)))
+
+
 static func weituo_by_id(weituo_id: String) -> Dictionary:
 	var wid := weituo_id.strip_edges()
 	if wid == "":
@@ -62,10 +67,6 @@ static func coalesce_savedata(data: Variant) -> Dictionary:
 				"offer_ids": (board.get("offer_ids", []) as Array).duplicate(),
 			}
 	out["active"] = _sanitize_active(out["active"] as Dictionary)
-	if (out["board"] as Dictionary).get("offer_ids", []) is Array:
-		var offer_ids: Array = (out["board"] as Dictionary).get("offer_ids", []) as Array
-		if offer_ids.is_empty():
-			(out["board"] as Dictionary)["offer_ids"] = _all_weituo_ids()
 	return out
 
 
@@ -127,12 +128,12 @@ static func visible_entries(savedata: Dictionary, game_state: Node = null) -> Ar
 	return entries
 
 
-static func board_badge(savedata: Dictionary) -> Dictionary:
+static func board_badge(savedata: Dictionary, game_state: Node = null) -> Dictionary:
 	var weituo_data := weituo_block(savedata)
 	var active_map := weituo_data.get("active", {}) as Dictionary
 	var has_ready := false
 	for instance_id_v in active_map.keys():
-		var check := can_submit(str(instance_id_v), savedata, null)
+		var check := can_submit(str(instance_id_v), savedata, game_state)
 		if bool(check.get("ok", false)):
 			has_ready = true
 			break
@@ -201,18 +202,18 @@ static func submit(instance_id: String, savedata: Dictionary, game_state: Node) 
 	var active := weituo_data.get("active", {}) as Dictionary
 	var rec := active[instance_id] as Dictionary
 	var weituo_def := weituo_by_id(str(_record_weituo_id(rec)))
-	for req_v in check.get("requirements", []) as Array:
-		if not req_v is Dictionary:
-			continue
-		var req := req_v as Dictionary
-		if str(req.get("kind", "")) == "item" and bool(req.get("consume", true)):
-			InventoryService.remove_item(
-				game_state.inventory,
-				str(req.get("id", "")),
-				int(req.get("required_count", 0))
-			)
+	var inventory := _resolve_inventory(savedata, game_state)
+	var consume_result := _consume_item_requirements(inventory, weituo_def)
+	if not bool(consume_result.get("ok", false)):
+		return {
+			"ok": false,
+			"error": str(consume_result.get("error", "扣除物品失败")),
+			"missing": consume_result.get("missing", []),
+		}
+	_persist_inventory(savedata, game_state, inventory)
 	var rewards := weituo_def.get("rewards", []) as Array
 	var applied := RewardService.apply_rewards(game_state, rewards, "weituo")
+	_emit_inventory_changed()
 	var title := str(weituo_def.get("title", "委托"))
 	_append_activity(game_state, "提交委托「%s」，获得预定奖励" % title)
 	var weituo_id := _record_weituo_id(rec)
@@ -306,11 +307,11 @@ static func refresh_board_if_needed(savedata: Dictionary, _game_state: Node = nu
 	var offer_ids: Array = board.get("offer_ids", []) as Array
 	var refreshed := false
 	if offer_ids.is_empty():
-		board["offer_ids"] = _all_weituo_ids()
+		board["offer_ids"] = _pick_board_offer_ids(savedata, _game_state)
 		refreshed = true
 	elif day >= refresh_day + refresh_days:
 		board["refresh_day"] = day
-		board["offer_ids"] = _all_weituo_ids()
+		board["offer_ids"] = _pick_board_offer_ids(savedata, _game_state)
 		refreshed = true
 	weituo_data["board"] = board
 	savedata["weituo"] = weituo_data
@@ -466,7 +467,7 @@ static func _evaluate_requirements(
 		var req := req_v as Dictionary
 		var kind := str(req.get("kind", ""))
 		if kind == "item":
-			var item_id := str(req.get("id", ""))
+			var item_id := _requirement_item_id(req)
 			var need := maxi(1, int(req.get("count", 1)))
 			var have := int(inventory.get(item_id, 0))
 			out.append({
@@ -600,11 +601,22 @@ static func _active_instance_for_weituo(active: Dictionary, weituo_id: String) -
 	return ""
 
 
-static func _all_weituo_ids() -> Array:
-	var ids: Array = []
+## 从已解锁委托池中随机抽取本周期榜单位（ponytail: 无种子 shuffle，读档后空榜重抽可能变化）。
+static func _pick_board_offer_ids(savedata: Dictionary, game_state: Node = null) -> Array:
+	var weituo_data := weituo_block(savedata)
+	var completed_once: Array = weituo_data.get("completed_once", []) as Array
+	var candidates: Array = []
 	for weituo_id_v in weituo_dict().keys():
-		ids.append(str(weituo_id_v))
-	return ids
+		var weituo_id := str(weituo_id_v)
+		var weituo_def := weituo_by_id(weituo_id)
+		if weituo_def.is_empty() or not is_unlocked(weituo_def, savedata, game_state):
+			continue
+		if not bool(weituo_def.get("repeatable", true)) and weituo_id in completed_once:
+			continue
+		candidates.append(weituo_id)
+	candidates.shuffle()
+	var pick_count := mini(board_offer_count(), candidates.size())
+	return candidates.slice(0, pick_count)
 
 
 static func _item_label(req: Dictionary, item_id: String) -> String:
@@ -634,6 +646,76 @@ static func _config_manager() -> Node:
 	if not loop is SceneTree:
 		return null
 	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
+
+
+static func _requirement_item_id(req: Dictionary) -> String:
+	var item_id := str(req.get("id", "")).strip_edges()
+	if item_id != "":
+		return item_id
+	return str(req.get("item_id", "")).strip_edges()
+
+
+static func _resolve_inventory(savedata: Dictionary, game_state: Node) -> Dictionary:
+	if game_state != null and "inventory" in game_state:
+		return game_state.inventory
+	return savedata.get("inventory", {}) as Dictionary
+
+
+static func _persist_inventory(savedata: Dictionary, game_state: Node, inventory: Dictionary) -> void:
+	savedata["inventory"] = inventory
+	if game_state != null and "inventory" in game_state:
+		game_state.inventory = inventory
+
+
+## 按委托配置扣除需交付的物品；提交前已由 can_submit 校验数量。
+static func _consume_item_requirements(inventory: Dictionary, weituo_def: Dictionary) -> Dictionary:
+	var missing: Array = []
+	for req_v in weituo_def.get("requirements", []) as Array:
+		if not req_v is Dictionary:
+			continue
+		var req := req_v as Dictionary
+		if str(req.get("kind", "")) != "item" or not bool(req.get("consume", true)):
+			continue
+		var item_id := _requirement_item_id(req)
+		var need := maxi(1, int(req.get("count", 1)))
+		if item_id == "":
+			continue
+		var have := int(inventory.get(item_id, 0))
+		if have < need:
+			missing.append({
+				"kind": "item",
+				"id": item_id,
+				"label": _item_label(req, item_id),
+				"current_count": have,
+				"required_count": need,
+				"satisfied": false,
+			})
+	if not missing.is_empty():
+		return {"ok": false, "error": "物品不足", "missing": missing}
+	for req_v in weituo_def.get("requirements", []) as Array:
+		if not req_v is Dictionary:
+			continue
+		var req := req_v as Dictionary
+		if str(req.get("kind", "")) != "item" or not bool(req.get("consume", true)):
+			continue
+		var item_id := _requirement_item_id(req)
+		var need := maxi(1, int(req.get("count", 1)))
+		if item_id == "":
+			continue
+		var removed := InventoryService.remove_item(inventory, item_id, need)
+		if removed < need:
+			push_error("WeituoService: item consume mismatch for %s (%d/%d)" % [item_id, removed, need])
+			return {"ok": false, "error": "扣除物品失败", "missing": []}
+	return {"ok": true}
+
+
+static func _emit_inventory_changed() -> void:
+	var bus := Engine.get_main_loop()
+	if not bus is SceneTree:
+		return
+	var data_events := (bus as SceneTree).root.get_node_or_null("DataEvents")
+	if data_events != null and data_events.has_method("emit_inventory_changed"):
+		data_events.call("emit_inventory_changed")
 
 
 static func _append_activity(game_state: Node, text: String) -> void:

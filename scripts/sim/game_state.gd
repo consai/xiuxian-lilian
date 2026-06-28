@@ -1,6 +1,6 @@
 extends Node
 
-const SIM_PATH := "res://data/simulation.yaml"
+const SIM_PATH := "res://data/moni.yaml"
 const HUB_SCENE := "res://scenes/sim/dongfu.tscn"
 
 const INSTABILITY_REDUCTION_PER_WIN := 10

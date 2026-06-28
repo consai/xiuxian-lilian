@@ -5,7 +5,7 @@ const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 
-const PATH := "res://data/abilities.yaml"  # 索引；分表见 abilityTables
+const PATH := "res://data/jineng.yaml"  # 索引；分表见 abilityTables
 const BASIC_STRIKE_ID := "ability.combat.basic_strike"
 
 static var _bundle: Dictionary = {}

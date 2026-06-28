@@ -3,6 +3,7 @@ schema_version: 1
 rules:
   active_limit: 3 # TODO: tune after playtest; image target shows 当前委托 2/3
   refresh_days: 30 # TODO: use GameTimeService cadence once implementation is allowed
+  board_offer_count: 3 # 委托榜每月刷新的可接受委托数量
 
 weituo:
   qingxin_herb_delivery_001:

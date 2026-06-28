@@ -3,7 +3,7 @@ import { ordinaryQualitiesFromPolicy, validateQualityTier } from "./validate-sha
 
 const dao = await readYaml(new URL("../../data/dao_tree.yaml", import.meta.url));
 const config = await readYaml(new URL("../../data/xiulian_methods.yaml", import.meta.url));
-const sharedCatalog = await readYaml(new URL("../../data/effect_catalog.yaml", import.meta.url));
+const sharedCatalog = await readYaml(new URL("../../data/xiaoguo_catalog.yaml", import.meta.url));
 const errors = [];
 
 const skills = new Map(dao.skills.map((skill) => [skill.id, skill]));
