@@ -1,0 +1,26 @@
+{
+  "version": {
+    "key": "version",
+    "value": 1.0
+  },
+  "jitter_x": {
+    "key": "jitter_x",
+    "value": 18.0
+  },
+  "max_per_unit_per_frame": {
+    "key": "max_per_unit_per_frame",
+    "value": 6.0
+  },
+  "arc_drift_ratio": {
+    "key": "arc_drift_ratio",
+    "value": 1.0
+  },
+  "arc_apex_min": {
+    "key": "arc_apex_min",
+    "value": 0.55
+  },
+  "arc_apex_max": {
+    "key": "arc_apex_max",
+    "value": 1.25
+  }
+}

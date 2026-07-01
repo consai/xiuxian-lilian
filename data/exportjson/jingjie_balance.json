@@ -1,0 +1,10 @@
+{
+  "schema_version": {
+    "key": "schema_version",
+    "value": "1"
+  },
+  "design_scope": {
+    "key": "design_scope",
+    "value": "combat_and_realm_foundation"
+  }
+}

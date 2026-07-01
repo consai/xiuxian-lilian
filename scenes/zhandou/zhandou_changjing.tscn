@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dp0ph2rhfe3qy"]
 
-[ext_resource type="Script" uid="uid://3kf84o4xhq3h" path="res://scripts/zhandou/zhandou_changjing.gd" id="1_6irjl"]
+[ext_resource type="Script" uid="uid://ctd4int1vj6qu" path="res://scripts/zhandou/zhandou_changjing.gd" id="1_6irjl"]
 [ext_resource type="Texture2D" uid="uid://k7aplfa6t5bk" path="res://assets/art/fightscene/fight1.png" id="2_co4yi"]
 [ext_resource type="Texture2D" uid="uid://dr8mq2yvaep1a" path="res://assets/art/ui_new/sprite_006.png" id="2_rpgid"]
 [ext_resource type="StyleBox" uid="uid://djo82jeb3from" path="res://ui/progress_blue_back.tres" id="3_eiqso"]
@@ -26,7 +26,7 @@
 [ext_resource type="Script" uid="uid://b8ghtxgbdb858" path="res://scripts/zhandou/zhandou_float_layer.gd" id="25_float"]
 [ext_resource type="PackedScene" uid="uid://do06os1xqkp8m" path="res://scenes/zhandou/zhandou_jiesuan_fuceng.tscn" id="26_resultoverlay"]
 [ext_resource type="PackedScene" uid="uid://bwekah2swk2g3" path="res://scenes/zhandou/interval_track_view.tscn" id="27_interval"]
-[ext_resource type="PackedScene" path="res://scenes/zhandou/buff_status_bar.tscn" id="28_buffbar"]
+[ext_resource type="PackedScene" uid="uid://cx0fbnjps78b1" path="res://scenes/zhandou/buff_status_bar.tscn" id="28_buffbar"]
 [ext_resource type="Script" uid="uid://dxe5p5sw8ftc0" path="res://scripts/ui/components/long_press_scroll_container.gd" id="29_lpsc"]
 [ext_resource type="PackedScene" uid="uid://cacywilhlbfpq" path="res://scenes/zhandou/enemy_formation_slot.tscn" id="30_enemy_slot"]
 [ext_resource type="Texture2D" uid="uid://hwomn6aon70a" path="res://assets/art/ui_new/btn_huang.png" id="31_escape_btn"]
@@ -700,49 +700,49 @@ position = Vector2(560, -11)
 texture = ExtResource("15_6irjl")
 
 [node name="EnemySlot_0" parent="center" unique_id=1170104318 instance=ExtResource("30_enemy_slot")]
-position = Vector2(96, -82)
+position = Vector2(-7, -97)
 
 [node name="EnemySlot_1" parent="center" unique_id=1703641528 instance=ExtResource("30_enemy_slot")]
-position = Vector2(132, -18)
+position = Vector2(61, -41)
 
 [node name="EnemySlot_2" parent="center" unique_id=1673865008 instance=ExtResource("30_enemy_slot")]
-position = Vector2(169, 46)
+position = Vector2(134, 15)
 
 [node name="EnemySlot_3" parent="center" unique_id=1201716536 instance=ExtResource("30_enemy_slot")]
-position = Vector2(215, 106)
+position = Vector2(203, 66)
 
 [node name="EnemySlot_4" parent="center" unique_id=2075805232 instance=ExtResource("30_enemy_slot")]
-position = Vector2(252, 170)
+position = Vector2(271, 110)
 
 [node name="EnemySlot_5" parent="center" unique_id=1560976258 instance=ExtResource("30_enemy_slot")]
-position = Vector2(226, -82)
+position = Vector2(123, -97)
 
 [node name="EnemySlot_6" parent="center" unique_id=96599165 instance=ExtResource("30_enemy_slot")]
-position = Vector2(262, -18)
+position = Vector2(191, -41)
 
 [node name="EnemySlot_7" parent="center" unique_id=945348374 instance=ExtResource("30_enemy_slot")]
-position = Vector2(299, 46)
+position = Vector2(264, 15)
 
 [node name="EnemySlot_8" parent="center" unique_id=2024117541 instance=ExtResource("30_enemy_slot")]
-position = Vector2(345, 106)
+position = Vector2(333, 66)
 
 [node name="EnemySlot_9" parent="center" unique_id=578804603 instance=ExtResource("30_enemy_slot")]
-position = Vector2(382, 170)
+position = Vector2(401, 110)
 
 [node name="EnemySlot_10" parent="center" unique_id=1460611612 instance=ExtResource("30_enemy_slot")]
-position = Vector2(353, -82)
+position = Vector2(250, -97)
 
 [node name="EnemySlot_11" parent="center" unique_id=260308700 instance=ExtResource("30_enemy_slot")]
-position = Vector2(392, -18)
+position = Vector2(321, -41)
 
 [node name="EnemySlot_12" parent="center" unique_id=498169488 instance=ExtResource("30_enemy_slot")]
-position = Vector2(432, 46)
+position = Vector2(397, 15)
 
 [node name="EnemySlot_13" parent="center" unique_id=820126145 instance=ExtResource("30_enemy_slot")]
-position = Vector2(478, 106)
+position = Vector2(466, 66)
 
 [node name="EnemySlot_14" parent="center" unique_id=614128274 instance=ExtResource("30_enemy_slot")]
-position = Vector2(518, 170)
+position = Vector2(537, 110)
 
 [node name="botton" type="Panel" parent="." unique_id=1376481080]
 layout_mode = 1
@@ -750,23 +750,22 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 18.0
-offset_top = -188.0
-offset_right = -18.0
-offset_bottom = -14.0
+offset_left = 6.0
+offset_top = -154.0
+offset_right = -30.0
+offset_bottom = 15.555603
 grow_horizontal = 2
 grow_vertical = 0
+scale = Vector2(0.9, 0.9)
 theme = SubResource("Theme_rbqh8")
 theme_override_styles/panel = SubResource("StyleActionBar")
 
 [node name="lefttip" type="TextureRect" parent="botton" unique_id=12645586]
 layout_mode = 1
 offset_left = 18.0
-offset_top = 10.0
+offset_top = 7.777771
 offset_right = 84.0
-offset_bottom = 166.0
-grow_horizontal = 0
-grow_vertical = 0
+offset_bottom = 163.77777
 texture = ExtResource("10_ropvy")
 expand_mode = 1
 
@@ -793,8 +792,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 90.0
 offset_top = 14.0
-offset_right = -645.0
-offset_bottom = -26.0
+offset_right = -636.0
+offset_bottom = -17.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleInnerCard")
@@ -849,9 +848,9 @@ anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -632.0
-offset_top = 9.0
+offset_top = 6.777771
 offset_right = -566.0
-offset_bottom = 165.0
+offset_bottom = 162.77777
 grow_horizontal = 0
 texture = ExtResource("10_ropvy")
 expand_mode = 1
@@ -908,9 +907,9 @@ anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -324.0
-offset_top = 9.0
+offset_top = 6.777771
 offset_right = -258.0
-offset_bottom = 165.0
+offset_bottom = 162.77777
 grow_horizontal = 0
 texture = ExtResource("10_ropvy")
 expand_mode = 1
@@ -967,10 +966,10 @@ layout_mode = 1
 anchors_preset = -1
 anchor_top = -0.18400002
 anchor_right = 1.0
-offset_left = 223.0
-offset_top = -27.983997
-offset_right = -929.0
-offset_bottom = -2.0
+offset_left = 1263.3334
+offset_top = 43.420425
+offset_right = 111.333374
+offset_bottom = 69.40442
 grow_horizontal = 0
 texture_normal = ExtResource("31_escape_btn")
 ignore_texture_size = true
@@ -985,6 +984,34 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "逃跑"
+label_settings = ExtResource("11_kccqe")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="tiaoxi" type="TextureButton" parent="botton" unique_id=2010080319]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_top = -0.18400002
+anchor_right = 1.0
+offset_left = 234.11115
+offset_top = -27.983995
+offset_right = -917.88885
+offset_bottom = -2.0
+grow_horizontal = 0
+texture_normal = ExtResource("31_escape_btn")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("32_press")
+
+[node name="Label" type="Label" parent="botton/tiaoxi" unique_id=203688600]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "调息"
 label_settings = ExtResource("11_kccqe")
 horizontal_alignment = 1
 vertical_alignment = 1

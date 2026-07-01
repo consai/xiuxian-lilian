@@ -33,12 +33,12 @@ static func _resolve_overlay(
 		skill_id: int,
 ) -> Dictionary:
 	if skill_id == 0:
-		var basic_damage := ZhandouAttr.estimate_basic_damage(attacker.attrs, defender.attrs)
-		if basic_damage <= 0.0:
+		var mp_restore: float = ZhandouAttr.estimate_tiaoxi_mp_restore(attacker.attrs)
+		if mp_restore <= 0.0:
 			return {}
 		return {
-			"intent_overlay": OVERLAY_DAMAGE,
-			"estimated_damage": _display_hp_damage(basic_damage, defender),
+			"intent_overlay": "mp_gain",
+			"estimated_mp_gain": int(roundf(mp_restore)),
 		}
 	var damage_total := 0.0
 	var has_shield := false
@@ -90,7 +90,10 @@ static func _attacker_skill_cfg(attacker: ZhandouObj, skill_cfg: Dictionary, ski
 
 
 static func _targets_player(effect: Dictionary) -> bool:
-	return EnumZhandouTarget.is_hostile_label(str(effect.get("target", "")))
+	return EnumZhandouTargetArg.is_hostile_pair(
+		str(effect.get("target", "")),
+		str(effect.get("target_arg", effect.get("targetArg", "")))
+	)
 
 
 static func _scaled_effect_value(attacker: ZhandouObj, effect: Dictionary) -> float:

@@ -65,16 +65,19 @@ static func _validate_quality_tier_row(row: Dictionary, label: String) -> Packed
 
 
 static func _validate_realm_balance() -> PackedStringArray:
-	var simulation := JsonLoader._read_json_root_object("res://data/moni.yaml")
-	var realms_v: Variant = simulation.get("realms", [])
-	var realms := realms_v as Array if realms_v is Array else []
-	return RealmBalanceServiceScript.collect_config_errors(realms)
+	return RealmBalanceServiceScript.collect_config_errors(RealmService.realms())
 
 
 static func _validate_v1_abilities() -> PackedStringArray:
 	var errors: PackedStringArray = []
 	for ability_v in AbilityServiceScript.all_abilities():
 		var ability := ability_v as Dictionary
+		var ability_id := str(ability.get("id", ""))
+		if ability.has("realm"):
+			errors.append("技能 %s 不得配置 realm，请仅用 tier" % ability_id)
+		var learning_reqs_v: Variant = ability.get("learningRequirements", {})
+		if learning_reqs_v is Dictionary and (learning_reqs_v as Dictionary).has("realm"):
+			errors.append("技能 %s learningRequirements 不得配置 realm" % ability_id)
 		if not ability.get("tags") is Array:
 			errors.append("技能 %s tags 必须是数组" % str(ability.get("id", "")))
 		if not ability.get("trigger") is Dictionary:
@@ -89,12 +92,20 @@ static func _validate_v1_abilities() -> PackedStringArray:
 				errors.append("技能 %s 的效果 %s 使用了禁用字段 masteryGrowth" % [
 					ability.get("id", ""), effect.get("effectId", ""),
 				])
-		if str(ability.get("type", "")) != "combat_active":
+			var effect_id := str(effect.get("effectId", ""))
+			errors.append_array(_validate_ability_effect_id(ability, effect_id))
+		var ability_type_all := str(ability.get("type", ""))
+		if ability_type_all not in ["combat_active", "combat_upkeep"]:
 			continue
 		var combat := ability.get("combat", {}) as Dictionary
+		var ability_type := str(ability.get("type", ""))
 		if not combat.has("powerScale") or float(combat.get("powerScale", -1.0)) < 0.0:
-			errors.append("技能 %s 缺少有效 powerScale" % str(ability.get("id", "")))
+			if ability_type == "combat_active":
+				errors.append("技能 %s 缺少有效 powerScale" % str(ability.get("id", "")))
 		errors.append_array(_validate_combat_costs(ability, combat))
+		errors.append_array(_validate_combat_target_fields(ability, combat))
+		if ability_type != "combat_active":
+			continue
 		for effect_v in ability.get("effects", []) as Array:
 			var effect := effect_v as Dictionary
 			var effect_id := str(effect.get("effectId", ""))
@@ -103,6 +114,59 @@ static func _validate_v1_abilities() -> PackedStringArray:
 			if str(effect.get("operation", "")) == "add_percent" \
 					and (not effect.has("clampMin") or not effect.has("clampMax")):
 				errors.append("技能 %s 的百分比效果 %s 缺少上下限" % [ability.get("id", ""), effect_id])
+	return errors
+
+
+static func _validate_ability_effect_id(ability: Dictionary, effect_id: String) -> PackedStringArray:
+	var errors: PackedStringArray = []
+	if effect_id == "":
+		return errors
+	var ability_id := str(ability.get("id", ""))
+	var ability_type := str(ability.get("type", ""))
+	match ability_type:
+		"combat_active", "combat_upkeep":
+			if not EnumZhandouActiveEffect.is_valid_label(effect_id) \
+					and not EffectResolverScript.has_combat_mapping(effect_id):
+				errors.append(
+					"技能 %s 的效果 %s 不在 EnumZhandouActiveEffect" % [ability_id, effect_id]
+				)
+		"combat_passive":
+			if not EnumZhandouPassiveEffect.is_valid_label(effect_id) \
+					and not EffectResolverScript.has_method_mapping(effect_id) \
+					and effect_id != "buff":
+				errors.append(
+					"技能 %s 的效果 %s 不在 EnumZhandouPassiveEffect" % [ability_id, effect_id]
+				)
+		"general_passive":
+			if not EnumTongyongPassiveEffect.is_valid_label(effect_id):
+				errors.append(
+					"技能 %s 的效果 %s 不在 EnumTongyongPassiveEffect" % [ability_id, effect_id]
+				)
+	return errors
+
+
+static func _validate_combat_target_fields(ability: Dictionary, combat: Dictionary) -> PackedStringArray:
+	var errors: PackedStringArray = []
+	var ability_id := str(ability.get("id", ""))
+	var pair := EnumZhandouTargetArg.normalize_pair(
+		combat.get("target", ""),
+		combat.get("targetArg", combat.get("target_arg", ""))
+	)
+	var target := str(pair.get("target", ""))
+	if not EnumZhandouTarget.is_valid_label(target):
+		errors.append("技能 %s combat.target '%s' 无效，仅支持 self/enemy" % [ability_id, target])
+	var target_arg := str(pair.get("target_arg", ""))
+	if target_arg != "" and not EnumZhandouTargetArg.is_valid_label(target_arg):
+		errors.append("技能 %s combat.targetArg '%s' 无效" % [ability_id, target_arg])
+	for effect_v in ability.get("effects", []) as Array:
+		if not effect_v is Dictionary:
+			continue
+		var effect := effect_v as Dictionary
+		if effect.has("target") or effect.has("targetArg") or effect.has("target_arg"):
+			errors.append(
+				"技能 %s 效果 %s 不得配置 target，请使用 combat.target"
+				% [ability_id, effect.get("effectId", "")]
+			)
 	return errors
 
 

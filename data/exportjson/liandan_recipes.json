@@ -1,0 +1,313 @@
+{
+  "recipe.huiqi": {
+    "id": "recipe.huiqi",
+    "name": "回气丹方",
+    "pill_name": "回气丹",
+    "difficulty": 20,
+    "base_yield": 3,
+    "minimum_level": 1,
+    "ingredients": [
+      {
+        "family": "灵草",
+        "count": 2,
+        "weight": 2,
+        "options": [
+          {
+            "id": "items_LingCao",
+            "quality": 1
+          },
+          {
+            "id": "items_LingCao_Fine",
+            "quality": 2
+          },
+          {
+            "id": "items_LingCao_Superior",
+            "quality": 3
+          }
+        ]
+      }
+    ],
+    "products": {
+      "low": "items_HuiQiDan_Low",
+      "medium": "items_HuiQiDan",
+      "high": "items_HuiQiDan_High",
+      "supreme": "items_HuiQiDan_Supreme"
+    }
+  },
+  "recipe.huiling": {
+    "id": "recipe.huiling",
+    "name": "回灵丹方",
+    "pill_name": "回灵丹",
+    "difficulty": 28,
+    "base_yield": 3,
+    "minimum_level": 1,
+    "ingredients": [
+      {
+        "family": "灵草",
+        "count": 1,
+        "weight": 2,
+        "options": [
+          {
+            "id": "items_LingCao",
+            "quality": 1
+          },
+          {
+            "id": "items_LingCao_Fine",
+            "quality": 2
+          },
+          {
+            "id": "items_LingCao_Superior",
+            "quality": 3
+          }
+        ]
+      },
+      {
+        "family": "灵果",
+        "count": 1,
+        "weight": 1,
+        "options": [
+          {
+            "id": "items_LingGuo",
+            "quality": 1
+          },
+          {
+            "id": "items_LingGuo_Fine",
+            "quality": 2
+          },
+          {
+            "id": "items_LingGuo_Superior",
+            "quality": 3
+          }
+        ]
+      }
+    ],
+    "products": {
+      "low": "items_HuiLingDan_Low",
+      "medium": "items_HuiLingDan",
+      "high": "items_HuiLingDan_High",
+      "supreme": "items_HuiLingDan_Supreme"
+    }
+  },
+  "recipe.liaoshang": {
+    "id": "recipe.liaoshang",
+    "name": "疗伤丹方",
+    "pill_name": "疗伤丹",
+    "difficulty": 38,
+    "base_yield": 2,
+    "minimum_level": 1,
+    "ingredients": [
+      {
+        "family": "灵草",
+        "count": 2,
+        "weight": 2,
+        "options": [
+          {
+            "id": "items_LingCao",
+            "quality": 1
+          },
+          {
+            "id": "items_LingCao_Fine",
+            "quality": 2
+          },
+          {
+            "id": "items_LingCao_Superior",
+            "quality": 3
+          }
+        ]
+      },
+      {
+        "family": "灵果",
+        "count": 1,
+        "weight": 1,
+        "options": [
+          {
+            "id": "items_LingGuo",
+            "quality": 1
+          },
+          {
+            "id": "items_LingGuo_Fine",
+            "quality": 2
+          },
+          {
+            "id": "items_LingGuo_Superior",
+            "quality": 3
+          }
+        ]
+      }
+    ],
+    "products": {
+      "low": "items_LiaoShangDan_Low",
+      "medium": "items_LiaoShangDan",
+      "high": "items_LiaoShangDan_High",
+      "supreme": "items_LiaoShangDan_Supreme"
+    }
+  },
+  "recipe.juqi": {
+    "id": "recipe.juqi",
+    "name": "聚气丹方",
+    "pill_name": "聚气丹",
+    "difficulty": 38,
+    "base_yield": 2,
+    "minimum_level": 1,
+    "ingredients": [
+      {
+        "family": "灵草",
+        "count": 2,
+        "weight": 2,
+        "options": [
+          {
+            "id": "items_LingCao",
+            "quality": 1
+          },
+          {
+            "id": "items_LingCao_Fine",
+            "quality": 2
+          },
+          {
+            "id": "items_LingCao_Superior",
+            "quality": 3
+          }
+        ]
+      },
+      {
+        "family": "灵果",
+        "count": 1,
+        "weight": 1,
+        "options": [
+          {
+            "id": "items_LingGuo",
+            "quality": 1
+          },
+          {
+            "id": "items_LingGuo_Fine",
+            "quality": 2
+          },
+          {
+            "id": "items_LingGuo_Superior",
+            "quality": 3
+          }
+        ]
+      },
+      {
+        "family": "妖丹",
+        "count": 1,
+        "weight": 1,
+        "options": [
+          {
+            "id": "items_YaoDan",
+            "quality": 3
+          }
+        ]
+      }
+    ],
+    "products": {
+      "low": "items_JuQiDan_Low",
+      "medium": "items_JuQiDan",
+      "high": "items_JuQiDan_High",
+      "supreme": "items_JuQiDan_Supreme"
+    }
+  },
+  "recipe.qingmai": {
+    "id": "recipe.qingmai",
+    "name": "清脉丹方",
+    "pill_name": "清脉丹",
+    "difficulty": 42,
+    "base_yield": 2,
+    "minimum_level": 1,
+    "ingredients": [
+      {
+        "family": "雾隐草",
+        "count": 2,
+        "weight": 2,
+        "options": [
+          {
+            "id": "items_MistHerb",
+            "quality": 2
+          },
+          {
+            "id": "items_MistHerb_Fine",
+            "quality": 3
+          }
+        ]
+      },
+      {
+        "family": "灵果",
+        "count": 1,
+        "weight": 1,
+        "options": [
+          {
+            "id": "items_LingGuo",
+            "quality": 1
+          },
+          {
+            "id": "items_LingGuo_Fine",
+            "quality": 2
+          },
+          {
+            "id": "items_LingGuo_Superior",
+            "quality": 3
+          }
+        ]
+      }
+    ],
+    "products": {
+      "low": "items_QingMaiDan_Low",
+      "medium": "items_QingMaiDan",
+      "high": "items_QingMaiDan_High",
+      "supreme": "items_QingMaiDan_Supreme"
+    }
+  },
+  "recipe.guben": {
+    "id": "recipe.guben",
+    "name": "固本道基丹方",
+    "pill_name": "固本道基丹",
+    "difficulty": 50,
+    "base_yield": 2,
+    "minimum_level": 1,
+    "ingredients": [
+      {
+        "family": "雾隐草",
+        "count": 2,
+        "weight": 2,
+        "options": [
+          {
+            "id": "items_MistHerb",
+            "quality": 2
+          },
+          {
+            "id": "items_MistHerb_Fine",
+            "quality": 3
+          }
+        ]
+      },
+      {
+        "family": "妖丹",
+        "count": 1,
+        "weight": 1,
+        "options": [
+          {
+            "id": "items_YaoDan",
+            "quality": 3
+          }
+        ]
+      },
+      {
+        "family": "阵核碎片",
+        "count": 1,
+        "weight": 2,
+        "options": [
+          {
+            "id": "items_ArrayCoreShard",
+            "quality": 3
+          }
+        ]
+      }
+    ],
+    "products": {
+      "low": "items_GuBenDaoJiDan_Low",
+      "medium": "items_GuBenDaoJiDan",
+      "high": "items_GuBenDaoJiDan_High",
+      "supreme": "items_GuBenDaoJiDan_Supreme"
+    }
+  }
+}

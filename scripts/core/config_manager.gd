@@ -292,15 +292,92 @@ func _monster_for_location_ref(location_id: String, monster_ref: String) -> Dict
 	return {}
 
 
+func monster_drop_entries(monster: Dictionary) -> Array:
+	return _monster_drop_entries(monster)
+
+
 func _monster_drop_pool(monster: Dictionary) -> Dictionary:
 	if monster.is_empty():
 		return {}
-	var drops_v: Variant = monster.get("drops", {})
-	if drops_v is Dictionary:
-		return (drops_v as Dictionary).duplicate(true)
-	if drops_v is Array:
-		return {"entries": (drops_v as Array).duplicate(true)}
+	var entries: Array = _monster_drop_entries(monster)
+	if not entries.is_empty():
+		return {"entries": entries}
 	return {}
+
+
+## 怪物表 dropitem 为 [kind, id, min, max, weight] 行数组。
+func _monster_drop_entries(monster: Dictionary) -> Array:
+	var dropitem_v: Variant = monster.get("dropitem", [])
+	if dropitem_v is Array:
+		var out: Array = []
+		for row_v in dropitem_v as Array:
+			if not row_v is Array:
+				continue
+			var cells: Array = row_v as Array
+			if cells.size() < 5:
+				continue
+			var reward_id: Variant = cells[1]
+			if str(cells[0]).strip_edges() == "equip" and str(reward_id).is_valid_int():
+				reward_id = int(reward_id)
+			out.append({
+				"kind": str(cells[0]).strip_edges(),
+				"id": reward_id,
+				"min": int(cells[2]),
+				"max": int(cells[3]),
+				"weight": int(cells[4]),
+			})
+		if not out.is_empty():
+			return out
+	return []
+
+
+## exportjson guaiwu 扁平字段 → 运行时怪物字典（species/attrs/icon）。
+func _normalize_monster_row(monster_id: String, row: Dictionary) -> Dictionary:
+	var out: Dictionary = row.duplicate(true)
+	if str(out.get("id", "")).strip_edges() == "":
+		out["id"] = monster_id
+	if str(out.get("species", "")).strip_edges() == "":
+		out["species"] = str(out.get("type", "")).strip_edges()
+	if str(out.get("icon", "")).strip_edges() == "":
+		var icon_path: String = str(out.get("headicon", out.get("obj", ""))).strip_edges()
+		if icon_path != "":
+			out["icon"] = icon_path
+	var attrs: Dictionary = (out.get("attrs", {}) as Dictionary).duplicate(true)
+	for attr_key in [
+		ZhandouAttr.HP_MAX, ZhandouAttr.MP_MAX, ZhandouAttr.SHIELD,
+		ZhandouAttr.PHYSICAL_ATK, ZhandouAttr.MAGIC_ATK,
+		ZhandouAttr.PHYSICAL_DEF, ZhandouAttr.MAGIC_DEF, ZhandouAttr.SPD,
+		ZhandouAttr.CONTROL_POWER, ZhandouAttr.CONTROL_RESIST,
+	]:
+		if out.has(attr_key) and not attrs.has(attr_key):
+			attrs[attr_key] = out[attr_key]
+	if not attrs.is_empty():
+		out["attrs"] = CharacterStats.finalize_combat_attrs(attrs)
+	out["skills"] = _normalize_monster_skills(out.get("skills", []))
+	return out
+
+
+## exportjson guaiwu：skills 为技能 id 数组；未配置调息 0 时自动补上。
+func _normalize_monster_skills(skills_v: Variant) -> Array:
+	if not skills_v is Array or (skills_v as Array).is_empty():
+		return [0]
+	var out: Array = []
+	var has_tiaoxi: bool = false
+	for sid_v in skills_v as Array:
+		if sid_v is Dictionary:
+			var slot: Dictionary = (sid_v as Dictionary).duplicate(true)
+			var sid: int = int(slot.get("id", -1))
+			if sid == 0:
+				has_tiaoxi = true
+			out.append(slot)
+		else:
+			var sid: int = int(sid_v)
+			if sid == 0:
+				has_tiaoxi = true
+			out.append(sid)
+	if not has_tiaoxi:
+		out.append(0)
+	return out
 
 
 func all_lilian_common_event_ids() -> Array:
@@ -327,8 +404,12 @@ func all_buff_ids() -> Array:
 	return (_buff_by_id.keys() as Array).duplicate()
 
 
-func basic_attack_cfg() -> Dictionary:
+func tiaoxi_cfg() -> Dictionary:
 	return skill_by_id(0)
+
+
+func basic_attack_cfg() -> Dictionary:
+	return tiaoxi_cfg()
 
 
 func battle_time_limit_default() -> float:
@@ -360,7 +441,7 @@ func build_skill_cfg(extra: Dictionary = {}) -> Dictionary:
 		return out
 	for k in extra.keys():
 		var key_str := str(k)
-		if key_str == "basic_attack":
+		if key_str == "basic_attack" or key_str == "tiaoxi_cfg":
 			var ba_v: Variant = extra[k]
 			if ba_v is Dictionary:
 				var merged := out.get(0, out.get("0", {})) as Dictionary
@@ -494,7 +575,7 @@ func _resolve_item_id_alias(item_id: String) -> String:
 
 func _load_locations_local() -> void:
 	_locations_by_id.clear()
-	var root := JsonLoader._read_json_root_object("res://data/didian.yaml")
+	var root := JsonLoader.load_locations_bundle()
 	var raw_v: Variant = root.get("locations", {})
 	if not raw_v is Dictionary:
 		return
@@ -506,14 +587,13 @@ func _load_locations_local() -> void:
 
 func _load_monsters_local() -> void:
 	_monsters_by_id.clear()
-	var root := JsonLoader._read_json_root_object("res://data/guaiwu.yaml")
-	var raw_v: Variant = root.get("monsters", {})
-	if not raw_v is Dictionary:
+	var root := JsonLoader._read_json_root_object(JsonLoader.export_path("exportjson_guaiwu.json"))
+	if not root is Dictionary:
 		return
-	for key in (raw_v as Dictionary).keys():
-		var row_v: Variant = (raw_v as Dictionary)[key]
+	for key in (root as Dictionary).keys():
+		var row_v: Variant = (root as Dictionary)[key]
 		if row_v is Dictionary:
-			_monsters_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
+			_monsters_by_id[str(key)] = _normalize_monster_row(str(key), row_v as Dictionary)
 
 
 func _load_world_map_local() -> void:
@@ -522,7 +602,7 @@ func _load_world_map_local() -> void:
 	_world_routes.clear()
 	_wilderness_regions_by_id.clear()
 	_wilderness_locations_by_id.clear()
-	var root := JsonLoader._read_json_root_object("res://data/shijie_map.yaml")
+	var root := JsonLoader.load_world_map_bundle()
 	_world_map_meta = {
 		"schema_version": int(root.get("schema_version", 1)),
 		"starter_city_id": str(root.get("starter_city_id", "qingshi_market")),
@@ -555,15 +635,15 @@ func _load_world_map_local() -> void:
 func _load_lilian_events_local() -> void:
 	_lilian_common_events_by_id.clear()
 	_lilian_events_by_id.clear()
-	var common_root := JsonLoader._read_json_root_object("res://data/lilian_common_events.yaml")
+	var common_root := JsonLoader.load_lilian_common_events_bundle()
 	var common_v: Variant = common_root.get("events", {})
 	if common_v is Dictionary:
 		for key in (common_v as Dictionary).keys():
 			var row_v: Variant = (common_v as Dictionary)[key]
 			if row_v is Dictionary:
 				_lilian_common_events_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
-	var root := JsonLoader._read_json_root_object("res://data/lilian_events.yaml")
-	var raw_v: Variant = root.get("map_events", root.get("events", {}))
+	var root := JsonLoader.load_lilian_events_bundle()
+	var raw_v: Variant = root.get("events", {})
 	if not raw_v is Dictionary:
 		return
 	for key in (raw_v as Dictionary).keys():
@@ -573,7 +653,7 @@ func _load_lilian_events_local() -> void:
 
 
 func _load_lilian_rules_local() -> void:
-	_lilian_rules = JsonLoader._read_json_root_object("res://data/lilian_rules.yaml").duplicate(true)
+	_lilian_rules = JsonLoader.load_lilian_rules_bundle().duplicate(true)
 
 
 func _load_skills_local() -> void:

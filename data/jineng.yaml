@@ -48,7 +48,6 @@ rules:
     maxKnowledgeRequirements: 2
     maxRequirementLevel: 2
 abilityTables:
-  combat_active: "jineng/zhandou_active.yaml"
-  combat_passive: "jineng/zhandou_passive.yaml"
-  combat_upkeep: "jineng/zhandou_upkeep.yaml"
-  general_passive: "jineng/tongyong_passive.yaml"
+  zhandou_active: "exportjson/zhandou_active.json"
+  zhandou_passive: "exportjson/zhandou_passive.json"
+  tongyong_passive: "exportjson/general_passive.json"

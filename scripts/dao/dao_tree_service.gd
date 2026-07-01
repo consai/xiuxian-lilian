@@ -3,7 +3,7 @@ extends RefCounted
 
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 
-const PATH := "res://data/dao_tree.yaml"
+const PATH := "res://data/exportjson/dao_tree.json"
 
 static var _config: Dictionary = {}
 static var _skills_by_id: Dictionary = {}

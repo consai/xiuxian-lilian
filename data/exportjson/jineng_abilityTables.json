@@ -1,0 +1,14 @@
+{
+  "zhandou_active": {
+    "key": "zhandou_active",
+    "value": "exportjson/zhandou_active.json"
+  },
+  "zhandou_passive": {
+    "key": "zhandou_passive",
+    "value": "exportjson/zhandou_passive.json"
+  },
+  "tongyong_passive": {
+    "key": "tongyong_passive",
+    "value": "exportjson/general_passive.json"
+  }
+}

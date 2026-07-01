@@ -1,0 +1,138 @@
+{
+  "wild_wolf_valley": {
+    "key": "wild_wolf_valley",
+    "name": "野狼谷",
+    "danger": 1,
+    "recommended_realm": "炼气一层",
+    "environment_tags": [
+      "山谷",
+      "狼群",
+      "迷雾"
+    ],
+    "preview_rewards": [
+      "妖丹",
+      "狼皮",
+      "灵草"
+    ],
+    "position": [
+      160,
+      430
+    ],
+    "parent_region": "qinglan_mountain",
+    "default_discovered": true,
+    "reveal_radius": 120,
+    "services": [
+      "剧情",
+      "狼患调查"
+    ],
+    "lilian_location_id": "wild_wolf_valley"
+  },
+  "spirit_spring_valley": {
+    "key": "spirit_spring_valley",
+    "name": "灵泉谷",
+    "danger": 1,
+    "recommended_realm": "炼气一层",
+    "environment_tags": [
+      "灵泉",
+      "竹林",
+      "药圃"
+    ],
+    "preview_rewards": [
+      "灵草",
+      "泉水精华"
+    ],
+    "position": [
+      75,
+      406
+    ],
+    "parent_region": "qinglan_mountain",
+    "default_discovered": null,
+    "reveal_radius": 120,
+    "services": [
+      "采集",
+      "恢复"
+    ],
+    "lilian_location_id": "qinglan_mountain"
+  },
+  "ancient_sword_tomb": {
+    "key": "ancient_sword_tomb",
+    "name": "古剑冢",
+    "danger": 3,
+    "recommended_realm": "炼气二层",
+    "environment_tags": [
+      "剑意",
+      "遗迹",
+      "禁制"
+    ],
+    "preview_rewards": [
+      "断剑",
+      "剑诀残页"
+    ],
+    "position": [
+      270,
+      371
+    ],
+    "parent_region": "qinglan_mountain",
+    "default_discovered": null,
+    "reveal_radius": 100,
+    "services": [
+      "秘境入口",
+      "剑冢试炼"
+    ],
+    "lilian_location_id": "qinglan_mountain"
+  },
+  "mist_creek_herb_garden": {
+    "key": "mist_creek_herb_garden",
+    "name": "雾溪药圃",
+    "danger": 2,
+    "recommended_realm": "筑基初期",
+    "environment_tags": [
+      "药圃",
+      "雾溪",
+      "灵草"
+    ],
+    "preview_rewards": [
+      "雾隐草",
+      "灵果"
+    ],
+    "position": [
+      430,
+      292
+    ],
+    "parent_region": "mist_hidden_valley",
+    "default_discovered": null,
+    "reveal_radius": 120,
+    "services": [
+      "采集",
+      "炼丹材料"
+    ],
+    "lilian_location_id": "mist_hidden_valley"
+  },
+  "sealed_creek_ruins": {
+    "key": "sealed_creek_ruins",
+    "name": "封溪残阵",
+    "danger": 4,
+    "recommended_realm": "筑基初期",
+    "environment_tags": [
+      "残阵",
+      "阵灵",
+      "禁制"
+    ],
+    "preview_rewards": [
+      "阵核碎片",
+      "筑基功法"
+    ],
+    "position": [
+      530,
+      312
+    ],
+    "parent_region": "mist_hidden_valley",
+    "default_discovered": null,
+    "reveal_radius": 100,
+    "services": [
+      "残阵调查",
+      "精英遭遇"
+    ],
+    "lilian_location_id": "mist_hidden_valley"
+  }
+}

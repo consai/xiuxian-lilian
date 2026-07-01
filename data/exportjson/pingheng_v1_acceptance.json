@@ -1,0 +1,38 @@
+{
+  "normal_win_rate_min": {
+    "key": "normal_win_rate_min",
+    "value": 0.7
+  },
+  "normal_win_rate_max": {
+    "key": "normal_win_rate_max",
+    "value": 0.85
+  },
+  "normal_duration_sec_min": {
+    "key": "normal_duration_sec_min",
+    "value": 8.0
+  },
+  "normal_duration_sec_max": {
+    "key": "normal_duration_sec_max",
+    "value": 14.0
+  },
+  "elite_win_rate_min": {
+    "key": "elite_win_rate_min",
+    "value": 0.35
+  },
+  "elite_win_rate_max": {
+    "key": "elite_win_rate_max",
+    "value": 0.55
+  },
+  "qi_mature_vs_foundation_normal_win_rate_max": {
+    "key": "qi_mature_vs_foundation_normal_win_rate_max",
+    "value": 0.5
+  },
+  "resource_remaining_ratio_min": {
+    "key": "resource_remaining_ratio_min",
+    "value": 0.25
+  },
+  "resource_remaining_ratio_max": {
+    "key": "resource_remaining_ratio_max",
+    "value": 0.65
+  }
+}

@@ -1,9 +1,9 @@
 class_name RealmBalanceService
 extends RefCounted
 
-## 数值配置门面：境界系数、属性公式、标杆敌人与平衡验收统一从 data/jingjie_balance.yaml 读取。
+## 数值配置门面：境界系数、属性公式、标杆敌人与平衡验收统一从 data/exportjson/jingjie_balance*.json 读取。
 
-const PATH := "res://data/jingjie_balance.yaml"
+const PATH := "res://data/exportjson/jingjie_balance.json"
 
 const DEFAULT_ATTRIBUTE_FORMULA := {
 	ZhandouAttr.HP_MAX: {"base": 50.0, "scale": {"body": 5.0}},
@@ -35,7 +35,7 @@ static var _bundle: Dictionary = {}
 
 
 static func reload() -> void:
-	_bundle = JsonLoader._read_json_root_object(PATH)
+	_bundle = JsonLoader.load_jingjie_balance_bundle()
 
 
 static func bundle() -> Dictionary:
@@ -296,12 +296,19 @@ static func _realm_phase(realm_row: Dictionary) -> String:
 		return "late"
 	var parts := id.split("_", false)
 	if parts.size() >= 2 and parts[1].is_valid_int():
-		var layer := int(parts[1])
-		if layer <= 3:
-			return "early"
-		if layer <= 6:
-			return "mid"
-		return "late"
+		var layer: int = int(parts[1])
+		# exportjson 三元小境：_1/_2/_3 对应初/中/后
+		match layer:
+			1:
+				return "early"
+			2:
+				return "mid"
+			3:
+				return "late"
+			_:
+				if layer <= 6:
+					return "mid"
+				return "late"
 	return "single"
 
 

@@ -1,0 +1,1227 @@
+{
+  "activation_speed": {
+    "key": "activation_speed",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "activation_speed",
+    "description": "功法效果属性 activation_speed，具体结算由 Godot 运行时映射。"
+  },
+  "alchemy_success": {
+    "key": "alchemy_success",
+    "category": "production",
+    "defaultTarget": "self",
+    "runtimeKey": "alchemy_success",
+    "description": "功法效果属性 alchemy_success，具体结算由 Godot 运行时映射。"
+  },
+  "all_efficiency": {
+    "key": "all_efficiency",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "all_efficiency",
+    "description": "功法效果属性 all_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "all_resistance": {
+    "key": "all_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "all_resistance",
+    "description": "功法效果属性 all_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "all_spell_efficiency": {
+    "key": "all_spell_efficiency",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "all_spell_efficiency",
+    "description": "功法效果属性 all_spell_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "ally_healing": {
+    "key": "ally_healing",
+    "category": "survival",
+    "defaultTarget": "allies",
+    "runtimeKey": "ally_healing",
+    "description": "功法效果属性 ally_healing，具体结算由 Godot 运行时映射。"
+  },
+  "ambient_qi_absorption": {
+    "key": "ambient_qi_absorption",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "runtimeKey": "ambient_qi_absorption",
+    "description": "功法效果属性 ambient_qi_absorption，具体结算由 Godot 运行时映射。"
+  },
+  "appraisal_accuracy": {
+    "key": "appraisal_accuracy",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "appraisal_accuracy",
+    "description": "功法效果属性 appraisal_accuracy，具体结算由 Godot 运行时映射。"
+  },
+  "armor_pierce": {
+    "key": "armor_pierce",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "armor_pierce",
+    "description": "功法效果属性 armor_pierce，具体结算由 Godot 运行时映射。"
+  },
+  "artifact_autonomy": {
+    "key": "artifact_autonomy",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "runtimeKey": "artifact_autonomy",
+    "description": "功法效果属性 artifact_autonomy，具体结算由 Godot 运行时映射。"
+  },
+  "artifact_power": {
+    "key": "artifact_power",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "runtimeKey": "artifact_power",
+    "description": "功法效果属性 artifact_power，具体结算由 Godot 运行时映射。"
+  },
+  "artifact_tribulation_success": {
+    "key": "artifact_tribulation_success",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "runtimeKey": "artifact_tribulation_success",
+    "description": "功法效果属性 artifact_tribulation_success，具体结算由 Godot 运行时映射。"
+  },
+  "ascension_failure_protection": {
+    "key": "ascension_failure_protection",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "runtimeKey": "ascension_failure_protection",
+    "description": "功法效果属性 ascension_failure_protection，具体结算由 Godot 运行时映射。"
+  },
+  "ascension_route_capacity": {
+    "key": "ascension_route_capacity",
+    "category": "exploration",
+    "defaultTarget": "world",
+    "runtimeKey": "ascension_route_capacity",
+    "description": "功法效果属性 ascension_route_capacity，具体结算由 Godot 运行时映射。"
+  },
+  "ascension_route_stability": {
+    "key": "ascension_route_stability",
+    "category": "exploration",
+    "defaultTarget": "world",
+    "runtimeKey": "ascension_route_stability",
+    "description": "功法效果属性 ascension_route_stability，具体结算由 Godot 运行时映射。"
+  },
+  "ascension_stability": {
+    "key": "ascension_stability",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "runtimeKey": "ascension_stability",
+    "description": "功法效果属性 ascension_stability，具体结算由 Godot 运行时映射。"
+  },
+  "ascension_success": {
+    "key": "ascension_success",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "runtimeKey": "ascension_success",
+    "description": "功法效果属性 ascension_success，具体结算由 Godot 运行时映射。"
+  },
+  "beast_contract_capacity": {
+    "key": "beast_contract_capacity",
+    "category": "control",
+    "defaultTarget": "controlled_entity",
+    "runtimeKey": "beast_contract_capacity",
+    "description": "功法效果属性 beast_contract_capacity，具体结算由 Godot 运行时映射。"
+  },
+  "beast_growth": {
+    "key": "beast_growth",
+    "category": "governance",
+    "defaultTarget": "controlled_entity",
+    "runtimeKey": "beast_growth",
+    "description": "功法效果属性 beast_growth，具体结算由 Godot 运行时映射。"
+  },
+  "beast_power": {
+    "key": "beast_power",
+    "category": "governance",
+    "defaultTarget": "controlled_entity",
+    "runtimeKey": "beast_power",
+    "description": "功法效果属性 beast_power，具体结算由 Godot 运行时映射。"
+  },
+  "bloodline_output": {
+    "key": "bloodline_output",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "bloodline_output",
+    "description": "功法效果属性 bloodline_output，具体结算由 Godot 运行时映射。"
+  },
+  "bloodline_stability": {
+    "key": "bloodline_stability",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "bloodline_stability",
+    "description": "功法效果属性 bloodline_stability，具体结算由 Godot 运行时映射。"
+  },
+  "body_energy_efficiency": {
+    "key": "body_energy_efficiency",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "body_energy_efficiency",
+    "description": "功法效果属性 body_energy_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "breakthrough_success": {
+    "key": "breakthrough_success",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "runtimeKey": "breakthrough_success",
+    "description": "功法效果属性 breakthrough_success，具体结算由 Godot 运行时映射。"
+  },
+  "cast_speed": {
+    "key": "cast_speed",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "cast_speed",
+    "description": "功法效果属性 cast_speed，具体结算由 Godot 运行时映射。"
+  },
+  "causality_detection": {
+    "key": "causality_detection",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "runtimeKey": "causality_detection",
+    "description": "功法效果属性 causality_detection，具体结算由 Godot 运行时映射。"
+  },
+  "causality_resistance": {
+    "key": "causality_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "causality_resistance",
+    "description": "功法效果属性 causality_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "cave_heaven_growth": {
+    "key": "cave_heaven_growth",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "cave_heaven_growth",
+    "description": "功法效果属性 cave_heaven_growth，具体结算由 Godot 运行时映射。"
+  },
+  "combat_mp_restore_2s": {
+    "key": "combat_mp_restore_2s",
+    "category": "combat",
+    "defaultTarget": "self",
+    "runtimeKey": "combat_mp_restore_2s",
+    "description": "功法效果属性 combat_mp_restore_2s，具体结算由 Godot 运行时映射。"
+  },
+  "contract_power": {
+    "key": "contract_power",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "contract_power",
+    "description": "功法效果属性 contract_power，具体结算由 Godot 运行时映射。"
+  },
+  "craft_quality": {
+    "key": "craft_quality",
+    "category": "production",
+    "defaultTarget": "self",
+    "runtimeKey": "craft_quality",
+    "description": "功法效果属性 craft_quality，具体结算由 Godot 运行时映射。"
+  },
+  "cultivation_speed": {
+    "key": "cultivation_speed",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "runtimeKey": "cultivation_speed",
+    "description": "功法效果属性 cultivation_speed，具体结算由 Godot 运行时映射。"
+  },
+  "cultivation_stability": {
+    "key": "cultivation_stability",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "runtimeKey": "cultivation_stability",
+    "description": "功法效果属性 cultivation_stability，具体结算由 Godot 运行时映射。"
+  },
+  "curse_power": {
+    "key": "curse_power",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "curse_power",
+    "description": "功法效果属性 curse_power，具体结算由 Godot 运行时映射。"
+  },
+  "curse_resistance": {
+    "key": "curse_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "curse_resistance",
+    "description": "功法效果属性 curse_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "damage_bonus": {
+    "key": "damage_bonus",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "damage_bonus",
+    "description": "功法效果属性 damage_bonus，具体结算由 Godot 运行时映射。"
+  },
+  "danger_warning": {
+    "key": "danger_warning",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "runtimeKey": "danger_warning",
+    "description": "功法效果属性 danger_warning，具体结算由 Godot 运行时映射。"
+  },
+  "dao_artifact_stability": {
+    "key": "dao_artifact_stability",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "runtimeKey": "dao_artifact_stability",
+    "description": "功法效果属性 dao_artifact_stability，具体结算由 Godot 运行时映射。"
+  },
+  "dao_heart_stability": {
+    "key": "dao_heart_stability",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "dao_heart_stability",
+    "description": "功法效果属性 dao_heart_stability，具体结算由 Godot 运行时映射。"
+  },
+  "dao_sword_power": {
+    "key": "dao_sword_power",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "dao_sword_power",
+    "description": "功法效果属性 dao_sword_power，具体结算由 Godot 运行时映射。"
+  },
+  "decree_power": {
+    "key": "decree_power",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "decree_power",
+    "description": "功法效果属性 decree_power，具体结算由 Godot 运行时映射。"
+  },
+  "deviation_resistance": {
+    "key": "deviation_resistance",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "runtimeKey": "deviation_resistance",
+    "description": "功法效果属性 deviation_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "dharma_form_power": {
+    "key": "dharma_form_power",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "dharma_form_power",
+    "description": "功法效果属性 dharma_form_power，具体结算由 Godot 运行时映射。"
+  },
+  "domain_damage": {
+    "key": "domain_damage",
+    "category": "offense",
+    "defaultTarget": "area",
+    "runtimeKey": "domain_damage",
+    "description": "功法效果属性 domain_damage，具体结算由 Godot 运行时映射。"
+  },
+  "domain_range": {
+    "key": "domain_range",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "domain_range",
+    "description": "功法效果属性 domain_range，具体结算由 Godot 运行时映射。"
+  },
+  "domain_resistance": {
+    "key": "domain_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "domain_resistance",
+    "description": "功法效果属性 domain_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "dream_infiltration": {
+    "key": "dream_infiltration",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "dream_infiltration",
+    "description": "功法效果属性 dream_infiltration，具体结算由 Godot 运行时映射。"
+  },
+  "dream_power": {
+    "key": "dream_power",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "dream_power",
+    "description": "功法效果属性 dream_power，具体结算由 Godot 运行时映射。"
+  },
+  "element_control": {
+    "key": "element_control",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "element_control",
+    "description": "功法效果属性 element_control，具体结算由 Godot 运行时映射。"
+  },
+  "element_conversion": {
+    "key": "element_conversion",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "element_conversion",
+    "description": "功法效果属性 element_conversion，具体结算由 Godot 运行时映射。"
+  },
+  "environment_spell_bonus": {
+    "key": "environment_spell_bonus",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "environment_spell_bonus",
+    "description": "功法效果属性 environment_spell_bonus，具体结算由 Godot 运行时映射。"
+  },
+  "escape_success": {
+    "key": "escape_success",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "escape_success",
+    "description": "功法效果属性 escape_success，具体结算由 Godot 运行时映射。"
+  },
+  "evil_bane": {
+    "key": "evil_bane",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "evil_bane",
+    "description": "功法效果属性 evil_bane，具体结算由 Godot 运行时映射。"
+  },
+  "lilian_capacity": {
+    "key": "lilian_capacity",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "runtimeKey": "lilian_capacity",
+    "description": "功法效果属性 lilian_capacity，具体结算由 Godot 运行时映射。"
+  },
+  "exploration_safety": {
+    "key": "exploration_safety",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "exploration_safety",
+    "description": "功法效果属性 exploration_safety，具体结算由 Godot 运行时映射。"
+  },
+  "fatal_recovery_chance": {
+    "key": "fatal_recovery_chance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "fatal_recovery_chance",
+    "description": "功法效果属性 fatal_recovery_chance，具体结算由 Godot 运行时映射。"
+  },
+  "fatal_resistance": {
+    "key": "fatal_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "fatal_resistance",
+    "description": "功法效果属性 fatal_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "formation_damage": {
+    "key": "formation_damage",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "formation_damage",
+    "description": "功法效果属性 formation_damage，具体结算由 Godot 运行时映射。"
+  },
+  "formation_power": {
+    "key": "formation_power",
+    "category": "production",
+    "defaultTarget": "self",
+    "runtimeKey": "formation_power",
+    "description": "功法效果属性 formation_power，具体结算由 Godot 运行时映射。"
+  },
+  "gather_speed": {
+    "key": "gather_speed",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "runtimeKey": "gather_speed",
+    "description": "功法效果属性 gather_speed，具体结算由 Godot 运行时映射。"
+  },
+  "gather_yield": {
+    "key": "gather_yield",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "runtimeKey": "gather_yield",
+    "description": "功法效果属性 gather_yield，具体结算由 Godot 运行时映射。"
+  },
+  "governance_efficiency": {
+    "key": "governance_efficiency",
+    "category": "governance",
+    "defaultTarget": "faction",
+    "runtimeKey": "governance_efficiency",
+    "description": "功法效果属性 governance_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "healing_domain": {
+    "key": "healing_domain",
+    "category": "survival",
+    "defaultTarget": "area",
+    "runtimeKey": "healing_domain",
+    "description": "功法效果属性 healing_domain，具体结算由 Godot 运行时映射。"
+  },
+  "healing_power": {
+    "key": "healing_power",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "healing_power",
+    "description": "功法效果属性 healing_power，具体结算由 Godot 运行时映射。"
+  },
+  "health_cost": {
+    "key": "health_cost",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "health_cost",
+    "description": "功法效果属性 health_cost，具体结算由 Godot 运行时映射。"
+  },
+  "health_regen": {
+    "key": "health_regen",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "health_regen",
+    "description": "功法效果属性 health_regen，具体结算由 Godot 运行时映射。"
+  },
+  "heart_tribulation_insight": {
+    "key": "heart_tribulation_insight",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "runtimeKey": "heart_tribulation_insight",
+    "description": "功法效果属性 heart_tribulation_insight，具体结算由 Godot 运行时映射。"
+  },
+  "heart_tribulation_resistance": {
+    "key": "heart_tribulation_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "heart_tribulation_resistance",
+    "description": "功法效果属性 heart_tribulation_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "herb_yield": {
+    "key": "herb_yield",
+    "category": "production",
+    "defaultTarget": "self",
+    "runtimeKey": "herb_yield",
+    "description": "功法效果属性 herb_yield，具体结算由 Godot 运行时映射。"
+  },
+  "hostile_energy_conversion": {
+    "key": "hostile_energy_conversion",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "hostile_energy_conversion",
+    "description": "功法效果属性 hostile_energy_conversion，具体结算由 Godot 运行时映射。"
+  },
+  "immortal_artifact_power": {
+    "key": "immortal_artifact_power",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "runtimeKey": "immortal_artifact_power",
+    "description": "功法效果属性 immortal_artifact_power，具体结算由 Godot 运行时映射。"
+  },
+  "immortal_qi_conversion": {
+    "key": "immortal_qi_conversion",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "runtimeKey": "immortal_qi_conversion",
+    "description": "功法效果属性 immortal_qi_conversion，具体结算由 Godot 运行时映射。"
+  },
+  "immortal_recovery": {
+    "key": "immortal_recovery",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "immortal_recovery",
+    "description": "功法效果属性 immortal_recovery，具体结算由 Godot 运行时映射。"
+  },
+  "injury_recovery": {
+    "key": "injury_recovery",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "injury_recovery",
+    "description": "功法效果属性 injury_recovery，具体结算由 Godot 运行时映射。"
+  },
+  "inner_demon_resistance": {
+    "key": "inner_demon_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "inner_demon_resistance",
+    "description": "功法效果属性 inner_demon_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "inscription_success": {
+    "key": "inscription_success",
+    "category": "production",
+    "defaultTarget": "self",
+    "runtimeKey": "inscription_success",
+    "description": "功法效果属性 inscription_success，具体结算由 Godot 运行时映射。"
+  },
+  "karma_resistance": {
+    "key": "karma_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "karma_resistance",
+    "description": "功法效果属性 karma_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "law_compatibility": {
+    "key": "law_compatibility",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "runtimeKey": "law_compatibility",
+    "description": "功法效果属性 law_compatibility，具体结算由 Godot 运行时映射。"
+  },
+  "law_pierce": {
+    "key": "law_pierce",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "law_pierce",
+    "description": "功法效果属性 law_pierce，具体结算由 Godot 运行时映射。"
+  },
+  "law_resistance": {
+    "key": "law_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "law_resistance",
+    "description": "功法效果属性 law_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "law_seed_growth": {
+    "key": "law_seed_growth",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "runtimeKey": "law_seed_growth",
+    "description": "功法效果属性 law_seed_growth，具体结算由 Godot 运行时映射。"
+  },
+  "law_spell_efficiency": {
+    "key": "law_spell_efficiency",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "runtimeKey": "law_spell_efficiency",
+    "description": "功法效果属性 law_spell_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "law_spell_power": {
+    "key": "law_spell_power",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "runtimeKey": "law_spell_power",
+    "description": "功法效果属性 law_spell_power，具体结算由 Godot 运行时映射。"
+  },
+  "life_bound_sync": {
+    "key": "life_bound_sync",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "life_bound_sync",
+    "description": "功法效果属性 life_bound_sync，具体结算由 Godot 运行时映射。"
+  },
+  "lifespan_efficiency": {
+    "key": "lifespan_efficiency",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "lifespan_efficiency",
+    "description": "功法效果属性 lifespan_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "lightning_chain_count": {
+    "key": "lightning_chain_count",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "lightning_chain_count",
+    "description": "功法效果属性 lightning_chain_count，具体结算由 Godot 运行时映射。"
+  },
+  "low_health_damage": {
+    "key": "low_health_damage",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "low_health_damage",
+    "description": "功法效果属性 low_health_damage，具体结算由 Godot 运行时映射。"
+  },
+  "mana_control": {
+    "key": "mana_control",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "runtimeKey": "mana_control",
+    "description": "功法效果属性 mana_control，具体结算由 Godot 运行时映射。"
+  },
+  "mana_efficiency": {
+    "key": "mana_efficiency",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "runtimeKey": "mana_efficiency",
+    "description": "功法效果属性 mana_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "mana_regen": {
+    "key": "mana_regen",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "runtimeKey": "mana_regen",
+    "description": "功法效果属性 mana_regen，具体结算由 Godot 运行时映射。"
+  },
+  "material_efficiency": {
+    "key": "material_efficiency",
+    "category": "production",
+    "defaultTarget": "self",
+    "runtimeKey": "material_efficiency",
+    "description": "功法效果属性 material_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "max_health": {
+    "key": "max_health",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "max_health",
+    "description": "功法效果属性 max_health，具体结算由 Godot 运行时映射。"
+  },
+  "max_mana": {
+    "key": "max_mana",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "runtimeKey": "max_mana",
+    "description": "功法效果属性 max_mana，具体结算由 Godot 运行时映射。"
+  },
+  "medicine_efficiency": {
+    "key": "medicine_efficiency",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "medicine_efficiency",
+    "description": "功法效果属性 medicine_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "melee_damage": {
+    "key": "melee_damage",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "melee_damage",
+    "description": "功法效果属性 melee_damage，具体结算由 Godot 运行时映射。"
+  },
+  "mental_resistance": {
+    "key": "mental_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "mental_resistance",
+    "description": "功法效果属性 mental_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "multi_sword_count": {
+    "key": "multi_sword_count",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "multi_sword_count",
+    "description": "功法效果属性 multi_sword_count，具体结算由 Godot 运行时映射。"
+  },
+  "parallel_action_efficiency": {
+    "key": "parallel_action_efficiency",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "parallel_action_efficiency",
+    "description": "功法效果属性 parallel_action_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "physical_resistance": {
+    "key": "physical_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "physical_resistance",
+    "description": "功法效果属性 physical_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "pill_quality": {
+    "key": "pill_quality",
+    "category": "production",
+    "defaultTarget": "self",
+    "runtimeKey": "pill_quality",
+    "description": "功法效果属性 pill_quality，具体结算由 Godot 运行时映射。"
+  },
+  "pill_tribulation_resistance": {
+    "key": "pill_tribulation_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "pill_tribulation_resistance",
+    "description": "功法效果属性 pill_tribulation_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "poison_duration": {
+    "key": "poison_duration",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "poison_duration",
+    "description": "功法效果属性 poison_duration，具体结算由 Godot 运行时映射。"
+  },
+  "poison_power": {
+    "key": "poison_power",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "poison_power",
+    "description": "功法效果属性 poison_power，具体结算由 Godot 运行时映射。"
+  },
+  "poison_resistance": {
+    "key": "poison_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "poison_resistance",
+    "description": "功法效果属性 poison_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "puppet_capacity": {
+    "key": "puppet_capacity",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "runtimeKey": "puppet_capacity",
+    "description": "功法效果属性 puppet_capacity，具体结算由 Godot 运行时映射。"
+  },
+  "puppet_power": {
+    "key": "puppet_power",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "runtimeKey": "puppet_power",
+    "description": "功法效果属性 puppet_power，具体结算由 Godot 运行时映射。"
+  },
+  "rare_find_chance": {
+    "key": "rare_find_chance",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "runtimeKey": "rare_find_chance",
+    "description": "功法效果属性 rare_find_chance，具体结算由 Godot 运行时映射。"
+  },
+  "rare_herb_yield": {
+    "key": "rare_herb_yield",
+    "category": "production",
+    "defaultTarget": "self",
+    "runtimeKey": "rare_herb_yield",
+    "description": "功法效果属性 rare_herb_yield，具体结算由 Godot 运行时映射。"
+  },
+  "regeneration_speed": {
+    "key": "regeneration_speed",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "regeneration_speed",
+    "description": "功法效果属性 regeneration_speed，具体结算由 Godot 运行时映射。"
+  },
+  "remote_control_range": {
+    "key": "remote_control_range",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "remote_control_range",
+    "description": "功法效果属性 remote_control_range，具体结算由 Godot 运行时映射。"
+  },
+  "resource_conversion": {
+    "key": "resource_conversion",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "runtimeKey": "resource_conversion",
+    "description": "功法效果属性 resource_conversion，具体结算由 Godot 运行时映射。"
+  },
+  "resurrection_cost_reduction": {
+    "key": "resurrection_cost_reduction",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "resurrection_cost_reduction",
+    "description": "功法效果属性 resurrection_cost_reduction，具体结算由 Godot 运行时映射。"
+  },
+  "route_discovery": {
+    "key": "route_discovery",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "runtimeKey": "route_discovery",
+    "description": "功法效果属性 route_discovery，具体结算由 Godot 运行时映射。"
+  },
+  "seal_power": {
+    "key": "seal_power",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "seal_power",
+    "description": "功法效果属性 seal_power，具体结算由 Godot 运行时映射。"
+  },
+  "settlement_output": {
+    "key": "settlement_output",
+    "category": "governance",
+    "defaultTarget": "faction",
+    "runtimeKey": "settlement_output",
+    "description": "功法效果属性 settlement_output，具体结算由 Godot 运行时映射。"
+  },
+  "ship_performance": {
+    "key": "ship_performance",
+    "category": "exploration",
+    "defaultTarget": "controlled_entity",
+    "runtimeKey": "ship_performance",
+    "description": "功法效果属性 ship_performance，具体结算由 Godot 运行时映射。"
+  },
+  "soul_healing": {
+    "key": "soul_healing",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "soul_healing",
+    "description": "功法效果属性 soul_healing，具体结算由 Godot 运行时映射。"
+  },
+  "soul_recovery": {
+    "key": "soul_recovery",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "soul_recovery",
+    "description": "功法效果属性 soul_recovery，具体结算由 Godot 运行时映射。"
+  },
+  "soul_resistance": {
+    "key": "soul_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "soul_resistance",
+    "description": "功法效果属性 soul_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "space_pierce": {
+    "key": "space_pierce",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "space_pierce",
+    "description": "功法效果属性 space_pierce，具体结算由 Godot 运行时映射。"
+  },
+  "space_stability": {
+    "key": "space_stability",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "space_stability",
+    "description": "功法效果属性 space_stability，具体结算由 Godot 运行时映射。"
+  },
+  "spell_damage": {
+    "key": "spell_damage",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "spell_damage",
+    "description": "功法效果属性 spell_damage，具体结算由 Godot 运行时映射。"
+  },
+  "spell_domain": {
+    "key": "spell_domain",
+    "category": "control",
+    "defaultTarget": "area",
+    "runtimeKey": "spell_domain",
+    "description": "功法效果属性 spell_domain，具体结算由 Godot 运行时映射。"
+  },
+  "spell_suppression": {
+    "key": "spell_suppression",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "spell_suppression",
+    "description": "功法效果属性 spell_suppression，具体结算由 Godot 运行时映射。"
+  },
+  "spirit_power": {
+    "key": "spirit_power",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "spirit_power",
+    "description": "功法效果属性 spirit_power，具体结算由 Godot 运行时映射。"
+  },
+  "spirit_sense_range": {
+    "key": "spirit_sense_range",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "spirit_sense_range",
+    "description": "功法效果属性 spirit_sense_range，具体结算由 Godot 运行时映射。"
+  },
+  "spirit_vein_detection": {
+    "key": "spirit_vein_detection",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "runtimeKey": "spirit_vein_detection",
+    "description": "功法效果属性 spirit_vein_detection，具体结算由 Godot 运行时映射。"
+  },
+  "spiritual_resistance": {
+    "key": "spiritual_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "spiritual_resistance",
+    "description": "功法效果属性 spiritual_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "split_mind_capacity": {
+    "key": "split_mind_capacity",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "split_mind_capacity",
+    "description": "功法效果属性 split_mind_capacity，具体结算由 Godot 运行时映射。"
+  },
+  "stagger_power": {
+    "key": "stagger_power",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "stagger_power",
+    "description": "功法效果属性 stagger_power，具体结算由 Godot 运行时映射。"
+  },
+  "stagger_resistance": {
+    "key": "stagger_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "stagger_resistance",
+    "description": "功法效果属性 stagger_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "stamina": {
+    "key": "stamina",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "stamina",
+    "description": "功法效果属性 stamina，具体结算由 Godot 运行时映射。"
+  },
+  "star_array_output": {
+    "key": "star_array_output",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "star_array_output",
+    "description": "功法效果属性 star_array_output，具体结算由 Godot 运行时映射。"
+  },
+  "sustained_cast_efficiency": {
+    "key": "sustained_cast_efficiency",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "sustained_cast_efficiency",
+    "description": "功法效果属性 sustained_cast_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "sword_attack_speed": {
+    "key": "sword_attack_speed",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "sword_attack_speed",
+    "description": "功法效果属性 sword_attack_speed，具体结算由 Godot 运行时映射。"
+  },
+  "sword_control": {
+    "key": "sword_control",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "sword_control",
+    "description": "功法效果属性 sword_control，具体结算由 Godot 运行时映射。"
+  },
+  "sword_damage": {
+    "key": "sword_damage",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "sword_damage",
+    "description": "功法效果属性 sword_damage，具体结算由 Godot 运行时映射。"
+  },
+  "sword_domain": {
+    "key": "sword_domain",
+    "category": "control",
+    "defaultTarget": "area",
+    "runtimeKey": "sword_domain",
+    "description": "功法效果属性 sword_domain，具体结算由 Godot 运行时映射。"
+  },
+  "sword_formation_control": {
+    "key": "sword_formation_control",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "sword_formation_control",
+    "description": "功法效果属性 sword_formation_control，具体结算由 Godot 运行时映射。"
+  },
+  "sword_intent_power": {
+    "key": "sword_intent_power",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "sword_intent_power",
+    "description": "功法效果属性 sword_intent_power，具体结算由 Godot 运行时映射。"
+  },
+  "talisman_capacity": {
+    "key": "talisman_capacity",
+    "category": "production",
+    "defaultTarget": "self",
+    "runtimeKey": "talisman_capacity",
+    "description": "功法效果属性 talisman_capacity，具体结算由 Godot 运行时映射。"
+  },
+  "talisman_cost_efficiency": {
+    "key": "talisman_cost_efficiency",
+    "category": "production",
+    "defaultTarget": "self",
+    "runtimeKey": "talisman_cost_efficiency",
+    "description": "功法效果属性 talisman_cost_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "teleport_stability": {
+    "key": "teleport_stability",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "teleport_stability",
+    "description": "功法效果属性 teleport_stability，具体结算由 Godot 运行时映射。"
+  },
+  "thunder_damage": {
+    "key": "thunder_damage",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "thunder_damage",
+    "description": "功法效果属性 thunder_damage，具体结算由 Godot 运行时映射。"
+  },
+  "trade_profit": {
+    "key": "trade_profit",
+    "category": "governance",
+    "defaultTarget": "faction",
+    "runtimeKey": "trade_profit",
+    "description": "功法效果属性 trade_profit，具体结算由 Godot 运行时映射。"
+  },
+  "travel_efficiency": {
+    "key": "travel_efficiency",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "runtimeKey": "travel_efficiency",
+    "description": "功法效果属性 travel_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_control": {
+    "key": "tribulation_control",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "tribulation_control",
+    "description": "功法效果属性 tribulation_control，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_damage": {
+    "key": "tribulation_damage",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "tribulation_damage",
+    "description": "功法效果属性 tribulation_damage，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_energy_absorption": {
+    "key": "tribulation_energy_absorption",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "runtimeKey": "tribulation_energy_absorption",
+    "description": "功法效果属性 tribulation_energy_absorption，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_forecast": {
+    "key": "tribulation_forecast",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "runtimeKey": "tribulation_forecast",
+    "description": "功法效果属性 tribulation_forecast，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_plan_slots": {
+    "key": "tribulation_plan_slots",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "runtimeKey": "tribulation_plan_slots",
+    "description": "功法效果属性 tribulation_plan_slots，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_recovery": {
+    "key": "tribulation_recovery",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "tribulation_recovery",
+    "description": "功法效果属性 tribulation_recovery，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_resistance": {
+    "key": "tribulation_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "tribulation_resistance",
+    "description": "功法效果属性 tribulation_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_resource_efficiency": {
+    "key": "tribulation_resource_efficiency",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "runtimeKey": "tribulation_resource_efficiency",
+    "description": "功法效果属性 tribulation_resource_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_sever": {
+    "key": "tribulation_sever",
+    "category": "offense",
+    "defaultTarget": "self",
+    "runtimeKey": "tribulation_sever",
+    "description": "功法效果属性 tribulation_sever，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_warning_time": {
+    "key": "tribulation_warning_time",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "runtimeKey": "tribulation_warning_time",
+    "description": "功法效果属性 tribulation_warning_time，具体结算由 Godot 运行时映射。"
+  },
+  "true_name_accuracy": {
+    "key": "true_name_accuracy",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "true_name_accuracy",
+    "description": "功法效果属性 true_name_accuracy，具体结算由 Godot 运行时映射。"
+  },
+  "true_name_power": {
+    "key": "true_name_power",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "true_name_power",
+    "description": "功法效果属性 true_name_power，具体结算由 Godot 运行时映射。"
+  },
+  "void_herb_growth": {
+    "key": "void_herb_growth",
+    "category": "production",
+    "defaultTarget": "self",
+    "runtimeKey": "void_herb_growth",
+    "description": "功法效果属性 void_herb_growth，具体结算由 Godot 运行时映射。"
+  },
+  "void_mobility": {
+    "key": "void_mobility",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "void_mobility",
+    "description": "功法效果属性 void_mobility，具体结算由 Godot 运行时映射。"
+  },
+  "void_resistance": {
+    "key": "void_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "void_resistance",
+    "description": "功法效果属性 void_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "void_route_safety": {
+    "key": "void_route_safety",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "runtimeKey": "void_route_safety",
+    "description": "功法效果属性 void_route_safety，具体结算由 Godot 运行时映射。"
+  },
+  "void_ship_range": {
+    "key": "void_ship_range",
+    "category": "control",
+    "defaultTarget": "controlled_entity",
+    "runtimeKey": "void_ship_range",
+    "description": "功法效果属性 void_ship_range，具体结算由 Godot 运行时映射。"
+  },
+  "void_spell_accuracy": {
+    "key": "void_spell_accuracy",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "void_spell_accuracy",
+    "description": "功法效果属性 void_spell_accuracy，具体结算由 Godot 运行时映射。"
+  },
+  "void_survival": {
+    "key": "void_survival",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "runtimeKey": "void_survival",
+    "description": "功法效果属性 void_survival，具体结算由 Godot 运行时映射。"
+  },
+  "void_target_accuracy": {
+    "key": "void_target_accuracy",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "void_target_accuracy",
+    "description": "功法效果属性 void_target_accuracy，具体结算由 Godot 运行时映射。"
+  },
+  "weakness_detection": {
+    "key": "weakness_detection",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "weakness_detection",
+    "description": "功法效果属性 weakness_detection，具体结算由 Godot 运行时映射。"
+  },
+  "weapon_loss_resistance": {
+    "key": "weapon_loss_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "runtimeKey": "weapon_loss_resistance",
+    "description": "功法效果属性 weapon_loss_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "weather_control": {
+    "key": "weather_control",
+    "category": "control",
+    "defaultTarget": "area",
+    "runtimeKey": "weather_control",
+    "description": "功法效果属性 weather_control，具体结算由 Godot 运行时映射。"
+  },
+  "weather_warning": {
+    "key": "weather_warning",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "runtimeKey": "weather_warning",
+    "description": "功法效果属性 weather_warning，具体结算由 Godot 运行时映射。"
+  },
+  "world_artifact_power": {
+    "key": "world_artifact_power",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "runtimeKey": "world_artifact_power",
+    "description": "功法效果属性 world_artifact_power，具体结算由 Godot 运行时映射。"
+  },
+  "world_ecology_stability": {
+    "key": "world_ecology_stability",
+    "category": "governance",
+    "defaultTarget": "world",
+    "runtimeKey": "world_ecology_stability",
+    "description": "功法效果属性 world_ecology_stability，具体结算由 Godot 运行时映射。"
+  },
+  "world_growth": {
+    "key": "world_growth",
+    "category": "governance",
+    "defaultTarget": "world",
+    "runtimeKey": "world_growth",
+    "description": "功法效果属性 world_growth，具体结算由 Godot 运行时映射。"
+  },
+  "world_spell_duration": {
+    "key": "world_spell_duration",
+    "category": "control",
+    "defaultTarget": "self",
+    "runtimeKey": "world_spell_duration",
+    "description": "功法效果属性 world_spell_duration，具体结算由 Godot 运行时映射。"
+  },
+  "world_spell_power": {
+    "key": "world_spell_power",
+    "category": "utility",
+    "defaultTarget": "self",
+    "runtimeKey": "world_spell_power",
+    "description": "功法效果属性 world_spell_power，具体结算由 Godot 运行时映射。"
+  }
+}

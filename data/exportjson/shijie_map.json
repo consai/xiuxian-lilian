@@ -1,0 +1,10 @@
+{
+  "schema_version": {
+    "key": "schema_version",
+    "value": "1"
+  },
+  "starter_city_id": {
+    "key": "starter_city_id",
+    "value": "qingshi_market"
+  }
+}

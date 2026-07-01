@@ -1,0 +1,13 @@
+{
+  "levelPolicy": {
+    "key": "levelPolicy",
+    "value": "cumulative_per_learned_level"
+  },
+  "supportedOperations": {
+    "key": "supportedOperations",
+    "value": [
+      "add_flat",
+      "add_percent"
+    ]
+  }
+}

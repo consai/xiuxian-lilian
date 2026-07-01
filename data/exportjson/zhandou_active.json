@@ -1,0 +1,614 @@
+{
+  "ability.combat.qi_bolt": {
+    "id": "ability.combat.qi_bolt",
+    "name": "御气弹",
+    "type": "combat_active",
+    "tier": 1,
+    "quality": 1,
+    "req_realm": "qi",
+    "req_knowledge": [],
+    "tags": "attack, spell, ranged, filler",
+    "vfx_preset": "qi_bolt_projectile",
+    "description": "低耗灵力弹，适合新手稳定补伤害。",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 0.8,
+    "cooldown": 1,
+    "cost_resource": "mana",
+    "cost_value": 6,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": [
+      [
+        "damage",
+        "1"
+      ]
+    ]
+  },
+  "ability.combat.wind_step": {
+    "id": "ability.combat.wind_step",
+    "name": "流风步",
+    "type": "combat_active",
+    "tier": 1,
+    "quality": 1,
+    "req_realm": "qi",
+    "req_knowledge": [],
+    "tags": "mobility, shield, defense",
+    "vfx_preset": null,
+    "description": "短暂借风护身，提升出手速度并获得灵力护盾。",
+    "target": "self",
+    "targetarg": null,
+    "cast_time": 0.8,
+    "cooldown": 1,
+    "cost_resource": "mana",
+    "cost_value": 6,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": [
+      [
+        "buff",
+        "buff_0001"
+      ],
+      [
+        "buff",
+        "buff_0002"
+      ],
+      [
+        "buff",
+        "buff_0003"
+      ],
+      [
+        "buff",
+        "buff_0004"
+      ],
+      [
+        "buff",
+        "buff_0005"
+      ],
+      [
+        "buff",
+        "buff_0006"
+      ],
+      [
+        "buff",
+        "buff_0007"
+      ]
+    ]
+  },
+  "ability.combat.sword_qi": {
+    "id": "ability.combat.sword_qi",
+    "name": "破空剑气",
+    "type": "combat_active",
+    "tier": 1,
+    "quality": 2,
+    "req_realm": "qi",
+    "req_knowledge": [],
+    "tags": "attack, sword, ranged, execute",
+    "vfx_preset": "sword_qi_projectile",
+    "description": "集中剑气斩向虚弱敌人，负责收割和压低战斗时长。",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 0.8,
+    "cooldown": 1,
+    "cost_resource": "mana",
+    "cost_value": 12,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": [
+      [
+        "buff",
+        "buff_0008"
+      ],
+      [
+        "buff",
+        "buff_0009"
+      ],
+      [
+        "buff",
+        "buff_0010"
+      ],
+      [
+        "buff",
+        "buff_0011"
+      ],
+      [
+        "buff",
+        "buff_0012"
+      ],
+      [
+        "buff",
+        "buff_0013"
+      ],
+      [
+        "buff",
+        "buff_0014"
+      ]
+    ]
+  },
+  "ability.combat.blood_strike": {
+    "id": "ability.combat.blood_strike",
+    "name": "震血拳",
+    "type": "combat_active",
+    "tier": 2,
+    "quality": 2,
+    "req_realm": "foundation",
+    "req_knowledge": [],
+    "tags": "attack, body, melee, control",
+    "vfx_preset": null,
+    "description": "震血拳",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 0.8,
+    "cooldown": 6,
+    "cost_resource": "stamina",
+    "cost_value": 18,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.five_phase_burst": {
+    "id": "ability.combat.five_phase_burst",
+    "name": "五行轮爆",
+    "type": "combat_active",
+    "tier": 2,
+    "quality": 3,
+    "req_realm": "foundation",
+    "req_knowledge": [
+      [
+        "spell.five_phase",
+        "2, spell.elements",
+        "2"
+      ]
+    ],
+    "tags": "attack, spell, area, wave_clear",
+    "vfx_preset": null,
+    "description": "五行轮爆",
+    "target": "enemy",
+    "targetarg": "all",
+    "cast_time": 1.2,
+    "cooldown": 10,
+    "cost_resource": "mana",
+    "cost_value": 28,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.seal_bind": {
+    "id": "ability.combat.seal_bind",
+    "name": "镇灵封印",
+    "type": "combat_active",
+    "tier": 2,
+    "quality": 3,
+    "req_realm": "foundation",
+    "req_knowledge": [
+      [
+        "talisman.seal",
+        "2, spirit.sense",
+        "2"
+      ]
+    ],
+    "tags": "talisman, control, seal",
+    "vfx_preset": null,
+    "description": "镇灵封印",
+    "target": "enemy",
+    "targetarg": "max_hp",
+    "cast_time": 1.1,
+    "cooldown": 14,
+    "cost_resource": "mana",
+    "cost_value": 24,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.thunder_judgment": {
+    "id": "ability.combat.thunder_judgment",
+    "name": "九霄雷击",
+    "type": "combat_active",
+    "tier": 3,
+    "quality": 3,
+    "req_realm": "core",
+    "req_knowledge": [
+      [
+        "spell.thunder",
+        "2, cultivation.core_fire",
+        "2"
+      ]
+    ],
+    "tags": "spell, thunder",
+    "vfx_preset": null,
+    "description": "九霄雷击",
+    "target": "enemy",
+    "targetarg": "fastest",
+    "cast_time": 1.0,
+    "cooldown": 12,
+    "cost_resource": "mana",
+    "cost_value": 45,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.sword_array": {
+    "id": "ability.combat.sword_array",
+    "name": "七星剑阵",
+    "type": "combat_active",
+    "tier": 3,
+    "quality": 4,
+    "req_realm": "core",
+    "req_knowledge": [
+      [
+        "sword.formation",
+        "2, formation.array",
+        "2"
+      ]
+    ],
+    "tags": "sword, formation, area",
+    "vfx_preset": null,
+    "description": "七星剑阵",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 2.0,
+    "cooldown": 24,
+    "cost_resource": "mana",
+    "cost_value": 65,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.soul_shock": {
+    "id": "ability.combat.soul_shock",
+    "name": "撼魂钟鸣",
+    "type": "combat_active",
+    "tier": 3,
+    "quality": 3,
+    "req_realm": "core",
+    "req_knowledge": [
+      [
+        "spirit.soul",
+        "2, talisman.curse",
+        "1"
+      ]
+    ],
+    "tags": "spirit, area",
+    "vfx_preset": null,
+    "description": "撼魂钟鸣",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 0.8,
+    "cooldown": 16,
+    "cost_resource": "spirit",
+    "cost_value": 40,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.dharma_palm": {
+    "id": "ability.combat.dharma_palm",
+    "name": "法相镇岳掌",
+    "type": "combat_active",
+    "tier": 5,
+    "quality": 4,
+    "req_realm": "transform",
+    "req_knowledge": [
+      [
+        "body.dharma_form",
+        "2"
+      ],
+      [
+        "spell.domain",
+        "2"
+      ]
+    ],
+    "tags": "body, area",
+    "vfx_preset": null,
+    "description": "法相镇岳掌",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 1.5,
+    "cooldown": 22,
+    "cost_resource": "stamina",
+    "cost_value": 100,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.dream_prison": {
+    "id": "ability.combat.dream_prison",
+    "name": "梦狱",
+    "type": "combat_active",
+    "tier": 5,
+    "quality": 4,
+    "req_realm": "transform",
+    "req_knowledge": [
+      [
+        "spirit.dream",
+        "2"
+      ],
+      [
+        "spirit.inner_demon",
+        "2"
+      ]
+    ],
+    "tags": "spirit, control",
+    "vfx_preset": null,
+    "description": "梦狱",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 1.8,
+    "cooldown": 26,
+    "cost_resource": "spirit",
+    "cost_value": 85,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.void_slash": {
+    "id": "ability.combat.void_slash",
+    "name": "斩虚",
+    "type": "combat_active",
+    "tier": 6,
+    "quality": 4,
+    "req_realm": "void",
+    "req_knowledge": [
+      [
+        "sword.void_cut",
+        "2"
+      ],
+      [
+        "spell.void",
+        "2"
+      ]
+    ],
+    "tags": "sword, void",
+    "vfx_preset": null,
+    "description": "斩虚",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 1.2,
+    "cooldown": 18,
+    "cost_resource": "mana",
+    "cost_value": 150,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.true_name_curse": {
+    "id": "ability.combat.true_name_curse",
+    "name": "真名蚀魂咒",
+    "type": "combat_active",
+    "tier": 6,
+    "quality": 4,
+    "req_realm": "void",
+    "req_knowledge": [
+      [
+        "talisman.true_name",
+        "2"
+      ],
+      [
+        "spirit.void_thought",
+        "2"
+      ]
+    ],
+    "tags": "curse, spirit",
+    "vfx_preset": null,
+    "description": "真名蚀魂咒",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 2.0,
+    "cooldown": 25,
+    "cost_resource": "spirit",
+    "cost_value": 130,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.law_command": {
+    "id": "ability.combat.law_command",
+    "name": "律令·止",
+    "type": "combat_active",
+    "tier": 7,
+    "quality": 4,
+    "req_realm": "merge",
+    "req_knowledge": [
+      [
+        "spell.law",
+        "2"
+      ],
+      [
+        "talisman.command",
+        "2"
+      ]
+    ],
+    "tags": "law, control, area",
+    "vfx_preset": null,
+    "description": "律令·止",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 2.5,
+    "cooldown": 45,
+    "cost_resource": "mana",
+    "cost_value": 240,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.open_heaven": {
+    "id": "ability.combat.open_heaven",
+    "name": "开天一式",
+    "type": "combat_active",
+    "tier": 9,
+    "quality": 4,
+    "req_realm": "tribulation",
+    "req_knowledge": [
+      [
+        "sword.heaven_cut",
+        "2"
+      ],
+      [
+        "sword.dao",
+        "2"
+      ]
+    ],
+    "tags": "sword, law, ultimate",
+    "vfx_preset": null,
+    "description": "开天一式",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 4.0,
+    "cooldown": 120,
+    "cost_resource": "mana",
+    "cost_value": 500,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.cataclysm": {
+    "id": "ability.combat.cataclysm",
+    "name": "劫灭神通",
+    "type": "combat_active",
+    "tier": 9,
+    "quality": 4,
+    "req_realm": "tribulation",
+    "req_knowledge": [
+      [
+        "spell.cataclysm",
+        "2"
+      ],
+      [
+        "heaven.tribulation",
+        "2"
+      ]
+    ],
+    "tags": "spell, tribulation, ultimate",
+    "vfx_preset": null,
+    "description": "劫灭神通",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 5.0,
+    "cooldown": 150,
+    "cost_resource": "mana",
+    "cost_value": 550,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.nascent_blade": {
+    "id": "ability.combat.nascent_blade",
+    "name": "元婴御灵斩",
+    "type": "combat_active",
+    "tier": 4,
+    "quality": 4,
+    "req_realm": "nascent",
+    "req_knowledge": [
+      [
+        "foundation.nascent_theory",
+        "2"
+      ],
+      [
+        "spirit.split",
+        "2"
+      ]
+    ],
+    "tags": "sword, spirit, ranged",
+    "vfx_preset": null,
+    "description": "元婴御灵斩",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 1.0,
+    "cooldown": 14,
+    "cost_resource": "mana",
+    "cost_value": 80,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.soul_contract_command": {
+    "id": "ability.combat.soul_contract_command",
+    "name": "魂契敕令",
+    "type": "combat_active",
+    "tier": 4,
+    "quality": 4,
+    "req_realm": "nascent",
+    "req_knowledge": [
+      [
+        "talisman.soul_seal",
+        "2"
+      ],
+      [
+        "spirit.split",
+        "2"
+      ]
+    ],
+    "tags": "talisman, command",
+    "vfx_preset": null,
+    "description": "魂契敕令",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 0.6,
+    "cooldown": 18,
+    "cost_resource": "spirit",
+    "cost_value": 70,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.dao_sword_river": {
+    "id": "ability.combat.dao_sword_river",
+    "name": "道剑长河",
+    "type": "combat_active",
+    "tier": 8,
+    "quality": 4,
+    "req_realm": "great",
+    "req_knowledge": [
+      [
+        "sword.dao",
+        "2"
+      ],
+      [
+        "heaven.dao_fruit",
+        "2"
+      ]
+    ],
+    "tags": "sword, law, area",
+    "vfx_preset": null,
+    "description": "道剑长河",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 3.0,
+    "cooldown": 65,
+    "cost_resource": "mana",
+    "cost_value": 340,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  },
+  "ability.combat.world_suppression": {
+    "id": "ability.combat.world_suppression",
+    "name": "掌中天地·镇",
+    "type": "combat_active",
+    "tier": 8,
+    "quality": 4,
+    "req_realm": "great",
+    "req_knowledge": [
+      [
+        "spell.world",
+        "2"
+      ],
+      [
+        "formation.cave_heaven",
+        "2"
+      ]
+    ],
+    "tags": "world, control, area",
+    "vfx_preset": null,
+    "description": "掌中天地·镇",
+    "target": "enemy",
+    "targetarg": "lowest_hp",
+    "cast_time": 3.5,
+    "cooldown": 80,
+    "cost_resource": "mana",
+    "cost_value": 380,
+    "activation": "cast",
+    "power_scale": 1.0,
+    "effects": []
+  }
+}

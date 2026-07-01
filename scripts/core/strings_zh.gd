@@ -1,9 +1,9 @@
 class_name StringsZh
 extends RefCounted
 
-## 战斗中文文案：[code]res://data/ui/strings_zh.yaml[/code]。
+## 战斗中文文案：[code]res://data/exportjson/ui_strings_zh.json[/code]。
 
-const DATA_PATH := "res://data/ui/strings_zh.yaml"
+const DATA_PATH := "res://data/exportjson/ui_strings_zh.json"
 
 static var _root: Dictionary = {}
 static var _loaded: bool = false

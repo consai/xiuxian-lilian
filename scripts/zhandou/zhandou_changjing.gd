@@ -297,3 +297,17 @@ func _schedule_lilian_auto_result_close() -> void:
 		_on_battle_result_close_requested,
 		CONNECT_ONE_SHOT
 	)
+
+
+## GM 战斗调试：暴露域层上下文（仅调试面板使用）。
+func gm_get_context() -> ZhandouChangjingContext:
+	return _ctx
+
+
+## GM 战斗调试：将域层状态同步到战斗 HUD。
+func gm_sync_hud() -> void:
+	if _ctx.domain == null:
+		return
+	_hud.sync_from_domain(_ctx)
+	_hud.sync_runtime_slot_interactive(_ctx)
+	_hud.update_skill_input_enabled(_ctx)

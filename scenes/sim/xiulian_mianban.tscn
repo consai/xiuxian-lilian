@@ -338,9 +338,9 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 32)
 layout_mode = 2
 size_flags_horizontal = 3
-min_value = 1.0
+min_value = 30.0
 max_value = 120.0
-value = 1.0
+value = 30.0
 
 [node name="DayMaxButton" type="Button" parent="PlanPanel/PlanContent/DaySelectRow/SliderRow" unique_id=1779764538]
 unique_name_in_owner = true

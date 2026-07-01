@@ -1,0 +1,82 @@
+{
+  "skill": {
+    "key": "skill",
+    "color": "#F2EDD7",
+    "font_size": 20,
+    "rise_px": 50,
+    "duration": 1.0,
+    "fade_in_frac": 0.15,
+    "fade_out_frac": 0.3,
+    "alpha": null
+  },
+  "damage": {
+    "key": "damage",
+    "color": "#E28C81",
+    "font_size": 22,
+    "rise_px": 60,
+    "duration": 1.1,
+    "fade_in_frac": 0.15,
+    "fade_out_frac": 0.3,
+    "alpha": null
+  },
+  "heal": {
+    "key": "heal",
+    "color": "#7CA96F",
+    "font_size": 22,
+    "rise_px": 60,
+    "duration": 1.1,
+    "fade_in_frac": 0.15,
+    "fade_out_frac": 0.3,
+    "alpha": null
+  },
+  "mp_cost": {
+    "key": "mp_cost",
+    "color": "#5599FF",
+    "font_size": 16,
+    "rise_px": 40,
+    "duration": 0.9,
+    "fade_in_frac": 0.15,
+    "fade_out_frac": 0.3,
+    "alpha": null
+  },
+  "mp_gain": {
+    "key": "mp_gain",
+    "color": "#6FA5C9",
+    "font_size": 16,
+    "rise_px": 40,
+    "duration": 0.9,
+    "fade_in_frac": 0.15,
+    "fade_out_frac": 0.3,
+    "alpha": null
+  },
+  "shield": {
+    "key": "shield",
+    "color": "#33DDCC",
+    "font_size": 18,
+    "rise_px": 45,
+    "duration": 1.0,
+    "fade_in_frac": 0.15,
+    "fade_out_frac": 0.3,
+    "alpha": null
+  },
+  "buff_add": {
+    "key": "buff_add",
+    "color": "#FFE033",
+    "font_size": 18,
+    "rise_px": 50,
+    "duration": 1.1,
+    "fade_in_frac": 0.15,
+    "fade_out_frac": 0.3,
+    "alpha": null
+  },
+  "buff_expire": {
+    "key": "buff_expire",
+    "color": "#CCCC88",
+    "font_size": 16,
+    "rise_px": 40,
+    "duration": 1.0,
+    "fade_in_frac": 0.15,
+    "fade_out_frac": 0.35,
+    "alpha": "0.75"
+  }
+}

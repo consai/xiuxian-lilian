@@ -1,0 +1,133 @@
+{
+  "qinglan_mountain": {
+    "key": "qinglan_mountain",
+    "name": "青岚山脉",
+    "danger": 1,
+    "min_difficulty": 1,
+    "max_difficulty": 6,
+    "recommended_realm": "炼气一层",
+    "environment_tags": [
+      "山林",
+      "灵泉",
+      "妖兽巢穴"
+    ],
+    "preview_rewards": [
+      "灵草",
+      "妖丹",
+      "寒潭珠"
+    ],
+    "polygon": [
+      [
+        30,
+        350
+      ],
+      [
+        280,
+        350
+      ],
+      [
+        280,
+        500
+      ],
+      [
+        30,
+        500
+      ]
+    ],
+    "near_city": [
+      "qingshi_market"
+    ],
+    "sub_locations": [
+      "wild_wolf_valley",
+      "spirit_spring_valley",
+      "ancient_sword_tomb"
+    ],
+    "lilian_location_id": "qinglan_mountain"
+  },
+  "blackwater_marsh": {
+    "key": "blackwater_marsh",
+    "name": "黑水沼泽",
+    "danger": 2,
+    "min_difficulty": 2,
+    "max_difficulty": 5,
+    "recommended_realm": "炼气三层",
+    "environment_tags": [
+      "沼泽",
+      "毒雾",
+      "妖兽"
+    ],
+    "preview_rewards": [
+      "毒囊",
+      "沼泽灵草"
+    ],
+    "polygon": [
+      [
+        500,
+        20
+      ],
+      [
+        750,
+        20
+      ],
+      [
+        750,
+        170
+      ],
+      [
+        500,
+        170
+      ]
+    ],
+    "near_city": [
+      "yunlan_city",
+      "tianhe_ferry"
+    ],
+    "sub_locations": [],
+    "lilian_location_id": "blackwater_marsh"
+  },
+  "mist_hidden_valley": {
+    "key": "mist_hidden_valley",
+    "name": "雾隐溪谷",
+    "danger": 3,
+    "min_difficulty": 4,
+    "max_difficulty": 8,
+    "recommended_realm": "筑基初期",
+    "environment_tags": [
+      "溪谷",
+      "雾瘴",
+      "残阵"
+    ],
+    "preview_rewards": [
+      "雾隐草",
+      "阵核碎片",
+      "筑基丹药材料"
+    ],
+    "polygon": [
+      [
+        390,
+        245
+      ],
+      [
+        560,
+        245
+      ],
+      [
+        560,
+        345
+      ],
+      [
+        390,
+        345
+      ]
+    ],
+    "near_city": [
+      "yunlan_city",
+      "tianhe_ferry"
+    ],
+    "sub_locations": [
+      "mist_creek_herb_garden",
+      "sealed_creek_ruins"
+    ],
+    "lilian_location_id": "mist_hidden_valley"
+  }
+}

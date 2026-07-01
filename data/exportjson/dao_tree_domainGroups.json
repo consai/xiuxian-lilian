@@ -1,0 +1,38 @@
+{
+  "cultivation_root": {
+    "id": "cultivation_root",
+    "name": "修行根本",
+    "domains": [
+      "foundation",
+      "cultivation",
+      "body"
+    ]
+  },
+  "mind_combat": {
+    "id": "mind_combat",
+    "name": "神魂斗法",
+    "domains": [
+      "spirit",
+      "spell",
+      "sword"
+    ]
+  },
+  "craft_arts": {
+    "id": "craft_arts",
+    "name": "百工四艺",
+    "domains": [
+      "artifact",
+      "alchemy",
+      "formation",
+      "talisman"
+    ]
+  },
+  "world_heaven": {
+    "id": "world_heaven",
+    "name": "天地劫运",
+    "domains": [
+      "world",
+      "heaven"
+    ]
+  }
+}

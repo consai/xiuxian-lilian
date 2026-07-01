@@ -1,0 +1,38 @@
+{
+  "schema_version": {
+    "key": "schema_version",
+    "value": "1"
+  },
+  "mind_base": {
+    "key": "mind_base",
+    "value": "80"
+  },
+  "mind_injury_penalty_per_day": {
+    "key": "mind_injury_penalty_per_day",
+    "value": "8"
+  },
+  "aptitude_foundations_weight": {
+    "key": "aptitude_foundations_weight",
+    "value": "0.6"
+  },
+  "aptitude_roots_weight": {
+    "key": "aptitude_roots_weight",
+    "value": "0.4"
+  },
+  "fortune_points_per_unit": {
+    "key": "fortune_points_per_unit",
+    "value": "8"
+  },
+  "consume_pills_on_fail": {
+    "key": "consume_pills_on_fail",
+    "value": "true"
+  },
+  "realm_unstable_days": {
+    "key": "realm_unstable_days",
+    "value": "3"
+  },
+  "realm_unstable_cultivation_multiplier": {
+    "key": "realm_unstable_cultivation_multiplier",
+    "value": "0.7"
+  }
+}

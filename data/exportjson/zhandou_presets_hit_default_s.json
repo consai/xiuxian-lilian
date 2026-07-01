@@ -1,0 +1,88 @@
+{
+  "1": {
+    "key": "1",
+    "op": "parallel",
+    "actor": "target",
+    "steps": [
+      {
+        "op": "tween",
+        "prop": "scale",
+        "to": {
+          "anchor": "hit_squash"
+        },
+        "duration_key": "hit.squash_duration",
+        "trans_key": "hit.squash_trans",
+        "ease_key": "hit.squash_ease"
+      },
+      {
+        "op": "tween",
+        "prop": "position",
+        "to": {
+          "anchor": "knockback"
+        },
+        "duration_key": "hit.knockback_duration",
+        "trans_key": "hit.squash_trans",
+        "ease_key": "hit.squash_ease"
+      },
+      {
+        "op": "tween",
+        "prop": "modulate",
+        "to": {
+          "anchor": "hit_flash"
+        },
+        "duration_key": "hit.flash_in_duration",
+        "trans_key": "hit.squash_trans",
+        "ease_key": "hit.squash_ease"
+      }
+    ],
+    "method": null,
+    "duration_key": null
+  },
+  "2": {
+    "key": "2",
+    "op": "tween_method",
+    "actor": "target",
+    "steps": null,
+    "method": "hit_shake",
+    "duration_key": "hit.shake_duration"
+  },
+  "3": {
+    "key": "3",
+    "op": "parallel",
+    "actor": "target",
+    "steps": [
+      {
+        "op": "tween",
+        "prop": "scale",
+        "to": {
+          "anchor": "rest_scale"
+        },
+        "duration_key": "hit.recover_duration",
+        "trans_key": "hit.squash_trans",
+        "ease_key": "hit.squash_ease"
+      },
+      {
+        "op": "tween",
+        "prop": "position",
+        "to": {
+          "anchor": "rest"
+        },
+        "duration_key": "hit.recover_duration",
+        "trans_key": "hit.squash_trans",
+        "ease_key": "hit.squash_ease"
+      },
+      {
+        "op": "tween",
+        "prop": "modulate",
+        "to": {
+          "anchor": "rest_modulate"
+        },
+        "duration_key": "hit.flash_out_duration",
+        "trans_key": "hit.flash_trans",
+        "ease_key": "hit.flash_ease"
+      }
+    ],
+    "method": null,
+    "duration_key": null
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "highest": {
+    "key": "highest",
+    "value": "同一 stackGroup 仅取最高绝对有效值"
+  },
+  "ability_instance": {
+    "key": "ability_instance",
+    "value": "按技能实例独立结算"
+  },
+  "add_capped": {
+    "key": "add_capped",
+    "value": "同组相加后受上下限约束"
+  }
+}

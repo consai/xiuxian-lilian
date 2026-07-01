@@ -1,0 +1,56 @@
+{
+  "qi": {
+    "id": "qi",
+    "name": "练气",
+    "order": 1,
+    "gate": 0
+  },
+  "foundation": {
+    "id": "foundation",
+    "name": "筑基",
+    "order": 2,
+    "gate": 20
+  },
+  "core": {
+    "id": "core",
+    "name": "金丹",
+    "order": 3,
+    "gate": 60
+  },
+  "nascent": {
+    "id": "nascent",
+    "name": "元婴",
+    "order": 4,
+    "gate": 130
+  },
+  "transform": {
+    "id": "transform",
+    "name": "化神",
+    "order": 5,
+    "gate": 240
+  },
+  "void": {
+    "id": "void",
+    "name": "炼虚",
+    "order": 6,
+    "gate": 400
+  },
+  "merge": {
+    "id": "merge",
+    "name": "合体",
+    "order": 7,
+    "gate": 620
+  },
+  "great": {
+    "id": "great",
+    "name": "大乘",
+    "order": 8,
+    "gate": 900
+  },
+  "tribulation": {
+    "id": "tribulation",
+    "name": "渡劫",
+    "order": 9,
+    "gate": 1250
+  }
+}

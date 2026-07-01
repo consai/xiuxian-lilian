@@ -1,0 +1,44 @@
+{
+  "1": {
+    "key": "1",
+    "from": "qingshi_market",
+    "to": "yunlan_city",
+    "days": 2,
+    "default_state": "open"
+  },
+  "2": {
+    "key": "2",
+    "from": "qingshi_market",
+    "to": "tianhe_ferry",
+    "days": 2,
+    "default_state": "open"
+  },
+  "3": {
+    "key": "3",
+    "from": "qingshi_market",
+    "to": "luoxia_town",
+    "days": 3,
+    "default_state": "open"
+  },
+  "4": {
+    "key": "4",
+    "from": "yunlan_city",
+    "to": "tianhe_ferry",
+    "days": 2,
+    "default_state": "open"
+  },
+  "5": {
+    "key": "5",
+    "from": "tianhe_ferry",
+    "to": "luoxia_town",
+    "days": 2,
+    "default_state": "open"
+  },
+  "6": {
+    "key": "6",
+    "from": "yunlan_city",
+    "to": "luoxia_town",
+    "days": 4,
+    "default_state": "open"
+  }
+}

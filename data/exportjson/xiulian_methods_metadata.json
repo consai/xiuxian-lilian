@@ -1,0 +1,22 @@
+{
+  "name": {
+    "key": "name",
+    "value": "功法体系"
+  },
+  "description": {
+    "key": "description",
+    "value": "开放学习、分层传承、旁门分支及知识加权反哺的功法体系"
+  },
+  "familyCount": {
+    "key": "familyCount",
+    "value": "15"
+  },
+  "methodCount": {
+    "key": "methodCount",
+    "value": "83"
+  },
+  "effectTypeCount": {
+    "key": "effectTypeCount",
+    "value": "175"
+  }
+}

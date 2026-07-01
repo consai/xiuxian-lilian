@@ -1,14 +1,14 @@
 class_name WeituoService
 extends RefCounted
 
-const WEITUO_CONFIG_PATH := "res://data/weituo.yaml"
+const WEITUO_CONFIG_PATH := "res://data/exportjson/weituo.json"
 
 static var _cached_config: Dictionary = {}
 
 
 static func load_config() -> Dictionary:
 	if _cached_config.is_empty():
-		var raw := JsonLoader._read_json_root_object(WEITUO_CONFIG_PATH)
+		var raw := JsonLoader.load_weituo_bundle()
 		if raw.is_empty():
 			return {}
 		_cached_config = raw.duplicate(true)

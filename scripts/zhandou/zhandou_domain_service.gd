@@ -133,6 +133,7 @@ func start_battle_many(
 		"敌方数量": enemies.size(),
 		"阵型": "%dx%d" % [formation_columns, formation_rows],
 	})
+	_fire_battle_start_passives()
 
 
 func tick_advancing(delta: float) -> String:
@@ -312,8 +313,8 @@ func _apply_escape_chase_damage() -> float:
 	return dmg
 
 
-func resolve_player_basic() -> Dictionary:
-	return _resolve_basic(EnumBattleSide.PLAYER)
+func resolve_player_tiaoxi() -> Dictionary:
+	return _resolve_tiaoxi(EnumBattleSide.PLAYER)
 
 
 func resolve_player_skill(skill_id: int) -> Dictionary:
@@ -324,6 +325,7 @@ func resolve_player_skill(skill_id: int) -> Dictionary:
 		})
 		return _fail_payload("not_paused")
 	var target := _current_enemy()
+	_trigger_exchange_passives(player, target)
 	var result := player.use_skill(skill_id, skill_cfg, target)
 	if not bool(result.get("ok", false)):
 		var reason := str(result.get("reason", "failed"))
@@ -366,8 +368,8 @@ func resolve_player_equip(slot_index: int) -> Dictionary:
 	return _with_actor_ids(_ok_payload(EnumBattleSide.PLAYER, EnumBattleSide.ENEMY, result, cfg), EnumBattleSide.PLAYER, _enemy_index_for_unit(target))
 
 
-func resolve_enemy_basic() -> Dictionary:
-	return _resolve_basic(EnumBattleSide.ENEMY)
+func resolve_enemy_tiaoxi() -> Dictionary:
+	return _resolve_tiaoxi(EnumBattleSide.ENEMY)
 
 
 func resolve_enemy_skill(skill_id: int) -> Dictionary:
@@ -378,6 +380,7 @@ func resolve_enemy_skill(skill_id: int) -> Dictionary:
 		})
 		return _fail_payload("not_paused")
 	enemy = _current_enemy()
+	_trigger_exchange_passives(enemy, player)
 	var result := enemy.use_skill(skill_id, skill_cfg, player)
 	if not bool(result.get("ok", false)):
 		var reason := str(result.get("reason", "failed"))
@@ -542,51 +545,44 @@ func _apply_interval_after_action(side: String) -> void:
 		_sync_legacy_enemy_interval()
 
 
-func _resolve_basic(side: String) -> Dictionary:
+func _resolve_tiaoxi(side: String) -> Dictionary:
 	if state != EnumBattleState.State.PAUSED:
-		ZhandouDebugLog.write("行动", "普攻被拒绝", {
+		ZhandouDebugLog.write("行动", "调息被拒绝", {
 			"出手方": ZhandouDebugLog.side_label(side),
 			"原因": ZhandouDebugLog.fail_reason_label("not_paused"),
 		})
 		return _fail_payload("not_paused")
 	if paused_side != side:
-		ZhandouDebugLog.write("行动", "普攻被拒绝", {
+		ZhandouDebugLog.write("行动", "调息被拒绝", {
 			"出手方": ZhandouDebugLog.side_label(side),
 			"当前暂停方": ZhandouDebugLog.side_label(paused_side),
 			"原因": ZhandouDebugLog.fail_reason_label("wrong_actor"),
 		})
 		return _fail_payload("wrong_actor")
-	var attacker: ZhandouObj
-	var defender: ZhandouObj
+	var actor: ZhandouObj
 	var source_id: String
-	var target_id: String
 	if side == EnumBattleSide.PLAYER:
-		attacker = player
-		defender = _current_enemy()
+		actor = player
 		source_id = EnumBattleSide.PLAYER
-		target_id = EnumBattleSide.ENEMY
 	else:
 		enemy = _current_enemy()
-		attacker = enemy
-		defender = player
+		actor = enemy
 		source_id = EnumBattleSide.ENEMY
-		target_id = EnumBattleSide.PLAYER
-	var report := ZhandouObj.resolve_basic_attack(attacker, defender)
-	ZhandouDebugLog.write("行动", "普攻结算完成", {
+	var report := ZhandouObj.resolve_tiaoxi(actor)
+	ZhandouDebugLog.write("行动", "调息结算完成", {
 		"出手方": ZhandouDebugLog.side_label(side),
-		"伤害": report.get("damage", 0.0),
-		"攻击方": ZhandouDebugLog.log_unit(attacker, side),
-		"防守方": ZhandouDebugLog.log_unit(defender, "defender"),
+		"回蓝": report.get("mp_gain", 0.0),
+		"单位": ZhandouDebugLog.log_unit(actor, side),
 	})
 	var cfg: Dictionary = {}
-	var basic_v: Variant = _lookup_skill_cfg(0)
-	if basic_v is Dictionary:
-		cfg = (basic_v as Dictionary).duplicate(true)
+	var tiaoxi_v: Variant = _lookup_skill_cfg(0)
+	if tiaoxi_v is Dictionary:
+		cfg = (tiaoxi_v as Dictionary).duplicate(true)
 	else:
-		cfg = {"tags": ["attack", "physical"]}
-	var payload := _ok_payload(source_id, target_id, report, cfg)
+		cfg = {"name": "调息", "tags": ["restore", "support"], "target": EnumZhandouTarget.LABEL_SELF}
+	var payload := _ok_payload(source_id, source_id, report, cfg)
 	if side == EnumBattleSide.PLAYER:
-		return _with_actor_ids(payload, EnumBattleSide.PLAYER, _enemy_index_for_unit(defender))
+		return _with_actor_ids(payload, EnumBattleSide.PLAYER, active_enemy_index)
 	return _with_actor_ids(payload, EnumBattleSide.ENEMY, active_enemy_index)
 
 
@@ -650,6 +646,21 @@ func _set_state(next: EnumBattleState.State, reason: String) -> void:
 	var from := state
 	state = next
 	ZhandouDebugLog.log_state(from, next, reason)
+
+
+func _fire_battle_start_passives() -> void:
+	if player != null:
+		player.try_trigger_passives("get")
+	for enemy_v in enemies:
+		if enemy_v is ZhandouObj:
+			(enemy_v as ZhandouObj).try_trigger_passives("get")
+
+
+func _trigger_exchange_passives(attacker: ZhandouObj, defender: ZhandouObj) -> void:
+	if attacker != null:
+		attacker.try_trigger_passives("attack", defender)
+	if defender != null:
+		defender.try_trigger_passives("beattack", attacker)
 
 
 func _set_end(reason: String, trigger: String = "") -> void:

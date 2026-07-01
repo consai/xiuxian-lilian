@@ -1,6 +1,6 @@
-import { readYaml } from "./yaml-loader.mjs";
+import { loadDaoTree } from "./json-config-loader.mjs";
 
-const config = await readYaml(new URL("../../data/dao_tree.yaml", import.meta.url));
+const config = await loadDaoTree();
 const { domains, realms, skills } = config;
 
 const errors = [];

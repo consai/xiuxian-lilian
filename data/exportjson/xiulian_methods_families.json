@@ -1,0 +1,220 @@
+{
+  "method.hunyuan": {
+    "id": "method.hunyuan",
+    "name": "混元归一经",
+    "role": "通用周天与稳健突破",
+    "quality": 3,
+    "methodIds": [
+      "method.hunyuan.1",
+      "method.hunyuan.2",
+      "method.hunyuan.3",
+      "method.hunyuan.4",
+      "method.hunyuan.5",
+      "method.hunyuan.6",
+      "method.hunyuan.7",
+      "method.hunyuan.8",
+      "method.hunyuan.9"
+    ],
+    "progressionType": null
+  },
+  "method.changsheng": {
+    "id": "method.changsheng",
+    "name": "青木长生诀",
+    "role": "恢复、丹医与生命造化",
+    "quality": 3,
+    "methodIds": [
+      "method.changsheng.1",
+      "method.changsheng.2",
+      "method.changsheng.3",
+      "method.changsheng.4",
+      "method.changsheng.5",
+      "method.changsheng.6",
+      "method.changsheng.7",
+      "method.changsheng.8",
+      "method.changsheng.9"
+    ],
+    "progressionType": null
+  },
+  "method.taixu_sword": {
+    "id": "method.taixu_sword",
+    "name": "太虚剑典",
+    "role": "御剑、剑域与破法杀伐",
+    "quality": 4,
+    "methodIds": [
+      "method.taixu_sword.1",
+      "method.taixu_sword.2",
+      "method.taixu_sword.3",
+      "method.taixu_sword.4",
+      "method.taixu_sword.5",
+      "method.taixu_sword.6",
+      "method.taixu_sword.7",
+      "method.taixu_sword.8",
+      "method.taixu_sword.9"
+    ],
+    "progressionType": null
+  },
+  "method.vajra": {
+    "id": "method.vajra",
+    "name": "金刚不灭身",
+    "role": "炼体、生存与正面承伤",
+    "quality": 3,
+    "methodIds": [
+      "method.vajra.1",
+      "method.vajra.2",
+      "method.vajra.3",
+      "method.vajra.4",
+      "method.vajra.5",
+      "method.vajra.6",
+      "method.vajra.7",
+      "method.vajra.8",
+      "method.vajra.9"
+    ],
+    "progressionType": null
+  },
+  "method.taiyin": {
+    "id": "method.taiyin",
+    "name": "太阴炼神录",
+    "role": "神魂、心防与咒法",
+    "quality": 4,
+    "methodIds": [
+      "method.taiyin.1",
+      "method.taiyin.2",
+      "method.taiyin.3",
+      "method.taiyin.4",
+      "method.taiyin.5",
+      "method.taiyin.6",
+      "method.taiyin.7",
+      "method.taiyin.8",
+      "method.taiyin.9"
+    ],
+    "progressionType": null
+  },
+  "method.leihuo": {
+    "id": "method.leihuo",
+    "name": "赤霄雷火典",
+    "role": "五行雷法与爆发神通",
+    "quality": 4,
+    "methodIds": [
+      "method.leihuo.1",
+      "method.leihuo.2",
+      "method.leihuo.3",
+      "method.leihuo.4",
+      "method.leihuo.5",
+      "method.leihuo.6",
+      "method.leihuo.7",
+      "method.leihuo.8",
+      "method.leihuo.9"
+    ],
+    "progressionType": null
+  },
+  "method.zhoutian_craft": {
+    "id": "method.zhoutian_craft",
+    "name": "周天阵器录",
+    "role": "阵法、炼器与洞天工程",
+    "quality": 3,
+    "methodIds": [
+      "method.zhoutian_craft.1",
+      "method.zhoutian_craft.2",
+      "method.zhoutian_craft.3",
+      "method.zhoutian_craft.4",
+      "method.zhoutian_craft.5",
+      "method.zhoutian_craft.6",
+      "method.zhoutian_craft.7",
+      "method.zhoutian_craft.8",
+      "method.zhoutian_craft.9"
+    ],
+    "progressionType": null
+  },
+  "method.wanxiang": {
+    "id": "method.wanxiang",
+    "name": "万象御灵经",
+    "role": "探索、御兽与世界经营",
+    "quality": 2,
+    "methodIds": [
+      "method.wanxiang.1",
+      "method.wanxiang.2",
+      "method.wanxiang.3",
+      "method.wanxiang.4",
+      "method.wanxiang.5",
+      "method.wanxiang.6",
+      "method.wanxiang.7",
+      "method.wanxiang.8",
+      "method.wanxiang.9"
+    ],
+    "progressionType": null
+  },
+  "method.jiuji": {
+    "id": "method.jiuji",
+    "name": "九劫飞升录",
+    "role": "劫数推演与终局飞升",
+    "quality": 4,
+    "methodIds": [
+      "method.jiuji.1",
+      "method.jiuji.2",
+      "method.jiuji.3",
+      "method.jiuji.4",
+      "method.jiuji.5"
+    ],
+    "progressionType": null
+  },
+  "method.blood_burst": {
+    "id": "method.blood_burst",
+    "name": "燃血断脉术",
+    "role": "旁门爆发，以伤换攻",
+    "quality": 2,
+    "methodIds": [
+      "method.blood_burst.1"
+    ],
+    "progressionType": "side_path"
+  },
+  "method.escape_art": {
+    "id": "method.escape_art",
+    "name": "浮光掠影诀",
+    "role": "专精遁法与脱离",
+    "quality": 2,
+    "methodIds": [
+      "method.escape_art.1"
+    ],
+    "progressionType": "side_path"
+  },
+  "method.poison_codex": {
+    "id": "method.poison_codex",
+    "name": "百毒真经",
+    "role": "毒理、炼毒与解毒",
+    "quality": 2,
+    "methodIds": [
+      "method.poison_codex.1"
+    ],
+    "progressionType": "side_path"
+  },
+  "method.fate_gaze": {
+    "id": "method.fate_gaze",
+    "name": "望气寻机篇",
+    "role": "趋吉避凶与天机探索",
+    "quality": 2,
+    "methodIds": [
+      "method.fate_gaze.1"
+    ],
+    "progressionType": "side_path"
+  },
+  "method.talisman_archive": {
+    "id": "method.talisman_archive",
+    "name": "万符归藏录",
+    "role": "符箓储备与快速激发",
+    "quality": 2,
+    "methodIds": [
+      "method.talisman_archive.1"
+    ],
+    "progressionType": "side_path"
+  },
+  "method.heavy_sword": {
+    "id": "method.heavy_sword",
+    "name": "无锋重剑诀",
+    "role": "低阶高专精重剑流派",
+    "quality": 2,
+    "methodIds": [
+      "method.heavy_sword.1"
+    ],
+    "progressionType": "side_path"
+  }
+}

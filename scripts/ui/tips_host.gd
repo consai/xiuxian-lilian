@@ -13,7 +13,7 @@ const RewardTipPresenterScript := preload("res://scripts/ui/tips/presenter/rewar
 const TipBarScene := preload("res://scenes/ui/tip_bar.tscn")
 const RewardTipLayerScene := preload("res://scenes/ui/reward_tip_layer.tscn")
 
-const POLICY_CFG_PATH := "res://data/ui/tip_policy.yaml"
+const POLICY_CFG_PATH := "res://data/exportjson/ui_tip_policy.json"
 
 var _metrics: TipMetrics
 var _policy: TipPolicyEngine
@@ -80,7 +80,4 @@ func _publish_intent(intent: Dictionary) -> void:
 
 
 func _load_policy_config() -> Dictionary:
-	if not FileAccess.file_exists(POLICY_CFG_PATH):
-		return {}
-	var data: Variant = JsonLoader._read_json_variant(POLICY_CFG_PATH)
-	return data as Dictionary if data is Dictionary else {}
+	return JsonLoader.load_tip_policy_bundle()

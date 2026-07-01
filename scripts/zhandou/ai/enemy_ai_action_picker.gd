@@ -16,13 +16,17 @@ static func find_skill_slot(enemy: ZhandouObj, skill_id: int) -> int:
 	return -1
 
 
-static func find_basic_slot(enemy: ZhandouObj) -> int:
+static func find_tiaoxi_slot(enemy: ZhandouObj) -> int:
 	if enemy == null or not enemy.skills is Array:
 		return -1
 	for i in (enemy.skills as Array).size():
 		if int(enemy.get_skill_slot_at(i).get("id", -1)) == 0:
 			return i
 	return -1
+
+
+static func find_basic_slot(enemy: ZhandouObj) -> int:
+	return find_tiaoxi_slot(enemy)
 
 
 static func find_first_usable_skill_by_slot(enemy: ZhandouObj, skill_cfg: Dictionary) -> Dictionary:
@@ -46,8 +50,12 @@ static func can_use_skill(enemy: ZhandouObj, skill_id: int, skill_cfg: Dictionar
 	return _is_skill_usable_at_slot(enemy, slot_index, skill_id, skill_cfg)
 
 
+static func can_use_tiaoxi(enemy: ZhandouObj) -> bool:
+	return find_tiaoxi_slot(enemy) >= 0
+
+
 static func can_use_basic(enemy: ZhandouObj) -> bool:
-	return find_basic_slot(enemy) >= 0
+	return can_use_tiaoxi(enemy)
 
 
 static func can_use_item(enemy: ZhandouObj, slot_index: int, item_cfg: Dictionary) -> bool:
@@ -108,11 +116,11 @@ static func resolve_action(
 				return EnemyAiTypesScript.fail(EnemyAiTypesScript.REASON_NO_SKILL_USABLE, phase_id)
 			var slot_index := find_skill_slot(ctx.self_unit, sid)
 			return EnemyAiTypesScript.ok_skill(sid, slot_index, reason, phase_id)
-		"basic":
-			var basic_slot := find_basic_slot(ctx.self_unit)
-			if basic_slot < 0:
-				return EnemyAiTypesScript.fail(EnemyAiTypesScript.REASON_NO_BASIC_SLOT, phase_id)
-			return EnemyAiTypesScript.ok_basic(basic_slot, reason, phase_id)
+		"basic", "tiaoxi":
+			var tiaoxi_slot := find_tiaoxi_slot(ctx.self_unit)
+			if tiaoxi_slot < 0:
+				return EnemyAiTypesScript.fail(EnemyAiTypesScript.REASON_NO_TIAOXI_SLOT, phase_id)
+			return EnemyAiTypesScript.ok_tiaoxi(tiaoxi_slot, reason, phase_id)
 		"item":
 			var item_slot := int(action.get("slot_index", -1))
 			if not can_use_item(ctx.self_unit, item_slot, ctx.item_cfg):

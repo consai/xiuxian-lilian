@@ -37,18 +37,7 @@ func has_preset(preset_id: String) -> bool:
 
 
 func get_preset_ids() -> Array:
-	var names: Array = []
-	var dir := DirAccess.open(JsonLoader.ZHANDOU_VFX_PRESETS_DIR)
-	if dir == null:
-		return names
-	dir.list_dir_begin()
-	var fn := dir.get_next()
-	while fn != "":
-		if not dir.current_is_dir() and (fn.ends_with(".yaml") or fn.ends_with(".yml")):
-			names.append(fn.get_basename())
-		fn = dir.get_next()
-	dir.list_dir_end()
-	return names
+	return JsonLoader.zhandou_vfx_preset_ids()
 
 
 func get_sequence(preset_ref: String) -> Array:

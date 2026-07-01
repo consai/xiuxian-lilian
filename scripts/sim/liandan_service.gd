@@ -1,7 +1,7 @@
 class_name LiandanService
 extends RefCounted
 
-const DATA_PATH := "res://data/liandan.yaml"
+const DATA_PATH := "res://data/exportjson/liandan.json"
 const MAX_RECIPE_MASTERY := 1000
 const MASTERY_SCORE_MAX := 20.0
 const MASTERY_EXTRA_PILL_CHANCE_MAX := 0.75
@@ -543,4 +543,4 @@ static func _by_id(rows: Array, target_id: String) -> Dictionary:
 
 
 static func _root() -> Dictionary:
-	return JsonLoader._read_json_root_object(DATA_PATH)
+	return JsonLoader.load_liandan_bundle()

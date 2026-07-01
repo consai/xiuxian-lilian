@@ -1,0 +1,14 @@
+{
+  "cultivate": {
+    "key": "cultivate",
+    "days": 30,
+    "cultivation_gain": 20,
+    "injury_recovery": null
+  },
+  "rest": {
+    "key": "rest",
+    "days": 1,
+    "cultivation_gain": null,
+    "injury_recovery": "2"
+  }
+}

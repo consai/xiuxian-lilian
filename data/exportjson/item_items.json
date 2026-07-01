@@ -1,0 +1,1246 @@
+{
+  "items_LingCao": {
+    "id": "items_LingCao",
+    "name": "灵草",
+    "type": "材料",
+    "primary_type": "道具",
+    "secondary_type": "药材",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 8,
+    "stackable": true,
+    "max_stack": 999,
+    "desc": "常见灵植，可用于炼丹与基础交易。",
+    "icon": "res://assets/art/ui_new/item_cao.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_LingGuo": {
+    "id": "items_LingGuo",
+    "name": "灵果",
+    "type": "材料",
+    "primary_type": "道具",
+    "secondary_type": "药材",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 14,
+    "stackable": true,
+    "max_stack": 999,
+    "desc": "富含灵气的果实，直接食用可略微补益。",
+    "icon": "res://assets/art/ui_new/item_shu_hong.png",
+    "use_effect": [
+      {
+        "op": "hp",
+        "args": [
+          10
+        ]
+      },
+      {
+        "op": "heart_demon",
+        "args": [
+          -2
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_YaoDan": {
+    "id": "items_YaoDan",
+    "name": "妖丹",
+    "type": "材料",
+    "primary_type": "道具",
+    "secondary_type": "药材",
+    "quality": 3,
+    "tier": 1,
+    "ling_shi": 62,
+    "stackable": true,
+    "max_stack": 999,
+    "desc": "妖兽内丹，是高阶炼制与交易的常用素材。",
+    "icon": "res://assets/art/ui_new/item_ya.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_HanTie": {
+    "id": "items_HanTie",
+    "name": "寒铁",
+    "type": "矿材",
+    "primary_type": "道具",
+    "secondary_type": "矿石",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 10,
+    "stackable": true,
+    "max_stack": 999,
+    "desc": "可用于锻造低阶法器。",
+    "icon": "res://assets/art/ui_new/item_shitou.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_XuanJin": {
+    "id": "items_XuanJin",
+    "name": "玄金",
+    "type": "矿材",
+    "primary_type": "道具",
+    "secondary_type": "矿石",
+    "quality": 3,
+    "tier": 1,
+    "ling_shi": 58,
+    "stackable": true,
+    "max_stack": 999,
+    "desc": "蕴含特殊灵纹的矿材，价值较高。",
+    "icon": "res://assets/art/ui_new/lingshi.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_MistHerb": {
+    "id": "items_MistHerb",
+    "name": "雾隐草",
+    "type": "材料",
+    "primary_type": "道具",
+    "secondary_type": "药材",
+    "quality": 2,
+    "tier": 2,
+    "ling_shi": 42,
+    "stackable": true,
+    "max_stack": 999,
+    "desc": "雾隐溪谷特产灵草，药性清凉，适合梳理筑基后的灵脉。",
+    "icon": "res://assets/art/ui_new/item_cao.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_MistHerb_Fine": {
+    "id": "items_MistHerb_Fine",
+    "name": "上等雾隐草",
+    "type": "材料",
+    "primary_type": "道具",
+    "secondary_type": "药材",
+    "quality": 3,
+    "tier": 2,
+    "ling_shi": 76,
+    "stackable": true,
+    "max_stack": 999,
+    "desc": "药性更纯的雾隐草，可提高筑基丹药品质。",
+    "icon": "res://assets/art/ui_new/item_cao.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_ArrayCoreShard": {
+    "id": "items_ArrayCoreShard",
+    "name": "阵核碎片",
+    "type": "材料",
+    "primary_type": "道具",
+    "secondary_type": "阵材",
+    "quality": 3,
+    "tier": 2,
+    "ling_shi": 110,
+    "stackable": true,
+    "max_stack": 999,
+    "desc": "封溪残阵中剥落的核心碎片，可用来稳固道基。",
+    "icon": "res://assets/art/ui_new/item_baozhu.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_HuiQiDan": {
+    "id": "items_HuiQiDan",
+    "name": "回气丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 25,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "用于恢复状态的常见丹药。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "hp",
+        "args": [
+          22
+        ]
+      }
+    ],
+    "fight_id": "9002",
+    "fight_cd": "4",
+    "fight_effect": [
+      {
+        "type": "heal",
+        "value": 22,
+        "target": "self"
+      }
+    ]
+  },
+  "items_JuQiDan": {
+    "id": "items_JuQiDan",
+    "name": "聚气丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 35,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "基础修炼丹药。需在修炼界面打坐炼化，直接增加修为。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "pill_cultivation",
+        "args": [
+          100
+        ]
+      },
+      {
+        "op": "instability",
+        "args": [
+          12
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_LiaoShangDan": {
+    "id": "items_LiaoShangDan",
+    "name": "疗伤丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 40,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "用于恢复气血的基础丹药。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "hp",
+        "args": [
+          35
+        ]
+      }
+    ],
+    "fight_id": "9004",
+    "fight_cd": "6",
+    "fight_effect": [
+      {
+        "type": "heal",
+        "value": 35,
+        "target": "self"
+      }
+    ]
+  },
+  "items_PoJingDan": {
+    "id": "items_PoJingDan",
+    "name": "破境丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 3,
+    "tier": 1,
+    "ling_shi": 120,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "可用于突破阶段辅助。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "cultivation",
+        "args": [
+          40
+        ]
+      },
+      {
+        "op": "heart_demon",
+        "args": [
+          -6
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_HuiLingDan": {
+    "id": "items_HuiLingDan",
+    "name": "回灵丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 30,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "用于补充灵气与回复状态。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "cultivation",
+        "args": [
+          15
+        ]
+      },
+      {
+        "op": "hp",
+        "args": [
+          8
+        ]
+      },
+      {
+        "op": "mp",
+        "args": [
+          25
+        ]
+      }
+    ],
+    "fight_id": "9003",
+    "fight_cd": "4",
+    "fight_effect": [
+      {
+        "type": "restore_mp",
+        "value": 25,
+        "target": "self"
+      }
+    ]
+  },
+  "items_QingMaiDan": {
+    "id": "items_QingMaiDan",
+    "name": "清脉丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 2,
+    "tier": 2,
+    "ling_shi": 72,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "筑基初期常用丹药，可在战斗中回灵并略微恢复气血。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "mp",
+        "args": [
+          35
+        ]
+      },
+      {
+        "op": "hp",
+        "args": [
+          12
+        ]
+      }
+    ],
+    "fight_id": "9005",
+    "fight_cd": "5",
+    "fight_effect": [
+      {
+        "type": "restore_mp",
+        "value": 35,
+        "target": "self"
+      },
+      {
+        "type": "heal",
+        "value": 12,
+        "target": "self"
+      }
+    ]
+  },
+  "items_GuBenDaoJiDan": {
+    "id": "items_GuBenDaoJiDan",
+    "name": "固本道基丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 2,
+    "tier": 2,
+    "ling_shi": 120,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "筑基后稳固道基的修炼丹药。需在修炼界面打坐炼化。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "pill_cultivation",
+        "args": [
+          333
+        ]
+      },
+      {
+        "op": "instability",
+        "args": [
+          10
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_QingFengJian": {
+    "id": "items_QingFengJian",
+    "name": "青锋剑",
+    "type": "法宝",
+    "primary_type": "法宝",
+    "secondary_type": "主动法宝",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 85,
+    "stackable": false,
+    "max_stack": 1,
+    "desc": "轻巧锋利，适合初期修士。",
+    "icon": "res://assets/art/ui_new/item_jian.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_XuanWuJia": {
+    "id": "items_XuanWuJia",
+    "name": "玄武甲",
+    "type": "法宝",
+    "primary_type": "法宝",
+    "secondary_type": "被动法宝",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 92,
+    "stackable": false,
+    "max_stack": 1,
+    "desc": "防护型护甲法宝。",
+    "icon": "res://assets/art/ui_new/item_yifu_1.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_ZhenHunLing": {
+    "id": "items_ZhenHunLing",
+    "name": "镇魂铃",
+    "type": "法宝",
+    "primary_type": "法宝",
+    "secondary_type": "被动法宝",
+    "quality": 3,
+    "tier": 1,
+    "ling_shi": 210,
+    "stackable": false,
+    "max_stack": 1,
+    "desc": "有助于稳固神魂、压制心魔。",
+    "icon": "res://assets/art/ui_new/item_baozhu.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_QianKunDai": {
+    "id": "items_QianKunDai",
+    "name": "乾坤袋",
+    "type": "法宝",
+    "primary_type": "法宝",
+    "secondary_type": "移动法宝",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 155,
+    "stackable": false,
+    "max_stack": 1,
+    "desc": "便携储物法宝，适合长期采集与携行。",
+    "icon": "res://assets/art/ui_new/item_koudai.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_JiuZhuanJinDan": {
+    "id": "items_JiuZhuanJinDan",
+    "name": "九转金丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 4,
+    "tier": 1,
+    "ling_shi": 520,
+    "stackable": true,
+    "max_stack": 9,
+    "desc": "极其珍贵的高阶丹药。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "cultivation",
+        "args": [
+          120
+        ]
+      },
+      {
+        "op": "hp",
+        "args": [
+          50
+        ]
+      },
+      {
+        "op": "heart_demon",
+        "args": [
+          -20
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_ZhuXianJian": {
+    "id": "items_ZhuXianJian",
+    "name": "诛仙剑",
+    "type": "法宝",
+    "primary_type": "法宝",
+    "secondary_type": "主动法宝",
+    "quality": 4,
+    "tier": 1,
+    "ling_shi": 880,
+    "stackable": false,
+    "max_stack": 1,
+    "desc": "顶级攻伐法宝，实战与历练价值极高。",
+    "icon": "res://assets/art/ui_new/jian.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_LunHuiYin": {
+    "id": "items_LunHuiYin",
+    "name": "轮回印",
+    "type": "法宝",
+    "primary_type": "法宝",
+    "secondary_type": "被动法宝",
+    "quality": 4,
+    "tier": 1,
+    "ling_shi": 620,
+    "stackable": false,
+    "max_stack": 1,
+    "desc": "罕见保命异宝，可在危局中逆转一线生机。",
+    "icon": "res://assets/art/ui_new/jian.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_FightTestDan": {
+    "id": "items_FightTestDan",
+    "name": "测试丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 1,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "战斗内测试用消耗品，回复气血并少量回灵。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "hp",
+        "args": [
+          30
+        ]
+      },
+      {
+        "op": "mp",
+        "args": [
+          15
+        ]
+      }
+    ],
+    "fight_id": "9001",
+    "fight_cd": "3",
+    "fight_effect": [
+      {
+        "type": "heal",
+        "value": 30,
+        "target": "self"
+      },
+      {
+        "type": "restore_mp",
+        "value": 15,
+        "target": "self"
+      }
+    ]
+  },
+  "items_LingCao_Fine": {
+    "id": "items_LingCao_Fine",
+    "name": "良品灵草",
+    "type": "材料",
+    "primary_type": "道具",
+    "secondary_type": "药材",
+    "quality": 2,
+    "tier": 1,
+    "ling_shi": 18,
+    "stackable": true,
+    "max_stack": 999,
+    "desc": "灵气较为充盈的灵草，可提高炼丹品质。",
+    "icon": "res://assets/art/ui_new/item_cao.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_LingCao_Superior": {
+    "id": "items_LingCao_Superior",
+    "name": "上等灵草",
+    "type": "材料",
+    "primary_type": "道具",
+    "secondary_type": "药材",
+    "quality": 3,
+    "tier": 1,
+    "ling_shi": 38,
+    "stackable": true,
+    "max_stack": 999,
+    "desc": "药性纯净的上等灵草。",
+    "icon": "res://assets/art/ui_new/item_cao.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_LingGuo_Fine": {
+    "id": "items_LingGuo_Fine",
+    "name": "良品灵果",
+    "type": "材料",
+    "primary_type": "道具",
+    "secondary_type": "药材",
+    "quality": 2,
+    "tier": 1,
+    "ling_shi": 28,
+    "stackable": true,
+    "max_stack": 999,
+    "desc": "灵气较为充盈的灵果。",
+    "icon": "res://assets/art/ui_new/item_shu_hong.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_LingGuo_Superior": {
+    "id": "items_LingGuo_Superior",
+    "name": "上等灵果",
+    "type": "材料",
+    "primary_type": "道具",
+    "secondary_type": "药材",
+    "quality": 3,
+    "tier": 1,
+    "ling_shi": 55,
+    "stackable": true,
+    "max_stack": 999,
+    "desc": "药性纯净的上等灵果。",
+    "icon": "res://assets/art/ui_new/item_shu_hong.png",
+    "use_effect": null,
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_WasteDan": {
+    "id": "items_WasteDan",
+    "name": "废丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 2,
+    "stackable": true,
+    "max_stack": 999,
+    "desc": "炼制失误留下的废丹，仍可低价出售。",
+    "icon": "res://assets/art/ui_new/wanzi.png",
+    "use_effect": [
+      {
+        "op": "sell_only"
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_HuiQiDan_Low": {
+    "id": "items_HuiQiDan_Low",
+    "name": "下品回气丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 16,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "药力稍弱的回气丹。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "hp",
+        "args": [
+          18
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_HuiQiDan_High": {
+    "id": "items_HuiQiDan_High",
+    "name": "上品回气丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 3,
+    "tier": 1,
+    "ling_shi": 40,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "药力充盈的回气丹。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "hp",
+        "args": [
+          28
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_HuiQiDan_Supreme": {
+    "id": "items_HuiQiDan_Supreme",
+    "name": "极品回气丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 4,
+    "tier": 1,
+    "ling_shi": 65,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "几无杂质的极品回气丹。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "hp",
+        "args": [
+          35
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_HuiLingDan_Low": {
+    "id": "items_HuiLingDan_Low",
+    "name": "下品回灵丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 20,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "药力稍弱的回灵丹。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "cultivation",
+        "args": [
+          12
+        ]
+      },
+      {
+        "op": "hp",
+        "args": [
+          6
+        ]
+      },
+      {
+        "op": "mp",
+        "args": [
+          20
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_HuiLingDan_High": {
+    "id": "items_HuiLingDan_High",
+    "name": "上品回灵丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 3,
+    "tier": 1,
+    "ling_shi": 48,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "药力充盈的回灵丹。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "cultivation",
+        "args": [
+          19
+        ]
+      },
+      {
+        "op": "hp",
+        "args": [
+          10
+        ]
+      },
+      {
+        "op": "mp",
+        "args": [
+          31
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_HuiLingDan_Supreme": {
+    "id": "items_HuiLingDan_Supreme",
+    "name": "极品回灵丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 4,
+    "tier": 1,
+    "ling_shi": 78,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "几无杂质的极品回灵丹。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "cultivation",
+        "args": [
+          23
+        ]
+      },
+      {
+        "op": "hp",
+        "args": [
+          12
+        ]
+      },
+      {
+        "op": "mp",
+        "args": [
+          39
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_LiaoShangDan_Low": {
+    "id": "items_LiaoShangDan_Low",
+    "name": "下品疗伤丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 26,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "药力稍弱，可恢复一定气血。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "hp",
+        "args": [
+          28
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_LiaoShangDan_High": {
+    "id": "items_LiaoShangDan_High",
+    "name": "上品疗伤丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 3,
+    "tier": 1,
+    "ling_shi": 64,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "药力充盈，可恢复较多气血。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "hp",
+        "args": [
+          44
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_LiaoShangDan_Supreme": {
+    "id": "items_LiaoShangDan_Supreme",
+    "name": "极品疗伤丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 4,
+    "tier": 1,
+    "ling_shi": 104,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "几无杂质，可大幅恢复气血。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "hp",
+        "args": [
+          55
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_JuQiDan_Low": {
+    "id": "items_JuQiDan_Low",
+    "name": "下品聚气丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 23,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "药力稍弱的聚气丹。需打坐炼化。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "pill_cultivation",
+        "args": [
+          85
+        ]
+      },
+      {
+        "op": "instability",
+        "args": [
+          12
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_JuQiDan_High": {
+    "id": "items_JuQiDan_High",
+    "name": "上品聚气丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 3,
+    "tier": 1,
+    "ling_shi": 56,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "药力充盈的聚气丹。需打坐炼化。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "pill_cultivation",
+        "args": [
+          125
+        ]
+      },
+      {
+        "op": "instability",
+        "args": [
+          12
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_AlchemyNotes_JuQi": {
+    "id": "items_AlchemyNotes_JuQi",
+    "name": "炼丹小札(聚气丹)",
+    "type": "典籍",
+    "primary_type": "书籍",
+    "secondary_type": "心得",
+    "quality": 1,
+    "tier": 1,
+    "ling_shi": 0,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "清铃观炉边的小札，记着聚气丹火候。研读后可增加该丹方熟练度。",
+    "icon": "res://assets/art/ui_new/gongfa.png",
+    "use_effect": [
+      {
+        "op": "alchemy_mastery",
+        "args": [
+          "recipe.juqi",
+          1000
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_JuQiDan_Supreme": {
+    "id": "items_JuQiDan_Supreme",
+    "name": "极品聚气丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 4,
+    "tier": 1,
+    "ling_shi": 91,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "几无杂质的极品聚气丹。需打坐炼化，药力雄厚。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "pill_cultivation",
+        "args": [
+          155
+        ]
+      },
+      {
+        "op": "instability",
+        "args": [
+          12
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_QingMaiDan_Low": {
+    "id": "items_QingMaiDan_Low",
+    "name": "下品清脉丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 1,
+    "tier": 2,
+    "ling_shi": 50,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "药力稍弱的清脉丹。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "mp",
+        "args": [
+          28
+        ]
+      },
+      {
+        "op": "hp",
+        "args": [
+          8
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_QingMaiDan_High": {
+    "id": "items_QingMaiDan_High",
+    "name": "上品清脉丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 3,
+    "tier": 2,
+    "ling_shi": 108,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "药力充盈的清脉丹。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "mp",
+        "args": [
+          45
+        ]
+      },
+      {
+        "op": "hp",
+        "args": [
+          16
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_QingMaiDan_Supreme": {
+    "id": "items_QingMaiDan_Supreme",
+    "name": "极品清脉丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 4,
+    "tier": 2,
+    "ling_shi": 160,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "几无杂质的极品清脉丹。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "mp",
+        "args": [
+          58
+        ]
+      },
+      {
+        "op": "hp",
+        "args": [
+          22
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_GuBenDaoJiDan_Low": {
+    "id": "items_GuBenDaoJiDan_Low",
+    "name": "下品固本道基丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 1,
+    "tier": 2,
+    "ling_shi": 84,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "药力稍弱的固本道基丹。需打坐炼化。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "pill_cultivation",
+        "args": [
+          283
+        ]
+      },
+      {
+        "op": "instability",
+        "args": [
+          10
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_GuBenDaoJiDan_High": {
+    "id": "items_GuBenDaoJiDan_High",
+    "name": "上品固本道基丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 3,
+    "tier": 2,
+    "ling_shi": 180,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "药力充盈的固本道基丹。需打坐炼化。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "pill_cultivation",
+        "args": [
+          416
+        ]
+      },
+      {
+        "op": "instability",
+        "args": [
+          10
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  },
+  "items_GuBenDaoJiDan_Supreme": {
+    "id": "items_GuBenDaoJiDan_Supreme",
+    "name": "极品固本道基丹",
+    "type": "丹药",
+    "primary_type": "消耗品",
+    "secondary_type": "丹药",
+    "quality": 4,
+    "tier": 2,
+    "ling_shi": 260,
+    "stackable": true,
+    "max_stack": 99,
+    "desc": "几无杂质的极品固本道基丹。需打坐炼化，适合筑基初期稳固根基。",
+    "icon": "res://assets/art/ui_new/hulu.png",
+    "use_effect": [
+      {
+        "op": "pill_cultivation",
+        "args": [
+          516
+        ]
+      },
+      {
+        "op": "instability",
+        "args": [
+          10
+        ]
+      }
+    ],
+    "fight_id": null,
+    "fight_cd": null,
+    "fight_effect": null
+  }
+}

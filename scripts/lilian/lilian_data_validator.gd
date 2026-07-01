@@ -132,14 +132,32 @@ static func _validate_monster(monster: Dictionary, monster_id: String) -> Packed
 	var errors: PackedStringArray = []
 	if str(monster.get("name", "")).strip_edges() == "":
 		errors.append("怪物 %s 缺少 name" % monster_id)
-	if str(monster.get("species", "")).strip_edges() == "":
-		errors.append("怪物 %s 缺少 species" % monster_id)
-	var drops := monster.get("drops", {}) as Dictionary
-	if drops.is_empty() or not drops.get("entries") is Array:
-		errors.append("怪物 %s 缺少 drops.entries" % monster_id)
-	for reward_v in drops.get("entries", []) as Array:
+	if str(monster.get("species", monster.get("type", ""))).strip_edges() == "":
+		errors.append("怪物 %s 缺少 species/type" % monster_id)
+	var drop_entries: Array = _monster_drop_entries(monster)
+	if drop_entries.is_empty():
+		errors.append("怪物 %s 缺少 dropitem" % monster_id)
+	for reward_v in drop_entries:
 		if reward_v is Dictionary:
 			errors.append_array(_validate_reward(reward_v as Dictionary, "怪物 %s 掉落" % monster_id))
+	var skills_v: Variant = monster.get("skills", [])
+	if not skills_v is Array or (skills_v as Array).is_empty():
+		errors.append("怪物 %s 缺少 skills" % monster_id)
+	else:
+		for sid_v in skills_v as Array:
+			var sid: int = -1
+			if sid_v is Dictionary:
+				sid = int((sid_v as Dictionary).get("id", -1))
+			else:
+				sid = int(sid_v)
+			if sid < 0:
+				errors.append("怪物 %s skills 含无效槽位" % monster_id)
+				continue
+			if sid == 0:
+				continue
+			var cm := _config_manager()
+			if cm != null and cm.has_method("skill_by_id") and (cm.call("skill_by_id", sid) as Dictionary).is_empty():
+				errors.append("怪物 %s 引用了未知技能 %d" % [monster_id, sid])
 	var attrs := (LilianEventServiceScript.build_battle_enemy({"enemy": monster}).get("attrs", {}) as Dictionary)
 	for key in [
 		ZhandouAttr.PHYSICAL_ATK, ZhandouAttr.MAGIC_ATK,
@@ -357,6 +375,13 @@ static func _monster_by_id(monster_id: String) -> Dictionary:
 	if cm != null and cm.has_method("monster_by_id"):
 		return cm.call("monster_by_id", monster_id) as Dictionary
 	return {}
+
+
+static func _monster_drop_entries(monster: Dictionary) -> Array:
+	var cm := _config_manager()
+	if cm != null and cm.has_method("monster_drop_entries"):
+		return cm.call("monster_drop_entries", monster) as Array
+	return []
 
 
 static func _location_enemy(location_id: String, monster_ref: String) -> Dictionary:

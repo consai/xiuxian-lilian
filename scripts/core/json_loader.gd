@@ -1,35 +1,133 @@
 class_name JsonLoader
 extends RefCounted
 
-const ITEMS_PATH := "res://data/item.yaml"
-const DAO_TREE_PATH := "res://data/dao_tree.yaml"
-const XIULIAN_METHODS_PATH := "res://data/xiulian_methods.yaml"
-const KNOWLEDGE_EFFECTS_PATH := "res://data/zhishi_effects.yaml"
-const ABILITIES_PATH := "res://data/jineng.yaml"
-const EFFECT_CATALOG_PATH := "res://data/xiaoguo_catalog.yaml"
-const EQUIPS_PATH := "res://data/zhuangbei.yaml"
-const BUFFS_PATH := "res://data/buff.yaml"
-const ZHANDOU_VFX_INDEX_PATH := "res://data/zhandou/vfx_index.yaml"
-const ZHANDOU_FLOAT_STYLES_PATH := "res://data/zhandou/float_styles.yaml"
-const ZHANDOU_VFX_PRESETS_DIR := "res://data/zhandou/presets"
+const EXPORT_DIR := "res://data/exportjson"
+const ITEMS_PATH := "%s/item_items.json" % EXPORT_DIR
+const ITEM_GENERATED_BOOKS_PATH := "%s/item_generated_learning_books.json" % EXPORT_DIR
+const ITEM_ALIASES_PATH := "%s/item_legacy_learning_book_ali.json" % EXPORT_DIR
+const EQUIPS_PATH := "%s/zhuangbei_equips.json" % EXPORT_DIR
+const BUFFS_PATH := "%s/exportjson_buff.json" % EXPORT_DIR
+const ZHANDOU_EFFECT_SCHEMA_PATH := "%s/exportjson_战斗effects效果介绍.json" % EXPORT_DIR
+const ZHANDOU_VFX_INDEX_PATH := "%s/zhandou_vfx_index.json" % EXPORT_DIR
+const ZHANDOU_FLOAT_STYLES_PATH := "%s/zhandou_float_styles.json" % EXPORT_DIR
+const ZHANDOU_FLOAT_STYLE_ROWS_PATH := "%s/zhandou_float_styles_styles.json" % EXPORT_DIR
 
-## 技能分表默认路径（类型键与文件名不一致时的兜底）。
-const ABILITY_TABLE_FILE_BY_TYPE := {
-	"combat_active": "jineng/zhandou_active.yaml",
-	"combat_passive": "jineng/zhandou_passive.yaml",
-	"combat_upkeep": "jineng/zhandou_upkeep.yaml",
-	"general_passive": "jineng/tongyong_passive.yaml",
-}
 const ItemDefScript = preload("res://scripts/core/item_def.gd")
 const EquipDefScript = preload("res://scripts/zhandou/equip_def.gd")
 const BuffDefScript = preload("res://scripts/zhandou/buff_def.gd")
 
 ## 配置文件中的文档用元数据键（加载后剔除）。
 const JSON_COMMENT_KEYS: Array[String] = ["_comment", "_说明", "_doc", "_备注"]
+const ZHANDOU_VFX_PRESET_FILES: Dictionary = {
+	"hit_default": "zhandou_presets_hit_default_s.json",
+	"hit_only": "zhandou_presets_hit_only_sequ.json",
+	"melee_default": "zhandou_presets_melee_default.json",
+	"qi_bolt_projectile": "zhandou_presets_qi_bolt_proje.json",
+	"ranged_default": "zhandou_presets_ranged_defaul.json",
+	"status_cast": "zhandou_presets_status_cast_s.json",
+	"sword_qi_projectile": "zhandou_presets_sword_qi_proj.json",
+}
 
 ## 配置表 id 统一为 String（空串表示无效/缺省）。
 static func config_id_to_string(v: Variant) -> String:
 	return str(v).strip_edges()
+
+
+static func export_path(file_name: String) -> String:
+	return "%s/%s" % [EXPORT_DIR, file_name]
+
+
+static func _export_keyed_rows(path: String) -> Dictionary:
+	var root := _read_json_root_object(path)
+	var out := {}
+	for key_v in root.keys():
+		var row_v: Variant = root[key_v]
+		if row_v is Dictionary:
+			out[str(key_v)] = _strip_null_fields(row_v)
+	return out
+
+
+static func _strip_null_fields(value: Variant) -> Variant:
+	if value is Dictionary:
+		var out := {}
+		for key_v in (value as Dictionary).keys():
+			var cell: Variant = value[key_v]
+			if cell != null:
+				out[key_v] = _strip_null_fields(cell)
+		return out
+	if value is Array:
+		var out: Array = []
+		for cell in value:
+			out.append(_strip_null_fields(cell))
+		return out
+	return value
+
+
+static func _export_row_array(path: String) -> Array:
+	var rows := _export_keyed_rows(path)
+	var keys: Array = rows.keys()
+	keys.sort_custom(_sort_config_keys)
+	var out: Array = []
+	for key_v in keys:
+		out.append((rows[key_v] as Dictionary).duplicate(true))
+	return out
+
+
+static func _export_settings(path: String) -> Dictionary:
+	var rows := _export_keyed_rows(path)
+	var out := {}
+	for key_v in rows.keys():
+		var row := rows[key_v] as Dictionary
+		var key := str(row.get("key", key_v)).strip_edges()
+		if key == "":
+			continue
+		out[key] = _export_setting_payload(row)
+	return out
+
+
+static func _export_setting_payload(row: Dictionary) -> Variant:
+	if row.has("value") and row["value"] != null:
+		return _coerce_export_scalar(row["value"])
+	var out := {}
+	for key_v in row.keys():
+		var key := str(key_v)
+		if key == "key" or key == "value":
+			continue
+		var value: Variant = row[key_v]
+		if value == null:
+			continue
+		out[key] = _coerce_export_scalar(value)
+	return out
+
+
+static func _coerce_export_scalar(value: Variant) -> Variant:
+	if not value is String:
+		return value
+	var s := str(value).strip_edges()
+	var comment_at := s.find(" #")
+	if comment_at >= 0:
+		var before_comment := s.substr(0, comment_at).strip_edges()
+		if before_comment.is_valid_int() or before_comment.is_valid_float() \
+				or before_comment.to_lower() in ["true", "false"]:
+			s = before_comment
+	var lower := s.to_lower()
+	if lower == "true":
+		return true
+	if lower == "false":
+		return false
+	if s.is_valid_int():
+		return int(s)
+	if s.is_valid_float():
+		return float(s)
+	return s
+
+
+static func _sort_config_keys(a: Variant, b: Variant) -> bool:
+	var sa := str(a)
+	var sb := str(b)
+	if sa.is_valid_int() and sb.is_valid_int():
+		return int(sa) < int(sb)
+	return sa.naturalnocasecmp_to(sb) < 0
 
 
 static func _read_json_root_object(path: String) -> Dictionary:
@@ -51,198 +149,17 @@ static func _read_config_variant(path: String) -> Variant:
 		push_error("JsonLoader: file not found: %s" % path)
 		return null
 	var text := FileAccess.get_file_as_string(path)
-	if path.ends_with(".yaml") or path.ends_with(".yml"):
-		return _parse_yaml(text, path)
 	var parsed: Variant = JSON.parse_string(text)
 	if parsed == null:
 		push_error("JsonLoader: invalid JSON: %s" % path)
 		return null
 	return parsed
 
-
-static func _parse_yaml(text: String, path: String = "") -> Variant:
-	var trimmed := text.strip_edges()
-	if trimmed.begins_with("{") or trimmed.begins_with("["):
-		var json_fallback: Variant = JSON.parse_string(text)
-		if json_fallback != null:
-			return json_fallback
-	var lines := _yaml_significant_lines(text)
-	if lines.is_empty():
-		return {}
-	var cursor := {"i": 0}
-	var parsed: Variant = _parse_yaml_block(lines, cursor, int(lines[0].get("indent", 0)))
-	if parsed == null:
-		push_error("JsonLoader: invalid YAML: %s" % path)
-	return parsed
-
-
-static func _yaml_significant_lines(text: String) -> Array:
-	var out: Array = []
-	for raw_line in text.split("\n"):
-		var line := str(raw_line).trim_suffix("\r")
-		if line.strip_edges() == "" or line.strip_edges().begins_with("#"):
-			continue
-		var content := line.substr(_yaml_indent(line))
-		out.append({"indent": _yaml_indent(line), "text": content})
-	return out
-
-
-static func _yaml_indent(line: String) -> int:
-	var indent := 0
-	while indent < line.length() and line[indent] == " ":
-		indent += 1
-	return indent
-
-
-static func _parse_yaml_block(lines: Array, cursor: Dictionary, indent: int) -> Variant:
-	if int(cursor.get("i", 0)) >= lines.size():
-		return {}
-	var line := lines[int(cursor["i"])] as Dictionary
-	var text := str(line.get("text", ""))
-	if text.begins_with("-"):
-		return _parse_yaml_array(lines, cursor, indent)
-	return _parse_yaml_dict(lines, cursor, indent)
-
-
-static func _parse_yaml_array(lines: Array, cursor: Dictionary, indent: int) -> Array:
-	var out: Array = []
-	while int(cursor.get("i", 0)) < lines.size():
-		var line := lines[int(cursor["i"])] as Dictionary
-		var line_indent := int(line.get("indent", 0))
-		if line_indent < indent:
-			break
-		if line_indent != indent:
-			break
-		var text := str(line.get("text", ""))
-		if not text.begins_with("-"):
-			break
-		var rest := text.substr(1).strip_edges()
-		cursor["i"] = int(cursor["i"]) + 1
-		if rest == "":
-			out.append(_parse_yaml_block(lines, cursor, _yaml_next_indent(lines, cursor, indent)))
-			continue
-		var split := _yaml_split_key_value(rest)
-		if split.size() == 2:
-			var row := {}
-			_yaml_assign_pair(row, str(split[0]), str(split[1]), lines, cursor, indent)
-			if int(cursor.get("i", 0)) < lines.size():
-				var next_line := lines[int(cursor["i"])] as Dictionary
-				if int(next_line.get("indent", 0)) > indent and not str(next_line.get("text", "")).begins_with("-"):
-					var extra: Variant = _parse_yaml_dict(lines, cursor, int(next_line.get("indent", 0)))
-					if extra is Dictionary:
-						for key in (extra as Dictionary).keys():
-							row[key] = (extra as Dictionary)[key]
-			out.append(row)
-		else:
-			out.append(_yaml_parse_scalar(rest))
-	return out
-
-
-static func _parse_yaml_dict(lines: Array, cursor: Dictionary, indent: int) -> Dictionary:
-	var out := {}
-	while int(cursor.get("i", 0)) < lines.size():
-		var line := lines[int(cursor["i"])] as Dictionary
-		var line_indent := int(line.get("indent", 0))
-		if line_indent < indent:
-			break
-		if line_indent != indent:
-			break
-		var text := str(line.get("text", ""))
-		if text.begins_with("-"):
-			break
-		var split := _yaml_split_key_value(text)
-		if split.size() != 2:
-			cursor["i"] = int(cursor["i"]) + 1
-			continue
-		cursor["i"] = int(cursor["i"]) + 1
-		_yaml_assign_pair(out, str(split[0]), str(split[1]), lines, cursor, indent)
-	return out
-
-
-static func _yaml_assign_pair(out: Dictionary, raw_key: String, raw_value: String, lines: Array, cursor: Dictionary, indent: int) -> void:
-	var key_v: Variant = _yaml_parse_scalar(raw_key.strip_edges())
-	var key := str(key_v)
-	var value := raw_value.strip_edges()
-	if value == "":
-		if int(cursor.get("i", 0)) < lines.size():
-			out[key] = _parse_yaml_block(lines, cursor, _yaml_next_indent(lines, cursor, indent))
-		else:
-			out[key] = {}
-	else:
-		out[key] = _yaml_parse_scalar(value)
-
-
-static func _yaml_next_indent(lines: Array, cursor: Dictionary, fallback: int) -> int:
-	if int(cursor.get("i", 0)) >= lines.size():
-		return fallback + 2
-	return int((lines[int(cursor["i"])] as Dictionary).get("indent", fallback + 2))
-
-
-static func _yaml_split_key_value(text: String) -> Array:
-	var in_quote := false
-	var quote := ""
-	var escaped := false
-	for i in text.length():
-		var ch := text[i]
-		if escaped:
-			escaped = false
-			continue
-		if ch == "\\":
-			escaped = true
-			continue
-		if in_quote:
-			if ch == quote:
-				in_quote = false
-			continue
-		if ch == "\"" or ch == "'":
-			in_quote = true
-			quote = ch
-			continue
-		if ch == ":":
-			return [text.substr(0, i), text.substr(i + 1)]
-	return []
-
-
-static func _yaml_parse_scalar(raw: String) -> Variant:
-	var s := raw.strip_edges()
-	if s == "":
-		return ""
-	if s.begins_with("{") or s.begins_with("[") or s.begins_with("\""):
-		var parsed: Variant = JSON.parse_string(s)
-		if parsed != null:
-			return parsed
-	var lower := s.to_lower()
-	if lower == "null" or lower == "~":
-		return null
-	if lower == "true":
-		return true
-	if lower == "false":
-		return false
-	if s.is_valid_int():
-		return int(s)
-	if s.is_valid_float():
-		return float(s)
-	if (s.begins_with("'") and s.ends_with("'")) or (s.begins_with("\"") and s.ends_with("\"")):
-		return s.substr(1, s.length() - 2)
-	return s
-
-
 static func load_items() -> Array:
-	var parsed: Variant = _read_json_variant(ITEMS_PATH)
 	var out: Array = []
-	var raw: Array = []
-	if parsed is Dictionary:
-		var d := parsed as Dictionary
-		if d.has("items") and d["items"] is Array:
-			raw = _expand_learning_book_items(d, d["items"] as Array)
-		else:
-			push_error("JsonLoader: item config object missing 'items' array")
-			return out
-	elif parsed is Array:
-		raw = parsed as Array
-	else:
-		push_error("JsonLoader: item config root must be object or array")
-		return out
+	var raw := _expand_learning_book_items({
+		"generated_learning_books": _export_row_array(ITEM_GENERATED_BOOKS_PATH),
+	}, _export_row_array(ITEMS_PATH))
 	for item in raw:
 		if not item is Dictionary:
 			continue
@@ -253,17 +170,11 @@ static func load_items() -> Array:
 
 
 static func load_item_aliases() -> Dictionary:
-	var parsed: Variant = _read_json_variant(ITEMS_PATH)
-	if not parsed is Dictionary:
-		return {}
-	var root := parsed as Dictionary
-	var aliases_v: Variant = root.get("legacy_learning_book_aliases", {})
-	if not aliases_v is Dictionary:
-		return {}
+	var rows := _export_settings(ITEM_ALIASES_PATH)
 	var out := {}
-	for from_v in (aliases_v as Dictionary).keys():
+	for from_v in rows.keys():
 		var from_id := config_id_to_string(from_v)
-		var to_id := config_id_to_string((aliases_v as Dictionary).get(from_v, ""))
+		var to_id := config_id_to_string(rows.get(from_v, ""))
 		if from_id == "" or to_id == "":
 			continue
 		out[from_id] = to_id
@@ -340,7 +251,7 @@ static func _append_generated_method_books(
 		existing_ids: Dictionary,
 		existing_targets: Dictionary
 ) -> void:
-	var bundle := _read_json_root_object(XIULIAN_METHODS_PATH)
+	var bundle := load_xiulian_methods_bundle()
 	var methods_v: Variant = bundle.get("methods", [])
 	if not methods_v is Array:
 		return
@@ -435,7 +346,7 @@ static func load_equips_bundle() -> Dictionary:
 	var root := _read_json_root_object(EQUIPS_PATH)
 	if root.is_empty():
 		return {"equips": []}
-	return {"equips": _parse_equip_rows(root.get("equips", {}))}
+	return {"equips": _parse_equip_rows(root)}
 
 
 static func _parse_equip_rows(raw: Variant) -> Array:
@@ -472,9 +383,9 @@ static func load_buffs() -> Array:
 	var out: Array = []
 	if root.is_empty():
 		return out
-	var raw: Variant = root.get("buffs", {})
+	var raw: Variant = root.get("buffs", root)
 	if not raw is Dictionary:
-		push_error("JsonLoader: buff config 'buffs' must be an object keyed by buff id")
+		push_error("JsonLoader: buff config root must be an object keyed by buff id")
 		return out
 	var d := raw as Dictionary
 	for k in d.keys():
@@ -486,8 +397,7 @@ static func load_buffs() -> Array:
 		if not row_v is Dictionary:
 			push_error("JsonLoader: buff '%s' entry must be an object" % bid)
 			continue
-		var row := (row_v as Dictionary).duplicate(true)
-		row["id"] = bid
+		var row := _normalize_export_buff_row(bid, row_v as Dictionary)
 		_validate_zhandou_effects_schema(
 			row.get("tick_effects", []),
 			"buff config buffs['%s'].tick_effects" % bid,
@@ -499,6 +409,27 @@ static func load_buffs() -> Array:
 	return out
 
 
+static func load_zhandou_effect_schema() -> Dictionary:
+	return _read_json_root_object(ZHANDOU_EFFECT_SCHEMA_PATH)
+
+
+static func _normalize_export_buff_row(buff_id: String, raw: Dictionary) -> Dictionary:
+	var row := raw.duplicate(true)
+	row["id"] = buff_id
+	if row.has("type") and not row.has("tags"):
+		row["tags"] = ZhandouEffectCodec.split_csv_tags(row.get("type", ""))
+	var ticktime := float(row.get("ticktime", 1.0))
+	if ticktime < 0.0:
+		row["ticktime"] = 0.0
+	var mods_v: Variant = row.get("modifiers", {})
+	if mods_v is Array:
+		row["modifiers"] = ZhandouEffectCodec.normalize_buff_modifiers(mods_v)
+	var tick_v: Variant = row.get("tick_effects", [])
+	if tick_v is Array:
+		row["tick_effects"] = ZhandouEffectCodec.normalize_buff_tick_effects(tick_v)
+	return row
+
+
 static func _validate_zhandou_effects_schema(raw: Variant, path_label: String, allow_target: bool) -> void:
 	if raw == null:
 		return
@@ -507,10 +438,37 @@ static func _validate_zhandou_effects_schema(raw: Variant, path_label: String, a
 		return
 	for i in (raw as Array).size():
 		var item_v: Variant = (raw as Array)[i]
+		if item_v is Array:
+			var cells := item_v as Array
+			if cells.is_empty():
+				push_error("JsonLoader: %s[%d] positional effect is empty" % [path_label, i])
+				continue
+			var effect_id := str(cells[0]).strip_edges().to_lower()
+			if not ZhandouEffectCodec.is_schema_effect_id(effect_id):
+				push_error("JsonLoader: %s[%d] effect '%s' is unsupported" % [path_label, i, effect_id])
+			continue
 		if not item_v is Dictionary:
-			push_error("JsonLoader: %s[%d] must be object" % [path_label, i])
+			push_error("JsonLoader: %s[%d] must be object or positional array" % [path_label, i])
 			continue
 		var item := item_v as Dictionary
+		if item.has("type"):
+			var etype := str(item.get("type", "")).strip_edges().to_lower()
+			if etype == "":
+				push_error("JsonLoader: %s[%d].type is required" % [path_label, i])
+				continue
+			if not EnumCombatEffectType.is_valid_label(etype):
+				push_error("JsonLoader: %s[%d].type '%s' is unsupported" % [path_label, i, etype])
+			if allow_target and item.has("target"):
+				var target := str(item.get("target", "")).strip_edges().to_lower()
+				if target != "" and not EnumZhandouTarget.is_valid_label(target):
+					push_error("JsonLoader: %s[%d].target '%s' is unsupported" % [path_label, i, target])
+				if item.has("target_arg") or item.has("targetArg"):
+					var target_arg := str(item.get("target_arg", item.get("targetArg", ""))).strip_edges().to_lower()
+					if target_arg != "" and not EnumZhandouTargetArg.is_valid_label(target_arg):
+						push_error("JsonLoader: %s[%d].target_arg '%s' is unsupported" % [path_label, i, target_arg])
+			if EnumCombatEffectType.requires_value(etype) and not item.has("value"):
+				push_error("JsonLoader: %s[%d].value is required for type '%s'" % [path_label, i, etype])
+			continue
 		var etype := str(item.get("type", "")).strip_edges().to_lower()
 		if etype == "":
 			push_error("JsonLoader: %s[%d].type is required" % [path_label, i])
@@ -521,6 +479,10 @@ static func _validate_zhandou_effects_schema(raw: Variant, path_label: String, a
 			var target := str(item.get("target", "")).strip_edges().to_lower()
 			if target != "" and not EnumZhandouTarget.is_valid_label(target):
 				push_error("JsonLoader: %s[%d].target '%s' is unsupported" % [path_label, i, target])
+			if item.has("target_arg") or item.has("targetArg"):
+				var target_arg := str(item.get("target_arg", item.get("targetArg", ""))).strip_edges().to_lower()
+				if target_arg != "" and not EnumZhandouTargetArg.is_valid_label(target_arg):
+					push_error("JsonLoader: %s[%d].target_arg '%s' is unsupported" % [path_label, i, target_arg])
 		if EnumCombatEffectType.requires_value(etype) and not item.has("value"):
 			push_error("JsonLoader: %s[%d].value is required for type '%s'" % [path_label, i, etype])
 
@@ -546,10 +508,8 @@ static func normalize_zhandou_vfx_preset_id(ref: String) -> String:
 	var s := ref.strip_edges()
 	if s == "":
 		return ""
-	if s.ends_with(".json") or s.ends_with(".yaml"):
+	if s.ends_with(".json"):
 		s = s.substr(0, s.length() - 5)
-	elif s.ends_with(".yml"):
-		s = s.substr(0, s.length() - 4)
 	var slash := s.rfind("/")
 	if slash >= 0:
 		s = s.substr(slash + 1)
@@ -563,19 +523,27 @@ static func zhandou_vfx_preset_path(preset_id: String) -> String:
 	var id := normalize_zhandou_vfx_preset_id(preset_id)
 	if id == "":
 		return ""
-	return "%s/%s.yaml" % [ZHANDOU_VFX_PRESETS_DIR, id]
+	var file_name := str(ZHANDOU_VFX_PRESET_FILES.get(id, ""))
+	return export_path(file_name) if file_name != "" else ""
+
+
+static func zhandou_vfx_preset_ids() -> Array:
+	var out: Array = ZHANDOU_VFX_PRESET_FILES.keys()
+	out.sort_custom(_sort_config_keys)
+	return out
 
 
 static func load_zhandou_float_styles() -> Dictionary:
-	var raw: Variant = _read_config_variant(ZHANDOU_FLOAT_STYLES_PATH)
-	if raw == null or not raw is Dictionary:
+	var raw := _export_settings(ZHANDOU_FLOAT_STYLES_PATH)
+	if raw.is_empty():
 		return {"version": 1, "jitter_x": 18.0, "max_per_unit_per_frame": 6, "styles": {}}
+	raw["styles"] = _export_keyed_rows(ZHANDOU_FLOAT_STYLE_ROWS_PATH)
 	return strip_json_comments(raw) as Dictionary
 
 
 static func load_zhandou_vfx_index() -> Dictionary:
-	var raw: Variant = _read_config_variant(ZHANDOU_VFX_INDEX_PATH)
-	if raw == null or not raw is Dictionary:
+	var raw := _export_settings(ZHANDOU_VFX_INDEX_PATH)
+	if raw.is_empty():
 		return {"version": 1, "default": "melee_default", "impact_preset": "hit_default", "preset_dir": "presets"}
 	return strip_json_comments(raw) as Dictionary
 
@@ -585,36 +553,57 @@ static func load_zhandou_vfx_preset_file(preset_ref: String) -> Dictionary:
 	if path == "" or not FileAccess.file_exists(path):
 		push_warning("JsonLoader: zhandou vfx preset not found: %s" % path)
 		return {}
-	var raw: Variant = _read_config_variant(path)
-	if raw == null or not raw is Dictionary:
+	var sequence := _export_row_array(path)
+	if sequence.is_empty():
 		return {}
-	return strip_json_comments(raw) as Dictionary
+	return strip_json_comments({"sequence": sequence}) as Dictionary
 
 
 static func load_dao_tree() -> Dictionary:
-	return _read_json_root_object(DAO_TREE_PATH)
+	var root := _export_settings(export_path("dao_tree.json"))
+	root["metadata"] = _export_settings(export_path("dao_tree_metadata.json"))
+	root["training"] = _export_settings(export_path("dao_tree_training.json"))
+	root["attributes"] = _export_settings(export_path("dao_tree_attributes.json"))
+	root["realms"] = _export_row_array(export_path("dao_tree_realms.json"))
+	root["domainGroups"] = _export_row_array(export_path("dao_tree_domainGroups.json"))
+	root["domains"] = _export_row_array(export_path("dao_tree_domains.json"))
+	root["skills"] = _export_row_array(export_path("dao_tree_skills.json"))
+	return root
 
 
 static func load_xiulian_methods_bundle() -> Dictionary:
-	return _read_json_root_object(XIULIAN_METHODS_PATH)
+	var root := _export_settings(export_path("xiulian_methods.json"))
+	root["metadata"] = _export_settings(export_path("xiulian_methods_metadata.json"))
+	root["rules"] = _export_settings(export_path("xiulian_methods_rules.json"))
+	root["families"] = _export_row_array(export_path("xiulian_methods_families.json"))
+	root["methods"] = _export_row_array(export_path("xiulian_methods_methods.json"))
+	root["effectCatalog"] = _export_keyed_rows(export_path("xiulian_methods_effectCatalog.json"))
+	root["effectDefinitions"] = _export_keyed_rows(export_path("xiulian_methods_effectDefinit.json"))
+	return root
 
 
 static func load_knowledge_effects_bundle() -> Dictionary:
-	return _read_json_root_object(KNOWLEDGE_EFFECTS_PATH)
+	var root := _export_settings(export_path("zhishi_effects.json"))
+	root["rules"] = _export_settings(export_path("zhishi_effects_rules.json"))
+	root["effects"] = _export_row_array(export_path("zhishi_effects_effects.json"))
+	return root
 
 
 static func load_abilities_bundle() -> Dictionary:
-	var bundle := _read_json_root_object(ABILITIES_PATH)
+	var bundle := _export_settings(export_path("jineng.json"))
+	bundle["metadata"] = _export_settings(export_path("jineng_metadata.json"))
+	bundle["rules"] = _export_settings(export_path("jineng_rules.json"))
 	var merged: Array = []
-	var tables_v: Variant = bundle.get("abilityTables", {})
-	if tables_v is Dictionary and not (tables_v as Dictionary).is_empty():
-		for type_name in _ability_table_load_order(bundle, tables_v as Dictionary):
-			merged.append_array(_load_ability_table_rows(str(type_name), tables_v as Dictionary))
-	else:
-		# ponytail: 兼容仍内联 abilities 的旧版单文件
-		var legacy_v: Variant = bundle.get("abilities", [])
-		if legacy_v is Array:
-			merged = (legacy_v as Array).duplicate(true)
+	var tables_out: Dictionary = {}
+	var tables := _export_settings(export_path("jineng_abilityTables.json"))
+	for table_key in EnumAbilityTable.LOAD_ORDER:
+		tables[table_key] = EnumAbilityTable.default_path(table_key)
+	for table_key in _ability_table_load_order(tables):
+		var rows := _load_ability_table_file(str(table_key), tables)
+		tables_out[str(table_key)] = rows
+		merged.append_array(rows)
+	bundle["abilityTables"] = tables
+	bundle["tables"] = tables_out
 	bundle["abilities"] = merged
 	var meta_v: Variant = bundle.get("metadata", {})
 	if meta_v is Dictionary:
@@ -622,44 +611,152 @@ static func load_abilities_bundle() -> Dictionary:
 	return bundle
 
 
-static func _ability_table_load_order(bundle: Dictionary, tables: Dictionary) -> Array:
-	var rules_v: Variant = bundle.get("rules", {})
-	if rules_v is Dictionary:
-		var types_v: Variant = (rules_v as Dictionary).get("types", [])
-		if types_v is Array and not (types_v as Array).is_empty():
-			return types_v as Array
-	return tables.keys()
+static func load_ability_table(table_key: String) -> Dictionary:
+	var path := _ability_table_path(table_key)
+	return _read_json_root_object(path)
 
 
-static func _load_ability_table_rows(type_name: String, tables: Dictionary) -> Array:
-	var rel := str(tables.get(type_name, "")).strip_edges()
+static func _ability_table_load_order(tables: Dictionary) -> Array:
+	var out: Array = []
+	for table_key in EnumAbilityTable.LOAD_ORDER:
+		if tables.has(table_key):
+			out.append(table_key)
+	for table_key in tables.keys():
+		var key := str(table_key)
+		if key not in out:
+			out.append(key)
+	return out
+
+
+static func _load_ability_table_file(table_key: String, tables: Dictionary) -> Array:
+	var rel := str(tables.get(table_key, "")).strip_edges()
 	if rel == "":
-		rel = str(ABILITY_TABLE_FILE_BY_TYPE.get(type_name, "jineng/%s.yaml" % type_name))
+		rel = EnumAbilityTable.default_path(table_key)
 	var path := rel if rel.begins_with("res://") else "res://data/%s" % rel.trim_prefix("/")
 	var table := _read_json_root_object(path)
 	var rows_v: Variant = table.get("abilities", [])
-	return (rows_v as Array).duplicate(true) if rows_v is Array else []
+	if rows_v is Array and not (rows_v as Array).is_empty():
+		return (rows_v as Array).duplicate(true)
+	if AbilityExportAdapter.is_export_root(table):
+		return AbilityExportAdapter.normalize_table_rows(table_key, table)
+	return []
+
+
+static func _ability_table_path(table_key: String) -> String:
+	var rel := EnumAbilityTable.default_path(table_key)
+	return rel if rel.begins_with("res://") else "res://data/%s" % rel.trim_prefix("/")
 
 
 static func load_effect_catalog() -> Dictionary:
-	return _read_json_root_object(EFFECT_CATALOG_PATH)
+	var root := _export_settings(export_path("xiaoguo_catalog.json"))
+	root["metadata"] = _export_settings(export_path("xiaoguo_catalog_metadata.json"))
+	root["effects"] = _export_keyed_rows(export_path("xiaoguo_catalog_effects.json"))
+	root["stackPolicies"] = _export_settings(export_path("xiaoguo_catalog_stackPolicies.json"))
+	return root
+
+
+static func load_locations_bundle() -> Dictionary:
+	var root := _export_settings(export_path("didian.json"))
+	root["locations"] = _export_keyed_rows(export_path("didian_locations.json"))
+	return root
+
+
+static func load_world_map_bundle() -> Dictionary:
+	var root := _export_settings(export_path("shijie_map.json"))
+	root["cities"] = _export_keyed_rows(export_path("shijie_map_cities.json"))
+	root["routes"] = _export_row_array(export_path("shijie_map_routes.json"))
+	root["wilderness_regions"] = _export_keyed_rows(export_path("shijie_map_wilderness_regions.json"))
+	root["wilderness_locations"] = _export_keyed_rows(export_path("shijie_map_wilderness_locatio.json"))
+	return root
+
+
+static func load_lilian_common_events_bundle() -> Dictionary:
+	var root := _export_settings(export_path("lilian_common_events.json"))
+	root["events"] = _export_keyed_rows(export_path("lilian_common_events_events.json"))
+	return root
+
+
+static func load_lilian_events_bundle() -> Dictionary:
+	var root := _export_settings(export_path("lilian_events.json"))
+	root["events"] = _export_keyed_rows(export_path("lilian_events_events.json"))
+	return root
+
+
+static func load_lilian_rules_bundle() -> Dictionary:
+	var root := _export_settings(export_path("lilian_rules.json"))
+	root["reward_budget"] = _export_settings(export_path("lilian_rules_reward_budget.json"))
+	return root
+
+
+static func load_moni_bundle() -> Dictionary:
+	var root := _export_settings(export_path("moni.json"))
+	root["rules"] = _export_settings(export_path("moni_rules.json"))
+	root["activities"] = _export_keyed_rows(export_path("moni_activities.json"))
+	root["initial_player"] = _export_settings(export_path("moni_initial_player.json"))
+	return root
+
+
+static func load_jingjie_balance_bundle() -> Dictionary:
+	var root := _export_settings(export_path("jingjie_balance.json"))
+	root["acceptance"] = _export_settings(export_path("jingjie_balance_acceptance.json"))
+	root["benchmark_enemies"] = _export_keyed_rows(export_path("jingjie_balance_benchmark_ene.json"))
+	root["budgets"] = _export_keyed_rows(export_path("jingjie_balance_budgets.json"))
+	root["combat_attribute_formula"] = _export_keyed_rows(export_path("jingjie_balance_combat_attrib.json"))
+	root["cultivation_progression"] = _export_settings(export_path("jingjie_balance_cultivation_p.json"))
+	root["encounter_bands"] = _export_keyed_rows(export_path("jingjie_balance_encounter_ban.json"))
+	root["major_realms"] = _export_row_array(export_path("jingjie_balance_major_realms.json"))
+	root["monster_design_baseline"] = _export_keyed_rows(export_path("jingjie_balance_monster_desig.json"))
+	root["player_level_curve"] = _export_keyed_rows(export_path("jingjie_balance_player_level_.json"))
+	root["realm_flat_per_layer"] = _export_settings(export_path("jingjie_balance_realm_flat_pe.json"))
+	root["rules"] = _export_settings(export_path("jingjie_balance_rules.json"))
+	root["standard_players"] = _export_keyed_rows(export_path("jingjie_balance_standard_play.json"))
+	return root
+
+
+static func load_liandan_bundle() -> Dictionary:
+	var root := _export_settings(export_path("liandan.json"))
+	root["furnaces"] = _export_row_array(export_path("liandan_furnaces.json"))
+	root["recipes"] = _export_row_array(export_path("liandan_recipes.json"))
+	root["strategies"] = _export_row_array(export_path("liandan_strategies.json"))
+	return root
+
+
+static func load_shijian_rules_bundle() -> Dictionary:
+	return _export_settings(export_path("shijian_rules.json"))
+
+
+static func load_tupo_rules_bundle() -> Dictionary:
+	var root := _export_settings(export_path("tupo_rules.json"))
+	root["component_caps"] = _export_settings(export_path("tupo_rules_component_caps.json"))
+	root["major_breakthroughs"] = _export_keyed_rows(export_path("tupo_rules_major_breakthrough.json"))
+	return root
+
+
+static func load_weituo_bundle() -> Dictionary:
+	var root := _export_settings(export_path("weituo.json"))
+	root["rules"] = _export_settings(export_path("weituo_rules.json"))
+	root["weituo"] = _export_keyed_rows(export_path("weituo_weituo.json"))
+	return root
+
+
+static func load_tip_policy_bundle() -> Dictionary:
+	var root := _export_settings(export_path("ui_tip_policy.json"))
+	root["channels"] = _export_keyed_rows(export_path("ui_tip_policy_channels.json"))
+	return root
+
+
+static func load_story_bundle(story_id: String) -> Dictionary:
+	var name := story_id.replace(".", "_").replace("/", "_").replace("\\", "_")
+	var root := _export_settings(export_path("gushi_%s.json" % name))
+	root["nodes"] = _export_keyed_rows(export_path("gushi_%s_nodes.json" % name))
+	return root
 
 
 static func load_zhandou_vfx_presets() -> Dictionary:
 	var index := load_zhandou_vfx_index()
-	var names: Array = []
-	var dir := DirAccess.open(ZHANDOU_VFX_PRESETS_DIR)
-	if dir != null:
-		dir.list_dir_begin()
-		var fn := dir.get_next()
-		while fn != "":
-			if not dir.current_is_dir() and (fn.ends_with(".yaml") or fn.ends_with(".yml")):
-				names.append(fn.get_basename())
-			fn = dir.get_next()
-		dir.list_dir_end()
 	return {
 		"version": index.get("version", 1),
 		"defaults": index.get("default", "melee_default"),
 		"impact_preset": index.get("impact_preset", "hit_default"),
-		"preset_names": names,
+		"preset_names": zhandou_vfx_preset_ids(),
 	}

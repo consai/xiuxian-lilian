@@ -44,7 +44,11 @@ static func build_from_runtime(cfg: Dictionary, icon: Texture2D = null) -> Dicti
 			StringsZh.getp("hover.skill.power", "威力：{value}"),
 			{"value": _fmt_num(power)}
 		))
-	for effect_line in HoverTipEffectFormatter.format_lines(cfg.get("effects", [])):
+	for effect_line in HoverTipEffectFormatter.format_lines(
+		cfg.get("effects", []),
+		str(cfg.get("target", "")),
+		str(cfg.get("target_arg", ""))
+	):
 		lines.append(effect_line)
 	var tags_v: Variant = cfg.get("tags", [])
 	if tags_v is Array and not (tags_v as Array).is_empty():
@@ -75,7 +79,7 @@ static func build_ability(ability_id: String, savedata: Dictionary, icon: Textur
 	var runtime := AbilityService.to_runtime_dict(ability_id, savedata)
 	var title := str(ability.get("name", ability_id)).strip_edges()
 	var quality := clampi(int(ability.get("quality", 1)), EnumQuality.Type.LOW, EnumQuality.Type.SUPREME)
-	var tier := EnumItemTier.clamp_tier(int(ability.get("tier", 1)))
+	var tier := AbilityService.ability_tier(ability)
 	var lines: Array[String] = []
 	var desc := str(ability.get("description", "")).strip_edges()
 	if desc != "":
@@ -84,14 +88,21 @@ static func build_ability(ability_id: String, savedata: Dictionary, icon: Textur
 	lines.append("类型：%s" % ability_type_label(ability_type))
 	for policy_line in _ability_policy_lines(ability_type):
 		lines.append(policy_line)
-	var realm := str(ability.get("realm", "")).strip_edges()
-	if realm != "":
-		lines.append("境界：%s" % DaoTreeServiceScript.realm_display_name(realm))
+	var realm_id := AbilityService.ability_realm_id(ability)
+	lines.append("境界：%s" % DaoTreeServiceScript.realm_display_name(realm_id))
 	lines.append("阶位：%s" % EnumItemTier.label(tier))
 	lines.append("品质：%s" % EnumQuality.display_label(quality))
 	var combat_v: Variant = ability.get("combat", {})
+	var combat_target := ""
+	var combat_target_arg := ""
 	if combat_v is Dictionary:
 		var combat := combat_v as Dictionary
+		var pair := EnumZhandouTargetArg.normalize_pair(
+			combat.get("target", ""),
+			combat.get("targetArg", combat.get("target_arg", ""))
+		)
+		combat_target = str(pair.get("target", ""))
+		combat_target_arg = str(pair.get("target_arg", ""))
 		var cost_text := _format_cost_text(combat.get("costs", []))
 		if cost_text != "":
 			lines.append("消耗：%s" % cost_text)
@@ -104,9 +115,13 @@ static func build_ability(ability_id: String, savedata: Dictionary, icon: Textur
 		var cast_time := float(combat.get("castTime", 0.0))
 		if cast_time > 0.0:
 			lines.append("施放：%s秒" % _fmt_num(cast_time))
-	var effect_lines := HoverTipEffectFormatter.format_lines(runtime.get("effects", []))
+	var effect_lines := HoverTipEffectFormatter.format_lines(
+		runtime.get("effects", []), combat_target, combat_target_arg
+	)
 	if effect_lines.is_empty():
-		effect_lines = HoverTipEffectFormatter.format_raw_ability_lines(ability.get("effects", []))
+		effect_lines = HoverTipEffectFormatter.format_raw_ability_lines(
+			ability.get("effects", []), -1.0, combat_target, combat_target_arg
+		)
 	for effect_line in effect_lines:
 		lines.append(effect_line)
 	var tags_v: Variant = ability.get("tags", [])

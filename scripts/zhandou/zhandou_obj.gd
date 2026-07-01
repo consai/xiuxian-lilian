@@ -18,6 +18,9 @@ const RESOURCE_MANA := "mana"
 const RESOURCE_SPIRIT := "spirit"
 const RESOURCE_STAMINA := "stamina"
 
+# ponytail: headless 测试注入 buff 定义，避免 ConfigManager autoload 未就绪
+static var _test_buff_defs: Dictionary = {}
+
 const test_attr: Dictionary = ZhandouAttr.TEST_DEFAULTS
 
 var hp: float = 0.0
@@ -29,6 +32,8 @@ var equips: Array = []
 var items: Array = []
 ## 当前挂接的 Buff：key 为 buff_id，value 为运行时实例（stacks、duration_left、tick_accum 等）。
 var buffs: Dictionary = {}
+## 战斗被动：key 为 ability_id，value 为 {cd, cd_total}；常驻显示在 Buff 栏，触发后才显示冷却。
+var passives: Dictionary = {}
 var next_action_time: float = 0.0
 ## 运行时事件队列，由 Domain 层拉取并转发到表现层。
 var _runtime_events: Array = []
@@ -59,6 +64,7 @@ func apply_dict(data: Dictionary) -> void:
 	var buffs_in: Variant = data.get("buffs", null)
 	if buffs_in is Dictionary:
 		buffs = _duplicate_nested_dict(buffs_in as Dictionary)
+	_apply_passives_from_row(data)
 
 # 创建stub
 static func create_stub(side: String = "player") -> ZhandouObj:
@@ -108,6 +114,7 @@ func to_dict() -> Dictionary:
 		"equips": _duplicate_slot_array(equips),
 		"items": _duplicate_slot_array(items),
 		"buffs": _duplicate_nested_dict(buffs),
+		"passives": _duplicate_nested_dict(passives),
 		"next_action_time": next_action_time,
 	}
 
@@ -222,12 +229,24 @@ func _lookup_buff_def(buff_id: String) -> Dictionary:
 	var bid := buff_id.strip_edges()
 	if bid == "":
 		return {}
+	if _test_buff_defs.has(bid):
+		var test_cfg_v: Variant = _test_buff_defs[bid]
+		if test_cfg_v is Dictionary:
+			return (test_cfg_v as Dictionary).duplicate(true)
 	var cm := _get_config_manager()
 	if cm != null and cm.has_method("buff_by_id"):
 		var cfg: Dictionary = cm.call("buff_by_id", bid) as Dictionary
 		if not cfg.is_empty():
 			return cfg
 	return {}
+
+
+static func set_test_buff_defs(defs: Dictionary) -> void:
+	_test_buff_defs = defs.duplicate(true)
+
+
+static func clear_test_buff_defs() -> void:
+	_test_buff_defs.clear()
 
 
 func add_buff(buff_id: String, stacks_add: int = 1, duration_override: float = -1.0) -> int:
@@ -239,7 +258,11 @@ func add_buff(buff_id: String, stacks_add: int = 1, duration_override: float = -
 		push_warning("ZhandouObj.add_buff: unknown buff '%s'" % bid)
 		return 0
 	var max_stacks := maxi(1, int(def.get("max_stacks", 1)))
-	var ticktime := maxf(0.01, float(def.get("ticktime", 1.0)))
+	var ticktime := float(def.get("ticktime", 1.0))
+	if ticktime <= 0.0:
+		ticktime = 0.0
+	else:
+		ticktime = maxf(0.01, ticktime)
 	var duration := float(def.get("duration", 0.0))
 	if duration_override >= 0.0:
 		duration = duration_override
@@ -263,18 +286,22 @@ func add_buff(buff_id: String, stacks_add: int = 1, duration_override: float = -
 		}
 		buffs[bid] = inst
 	var old_stacks := int(inst.get("stacks", 0))
+	var had_existing := old_stacks > 0
 	var new_stacks := mini(max_stacks, old_stacks + stacks_add)
 	var applied := new_stacks - old_stacks
-	if applied <= 0:
+	# 持续期间再次收到同一 buff：叠层（至 max_stacks）并刷新剩余时间；满层时仅刷新时间
+	if applied <= 0 and not had_existing:
 		return 0
 	inst["stacks"] = new_stacks
 	inst["duration_left"] = duration
+	inst["tick_accum"] = 0.0
 	inst["ticktime"] = ticktime
 	inst["tick_effects"] = tick_effects
 	inst["stat_modifiers"] = stat_mods.duplicate(true)
-	if not stat_mods.is_empty():
+	if applied > 0 and not stat_mods.is_empty():
 		attrs = ZhandouAttr.apply_modifiers(attrs, stat_mods, applied)
-	return applied
+	# 满层仅刷新剩余时间时返回 1，供战报/UI 识别为成功施加
+	return applied if applied > 0 else 1
 
 
 func add_runtime_modifier_buff(
@@ -351,7 +378,9 @@ func tick_buffs(delta: float) -> void:
 		if duration_left <= 0.0:
 			expired.append(bid)
 			continue
-		var ticktime := maxf(0.01, float(inst.get("ticktime", 1.0)))
+		var ticktime := float(inst.get("ticktime", 1.0))
+		if ticktime > 0.0:
+			ticktime = maxf(0.01, ticktime)
 		var tick_accum := float(inst.get("tick_accum", 0.0))
 		var alive := minf(delta, duration_left)
 		duration_left -= alive
@@ -413,19 +442,20 @@ func _apply_buff_tick_effects(tick_effects: Array, stacks: int, buff_id: String 
 				change_mp(scaled)
 
 
-## 普攻数据结算（无前后摇）；ponytail: 已移除命中随机，伤害段必定命中。
-static func resolve_basic_attack(attacker: ZhandouObj, defender: ZhandouObj) -> Dictionary:
-	var report := ZhandouAttr.calc_basic_damage(attacker.attrs, defender.attrs)
-	var raw_damage := float(report.get(ZhandouReportScript.KEY_DAMAGE, 0.0))
-	var shield_abs := defender.be_attacked(raw_damage)
-	report[ZhandouReportScript.KEY_DAMAGE] = raw_damage
-	report[ZhandouReportScript.KEY_RAW_DAMAGE] = raw_damage
-	report[ZhandouReportScript.KEY_HP_DAMAGE] = maxf(0.0, raw_damage - shield_abs)
-	report[ZhandouReportScript.KEY_SHIELD_ABSORBED] = shield_abs
-	report[ZhandouReportScript.KEY_HEAL] = 0.0
-	report[ZhandouReportScript.KEY_MP_GAIN] = 0.0
-	report[ZhandouReportScript.KEY_BUFF_NAMES] = []
-	return report
+## 调息数据结算：按法力恢复速度倍率回蓝，不造成伤害。
+static func resolve_tiaoxi(actor: ZhandouObj) -> Dictionary:
+	var mp_gain: float = ZhandouAttr.calc_tiaoxi_mp_restore(actor.attrs)
+	if mp_gain > 0.0:
+		actor.change_mp(mp_gain)
+	return {
+		ZhandouReportScript.KEY_DAMAGE: 0.0,
+		ZhandouReportScript.KEY_RAW_DAMAGE: 0.0,
+		ZhandouReportScript.KEY_HP_DAMAGE: 0.0,
+		ZhandouReportScript.KEY_SHIELD_ABSORBED: 0.0,
+		ZhandouReportScript.KEY_HEAL: 0.0,
+		ZhandouReportScript.KEY_MP_GAIN: mp_gain,
+		ZhandouReportScript.KEY_BUFF_NAMES: [],
+	}
 
 
 ## 使用技能。 [param skill_cfg] 为 [code]id -> 配置[/code] 表；[param target] 为受击方（伤害类效果）。
@@ -548,6 +578,7 @@ func tick_cooldowns(delta: float) -> void:
 	if delta <= 0.0:
 		return
 	tick_buffs(delta)
+	_tick_passive_cds(delta)
 	for slot_v in skills:
 		if slot_v is Dictionary:
 			_tick_slot_cd(slot_v as Dictionary, delta)
@@ -601,6 +632,168 @@ func get_equip_slot_at(index: int) -> Dictionary:
 		return {}
 	var slot_v: Variant = equips[index]
 	return slot_v as Dictionary if slot_v is Dictionary else {}
+
+
+## 从战斗行数据或 gm_passives 初始化被动槽（passive_ids / gm_passives / passives 字典）。
+func _apply_passives_from_row(data: Dictionary) -> void:
+	var stored_v: Variant = data.get("passives", null)
+	if stored_v is Dictionary and not (stored_v as Dictionary).is_empty():
+		passives = _duplicate_nested_dict(stored_v as Dictionary)
+		return
+	var ids: Array = []
+	if data.get("passive_ids") is Array:
+		ids = (data.get("passive_ids") as Array).duplicate()
+	elif data.get("gm_passives") is Array:
+		ids = (data.get("gm_passives") as Array).duplicate()
+	if not ids.is_empty():
+		init_passives_from_ids(ids)
+
+
+func init_passives_from_ids(passive_ids: Array) -> void:
+	passives.clear()
+	for aid_v in passive_ids:
+		var aid: String = str(aid_v).strip_edges()
+		if aid == "" or passives.has(aid):
+			continue
+		if AbilityService.by_id(aid).is_empty():
+			continue
+		passives[aid] = {
+			"cd": 0.0,
+			"cd_total": _passive_cooldown_total(aid),
+		}
+
+
+## GM/战斗中途增删被动时保留仍在冷却中的条目。
+func sync_passive_ids(passive_ids: Array) -> void:
+	var next: Dictionary = {}
+	for aid_v in passive_ids:
+		var aid: String = str(aid_v).strip_edges()
+		if aid == "":
+			continue
+		if passives.has(aid):
+			next[aid] = (passives[aid] as Dictionary).duplicate(true)
+		elif not AbilityService.by_id(aid).is_empty():
+			next[aid] = {
+				"cd": 0.0,
+				"cd_total": _passive_cooldown_total(aid),
+			}
+	passives = next
+
+
+func get_passive_cd(ability_id: String) -> float:
+	var aid: String = ability_id.strip_edges()
+	if aid == "" or not passives.has(aid):
+		return 0.0
+	return maxf(0.0, float((passives[aid] as Dictionary).get("cd", 0.0)))
+
+
+func start_passive_cooldown(ability_id: String) -> void:
+	var aid: String = ability_id.strip_edges()
+	if aid == "" or not passives.has(aid):
+		return
+	var inst: Dictionary = passives[aid] as Dictionary
+	var cd_total: float = float(inst.get("cd_total", 0.0))
+	if cd_total <= 0.0:
+		cd_total = _passive_cooldown_total(aid)
+		inst["cd_total"] = cd_total
+	if cd_total > 0.0:
+		inst["cd"] = cd_total
+
+
+func passive_trigger_runtype(ability_id: String) -> String:
+	var ability: Dictionary = AbilityService.by_id(ability_id)
+	if ability.is_empty():
+		return ""
+	var trigger_v: Variant = ability.get("trigger", {})
+	if not trigger_v is Dictionary:
+		return ""
+	return str((trigger_v as Dictionary).get("runtype", "")).strip_edges().to_lower()
+
+
+## 按 runtype 触发战斗被动；返回已触发的 ability_id 列表。
+func try_trigger_passives(runtype: String, opponent: ZhandouObj = null) -> Array:
+	var key: String = runtype.strip_edges().to_lower()
+	if key == "":
+		return []
+	var fired: Array = []
+	for aid_v in passives.keys():
+		var aid: String = str(aid_v)
+		if passive_trigger_runtype(aid) != key:
+			continue
+		if get_passive_cd(aid) > 0.0:
+			continue
+		var runtime: Dictionary = AbilityService.to_runtime_dict(aid, {})
+		if runtime.is_empty():
+			continue
+		var target: ZhandouObj = self
+		if key == "attack" and opponent != null:
+			target = opponent
+		_apply_effects_with_routing(runtime, target)
+		start_passive_cooldown(aid)
+		fired.append(aid)
+	return fired
+
+
+## Buff 栏条目：被动常驻显示；Buff 仅 duration_left > 0 时出现。
+func build_status_bar_entries() -> Array:
+	var active: Array = []
+	var passive_keys: Array = passives.keys()
+	passive_keys.sort()
+	for aid_v in passive_keys:
+		var aid: String = str(aid_v)
+		var inst: Dictionary = passives[aid] as Dictionary
+		var cd_left: float = float(inst.get("cd", 0.0))
+		active.append({
+			"kind": "passive",
+			"id": aid,
+			"duration_left": cd_left,
+			"stacks": 1,
+			"show_time": cd_left > 0.0,
+		})
+	var buff_keys: Array = buffs.keys()
+	buff_keys.sort()
+	for bid_v in buff_keys:
+		var bid: String = str(bid_v).strip_edges()
+		if bid == "":
+			continue
+		var buff_inst_v: Variant = buffs[bid]
+		if not buff_inst_v is Dictionary:
+			continue
+		var buff_inst: Dictionary = buff_inst_v as Dictionary
+		var stacks: int = int(buff_inst.get("stacks", 0))
+		var duration_left: float = float(buff_inst.get("duration_left", 0.0))
+		if stacks <= 0 or duration_left <= 0.0:
+			continue
+		active.append({
+			"kind": "buff",
+			"id": bid,
+			"duration_left": duration_left,
+			"stacks": stacks,
+			"show_time": true,
+		})
+	return active
+
+
+func _passive_cooldown_total(ability_id: String) -> float:
+	var ability: Dictionary = AbilityService.by_id(ability_id)
+	if ability.is_empty():
+		return 0.0
+	var combat_v: Variant = ability.get("combat", {})
+	if not combat_v is Dictionary:
+		return 0.0
+	return maxf(0.0, float((combat_v as Dictionary).get("cooldown", 0.0)))
+
+
+func _tick_passive_cds(delta: float) -> void:
+	for aid_v in passives.keys():
+		var inst_v: Variant = passives[aid_v]
+		if not inst_v is Dictionary:
+			continue
+		var inst: Dictionary = inst_v as Dictionary
+		var cd: float = float(inst.get("cd", 0.0))
+		if cd <= 0.0:
+			continue
+		inst["cd"] = maxf(0.0, cd - delta)
 
 
 func get_skill_cd_at(index: int) -> float:
@@ -790,6 +983,10 @@ func _apply_effects_with_routing(cfg: Dictionary, default_target: ZhandouObj = n
 			continue
 		var eff := eff_v as Dictionary
 		var eff_type := str(eff.get("type", "")).strip_edges().to_lower()
+		if eff_type == "heal_hp":
+			eff_type = EnumCombatEffectType.LABEL_HEAL
+		elif eff_type == "restore_mana":
+			eff_type = EnumCombatEffectType.LABEL_RESTORE_MP
 		var target := _resolve_effect_target(eff, eff_type, default_target)
 		match eff_type:
 			"damage":
@@ -939,10 +1136,13 @@ func _runtime_buff_display_name(effect: Dictionary, buff_id: String) -> String:
 
 
 func _resolve_effect_target(eff: Dictionary, eff_type: String, default_target: ZhandouObj) -> ZhandouObj:
-	var target_key := str(eff.get("target", "")).strip_edges().to_lower()
-	if target_key == EnumZhandouTarget.LABEL_SELF:
+	var pair := EnumZhandouTargetArg.normalize_pair(
+		eff.get("target", ""),
+		eff.get("target_arg", eff.get("targetArg", ""))
+	)
+	if str(pair.get("target", "")) == EnumZhandouTarget.LABEL_SELF:
 		return self
-	if EnumZhandouTarget.is_hostile_label(target_key):
+	if EnumZhandouTargetArg.is_hostile_pair(str(pair.get("target", "")), str(pair.get("target_arg", ""))):
 		return default_target
 	if default_target != null:
 		return default_target if eff_type == "damage" else self

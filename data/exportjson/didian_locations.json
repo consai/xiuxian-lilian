@@ -1,0 +1,769 @@
+{
+  "qinglan_mountain": {
+    "key": "qinglan_mountain",
+    "name": "青岚山脉",
+    "subtitle": "林深雾重，灵草与妖兽并存",
+    "desc": "适合炼气期修士采集基础材料的历练地。",
+    "danger": 1,
+    "min_difficulty": 1,
+    "max_difficulty": 6,
+    "recommended_realm": "炼气一层",
+    "preview_rewards": [
+      "items_LingCao",
+      "items_YaoDan",
+      5002
+    ],
+    "tags": [
+      "resource"
+    ],
+    "monsters": [
+      "qinglan_wolf",
+      "ironback_bear",
+      "qinglan_boss"
+    ],
+    "materials": [
+      {
+        "id": "lingcao",
+        "name": "灵草",
+        "category": "herb",
+        "drop_pool": "herbs",
+        "item_ids": [
+          "items_LingCao",
+          "items_LingCao_Fine",
+          "items_LingCao_Superior"
+        ]
+      },
+      {
+        "id": "lingguo",
+        "name": "灵果",
+        "category": "fruit",
+        "drop_pool": "fruit",
+        "item_ids": [
+          "items_LingGuo",
+          "items_LingGuo_Fine",
+          "items_LingGuo_Superior"
+        ]
+      },
+      {
+        "id": "hantie",
+        "name": "寒铁",
+        "category": "ore",
+        "drop_pool": "ore",
+        "item_ids": [
+          "items_HanTie"
+        ]
+      }
+    ],
+    "drop_pools": {
+      "herbs": {
+        "entries": [
+          {
+            "kind": "item",
+            "id": "items_LingCao",
+            "material_grade": 1,
+            "min": 3,
+            "max": 5,
+            "weight": 1,
+            "variants": [
+              {
+                "id": "items_LingCao",
+                "material_grade": 1,
+                "weight": 6
+              },
+              {
+                "id": "items_LingCao_Fine",
+                "material_grade": 2,
+                "weight": 3,
+                "conditions": [
+                  {
+                    "type": "difficulty_at_least",
+                    "value": 3
+                  }
+                ]
+              },
+              {
+                "id": "items_LingCao_Superior",
+                "material_grade": 3,
+                "weight": 1,
+                "conditions": [
+                  {
+                    "type": "difficulty_at_least",
+                    "value": 5
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "ore": {
+        "entries": [
+          {
+            "kind": "item",
+            "id": "items_HanTie",
+            "material_grade": 1,
+            "min": 1,
+            "max": 2,
+            "weight": 3
+          },
+          {
+            "kind": "currency",
+            "id": "ling_stones",
+            "min": 5,
+            "max": 15,
+            "weight": 2
+          }
+        ]
+      },
+      "fruit": {
+        "entries": [
+          {
+            "kind": "item",
+            "id": "items_LingGuo",
+            "material_grade": 1,
+            "min": 1,
+            "max": 3,
+            "weight": 4,
+            "variants": [
+              {
+                "id": "items_LingGuo",
+                "material_grade": 1,
+                "weight": 5
+              },
+              {
+                "id": "items_LingGuo_Fine",
+                "material_grade": 2,
+                "weight": 2,
+                "conditions": [
+                  {
+                    "type": "difficulty_at_least",
+                    "value": 3
+                  }
+                ]
+              },
+              {
+                "id": "items_LingGuo_Superior",
+                "material_grade": 3,
+                "weight": 1,
+                "conditions": [
+                  {
+                    "type": "difficulty_at_least",
+                    "value": 5
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "item",
+            "id": "items_LingCao",
+            "min": 1,
+            "max": 2,
+            "weight": 2
+          }
+        ]
+      },
+      "cache": {
+        "entries": [
+          {
+            "kind": "currency",
+            "id": "ling_stones",
+            "min": 12,
+            "max": 30,
+            "weight": 4
+          },
+          {
+            "kind": "item",
+            "id": "items_HuiLingDan",
+            "min": 1,
+            "max": 2,
+            "weight": 2
+          },
+          {
+            "kind": "item",
+            "id": "items_HanTie",
+            "min": 1,
+            "max": 2,
+            "weight": 2
+          }
+        ]
+      },
+      "traveler": {
+        "entries": [
+          {
+            "kind": "item",
+            "id": "items_HuiQiDan",
+            "min": 1,
+            "max": 1,
+            "weight": 3
+          },
+          {
+            "kind": "currency",
+            "id": "ling_stones",
+            "min": 6,
+            "max": 16,
+            "weight": 2
+          }
+        ]
+      }
+    },
+    "event_pool": [
+      "qinglan_mountain__travel",
+      "qinglan_mountain__gather_herbs",
+      "qinglan_mountain__gather_ore",
+      "qinglan_mountain__recover_mp",
+      "qinglan_mountain__recover_hp",
+      "qinglan_mountain__local_beast",
+      "qinglan_mountain__gather_fruit",
+      "qinglan_mountain__hidden_cache",
+      "qinglan_mountain__harsh_terrain",
+      "qinglan_mountain__deep_rest",
+      "qinglan_mountain__wandering_cultivator",
+      "qinglan_mountain__local_elite",
+      "qinglan_mountain__local_boss"
+    ]
+  },
+  "wild_wolf_valley": {
+    "key": "wild_wolf_valley",
+    "name": "野狼谷",
+    "subtitle": "狼嚎穿谷，清铃观巡山旧路",
+    "desc": "青岚山外围狼患巢穴，适合炼气期修士巡山采药。",
+    "danger": 1,
+    "min_difficulty": 1,
+    "max_difficulty": 6,
+    "recommended_realm": "炼气一层",
+    "preview_rewards": [
+      "items_LingCao",
+      "items_YaoDan",
+      5002
+    ],
+    "tags": [
+      "story"
+    ],
+    "monsters": [
+      "qinglan_wolf",
+      "qinglan_serpent",
+      "qinglan_boss"
+    ],
+    "materials": [],
+    "drop_pools": {},
+    "event_pool": [
+      "qinglan_fog",
+      "qinglan_cliff",
+      "qinglan_wolf",
+      "qinglan_wolf_tracks",
+      "qinglan_injured_cultivator",
+      "qinglan_serpent",
+      "qinglan_boss"
+    ]
+  },
+  "blackwater_marsh": {
+    "key": "blackwater_marsh",
+    "name": "黑水沼泽",
+    "subtitle": "毒雾弥漫，泥沼暗藏妖兽",
+    "desc": "适合炼气三层以上修士历练的沼泽地带。",
+    "danger": 2,
+    "min_difficulty": 2,
+    "max_difficulty": 5,
+    "recommended_realm": "炼气三层",
+    "preview_rewards": [
+      "items_LingCao",
+      "items_YaoDan",
+      "items_LiaoShangDan"
+    ],
+    "tags": [
+      "resource"
+    ],
+    "monsters": [
+      "poison_marsh_serpent",
+      "rot_armor_crocodile",
+      "blackwater_boss"
+    ],
+    "materials": [
+      {
+        "id": "lingcao",
+        "name": "灵草",
+        "category": "herb",
+        "drop_pool": "herbs",
+        "item_ids": [
+          "items_LingCao",
+          "items_LingCao_Fine",
+          "items_LingCao_Superior"
+        ]
+      },
+      {
+        "id": "lingguo",
+        "name": "灵果",
+        "category": "fruit",
+        "drop_pool": "fruit",
+        "item_ids": [
+          "items_LingGuo",
+          "items_LingGuo_Fine",
+          "items_LingGuo_Superior"
+        ]
+      },
+      {
+        "id": "xuanjin",
+        "name": "玄金",
+        "category": "ore",
+        "drop_pool": "ore",
+        "item_ids": [
+          "items_HanTie",
+          "items_XuanJin"
+        ]
+      }
+    ],
+    "drop_pools": {
+      "herbs": {
+        "entries": [
+          {
+            "kind": "item",
+            "id": "items_LingCao",
+            "material_grade": 1,
+            "min": 2,
+            "max": 4,
+            "weight": 4,
+            "variants": [
+              {
+                "id": "items_LingCao",
+                "material_grade": 1,
+                "weight": 3
+              },
+              {
+                "id": "items_LingCao_Fine",
+                "material_grade": 2,
+                "weight": 4
+              },
+              {
+                "id": "items_LingCao_Superior",
+                "material_grade": 3,
+                "weight": 2,
+                "conditions": [
+                  {
+                    "type": "difficulty_at_least",
+                    "value": 4
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "item",
+            "id": "items_LingGuo",
+            "material_grade": 1,
+            "min": 1,
+            "max": 2,
+            "weight": 2,
+            "variants": [
+              {
+                "id": "items_LingGuo",
+                "material_grade": 1,
+                "weight": 3
+              },
+              {
+                "id": "items_LingGuo_Fine",
+                "material_grade": 2,
+                "weight": 3
+              },
+              {
+                "id": "items_LingGuo_Superior",
+                "material_grade": 3,
+                "weight": 1,
+                "conditions": [
+                  {
+                    "type": "difficulty_at_least",
+                    "value": 4
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "ore": {
+        "entries": [
+          {
+            "kind": "item",
+            "id": "items_HanTie",
+            "material_grade": 1,
+            "min": 1,
+            "max": 2,
+            "weight": 3,
+            "variants": [
+              {
+                "id": "items_HanTie",
+                "material_grade": 1,
+                "weight": 5
+              },
+              {
+                "id": "items_XuanJin",
+                "material_grade": 3,
+                "weight": 2,
+                "conditions": [
+                  {
+                    "type": "difficulty_at_least",
+                    "value": 4
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "currency",
+            "id": "ling_stones",
+            "min": 8,
+            "max": 20,
+            "weight": 2
+          }
+        ]
+      },
+      "fruit": {
+        "entries": [
+          {
+            "kind": "item",
+            "id": "items_LingGuo",
+            "material_grade": 1,
+            "min": 1,
+            "max": 2,
+            "weight": 3,
+            "variants": [
+              {
+                "id": "items_LingGuo",
+                "material_grade": 1,
+                "weight": 3
+              },
+              {
+                "id": "items_LingGuo_Fine",
+                "material_grade": 2,
+                "weight": 3
+              },
+              {
+                "id": "items_LingGuo_Superior",
+                "material_grade": 3,
+                "weight": 1,
+                "conditions": [
+                  {
+                    "type": "difficulty_at_least",
+                    "value": 4
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "item",
+            "id": "items_LingCao",
+            "material_grade": 1,
+            "min": 2,
+            "max": 4,
+            "weight": 2,
+            "variants": [
+              {
+                "id": "items_LingCao",
+                "material_grade": 1,
+                "weight": 3
+              },
+              {
+                "id": "items_LingCao_Fine",
+                "material_grade": 2,
+                "weight": 3
+              },
+              {
+                "id": "items_LingCao_Superior",
+                "material_grade": 3,
+                "weight": 1,
+                "conditions": [
+                  {
+                    "type": "difficulty_at_least",
+                    "value": 4
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "cache": {
+        "entries": [
+          {
+            "kind": "currency",
+            "id": "ling_stones",
+            "min": 18,
+            "max": 40,
+            "weight": 3
+          },
+          {
+            "kind": "item",
+            "id": "items_LiaoShangDan",
+            "min": 1,
+            "max": 2,
+            "weight": 2
+          },
+          {
+            "kind": "item",
+            "id": "items_XuanJin",
+            "min": 1,
+            "max": 1,
+            "weight": 1
+          }
+        ]
+      },
+      "traveler": {
+        "entries": [
+          {
+            "kind": "item",
+            "id": "items_HuiLingDan",
+            "min": 1,
+            "max": 1,
+            "weight": 3
+          },
+          {
+            "kind": "item",
+            "id": "items_LiaoShangDan",
+            "min": 1,
+            "max": 1,
+            "weight": 2
+          }
+        ]
+      }
+    },
+    "event_pool": [
+      "blackwater_marsh__travel",
+      "blackwater_marsh__gather_herbs",
+      "blackwater_marsh__gather_ore",
+      "blackwater_marsh__recover_mp",
+      "blackwater_marsh__recover_hp",
+      "blackwater_marsh__local_beast",
+      "blackwater_marsh__gather_fruit",
+      "blackwater_marsh__hidden_cache",
+      "blackwater_marsh__harsh_terrain",
+      "blackwater_marsh__deep_rest",
+      "blackwater_marsh__wandering_cultivator",
+      "blackwater_marsh__local_elite",
+      "blackwater_marsh__local_boss"
+    ]
+  },
+  "mist_hidden_valley": {
+    "key": "mist_hidden_valley",
+    "name": "雾隐溪谷",
+    "subtitle": "溪雾遮阵，筑基修士寻药试炼之地",
+    "desc": "适合筑基初期修士采集清脉药材、调查封溪残阵的野外区域。",
+    "danger": 3,
+    "min_difficulty": 4,
+    "max_difficulty": 8,
+    "recommended_realm": "筑基初期",
+    "preview_rewards": [
+      "items_MistHerb",
+      "items_ArrayCoreShard",
+      "items_QingMaiDan"
+    ],
+    "tags": [
+      "resource",
+      "foundation"
+    ],
+    "monsters": [
+      "mist_marten",
+      "vine_armor_guard",
+      "sealed_creek_boss"
+    ],
+    "materials": [
+      {
+        "id": "mist_herb",
+        "name": "雾隐草",
+        "category": "herb",
+        "drop_pool": "herbs",
+        "item_ids": [
+          "items_MistHerb",
+          "items_MistHerb_Fine"
+        ]
+      },
+      {
+        "id": "spirit_fruit",
+        "name": "灵果",
+        "category": "fruit",
+        "drop_pool": "fruit",
+        "item_ids": [
+          "items_LingGuo",
+          "items_LingGuo_Fine",
+          "items_LingGuo_Superior"
+        ]
+      },
+      {
+        "id": "array_core",
+        "name": "阵核碎片",
+        "category": "relic",
+        "drop_pool": "ore",
+        "item_ids": [
+          "items_ArrayCoreShard"
+        ]
+      }
+    ],
+    "drop_pools": {
+      "herbs": {
+        "entries": [
+          {
+            "kind": "item",
+            "id": "items_MistHerb",
+            "material_grade": 2,
+            "min": 1,
+            "max": 3,
+            "weight": 5,
+            "variants": [
+              {
+                "id": "items_MistHerb",
+                "material_grade": 2,
+                "weight": 5
+              },
+              {
+                "id": "items_MistHerb_Fine",
+                "material_grade": 3,
+                "weight": 2,
+                "conditions": [
+                  {
+                    "type": "difficulty_at_least",
+                    "value": 6
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "item",
+            "id": "items_LingCao_Superior",
+            "material_grade": 3,
+            "min": 1,
+            "max": 2,
+            "weight": 1
+          }
+        ]
+      },
+      "ore": {
+        "entries": [
+          {
+            "kind": "item",
+            "id": "items_ArrayCoreShard",
+            "material_grade": 3,
+            "min": 1,
+            "max": 1,
+            "weight": 2,
+            "conditions": [
+              {
+                "type": "difficulty_at_least",
+                "value": 6
+              }
+            ]
+          },
+          {
+            "kind": "currency",
+            "id": "ling_stones",
+            "min": 20,
+            "max": 45,
+            "weight": 3
+          }
+        ]
+      },
+      "fruit": {
+        "entries": [
+          {
+            "kind": "item",
+            "id": "items_LingGuo_Fine",
+            "material_grade": 2,
+            "min": 1,
+            "max": 2,
+            "weight": 3,
+            "variants": [
+              {
+                "id": "items_LingGuo_Fine",
+                "material_grade": 2,
+                "weight": 3
+              },
+              {
+                "id": "items_LingGuo_Superior",
+                "material_grade": 3,
+                "weight": 2,
+                "conditions": [
+                  {
+                    "type": "difficulty_at_least",
+                    "value": 6
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "item",
+            "id": "items_MistHerb",
+            "material_grade": 2,
+            "min": 1,
+            "max": 2,
+            "weight": 2
+          }
+        ]
+      },
+      "cache": {
+        "entries": [
+          {
+            "kind": "currency",
+            "id": "ling_stones",
+            "min": 30,
+            "max": 70,
+            "weight": 3
+          },
+          {
+            "kind": "item",
+            "id": "items_QingMaiDan",
+            "min": 1,
+            "max": 2,
+            "weight": 2
+          },
+          {
+            "kind": "item",
+            "id": "book_method_hunyuan_2",
+            "min": 1,
+            "max": 1,
+            "weight": 1
+          }
+        ]
+      },
+      "traveler": {
+        "entries": [
+          {
+            "kind": "item",
+            "id": "items_QingMaiDan",
+            "min": 1,
+            "max": 1,
+            "weight": 3
+          },
+          {
+            "kind": "item",
+            "id": "book_skill_blood_strike",
+            "min": 1,
+            "max": 1,
+            "weight": 1
+          }
+        ]
+      }
+    },
+    "event_pool": [
+      "mist_hidden_valley__travel",
+      "mist_hidden_valley__gather_herbs",
+      "mist_hidden_valley__gather_ore",
+      "mist_hidden_valley__recover_mp",
+      "mist_hidden_valley__recover_hp",
+      "mist_hidden_valley__local_beast",
+      "mist_hidden_valley__gather_fruit",
+      "mist_hidden_valley__hidden_cache",
+      "mist_hidden_valley__harsh_terrain",
+      "mist_hidden_valley__deep_rest",
+      "mist_hidden_valley__wandering_cultivator",
+      "mist_hidden_valley__local_elite",
+      "mist_hidden_valley__local_boss",
+      "mist_creek_chain_tracks",
+      "mist_creek_chain_fog_test",
+      "mist_creek_chain_marten_battle",
+      "mist_creek_chain_choice",
+      "mist_creek_chain_guard_elite",
+      "mist_creek_chain_seal_core"
+    ]
+  }
+}

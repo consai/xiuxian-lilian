@@ -3,8 +3,8 @@ extends SceneTree
 const StoryPlayerScript := preload("res://scripts/story/story_player.gd")
 const StoryValidatorScript := preload("res://scripts/story/story_validator.gd")
 const EnumCharacterPortraitScript := preload("res://scripts/enum/enum_character_portrait.gd")
-const STORY_PATH := "res://data/gushi/prologue_fragment.yaml"
-const TUTORIAL_STORY_PATH := "res://data/gushi/prologue_tutorial.yaml"
+const STORY_ID := "prologue_fragment"
+const TUTORIAL_STORY_ID := "prologue_tutorial"
 
 var _failures: Array[String] = []
 var _tests_run := 0
@@ -48,7 +48,7 @@ func _run_all() -> void:
 		_expect_true(StoryValidatorScript.collect_errors(story).is_empty(), "sample validation")
 	)
 	_run("tutorial story validates", func() -> void:
-		var tutorial_story := _load_story_at(TUTORIAL_STORY_PATH)
+		var tutorial_story := _load_story_at(TUTORIAL_STORY_ID)
 		_expect_true(StoryValidatorScript.collect_errors(tutorial_story).is_empty(), "tutorial validation")
 		_expect_eq(str(tutorial_story.get("entry", "")), "empty_cave", "tutorial entry")
 		var narration_count := 0
@@ -157,12 +157,11 @@ func _run_all() -> void:
 
 
 func _load_story() -> Dictionary:
-	return _load_story_at(STORY_PATH)
+	return _load_story_at(STORY_ID)
 
 
-func _load_story_at(path: String) -> Dictionary:
-	var parsed: Variant = JsonLoader._read_json_variant(path)
-	return parsed as Dictionary if parsed is Dictionary else {}
+func _load_story_at(story_id: String) -> Dictionary:
+	return JsonLoader.load_story_bundle(story_id)
 
 
 func _run(name: String, test: Callable) -> void:

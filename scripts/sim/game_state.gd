@@ -1,6 +1,6 @@
 extends Node
 
-const SIM_PATH := "res://data/moni.yaml"
+const SIM_PATH := "res://data/exportjson/moni.json"
 const HUB_SCENE := "res://scenes/sim/dongfu.tscn"
 
 const INSTABILITY_REDUCTION_PER_WIN := 10
@@ -147,7 +147,7 @@ func _bootstrap_savedata() -> void:
 func new_game() -> void:
 	DataStore.reset_all()
 	DataStore.start_tutorial()
-	var root := JsonLoader._read_json_root_object(SIM_PATH)
+	var root := JsonLoader.load_moni_bundle()
 	var initial := root.get("initial_player", {}) as Dictionary
 	day = 1
 	realm_index = 0
@@ -435,8 +435,9 @@ func _apply_liandan_brew_result(
 const CULTIVATION_MAX_YEARS := 1
 
 
+## 单次闭关最短天数（1 个游戏月）。
 func min_cultivation_days() -> int:
-	return 1
+	return GameTimeService.days_per_month()
 
 
 func max_cultivation_days_cap() -> int:
@@ -1641,7 +1642,7 @@ func _roman_knowledge_level(level: int) -> String:
 
 
 func _realms() -> Array:
-	return _simulation_root().get("realms", []) as Array
+	return RealmService.realms()
 
 
 func _realm_row(index: int) -> Dictionary:
@@ -1693,7 +1694,7 @@ func _apply_realm_row() -> void:
 	var realms := _realms()
 	var index := mini(realm_index, maxi(0, realms.size() - 1))
 	var row := _realm_row(index)
-	realm_name = str(row.get("name", "炼气一层"))
+	realm_name = str(row.get("name", "练气初期"))
 	breakthrough_at = maxi(cultivation + 100, int(row.get("breakthrough_at", 100))) if realm_index >= realms.size() else int(row.get("breakthrough_at", 100))
 
 
@@ -1709,7 +1710,7 @@ func _activity_cfg(activity_id: String) -> Dictionary:
 
 
 func _simulation_root() -> Dictionary:
-	return JsonLoader._read_json_root_object(SIM_PATH)
+	return JsonLoader.load_moni_bundle()
 
 
 func _config_manager() -> Node:

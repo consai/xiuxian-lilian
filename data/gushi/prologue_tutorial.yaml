@@ -12,7 +12,7 @@ nodes:
   jade_message:
     type: "line"
     speaker: ""
-    text: "小道观晨光正好，丹炉冷着，药架也空了些。小札第一页写着：先闭关一天，再下山看看山路。"
+    text: "小道观晨光正好，丹炉冷着，药架也空了些。小札第一页写着：先闭关一月，再下山看看山路。"
     meta:
       narration: true
     next: "master_confession"

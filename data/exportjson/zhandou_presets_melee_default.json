@@ -1,0 +1,112 @@
+{
+  "1": {
+    "key": "1",
+    "op": "stop_idle",
+    "actor": "caster",
+    "steps": null,
+    "prop": null,
+    "to": null,
+    "duration_key": null,
+    "trans_key": null,
+    "ease_key": null
+  },
+  "2": {
+    "key": "2",
+    "op": "parallel",
+    "actor": "caster",
+    "steps": [
+      {
+        "op": "tween",
+        "prop": "position",
+        "to": {
+          "anchor": "windup"
+        },
+        "duration_key": "melee.windup_duration",
+        "trans_key": "melee.windup_trans",
+        "ease_key": "melee.windup_ease"
+      },
+      {
+        "op": "tween",
+        "prop": "scale",
+        "to": {
+          "anchor": "melee_squash"
+        },
+        "duration_key": "melee.windup_duration",
+        "trans_key": "melee.windup_trans",
+        "ease_key": "melee.windup_ease"
+      }
+    ],
+    "prop": null,
+    "to": null,
+    "duration_key": null,
+    "trans_key": null,
+    "ease_key": null
+  },
+  "3": {
+    "key": "3",
+    "op": "tween",
+    "actor": "caster",
+    "steps": null,
+    "prop": "position",
+    "to": {
+      "anchor": "strike"
+    },
+    "duration_key": "melee.dash_duration",
+    "trans_key": "melee.dash_trans",
+    "ease_key": "melee.dash_ease"
+  },
+  "4": {
+    "key": "4",
+    "op": "parallel",
+    "actor": null,
+    "steps": [
+      {
+        "_comment": "施法者：恢复缩放与回静止位",
+        "op": "parallel",
+        "actor": "caster",
+        "steps": [
+          {
+            "op": "tween",
+            "prop": "scale",
+            "to": {
+              "anchor": "rest_scale"
+            },
+            "duration": 0.077,
+            "trans_key": "melee.return_trans",
+            "ease_key": "melee.return_ease"
+          },
+          {
+            "op": "tween",
+            "prop": "position",
+            "to": {
+              "anchor": "rest"
+            },
+            "duration_key": "melee.return_duration",
+            "trans_key": "melee.return_trans",
+            "ease_key": "melee.return_ease"
+          }
+        ]
+      },
+      {
+        "_comment": "目标：受击反馈（hit_default）",
+        "op": "impact"
+      }
+    ],
+    "prop": null,
+    "to": null,
+    "duration_key": null,
+    "trans_key": null,
+    "ease_key": null
+  },
+  "5": {
+    "key": "5",
+    "op": "resume_idle",
+    "actor": "caster",
+    "steps": null,
+    "prop": null,
+    "to": null,
+    "duration_key": null,
+    "trans_key": null,
+    "ease_key": null
+  }
+}

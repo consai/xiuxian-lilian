@@ -1,0 +1,353 @@
+{
+  "qinglan_wolf": {
+    "key": "qinglan_wolf",
+    "id": "qinglan_wolf",
+    "name": "青牙狼",
+    "obj": "characters/003_cutout_407x512.png",
+    "headicon": "characters/003_cutout_407x512.png",
+    "type": "beast",
+    "dropitem": [
+      [
+        "item",
+        "items_LingCao",
+        "1",
+        "3",
+        "5"
+      ],
+      [
+        "item",
+        "items_HuiQiDan",
+        "1",
+        "1",
+        "2"
+      ]
+    ],
+    "skills": [
+      1
+    ],
+    "hp_max": 75,
+    "mp_max": 30,
+    "shield": 0,
+    "physical_atk": 21,
+    "magic_atk": 22,
+    "physical_def": 16,
+    "magic_def": 19,
+    "spd": 92
+  },
+  "ironback_bear": {
+    "key": "ironback_bear",
+    "id": "ironback_bear",
+    "name": "铁背山罴",
+    "obj": "characters/005_cutout_311x512.png",
+    "headicon": "characters/005_cutout_311x512.png",
+    "type": "elite",
+    "dropitem": [
+      [
+        "item",
+        "items_LingCao",
+        "1",
+        "3",
+        "5"
+      ],
+      [
+        "item",
+        "items_HuiQiDan",
+        "1",
+        "1",
+        "2"
+      ]
+    ],
+    "skills": [
+      1
+    ],
+    "hp_max": 165,
+    "mp_max": 55,
+    "shield": 18,
+    "physical_atk": 31,
+    "magic_atk": 33,
+    "physical_def": 23,
+    "magic_def": 28,
+    "spd": 86
+  },
+  "qinglan_serpent": {
+    "key": "qinglan_serpent",
+    "id": "qinglan_serpent",
+    "name": "寒潭妖蟒",
+    "obj": "characters/006_cutout_427x512.png",
+    "headicon": "characters/006_cutout_427x512.png",
+    "type": "elite",
+    "dropitem": [
+      [
+        "item",
+        "items_LingCao",
+        "1",
+        "3",
+        "5"
+      ],
+      [
+        "item",
+        "items_HuiQiDan",
+        "1",
+        "1",
+        "2"
+      ]
+    ],
+    "skills": [
+      1
+    ],
+    "hp_max": 145,
+    "mp_max": 70,
+    "shield": 0,
+    "physical_atk": 27,
+    "magic_atk": 29,
+    "physical_def": 21,
+    "magic_def": 25,
+    "spd": 96
+  },
+  "qinglan_boss": {
+    "key": "qinglan_boss",
+    "id": "qinglan_boss",
+    "name": "赤焰妖王",
+    "obj": "characters/004_cutout_502x512.png",
+    "headicon": "characters/004_cutout_502x512.png",
+    "type": "boss",
+    "dropitem": [
+      [
+        "item",
+        "items_LingCao",
+        "1",
+        "3",
+        "5"
+      ],
+      [
+        "item",
+        "items_HuiQiDan",
+        "1",
+        "1",
+        "2"
+      ]
+    ],
+    "skills": [
+      1
+    ],
+    "hp_max": 240,
+    "mp_max": 100,
+    "shield": 0,
+    "physical_atk": 33,
+    "magic_atk": 35,
+    "physical_def": 24,
+    "magic_def": 28,
+    "spd": 105
+  },
+  "poison_marsh_serpent": {
+    "key": "poison_marsh_serpent",
+    "id": "poison_marsh_serpent",
+    "name": "毒沼蛇",
+    "obj": "characters/003_cutout_407x512.png",
+    "headicon": "characters/003_cutout_407x512.png",
+    "type": "beast",
+    "dropitem": [
+      [
+        "item",
+        "items_LingCao",
+        "1",
+        "3",
+        "5"
+      ],
+      [
+        "item",
+        "items_HuiQiDan",
+        "1",
+        "1",
+        "2"
+      ]
+    ],
+    "skills": [
+      1
+    ],
+    "hp_max": 95,
+    "mp_max": 40,
+    "shield": 0,
+    "physical_atk": 24,
+    "magic_atk": 26,
+    "physical_def": 15,
+    "magic_def": 18,
+    "spd": 98
+  },
+  "rot_armor_crocodile": {
+    "key": "rot_armor_crocodile",
+    "id": "rot_armor_crocodile",
+    "name": "腐甲鳄妖",
+    "obj": "characters/004_cutout_502x512.png",
+    "headicon": "characters/004_cutout_502x512.png",
+    "type": "elite",
+    "dropitem": [
+      [
+        "item",
+        "items_LingCao",
+        "1",
+        "3",
+        "5"
+      ],
+      [
+        "item",
+        "items_HuiQiDan",
+        "1",
+        "1",
+        "2"
+      ]
+    ],
+    "skills": [
+      1
+    ],
+    "hp_max": 190,
+    "mp_max": 70,
+    "shield": 25,
+    "physical_atk": 33,
+    "magic_atk": 35,
+    "physical_def": 25,
+    "magic_def": 30,
+    "spd": 82
+  },
+  "blackwater_boss": {
+    "key": "blackwater_boss",
+    "id": "blackwater_boss",
+    "name": "黑潭腐蛟",
+    "obj": "characters/006_cutout_427x512.png",
+    "headicon": "characters/006_cutout_427x512.png",
+    "type": "boss",
+    "dropitem": [
+      [
+        "item",
+        "items_LingCao",
+        "1",
+        "3",
+        "5"
+      ],
+      [
+        "item",
+        "items_HuiQiDan",
+        "1",
+        "1",
+        "2"
+      ]
+    ],
+    "skills": [
+      1
+    ],
+    "hp_max": 255,
+    "mp_max": 110,
+    "shield": 20,
+    "physical_atk": 36,
+    "magic_atk": 39,
+    "physical_def": 27,
+    "magic_def": 32,
+    "spd": 96
+  },
+  "mist_marten": {
+    "key": "mist_marten",
+    "id": "mist_marten",
+    "name": "雾溪灵鼬",
+    "obj": "characters/003_cutout_407x512.png",
+    "headicon": "characters/003_cutout_407x512.png",
+    "type": "beast",
+    "dropitem": [
+      [
+        "item",
+        "items_LingCao",
+        "1",
+        "3",
+        "5"
+      ],
+      [
+        "item",
+        "items_HuiQiDan",
+        "1",
+        "1",
+        "2"
+      ]
+    ],
+    "skills": [
+      1
+    ],
+    "hp_max": 145,
+    "mp_max": 75,
+    "shield": 0,
+    "physical_atk": 31,
+    "magic_atk": 33,
+    "physical_def": 22,
+    "magic_def": 26,
+    "spd": 118
+  },
+  "vine_armor_guard": {
+    "key": "vine_armor_guard",
+    "id": "vine_armor_guard",
+    "name": "藤甲守卫",
+    "obj": "characters/005_cutout_311x512.png",
+    "headicon": "characters/005_cutout_311x512.png",
+    "type": "elite",
+    "dropitem": [
+      [
+        "item",
+        "items_LingCao",
+        "1",
+        "3",
+        "5"
+      ],
+      [
+        "item",
+        "items_HuiQiDan",
+        "1",
+        "1",
+        "2"
+      ]
+    ],
+    "skills": [
+      1
+    ],
+    "hp_max": 260,
+    "mp_max": 100,
+    "shield": 36,
+    "physical_atk": 38,
+    "magic_atk": 40,
+    "physical_def": 36,
+    "magic_def": 42,
+    "spd": 82
+  },
+  "sealed_creek_boss": {
+    "key": "sealed_creek_boss",
+    "id": "sealed_creek_boss",
+    "name": "封溪阵灵",
+    "obj": "characters/006_cutout_427x512.png",
+    "headicon": "characters/006_cutout_427x512.png",
+    "type": "boss",
+    "dropitem": [
+      [
+        "item",
+        "items_LingCao",
+        "1",
+        "3",
+        "5"
+      ],
+      [
+        "item",
+        "items_HuiQiDan",
+        "1",
+        "1",
+        "2"
+      ]
+    ],
+    "skills": [
+      1,
+      2
+    ],
+    "hp_max": 380,
+    "mp_max": 150,
+    "shield": 45,
+    "physical_atk": 43,
+    "magic_atk": 48,
+    "physical_def": 38,
+    "magic_def": 46,
+    "spd": 96
+  }
+}

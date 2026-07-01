@@ -141,9 +141,8 @@ func _refresh_filter_buttons() -> void:
 
 func _skill_meta(ability: Dictionary, _runtime: Dictionary, _ability_id: String) -> String:
 	var parts: PackedStringArray = []
-	var realm := str(ability.get("realm", "")).strip_edges()
-	if realm != "":
-		parts.append("境界 %s" % DaoTreeServiceScript.realm_display_name(realm))
+	var realm_id := AbilityService.ability_realm_id(ability)
+	parts.append("境界 %s" % DaoTreeServiceScript.realm_display_name(realm_id))
 	parts.append(EnumItemTier.label(_entry_tier(ability)))
 	parts.append(EnumQuality.display_label(_entry_quality(ability)))
 	var combat_v: Variant = ability.get("combat", {})

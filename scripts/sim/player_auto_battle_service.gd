@@ -135,7 +135,7 @@ static func preset_description(preset: String) -> String:
 		_:
 			return (
 				"均衡模式下的释放逻辑：\n"
-				+ "优先按技能槽顺位施放第一个可用技能；无自定义策略时自动普攻。"
+				+ "优先按技能槽顺位施放第一个可用技能；无自定义策略时自动调息。"
 			)
 
 
@@ -188,8 +188,8 @@ static func strategy_info_text(strategy: Dictionary) -> String:
 			return "战斗道具    辅助\n按条件自动使用背包道具。"
 		"equip":
 			return "法宝    辅助\n按条件自动使用法宝。"
-		"basic":
-			return "普攻    攻击\n基础攻击，造成少量伤害。"
+		"basic", "tiaoxi":
+			return "调息    辅助\n盘膝调息，按法力恢复速度恢复灵力。"
 		_:
 			return "未知策略\n请重新配置。"
 
@@ -322,7 +322,7 @@ static func _action_label(action: Dictionary) -> String:
 			return "使用道具 %d" % (int(action.get("slot_index", 0)) + 1)
 		"equip":
 			return "使用法宝 %d" % (int(action.get("slot_index", 0)) + 1)
-		"basic":
-			return "普攻"
+		"basic", "tiaoxi":
+			return "调息"
 		_:
 			return "未知行动"

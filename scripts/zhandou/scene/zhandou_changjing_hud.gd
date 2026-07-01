@@ -155,6 +155,7 @@ func sync_from_domain(ctx: ZhandouChangjingContext) -> void:
 		ctx.domain.player.get_attr(ZhandouAttr.SHIELD),
 		ctx.domain.player.get_hp_max()
 	)
+	_sync_head_status_bars(ctx)
 	sync_enemy_header(ctx)
 	sync_player_slot(ctx)
 	sync_enemy_formation(ctx)
@@ -165,6 +166,15 @@ func sync_from_domain(ctx: ZhandouChangjingContext) -> void:
 		_set_interval_bar(_refs.interval_right, id.get("right", {}))
 	sync_skill_cooldowns(ctx)
 	sync_item_and_equip_runtime_ui(ctx)
+
+
+func _sync_head_status_bars(ctx: ZhandouChangjingContext) -> void:
+	if ctx.domain == null:
+		return
+	if _refs.buff_status_left != null:
+		_refs.buff_status_left.sync_unit(ctx.domain.player)
+	if _refs.buff_status_right != null:
+		_refs.buff_status_right.sync_unit(ctx.domain.enemy)
 
 
 func sync_player_slot(ctx: ZhandouChangjingContext) -> void:
@@ -276,8 +286,8 @@ func _resolve_enemy_intent_row(ctx: ZhandouChangjingContext, enemy_index: int) -
 				int(decision.get("skill_id", -1)),
 				"skill"
 			)
-		"basic":
-			return _build_skill_intent_row(ctx, enemy_index, 0, "basic")
+		"tiaoxi", "basic":
+			return _build_skill_intent_row(ctx, enemy_index, 0, "tiaoxi")
 		"item":
 			var unit := ctx.domain._enemy_at(enemy_index)
 			var slot := unit.get_item_slot_at(int(decision.get("slot_index", -1))) if unit != null else {}
@@ -303,7 +313,7 @@ func _resolve_enemy_intent_row(ctx: ZhandouChangjingContext, enemy_index: int) -
 				"back_color": ZhandouInitData._quality_back_color(int(equip_cfg.get("quality", 1))),
 			}
 		_:
-			return _build_skill_intent_row(ctx, enemy_index, 0, "basic")
+			return _build_skill_intent_row(ctx, enemy_index, 0, "tiaoxi")
 
 
 func _build_skill_intent_row(

@@ -1,0 +1,68 @@
+{
+  "1": {
+    "key": "1",
+    "skillId": "foundation.breathing",
+    "level": 2,
+    "effectId": "max_mana",
+    "base": 8.0,
+    "operation": "add_flat",
+    "stackGroup": "pm204_breathing_mana",
+    "stackPolicy": "add_capped",
+    "cap": 30.0
+  },
+  "2": {
+    "key": "2",
+    "skillId": "foundation.breathing",
+    "level": 4,
+    "effectId": "mana_regen",
+    "base": 0.03,
+    "operation": "add_percent",
+    "stackGroup": "pm204_breathing_regen",
+    "stackPolicy": "add_capped",
+    "cap": 0.12
+  },
+  "3": {
+    "key": "3",
+    "skillId": "spell.escape",
+    "level": 2,
+    "effectId": "evasion_window",
+    "base": 0.04,
+    "operation": "add_percent",
+    "stackGroup": "pm204_escape_evasion",
+    "stackPolicy": "add_capped",
+    "cap": 0.12
+  },
+  "4": {
+    "key": "4",
+    "skillId": "foundation.dao_base",
+    "level": 1,
+    "effectId": "max_health",
+    "base": 18.0,
+    "operation": "add_flat",
+    "stackGroup": "p3_dao_base_health",
+    "stackPolicy": "add_capped",
+    "cap": 60.0
+  },
+  "5": {
+    "key": "5",
+    "skillId": "cultivation.great_cycle",
+    "level": 2,
+    "effectId": "max_mana",
+    "base": 24.0,
+    "operation": "add_flat",
+    "stackGroup": "p3_great_cycle_mana",
+    "stackPolicy": "add_capped",
+    "cap": 90.0
+  },
+  "6": {
+    "key": "6",
+    "skillId": "body.jade",
+    "level": 1,
+    "effectId": "physical_defense",
+    "base": 0.06,
+    "operation": "add_percent",
+    "stackGroup": "p3_jade_defense",
+    "stackPolicy": "add_capped",
+    "cap": 0.18
+  }
+}

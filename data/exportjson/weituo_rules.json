@@ -1,0 +1,14 @@
+{
+  "active_limit": {
+    "key": "active_limit",
+    "value": "3 # TODO: tune after playtest; image target shows 当前委托 2/3"
+  },
+  "refresh_days": {
+    "key": "refresh_days",
+    "value": "30 # TODO: use GameTimeService cadence once implementation is allowed"
+  },
+  "board_offer_count": {
+    "key": "board_offer_count",
+    "value": "3 # 委托榜每月刷新的可接受委托数量"
+  }
+}

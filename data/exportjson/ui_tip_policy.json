@@ -1,0 +1,10 @@
+{
+  "default_dedupe_window_ms": {
+    "key": "default_dedupe_window_ms",
+    "value": 450
+  },
+  "default_throttle_ms": {
+    "key": "default_throttle_ms",
+    "value": 160
+  }
+}

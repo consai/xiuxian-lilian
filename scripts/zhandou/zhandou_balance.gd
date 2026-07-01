@@ -12,6 +12,9 @@ const INTERVAL_MAX_SEC := 12.0
 const SPD_FLOOR := 1.0
 const ACTION_PROGRESS_MAX := 100.0
 
+## 调息一次恢复的法力 = mp_regen × 本倍率（与属性面板「法力恢复」同单位）。
+const TIAOXI_MP_REGEN_MULTIPLIER := 5.0
+
 
 static func interval_cap_from_spd(spd: float) -> float:
 	var t := INTERVAL_BASE_SEC * SPD_REF / maxf(SPD_FLOOR, spd)

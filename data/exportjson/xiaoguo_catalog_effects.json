@@ -1,0 +1,1826 @@
+{
+  "activation_speed": {
+    "id": "activation_speed",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 activation_speed，具体结算由 Godot 运行时映射。"
+  },
+  "alchemy_success": {
+    "id": "alchemy_success",
+    "category": "production",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 alchemy_success，具体结算由 Godot 运行时映射。"
+  },
+  "all_efficiency": {
+    "id": "all_efficiency",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 all_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "all_resistance": {
+    "id": "all_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 all_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "all_spell_efficiency": {
+    "id": "all_spell_efficiency",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 all_spell_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "ally_healing": {
+    "id": "ally_healing",
+    "category": "survival",
+    "defaultTarget": "allies",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 ally_healing，具体结算由 Godot 运行时映射。"
+  },
+  "ambient_qi_absorption": {
+    "id": "ambient_qi_absorption",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 ambient_qi_absorption，具体结算由 Godot 运行时映射。"
+  },
+  "appraisal_accuracy": {
+    "id": "appraisal_accuracy",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 appraisal_accuracy，具体结算由 Godot 运行时映射。"
+  },
+  "armor_pierce": {
+    "id": "armor_pierce",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 armor_pierce，具体结算由 Godot 运行时映射。"
+  },
+  "array_duration": {
+    "id": "array_duration",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 array_duration"
+  },
+  "artifact_autonomy": {
+    "id": "artifact_autonomy",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 artifact_autonomy，具体结算由 Godot 运行时映射。"
+  },
+  "artifact_power": {
+    "id": "artifact_power",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 artifact_power，具体结算由 Godot 运行时映射。"
+  },
+  "artifact_tribulation_success": {
+    "id": "artifact_tribulation_success",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 artifact_tribulation_success，具体结算由 Godot 运行时映射。"
+  },
+  "ascension_failure_protection": {
+    "id": "ascension_failure_protection",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 ascension_failure_protection，具体结算由 Godot 运行时映射。"
+  },
+  "ascension_route_capacity": {
+    "id": "ascension_route_capacity",
+    "category": "exploration",
+    "defaultTarget": "world",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 ascension_route_capacity，具体结算由 Godot 运行时映射。"
+  },
+  "ascension_route_stability": {
+    "id": "ascension_route_stability",
+    "category": "exploration",
+    "defaultTarget": "world",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 ascension_route_stability，具体结算由 Godot 运行时映射。"
+  },
+  "ascension_stability": {
+    "id": "ascension_stability",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 ascension_stability，具体结算由 Godot 运行时映射。"
+  },
+  "ascension_success": {
+    "id": "ascension_success",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 ascension_success，具体结算由 Godot 运行时映射。"
+  },
+  "beast_capacity": {
+    "id": "beast_capacity",
+    "category": "general",
+    "defaultTarget": "self",
+    "valueType": "flat",
+    "defaultStackPolicy": "highest",
+    "description": "统一效果属性 beast_capacity"
+  },
+  "beast_contract_capacity": {
+    "id": "beast_contract_capacity",
+    "category": "control",
+    "defaultTarget": "controlled_entity",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 beast_contract_capacity，具体结算由 Godot 运行时映射。"
+  },
+  "beast_growth": {
+    "id": "beast_growth",
+    "category": "governance",
+    "defaultTarget": "controlled_entity",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 beast_growth，具体结算由 Godot 运行时映射。"
+  },
+  "beast_power": {
+    "id": "beast_power",
+    "category": "governance",
+    "defaultTarget": "controlled_entity",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 beast_power，具体结算由 Godot 运行时映射。"
+  },
+  "bloodline_output": {
+    "id": "bloodline_output",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 bloodline_output，具体结算由 Godot 运行时映射。"
+  },
+  "bloodline_stability": {
+    "id": "bloodline_stability",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 bloodline_stability，具体结算由 Godot 运行时映射。"
+  },
+  "body_energy_efficiency": {
+    "id": "body_energy_efficiency",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 body_energy_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "breakthrough_success": {
+    "id": "breakthrough_success",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 breakthrough_success，具体结算由 Godot 运行时映射。"
+  },
+  "delay_special_action_chance": {
+    "id": "delay_special_action_chance",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "延后敌方下一次特殊行动的概率。"
+  },
+  "cast_speed": {
+    "id": "cast_speed",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 cast_speed，具体结算由 Godot 运行时映射。"
+  },
+  "causality_detection": {
+    "id": "causality_detection",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 causality_detection，具体结算由 Godot 运行时映射。"
+  },
+  "causality_resistance": {
+    "id": "causality_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 causality_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "cave_heaven_growth": {
+    "id": "cave_heaven_growth",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 cave_heaven_growth，具体结算由 Godot 运行时映射。"
+  },
+  "combat_mp_restore_2s": {
+    "id": "combat_mp_restore_2s",
+    "category": "combat",
+    "defaultTarget": "self",
+    "valueType": "flat",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 combat_mp_restore_2s，具体结算由 Godot 运行时映射。"
+  },
+  "command_duration": {
+    "id": "command_duration",
+    "category": "combat",
+    "defaultTarget": "controlled_entity",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 command_duration"
+  },
+  "contract_power": {
+    "id": "contract_power",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 contract_power，具体结算由 Godot 运行时映射。"
+  },
+  "control_duration": {
+    "id": "control_duration",
+    "category": "combat",
+    "defaultTarget": "enemy",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 control_duration"
+  },
+  "control_resist": {
+    "id": "control_resist",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "战斗被动控制抗性"
+  },
+  "control_resistance": {
+    "id": "control_resistance",
+    "category": "combat",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 control_resistance"
+  },
+  "controlled_entity_damage": {
+    "id": "controlled_entity_damage",
+    "category": "combat",
+    "defaultTarget": "controlled_entity",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 controlled_entity_damage"
+  },
+  "craft_quality": {
+    "id": "craft_quality",
+    "category": "production",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 craft_quality，具体结算由 Godot 运行时映射。"
+  },
+  "cultivation_speed": {
+    "id": "cultivation_speed",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 cultivation_speed，具体结算由 Godot 运行时映射。"
+  },
+  "cultivation_stability": {
+    "id": "cultivation_stability",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 cultivation_stability，具体结算由 Godot 运行时映射。"
+  },
+  "curse_power": {
+    "id": "curse_power",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 curse_power，具体结算由 Godot 运行时映射。"
+  },
+  "curse_resistance": {
+    "id": "curse_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 curse_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "damage": {
+    "id": "damage",
+    "category": "combat",
+    "defaultTarget": "enemy",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一伤害（不分属性）"
+  },
+  "damage_elemental": {
+    "id": "damage_elemental",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 damage_elemental"
+  },
+  "damage_law": {
+    "id": "damage_law",
+    "category": "combat",
+    "defaultTarget": "line",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 damage_law"
+  },
+  "damage_law_area": {
+    "id": "damage_law_area",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 damage_law_area"
+  },
+  "damage_over_time": {
+    "id": "damage_over_time",
+    "category": "combat",
+    "defaultTarget": "enemy",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "持续伤害（v1 仅占位）"
+  },
+  "damage_physical": {
+    "id": "damage_physical",
+    "category": "combat",
+    "defaultTarget": "enemy",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 damage_physical"
+  },
+  "damage_physical_area": {
+    "id": "damage_physical_area",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 damage_physical_area"
+  },
+  "damage_spirit": {
+    "id": "damage_spirit",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 damage_spirit"
+  },
+  "damage_spirit_over_time": {
+    "id": "damage_spirit_over_time",
+    "category": "combat",
+    "defaultTarget": "enemy",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 damage_spirit_over_time"
+  },
+  "damage_spirit_sword": {
+    "id": "damage_spirit_sword",
+    "category": "combat",
+    "defaultTarget": "enemy",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 damage_spirit_sword"
+  },
+  "damage_spiritual": {
+    "id": "damage_spiritual",
+    "category": "combat",
+    "defaultTarget": "enemy",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 damage_spiritual"
+  },
+  "damage_sword": {
+    "id": "damage_sword",
+    "category": "combat",
+    "defaultTarget": "enemy",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 damage_sword"
+  },
+  "damage_sword_area": {
+    "id": "damage_sword_area",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 damage_sword_area"
+  },
+  "damage_thunder": {
+    "id": "damage_thunder",
+    "category": "combat",
+    "defaultTarget": "enemy",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 damage_thunder"
+  },
+  "damage_tribulation": {
+    "id": "damage_tribulation",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 damage_tribulation"
+  },
+  "damage_void": {
+    "id": "damage_void",
+    "category": "combat",
+    "defaultTarget": "line",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 damage_void"
+  },
+  "damage_bonus": {
+    "id": "damage_bonus",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "统一效果属性 damage_bonus"
+  },
+  "danger_warning": {
+    "id": "danger_warning",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 danger_warning，具体结算由 Godot 运行时映射。"
+  },
+  "dao_artifact_stability": {
+    "id": "dao_artifact_stability",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 dao_artifact_stability，具体结算由 Godot 运行时映射。"
+  },
+  "dao_heart_stability": {
+    "id": "dao_heart_stability",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 dao_heart_stability，具体结算由 Godot 运行时映射。"
+  },
+  "dao_sword_power": {
+    "id": "dao_sword_power",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 dao_sword_power，具体结算由 Godot 运行时映射。"
+  },
+  "dash_distance": {
+    "id": "dash_distance",
+    "category": "combat",
+    "defaultTarget": "self",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 dash_distance"
+  },
+  "decree_power": {
+    "id": "decree_power",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 decree_power，具体结算由 Godot 运行时映射。"
+  },
+  "deviation_resistance": {
+    "id": "deviation_resistance",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 deviation_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "dharma_form_power": {
+    "id": "dharma_form_power",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 dharma_form_power，具体结算由 Godot 运行时映射。"
+  },
+  "domain_damage": {
+    "id": "domain_damage",
+    "category": "offense",
+    "defaultTarget": "area",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 domain_damage，具体结算由 Godot 运行时映射。"
+  },
+  "domain_range": {
+    "id": "domain_range",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 domain_range，具体结算由 Godot 运行时映射。"
+  },
+  "domain_resistance": {
+    "id": "domain_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 domain_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "dream_infiltration": {
+    "id": "dream_infiltration",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 dream_infiltration，具体结算由 Godot 运行时映射。"
+  },
+  "dream_power": {
+    "id": "dream_power",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 dream_power，具体结算由 Godot 运行时映射。"
+  },
+  "element_control": {
+    "id": "element_control",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 element_control，具体结算由 Godot 运行时映射。"
+  },
+  "element_conversion": {
+    "id": "element_conversion",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 element_conversion，具体结算由 Godot 运行时映射。"
+  },
+  "elemental_vulnerability": {
+    "id": "elemental_vulnerability",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 elemental_vulnerability"
+  },
+  "enemy_all_resistance": {
+    "id": "enemy_all_resistance",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 enemy_all_resistance"
+  },
+  "enemy_special_action_slow": {
+    "id": "enemy_special_action_slow",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "降低敌方特殊行动循环速度。"
+  },
+  "enemy_law_resistance": {
+    "id": "enemy_law_resistance",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 enemy_law_resistance"
+  },
+  "enemy_slow": {
+    "id": "enemy_slow",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 enemy_slow"
+  },
+  "environment_spell_bonus": {
+    "id": "environment_spell_bonus",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 environment_spell_bonus，具体结算由 Godot 运行时映射。"
+  },
+  "escape_success": {
+    "id": "escape_success",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 escape_success，具体结算由 Godot 运行时映射。"
+  },
+  "evasion_window": {
+    "id": "evasion_window",
+    "category": "combat",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "战斗内短时提升出手速度"
+  },
+  "evil_bane": {
+    "id": "evil_bane",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 evil_bane，具体结算由 Godot 运行时映射。"
+  },
+  "lilian_capacity": {
+    "id": "lilian_capacity",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 lilian_capacity，具体结算由 Godot 运行时映射。"
+  },
+  "exploration_safety": {
+    "id": "exploration_safety",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 exploration_safety，具体结算由 Godot 运行时映射。"
+  },
+  "fatal_recovery_chance": {
+    "id": "fatal_recovery_chance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 fatal_recovery_chance，具体结算由 Godot 运行时映射。"
+  },
+  "fatal_resistance": {
+    "id": "fatal_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 fatal_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "formation_damage": {
+    "id": "formation_damage",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 formation_damage，具体结算由 Godot 运行时映射。"
+  },
+  "formation_power": {
+    "id": "formation_power",
+    "category": "production",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 formation_power，具体结算由 Godot 运行时映射。"
+  },
+  "formation_setup_speed": {
+    "id": "formation_setup_speed",
+    "category": "general",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "统一效果属性 formation_setup_speed"
+  },
+  "gather_speed": {
+    "id": "gather_speed",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 gather_speed，具体结算由 Godot 运行时映射。"
+  },
+  "gather_yield": {
+    "id": "gather_yield",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 gather_yield，具体结算由 Godot 运行时映射。"
+  },
+  "governance_efficiency": {
+    "id": "governance_efficiency",
+    "category": "governance",
+    "defaultTarget": "faction",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 governance_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "healing_domain": {
+    "id": "healing_domain",
+    "category": "survival",
+    "defaultTarget": "area",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 healing_domain，具体结算由 Godot 运行时映射。"
+  },
+  "healing_power": {
+    "id": "healing_power",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 healing_power，具体结算由 Godot 运行时映射。"
+  },
+  "healing_reduction": {
+    "id": "healing_reduction",
+    "category": "combat",
+    "defaultTarget": "enemy",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 healing_reduction"
+  },
+  "health_cost": {
+    "id": "health_cost",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 health_cost，具体结算由 Godot 运行时映射。"
+  },
+  "heal_hp": {
+    "id": "heal_hp",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "气血恢复"
+  },
+  "health_regen": {
+    "id": "health_regen",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 health_regen，具体结算由 Godot 运行时映射。"
+  },
+  "heart_tribulation_insight": {
+    "id": "heart_tribulation_insight",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 heart_tribulation_insight，具体结算由 Godot 运行时映射。"
+  },
+  "heart_tribulation_resistance": {
+    "id": "heart_tribulation_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 heart_tribulation_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "herb_yield": {
+    "id": "herb_yield",
+    "category": "production",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 herb_yield，具体结算由 Godot 运行时映射。"
+  },
+  "hostile_energy_conversion": {
+    "id": "hostile_energy_conversion",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 hostile_energy_conversion，具体结算由 Godot 运行时映射。"
+  },
+  "immortal_artifact_power": {
+    "id": "immortal_artifact_power",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 immortal_artifact_power，具体结算由 Godot 运行时映射。"
+  },
+  "immortal_qi_conversion": {
+    "id": "immortal_qi_conversion",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 immortal_qi_conversion，具体结算由 Godot 运行时映射。"
+  },
+  "immortal_recovery": {
+    "id": "immortal_recovery",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 immortal_recovery，具体结算由 Godot 运行时映射。"
+  },
+  "hp_regen": {
+    "id": "hp_regen",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "战斗被动气血回复"
+  },
+  "injury_diagnosis": {
+    "id": "injury_diagnosis",
+    "category": "general",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "统一效果属性 injury_diagnosis"
+  },
+  "injury_recovery": {
+    "id": "injury_recovery",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 injury_recovery，具体结算由 Godot 运行时映射。"
+  },
+  "inner_demon_resistance": {
+    "id": "inner_demon_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 inner_demon_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "inscription_success": {
+    "id": "inscription_success",
+    "category": "production",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 inscription_success，具体结算由 Godot 运行时映射。"
+  },
+  "karma_resistance": {
+    "id": "karma_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 karma_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "knockdown_duration": {
+    "id": "knockdown_duration",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 knockdown_duration"
+  },
+  "law_compatibility": {
+    "id": "law_compatibility",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 law_compatibility，具体结算由 Godot 运行时映射。"
+  },
+  "law_pierce": {
+    "id": "law_pierce",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 law_pierce，具体结算由 Godot 运行时映射。"
+  },
+  "law_power": {
+    "id": "law_power",
+    "category": "combat",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 law_power"
+  },
+  "law_resistance": {
+    "id": "law_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 law_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "law_seed_growth": {
+    "id": "law_seed_growth",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 law_seed_growth，具体结算由 Godot 运行时映射。"
+  },
+  "law_spell_efficiency": {
+    "id": "law_spell_efficiency",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 law_spell_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "law_spell_power": {
+    "id": "law_spell_power",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 law_spell_power，具体结算由 Godot 运行时映射。"
+  },
+  "law_suppression": {
+    "id": "law_suppression",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 law_suppression"
+  },
+  "life_bound_sync": {
+    "id": "life_bound_sync",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 life_bound_sync，具体结算由 Godot 运行时映射。"
+  },
+  "lifespan_efficiency": {
+    "id": "lifespan_efficiency",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 lifespan_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "lightning_chain_count": {
+    "id": "lightning_chain_count",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 lightning_chain_count，具体结算由 Godot 运行时映射。"
+  },
+  "low_health_damage": {
+    "id": "low_health_damage",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 low_health_damage，具体结算由 Godot 运行时映射。"
+  },
+  "mana_control": {
+    "id": "mana_control",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 mana_control，具体结算由 Godot 运行时映射。"
+  },
+  "mana_efficiency": {
+    "id": "mana_efficiency",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 mana_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "magic_def": {
+    "id": "magic_def",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "战斗被动法术防御"
+  },
+  "mana_regen": {
+    "id": "mana_regen",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 mana_regen，具体结算由 Godot 运行时映射。"
+  },
+  "material_efficiency": {
+    "id": "material_efficiency",
+    "category": "production",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 material_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "max_hp": {
+    "id": "max_hp",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "气血上限加成"
+  },
+  "max_health": {
+    "id": "max_health",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 max_health，具体结算由 Godot 运行时映射。"
+  },
+  "max_mana": {
+    "id": "max_mana",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 max_mana，具体结算由 Godot 运行时映射。"
+  },
+  "medicine_efficiency": {
+    "id": "medicine_efficiency",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 medicine_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "melee_damage": {
+    "id": "melee_damage",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 melee_damage，具体结算由 Godot 运行时映射。"
+  },
+  "mental_resistance": {
+    "id": "mental_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 mental_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "multi_sword_count": {
+    "id": "multi_sword_count",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 multi_sword_count，具体结算由 Godot 运行时映射。"
+  },
+  "parallel_action_efficiency": {
+    "id": "parallel_action_efficiency",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 parallel_action_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "physical_def": {
+    "id": "physical_def",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "战斗被动物理防御"
+  },
+  "physical_resistance": {
+    "id": "physical_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 physical_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "pill_quality": {
+    "id": "pill_quality",
+    "category": "production",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 pill_quality，具体结算由 Godot 运行时映射。"
+  },
+  "pill_tribulation_resistance": {
+    "id": "pill_tribulation_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 pill_tribulation_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "poison_duration": {
+    "id": "poison_duration",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 poison_duration，具体结算由 Godot 运行时映射。"
+  },
+  "poison_power": {
+    "id": "poison_power",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 poison_power，具体结算由 Godot 运行时映射。"
+  },
+  "poison_resistance": {
+    "id": "poison_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 poison_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "puppet_capacity": {
+    "id": "puppet_capacity",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 puppet_capacity，具体结算由 Godot 运行时映射。"
+  },
+  "puppet_power": {
+    "id": "puppet_power",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 puppet_power，具体结算由 Godot 运行时映射。"
+  },
+  "rare_find_chance": {
+    "id": "rare_find_chance",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 rare_find_chance，具体结算由 Godot 运行时映射。"
+  },
+  "rare_herb_yield": {
+    "id": "rare_herb_yield",
+    "category": "production",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 rare_herb_yield，具体结算由 Godot 运行时映射。"
+  },
+  "regeneration_speed": {
+    "id": "regeneration_speed",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 regeneration_speed，具体结算由 Godot 运行时映射。"
+  },
+  "remote_control_range": {
+    "id": "remote_control_range",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 remote_control_range，具体结算由 Godot 运行时映射。"
+  },
+  "resource_conversion": {
+    "id": "resource_conversion",
+    "category": "cultivation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 resource_conversion，具体结算由 Godot 运行时映射。"
+  },
+  "restore_mana": {
+    "id": "restore_mana",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "法力恢复"
+  },
+  "resurrection_cost_reduction": {
+    "id": "resurrection_cost_reduction",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 resurrection_cost_reduction，具体结算由 Godot 运行时映射。"
+  },
+  "route_discovery": {
+    "id": "route_discovery",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 route_discovery，具体结算由 Godot 运行时映射。"
+  },
+  "seal_power": {
+    "id": "seal_power",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 seal_power，具体结算由 Godot 运行时映射。"
+  },
+  "settlement_output": {
+    "id": "settlement_output",
+    "category": "governance",
+    "defaultTarget": "faction",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 settlement_output，具体结算由 Godot 运行时映射。"
+  },
+  "shield": {
+    "id": "shield",
+    "category": "combat",
+    "defaultTarget": "self",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一护盾（不分属性）"
+  },
+  "shield_spiritual": {
+    "id": "shield_spiritual",
+    "category": "combat",
+    "defaultTarget": "self",
+    "valueType": "flat",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 shield_spiritual"
+  },
+  "ship_performance": {
+    "id": "ship_performance",
+    "category": "exploration",
+    "defaultTarget": "controlled_entity",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 ship_performance，具体结算由 Godot 运行时映射。"
+  },
+  "soul_healing": {
+    "id": "soul_healing",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 soul_healing，具体结算由 Godot 运行时映射。"
+  },
+  "soul_recovery": {
+    "id": "soul_recovery",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 soul_recovery，具体结算由 Godot 运行时映射。"
+  },
+  "soul_resistance": {
+    "id": "soul_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 soul_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "space_pierce": {
+    "id": "space_pierce",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 space_pierce，具体结算由 Godot 运行时映射。"
+  },
+  "space_stability": {
+    "id": "space_stability",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 space_stability，具体结算由 Godot 运行时映射。"
+  },
+  "spell_damage": {
+    "id": "spell_damage",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 spell_damage，具体结算由 Godot 运行时映射。"
+  },
+  "spell_domain": {
+    "id": "spell_domain",
+    "category": "control",
+    "defaultTarget": "area",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 spell_domain，具体结算由 Godot 运行时映射。"
+  },
+  "spell_suppression": {
+    "id": "spell_suppression",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 spell_suppression，具体结算由 Godot 运行时映射。"
+  },
+  "spirit_power": {
+    "id": "spirit_power",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 spirit_power，具体结算由 Godot 运行时映射。"
+  },
+  "spirit_sense_range": {
+    "id": "spirit_sense_range",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 spirit_sense_range，具体结算由 Godot 运行时映射。"
+  },
+  "spirit_suppression": {
+    "id": "spirit_suppression",
+    "category": "combat",
+    "defaultTarget": "enemy",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 spirit_suppression"
+  },
+  "spirit_vein_detection": {
+    "id": "spirit_vein_detection",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 spirit_vein_detection，具体结算由 Godot 运行时映射。"
+  },
+  "spiritual_resistance": {
+    "id": "spiritual_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 spiritual_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "split_mind_capacity": {
+    "id": "split_mind_capacity",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 split_mind_capacity，具体结算由 Godot 运行时映射。"
+  },
+  "stagger_power": {
+    "id": "stagger_power",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 stagger_power，具体结算由 Godot 运行时映射。"
+  },
+  "stagger_resistance": {
+    "id": "stagger_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 stagger_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "stamina": {
+    "id": "stamina",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 stamina，具体结算由 Godot 运行时映射。"
+  },
+  "star_array_output": {
+    "id": "star_array_output",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 star_array_output，具体结算由 Godot 运行时映射。"
+  },
+  "stun_chance": {
+    "id": "stun_chance",
+    "category": "combat",
+    "defaultTarget": "enemy",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 stun_chance"
+  },
+  "sustained_cast_efficiency": {
+    "id": "sustained_cast_efficiency",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 sustained_cast_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "sword_attack_speed": {
+    "id": "sword_attack_speed",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 sword_attack_speed，具体结算由 Godot 运行时映射。"
+  },
+  "sword_control": {
+    "id": "sword_control",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 sword_control，具体结算由 Godot 运行时映射。"
+  },
+  "sword_damage": {
+    "id": "sword_damage",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 sword_damage，具体结算由 Godot 运行时映射。"
+  },
+  "sword_domain": {
+    "id": "sword_domain",
+    "category": "control",
+    "defaultTarget": "area",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 sword_domain，具体结算由 Godot 运行时映射。"
+  },
+  "sword_formation_control": {
+    "id": "sword_formation_control",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 sword_formation_control，具体结算由 Godot 运行时映射。"
+  },
+  "sword_intent_power": {
+    "id": "sword_intent_power",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 sword_intent_power，具体结算由 Godot 运行时映射。"
+  },
+  "talisman_activation_speed": {
+    "id": "talisman_activation_speed",
+    "category": "general",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "统一效果属性 talisman_activation_speed"
+  },
+  "talisman_capacity": {
+    "id": "talisman_capacity",
+    "category": "production",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 talisman_capacity，具体结算由 Godot 运行时映射。"
+  },
+  "talisman_cost_efficiency": {
+    "id": "talisman_cost_efficiency",
+    "category": "production",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 talisman_cost_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "talisman_quality": {
+    "id": "talisman_quality",
+    "category": "general",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "统一效果属性 talisman_quality"
+  },
+  "teleport_stability": {
+    "id": "teleport_stability",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 teleport_stability，具体结算由 Godot 运行时映射。"
+  },
+  "thunder_damage": {
+    "id": "thunder_damage",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 thunder_damage，具体结算由 Godot 运行时映射。"
+  },
+  "trade_profit": {
+    "id": "trade_profit",
+    "category": "governance",
+    "defaultTarget": "faction",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 trade_profit，具体结算由 Godot 运行时映射。"
+  },
+  "travel_efficiency": {
+    "id": "travel_efficiency",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 travel_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_control": {
+    "id": "tribulation_control",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 tribulation_control，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_damage": {
+    "id": "tribulation_damage",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 tribulation_damage，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_energy_absorption": {
+    "id": "tribulation_energy_absorption",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 tribulation_energy_absorption，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_forecast": {
+    "id": "tribulation_forecast",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 tribulation_forecast，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_mark": {
+    "id": "tribulation_mark",
+    "category": "combat",
+    "defaultTarget": "area",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 tribulation_mark"
+  },
+  "tribulation_plan_slots": {
+    "id": "tribulation_plan_slots",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 tribulation_plan_slots，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_recovery": {
+    "id": "tribulation_recovery",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 tribulation_recovery，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_resistance": {
+    "id": "tribulation_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 tribulation_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_resource_efficiency": {
+    "id": "tribulation_resource_efficiency",
+    "category": "tribulation",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 tribulation_resource_efficiency，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_sever": {
+    "id": "tribulation_sever",
+    "category": "offense",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 tribulation_sever，具体结算由 Godot 运行时映射。"
+  },
+  "tribulation_warning_time": {
+    "id": "tribulation_warning_time",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 tribulation_warning_time，具体结算由 Godot 运行时映射。"
+  },
+  "true_name_accuracy": {
+    "id": "true_name_accuracy",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 true_name_accuracy，具体结算由 Godot 运行时映射。"
+  },
+  "true_name_power": {
+    "id": "true_name_power",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 true_name_power，具体结算由 Godot 运行时映射。"
+  },
+  "void_herb_growth": {
+    "id": "void_herb_growth",
+    "category": "production",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 void_herb_growth，具体结算由 Godot 运行时映射。"
+  },
+  "void_mobility": {
+    "id": "void_mobility",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 void_mobility，具体结算由 Godot 运行时映射。"
+  },
+  "void_resistance": {
+    "id": "void_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 void_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "void_route_safety": {
+    "id": "void_route_safety",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 void_route_safety，具体结算由 Godot 运行时映射。"
+  },
+  "void_ship_range": {
+    "id": "void_ship_range",
+    "category": "control",
+    "defaultTarget": "controlled_entity",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 void_ship_range，具体结算由 Godot 运行时映射。"
+  },
+  "void_spell_accuracy": {
+    "id": "void_spell_accuracy",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 void_spell_accuracy，具体结算由 Godot 运行时映射。"
+  },
+  "void_survival": {
+    "id": "void_survival",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 void_survival，具体结算由 Godot 运行时映射。"
+  },
+  "void_target_accuracy": {
+    "id": "void_target_accuracy",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 void_target_accuracy，具体结算由 Godot 运行时映射。"
+  },
+  "void_travel_speed": {
+    "id": "void_travel_speed",
+    "category": "general",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "统一效果属性 void_travel_speed"
+  },
+  "weakness_detection": {
+    "id": "weakness_detection",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 weakness_detection，具体结算由 Godot 运行时映射。"
+  },
+  "weapon_damage": {
+    "id": "weapon_damage",
+    "category": "combat",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "统一效果属性 weapon_damage"
+  },
+  "weapon_durability": {
+    "id": "weapon_durability",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "ability_instance",
+    "description": "战斗被动兵刃耐久"
+  },
+  "weapon_loss_resistance": {
+    "id": "weapon_loss_resistance",
+    "category": "survival",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 weapon_loss_resistance，具体结算由 Godot 运行时映射。"
+  },
+  "weather_control": {
+    "id": "weather_control",
+    "category": "control",
+    "defaultTarget": "area",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 weather_control，具体结算由 Godot 运行时映射。"
+  },
+  "weather_warning": {
+    "id": "weather_warning",
+    "category": "exploration",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 weather_warning，具体结算由 Godot 运行时映射。"
+  },
+  "world_artifact_power": {
+    "id": "world_artifact_power",
+    "category": "production",
+    "defaultTarget": "controlled_entity",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 world_artifact_power，具体结算由 Godot 运行时映射。"
+  },
+  "world_ecology_stability": {
+    "id": "world_ecology_stability",
+    "category": "governance",
+    "defaultTarget": "world",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 world_ecology_stability，具体结算由 Godot 运行时映射。"
+  },
+  "world_growth": {
+    "id": "world_growth",
+    "category": "governance",
+    "defaultTarget": "world",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 world_growth，具体结算由 Godot 运行时映射。"
+  },
+  "world_spell_duration": {
+    "id": "world_spell_duration",
+    "category": "control",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 world_spell_duration，具体结算由 Godot 运行时映射。"
+  },
+  "world_spell_power": {
+    "id": "world_spell_power",
+    "category": "utility",
+    "defaultTarget": "self",
+    "valueType": "ratio",
+    "defaultStackPolicy": "highest",
+    "description": "功法效果属性 world_spell_power，具体结算由 Godot 运行时映射。"
+  }
+}

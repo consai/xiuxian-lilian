@@ -42,7 +42,7 @@ func apply_slot(
 	visible = unit != null
 	if unit == null:
 		if _buff_status != null:
-			_buff_status.sync_buffs({})
+			_buff_status.sync_unit(null)
 		return
 	var enabled := active and not dead
 	modulate = Color(1, 1, 1, 1) if enabled else Color(0.66, 0.66, 0.66, 0.72)
@@ -58,7 +58,7 @@ func apply_slot(
 		var name_text := str(row_data.get("name", "敌人")).strip_edges()
 		name_label.text = name_text if name_text != "" else "敌人"
 	if _buff_status != null:
-		_buff_status.sync_buffs(unit.buffs)
+		_buff_status.sync_unit(unit)
 	_apply_intent(intent_row, enabled)
 
 
@@ -86,6 +86,14 @@ func _apply_intent(intent_row: Dictionary, enabled: bool) -> void:
 			_intent_icon.visible = true
 			if _intent_damage != null:
 				_intent_damage.visible = false
+		"mp_gain":
+			_intent_badge.visible = true
+			_intent_icon.visible = false
+			if _intent_damage != null:
+				var mp_gain := int(intent_row.get("estimated_mp_gain", 0))
+				_intent_damage.visible = mp_gain > 0
+				if mp_gain > 0:
+					_intent_damage.text = "+%d" % mp_gain
 		_:
 			var fallback_icon_v: Variant = intent_row.get("icon")
 			if fallback_icon_v is Texture2D:

@@ -1,0 +1,157 @@
+{
+  "max_level": {
+    "key": "max_level",
+    "value": 90,
+    "base": null,
+    "per_level_all": null,
+    "major_realm_pulse": null,
+    "formula": null,
+    "foundation_points_per_level": null,
+    "point_value": null,
+    "resonance_all_foundations": null,
+    "expected_avg_gain_per_foundation": null,
+    "foundation_avg_gain": null,
+    "combat_power_jump_target": null,
+    "qualitative_unlocks": null,
+    "realm_flat_index": null,
+    "combat_attrs": null
+  },
+  "major_realm_starts": {
+    "key": "major_realm_starts",
+    "value": [
+      {
+        "level": 1,
+        "id": "qi",
+        "name": "炼气"
+      },
+      {
+        "level": 10,
+        "id": "foundation",
+        "name": "筑基"
+      },
+      {
+        "level": 20,
+        "id": "core",
+        "name": "金丹"
+      },
+      {
+        "level": 30,
+        "id": "nascent",
+        "name": "元婴"
+      },
+      {
+        "level": 40,
+        "id": "transform",
+        "name": "化神"
+      },
+      {
+        "level": 50,
+        "id": "void",
+        "name": "炼虚"
+      },
+      {
+        "level": 60,
+        "id": "merge",
+        "name": "合体"
+      },
+      {
+        "level": 70,
+        "id": "great",
+        "name": "大乘"
+      },
+      {
+        "level": 80,
+        "id": "tribulation",
+        "name": "渡劫"
+      }
+    ],
+    "base": null,
+    "per_level_all": null,
+    "major_realm_pulse": null,
+    "formula": null,
+    "foundation_points_per_level": null,
+    "point_value": null,
+    "resonance_all_foundations": null,
+    "expected_avg_gain_per_foundation": null,
+    "foundation_avg_gain": null,
+    "combat_power_jump_target": null,
+    "qualitative_unlocks": null,
+    "realm_flat_index": null,
+    "combat_attrs": null
+  },
+  "baseline_foundations": {
+    "key": "baseline_foundations",
+    "value": null,
+    "base": "10",
+    "per_level_all": "0.55",
+    "major_realm_pulse": "2.5",
+    "formula": "foundation_avg = 10 + 0.55 * (level - 1) + 2.5 * major_realm_index",
+    "foundation_points_per_level": null,
+    "point_value": null,
+    "resonance_all_foundations": null,
+    "expected_avg_gain_per_foundation": null,
+    "foundation_avg_gain": null,
+    "combat_power_jump_target": null,
+    "qualitative_unlocks": null,
+    "realm_flat_index": null,
+    "combat_attrs": null
+  },
+  "level_gain_packet": {
+    "key": "level_gain_packet",
+    "value": null,
+    "base": null,
+    "per_level_all": null,
+    "major_realm_pulse": null,
+    "formula": null,
+    "foundation_points_per_level": "4",
+    "point_value": "0.5",
+    "resonance_all_foundations": "0.05",
+    "expected_avg_gain_per_foundation": "0.55",
+    "foundation_avg_gain": null,
+    "combat_power_jump_target": null,
+    "qualitative_unlocks": null,
+    "realm_flat_index": null,
+    "combat_attrs": null
+  },
+  "major_breakthrough_pulse": {
+    "key": "major_breakthrough_pulse",
+    "value": null,
+    "base": null,
+    "per_level_all": null,
+    "major_realm_pulse": null,
+    "formula": null,
+    "foundation_points_per_level": null,
+    "point_value": null,
+    "resonance_all_foundations": null,
+    "expected_avg_gain_per_foundation": null,
+    "foundation_avg_gain": "2.5",
+    "combat_power_jump_target": {
+      "min": 0.15,
+      "max": 0.25
+    },
+    "qualitative_unlocks": [
+      "new_mechanic",
+      "new_content_band",
+      "build_slot_or_resource_upgrade"
+    ],
+    "realm_flat_index": null,
+    "combat_attrs": null
+  },
+  "content_level_formula": {
+    "key": "content_level_formula",
+    "value": null,
+    "base": null,
+    "per_level_all": null,
+    "major_realm_pulse": null,
+    "formula": null,
+    "foundation_points_per_level": null,
+    "point_value": null,
+    "resonance_all_foundations": null,
+    "expected_avg_gain_per_foundation": null,
+    "foundation_avg_gain": null,
+    "combat_power_jump_target": null,
+    "qualitative_unlocks": null,
+    "realm_flat_index": "level - 1",
+    "combat_attrs": "CharacterStats.build_combat_attrs(foundations, CharacterStats.realm_flat_modifiers(level - 1))"
+  }
+}

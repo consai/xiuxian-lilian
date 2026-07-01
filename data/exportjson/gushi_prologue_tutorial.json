@@ -1,0 +1,14 @@
+{
+  "schema_version": {
+    "key": "schema_version",
+    "value": "1"
+  },
+  "id": {
+    "key": "id",
+    "value": "prologue_tutorial"
+  },
+  "entry": {
+    "key": "entry",
+    "value": "empty_cave"
+  }
+}

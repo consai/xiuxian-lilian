@@ -55,8 +55,8 @@ func format_entry(entry: Dictionary, names: Dictionary = {}) -> String:
 		parts.append(_colored(src_name, _color_for_unit(src)))
 
 	var verb := "使用"
-	if kind == ZhandouRecordTypesScript.ACTION_BASIC:
-		verb = "普攻"
+	if kind == ZhandouRecordTypesScript.ACTION_TIAOXI:
+		verb = "调息"
 	elif kind == ZhandouRecordTypesScript.ACTION_ITEM:
 		verb = "使用道具"
 	elif kind == ZhandouRecordTypesScript.ACTION_EQUIP:

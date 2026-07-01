@@ -1,0 +1,10 @@
+{
+  "schemaVersion": {
+    "key": "schemaVersion",
+    "value": "4"
+  },
+  "configId": {
+    "key": "configId",
+    "value": "abilities"
+  }
+}

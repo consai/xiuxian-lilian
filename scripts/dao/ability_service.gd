@@ -5,11 +5,13 @@ const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 
-const PATH := "res://data/jineng.yaml"  # 索引；分表见 abilityTables
-const BASIC_STRIKE_ID := "ability.combat.basic_strike"
+const PATH := "res://data/exportjson/jineng.json"
+const TIAOXI_ID := "ability.combat.tiaoxi"
 
 static var _bundle: Dictionary = {}
 static var _abilities_by_id: Dictionary = {}
+static var _abilities_by_table: Dictionary = {}
+static var _table_by_ability_id: Dictionary = {}
 static var _combat_id_by_ability: Dictionary = {}
 static var _ability_by_combat_id: Dictionary = {}
 
@@ -17,10 +19,23 @@ static var _ability_by_combat_id: Dictionary = {}
 static func reload() -> void:
 	_bundle = JsonLoader.load_abilities_bundle()
 	_abilities_by_id.clear()
+	_abilities_by_table.clear()
+	_table_by_ability_id.clear()
 	_combat_id_by_ability.clear()
 	_ability_by_combat_id.clear()
-	_ability_by_combat_id[0] = _basic_strike_row()
-	_combat_id_by_ability[BASIC_STRIKE_ID] = 0
+	_ability_by_combat_id[0] = _tiaoxi_row()
+	_combat_id_by_ability[TIAOXI_ID] = 0
+	for table_key in EnumAbilityTable.LOAD_ORDER:
+		_abilities_by_table[table_key] = {}
+	var tables_v: Variant = _bundle.get("tables", {})
+	if tables_v is Dictionary and not (tables_v as Dictionary).is_empty():
+		for table_key_v in (tables_v as Dictionary).keys():
+			var table_key := str(table_key_v)
+			if not _abilities_by_table.has(table_key):
+				_abilities_by_table[table_key] = {}
+			_index_table_rows(table_key, (tables_v as Dictionary).get(table_key_v, []) as Array)
+	else:
+		_index_table_rows_from_merged(_bundle.get("abilities", []) as Array)
 	var next_id := 1
 	for ability_v in _bundle.get("abilities", []) as Array:
 		if not ability_v is Dictionary:
@@ -29,12 +44,96 @@ static func reload() -> void:
 		var aid := str(ability.get("id", ""))
 		if aid == "":
 			continue
-		_abilities_by_id[aid] = ability
 		var atype := str(ability.get("type", ""))
 		if uses_combat_skill_slot(atype):
 			_combat_id_by_ability[aid] = next_id
 			_ability_by_combat_id[next_id] = ability
 			next_id += 1
+
+
+static func _index_table_rows(table_key: String, rows: Array) -> void:
+	for ability_v in rows:
+		if not ability_v is Dictionary:
+			continue
+		var ability := ability_v as Dictionary
+		var aid := str(ability.get("id", ""))
+		if aid == "":
+			continue
+		_abilities_by_id[aid] = ability
+		(_abilities_by_table[table_key] as Dictionary)[aid] = ability
+		_table_by_ability_id[aid] = table_key
+
+
+static func _index_table_rows_from_merged(rows: Array) -> void:
+	for ability_v in rows:
+		if not ability_v is Dictionary:
+			continue
+		var ability := ability_v as Dictionary
+		var aid := str(ability.get("id", ""))
+		if aid == "":
+			continue
+		var table_key := _infer_table_key(str(ability.get("type", "")))
+		if table_key == "":
+			continue
+		if not _abilities_by_table.has(table_key):
+			_abilities_by_table[table_key] = {}
+		_abilities_by_id[aid] = ability
+		(_abilities_by_table[table_key] as Dictionary)[aid] = ability
+		_table_by_ability_id[aid] = table_key
+
+
+static func _infer_table_key(ability_type: String) -> String:
+	match ability_type:
+		"combat_active", "combat_upkeep":
+			return EnumAbilityTable.LABEL_ZHANDOU_ACTIVE
+		"combat_passive":
+			return EnumAbilityTable.LABEL_ZHANDOU_PASSIVE
+		"general_passive":
+			return EnumAbilityTable.LABEL_TONGYONG_PASSIVE
+		_:
+			return ""
+
+
+static func table_keys() -> Array[String]:
+	bundle()
+	var out: Array[String] = []
+	for table_key in EnumAbilityTable.LOAD_ORDER:
+		if (_abilities_by_table.get(table_key, {}) as Dictionary).size() > 0:
+			out.append(table_key)
+	for table_key in _abilities_by_table.keys():
+		var key := str(table_key)
+		if key not in out and (_abilities_by_table.get(key, {}) as Dictionary).size() > 0:
+			out.append(key)
+	return out
+
+
+static func abilities_in_table(table_key: String) -> Array:
+	bundle()
+	var out: Array = []
+	var table_map: Variant = _abilities_by_table.get(table_key.strip_edges(), {})
+	if not table_map is Dictionary:
+		return out
+	for ability_v in (table_map as Dictionary).values():
+		if ability_v is Dictionary:
+			out.append((ability_v as Dictionary).duplicate(true))
+	return out
+
+
+static func table_key_for(ability_id: String) -> String:
+	bundle()
+	return str(_table_by_ability_id.get(ability_id.strip_edges(), ""))
+
+
+static func zhandou_active_abilities() -> Array:
+	return abilities_in_table(EnumAbilityTable.LABEL_ZHANDOU_ACTIVE)
+
+
+static func zhandou_passive_abilities() -> Array:
+	return abilities_in_table(EnumAbilityTable.LABEL_ZHANDOU_PASSIVE)
+
+
+static func tongyong_passive_abilities() -> Array:
+	return abilities_in_table(EnumAbilityTable.LABEL_TONGYONG_PASSIVE)
 
 
 ## 需编入战斗技能栏的类型（主动施放或手动开关的持续技）。
@@ -66,8 +165,8 @@ static func by_id(ability_id: String) -> Dictionary:
 	var row: Variant = _abilities_by_id.get(ability_id.strip_edges())
 	if row is Dictionary:
 		return (row as Dictionary).duplicate(true)
-	if ability_id == BASIC_STRIKE_ID:
-		return _basic_strike_row()
+	if ability_id == TIAOXI_ID:
+		return _tiaoxi_row()
 	return {}
 
 
@@ -81,11 +180,20 @@ static func combat_id_for(ability_id: String) -> int:
 static func ability_id_for_combat_id(combat_id: int) -> String:
 	bundle()
 	if combat_id == 0:
-		return BASIC_STRIKE_ID
+		return TIAOXI_ID
 	var row: Variant = _ability_by_combat_id.get(combat_id)
 	if row is Dictionary:
 		return str((row as Dictionary).get("id", ""))
 	return ""
+
+
+static func ability_tier(ability: Dictionary) -> int:
+	return EnumItemTier.clamp_tier(int(ability.get("tier", EnumItemTier.Type.QI)))
+
+
+## 技能配置仅用 tier；大境界 id 由阶位推导。
+static func ability_realm_id(ability: Dictionary) -> String:
+	return EnumItemTier.realm_id_for_tier(ability_tier(ability))
 
 
 static func can_learn(ability_id: String, savedata: Dictionary, player_major_realm: String) -> bool:
@@ -115,7 +223,7 @@ static func unmet_learning_requirement_lines(
 	if ability.is_empty():
 		return lines
 	var reqs: Dictionary = ability.get("learningRequirements", {}) as Dictionary
-	var realm := str(reqs.get("realm", ability.get("realm", "qi")))
+	var realm := ability_realm_id(ability)
 	if player_major_realm == "":
 		player_major_realm = str(savedata.get("major_realm", "qi"))
 	if not DaoTreeServiceScript.meets_realm_gate(realm, player_major_realm):
@@ -154,10 +262,10 @@ static func unmet_learning_requirement_lines(
 
 static func to_runtime_dict(ability_id: String, _savedata: Dictionary) -> Dictionary:
 	var combat_id := combat_id_for(ability_id)
-	if combat_id < 0 and ability_id != BASIC_STRIKE_ID:
+	if combat_id < 0 and ability_id != TIAOXI_ID:
 		return {}
-	if ability_id == BASIC_STRIKE_ID or combat_id == 0:
-		return _basic_strike_runtime()
+	if ability_id == TIAOXI_ID or combat_id == 0:
+		return _tiaoxi_runtime()
 	var ability := by_id(ability_id)
 	if ability.is_empty():
 		return {}
@@ -185,6 +293,10 @@ static func to_runtime_dict(ability_id: String, _savedata: Dictionary) -> Dictio
 		elif vfx_type == "melee":
 			vfx = "melee_default"
 	var icon_path := _runtime_icon_path(ability, combat_id)
+	var combat_target := EnumZhandouTargetArg.normalize_pair(
+		combat.get("target", EnumZhandouTarget.LABEL_ENEMY),
+		combat.get("targetArg", combat.get("target_arg", ""))
+	)
 	var out := {
 		"id": combat_id,
 		"ability_id": ability_id,
@@ -203,8 +315,16 @@ static func to_runtime_dict(ability_id: String, _savedata: Dictionary) -> Dictio
 		"vfx_type": vfx_type,
 		"vfx": vfx,
 		"tags": tags,
-		"effects": EffectResolverScript.resolve_combat_effects(ability.get("effects", []) as Array),
+		"target": str(combat_target.get("target", EnumZhandouTarget.LABEL_ENEMY)),
+		"effects": EffectResolverScript.resolve_combat_effects(
+			ability.get("effects", []) as Array,
+			str(combat_target.get("target", EnumZhandouTarget.LABEL_ENEMY)),
+			str(combat_target.get("target_arg", ""))
+		),
 	}
+	var combat_target_arg := str(combat_target.get("target_arg", ""))
+	if combat_target_arg != "":
+		out["target_arg"] = combat_target_arg
 	if icon_path != "":
 		out["icon"] = icon_path
 	return out
@@ -213,7 +333,7 @@ static func to_runtime_dict(ability_id: String, _savedata: Dictionary) -> Dictio
 static func build_skill_cfg(savedata: Dictionary) -> Dictionary:
 	bundle()
 	var skills: Dictionary = {}
-	skills["0"] = _basic_strike_runtime()
+	skills["0"] = _tiaoxi_runtime()
 	for combat_id in _ability_by_combat_id.keys():
 		if int(combat_id) <= 0:
 			continue
@@ -223,49 +343,46 @@ static func build_skill_cfg(savedata: Dictionary) -> Dictionary:
 	return {"battle_time_limit": 200.0, "skills": skills}
 
 
-static func _basic_strike_row() -> Dictionary:
+static func _tiaoxi_row() -> Dictionary:
 	return {
-		"id": BASIC_STRIKE_ID,
-		"name": "普攻",
+		"id": TIAOXI_ID,
+		"name": "调息",
 		"type": "combat_active",
 		"realm": "qi",
-		"description": "基础近战攻击。",
-		"tags": ["attack", "physical"],
-		"combat": {"target": EnumZhandouTarget.LABEL_ENEMY, "castTime": 0.0, "cooldown": 0.0, "costs": []},
-		"effects": [{
-			"effectId": "damage_physical",
-			"base": 12,
-			"operation": "add_flat",
-			"target": EnumZhandouTarget.LABEL_ENEMY,
-		}],
-		"learningRequirements": {"realm": "qi", "knowledge": []},
+		"description": "盘膝调息，按法力恢复速度恢复灵力。",
+		"tags": ["restore", "support"],
+		"combat": {
+			"target": EnumZhandouTarget.LABEL_SELF,
+			"castTime": 0.0,
+			"cooldown": 0.0,
+			"costs": [],
+		},
+		"effects": [],
+		"learningRequirements": {"knowledge": []},
 	}
 
 
-static func _basic_strike_runtime() -> Dictionary:
+static func _tiaoxi_runtime() -> Dictionary:
 	return {
 		"id": 0,
-		"ability_id": BASIC_STRIKE_ID,
-		"name": "普攻",
-		"desc": "基础近战攻击。",
-		"icon": _runtime_icon_path(_basic_strike_row(), 0),
+		"ability_id": TIAOXI_ID,
+		"name": "调息",
+		"desc": "盘膝调息，按法力恢复速度恢复灵力。",
+		"icon": "ui_new/skill_03.png",
 		"costs": [],
 		"cost_text": "",
 		"mp_cost": 0.0,
 		"cd": 0.0,
 		"cd_total": 0.0,
-		"power": 1000.0,
+		"power": 0.0,
 		"tier": 1,
 		"quality": 1,
-		"vfx_type": "melee",
-		"vfx": "melee_default",
-		"tags": ["attack", "physical"],
-		"effects": [{
-			"type": EnumCombatEffectType.LABEL_DAMAGE,
-			"damage_type": "physical",
-			"value": 12.0,
-			"target": EnumZhandouTarget.LABEL_ENEMY,
-		}],
+		"vfx_type": "buff",
+		"vfx": "status_cast",
+		"tags": ["restore", "support"],
+		"target": EnumZhandouTarget.LABEL_SELF,
+		"effects": [],
+		"is_tiaoxi": true,
 	}
 
 

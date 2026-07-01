@@ -1,0 +1,10 @@
+{
+  "schemaVersion": {
+    "key": "schemaVersion",
+    "value": "1"
+  },
+  "configId": {
+    "key": "configId",
+    "value": "dao_tree"
+  }
+}

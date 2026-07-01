@@ -1,0 +1,27 @@
+{
+  "weak": {
+    "key": "weak",
+    "strength_min": 55,
+    "strength_max": 70
+  },
+  "normal": {
+    "key": "normal",
+    "strength_min": 80,
+    "strength_max": 95
+  },
+  "strong": {
+    "key": "strong",
+    "strength_min": 105,
+    "strength_max": 120
+  },
+  "elite": {
+    "key": "elite",
+    "strength_min": 140,
+    "strength_max": 170
+  },
+  "boss": {
+    "key": "boss",
+    "strength_min": 220,
+    "strength_max": 300
+  }
+}

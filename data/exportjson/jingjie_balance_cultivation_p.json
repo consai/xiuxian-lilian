@@ -1,0 +1,151 @@
+{
+  "base_monthly_gain_formula": {
+    "key": "base_monthly_gain_formula",
+    "value": "round(20 * major_realm.content_coefficient * layer_multiplier)",
+    "early": null,
+    "mid": null,
+    "late": null,
+    "single": null,
+    "qi": null,
+    "foundation": null,
+    "core": null,
+    "nascent": null,
+    "transform": null,
+    "void": null,
+    "merge": null,
+    "great": null,
+    "tribulation": null,
+    "anchor_realm": null,
+    "reference_phase": null,
+    "medium_cultivation_gain": null,
+    "quality_band_multiplier": null,
+    "tier_major_realm": null,
+    "formula_medium": null,
+    "formula_gain": null,
+    "design_note": null
+  },
+  "layer_multiplier": {
+    "key": "layer_multiplier",
+    "value": null,
+    "early": "1",
+    "mid": "1.15",
+    "late": "1.3",
+    "single": "1",
+    "qi": null,
+    "foundation": null,
+    "core": null,
+    "nascent": null,
+    "transform": null,
+    "void": null,
+    "merge": null,
+    "great": null,
+    "tribulation": null,
+    "anchor_realm": null,
+    "reference_phase": null,
+    "medium_cultivation_gain": null,
+    "quality_band_multiplier": null,
+    "tier_major_realm": null,
+    "formula_medium": null,
+    "formula_gain": null,
+    "design_note": null
+  },
+  "base_monthly_gain_by_realm": {
+    "key": "base_monthly_gain_by_realm",
+    "value": null,
+    "early": null,
+    "mid": null,
+    "late": null,
+    "single": null,
+    "qi": {
+      "early": 30,
+      "mid": 40,
+      "late": 50
+    },
+    "foundation": {
+      "early": 100,
+      "mid": 120,
+      "late": 140
+    },
+    "core": {
+      "early": 300,
+      "mid": 360,
+      "late": 420
+    },
+    "nascent": {
+      "early": 800,
+      "mid": 960,
+      "late": 1120
+    },
+    "transform": {
+      "early": 2000,
+      "mid": 2400,
+      "late": 2800
+    },
+    "void": {
+      "early": 5000,
+      "mid": 6000,
+      "late": 7000
+    },
+    "merge": {
+      "early": 12000,
+      "mid": 14400,
+      "late": 16800
+    },
+    "great": {
+      "early": 30000,
+      "mid": 36000,
+      "late": 42000
+    },
+    "tribulation": {
+      "single": 80000
+    },
+    "anchor_realm": null,
+    "reference_phase": null,
+    "medium_cultivation_gain": null,
+    "quality_band_multiplier": null,
+    "tier_major_realm": null,
+    "formula_medium": null,
+    "formula_gain": null,
+    "design_note": null
+  },
+  "cultivation_pill_balance": {
+    "key": "cultivation_pill_balance",
+    "value": null,
+    "early": null,
+    "mid": null,
+    "late": null,
+    "single": null,
+    "qi": null,
+    "foundation": null,
+    "core": null,
+    "nascent": null,
+    "transform": null,
+    "void": null,
+    "merge": null,
+    "great": null,
+    "tribulation": null,
+    "anchor_realm": "qi",
+    "reference_phase": "early",
+    "medium_cultivation_gain": "100",
+    "quality_band_multiplier": {
+      "low": 0.85,
+      "medium": 1,
+      "high": 1.25,
+      "supreme": 1.55
+    },
+    "tier_major_realm": {
+      "1": "qi",
+      "2": "foundation",
+      "3": "core",
+      "4": "nascent",
+      "5": "transform",
+      "6": "void",
+      "7": "merge",
+      "8": "great",
+      "9": "tribulation"
+    },
+    "formula_medium": "round(medium_cultivation_gain * base_monthly_gain[major_realm][reference_phase] / base_monthly_gain[anchor_realm][reference_phase])",
+    "formula_gain": "round(medium_gain * quality_band_multiplier[band])",
+    "design_note": "相对同境界日常修炼（日修为=月修为×0.1）加速比恒定为 medium_cultivation_gain / (anchor月修为×0.1)；练气为 100/3≈33×。品质档位由物品 id 后缀 _Low/_High/_Supreme 判定，无后缀为中品。"
+  }
+}

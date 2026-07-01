@@ -17,6 +17,7 @@ func _run_all() -> void:
 	_run("gm grant panel includes equips first", _test_grant_panel_includes_equips_first)
 	_run("gm grant equip writes owned equips", _test_grant_equip_writes_owned_equips)
 	_run("gm battle builder supports enemy kind and count", _test_battle_builder_enemy_kind_and_count)
+	_run("gm battle access empty outside fight", _test_battle_access_outside_fight)
 	if _failures.is_empty():
 		print("PASS: %d gm tool tests" % _tests_run)
 		quit(0)
@@ -96,6 +97,11 @@ func _test_battle_builder_enemy_kind_and_count() -> void:
 	)
 	_expect_eq(int((boss_init.get("enemy_formation", {}) as Dictionary).get("rank_size", 0)), 1, "gm boss battle places one boss per rank")
 	_expect_eq(str((boss_init.get("enemy_formation", {}) as Dictionary).get("mode", "")), EnumBattleFormationMode.LABEL_COLUMNS, "gm boss battle uses column formation")
+
+
+func _test_battle_access_outside_fight() -> void:
+	_expect_true(not GmBattleAccess.is_in_battle(), "gm battle access false when no fight")
+	_expect_true(GmBattleAccess.list_units().is_empty(), "gm battle unit list empty outside fight")
 
 
 func _new_panel() -> Control:

@@ -1,0 +1,26 @@
+{
+  "steady": {
+    "id": "steady",
+    "name": "稳守炉火",
+    "score": 7,
+    "spread": 7,
+    "spread_down": 4,
+    "spread_up": 10,
+    "days": 1,
+    "yield": 0,
+    "safety": 0.15,
+    "description": "多耗一日，显著降低失败与结果波动。"
+  },
+  "supreme": {
+    "id": "supreme",
+    "name": "搏炼极品",
+    "score": -5,
+    "spread": 24,
+    "spread_down": null,
+    "spread_up": null,
+    "days": 0,
+    "yield": 0,
+    "safety": 0.0,
+    "description": "扩大结果波动，以失败风险换取上品、极品机会。"
+  }
+}

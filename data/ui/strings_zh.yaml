@@ -73,7 +73,8 @@ item_info:
   use_study: "研读"
 combat:
   float:
-    basic_attack: "普攻"
+    tiaoxi: "调息"
+    basic_attack: "调息"
     damage: "-{value}"
     heal: "+{value}"
     mp_cost: "-{value} MP"

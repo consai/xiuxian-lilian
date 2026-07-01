@@ -5,6 +5,42 @@ export const QUALITY_MAX = 4;
 export const TIER_MIN = 1;
 export const TIER_MAX = 9;
 
+/** 阶位与大境界 id 一一对应（与 EnumItemTier / dao_tree.realms.order 一致）。 */
+export const REALM_IDS_BY_TIER = [
+  "qi",
+  "foundation",
+  "core",
+  "nascent",
+  "transform",
+  "void",
+  "merge",
+  "great",
+  "tribulation",
+];
+
+/** 阶位 → 大境界 id。 */
+export function realmIdForTier(tier) {
+  const t = Math.max(TIER_MIN, Math.min(TIER_MAX, Number(tier) || TIER_MIN));
+  return REALM_IDS_BY_TIER[t - 1] ?? "qi";
+}
+
+/** 大境界 id → 阶位。 */
+export function tierForRealmId(realmId) {
+  const idx = REALM_IDS_BY_TIER.indexOf(String(realmId ?? "").trim().toLowerCase());
+  return idx >= 0 ? idx + 1 : TIER_MIN;
+}
+
+/** 技能/功法配置禁止再写 realm，统一用 tier。 */
+export function rejectLegacyRealmField(row, label, errors) {
+  const rowId = row.id ?? "";
+  if ("realm" in row) {
+    errors.push(`${label} ${rowId} 不得配置 realm，请仅用 tier`);
+  }
+  if (row.learningRequirements?.realm != null) {
+    errors.push(`${label} ${rowId} learningRequirements 不得配置 realm，请仅用 tier`);
+  }
+}
+
 /** 从 learningKnowledgeGatePolicy 读取普通品质档位（默认 1、2）。 */
 export function ordinaryQualitiesFromPolicy(policy) {
   return new Set(policy?.ordinaryQualities ?? [QUALITY_MIN, 2]);

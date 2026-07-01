@@ -1,0 +1,155 @@
+{
+  "qi": {
+    "id": "qi",
+    "name": "炼气",
+    "content_coefficient": 1.0,
+    "normal_duration_sec": [
+      8,
+      14
+    ],
+    "elite_duration_sec": [
+      20,
+      30
+    ],
+    "boss_duration_sec": [
+      45,
+      70
+    ]
+  },
+  "foundation": {
+    "id": "foundation",
+    "name": "筑基",
+    "content_coefficient": 1.7,
+    "normal_duration_sec": [
+      9,
+      15
+    ],
+    "elite_duration_sec": [
+      22,
+      34
+    ],
+    "boss_duration_sec": [
+      50,
+      80
+    ]
+  },
+  "core": {
+    "id": "core",
+    "name": "金丹",
+    "content_coefficient": 2.8,
+    "normal_duration_sec": [
+      10,
+      16
+    ],
+    "elite_duration_sec": [
+      24,
+      38
+    ],
+    "boss_duration_sec": [
+      55,
+      90
+    ]
+  },
+  "nascent": {
+    "id": "nascent",
+    "name": "元婴",
+    "content_coefficient": 4.5,
+    "normal_duration_sec": [
+      10,
+      18
+    ],
+    "elite_duration_sec": [
+      26,
+      42
+    ],
+    "boss_duration_sec": [
+      60,
+      100
+    ]
+  },
+  "transform": {
+    "id": "transform",
+    "name": "化神",
+    "content_coefficient": 7.0,
+    "normal_duration_sec": [
+      12,
+      20
+    ],
+    "elite_duration_sec": [
+      30,
+      48
+    ],
+    "boss_duration_sec": [
+      70,
+      110
+    ]
+  },
+  "void": {
+    "id": "void",
+    "name": "炼虚",
+    "content_coefficient": 11.0,
+    "normal_duration_sec": [
+      12,
+      22
+    ],
+    "elite_duration_sec": [
+      32,
+      52
+    ],
+    "boss_duration_sec": [
+      75,
+      120
+    ]
+  },
+  "merge": {
+    "id": "merge",
+    "name": "合体",
+    "content_coefficient": 17.0,
+    "normal_duration_sec": [
+      14,
+      24
+    ],
+    "elite_duration_sec": [
+      36,
+      58
+    ],
+    "boss_duration_sec": [
+      80,
+      130
+    ]
+  },
+  "great": {
+    "id": "great",
+    "name": "大乘",
+    "content_coefficient": 26.0,
+    "normal_duration_sec": [
+      14,
+      26
+    ],
+    "elite_duration_sec": [
+      40,
+      65
+    ],
+    "boss_duration_sec": [
+      90,
+      145
+    ]
+  },
+  "tribulation": {
+    "id": "tribulation",
+    "name": "渡劫",
+    "content_coefficient": 40.0,
+    "normal_duration_sec": [
+      16,
+      28
+    ],
+    "elite_duration_sec": [
+      45,
+      72
+    ],
+    "boss_duration_sec": [
+      100,
+      160
+    ]
+  }
+}

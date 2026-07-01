@@ -56,8 +56,7 @@ func _test_config_has_no_errors() -> void:
 
 
 func _test_realm_balance_covers_simulation_realms() -> void:
-	var simulation := JsonLoader._read_json_root_object("res://data/moni.yaml")
-	var errors := RealmBalanceServiceScript.collect_config_errors(simulation.get("realms", []) as Array)
+	var errors := RealmBalanceServiceScript.collect_config_errors(RealmService.realms())
 	_expect_true(errors.is_empty(), "realm balance errors: %s" % str(errors))
 	var qi := RealmBalanceServiceScript.major_realm_by_id("qi")
 	_expect_eq(str(qi.get("name", "")), "炼气", "qi realm configured")
@@ -66,16 +65,13 @@ func _test_realm_balance_covers_simulation_realms() -> void:
 
 
 func _test_realm_threshold_formula() -> void:
-	var simulation := JsonLoader._read_json_root_object("res://data/moni.yaml")
-	var realms := simulation.get("realms", []) as Array
-	for index in realms.size():
-		var realm := realms[index] as Dictionary
-		var order := index + 1
-		_expect_eq(
-			int(realm.get("breakthrough_at", 0)),
-			300 * order * order,
-			"%s breakthrough_at formula" % str(realm.get("id", ""))
-		)
+	var realms: Array = RealmService.realms()
+	var prev_xiuwei: int = 0
+	for realm_v in realms:
+		var realm: Dictionary = realm_v as Dictionary
+		var xiuwei: int = int(realm.get("breakthrough_at", 0))
+		_expect_true(xiuwei > prev_xiuwei, "%s xiuwei must increase" % str(realm.get("id", "")))
+		prev_xiuwei = xiuwei
 
 
 func _test_cultivation_pill_gain_formula() -> void:

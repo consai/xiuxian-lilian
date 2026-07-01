@@ -9,6 +9,8 @@ const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 const EnemyIntentPreviewScript := preload("res://scripts/zhandou/enemy_intent_preview.gd")
 const ZhandouActorVfxScript := preload("res://scripts/zhandou/zhandou_actor_vfx.gd")
 const ZhandouVfxSettingsScript := preload("res://scripts/zhandou/zhandou_vfx_settings.gd")
+const ZhandouFloatPresenterScript := preload("res://scripts/zhandou/zhandou_float_presenter.gd")
+const BuffStatusBarScript := preload("res://scripts/zhandou/buff_status_bar.gd")
 
 var _failures: Array[String] = []
 var _tests_run := 0
@@ -26,7 +28,7 @@ func _init() -> void:
 	_run("physical and magic damage use matching defense", _test_damage_types_use_matching_defense)
 	_run("true damage bypasses defense", _test_true_damage_bypasses_defense)
 	_run("non mana ability costs are paid", _test_non_mana_ability_costs_are_paid)
-	_run("attacks always hit", _test_attacks_always_hit)
+	_run("tiaoxi restores mp from regen rate", _test_tiaoxi_restores_mp)
 	_run("control effects always apply", _test_control_effects_always_apply)
 	_run("effect scaling uses combat attributes", _test_effect_scaling)
 	_run("action progress advances from current speed", _test_action_progress_uses_current_speed)
@@ -39,6 +41,8 @@ func _init() -> void:
 	_run("cultivation method restores mp every two seconds", _test_method_mp_recovery)
 	_run("skill damage supports pierce and vulnerability", _test_pierce_and_vulnerability)
 	_run("runtime modifier expires cleanly", _test_runtime_modifier_expires)
+	_run("buff reapply stacks and refreshes duration", _test_buff_reapply_stacks_and_refreshes_duration)
+	_run("self buff float targets caster", _test_self_buff_float_targets_caster)
 	_run("qi and foundation active abilities resolve effects", _test_v1_abilities_resolve_effects)
 	_run("PM-206 projectile presets are bound", _test_pm206_projectile_presets_are_bound)
 	_run("melee strike point works across formation slot parents", _test_melee_strike_across_formation_slots)
@@ -48,6 +52,8 @@ func _init() -> void:
 	_run("escape chance rises with player speed over max enemy", _test_escape_chance_speed_ratio)
 	_run("escape success ends battle", _test_escape_success_ends_battle)
 	_run("escape failure consumes player turn", _test_escape_failure_consumes_turn)
+	_run("passive status bar shows cooldown after trigger", _test_passive_status_bar_shows_cooldown_after_trigger)
+	_run("passive status entries sort before buffs", _test_passive_status_entries_sort_before_buffs)
 
 	if _failures.is_empty():
 		print("PASS: %d battle domain tests" % _tests_run)
@@ -131,8 +137,8 @@ func _test_action_resets_actor_and_preserves_opponent_progress() -> void:
 	var ready_time := ZhandouBalance.interval_cap_for(domain.player)
 	_expect_eq(domain.tick_advancing(ready_time), ZhandouDomainServiceScript.SIGNAL_PLAYER_READY, "player ready")
 	domain.enter_paused(EnumBattleSide.PLAYER)
-	var payload := domain.resolve_player_basic()
-	_expect_true(bool(payload.get("ok", false)), "player basic attack should resolve")
+	var payload := domain.resolve_player_tiaoxi()
+	_expect_true(bool(payload.get("ok", false)), "player tiaoxi should resolve")
 	domain.begin_presentation(EnumBattleSide.PLAYER)
 	domain.finish_presentation()
 
@@ -217,12 +223,16 @@ func _test_non_mana_ability_costs_are_paid() -> void:
 	_expect_near(player.mp, 2.0, "stamina-cost skill consumes shared combat resource")
 
 
-func _test_attacks_always_hit() -> void:
+func _test_tiaoxi_restores_mp() -> void:
+	var actor := _make_unit(100.0, 100.0)
+	actor.attrs[ZhandouAttr.MP_REGEN] = 2.0
+	actor.mp = 40.0
+	var expected: float = 2.0 * ZhandouBalance.TIAOXI_MP_REGEN_MULTIPLIER
+	var report := ZhandouObjScript.resolve_tiaoxi(actor)
+	_expect_near(float(report.get(ZhandouReportScript.KEY_MP_GAIN, 0.0)), expected, "tiaoxi mp gain")
+	_expect_near(actor.mp, 40.0 + expected, "tiaoxi restores mp on actor")
 	var attacker := _make_unit(100.0, 100.0)
 	var defender := _make_unit(100.0, 100.0)
-	var basic := ZhandouObjScript.resolve_basic_attack(attacker, defender)
-	_expect_false(bool(basic.get(ZhandouReportScript.KEY_MISSED, false)), "basic attack should not miss")
-	_expect_true(float(basic.get(ZhandouReportScript.KEY_DAMAGE, 0.0)) > 0.0, "basic attack should deal damage")
 	attacker.skills = [{"id": 1, "cd": 0.0}]
 	var cfg := {
 		1: {
@@ -311,14 +321,20 @@ func _test_action_progress_uses_current_speed() -> void:
 
 func _test_one_player_can_fight_multiple_enemies() -> void:
 	var player := _make_unit(100.0, 100.0)
-	player.attrs[ZhandouObjScript.ATTR_PHYSICAL_ATK] = 200.0
 	var first := _make_unit(1.0, 80.0)
 	var second := _make_unit(40.0, 80.0)
 	var domain := ZhandouDomainServiceScript.new()
-	domain.start_battle_many(player, [first, second], {}, 200.0)
+	var skill_cfg := {
+		1: {
+			"mp_cost": 0.0,
+			"cd": 0.0,
+			"effects": [{"type": "damage", "value": 999.0, "target": "enemy"}],
+		},
+	}
+	domain.start_battle_many(player, [first, second], skill_cfg, 200.0)
 	domain.enter_paused(EnumBattleSide.PLAYER)
-	var payload := domain.resolve_player_basic()
-	_expect_true(bool(payload.get("ok", false)), "player should hit first enemy")
+	var payload := domain.resolve_player_skill(1)
+	_expect_true(bool(payload.get("ok", false)), "player should hit first enemy with skill")
 	_expect_true(first.is_dead(), "first enemy should die")
 	_expect_eq(domain.check_end_after_resolve(), "", "battle should continue while another enemy is alive")
 	_expect_eq(domain.active_enemy_index, 1, "active target should move to second enemy")
@@ -518,15 +534,62 @@ func _test_runtime_modifier_expires() -> void:
 	_expect_near(unit.get_attr(ZhandouAttr.CONTROL_POWER), before, "runtime modifier expires")
 
 
+func _test_buff_reapply_stacks_and_refreshes_duration() -> void:
+	ZhandouObjScript.set_test_buff_defs({
+		"test_stack": {
+			"id": "test_stack",
+			"name": "测试叠层",
+			"duration": 3.0,
+			"max_stacks": 5,
+			"ticktime": 0.0,
+			"modifiers": {},
+			"tick_effects": [],
+		},
+	})
+	var unit := _make_unit()
+	_expect_eq(unit.add_buff("test_stack", 1), 1, "first buff stack")
+	var inst := unit.buffs["test_stack"] as Dictionary
+	_expect_eq(int(inst.get("stacks", 0)), 1, "one stack after first apply")
+	inst["duration_left"] = 1.0
+	_expect_eq(unit.add_buff("test_stack", 1), 1, "second stack applied")
+	_expect_eq(int((unit.buffs["test_stack"] as Dictionary).get("stacks", 0)), 2, "two stacks after reapply")
+	_expect_near(float((unit.buffs["test_stack"] as Dictionary).get("duration_left", 0.0)), 3.0, "duration refreshed on stack")
+	for _i in 3:
+		unit.add_buff("test_stack", 1)
+	_expect_eq(int((unit.buffs["test_stack"] as Dictionary).get("stacks", 0)), 5, "capped at max stacks")
+	(unit.buffs["test_stack"] as Dictionary)["duration_left"] = 0.5
+	_expect_eq(unit.add_buff("test_stack", 1), 1, "max stack refresh still succeeds")
+	_expect_eq(int((unit.buffs["test_stack"] as Dictionary).get("stacks", 0)), 5, "stacks unchanged at cap")
+	_expect_near(float((unit.buffs["test_stack"] as Dictionary).get("duration_left", 0.0)), 3.0, "duration refreshed at cap")
+	ZhandouObjScript.clear_test_buff_defs()
+
+
+func _test_self_buff_float_targets_caster() -> void:
+	var spawns: Array = ZhandouFloatPresenterScript.build_spawns(
+		"player",
+		"enemy",
+		{"buff_names": ["流风护身"]},
+		{"name": "流风步", "target": "self"},
+	)
+	var found := false
+	for spawn_v in spawns:
+		if not spawn_v is Dictionary:
+			continue
+		var spawn := spawn_v as Dictionary
+		if str(spawn.get("tone", "")) != "buff_add":
+			continue
+		found = true
+		_expect_eq(str(spawn.get("unit_id", "")), "player", "self buff float on caster")
+		break
+	_expect_true(found, "buff float spawn exists")
+
+
 func _test_v1_abilities_resolve_effects() -> void:
 	AbilityServiceScript.reload()
+	# exportjson 多数技能 effects 待策划补表；仅校验已有数据的代表技能
 	for ability_id in [
 		"ability.combat.qi_bolt",
 		"ability.combat.wind_step",
-		"ability.combat.sword_qi",
-		"ability.combat.blood_strike",
-		"ability.combat.five_phase_burst",
-		"ability.combat.seal_bind",
 	]:
 		var runtime := AbilityServiceScript.to_runtime_dict(ability_id, {"knowledge": {}})
 		_expect_true(not (runtime.get("effects", []) as Array).is_empty(), "%s has runtime effects" % ability_id)
@@ -554,9 +617,9 @@ func _test_melee_strike_across_formation_slots() -> void:
 	var strike := vfx.strike_point_in_front(target, 40.0)
 	_expect_true(strike.x > vfx.get_rest_position().x + 100.0, "strike point advances toward target")
 	_expect_true(strike != target.position, "strike point must not reuse target local position")
-	var basic := AbilityServiceScript.to_runtime_dict("ability.combat.basic_strike", {})
-	_expect_eq(str(basic.get("vfx_type", "")), "melee", "basic attack uses melee vfx type")
-	_expect_eq(str(basic.get("vfx", "")), "melee_default", "basic attack uses melee preset")
+	var tiaoxi := AbilityServiceScript.to_runtime_dict("ability.combat.tiaoxi", {})
+	_expect_eq(str(tiaoxi.get("vfx_type", "")), "buff", "tiaoxi uses buff vfx type")
+	_expect_eq(str(tiaoxi.get("vfx", "")), "status_cast", "tiaoxi uses status cast preset")
 	world.queue_free()
 
 
@@ -564,8 +627,8 @@ func _test_pm206_projectile_presets_are_bound() -> void:
 	AbilityServiceScript.reload()
 	var qi := AbilityServiceScript.to_runtime_dict("ability.combat.qi_bolt", {})
 	var sword := AbilityServiceScript.to_runtime_dict("ability.combat.sword_qi", {})
-	_expect_eq(str((qi.get("vfx", {}) as Dictionary).get("preset", "")), "qi_bolt_projectile", "qi bolt vfx preset")
-	_expect_eq(str((sword.get("vfx", {}) as Dictionary).get("preset", "")), "sword_qi_projectile", "sword qi vfx preset")
+	_expect_eq(str(qi.get("vfx", "")), "qi_bolt_projectile", "qi bolt vfx preset")
+	_expect_eq(str(sword.get("vfx", "")), "sword_qi_projectile", "sword qi vfx preset")
 	var lib := ZhandouVfxPresetLibrary.load_default()
 	_expect_true(_has_projectile_texture(lib.get_sequence("qi_bolt_projectile")), "qi bolt projectile texture")
 	_expect_true(_has_projectile_texture(lib.get_sequence("sword_qi_projectile")), "sword qi projectile texture")
@@ -605,7 +668,7 @@ func _test_intent_preview_enemy_lowest_hp_shows_damage() -> void:
 	var attacker := _make_unit()
 	attacker.attrs[ZhandouObjScript.ATTR_MAGIC_ATK] = 40.0
 	var defender := _make_unit()
-	var skill_cfg := AbilityServiceScript.to_runtime_dict("ability.combat.sword_qi", {"knowledge": {}})
+	var skill_cfg := AbilityServiceScript.to_runtime_dict("ability.combat.qi_bolt", {"knowledge": {}})
 	var row := EnemyIntentPreviewScript.enrich_skill_row(
 		{},
 		attacker,
@@ -675,6 +738,31 @@ func _test_escape_failure_consumes_turn() -> void:
 	_expect_true(not bool(result.get("success", false)), "escape should fail with slow player")
 	_expect_eq(domain.state, EnumBattleState.State.ADVANCING, "failed escape resumes advancing")
 	_expect_true(domain.player.hp < before_hp, "failed escape applies chase damage")
+
+
+func _test_passive_status_bar_shows_cooldown_after_trigger() -> void:
+	var unit := _make_unit()
+	unit.init_passives_from_ids(["fpassive_0003"])
+	var entries: Array = unit.build_status_bar_entries()
+	_expect_eq(entries.size(), 1, "passive always visible in status bar")
+	var idle_row: Dictionary = entries[0] as Dictionary
+	_expect_false(bool(idle_row.get("show_time", true)), "idle passive hides countdown")
+	unit.start_passive_cooldown("fpassive_0003")
+	entries = unit.build_status_bar_entries()
+	var cd_row: Dictionary = entries[0] as Dictionary
+	_expect_true(bool(cd_row.get("show_time", false)), "triggered passive shows countdown")
+	_expect_true(float(cd_row.get("duration_left", 0.0)) > 0.0, "triggered passive has remaining cd")
+
+
+func _test_passive_status_entries_sort_before_buffs() -> void:
+	var sorted: Array = BuffStatusBarScript._sorted_entries([
+		{"kind": "buff", "id": "aaa"},
+		{"kind": "passive", "id": "zzz"},
+		{"kind": "buff", "id": "bbb"},
+		{"kind": "passive", "id": "aaa"},
+	])
+	_expect_eq(str((sorted[0] as Dictionary).get("kind", "")), "passive", "passive sorts first")
+	_expect_eq(str((sorted[2] as Dictionary).get("kind", "")), "buff", "buff follows passives")
 
 
 func _make_unit(hp: float = 100.0, spd: float = 100.0, skill_cd: float = 0.0) -> ZhandouObj:

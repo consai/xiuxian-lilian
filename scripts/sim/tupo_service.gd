@@ -1,7 +1,7 @@
 class_name TupoService
 extends RefCounted
 
-const RULES_PATH := "res://data/tupo_rules.yaml"
+const RULES_PATH := "res://data/exportjson/tupo_rules.json"
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
@@ -29,7 +29,7 @@ const TRANSITION_BY_MAJOR := {
 
 
 static func rules() -> Dictionary:
-	return JsonLoader._read_json_root_object(RULES_PATH)
+	return JsonLoader.load_tupo_rules_bundle()
 
 
 static func compute_breakdown(savedata: Dictionary, realms: Array, realm_index: int) -> Dictionary:

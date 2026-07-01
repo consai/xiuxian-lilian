@@ -23,7 +23,7 @@ static func skill_id_at(actor: ZhandouObj, index: int) -> int:
 	return int((slot_v as Dictionary).get("id", -1))
 
 
-static func find_basic_attack_slot(actor: ZhandouObj) -> int:
+static func find_tiaoxi_slot(actor: ZhandouObj) -> int:
 	if not actor.skills is Array:
 		return -1
 	for i in (actor.skills as Array).size():
@@ -213,8 +213,8 @@ static func handle_blocked_slot_click(
 
 static func resolve_player_slot(ctx: ZhandouChangjingContext, index: int, skill_id: int) -> Dictionary:
 	var payload: Dictionary
-	if skill_id <= 0:
-		payload = ctx.domain.resolve_player_basic()
+	if skill_id == 0:
+		payload = ctx.domain.resolve_player_tiaoxi()
 	else:
 		payload = ctx.domain.resolve_player_skill(skill_id)
 	if not bool(payload.get("ok", false)):
@@ -236,8 +236,8 @@ static func resolve_side_slot(
 	if side == EnumBattleSide.PLAYER:
 		return resolve_player_slot(ctx, index, skill_id)
 	var payload: Dictionary
-	if skill_id <= 0:
-		payload = ctx.domain.resolve_enemy_basic()
+	if skill_id == 0:
+		payload = ctx.domain.resolve_enemy_tiaoxi()
 	else:
 		payload = ctx.domain.resolve_enemy_skill(skill_id)
 	if not bool(payload.get("ok", false)):
@@ -285,9 +285,9 @@ static func resolve_enemy_action_with_ai(ctx: ZhandouChangjingContext) -> Dictio
 	var desc: Dictionary = {}
 	var payload: Dictionary
 	match action_type:
-		EnemyAiTypesScript.ACTION_BASIC:
-			payload = ctx.domain.resolve_enemy_basic()
-			desc = {"action_kind": ZhandouRecordTypes.ACTION_BASIC, "action_id": 0}
+		EnemyAiTypesScript.ACTION_TIAOXI:
+			payload = ctx.domain.resolve_enemy_tiaoxi()
+			desc = {"action_kind": ZhandouRecordTypes.ACTION_TIAOXI, "action_id": 0}
 		EnemyAiTypesScript.ACTION_SKILL:
 			var sid := int(decision.get("skill_id", -1))
 			payload = ctx.domain.resolve_enemy_skill(sid)
@@ -331,9 +331,9 @@ static func resolve_player_action_with_ai(ctx: ZhandouChangjingContext) -> Dicti
 	var payload: Dictionary
 	var desc: Dictionary
 	match str(decision.get("action_type", "")):
-		EnemyAiTypesScript.ACTION_BASIC:
-			payload = ctx.domain.resolve_player_basic()
-			desc = {"action_kind": ZhandouRecordTypes.ACTION_BASIC, "action_id": 0}
+		EnemyAiTypesScript.ACTION_TIAOXI:
+			payload = ctx.domain.resolve_player_tiaoxi()
+			desc = {"action_kind": ZhandouRecordTypes.ACTION_TIAOXI, "action_id": 0}
 		EnemyAiTypesScript.ACTION_SKILL:
 			var sid := int(decision.get("skill_id", -1))
 			payload = ctx.domain.resolve_player_skill(sid)
@@ -374,10 +374,10 @@ static func _enemy_ai_runtime_for_current(ctx: ZhandouChangjingContext) -> Enemy
 
 static func preview_enemy_action(ctx: ZhandouChangjingContext, enemy_index: int) -> Dictionary:
 	if ctx.domain == null or ctx.battle_player == null:
-		return {"action_type": EnemyAiTypesScript.ACTION_BASIC, "skill_id": 0, "slot_index": -1}
+		return {"action_type": EnemyAiTypesScript.ACTION_TIAOXI, "skill_id": 0, "slot_index": -1}
 	var unit := ctx.domain._enemy_at(enemy_index)
 	if unit == null:
-		return {"action_type": EnemyAiTypesScript.ACTION_BASIC, "skill_id": 0, "slot_index": -1}
+		return {"action_type": EnemyAiTypesScript.ACTION_TIAOXI, "skill_id": 0, "slot_index": -1}
 	var ai_cfg := ctx.enemy_ai_cfg
 	if enemy_index >= 0 and enemy_index < ctx.battle_enemy_rows.size():
 		var row_v: Variant = ctx.battle_enemy_rows[enemy_index]
@@ -398,7 +398,7 @@ static func preview_enemy_action(ctx: ZhandouChangjingContext, enemy_index: int)
 		false
 	)
 	if not bool(decision.get("ok", false)):
-		return {"action_type": EnemyAiTypesScript.ACTION_BASIC, "skill_id": 0, "slot_index": -1}
+		return {"action_type": EnemyAiTypesScript.ACTION_TIAOXI, "skill_id": 0, "slot_index": -1}
 	return decision
 
 
@@ -413,9 +413,9 @@ static func _enemy_unit_for_intent_preview(
 	return ZhandouObj.duplicate_with_advancing_projection(unit, advancing_seconds)
 
 
-static func descriptor_for_skill_or_basic(skill_id: int) -> Dictionary:
-	if skill_id <= 0:
-		return {"action_kind": ZhandouRecordTypes.ACTION_BASIC, "action_id": 0}
+static func descriptor_for_skill_or_tiaoxi(skill_id: int) -> Dictionary:
+	if skill_id == 0:
+		return {"action_kind": ZhandouRecordTypes.ACTION_TIAOXI, "action_id": 0}
 	return {"action_kind": ZhandouRecordTypes.ACTION_SKILL, "action_id": int(skill_id)}
 
 

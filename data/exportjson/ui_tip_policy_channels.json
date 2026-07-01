@@ -1,0 +1,22 @@
+{
+  "bar": {
+    "key": "bar",
+    "max_inflight": 2
+  },
+  "combat_block": {
+    "key": "combat_block",
+    "max_inflight": 2
+  },
+  "reward_item": {
+    "key": "reward_item",
+    "max_inflight": 4
+  },
+  "reward_growth": {
+    "key": "reward_growth",
+    "max_inflight": 6
+  },
+  "reward_resource": {
+    "key": "reward_resource",
+    "max_inflight": 3
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "hp_max": {
+    "key": "hp_max",
+    "value": 30.0
+  },
+  "mp_max": {
+    "key": "mp_max",
+    "value": 24.0
+  },
+  "physical_atk": {
+    "key": "physical_atk",
+    "value": 5.5
+  },
+  "magic_atk": {
+    "key": "magic_atk",
+    "value": 6.0
+  },
+  "physical_def": {
+    "key": "physical_def",
+    "value": 3.5
+  },
+  "magic_def": {
+    "key": "magic_def",
+    "value": 4.2
+  },
+  "spd": {
+    "key": "spd",
+    "value": 2.0
+  }
+}

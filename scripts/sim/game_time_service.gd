@@ -1,7 +1,7 @@
 class_name GameTimeService
 extends RefCounted
 
-const DATA_PATH := "res://data/shijian_rules.yaml"
+const DATA_PATH := "res://data/exportjson/shijian_rules.json"
 
 
 static func calendar() -> Dictionary:
@@ -107,4 +107,4 @@ static func duration_label(days: int) -> String:
 
 
 static func _root() -> Dictionary:
-	return JsonLoader._read_json_root_object(DATA_PATH)
+	return JsonLoader.load_shijian_rules_bundle()

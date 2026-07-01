@@ -15,7 +15,7 @@ extends Control
 ## - 新局：GameState.new_game
 ## - 日数：无独立「跳日」玩法 API，GM 直接改 day 仅用于测试时间轴
 
-const SIM_PATH := "res://data/moni.yaml"
+const SIM_PATH := "res://data/exportjson/moni.json"
 const GmBattleBuilderScript := preload("res://scripts/ui/gm_battle_builder.gd")
 
 @onready var _status_label: Label = %StatusLabel
@@ -40,6 +40,8 @@ func refresh() -> void:
 
 
 func _connect_buttons() -> void:
+	%WindowMainButton.pressed.connect(_show_main_window)
+	%WindowBattleButton.pressed.connect(_show_battle_window)
 	%Cultivation100Button.pressed.connect(func() -> void: _add_cultivation(100))
 	%Cultivation1000Button.pressed.connect(func() -> void: _add_cultivation(1000))
 	%CultivationMaxButton.pressed.connect(_fill_cultivation)
@@ -229,6 +231,18 @@ func _open_item_grant_panel() -> void:
 		_flash("无法打开添加道具面板")
 
 
+func _show_main_window() -> void:
+	if GmPanelHost != null and GmPanelHost.has_method("show_panel"):
+		GmPanelHost.show_panel()
+
+
+func _show_battle_window() -> void:
+	if GmPanelHost != null and GmPanelHost.has_method("show_battle_panel"):
+		GmPanelHost.show_battle_panel()
+	else:
+		_flash("无法打开战斗调试面板")
+
+
 func _navigate(nav: Dictionary, fallback_error: String) -> bool:
 	if bool(nav.get("ok", false)):
 		return true
@@ -321,4 +335,4 @@ func _grant_dao_knowledge() -> void:
 
 
 func _realms() -> Array:
-	return JsonLoader._read_json_root_object(SIM_PATH).get("realms", []) as Array
+	return RealmService.realms()

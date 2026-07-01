@@ -1,0 +1,102 @@
+{
+  "wake": {
+    "key": "wake",
+    "type": "line",
+    "speaker": null,
+    "text": "小道观晨钟已响。先确认自己还能引气入体。",
+    "next": "first_choice",
+    "meta": {
+      "backdrop": "cave_hub",
+      "music": "quiet_cave"
+    },
+    "prompt": null,
+    "choices": null,
+    "commands": null,
+    "result": null
+  },
+  "first_choice": {
+    "key": "first_choice",
+    "type": "choice",
+    "speaker": null,
+    "text": null,
+    "next": null,
+    "meta": null,
+    "prompt": "你准备如何回应？",
+    "choices": [
+      {
+        "id": "steady",
+        "label": "静心运气",
+        "hint": "稳住心神，再作打算。",
+        "effects": [
+          {
+            "op": "set",
+            "flag": "prologue.calm",
+            "value": true
+          }
+        ],
+        "next": "guide_cultivate"
+      },
+      {
+        "id": "search",
+        "label": "翻看小札夹页",
+        "hint": "也许夹页里还写着今日安排。",
+        "effects": [
+          {
+            "op": "set",
+            "flag": "prologue.asked_master",
+            "value": true
+          }
+        ],
+        "next": "master_answer"
+      }
+    ],
+    "commands": null,
+    "result": null
+  },
+  "master_answer": {
+    "key": "master_answer",
+    "type": "line",
+    "speaker": null,
+    "text": "早课之后去青岚山巡一圈，记得带回炉边要用的灵草。",
+    "next": "guide_cultivate",
+    "meta": null,
+    "prompt": null,
+    "choices": null,
+    "commands": null,
+    "result": null
+  },
+  "guide_cultivate": {
+    "key": "guide_cultivate",
+    "type": "command",
+    "speaker": null,
+    "text": null,
+    "next": "chapter_end",
+    "meta": null,
+    "prompt": null,
+    "choices": null,
+    "commands": [
+      {
+        "type": "guide_focus",
+        "target": "hub.cultivate_button",
+        "reason": "完成一次修炼"
+      },
+      {
+        "type": "await_game_event",
+        "event": "cultivation.completed"
+      }
+    ],
+    "result": null
+  },
+  "chapter_end": {
+    "key": "chapter_end",
+    "type": "end",
+    "speaker": null,
+    "text": null,
+    "next": null,
+    "meta": null,
+    "prompt": null,
+    "choices": null,
+    "commands": null,
+    "result": "completed"
+  }
+}

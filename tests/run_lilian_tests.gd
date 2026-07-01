@@ -46,9 +46,9 @@ func _run_all() -> void:
 	_run("high difficulty battle nodes generate map enemies", _test_high_difficulty_battle_nodes_generate_map_enemies)
 	_run("battle win opens next map nodes", _test_battle_win_opens_next_map_nodes)
 	_run("reward budget scales by days and difficulty", _test_reward_budget_scales_by_days_and_difficulty)
-	_run("battle win returns to lilian", _test_battle_win_returns_to_expedition)
+	_run("battle win returns to lilian", _test_battle_win_returns_to_lilian)
 	_run("runtime potion slot can be used manually", _test_runtime_potion_slot_can_be_used_manually)
-	_run("battle loss forces lilian result", _test_battle_loss_forces_expedition_result)
+	_run("battle loss forces lilian result", _test_battle_loss_forces_lilian_jiesuan)
 	_run("boss battle resolves at high difficulty", _test_boss_battle_resolves_at_high_difficulty)
 	_run("game settlement occurs once", _test_game_settlement_occurs_once)
 	_run("distinct expeditions do not collide on settlement", _test_distinct_expeditions_settlement_ids)
@@ -280,7 +280,8 @@ func _test_location_declares_monsters_and_materials() -> void:
 	_expect_true(materials.size() >= 3, "blackwater declares available materials")
 	_expect_eq(str((monsters[0] as Dictionary).get("id", "")), "poison_marsh_serpent", "map monster id resolves global monster")
 	_expect_eq(str((monsters[0] as Dictionary).get("species", "")), "beast", "resolved monster keeps species")
-	_expect_true(not ((monsters[0] as Dictionary).get("drops", {}) as Dictionary).is_empty(), "resolved monster keeps drops")
+	var config_manager := root.get_node("ConfigManager")
+	_expect_true(not config_manager.monster_drop_entries(monsters[0] as Dictionary).is_empty(), "resolved monster keeps drops")
 	var found_superior_material := false
 	for material_v in materials:
 		var material := material_v as Dictionary

@@ -1,0 +1,14 @@
+{
+  "schema_version": {
+    "key": "schema_version",
+    "value": "1"
+  },
+  "id": {
+    "key": "id",
+    "value": "prologue.fragment"
+  },
+  "entry": {
+    "key": "entry",
+    "value": "wake"
+  }
+}

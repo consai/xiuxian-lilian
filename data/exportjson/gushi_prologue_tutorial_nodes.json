@@ -1,0 +1,396 @@
+{
+  "empty_cave": {
+    "key": "empty_cave",
+    "type": "line",
+    "speaker": null,
+    "text": "山风从清铃观檐角吹过，铜铃叮当响了三声。你从蒲团上坐起来，尾巴还压着一卷修炼小札。",
+    "meta": {
+      "narration": true
+    },
+    "next": "jade_message",
+    "commands": null,
+    "result": null
+  },
+  "jade_message": {
+    "key": "jade_message",
+    "type": "line",
+    "speaker": null,
+    "text": "小道观晨光正好，丹炉冷着，药架也空了些。小札第一页写着：先闭关一月，再下山看看山路。",
+    "meta": {
+      "narration": true
+    },
+    "next": "master_confession",
+    "commands": null,
+    "result": null
+  },
+  "master_confession": {
+    "key": "master_confession",
+    "type": "line",
+    "speaker": "修炼小札",
+    "text": "聚气丹能帮你快些引气，但药力来得急。闭关之后若灵气浮躁，就去巡山,战斗时灵气运转之间会变得更平稳。",
+    "meta": null,
+    "next": "open_pill_cultivation",
+    "commands": null,
+    "result": null
+  },
+  "open_pill_cultivation": {
+    "key": "open_pill_cultivation",
+    "type": "command",
+    "speaker": null,
+    "text": null,
+    "meta": null,
+    "next": "select_pill",
+    "commands": [
+      {
+        "type": "guide_focus",
+        "target": "CultivateObjectButton",
+        "reason": "开始闭关：打开修炼界面"
+      },
+      {
+        "type": "await_game_event",
+        "event": "tutorial.xiulian_mianban_opened"
+      }
+    ],
+    "result": null
+  },
+  "select_pill": {
+    "key": "select_pill",
+    "type": "command",
+    "speaker": null,
+    "text": null,
+    "meta": null,
+    "next": "start_pill",
+    "commands": [
+      {
+        "type": "guide_focus",
+        "target": "PillButton",
+        "reason": "选择【丹药炼化】，用聚气丹完成首次修炼"
+      },
+      {
+        "type": "await_game_event",
+        "event": "tutorial.pill_mode_selected"
+      }
+    ],
+    "result": null
+  },
+  "start_pill": {
+    "key": "start_pill",
+    "type": "command",
+    "speaker": null,
+    "text": null,
+    "meta": null,
+    "next": "pill_result",
+    "commands": [
+      {
+        "type": "guide_focus",
+        "target": "StartButton",
+        "reason": "开始闭关"
+      },
+      {
+        "type": "await_game_event",
+        "event": "tutorial.cultivation_result_shown"
+      }
+    ],
+    "result": null
+  },
+  "pill_result": {
+    "key": "pill_result",
+    "type": "line",
+    "speaker": null,
+    "text": "一次闭关后，聚气丹化开的灵气像热乎乎的云，把经脉塞得鼓鼓的。运气时有些飘忽，需要战斗来压稳灵气。该去巡山了。",
+    "meta": {
+      "narration": true
+    },
+    "next": "return_pill",
+    "commands": null,
+    "result": null
+  },
+  "return_pill": {
+    "key": "return_pill",
+    "type": "command",
+    "speaker": null,
+    "text": null,
+    "meta": null,
+    "next": "open_map",
+    "commands": [
+      {
+        "type": "guide_focus",
+        "target": "ConfirmButton",
+        "reason": "确认闭关结果，准备出门巡山"
+      },
+      {
+        "type": "await_game_event",
+        "event": "tutorial.cultivation_completed"
+      }
+    ],
+    "result": null
+  },
+  "open_map": {
+    "key": "open_map",
+    "type": "command",
+    "speaker": null,
+    "text": null,
+    "meta": null,
+    "next": "choose_wolf_valley",
+    "commands": [
+      {
+        "type": "guide_focus",
+        "target": "LilianObjectButton",
+        "reason": "出门巡山：并采些炼丹灵草"
+      },
+      {
+        "type": "await_game_event",
+        "event": "tutorial.world_map_opened"
+      }
+    ],
+    "result": null
+  },
+  "choose_wolf_valley": {
+    "key": "choose_wolf_valley",
+    "type": "command",
+    "speaker": null,
+    "text": null,
+    "meta": null,
+    "next": "depart_wolf_valley",
+    "commands": [
+      {
+        "type": "guide_focus",
+        "target": "WildWolfValley",
+        "reason": "选择野狼谷，那里有今日要采的灵草"
+      },
+      {
+        "type": "await_game_event",
+        "event": "tutorial.wolf_valley_selected"
+      }
+    ],
+    "result": null
+  },
+  "depart_wolf_valley": {
+    "key": "depart_wolf_valley",
+    "type": "command",
+    "speaker": null,
+    "text": null,
+    "meta": null,
+    "next": "mountain",
+    "commands": [
+      {
+        "type": "guide_focus",
+        "target": "EnterButton",
+        "reason": "背上小背篓，出门巡山"
+      },
+      {
+        "type": "await_game_event",
+        "event": "tutorial.lilian_started"
+      }
+    ],
+    "result": null
+  },
+  "mountain": {
+    "key": "mountain",
+    "type": "line",
+    "speaker": null,
+    "text": "雨后的野狼谷带着草木清气。石阶旁有新鲜爪印，也有几株冒头的灵草。",
+    "meta": {
+      "narration": true
+    },
+    "next": "wait_battle",
+    "commands": null,
+    "result": null
+  },
+  "wait_battle": {
+    "key": "wait_battle",
+    "type": "command",
+    "speaker": null,
+    "text": null,
+    "meta": null,
+    "next": "battle_press",
+    "commands": [
+      {
+        "type": "guide_focus",
+        "target": "TutorialNextMapNode",
+        "reason": "你听到几声嚎叫, 顺着声音走去, 发现了一群野狼."
+      },
+      {
+        "type": "await_game_event",
+        "event": "tutorial.first_battle_won"
+      }
+    ],
+    "result": null
+  },
+  "battle_press": {
+    "key": "battle_press",
+    "type": "line",
+    "speaker": null,
+    "text": "山路上一场小小争斗后，乱窜的灵气终于安分下来。你拍拍衣摆，把几株灵草收进小背篓。",
+    "meta": {
+      "narration": true
+    },
+    "next": "return_lilian",
+    "commands": null,
+    "result": null
+  },
+  "return_lilian": {
+    "key": "return_lilian",
+    "type": "command",
+    "speaker": null,
+    "text": null,
+    "meta": null,
+    "next": "close_lilian_jiesuan",
+    "commands": [
+      {
+        "type": "guide_focus",
+        "target": "ExitButton",
+        "reason": "带着灵草返程，保住今日收获"
+      },
+      {
+        "type": "await_game_event",
+        "event": "tutorial.lilian_returned"
+      }
+    ],
+    "result": null
+  },
+  "close_lilian_jiesuan": {
+    "key": "close_lilian_jiesuan",
+    "type": "command",
+    "speaker": null,
+    "text": null,
+    "meta": null,
+    "next": "home",
+    "commands": [
+      {
+        "type": "guide_focus",
+        "target": "ReturnButton",
+        "reason": "查看巡山收获，返回小道观"
+      },
+      {
+        "type": "await_game_event",
+        "event": "tutorial.result_closed"
+      }
+    ],
+    "result": null
+  },
+  "home": {
+    "key": "home",
+    "type": "line",
+    "speaker": null,
+    "text": "山门风铃又响了一声。小背篓里的灵草带着露水，丹炉也该重新热起来了。",
+    "meta": {
+      "narration": true
+    },
+    "next": "open_alchemy",
+    "commands": null,
+    "result": null
+  },
+  "open_alchemy": {
+    "key": "open_alchemy",
+    "type": "command",
+    "speaker": null,
+    "text": null,
+    "meta": null,
+    "next": "preview_alchemy",
+    "commands": [
+      {
+        "type": "guide_focus",
+        "target": "FurnaceButton",
+        "reason": "打开丹炉，把巡山灵草炼成丹药"
+      },
+      {
+        "type": "await_game_event",
+        "event": "tutorial.alchemy_opened"
+      }
+    ],
+    "result": null
+  },
+  "preview_alchemy": {
+    "key": "preview_alchemy",
+    "type": "command",
+    "speaker": null,
+    "text": null,
+    "meta": null,
+    "next": "brew_first",
+    "commands": [
+      {
+        "type": "guide_focus",
+        "target": "TutorialPreviewClickArea",
+        "reason": "查看预览区域，点击继续"
+      },
+      {
+        "type": "await_game_event",
+        "event": "tutorial.alchemy_preview_acknowledged"
+      }
+    ],
+    "result": null
+  },
+  "brew_first": {
+    "key": "brew_first",
+    "type": "command",
+    "speaker": null,
+    "text": null,
+    "meta": null,
+    "next": "alchemy_result",
+    "commands": [
+      {
+        "type": "guide_focus",
+        "target": "BrewButton",
+        "reason": "开炉炼制第一炉丹药"
+      },
+      {
+        "type": "await_game_event",
+        "event": "tutorial.alchemy_result_shown"
+      }
+    ],
+    "result": null
+  },
+  "alchemy_result": {
+    "key": "alchemy_result",
+    "type": "line",
+    "speaker": null,
+    "text": "炉火一跳，第一炉丹药滚进瓷盏。小道观里终于有药香。",
+    "meta": {
+      "narration": true
+    },
+    "next": "finish_alchemy",
+    "commands": null,
+    "result": null
+  },
+  "finish_alchemy": {
+    "key": "finish_alchemy",
+    "type": "command",
+    "speaker": null,
+    "text": null,
+    "meta": null,
+    "next": "last_words",
+    "commands": [
+      {
+        "type": "guide_focus",
+        "target": "ReturnButton",
+        "reason": "收起丹药，返回观中"
+      },
+      {
+        "type": "await_game_event",
+        "event": "tutorial.alchemy_completed"
+      }
+    ],
+    "result": null
+  },
+  "last_words": {
+    "key": "last_words",
+    "type": "line",
+    "speaker": "修炼小札",
+    "text": "接下来是打坐修炼，还是再去巡山，就由小观主自己安排了。",
+    "meta": null,
+    "next": "chapter_end",
+    "commands": null,
+    "result": null
+  },
+  "chapter_end": {
+    "key": "chapter_end",
+    "type": "end",
+    "speaker": null,
+    "text": null,
+    "meta": null,
+    "next": null,
+    "commands": null,
+    "result": "completed"
+  }
+}

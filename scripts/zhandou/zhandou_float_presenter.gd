@@ -16,20 +16,20 @@ static func build_spawns(
 	var suppress_skill_line := bool(context.get("suppress_skill_line", false))
 	var damage_suffix := str(context.get("damage_suffix", "")).strip_edges()
 	var skill_name := str(cfg.get("name", "")).strip_edges()
-	var basic_name := StringsZh.getp("combat.float.basic_attack", "普攻")
-	var is_basic_attack := bool(cfg.get("is_basic_attack", false))
+	var tiaoxi_name := StringsZh.getp("combat.float.tiaoxi", "调息")
+	var is_tiaoxi := bool(cfg.get("is_tiaoxi", false))
 	if skill_name == "":
-		is_basic_attack = true
-		skill_name = basic_name
-	elif skill_name == basic_name:
-		is_basic_attack = true
-	if not suppress_skill_line and not is_basic_attack:
+		is_tiaoxi = true
+		skill_name = tiaoxi_name
+	elif skill_name == tiaoxi_name:
+		is_tiaoxi = true
+	if not suppress_skill_line and not is_tiaoxi:
 		_append_spawn(out, skill_name, source_id, "skill", 2)
 	if bool(report.get(ZhandouReportScript.KEY_MISSED, false)):
 		_append_spawn(out, "未命中", target_id, "buff_expire", 8)
 	if bool(report.get(ZhandouReportScript.KEY_CONTROL_RESISTED, false)):
 		_append_spawn(out, "抵抗", target_id, "buff_expire", 8)
-	_append_shield_spawn(out, target_id, float(report.get("shield_absorbed", 0.0)))
+	_append_shield_spawn(out, _status_effect_unit_id(source_id, target_id, cfg), float(report.get("shield_absorbed", 0.0)))
 	_append_damage_spawn(
 		out,
 		target_id,
@@ -55,13 +55,14 @@ static func build_spawns(
 
 	var buff_names_v: Variant = report.get("buff_names", [])
 	if buff_names_v is Array:
+		var buff_unit_id := _status_effect_unit_id(source_id, target_id, cfg)
 		var prefix := StringsZh.getp("combat.float.buff_prefix", "")
 		for name_v in buff_names_v as Array:
 			var bname := str(name_v).strip_edges()
 			if bname == "":
 				continue
 			var line := ("%s %s" % [prefix, bname]).strip_edges() if prefix != "" else bname
-			_append_spawn(out, line, target_id, "buff_add", 6)
+			_append_spawn(out, line, buff_unit_id, "buff_add", 6)
 
 	if out.is_empty():
 		# 便于调试飘字缺失问题。
@@ -90,7 +91,7 @@ static func build_buff_tick_spawns(
 		unit_id,
 		unit_id,
 		report,
-		{"name": line_name, "is_basic_attack": false}
+		{"name": line_name, "is_tiaoxi": false}
 	)
 
 
@@ -106,6 +107,13 @@ static func build_buff_expire_spawn(buff_id: String, unit_id: String) -> Diction
 		{"name": bname}
 	)
 	return {"text": text, "unit_id": unit_id, "tone": "buff_expire", "priority": 0}
+
+
+static func _status_effect_unit_id(source_id: String, target_id: String, cfg: Dictionary) -> String:
+	# 技能 combat.target=self 时，buff/护盾等状态效果落在施法者身上，飘字应跟随受效单位
+	if str(cfg.get("target", "")).strip_edges().to_lower() == EnumZhandouTarget.LABEL_SELF:
+		return source_id
+	return target_id
 
 
 static func _append_spawn(out: Array, text: String, unit_id: String, tone: String, priority: int) -> void:

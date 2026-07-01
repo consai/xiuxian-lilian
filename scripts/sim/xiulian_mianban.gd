@@ -30,7 +30,7 @@ const MODE_IDS := EnumXiulianMode.MODE_IDS
 @onready var _method_picker: PeizhiXuanzeTanchuang = %MethodPicker
 
 var _mode_id := EnumXiulianMode.LABEL_CYCLE
-var _days := 1
+var _days: int = GameTimeService.days_per_month()
 var _selected_pill_id := ""
 
 
@@ -117,7 +117,7 @@ func _sync_day_slider() -> void:
 	var max_days := maxi(min_days, GameState.max_cultivation_days(_mode_id, _selected_pill_id))
 	_day_slider.min_value = float(min_days)
 	_day_slider.max_value = float(max_days)
-	# 未选择或越界时回落到最短可选天数（默认 1 天）
+	# 未选择或越界时回落到最短可选天数（1 月）
 	if _days < min_days:
 		_days = min_days
 	_days = clampi(_days, min_days, max_days)

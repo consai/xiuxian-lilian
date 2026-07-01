@@ -22,3 +22,8 @@ alwaysApply: true
 
 # 代码不要使用preload加载 使用 class_name 自定义类名使用
 # 不要使用 var + :=  使用类型全名
+
+
+
+# data/exportjson 中的配置修改规则
+配置不要直接修改, 修改需要先改 C:\godot\docs 中的源文件再导出, 需要新增字段告诉我

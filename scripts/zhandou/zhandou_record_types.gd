@@ -7,7 +7,8 @@ const UNIT_PLAYER := "player"
 const UNIT_ENEMY := "enemy"
 
 const ACTION_SKILL := "skill"
-const ACTION_BASIC := "basic"
+const ACTION_TIAOXI := "tiaoxi"
+const ACTION_BASIC := ACTION_TIAOXI
 const ACTION_ITEM := "item"
 const ACTION_EQUIP := "equip"
 const ACTION_BUFF_TICK := "buff_tick"

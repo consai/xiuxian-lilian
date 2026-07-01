@@ -42,6 +42,7 @@ static func build_battle_snapshot(savedata: Dictionary, runtime: Dictionary = {}
 	if not _skills_include_id(skills, 0):
 		for i in skills.size():
 			if int((skills[i] as Dictionary).get("id", -1)) < 0:
+				# 首个空槽填入内置调息（combat id 0）
 				skills[i] = {"id": 0, "cd": 0.0}
 				break
 	var equips: Array = []
@@ -67,7 +68,22 @@ static func build_battle_snapshot(savedata: Dictionary, runtime: Dictionary = {}
 		),
 		"build": build,
 		"tag_stats": build.get("tag_stats", {}),
+		"passive_ids": _battle_passive_ids(savedata),
 	}
+
+
+static func _battle_passive_ids(savedata: Dictionary) -> Array:
+	var out: Array = []
+	for aid_v in savedata.get("unlocked_abilities", []) as Array:
+		var aid: String = str(aid_v).strip_edges()
+		if aid == "":
+			continue
+		var row: Dictionary = AbilityServiceScript.by_id(aid)
+		if row.is_empty():
+			continue
+		if AbilityServiceScript.is_always_active_passive(str(row.get("type", ""))):
+			out.append(aid)
+	return out
 
 
 static func _equipped_abilities(savedata: Dictionary) -> Array:

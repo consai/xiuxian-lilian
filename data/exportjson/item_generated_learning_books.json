@@ -1,0 +1,30 @@
+{
+  "1": {
+    "key": "1",
+    "category": "ability",
+    "enabled": true,
+    "id_prefix": "book_skill_",
+    "type": "技能书",
+    "primary_type": "书籍",
+    "secondary_type": "技能书",
+    "icon": "res://assets/art/ui_new/fulu.png",
+    "stackable": true,
+    "max_stack": 9,
+    "name_template": "{name}",
+    "desc_template": "研读后习得技能「{name}」。"
+  },
+  "2": {
+    "key": "2",
+    "category": "method",
+    "enabled": true,
+    "id_prefix": "book_method_",
+    "type": "功法书",
+    "primary_type": "书籍",
+    "secondary_type": "功法书",
+    "icon": "res://assets/art/ui_new/fulu1.png",
+    "stackable": true,
+    "max_stack": 9,
+    "name_template": "{name}",
+    "desc_template": "研读后习得功法「{name}」。"
+  }
+}

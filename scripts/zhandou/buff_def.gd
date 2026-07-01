@@ -1,7 +1,7 @@
 class_name BuffDef
 extends RefCounted
 
-## 与 [code]data/buff.yaml[/code] 中单条 Buff 配置对应。
+## 与导出的 Buff 配置对应。
 
 var id: String = ""
 var name: String = ""
@@ -27,7 +27,11 @@ static func from_dict(data: Dictionary) -> BuffDef:
 	buff.desc = str(data.get("desc", "")).strip_edges()
 	buff.duration = float(data.get("duration", 0.0))
 	buff.max_stacks = maxi(1, int(data.get("max_stacks", 1)))
-	buff.ticktime = maxf(0.01, float(data.get("ticktime", 1.0)))
+	buff.ticktime = float(data.get("ticktime", 1.0))
+	if buff.ticktime < 0.0:
+		buff.ticktime = 0.0
+	elif buff.ticktime > 0.0:
+		buff.ticktime = maxf(0.01, buff.ticktime)
 	buff.modifiers = normalize_modifiers(data.get("modifiers", {}))
 	var tick_v: Variant = data.get("tick_effects", [])
 	if tick_v is Array:
@@ -38,11 +42,16 @@ static func from_dict(data: Dictionary) -> BuffDef:
 	return buff
 
 
-## 支持 [code]{"atk": 10}[/code] 或 [code][{"atk": 10}, {"def": 5}][/code]。
+## 支持 [code]{"atk": 10}[/code]、[code][{"atk": 10}, {"def": 5}][/code] 或 export positional attrschange 行。
 static func normalize_modifiers(raw: Variant) -> Dictionary:
 	if raw is Dictionary:
-		return (raw as Dictionary).duplicate(true)
+		var source := raw as Dictionary
+		if source.has("_percent"):
+			return source.duplicate(true)
+		return source.duplicate(true)
 	if raw is Array:
+		if not raw.is_empty() and raw[0] is Array:
+			return ZhandouEffectCodec.normalize_buff_modifiers(raw)
 		var out: Dictionary = {}
 		for entry_v in raw as Array:
 			if not entry_v is Dictionary:

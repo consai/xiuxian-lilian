@@ -82,11 +82,11 @@ func side_act_and_present(
 		var enemy_payload: Dictionary = enemy_resolved.get("payload", {}) as Dictionary
 		var enemy_desc: Dictionary = enemy_resolved.get("descriptor", {}) as Dictionary
 		if enemy_payload.is_empty():
-			ZhandouDebugLog.write("场景", "敌方 AI 行为不可用，降级普攻")
-			enemy_payload = ctx.domain.resolve_enemy_basic()
-			enemy_desc = {"action_kind": ZhandouRecordTypes.ACTION_BASIC, "action_id": 0}
+			ZhandouDebugLog.write("场景", "敌方 AI 行为不可用，降级调息")
+			enemy_payload = ctx.domain.resolve_enemy_tiaoxi()
+			enemy_desc = {"action_kind": ZhandouRecordTypes.ACTION_TIAOXI, "action_id": 0}
 			if not bool(enemy_payload.get("ok", false)):
-				ZhandouDebugLog.write("场景", "敌方降级普攻失败，安全推进状态机避免卡死", {
+				ZhandouDebugLog.write("场景", "敌方降级调息失败，安全推进状态机避免卡死", {
 					"原因": ZhandouDebugLog.fail_reason_label(str(enemy_payload.get("reason", ""))),
 				})
 				ctx.domain.begin_presentation(EnumBattleSide.ENEMY)
@@ -113,11 +113,11 @@ func side_act_and_present(
 	var slot_index := ZhandouChangjingActions.find_auto_skill_slot(ctx, actor, check_interactive)
 	var skill_id := ZhandouChangjingActions.skill_id_at(actor, slot_index)
 	if slot_index < 0:
-		ZhandouDebugLog.write("场景", "自动战斗无可用技能，尝试普攻", {
+		ZhandouDebugLog.write("场景", "自动战斗无可用技能，尝试调息", {
 			"出手方": ZhandouDebugLog.side_label(side),
 		})
 		skill_id = 0
-		slot_index = ZhandouChangjingActions.find_basic_attack_slot(actor)
+		slot_index = ZhandouChangjingActions.find_tiaoxi_slot(actor)
 		if slot_index < 0:
 			ZhandouDebugLog.write("场景", "自动战斗无法出手", {"出手方": ZhandouDebugLog.side_label(side)})
 			return
@@ -138,7 +138,7 @@ func side_act_and_present(
 		ctx,
 		hud,
 		payload,
-		ZhandouChangjingActions.descriptor_for_skill_or_basic(skill_id)
+		ZhandouChangjingActions.descriptor_for_skill_or_tiaoxi(skill_id)
 	)
 	hud.sync_from_domain(ctx)
 	await presentation.run_presentation(ctx, hud, payload, on_battle_ended)
@@ -170,7 +170,7 @@ func on_skill_pressed(
 		ctx,
 		hud,
 		payload,
-		ZhandouChangjingActions.descriptor_for_skill_or_basic(skill_id)
+		ZhandouChangjingActions.descriptor_for_skill_or_tiaoxi(skill_id)
 	)
 	hud.sync_from_domain(ctx)
 	await presentation.run_presentation(ctx, hud, payload, on_battle_ended)

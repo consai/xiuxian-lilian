@@ -1,0 +1,10 @@
+{
+  "schemaVersion": {
+    "key": "schemaVersion",
+    "value": "2"
+  },
+  "configId": {
+    "key": "configId",
+    "value": "cultivation_methods"
+  }
+}

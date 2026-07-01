@@ -129,7 +129,7 @@ static func is_combatant_row(row: Dictionary) -> bool:
 	return true
 
 
-## 将 [code]data/jineng.yaml[/code] 与可选的 [code]skill_cfg[/code] 覆盖合并进 [param data]。
+## 将技能表与可选的 [code]skill_cfg[/code] 覆盖合并进 [param data]。
 static func merge_skill_cfg_from_tables(data: Dictionary) -> Dictionary:
 	var out := data.duplicate(true)
 	var partial: Dictionary = {}
@@ -705,25 +705,25 @@ static func build_skills_ui(player: ZhandouObj, skill_cfg: Dictionary) -> Array:
 			rows.append({"empty": true})
 			continue
 		if skill_id == 0:
-			var basic := {
+			var tiaoxi := {
 				"skill_id": 0,
-				"name": "普攻",
+				"name": "调息",
 				"cd_remaining": float(slot.get("cd", 0.0)),
 				"cd_total": -1.0,
 			}
-			var basic_cfg := ZhandouObj._lookup_cfg(skill_cfg, 0)
-			if basic_cfg is Dictionary:
-				var ba := basic_cfg as Dictionary
-				var ba_name := str(ba.get("name", "")).strip_edges()
-				if ba_name != "":
-					basic["name"] = ba_name
-				var basic_icon := _resolve_icon_texture(ba)
-				if basic_icon != null:
-					basic["icon"] = basic_icon
-				basic["quality"] = EnumQuality.clamp_quality(int(ba.get("quality", 1)))
-				basic["tier"] = EnumItemTier.clamp_tier(int(ba.get("tier", 1)))
-				basic["back_color"] = _quality_back_color(int(basic["quality"]))
-			rows.append(basic)
+			var tiaoxi_cfg := ZhandouObj._lookup_cfg(skill_cfg, 0)
+			if tiaoxi_cfg is Dictionary:
+				var tx := tiaoxi_cfg as Dictionary
+				var tx_name := str(tx.get("name", "")).strip_edges()
+				if tx_name != "":
+					tiaoxi["name"] = tx_name
+				var tiaoxi_icon := _resolve_icon_texture(tx)
+				if tiaoxi_icon != null:
+					tiaoxi["icon"] = tiaoxi_icon
+				tiaoxi["quality"] = EnumQuality.clamp_quality(int(tx.get("quality", 1)))
+				tiaoxi["tier"] = EnumItemTier.clamp_tier(int(tx.get("tier", 1)))
+				tiaoxi["back_color"] = _quality_back_color(int(tiaoxi["quality"]))
+			rows.append(tiaoxi)
 			continue
 		var cfg := ZhandouObj._lookup_cfg(skill_cfg, skill_id)
 		if cfg.is_empty():
@@ -898,7 +898,7 @@ static func _interval_cap(unit: ZhandouObj) -> float:
 	return ZhandouBalance.interval_cap_for(unit)
 
 
-## 编辑器直开战斗场景 / 测试进战用 stub；技能来自 [code]data/jineng.yaml[/code]，道具来自 [code]data/item.yaml[/code]（[code]items_FightTestDan[/code] / [code]fight_id=9001[/code]）。
+## 编辑器直开战斗场景 / 测试进战用 stub；技能和道具来自导出的 JSON 配置。
 static func sample_for_editor() -> Dictionary:
 	var out := {
 		"player": {
@@ -953,7 +953,7 @@ static func sample_for_editor() -> Dictionary:
 								"when": {"skill_ready": 3},
 								"action": {"type": "skill", "skill_id": 3},
 							},
-							{"action": {"type": "basic"}},
+							{"action": {"type": "tiaoxi"}},
 						],
 					},
 					{
@@ -1015,7 +1015,7 @@ static func _build_skill_cfg_fallback(partial: Dictionary) -> Dictionary:
 		return out
 	for k in partial.keys():
 		var key_str := str(k)
-		if key_str == "basic_attack":
+		if key_str == "basic_attack" or key_str == "tiaoxi_cfg":
 			var ba_v: Variant = partial[k]
 			if ba_v is Dictionary:
 				var merged := out.get(0, out.get("0", {})) as Dictionary

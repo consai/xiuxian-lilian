@@ -1,0 +1,62 @@
+{
+  "qingshi_market": {
+    "key": "qingshi_market",
+    "name": "青石坊市",
+    "type": "market",
+    "position": [
+      146,
+      181
+    ],
+    "desc": "小型修士聚集地，适合交易基础材料与补给。",
+    "services": [
+      "坊市",
+      "委托",
+      "补给"
+    ]
+  },
+  "yunlan_city": {
+    "key": "yunlan_city",
+    "name": "云岚仙城",
+    "type": "cultivation_city",
+    "position": [
+      350,
+      106
+    ],
+    "desc": "云雾环绕的繁华仙城，宗门与商会在此设有驻地。",
+    "services": [
+      "坊市",
+      "传送阵",
+      "宗门驻地"
+    ]
+  },
+  "tianhe_ferry": {
+    "key": "tianhe_ferry",
+    "name": "天河渡口",
+    "type": "market",
+    "position": [
+      565,
+      196
+    ],
+    "desc": "天河航运枢纽，可由此转赴各处。",
+    "services": [
+      "摆渡",
+      "补给",
+      "情报"
+    ]
+  },
+  "luoxia_town": {
+    "key": "luoxia_town",
+    "name": "落霞镇",
+    "type": "market",
+    "position": [
+      650,
+      371
+    ],
+    "desc": "落霞映照的小镇，商旅往来频繁。",
+    "services": [
+      "坊市",
+      "客栈",
+      "委托"
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 class_name EnumZhandouTarget
 extends RefCounted
 
-## 战斗效果配置 target/defaultTarget 字段。
+## 战斗效果配置 target 字段：仅表示作用侧（自身 / 敌方）。
 
 enum Target {
 	SELF,
@@ -37,14 +37,13 @@ static func is_valid_label(text: String) -> bool:
 	return text.strip_edges().to_lower() in VALID_LABELS
 
 
-## 效果 target 是否指向敌方（含 enemy_lowest_hp 等扩展选敌标签）。
+## 效果 target 是否指向敌方（兼容旧复合 target 与 targetArg）。
 static func is_hostile_label(text: String) -> bool:
 	var key := text.strip_edges().to_lower()
 	if key == LABEL_SELF:
 		return false
-	if key == "" or key == LABEL_ENEMY:
+	if key == LABEL_ENEMY:
 		return true
 	if key.begins_with("enemy"):
 		return true
-	# 范围/落点类目标在 1v1 中仍落在 default_target（玩家）上。
-	return key in ["area", "line", "position"]
+	return key in ["area", "line"]

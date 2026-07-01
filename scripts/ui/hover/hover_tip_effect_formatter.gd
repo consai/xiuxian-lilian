@@ -4,25 +4,28 @@ class_name HoverTipEffectFormatter
 ## 战斗效果行文案格式化，供技能/道具/法宝 hover tip 共用。
 
 
-static func format_lines(effects_v: Variant) -> Array[String]:
+static func format_lines(effects_v: Variant, skill_target: String = "", skill_target_arg: String = "") -> Array[String]:
 	var out: Array[String] = []
 	if not effects_v is Array:
 		return out
 	for eff_v in effects_v as Array:
 		if not eff_v is Dictionary:
 			continue
-		var line := format_one(eff_v as Dictionary)
+		var line := format_one(eff_v as Dictionary, skill_target, skill_target_arg)
 		if line != "":
 			out.append(line)
 	return out
 
 
-static func format_one(effect: Dictionary) -> String:
+static func format_one(effect: Dictionary, skill_target: String = "", skill_target_arg: String = "") -> String:
 	var type_name := str(effect.get("type", "")).strip_edges().to_lower()
 	var value := float(effect.get("value", 0.0))
 	var value_label := _effect_value_label(effect, value)
-	var target_key := str(effect.get("target", "")).strip_edges().to_lower()
-	var target_label := _target_label(target_key)
+	var target_key := str(effect.get("target", skill_target)).strip_edges().to_lower()
+	var target_arg := str(
+		effect.get("target_arg", effect.get("targetArg", skill_target_arg))
+	).strip_edges().to_lower()
+	var target_label := EnumZhandouTargetArg.display_label(target_key, target_arg)
 	if type_name in ["damage", "heal", "shield", "restore_mp"] and value <= 0.0:
 		return ""
 	match type_name:
@@ -102,20 +105,32 @@ static func _target_label(target_key: String) -> String:
 			return StringsZh.getp("hover.target.default", "目标")
 
 
-static func format_raw_ability_lines(effects_v: Variant, mastery: float = -1.0) -> Array[String]:
+static func format_raw_ability_lines(
+		effects_v: Variant,
+		mastery: float = -1.0,
+		skill_target: String = "",
+		skill_target_arg: String = ""
+) -> Array[String]:
 	var out: Array[String] = []
 	if not effects_v is Array:
 		return out
 	for eff_v in effects_v as Array:
 		if not eff_v is Dictionary:
 			continue
-		var line := _format_raw_ability_effect(eff_v as Dictionary, mastery)
+		var line := _format_raw_ability_effect(
+			eff_v as Dictionary, mastery, skill_target, skill_target_arg
+		)
 		if line != "":
 			out.append(line)
 	return out
 
 
-static func _format_raw_ability_effect(effect: Dictionary, mastery: float = -1.0) -> String:
+static func _format_raw_ability_effect(
+		effect: Dictionary,
+		mastery: float = -1.0,
+		skill_target: String = "",
+		skill_target_arg: String = ""
+) -> String:
 	var effect_id := str(effect.get("effectId", "")).strip_edges()
 	if effect_id == "":
 		return ""
@@ -125,7 +140,10 @@ static func _format_raw_ability_effect(effect: Dictionary, mastery: float = -1.0
 		value += float(effect.get("masteryGrowth", 0.0)) * clampf(mastery, 0.0, 1.0)
 	var operation := str(effect.get("operation", "add_flat"))
 	var attrs: Dictionary = effect.get("attributes", {}) as Dictionary
-	var target := _target_label(str(effect.get("target", attrs.get("target", ""))))
+	var target := EnumZhandouTargetArg.display_label(
+		str(effect.get("target", attrs.get("target", skill_target))),
+		str(effect.get("targetArg", effect.get("target_arg", attrs.get("targetArg", skill_target_arg))))
+	)
 	var value_text := _fmt_effect_value(value, operation)
 	var label := _effect_id_label(effect_id)
 	return "%s：%s %s" % [target, label, value_text]
@@ -181,55 +199,32 @@ static func _signed_percent(value: float) -> String:
 
 
 static func _effect_id_label(effect_id: String) -> String:
-	var labels := {
+	var active_label := EnumZhandouActiveEffect.label(effect_id)
+	if active_label != "":
+		return active_label
+	var passive_label := EnumZhandouPassiveEffect.label(effect_id)
+	if passive_label != "":
+		return passive_label
+	var general_label := EnumTongyongPassiveEffect.label(effect_id)
+	if general_label != "":
+		return general_label
+	# 功法/知识等仍引用统一效果目录中的旧 ID，保留少量常用显示名。
+	var legacy_labels := {
 		"damage_spiritual": "灵力伤害",
-		"damage_sword": "剑气伤害",
-		"damage_sword_area": "剑阵伤害",
-		"damage_elemental": "五行伤害",
 		"damage_physical": "物理伤害",
-		"damage_physical_area": "范围物理伤害",
-		"damage_thunder": "雷法伤害",
-		"damage_spirit": "神魂伤害",
-		"damage_spirit_sword": "神魂剑伤",
-		"damage_void": "虚空伤害",
-		"damage_law": "法则伤害",
-		"damage_law_area": "范围法则伤害",
-		"damage_tribulation": "劫雷伤害",
-		"damage_true": "真实伤害",
-		"shield_flat": "护盾",
 		"shield_spiritual": "灵力护盾",
-		"heal_hp": "气血恢复",
-		"restore_mana": "法力恢复",
 		"mana_regen": "法力回复",
 		"activation_speed": "激活速度",
 		"cast_speed": "施法速度",
-		"cultivation_speed": "修炼速度",
-		"formation_setup_speed": "布阵速度",
-		"gather_speed": "采集速度",
-		"regeneration_speed": "再生速度",
-		"sword_attack_speed": "剑道攻速",
-		"talisman_activation_speed": "符箓激活速度",
-		"void_travel_speed": "虚空遁行速度",
 		"max_mana": "法力上限",
-		"max_hp": "气血上限",
 		"max_health": "气血上限",
 		"physical_attack": "物理攻击",
 		"magic_attack": "法术攻击",
 		"physical_defense": "物理防御",
 		"magic_defense": "法术防御",
-		"damage_bonus": "伤害加成",
-		"armor_pierce": "护甲穿透",
-		"space_pierce": "空间穿透",
-		"law_pierce": "法则穿透",
-		"dash_distance": "位移距离",
-		"evasion_window": "借势提速",
-		"array_duration": "阵法持续",
-		"control_duration": "控制时长",
-		"stun_chance": "麻痹概率",
-		"delay_special_action_chance": "延缓特殊行动概率",
 	}
-	if labels.has(effect_id):
-		return str(labels[effect_id])
+	if legacy_labels.has(effect_id):
+		return str(legacy_labels[effect_id])
 	return _humanize_effect_id(effect_id)
 
 

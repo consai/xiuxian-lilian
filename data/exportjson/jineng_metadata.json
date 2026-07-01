@@ -1,0 +1,14 @@
+{
+  "name": {
+    "key": "name",
+    "value": "技能配置"
+  },
+  "description": {
+    "key": "description",
+    "value": "技能自身配置学习门槛"
+  },
+  "abilityCount": {
+    "key": "abilityCount",
+    "value": "45"
+  }
+}

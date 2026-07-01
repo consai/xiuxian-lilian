@@ -98,7 +98,7 @@ static func validate_core(attrs: Dictionary) -> PackedStringArray:
 	return errors
 
 
-## 按 Buff [code]modifiers[/code] 叠层修正（加法，与 [code]data/buff.yaml[/code] 示例一致）。
+## 按 Buff [code]modifiers[/code] 叠层修正（加法）。
 static func apply_modifiers(attrs: Dictionary, modifiers: Dictionary, stacks: int = 1) -> Dictionary:
 	if modifiers.is_empty() or stacks == 0:
 		return attrs.duplicate(true)
@@ -201,6 +201,16 @@ static func calc_skill_damage(
 	dmg *= 1.0 + maxf(0.0, get_attr(attacker, DAMAGE_BONUS, 0.0))
 	dmg *= 1.0 + maxf(-0.75, get_attr(defender, DAMAGE_TAKEN, 0.0))
 	return {"damage": dmg, "damage_type": resolved_type}
+
+
+## 调息回蓝量：按法力恢复速度 × [member ZhandouBalance.TIAOXI_MP_REGEN_MULTIPLIER]。
+static func calc_tiaoxi_mp_restore(attrs: Dictionary) -> float:
+	var regen: float = maxf(0.0, get_attr(attrs, MP_REGEN, 0.0))
+	return regen * ZhandouBalance.TIAOXI_MP_REGEN_MULTIPLIER
+
+
+static func estimate_tiaoxi_mp_restore(attrs: Dictionary) -> float:
+	return calc_tiaoxi_mp_restore(attrs)
 
 
 ## 意图预览：按期望伤害估算，避免随机波动。

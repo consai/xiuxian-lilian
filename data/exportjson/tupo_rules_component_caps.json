@@ -1,0 +1,30 @@
+{
+  "cultivation": {
+    "key": "cultivation",
+    "value": 400
+  },
+  "pills": {
+    "key": "pills",
+    "value": 300
+  },
+  "mind": {
+    "key": "mind",
+    "value": 200
+  },
+  "aptitude": {
+    "key": "aptitude",
+    "value": 200
+  },
+  "fortune": {
+    "key": "fortune",
+    "value": 150
+  },
+  "special_method": {
+    "key": "special_method",
+    "value": 150
+  },
+  "other": {
+    "key": "other",
+    "value": 100
+  }
+}

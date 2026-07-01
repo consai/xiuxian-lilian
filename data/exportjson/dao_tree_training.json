@@ -1,0 +1,28 @@
+{
+  "maxLevel": {
+    "key": "maxLevel",
+    "value": 5
+  },
+  "basePoints": {
+    "key": "basePoints",
+    "value": 250
+  },
+  "levelMultipliers": {
+    "key": "levelMultipliers",
+    "value": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ]
+  },
+  "speedFormula": {
+    "key": "speedFormula",
+    "value": "primary + secondary / 2"
+  },
+  "pointsFormula": {
+    "key": "pointsFormula",
+    "value": "basePoints * rank * levelMultipliers[level - 1]"
+  }
+}
