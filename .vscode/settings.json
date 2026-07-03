@@ -1,0 +1,27 @@
+{
+  // 工作区文件树与搜索排除（与 .cursorignore 对齐；不影响 Git）
+  "files.watcherExclude": {
+    "**/.godot/**": true,
+    "**/.godot_test_*/**": true,
+    "**/outputs/**": true
+  },
+  "files.exclude": {
+    "**/.godot": true,
+    "**/.godot_test_*": true,
+    "**/outputs": true
+  },
+  "search.exclude": {
+    "**/.godot": true,
+    "**/.godot_test_*": true,
+    "**/outputs": true,
+    "xiuxian配置表/indir": true,
+    "**/*.import": true,
+    "**/*.uid": true,
+    "**/*.translation": true,
+    "**/*.inspect.ndjson": true,
+    "**/*.xlsx": true,
+    "assets/**": true,
+    "docs/**/*.png": true,
+    "docs/**/*.png.import": true
+  }
+}

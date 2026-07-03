@@ -5,7 +5,8 @@
 [ext_resource type="FontFile" uid="uid://btkp4vukwqrul" path="res://assets/art/AlimamaDaoLiTi.ttf" id="3_kkcco"]
 [ext_resource type="Texture2D" uid="uid://dgasoy4txpadq" path="res://assets/art/ui_new/item_jian.png" id="3_sword"]
 [ext_resource type="Script" uid="uid://i2ey5righwn7" path="res://scripts/ui/hover/hover_tip_source.gd" id="5_hover"]
-[ext_resource type="PackedScene" path="res://scenes/zhandou/buff_status_bar.tscn" id="6_buffbar"]
+[ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="6_4fcsx"]
+[ext_resource type="PackedScene" uid="uid://cx0fbnjps78b1" path="res://scenes/zhandou/buff_status_bar.tscn" id="6_buffbar"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_j46pb"]
 font = ExtResource("3_kkcco")
@@ -33,23 +34,32 @@ script = ExtResource("1_slot")
 
 [node name="role" type="Node2D" parent="." unique_id=2009636443]
 position = Vector2(0, -3)
-scale = Vector2(0.2, 0.2)
+scale = Vector2(0.16, 0.16)
 
 [node name="Sprite" type="Sprite2D" parent="role" unique_id=1112236993]
 unique_name_in_owner = true
 texture = ExtResource("2_rfuso")
 
-[node name="IntentBadge" type="Control" parent="." unique_id=-2147483636]
+[node name="ColorRect" type="ColorRect" parent="." unique_id=88724672]
+unique_name_in_owner = true
+z_index = 1
+y_sort_enabled = true
+offset_left = -37.0
+offset_top = -161.0
+offset_right = 40.0
+offset_bottom = -45.0
+color = Color(0.17923622, 0.17923622, 0.17923622, 0.416)
+
+[node name="IntentBadge" type="Control" parent="ColorRect" unique_id=-2147483636]
 unique_name_in_owner = true
 z_index = 10
-layout_mode = 3
 anchors_preset = 0
-offset_left = -24.0
-offset_top = -94.0
-offset_right = 44.0
-offset_bottom = -64.0
+offset_left = 9.0
+offset_top = 5.0
+offset_right = 77.0
+offset_bottom = 35.0
 
-[node name="IntentIcon" type="TextureRect" parent="IntentBadge" unique_id=-2147483635]
+[node name="IntentIcon" type="TextureRect" parent="ColorRect/IntentBadge" unique_id=-2147483635]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 2.0
@@ -61,7 +71,7 @@ texture = ExtResource("3_sword")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="IntentDamage" type="Label" parent="IntentBadge" unique_id=-2147483634]
+[node name="IntentDamage" type="Label" parent="ColorRect/IntentBadge" unique_id=-2147483634]
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 26.0
@@ -75,37 +85,41 @@ text = "22"
 label_settings = SubResource("LabelSettings_j46pb")
 vertical_alignment = 1
 
-[node name="IntentHover" type="Node" parent="IntentBadge" unique_id=-2147483633]
+[node name="IntentHover" type="Node" parent="ColorRect/IntentBadge" unique_id=-2147483633]
 unique_name_in_owner = true
 script = ExtResource("5_hover")
 
-[node name="HpBar" type="ProgressBar" parent="." unique_id=572268535]
+[node name="HpBar" type="ProgressBar" parent="ColorRect" unique_id=572268535]
 unique_name_in_owner = true
-offset_left = -30.0
-offset_top = 61.0
-offset_right = 32.0
-offset_bottom = 69.0
+layout_mode = 0
+offset_left = 6.0
+offset_top = 62.0
+offset_right = 68.0
+offset_bottom = 70.0
 theme_override_styles/background = SubResource("HpBack")
 theme_override_styles/fill = SubResource("HpFill")
 value = 26.93
 show_percentage = false
 
-[node name="Name" type="Label" parent="." unique_id=792346274]
+[node name="Name" type="Label" parent="ColorRect" unique_id=792346274]
 unique_name_in_owner = true
-offset_left = -43.0
-offset_top = 71.0
-offset_right = 45.0
-offset_bottom = 91.0
+layout_mode = 0
+offset_left = -7.0
+offset_top = 38.0
+offset_right = 81.0
+offset_bottom = 58.0
 theme_override_font_sizes/font_size = 12
 text = "敌人"
+label_settings = ExtResource("6_4fcsx")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="BuffStatusBar" parent="." unique_id=2147483640 instance=ExtResource("6_buffbar")]
+[node name="BuffStatusBar" parent="ColorRect" unique_id=2147483640 instance=ExtResource("6_buffbar")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 44)
-offset_left = -59.0
-offset_top = 91.0
-offset_right = 61.0
-offset_bottom = 135.0
+custom_minimum_size = Vector2(80, 44)
+layout_mode = 0
+offset_left = -4.0
+offset_top = 75.0
+offset_right = 76.0
+offset_bottom = 119.0
 row_alignment = "center"

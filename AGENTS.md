@@ -88,6 +88,16 @@ var _cached_inventory := {}
 
 新增字段时：在 `DataStore._default_savedata()` 或对应 `_default_*()` 中补充默认值，并通过 `coalesce_savedata()` 等合并逻辑保证读档兼容。
 
+## 配置表与 AI 忽略规则
+
+| 路径 | 用途 | AI 是否应读 |
+|------|------|-------------|
+| `xiuxian配置表/indir/*.xlsx` | Excel 源表 | 否（二进制；用表格工具或导出后改） |
+| `xiuxian配置表/indir/*.inspect.ndjson` | 导出中间产物 | **禁止**（大文件，已加入 ignore） |
+| `data/*.yaml` | 运行时配置 | 按需单文件 |
+| `data/exportjson/*.json` | 导出结果 | 按需单文件，勿批量读取 |
+
+忽略配置：`.cursorignore`（Cursor）、`.codex/config.toml` permissions deny（Codex）、`.codexignore`（与 cursorignore 同步备查）。
 
 
 

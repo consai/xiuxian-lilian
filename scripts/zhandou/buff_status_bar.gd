@@ -4,7 +4,7 @@ class_name BuffStatusBar
 ## Buff/被动状态栏：被动恒靠左，每行最多 6 个自动换行。
 
 const BuffStatusItemScene := preload("res://scenes/zhandou/buff_status_item.tscn")
-const ITEMS_PER_ROW := 6
+const ITEMS_PER_ROW := 3
 const ROW_SEPARATION := 4
 const ROW_GAP := 2
 const ITEM_WIDTH := 34

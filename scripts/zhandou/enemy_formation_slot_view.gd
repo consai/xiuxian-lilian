@@ -14,6 +14,7 @@ const _SHIELD_ICON := preload("res://assets/art/ui_new/hudun_icon.png")
 @onready var _intent_damage: Label = %IntentDamage
 @onready var _intent_hover: HoverTipSource = %IntentHover
 @onready var sprite: Sprite2D = %Sprite
+@onready var _color_rect: ColorRect = %ColorRect
 @onready var hp_bar: ProgressBar = %HpBar
 @onready var name_label: Label = %Name
 @onready var _buff_status: BuffStatusBar = %BuffStatusBar
@@ -45,6 +46,9 @@ func apply_slot(
 			_buff_status.sync_unit(null)
 		return
 	var enabled := active and not dead
+	# 后排/候补只显示立绘，前排才展示血条与意图等 UI 底板。
+	if _color_rect != null:
+		_color_rect.visible = active
 	modulate = Color(1, 1, 1, 1) if enabled else Color(0.66, 0.66, 0.66, 0.72)
 	var avatar := ZhandouInitData._resolve_avatar_texture(row_data)
 	if sprite != null:

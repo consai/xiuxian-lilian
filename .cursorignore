@@ -1,0 +1,45 @@
+# =============================================================================
+# Cursor / AI 索引忽略（与 .codexignore、.codex/config.toml 同步）
+# 改表流程：xiuxian配置表/indir/*.xlsx → export_excel_json.bat → data/exportjson/
+# =============================================================================
+
+# --- Godot 编辑器缓存与 headless/CI 测试临时目录 ---
+.godot/
+.godot_test_*/
+
+# --- Excel 配置源与 inspect 中间产物 ---
+xiuxian配置表/indir/
+xiuxian配置表/**/previews/
+**/*.xlsx
+**/*.inspect.ndjson
+
+# --- 配置表导出工具本地输出（previews / 副本 xlsx / inspect）---
+outputs/
+
+# --- Godot 自动生成 sidecar（.gd/.tscn 才是源码）---
+**/*.import
+**/*.uid
+**/*.translation
+
+# --- 二进制美术与音频（路径引用在 .tscn/.gd；AI 无需读像素/波形）---
+assets/**/*.png
+assets/**/*.jpg
+assets/**/*.jpeg
+assets/**/*.webp
+assets/**/*.gif
+assets/**/*.ttf
+assets/**/*.otf
+assets/**/*.woff
+assets/**/*.woff2
+assets/**/*.wav
+**/*.wav
+
+# --- docs 设计稿大图 ---
+docs/**/*.png
+docs/**/*.png.import
+
+# --- 系统/编辑器杂项 ---
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak

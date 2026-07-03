@@ -1,0 +1,35 @@
+# xiuxian 项目 Codex 权限：屏蔽 Excel 配置目录中的大文件/二进制，降低上下文占用。
+# Codex 无 .codexignore；用 permissions.filesystem deny 实现同等效果。
+# 改表流程：xiuxian配置表/indir/*.xlsx → export_excel_json.bat → data/exportjson/
+# 运行时读表：按需打开 data/*.yaml 或 data/exportjson/ 中的单个 json。
+
+default_permissions = "xiuxian-workspace"
+
+[permissions.xiuxian-workspace]
+extends = ":workspace"
+
+[permissions.xiuxian-workspace.filesystem.":workspace_roots"]
+"." = "write"
+".godot" = "deny"
+".godot_test_*" = "deny"
+"outputs" = "deny"
+"xiuxian配置表/indir" = "deny"
+"xiuxian配置表/**/previews" = "deny"
+"**/*.xlsx" = "deny"
+"**/*.inspect.ndjson" = "deny"
+"**/*.import" = "deny"
+"**/*.uid" = "deny"
+"**/*.translation" = "deny"
+"assets/**/*.png" = "deny"
+"assets/**/*.jpg" = "deny"
+"assets/**/*.jpeg" = "deny"
+"assets/**/*.webp" = "deny"
+"assets/**/*.gif" = "deny"
+"assets/**/*.ttf" = "deny"
+"assets/**/*.otf" = "deny"
+"assets/**/*.woff" = "deny"
+"assets/**/*.woff2" = "deny"
+"assets/**/*.wav" = "deny"
+"**/*.wav" = "deny"
+"docs/**/*.png" = "deny"
+"docs/**/*.png.import" = "deny"

@@ -690,7 +690,7 @@ grow_vertical = 2
 
 [node name="sprite_left" parent="center" unique_id=1019927927 instance=ExtResource("30_enemy_slot")]
 unique_name_in_owner = true
-position = Vector2(-358, 6)
+position = Vector2(-295, 82)
 flip_sprite_horizontal = false
 
 [node name="sprite_right" type="Sprite2D" parent="center" unique_id=1778740699]
@@ -700,49 +700,49 @@ position = Vector2(560, -11)
 texture = ExtResource("15_6irjl")
 
 [node name="EnemySlot_0" parent="center" unique_id=1170104318 instance=ExtResource("30_enemy_slot")]
-position = Vector2(-7, -97)
+position = Vector2(-34, -13)
 
 [node name="EnemySlot_1" parent="center" unique_id=1703641528 instance=ExtResource("30_enemy_slot")]
-position = Vector2(61, -41)
+position = Vector2(43, 43)
 
 [node name="EnemySlot_2" parent="center" unique_id=1673865008 instance=ExtResource("30_enemy_slot")]
-position = Vector2(134, 15)
+position = Vector2(120, 99)
 
 [node name="EnemySlot_3" parent="center" unique_id=1201716536 instance=ExtResource("30_enemy_slot")]
-position = Vector2(203, 66)
+position = Vector2(197, 150)
 
 [node name="EnemySlot_4" parent="center" unique_id=2075805232 instance=ExtResource("30_enemy_slot")]
-position = Vector2(271, 110)
+position = Vector2(273, 194)
 
 [node name="EnemySlot_5" parent="center" unique_id=1560976258 instance=ExtResource("30_enemy_slot")]
-position = Vector2(123, -97)
+position = Vector2(157, -13)
 
 [node name="EnemySlot_6" parent="center" unique_id=96599165 instance=ExtResource("30_enemy_slot")]
-position = Vector2(191, -41)
+position = Vector2(234, 43)
 
 [node name="EnemySlot_7" parent="center" unique_id=945348374 instance=ExtResource("30_enemy_slot")]
-position = Vector2(264, 15)
+position = Vector2(311, 99)
 
 [node name="EnemySlot_8" parent="center" unique_id=2024117541 instance=ExtResource("30_enemy_slot")]
-position = Vector2(333, 66)
+position = Vector2(388, 150)
 
 [node name="EnemySlot_9" parent="center" unique_id=578804603 instance=ExtResource("30_enemy_slot")]
-position = Vector2(401, 110)
+position = Vector2(462, 194)
 
 [node name="EnemySlot_10" parent="center" unique_id=1460611612 instance=ExtResource("30_enemy_slot")]
-position = Vector2(250, -97)
+position = Vector2(284, -13)
 
 [node name="EnemySlot_11" parent="center" unique_id=260308700 instance=ExtResource("30_enemy_slot")]
-position = Vector2(321, -41)
+position = Vector2(364, 43)
 
 [node name="EnemySlot_12" parent="center" unique_id=498169488 instance=ExtResource("30_enemy_slot")]
-position = Vector2(397, 15)
+position = Vector2(444, 99)
 
 [node name="EnemySlot_13" parent="center" unique_id=820126145 instance=ExtResource("30_enemy_slot")]
-position = Vector2(466, 66)
+position = Vector2(521, 150)
 
 [node name="EnemySlot_14" parent="center" unique_id=614128274 instance=ExtResource("30_enemy_slot")]
-position = Vector2(537, 110)
+position = Vector2(598, 194)
 
 [node name="botton" type="Panel" parent="." unique_id=1376481080]
 layout_mode = 1

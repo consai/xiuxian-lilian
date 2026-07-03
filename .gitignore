@@ -4,6 +4,10 @@
 # Godot headless/CI test runtime dirs (APPDATA/LOCALAPPDATA overrides)
 /.godot_test_*/
 
+# 配置表导出工具本地输出（previews / inspect / 副本 xlsx）
+/outputs/
+**/*.inspect.ndjson
+
 # Editor/user-specific caches (never commit)
 /.godot/editor/
 !/.godot/editor/project_metadata.cfg
