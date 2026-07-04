@@ -31,12 +31,10 @@ assets/**/*.ttf
 assets/**/*.otf
 assets/**/*.woff
 assets/**/*.woff2
-assets/**/*.wav
 **/*.wav
 
 # --- docs 设计稿大图 ---
 docs/**/*.png
-docs/**/*.png.import
 
 # --- 系统/编辑器杂项 ---
 .DS_Store

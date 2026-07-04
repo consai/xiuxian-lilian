@@ -1,0 +1,178 @@
+{
+  "schema_version": {
+    "key": "schema_version",
+    "value": "1"
+  },
+  "calendar:days_per_month": {
+    "key": "calendar:days_per_month",
+    "value": "30"
+  },
+  "calendar:months_per_year": {
+    "key": "calendar:months_per_year",
+    "value": "12"
+  },
+  "calendar:days_per_year": {
+    "key": "calendar:days_per_year",
+    "value": "360"
+  },
+  "major_realm_multipliers:qi": {
+    "key": "major_realm_multipliers:qi",
+    "value": "1"
+  },
+  "major_realm_multipliers:foundation": {
+    "key": "major_realm_multipliers:foundation",
+    "value": "2"
+  },
+  "major_realm_multipliers:core": {
+    "key": "major_realm_multipliers:core",
+    "value": "4"
+  },
+  "major_realm_multipliers:nascent": {
+    "key": "major_realm_multipliers:nascent",
+    "value": "8"
+  },
+  "major_realm_multipliers:transform": {
+    "key": "major_realm_multipliers:transform",
+    "value": "16"
+  },
+  "major_realm_multipliers:void": {
+    "key": "major_realm_multipliers:void",
+    "value": "32"
+  },
+  "major_realm_multipliers:merge": {
+    "key": "major_realm_multipliers:merge",
+    "value": "64"
+  },
+  "major_realm_multipliers:great": {
+    "key": "major_realm_multipliers:great",
+    "value": "128"
+  },
+  "major_realm_multipliers:tribulation": {
+    "key": "major_realm_multipliers:tribulation",
+    "value": "256"
+  },
+  "activity_base_days:cultivate": {
+    "key": "activity_base_days:cultivate",
+    "value": "7"
+  },
+  "activity_base_days:lilian": {
+    "key": "activity_base_days:lilian",
+    "value": "30"
+  },
+  "activity_base_days:travel_short": {
+    "key": "activity_base_days:travel_short",
+    "value": "3"
+  },
+  "activity_base_days:travel_mid": {
+    "key": "activity_base_days:travel_mid",
+    "value": "15"
+  },
+  "activity_base_days:travel_long": {
+    "key": "activity_base_days:travel_long",
+    "value": "90"
+  },
+  "activity_base_days:insight": {
+    "key": "activity_base_days:insight",
+    "value": "100"
+  },
+  "activity_base_days:self_study": {
+    "key": "activity_base_days:self_study",
+    "value": "7"
+  },
+  "activity_base_days:skill_basic": {
+    "key": "activity_base_days:skill_basic",
+    "value": "30"
+  },
+  "activity_base_days:skill_advanced": {
+    "key": "activity_base_days:skill_advanced",
+    "value": "180"
+  },
+  "activity_base_days:liandan": {
+    "key": "activity_base_days:liandan",
+    "value": "7"
+  },
+  "activity_base_days:crafting": {
+    "key": "activity_base_days:crafting",
+    "value": "30"
+  },
+  "activity_base_days:tupo": {
+    "key": "activity_base_days:tupo",
+    "value": "30"
+  },
+  "rank_multipliers:first": {
+    "key": "rank_multipliers:first",
+    "value": "1"
+  },
+  "rank_multipliers:second": {
+    "key": "rank_multipliers:second",
+    "value": "2"
+  },
+  "rank_multipliers:third": {
+    "key": "rank_multipliers:third",
+    "value": "4"
+  },
+  "rank_multipliers:fourth": {
+    "key": "rank_multipliers:fourth",
+    "value": "8"
+  },
+  "rank_multipliers:fifth": {
+    "key": "rank_multipliers:fifth",
+    "value": "16"
+  },
+  "rank_multipliers:immortal": {
+    "key": "rank_multipliers:immortal",
+    "value": "32"
+  },
+  "aptitude_multipliers:heavenly_root": {
+    "key": "aptitude_multipliers:heavenly_root",
+    "value": "0.5"
+  },
+  "aptitude_multipliers:double_root": {
+    "key": "aptitude_multipliers:double_root",
+    "value": "0.75"
+  },
+  "aptitude_multipliers:triple_root": {
+    "key": "aptitude_multipliers:triple_root",
+    "value": "1"
+  },
+  "aptitude_multipliers:quad_root": {
+    "key": "aptitude_multipliers:quad_root",
+    "value": "1.25"
+  },
+  "aptitude_multipliers:penta_root": {
+    "key": "aptitude_multipliers:penta_root",
+    "value": "1.5"
+  },
+  "facility_multipliers:top_cave": {
+    "key": "facility_multipliers:top_cave",
+    "value": "0.5"
+  },
+  "facility_multipliers:advanced_cave": {
+    "key": "facility_multipliers:advanced_cave",
+    "value": "0.75"
+  },
+  "facility_multipliers:normal_cave": {
+    "key": "facility_multipliers:normal_cave",
+    "value": "1"
+  },
+  "facility_multipliers:poor_spirit": {
+    "key": "facility_multipliers:poor_spirit",
+    "value": "1.5"
+  },
+  "status_multipliers:self_study": {
+    "key": "status_multipliers:self_study",
+    "value": "1.2"
+  },
+  "status_multipliers:guided": {
+    "key": "status_multipliers:guided",
+    "value": "0.7"
+  },
+  "status_multipliers:injured": {
+    "key": "status_multipliers:injured",
+    "value": "1.5"
+  },
+  "status_multipliers:heart_demon": {
+    "key": "status_multipliers:heart_demon",
+    "value": "2"
+  }
+}

@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { realmIdForTier, tierForRealmId } from "./validate-shared.mjs";
 
 const dataDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../data");
-const SCHEMA_PATH = path.join(dataDir, "exportjson", "exportjson_战斗effects效果介绍.json");
+const SCHEMA_PATH = path.join(dataDir, "exportjson", "战斗effects效果介绍.json");
 
 const ATTR_EXPORT_TO_EFFECT_ID = {
   castspd: "cast_speed",

@@ -1,9 +1,0 @@
-﻿checkpoint_id,minute_mark,question,expected_range,observed_value,result,fix_hint
-first_feedback,3,玩家是否获得第一次成长反馈,1-3分钟,,,若没有则降低第一目标成本或提高新手奖励
-first_small_goal,10,玩家是否完成2-3个小成长,2-3个,,,检查普通战斗与采集回报
-first_resource_pressure,30,玩家是否第一次感到资源不足,有但不阻塞,,,若没有压力则提高强化或丹药消耗
-normal_battle_turns,30,普通战斗平均回合数,3-5回合,,,偏高降敌方生命或提高玩家伤害
-elite_pressure,45,精英敌人是否需要准备,胜率40%-65%,,,偏容易提高精英power_ratio
-major_goal_visibility,60,玩家是否有明确大目标,有,,,若没有则提前展示突破材料或区域门槛
-major_breakthrough_time,90,第一次大突破是否完成或接近完成,45-90分钟,,,偏慢提高关键资源净收入
-failure_cost,90,一次失败损失是否可接受,2-5分钟普通进度,,,偏重降低掉落损失或伤病天数

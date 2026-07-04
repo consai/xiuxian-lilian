@@ -181,9 +181,10 @@ def rows_to_records(sheet_name: str, rows: list[list[object]]) -> dict[str, dict
 
 
 def xlsx_files(root: Path) -> list[Path]:
+    """仅扫描目录本身的 xlsx，不递归子目录（子目录由独立导出任务配置）。"""
     if root.is_file():
         return [root] if root.suffix.lower() == ".xlsx" and not root.name.startswith("~$") else []
-    return sorted(p for p in root.rglob("*.xlsx") if not p.name.startswith("~$"))
+    return sorted(p for p in root.glob("*.xlsx") if not p.name.startswith("~$"))
 
 
 def export(root: Path, out_dir: Path, prefix: str, dry_run: bool = False) -> list[Path]:
@@ -208,17 +209,31 @@ def export(root: Path, out_dir: Path, prefix: str, dry_run: bool = False) -> lis
     return written
 
 
-def read_arg_ini(path: Path) -> dict[str, str]:
+def read_arg_ini(path: Path) -> tuple[dict[str, str], list[dict[str, str]]]:
+    """解析 export_arg.ini：全局键 + 可选 [section] 导出任务（各含 indir/outdir）。"""
     if not path.exists():
-        return {}
-    out: dict[str, str] = {}
+        return {}, []
+    global_cfg: dict[str, str] = {}
+    jobs: list[dict[str, str]] = []
+    current: dict[str, str] | None = None
     for raw in path.read_text(encoding="utf-8-sig").splitlines():
         line = raw.strip()
-        if not line or line.startswith(("#", ";", "[")) or "=" not in line:
+        if not line or line.startswith(("#", ";")):
+            continue
+        if line.startswith("[") and line.endswith("]"):
+            current = {"name": line[1:-1].strip()}
+            jobs.append(current)
+            continue
+        if "=" not in line:
             continue
         key, value = line.split("=", 1)
-        out[key.strip().lower()] = value.strip().strip("\"'")
-    return out
+        key = key.strip().lower()
+        value = value.strip().strip("\"'")
+        if current is None:
+            global_cfg[key] = value
+        else:
+            current[key] = value
+    return global_cfg, jobs
 
 
 def resolve_config_path(value: str | None, base: Path) -> Path | None:
@@ -226,6 +241,45 @@ def resolve_config_path(value: str | None, base: Path) -> Path | None:
         return None
     path = Path(value)
     return path.resolve() if path.is_absolute() else (base / path).resolve()
+
+
+def build_jobs(
+    config: dict[str, str],
+    jobs: list[dict[str, str]],
+    arg_path: Path,
+    tool_dir: Path,
+    cli_root: Path | None,
+    cli_out: Path | None,
+) -> list[tuple[str, Path, Path]]:
+    """组装 (任务名, indir, outdir)。命令行 root/out 优先为单任务。"""
+    if cli_root is not None or cli_out is not None:
+        root = (
+            cli_root.resolve()
+            if cli_root is not None
+            else resolve_config_path(config.get("indir"), arg_path.parent) or tool_dir / "indir"
+        )
+        out_dir = (
+            cli_out.resolve()
+            if cli_out is not None
+            else resolve_config_path(config.get("outdir"), arg_path.parent) or tool_dir / "out"
+        )
+        return [("cli", root, out_dir)]
+
+    if jobs:
+        out: list[tuple[str, Path, Path]] = []
+        for job in jobs:
+            name = job.get("name") or "job"
+            root = resolve_config_path(job.get("indir"), arg_path.parent)
+            out_dir = resolve_config_path(job.get("outdir"), arg_path.parent)
+            if root is None or out_dir is None:
+                raise ValueError(f"section [{name}] needs both indir and outdir")
+            out.append((name, root, out_dir))
+        return out
+
+    # 兼容旧版：无 section，仅顶层 indir/outdir
+    root = resolve_config_path(config.get("indir"), arg_path.parent) or tool_dir / "indir"
+    out_dir = resolve_config_path(config.get("outdir"), arg_path.parent) or tool_dir / "out"
+    return [("default", root, out_dir)]
 
 
 def self_test() -> None:
@@ -249,6 +303,26 @@ def self_test() -> None:
     nested = rows_to_records("z_nested", rows)
     assert nested["a"]["A"]["id"] == "a"
     assert nested["a"]["B"]["enabled"] is False
+
+    # 多任务 ini：section 解析
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        ini = Path(tmp) / "export_arg.ini"
+        ini.write_text(
+            "prefix=z_\n\n[content]\nindir=.\\a\noutdir=.\\out_a\n\n[params]\nindir=.\\b\noutdir=.\\out_b\n",
+            encoding="utf-8",
+        )
+        cfg, job_rows = read_arg_ini(ini)
+        assert cfg["prefix"] == "z_"
+        assert len(job_rows) == 2
+        assert job_rows[0]["name"] == "content"
+        assert job_rows[1]["indir"] == ".\\b"
+        built = build_jobs(cfg, job_rows, ini, Path(tmp), None, None)
+        assert [name for name, _, _ in built] == ["content", "params"]
+        assert built[0][1] == (Path(tmp) / "a").resolve()
+        assert built[1][2] == (Path(tmp) / "out_b").resolve()
+
     print("self-test ok")
 
 
@@ -268,19 +342,28 @@ def main() -> int:
         return 0
 
     arg_path = (args.arg or tool_dir / "export_arg.ini").resolve()
-    config = read_arg_ini(arg_path)
-    root = (args.root.resolve() if args.root else resolve_config_path(config.get("indir"), arg_path.parent) or tool_dir / "indir")
-    out_dir = (args.out.resolve() if args.out else resolve_config_path(config.get("outdir"), arg_path.parent) or tool_dir / "out")
+    config, job_rows = read_arg_ini(arg_path)
     prefix = args.prefix or config.get("prefix") or "z_"
-    if not root.exists():
-        print(f"input path not found: {root}", file=sys.stderr)
+
+    try:
+        jobs = build_jobs(config, job_rows, arg_path, tool_dir, args.root, args.out)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
         return 1
 
-    written = export(root, out_dir, prefix, args.dry_run)
-    for path in written:
-        print(path)
+    total = 0
     action = "would export" if args.dry_run else "exported"
-    print(f"{action} {len(written)} json file(s) to {out_dir}")
+    for name, root, out_dir in jobs:
+        if not root.exists():
+            print(f"input path not found: {root} (job [{name}])", file=sys.stderr)
+            return 1
+        written = export(root, out_dir, prefix, args.dry_run)
+        for path in written:
+            print(path)
+        print(f"{action} {len(written)} json file(s) [{name}] {root} -> {out_dir}")
+        total += len(written)
+    if len(jobs) > 1:
+        print(f"{action} {total} json file(s) total ({len(jobs)} jobs)")
     return 0
 
 

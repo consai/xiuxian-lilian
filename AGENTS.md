@@ -92,10 +92,13 @@ var _cached_inventory := {}
 
 | 路径 | 用途 | AI 是否应读 |
 |------|------|-------------|
-| `xiuxian配置表/indir/*.xlsx` | Excel 源表 | 否（二进制；用表格工具或导出后改） |
+| `xiuxian配置表/indir/*.xlsx` | Excel 源表（内容表） | 否（二进制；用表格工具或导出后改） |
+| `xiuxian配置表/yunxing_params/*.xlsx` | Excel 源表（运行参数） | 否（二进制；用表格工具或导出后改） |
+| `xiuxian配置表/export_arg.ini` | 导出任务 indir/outdir 配置 | 可改路径，勿写死在导出脚本 |
 | `xiuxian配置表/indir/*.inspect.ndjson` | 导出中间产物 | **禁止**（大文件，已加入 ignore） |
 | `data/*.yaml` | 运行时配置 | 按需单文件 |
-| `data/exportjson/*.json` | 导出结果 | 按需单文件，勿批量读取 |
+| `data/exportjson/*.json` | 导出结果（内容表） | 按需单文件，勿批量读取 |
+| `data/exportjson/yunxing_params/*.json` | 运行参数（时间/模拟/UI/规则/平衡） | 按需单文件，勿批量读取 |
 
 忽略配置：`.cursorignore`（Cursor）、`.codex/config.toml` permissions deny（Codex）、`.codexignore`（与 cursorignore 同步备查）。
 

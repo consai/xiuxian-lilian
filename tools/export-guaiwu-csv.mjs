@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const jsonPath = path.join(rootDir, "data/exportjson/exportjson_guaiwu.json");
+const jsonPath = path.join(rootDir, "data/exportjson/guaiwu.json");
 const outPath = path.join(rootDir, "data/guaiwu.csv");
 
 const CN_HEADERS = [

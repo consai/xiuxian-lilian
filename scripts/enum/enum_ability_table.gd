@@ -1,7 +1,7 @@
 class_name EnumAbilityTable
 extends RefCounted
 
-## 技能配置分表键，与 data/exportjson/exportjson_*.json 一一对应。
+## 技能配置分表键，与 data/exportjson/*.json 一一对应。
 
 enum Key {
 	ZHANDOU_ACTIVE,
@@ -20,9 +20,9 @@ const LOAD_ORDER: Array[String] = [
 ]
 
 const DEFAULT_PATHS: Dictionary = {
-	LABEL_ZHANDOU_ACTIVE: "exportjson/exportjson_zhandou_active.json",
-	LABEL_ZHANDOU_PASSIVE: "exportjson/exportjson_zhandou_passive.json",
-	LABEL_TONGYONG_PASSIVE: "exportjson/exportjson_general_passive.json",
+	LABEL_ZHANDOU_ACTIVE: "exportjson/zhandou_active.json",
+	LABEL_ZHANDOU_PASSIVE: "exportjson/zhandou_passive.json",
+	LABEL_TONGYONG_PASSIVE: "exportjson/general_passive.json",
 }
 
 
@@ -32,4 +32,4 @@ static func is_valid_label(text: String) -> bool:
 
 static func default_path(table_key: String) -> String:
 	var key := table_key.strip_edges().to_lower()
-	return str(DEFAULT_PATHS.get(key, "exportjson/exportjson_%s.json" % key))
+	return str(DEFAULT_PATHS.get(key, "exportjson/%s.json" % key))

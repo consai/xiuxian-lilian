@@ -1,7 +1,7 @@
 class_name TupoService
 extends RefCounted
 
-const RULES_PATH := "res://data/exportjson/tupo_rules.json"
+const RULES_PATH := "res://data/exportjson/yunxing_params/tupo_rules.json"
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")

@@ -19,10 +19,8 @@ assets/**/*.ttf
 assets/**/*.otf
 assets/**/*.woff
 assets/**/*.woff2
-assets/**/*.wav
 **/*.wav
 docs/**/*.png
-docs/**/*.png.import
 .DS_Store
 Thumbs.db
 *.tmp

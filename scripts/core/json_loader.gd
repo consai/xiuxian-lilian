@@ -2,12 +2,14 @@ class_name JsonLoader
 extends RefCounted
 
 const EXPORT_DIR := "res://data/exportjson"
+## 运行参数子目录：时间/模拟/UI/规则/平衡等，与内容表分开放。
+const YUNXING_PARAMS_DIR := "%s/yunxing_params" % EXPORT_DIR
 const ITEMS_PATH := "%s/item_items.json" % EXPORT_DIR
 const ITEM_GENERATED_BOOKS_PATH := "%s/item_generated_learning_books.json" % EXPORT_DIR
 const ITEM_ALIASES_PATH := "%s/item_legacy_learning_book_ali.json" % EXPORT_DIR
 const EQUIPS_PATH := "%s/zhuangbei_equips.json" % EXPORT_DIR
-const BUFFS_PATH := "%s/exportjson_buff.json" % EXPORT_DIR
-const ZHANDOU_EFFECT_SCHEMA_PATH := "%s/exportjson_战斗effects效果介绍.json" % EXPORT_DIR
+const BUFFS_PATH := "%s/buff.json" % EXPORT_DIR
+const ZHANDOU_EFFECT_SCHEMA_PATH := "%s/战斗effects效果介绍.json" % EXPORT_DIR
 const ZHANDOU_VFX_INDEX_PATH := "%s/zhandou_vfx_index.json" % EXPORT_DIR
 const ZHANDOU_FLOAT_STYLES_PATH := "%s/zhandou_float_styles.json" % EXPORT_DIR
 const ZHANDOU_FLOAT_STYLE_ROWS_PATH := "%s/zhandou_float_styles_styles.json" % EXPORT_DIR
@@ -35,6 +37,11 @@ static func config_id_to_string(v: Variant) -> String:
 
 static func export_path(file_name: String) -> String:
 	return "%s/%s" % [EXPORT_DIR, file_name]
+
+
+## 运行参数目录下的配置路径。
+static func yunxing_params_path(file_name: String) -> String:
+	return "%s/%s" % [YUNXING_PARAMS_DIR, file_name]
 
 
 static func _export_keyed_rows(path: String) -> Dictionary:
@@ -578,7 +585,6 @@ static func load_xiulian_methods_bundle() -> Dictionary:
 	root["families"] = _export_row_array(export_path("xiulian_methods_families.json"))
 	root["methods"] = _export_row_array(export_path("xiulian_methods_methods.json"))
 	root["effectCatalog"] = _export_keyed_rows(export_path("xiulian_methods_effectCatalog.json"))
-	root["effectDefinitions"] = _export_keyed_rows(export_path("xiulian_methods_effectDefinit.json"))
 	return root
 
 
@@ -595,7 +601,8 @@ static func load_abilities_bundle() -> Dictionary:
 	bundle["rules"] = _export_settings(export_path("jineng_rules.json"))
 	var merged: Array = []
 	var tables_out: Dictionary = {}
-	var tables := _export_settings(export_path("jineng_abilityTables.json"))
+	# 分表路径以 EnumAbilityTable 为准，不再读独立 abilityTables 配置文件。
+	var tables: Dictionary = {}
 	for table_key in EnumAbilityTable.LOAD_ORDER:
 		tables[table_key] = EnumAbilityTable.default_path(table_key)
 	for table_key in _ability_table_load_order(tables):
@@ -683,33 +690,33 @@ static func load_lilian_events_bundle() -> Dictionary:
 
 
 static func load_lilian_rules_bundle() -> Dictionary:
-	var root := _export_settings(export_path("lilian_rules.json"))
-	root["reward_budget"] = _export_settings(export_path("lilian_rules_reward_budget.json"))
+	var root := _export_settings(yunxing_params_path("lilian_rules.json"))
+	root["reward_budget"] = _export_settings(yunxing_params_path("lilian_rules_reward_budget.json"))
 	return root
 
 
 static func load_moni_bundle() -> Dictionary:
-	var root := _export_settings(export_path("moni.json"))
-	root["rules"] = _export_settings(export_path("moni_rules.json"))
-	root["activities"] = _export_keyed_rows(export_path("moni_activities.json"))
-	root["initial_player"] = _export_settings(export_path("moni_initial_player.json"))
+	var root := _export_settings(yunxing_params_path("moni.json"))
+	root["rules"] = _export_settings(yunxing_params_path("moni_rules.json"))
+	root["activities"] = _export_keyed_rows(yunxing_params_path("moni_activities.json"))
+	root["initial_player"] = _export_settings(yunxing_params_path("moni_initial_player.json"))
 	return root
 
 
 static func load_jingjie_balance_bundle() -> Dictionary:
-	var root := _export_settings(export_path("jingjie_balance.json"))
-	root["acceptance"] = _export_settings(export_path("jingjie_balance_acceptance.json"))
-	root["benchmark_enemies"] = _export_keyed_rows(export_path("jingjie_balance_benchmark_ene.json"))
-	root["budgets"] = _export_keyed_rows(export_path("jingjie_balance_budgets.json"))
-	root["combat_attribute_formula"] = _export_keyed_rows(export_path("jingjie_balance_combat_attrib.json"))
-	root["cultivation_progression"] = _export_settings(export_path("jingjie_balance_cultivation_p.json"))
-	root["encounter_bands"] = _export_keyed_rows(export_path("jingjie_balance_encounter_ban.json"))
-	root["major_realms"] = _export_row_array(export_path("jingjie_balance_major_realms.json"))
-	root["monster_design_baseline"] = _export_keyed_rows(export_path("jingjie_balance_monster_desig.json"))
-	root["player_level_curve"] = _export_keyed_rows(export_path("jingjie_balance_player_level_.json"))
-	root["realm_flat_per_layer"] = _export_settings(export_path("jingjie_balance_realm_flat_pe.json"))
-	root["rules"] = _export_settings(export_path("jingjie_balance_rules.json"))
-	root["standard_players"] = _export_keyed_rows(export_path("jingjie_balance_standard_play.json"))
+	var root := _export_settings(yunxing_params_path("jingjie_balance.json"))
+	root["acceptance"] = _export_settings(yunxing_params_path("jingjie_balance_acceptance.json"))
+	root["benchmark_enemies"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_benchmark_ene.json"))
+	root["budgets"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_budgets.json"))
+	root["combat_attribute_formula"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_combat_attrib.json"))
+	root["cultivation_progression"] = _export_settings(yunxing_params_path("jingjie_balance_cultivation_p.json"))
+	root["encounter_bands"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_encounter_ban.json"))
+	root["major_realms"] = _export_row_array(yunxing_params_path("jingjie_balance_major_realms.json"))
+	root["monster_design_baseline"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_monster_desig.json"))
+	root["player_level_curve"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_player_level_.json"))
+	root["realm_flat_per_layer"] = _export_settings(yunxing_params_path("jingjie_balance_realm_flat_pe.json"))
+	root["rules"] = _export_settings(yunxing_params_path("jingjie_balance_rules.json"))
+	root["standard_players"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_standard_play.json"))
 	return root
 
 
@@ -722,13 +729,13 @@ static func load_liandan_bundle() -> Dictionary:
 
 
 static func load_shijian_rules_bundle() -> Dictionary:
-	return _export_settings(export_path("shijian_rules.json"))
+	return _export_settings(yunxing_params_path("shijian_rules.json"))
 
 
 static func load_tupo_rules_bundle() -> Dictionary:
-	var root := _export_settings(export_path("tupo_rules.json"))
-	root["component_caps"] = _export_settings(export_path("tupo_rules_component_caps.json"))
-	root["major_breakthroughs"] = _export_keyed_rows(export_path("tupo_rules_major_breakthrough.json"))
+	var root := _export_settings(yunxing_params_path("tupo_rules.json"))
+	root["component_caps"] = _export_settings(yunxing_params_path("tupo_rules_component_caps.json"))
+	root["major_breakthroughs"] = _export_keyed_rows(yunxing_params_path("tupo_rules_major_breakthrough.json"))
 	return root
 
 
@@ -740,8 +747,8 @@ static func load_weituo_bundle() -> Dictionary:
 
 
 static func load_tip_policy_bundle() -> Dictionary:
-	var root := _export_settings(export_path("ui_tip_policy.json"))
-	root["channels"] = _export_keyed_rows(export_path("ui_tip_policy_channels.json"))
+	var root := _export_settings(yunxing_params_path("ui_tip_policy.json"))
+	root["channels"] = _export_keyed_rows(yunxing_params_path("ui_tip_policy_channels.json"))
 	return root
 
 

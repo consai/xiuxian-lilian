@@ -3,7 +3,7 @@ extends RefCounted
 
 ## 解析 exportjson 中 positional effects。
 
-const SCHEMA_PATH := "res://data/exportjson/exportjson_战斗effects效果介绍.json"
+const SCHEMA_PATH := "res://data/exportjson/战斗effects效果介绍.json"
 
 ## 导出表属性名 → ZhandouAttr 键。
 const ATTR_EXPORT_TO_FIGHT: Dictionary = {

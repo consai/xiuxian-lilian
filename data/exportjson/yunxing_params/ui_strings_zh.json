@@ -1,0 +1,302 @@
+{
+  "hover:target:self": {
+    "key": "hover:target:self",
+    "value": "自身"
+  },
+  "hover:target:enemy": {
+    "key": "hover:target:enemy",
+    "value": "敌人"
+  },
+  "hover:target:ally": {
+    "key": "hover:target:ally",
+    "value": "友方"
+  },
+  "hover:target:default": {
+    "key": "hover:target:default",
+    "value": "目标"
+  },
+  "hover:skill:mp_cost": {
+    "key": "hover:skill:mp_cost",
+    "value": "法力消耗：{value}"
+  },
+  "hover:skill:cd": {
+    "key": "hover:skill:cd",
+    "value": "冷却：{value}秒"
+  },
+  "hover:skill:power": {
+    "key": "hover:skill:power",
+    "value": "威力：{value}"
+  },
+  "hover:skill:tags": {
+    "key": "hover:skill:tags",
+    "value": "标签：{value}"
+  },
+  "hover:skill:effect_damage": {
+    "key": "hover:skill:effect_damage",
+    "value": "对{target}造成伤害 {value}"
+  },
+  "hover:skill:effect_heal": {
+    "key": "hover:skill:effect_heal",
+    "value": "为{target}恢复 {value} 生命"
+  },
+  "hover:skill:effect_shield": {
+    "key": "hover:skill:effect_shield",
+    "value": "为{target}获得护盾 {value}"
+  },
+  "hover:skill:effect_buff": {
+    "key": "hover:skill:effect_buff",
+    "value": "对{target}施加 {name}"
+  },
+  "hover:skill:effect_buff_plain": {
+    "key": "hover:skill:effect_buff_plain",
+    "value": "对{target}施加状态"
+  },
+  "hover:skill:tag:attack": {
+    "key": "hover:skill:tag:attack",
+    "value": "攻击"
+  },
+  "hover:skill:tag:physical": {
+    "key": "hover:skill:tag:physical",
+    "value": "物理"
+  },
+  "hover:skill:tag:magic": {
+    "key": "hover:skill:tag:magic",
+    "value": "法术"
+  },
+  "hover:skill:tag:fire": {
+    "key": "hover:skill:tag:fire",
+    "value": "火系"
+  },
+  "hover:skill:tag:lightning": {
+    "key": "hover:skill:tag:lightning",
+    "value": "雷系"
+  },
+  "hover:skill:tag:ice": {
+    "key": "hover:skill:tag:ice",
+    "value": "冰系"
+  },
+  "hover:skill:tag:shield": {
+    "key": "hover:skill:tag:shield",
+    "value": "护盾"
+  },
+  "hover:skill:tag:control": {
+    "key": "hover:skill:tag:control",
+    "value": "控制"
+  },
+  "hover:skill:tag:poison": {
+    "key": "hover:skill:tag:poison",
+    "value": "毒"
+  },
+  "hover:item:count": {
+    "key": "hover:item:count",
+    "value": "数量：{value}"
+  },
+  "hover:item:effect_restore_mp": {
+    "key": "hover:item:effect_restore_mp",
+    "value": "为{target}恢复 {value} 法力"
+  },
+  "hover:equip:kind": {
+    "key": "hover:equip:kind",
+    "value": "战斗法宝"
+  },
+  "hover:buff:stacks": {
+    "key": "hover:buff:stacks",
+    "value": "层数：{value}"
+  },
+  "hover:buff:duration": {
+    "key": "hover:buff:duration",
+    "value": "持续：{value}秒"
+  },
+  "hover:buff:max_stacks": {
+    "key": "hover:buff:max_stacks",
+    "value": "最大层数：{value}"
+  },
+  "hover:buff:ticktime": {
+    "key": "hover:buff:ticktime",
+    "value": "周期：{value}秒"
+  },
+  "hover:buff:modifier": {
+    "key": "hover:buff:modifier",
+    "value": "{name} {sign}{value}"
+  },
+  "hover:buff:tags": {
+    "key": "hover:buff:tags",
+    "value": "标签：{value}"
+  },
+  "hover:buff:tag:buff": {
+    "key": "hover:buff:tag:buff",
+    "value": "增益"
+  },
+  "hover:buff:tag:debuff": {
+    "key": "hover:buff:tag:debuff",
+    "value": "减益"
+  },
+  "hover:buff:attr:hp_max": {
+    "key": "hover:buff:attr:hp_max",
+    "value": "气血上限"
+  },
+  "hover:buff:attr:mp_max": {
+    "key": "hover:buff:attr:mp_max",
+    "value": "法力上限"
+  },
+  "hover:buff:attr:shield": {
+    "key": "hover:buff:attr:shield",
+    "value": "护盾"
+  },
+  "hover:buff:attr:atk": {
+    "key": "hover:buff:attr:atk",
+    "value": "攻击"
+  },
+  "hover:buff:attr:def": {
+    "key": "hover:buff:attr:def",
+    "value": "防御"
+  },
+  "hover:buff:attr:spd": {
+    "key": "hover:buff:attr:spd",
+    "value": "速度"
+  },
+  "item_info:type": {
+    "key": "item_info:type",
+    "value": "类型：{value}"
+  },
+  "item_info:type_equip": {
+    "key": "item_info:type_equip",
+    "value": "法宝"
+  },
+  "item_info:quality": {
+    "key": "item_info:quality",
+    "value": "品质：{value}"
+  },
+  "item_info:count": {
+    "key": "item_info:count",
+    "value": "数量：{value}"
+  },
+  "item_info:price": {
+    "key": "item_info:price",
+    "value": "灵石估价：{value}"
+  },
+  "item_info:stack": {
+    "key": "item_info:stack",
+    "value": "可堆叠（上限 {value}）"
+  },
+  "item_info:equip_kind": {
+    "key": "item_info:equip_kind",
+    "value": "战斗法宝"
+  },
+  "item_info:use_hp": {
+    "key": "item_info:use_hp",
+    "value": "使用效果：恢复气血 {value}"
+  },
+  "item_info:use_mp": {
+    "key": "item_info:use_mp",
+    "value": "使用效果：恢复法力 {value}"
+  },
+  "item_info:use_heart_demon": {
+    "key": "item_info:use_heart_demon",
+    "value": "使用效果：心魔 {value}"
+  },
+  "item_info:use_cultivation": {
+    "key": "item_info:use_cultivation",
+    "value": "使用效果：修为 +{value}"
+  },
+  "item_info:use_instability": {
+    "key": "item_info:use_instability",
+    "value": "使用效果：灵力驳杂 {value}"
+  },
+  "item_info:use_pill_cultivation": {
+    "key": "item_info:use_pill_cultivation",
+    "value": "使用效果：修炼「丹药炼化」修为 +{value}"
+  },
+  "item_info:use_injury": {
+    "key": "item_info:use_injury",
+    "value": "使用效果：缩短伤势 {value} 日"
+  },
+  "item_info:use_sell_only": {
+    "key": "item_info:use_sell_only",
+    "value": "使用效果：无药效，仅可出售"
+  },
+  "item_info:use_alchemy_mastery": {
+    "key": "item_info:use_alchemy_mastery",
+    "value": "使用效果：{recipe} 熟练度 +{value}"
+  },
+  "item_info:use_fight_prefix": {
+    "key": "item_info:use_fight_prefix",
+    "value": "战斗使用：{value}"
+  },
+  "item_info:fight_mp_cost": {
+    "key": "item_info:fight_mp_cost",
+    "value": "战斗消耗：法力 {value}"
+  },
+  "item_info:fight_cd": {
+    "key": "item_info:fight_cd",
+    "value": "战斗冷却：{value} 秒"
+  },
+  "item_info:learn_ability": {
+    "key": "item_info:learn_ability",
+    "value": "研读习得：技能 {value}"
+  },
+  "item_info:learn_method": {
+    "key": "item_info:learn_method",
+    "value": "研读习得：功法 {value}"
+  },
+  "item_info:learn_req_header": {
+    "key": "item_info:learn_req_header",
+    "value": "学习条件："
+  },
+  "item_info:learn_req_realm": {
+    "key": "item_info:learn_req_realm",
+    "value": "境界要求：{need}（当前：{current}）"
+  },
+  "item_info:learn_req_knowledge": {
+    "key": "item_info:learn_req_knowledge",
+    "value": "知识要求：{name} ≥ {need} 级（当前 {current} 级）"
+  },
+  "item_info:learn_hub_hint": {
+    "key": "item_info:learn_hub_hint",
+    "value": "在洞府底部「研读」使用"
+  },
+  "item_info:use_study": {
+    "key": "item_info:use_study",
+    "value": "研读"
+  },
+  "combat:float:tiaoxi": {
+    "key": "combat:float:tiaoxi",
+    "value": "调息"
+  },
+  "combat:float:basic_attack": {
+    "key": "combat:float:basic_attack",
+    "value": "调息"
+  },
+  "combat:float:damage": {
+    "key": "combat:float:damage",
+    "value": "-{value}"
+  },
+  "combat:float:heal": {
+    "key": "combat:float:heal",
+    "value": "+{value}"
+  },
+  "combat:float:mp_cost": {
+    "key": "combat:float:mp_cost",
+    "value": "-{value} MP"
+  },
+  "combat:float:mp_gain": {
+    "key": "combat:float:mp_gain",
+    "value": "+{value} MP"
+  },
+  "combat:float:shield": {
+    "key": "combat:float:shield",
+    "value": "盾 -{value}"
+  },
+  "combat:float:shield_absorb": {
+    "key": "combat:float:shield_absorb",
+    "value": "吸收"
+  },
+  "combat:float:buff_expire": {
+    "key": "combat:float:buff_expire",
+    "value": "{name} 消散"
+  },
+  "combat:float:buff_tick": {
+    "key": "combat:float:buff_tick",
+    "value": "状态"
+  }
+}

@@ -1,12 +1,13 @@
 {
   "fpassive_0001": {
+    "key": "fpassive_0001",
     "id": "fpassive_0001",
     "name": "铁骨",
     "tier": 1,
     "quality": 1,
     "icon": null,
     "tag": [],
-    "cd": 0.0,
+    "cd": 0,
     "runtype": "beattack",
     "effects": [
       [
@@ -18,13 +19,14 @@
     "desc": "被攻击前增加20出手速度"
   },
   "fpassive_0002": {
+    "key": "fpassive_0002",
     "id": "fpassive_0002",
     "name": "剑心通明",
     "tier": 4,
     "quality": 4,
     "icon": null,
     "tag": [],
-    "cd": 0.0,
+    "cd": 0,
     "runtype": "attack",
     "effects": [
       [
@@ -36,13 +38,14 @@
     "desc": "攻击前增加20出手速度"
   },
   "fpassive_0003": {
+    "key": "fpassive_0003",
     "id": "fpassive_0003",
     "name": "固魂守一",
     "tier": 3,
     "quality": 3,
     "icon": null,
     "tag": [],
-    "cd": 5.0,
+    "cd": 5,
     "runtype": "get",
     "effects": [
       [
@@ -54,13 +57,14 @@
     "desc": "增加20出手速度"
   },
   "fpassive_0004": {
+    "key": "fpassive_0004",
     "id": "fpassive_0004",
     "name": "滴血不灭",
     "tier": 4,
     "quality": 4,
     "icon": null,
     "tag": [],
-    "cd": 5.0,
+    "cd": 5,
     "runtype": "ondie",
     "effects": [
       [
@@ -71,13 +75,14 @@
     "desc": "死亡前回血(模拟濒死复活)"
   },
   "fpassive_0005": {
+    "key": "fpassive_0005",
     "id": "fpassive_0005",
     "name": "人兵相契",
     "tier": 7,
     "quality": 4,
     "icon": null,
     "tag": [],
-    "cd": 5.0,
+    "cd": 5,
     "runtype": "beattacked",
     "effects": [
       [
@@ -89,13 +94,14 @@
     "desc": "被攻击后增加20出手速度"
   },
   "fpassive_0006": {
+    "key": "fpassive_0006",
     "id": "fpassive_0006",
     "name": "不坏道心",
     "tier": 8,
     "quality": 4,
     "icon": null,
     "tag": [],
-    "cd": 5.0,
+    "cd": 5,
     "runtype": "attacked",
     "effects": [
       [
@@ -107,13 +113,14 @@
     "desc": "攻击后增加20出手速度"
   },
   "fpassive_0007": {
+    "key": "fpassive_0007",
     "id": "fpassive_0007",
     "name": "万劫不坏",
     "tier": 9,
     "quality": 4,
     "icon": null,
     "tag": [],
-    "cd": 5.0,
+    "cd": 5,
     "runtype": "get",
     "effects": [
       [

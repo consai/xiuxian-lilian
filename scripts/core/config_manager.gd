@@ -587,7 +587,7 @@ func _load_locations_local() -> void:
 
 func _load_monsters_local() -> void:
 	_monsters_by_id.clear()
-	var root := JsonLoader._read_json_root_object(JsonLoader.export_path("exportjson_guaiwu.json"))
+	var root := JsonLoader._read_json_root_object(JsonLoader.export_path("guaiwu.json"))
 	if not root is Dictionary:
 		return
 	for key in (root as Dictionary).keys():

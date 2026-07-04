@@ -1,6 +1,6 @@
 extends Node
 
-const SIM_PATH := "res://data/exportjson/moni.json"
+const SIM_PATH := "res://data/exportjson/yunxing_params/moni.json"
 const HUB_SCENE := "res://scenes/sim/dongfu.tscn"
 
 const INSTABILITY_REDUCTION_PER_WIN := 10

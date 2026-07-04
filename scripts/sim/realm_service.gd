@@ -1,9 +1,9 @@
 class_name RealmService
 extends RefCounted
 
-## 境界阶梯：从 exportjson/exportjson_realms.json 加载，供模拟层按索引遍历。
+## 境界阶梯：从 exportjson/realms.json 加载，供模拟层按索引遍历。
 
-const PATH := "res://data/exportjson/exportjson_realms.json"
+const PATH := "res://data/exportjson/realms.json"
 
 ## realms.json 境界 id 前缀 → jingjie_balance / dao_tree 大境界 id
 const MAJOR_REALM_BY_PREFIX: Dictionary = {

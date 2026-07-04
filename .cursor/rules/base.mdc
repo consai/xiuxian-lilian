@@ -26,4 +26,7 @@ alwaysApply: true
 
 
 # data/exportjson 中的配置修改规则
-配置不要直接修改, 修改需要先改 xiuxian配置表/indir/*.xlsx 再运行 export_excel_json.bat 导出, 需要新增字段告诉我
+配置不要直接修改, 修改需要先改 Excel 源表再运行 export_excel_json.bat 导出：
+- 内容表：`xiuxian配置表/indir/*.xlsx` → `data/exportjson/`
+- 运行参数：`xiuxian配置表/yunxing_params/*.xlsx` → `data/exportjson/yunxing_params/`
+导入/导出目录在 `xiuxian配置表/export_arg.ini` 配置，不要在导出脚本里写死特殊路径。需要新增字段告诉我

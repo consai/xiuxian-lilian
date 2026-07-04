@@ -15,7 +15,7 @@ extends Control
 ## - 新局：GameState.new_game
 ## - 日数：无独立「跳日」玩法 API，GM 直接改 day 仅用于测试时间轴
 
-const SIM_PATH := "res://data/exportjson/moni.json"
+const SIM_PATH := "res://data/exportjson/yunxing_params/moni.json"
 const GmBattleBuilderScript := preload("res://scripts/ui/gm_battle_builder.gd")
 
 @onready var _status_label: Label = %StatusLabel

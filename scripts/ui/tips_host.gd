@@ -13,7 +13,7 @@ const RewardTipPresenterScript := preload("res://scripts/ui/tips/presenter/rewar
 const TipBarScene := preload("res://scenes/ui/tip_bar.tscn")
 const RewardTipLayerScene := preload("res://scenes/ui/reward_tip_layer.tscn")
 
-const POLICY_CFG_PATH := "res://data/exportjson/ui_tip_policy.json"
+const POLICY_CFG_PATH := "res://data/exportjson/yunxing_params/ui_tip_policy.json"
 
 var _metrics: TipMetrics
 var _policy: TipPolicyEngine

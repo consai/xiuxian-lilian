@@ -3,7 +3,6 @@ extends SceneTree
 const StoryPlayerScript := preload("res://scripts/story/story_player.gd")
 const StoryValidatorScript := preload("res://scripts/story/story_validator.gd")
 const EnumCharacterPortraitScript := preload("res://scripts/enum/enum_character_portrait.gd")
-const STORY_ID := "prologue_fragment"
 const TUTORIAL_STORY_ID := "prologue_tutorial"
 
 var _failures: Array[String] = []
@@ -43,9 +42,9 @@ func _run_all() -> void:
 			"p3 boss portrait"
 		)
 	)
-	var story := _load_story()
-	_run("sample story validates", func() -> void:
-		_expect_true(StoryValidatorScript.collect_errors(story).is_empty(), "sample validation")
+	var fixture := _fixture_story()
+	_run("fixture story validates", func() -> void:
+		_expect_true(StoryValidatorScript.collect_errors(fixture).is_empty(), "fixture validation")
 	)
 	_run("tutorial story validates", func() -> void:
 		var tutorial_story := _load_story_at(TUTORIAL_STORY_ID)
@@ -103,7 +102,7 @@ func _run_all() -> void:
 	)
 	_run("line advances to choice", func() -> void:
 		var player = StoryPlayerScript.new()
-		_expect_true(bool(player.load_story(story).get("ok", false)), "load story")
+		_expect_true(bool(player.load_story(fixture).get("ok", false)), "load story")
 		var first: Dictionary = player.start()
 		_expect_eq(str(first.get("type", "")), "line", "entry type")
 		var choice: Dictionary = player.advance()
@@ -112,7 +111,7 @@ func _run_all() -> void:
 	)
 	_run("choice writes local story state", func() -> void:
 		var player = StoryPlayerScript.new()
-		player.load_story(story)
+		player.load_story(fixture)
 		player.start()
 		player.advance()
 		var frame: Dictionary = player.select_choice("search")
@@ -121,7 +120,7 @@ func _run_all() -> void:
 	)
 	_run("command frame can be acknowledged", func() -> void:
 		var player = StoryPlayerScript.new()
-		player.load_story(story)
+		player.load_story(fixture)
 		player.start()
 		player.advance()
 		player.select_choice("steady")
@@ -133,17 +132,17 @@ func _run_all() -> void:
 	)
 	_run("snapshot restores current node and flags", func() -> void:
 		var player = StoryPlayerScript.new()
-		player.load_story(story)
+		player.load_story(fixture)
 		player.start()
 		player.advance()
 		player.select_choice("search")
 		var restored = StoryPlayerScript.new()
-		_expect_true(bool(restored.restore(story, player.snapshot()).get("ok", false)), "restore")
+		_expect_true(bool(restored.restore(fixture, player.snapshot()).get("ok", false)), "restore")
 		_expect_eq(str(restored.current_frame().get("node_id", "")), "master_answer", "restored node")
 		_expect_true(bool(restored.state().get("prologue.asked_master", false)), "restored state")
 	)
 	_run("validator catches broken references", func() -> void:
-		var broken := story.duplicate(true)
+		var broken := fixture.duplicate(true)
 		(broken["nodes"]["wake"] as Dictionary)["next"] = "missing"
 		_expect_false(StoryValidatorScript.collect_errors(broken).is_empty(), "broken next")
 	)
@@ -156,12 +155,58 @@ func _run_all() -> void:
 	quit(1)
 
 
-func _load_story() -> Dictionary:
-	return _load_story_at(STORY_ID)
-
-
 func _load_story_at(story_id: String) -> Dictionary:
 	return JsonLoader.load_story_bundle(story_id)
+
+
+## 内联最小剧情图：覆盖 line / choice / command / end，不依赖已删的 exportjson 示例表。
+func _fixture_story() -> Dictionary:
+	return {
+		"id": "test.fixture",
+		"entry": "wake",
+		"nodes": {
+			"wake": {
+				"type": "line",
+				"text": "小道观晨钟已响。先确认自己还能引气入体。",
+				"next": "first_choice",
+			},
+			"first_choice": {
+				"type": "choice",
+				"prompt": "你准备如何回应？",
+				"choices": [
+					{
+						"id": "steady",
+						"label": "静心运气",
+						"effects": [{"op": "set", "flag": "prologue.calm", "value": true}],
+						"next": "guide_cultivate",
+					},
+					{
+						"id": "search",
+						"label": "翻看小札夹页",
+						"effects": [{"op": "set", "flag": "prologue.asked_master", "value": true}],
+						"next": "master_answer",
+					},
+				],
+			},
+			"master_answer": {
+				"type": "line",
+				"text": "早课之后去青岚山巡一圈，记得带回炉边要用的灵草。",
+				"next": "guide_cultivate",
+			},
+			"guide_cultivate": {
+				"type": "command",
+				"next": "chapter_end",
+				"commands": [
+					{"type": "guide_focus", "target": "hub.cultivate_button"},
+					{"type": "await_game_event", "event": "cultivation.completed"},
+				],
+			},
+			"chapter_end": {
+				"type": "end",
+				"result": "completed",
+			},
+		},
+	}
 
 
 func _run(name: String, test: Callable) -> void:

@@ -1,43 +1,44 @@
 class_name GameTimeService
 extends RefCounted
 
-const DATA_PATH := "res://data/exportjson/shijian_rules.json"
+## 时间规则：扁平键 `分组:字段`，见 [code]res://data/exportjson/yunxing_params/shijian_rules.json[/code]。
+
+const DATA_PATH := "res://data/exportjson/yunxing_params/shijian_rules.json"
 
 
 static func calendar() -> Dictionary:
-	var root := _root()
-	var calendar_v: Variant = root.get("calendar", {})
-	return calendar_v as Dictionary if calendar_v is Dictionary else {}
+	return {
+		"days_per_month": days_per_month(),
+		"months_per_year": months_per_year(),
+		"days_per_year": days_per_year(),
+	}
 
 
 static func days_per_month() -> int:
-	return maxi(1, int(calendar().get("days_per_month", 30)))
+	return maxi(1, int(_setting("calendar:days_per_month", 30)))
 
 
 static func months_per_year() -> int:
-	return maxi(1, int(calendar().get("months_per_year", 12)))
+	return maxi(1, int(_setting("calendar:months_per_year", 12)))
 
 
 static func days_per_year() -> int:
-	return maxi(1, int(calendar().get("days_per_year", days_per_month() * months_per_year())))
+	return maxi(1, int(_setting("calendar:days_per_year", days_per_month() * months_per_year())))
 
 
 static func realm_multiplier(major_realm_id: String) -> float:
-	var table_v: Variant = _root().get("major_realm_multipliers", {})
-	var table := table_v as Dictionary if table_v is Dictionary else {}
-	return maxf(0.01, float(table.get(major_realm_id.strip_edges(), 1.0)))
+	var key := "major_realm_multipliers:%s" % major_realm_id.strip_edges()
+	return maxf(0.01, float(_setting(key, 1.0)))
 
 
 static func activity_base_days(activity_id: String) -> int:
-	var table_v: Variant = _root().get("activity_base_days", {})
-	var table := table_v as Dictionary if table_v is Dictionary else {}
 	var key := activity_id.strip_edges()
 	# ponytail: 旧存档/配置仍可能用 alchemy、breakthrough 键
 	if key == "alchemy":
 		key = "liandan"
 	elif key == "breakthrough":
 		key = "tupo"
-	return maxi(1, int(table.get(key, 1)))
+	return maxi(1, int(_setting("activity_base_days:%s" % key, 1)))
 
 
 static func suggested_activity_days(
@@ -104,6 +105,11 @@ static func duration_label(days: int) -> String:
 	if remaining > 0 or parts.is_empty():
 		parts.append("%d日" % remaining)
 	return "".join(parts)
+
+
+## 读取扁平配置项；缺省时返回 [param default_value]。
+static func _setting(key: String, default_value: Variant) -> Variant:
+	return _root().get(key, default_value)
 
 
 static func _root() -> Dictionary:

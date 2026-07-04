@@ -1,8 +1,0 @@
-﻿activity_id,activity_name,phase_id,duration_sec,target_time_value_min,reward_ling_stone,reward_herb,reward_spiritual_qi,risk_level,fail_loss_minutes,validation_note
-normal_battle_early,普通战斗-前期,newbie,30,0.5-1.0,18,0,30,low,0.5,10次战斗均值接近目标
-gather_herb_early,采集草药-前期,newbie,45,0.75-1.25,0,4,10,low,0.5,单节点灵草3-5；PM-401补足一炉回气丹
-short_expedition_early,短探索-前期,entry,120,2.0-3.0,90,7,90,medium,1.5,PM-401：战败掉20%仍保留推进；短历练均值覆盖2-3炉基础丹草药
-normal_battle_mid,普通战斗-中期,pressure,35,0.75-1.25,45,1,75,medium,1,普通战斗保持3-5回合
-elite_battle_mid,精英战斗-中期,pressure,90,3.0-5.0,180,5,250,high,3,需要准备但收益明显
-long_expedition_breakthrough,长探索-突破期,breakthrough,300,5.0-8.0,360,16,520,high,5,失败损失不超过普通5分钟进度
-boss_attempt_qi,炼气Boss挑战,challenge,600,10.0-16.0,900,30,1200,very_high,8,准备后胜率应提升到60%以上

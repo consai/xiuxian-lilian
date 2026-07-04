@@ -1,5 +1,6 @@
 {
   "ability.combat.qi_bolt": {
+    "key": "ability.combat.qi_bolt",
     "id": "ability.combat.qi_bolt",
     "name": "御气弹",
     "type": "combat_active",
@@ -17,7 +18,7 @@
     "cost_resource": "mana",
     "cost_value": 6,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": [
       [
         "damage",
@@ -26,6 +27,7 @@
     ]
   },
   "ability.combat.wind_step": {
+    "key": "ability.combat.wind_step",
     "id": "ability.combat.wind_step",
     "name": "流风步",
     "type": "combat_active",
@@ -43,7 +45,7 @@
     "cost_resource": "mana",
     "cost_value": 6,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": [
       [
         "buff",
@@ -76,6 +78,7 @@
     ]
   },
   "ability.combat.sword_qi": {
+    "key": "ability.combat.sword_qi",
     "id": "ability.combat.sword_qi",
     "name": "破空剑气",
     "type": "combat_active",
@@ -93,7 +96,7 @@
     "cost_resource": "mana",
     "cost_value": 12,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": [
       [
         "buff",
@@ -126,6 +129,7 @@
     ]
   },
   "ability.combat.blood_strike": {
+    "key": "ability.combat.blood_strike",
     "id": "ability.combat.blood_strike",
     "name": "震血拳",
     "type": "combat_active",
@@ -143,10 +147,11 @@
     "cost_resource": "stamina",
     "cost_value": 18,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.five_phase_burst": {
+    "key": "ability.combat.five_phase_burst",
     "id": "ability.combat.five_phase_burst",
     "name": "五行轮爆",
     "type": "combat_active",
@@ -170,10 +175,11 @@
     "cost_resource": "mana",
     "cost_value": 28,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.seal_bind": {
+    "key": "ability.combat.seal_bind",
     "id": "ability.combat.seal_bind",
     "name": "镇灵封印",
     "type": "combat_active",
@@ -197,10 +203,11 @@
     "cost_resource": "mana",
     "cost_value": 24,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.thunder_judgment": {
+    "key": "ability.combat.thunder_judgment",
     "id": "ability.combat.thunder_judgment",
     "name": "九霄雷击",
     "type": "combat_active",
@@ -224,10 +231,11 @@
     "cost_resource": "mana",
     "cost_value": 45,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.sword_array": {
+    "key": "ability.combat.sword_array",
     "id": "ability.combat.sword_array",
     "name": "七星剑阵",
     "type": "combat_active",
@@ -251,10 +259,11 @@
     "cost_resource": "mana",
     "cost_value": 65,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.soul_shock": {
+    "key": "ability.combat.soul_shock",
     "id": "ability.combat.soul_shock",
     "name": "撼魂钟鸣",
     "type": "combat_active",
@@ -278,10 +287,11 @@
     "cost_resource": "spirit",
     "cost_value": 40,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.dharma_palm": {
+    "key": "ability.combat.dharma_palm",
     "id": "ability.combat.dharma_palm",
     "name": "法相镇岳掌",
     "type": "combat_active",
@@ -308,10 +318,11 @@
     "cost_resource": "stamina",
     "cost_value": 100,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.dream_prison": {
+    "key": "ability.combat.dream_prison",
     "id": "ability.combat.dream_prison",
     "name": "梦狱",
     "type": "combat_active",
@@ -338,10 +349,11 @@
     "cost_resource": "spirit",
     "cost_value": 85,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.void_slash": {
+    "key": "ability.combat.void_slash",
     "id": "ability.combat.void_slash",
     "name": "斩虚",
     "type": "combat_active",
@@ -368,10 +380,11 @@
     "cost_resource": "mana",
     "cost_value": 150,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.true_name_curse": {
+    "key": "ability.combat.true_name_curse",
     "id": "ability.combat.true_name_curse",
     "name": "真名蚀魂咒",
     "type": "combat_active",
@@ -398,10 +411,11 @@
     "cost_resource": "spirit",
     "cost_value": 130,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.law_command": {
+    "key": "ability.combat.law_command",
     "id": "ability.combat.law_command",
     "name": "律令·止",
     "type": "combat_active",
@@ -428,10 +442,11 @@
     "cost_resource": "mana",
     "cost_value": 240,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.open_heaven": {
+    "key": "ability.combat.open_heaven",
     "id": "ability.combat.open_heaven",
     "name": "开天一式",
     "type": "combat_active",
@@ -458,10 +473,11 @@
     "cost_resource": "mana",
     "cost_value": 500,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.cataclysm": {
+    "key": "ability.combat.cataclysm",
     "id": "ability.combat.cataclysm",
     "name": "劫灭神通",
     "type": "combat_active",
@@ -488,10 +504,11 @@
     "cost_resource": "mana",
     "cost_value": 550,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.nascent_blade": {
+    "key": "ability.combat.nascent_blade",
     "id": "ability.combat.nascent_blade",
     "name": "元婴御灵斩",
     "type": "combat_active",
@@ -518,10 +535,11 @@
     "cost_resource": "mana",
     "cost_value": 80,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.soul_contract_command": {
+    "key": "ability.combat.soul_contract_command",
     "id": "ability.combat.soul_contract_command",
     "name": "魂契敕令",
     "type": "combat_active",
@@ -548,10 +566,11 @@
     "cost_resource": "spirit",
     "cost_value": 70,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.dao_sword_river": {
+    "key": "ability.combat.dao_sword_river",
     "id": "ability.combat.dao_sword_river",
     "name": "道剑长河",
     "type": "combat_active",
@@ -578,10 +597,11 @@
     "cost_resource": "mana",
     "cost_value": 340,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   },
   "ability.combat.world_suppression": {
+    "key": "ability.combat.world_suppression",
     "id": "ability.combat.world_suppression",
     "name": "掌中天地·镇",
     "type": "combat_active",
@@ -608,7 +628,7 @@
     "cost_resource": "mana",
     "cost_value": 380,
     "activation": "cast",
-    "power_scale": 1.0,
+    "power_scale": 1,
     "effects": []
   }
 }
