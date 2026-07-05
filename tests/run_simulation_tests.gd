@@ -6,8 +6,6 @@ const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd"
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
-const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
-const KnowledgeEffectServiceScript := preload("res://scripts/dao/knowledge_effect_service.gd")
 const TupoServiceScript := preload("res://scripts/sim/tupo_service.gd")
 const LiandanServiceScript := preload("res://scripts/sim/liandan_service.gd")
 const PlayerAutoBattleServiceScript := preload("res://scripts/sim/player_auto_battle_service.gd")
@@ -24,9 +22,8 @@ func _init() -> void:
 
 func _run_all() -> void:
 	_run("new game and daily activities", _test_new_game_and_daily_activities)
-	_run("breakthrough preview survives knowledge gate", _test_breakthrough_preview_with_knowledge_gate)
+	_run("breakthrough preview ignores knowledge gates", _test_breakthrough_preview_without_knowledge_gate)
 	_run("foundations derive combat attributes", _test_foundations_derive_combat_attributes)
-	_run("knowledge effects feed derived attributes", _test_knowledge_effects_feed_attrs)
 	_run("cultivation methods gate growth and apply effects", _test_cultivation_methods)
 	_run("main cultivation method can be replaced and passively practices", _test_main_method_replacement_and_passive_practice)
 	_run("cultivation sessions support focus and duration", _test_cultivation_sessions)
@@ -122,7 +119,6 @@ func _test_new_game_and_daily_activities() -> void:
 	state.realm_index = 2
 	state._sync_realm()
 	state.cultivation = state.breakthrough_at
-	_grant_foundation_knowledge_gate(state)
 	_expect_true(state.can_breakthrough(), "major realm breakthrough available")
 	var result: Dictionary = state.breakthrough()
 	_expect_true(bool(result.get("ok", false)), "breakthrough succeeds")
@@ -132,13 +128,6 @@ func _test_new_game_and_daily_activities() -> void:
 		ZhandouAttr.get_attr(state.attrs, ZhandouAttr.HP_MAX) >= base_hp_max + 18.0,
 		"major breakthrough raises hp max"
 	)
-
-
-func _grant_foundation_knowledge_gate(state: Node) -> void:
-	state.grant_knowledge("cultivation.cycle", 5)
-	state.grant_knowledge("body.tempering", 5)
-	state.grant_knowledge("spell.escape", 5)
-	state.grant_knowledge("foundation.breathing", 5)
 
 
 func _test_main_method_replacement_and_passive_practice() -> void:
@@ -160,7 +149,7 @@ func _test_main_method_replacement_and_passive_practice() -> void:
 	_expect_gt(mastery_after, mastery_before, "resting day passively practices current method")
 
 
-func _test_breakthrough_preview_with_knowledge_gate() -> void:
+func _test_breakthrough_preview_without_knowledge_gate() -> void:
 	var state := _state()
 	state.realm_index = 2
 	state._sync_realm()
@@ -169,12 +158,8 @@ func _test_breakthrough_preview_with_knowledge_gate() -> void:
 	_expect_true(bool(preview.get("ok", false)), "preview still returns breakdown")
 	_expect_eq(str(preview.get("current_realm_name", "")), "练气后期", "preview uses current realm")
 	_expect_eq(str(preview.get("target_realm_name", "")), "筑基初期", "preview uses target realm")
-	_expect_true(not bool(preview.get("can_attempt", true)), "knowledge gate blocks attempt")
-	_expect_true(str(preview.get("knowledge_error", "")).contains("知识点不足"), "knowledge error surfaced")
-	_grant_foundation_knowledge_gate(state)
-	var ready: Dictionary = state.preview_breakthrough()
-	_expect_true(str(ready.get("knowledge_error", "")) == "", "knowledge gate clears after grant")
-	_expect_true(not bool(ready.get("can_attempt", true)), "still blocked when breakthrough value is low")
+	_expect_eq(str(preview.get("knowledge_error", "")), "", "knowledge gates are removed")
+	_expect_true(not bool(preview.get("can_attempt", true)), "still blocked when breakthrough value is low")
 
 
 func _test_foundations_derive_combat_attributes() -> void:
@@ -193,39 +178,6 @@ func _test_foundations_derive_combat_attributes() -> void:
 	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.SPD), 100.0, "derived action speed")
 
 
-func _test_knowledge_effects_feed_attrs() -> void:
-	var state := _state()
-	var rows := [
-		{
-			"skillId": "foundation.breathing",
-			"level": 2,
-			"effectId": "max_mana",
-			"base": 9.0,
-			"operation": "add_flat",
-			"stackGroup": "test_refresh_mana",
-			"stackPolicy": "add_capped",
-			"cap": 99.0,
-		},
-	]
-	KnowledgeEffectServiceScript.replace_effects_for_tests(rows)
-	var mods := KnowledgeEffectServiceScript.resolve_modifiers(state.to_dict(), rows)
-	_expect_true((mods.get("flat", {}) as Dictionary).is_empty(), "knowledge effect inactive below full level")
-	state.grant_knowledge("foundation.breathing", 2)
-	KnowledgeEffectServiceScript.replace_effects_for_tests([])
-	state.refresh_derived_attrs(true)
-	var baseline := ZhandouAttr.get_attr(state.attrs, ZhandouAttr.MP_MAX)
-	KnowledgeEffectServiceScript.replace_effects_for_tests(rows)
-	state.refresh_derived_attrs(true)
-	_expect_near(
-		ZhandouAttr.get_attr(state.attrs, ZhandouAttr.MP_MAX),
-		baseline + 9.0,
-		"knowledge effect feeds GameState derived attrs"
-	)
-	KnowledgeEffectServiceScript.reload()
-	state.refresh_derived_attrs(true)
-	_expect_true(ZhandouAttr.get_attr(state.attrs, ZhandouAttr.MP_MAX) >= baseline, "production knowledge config restores safely")
-
-
 func _test_cultivation_methods() -> void:
 	var state := _state()
 	var preview: Dictionary = state.preview_cultivation_session("cycle", state.min_cultivation_days())
@@ -233,9 +185,9 @@ func _test_cultivation_methods() -> void:
 	var before_mp := ZhandouAttr.get_attr(state.attrs, ZhandouAttr.MP_MAX)
 	state.cultivate()
 	_expect_gt(
-		KnowledgeServiceScript.effective_level(state.to_dict(), "foundation.breathing"),
+		XiulianMethodServiceScript.method_mastery(state.to_dict(), str(preview.get("method_id", ""))),
 		0.0,
-		"cultivation grants knowledge xp"
+		"cultivation grants method mastery"
 	)
 	_expect_gt(ZhandouAttr.get_attr(state.attrs, ZhandouAttr.MP_MAX), 0.0, "method modifiers apply")
 	_expect_gt(before_mp, 0.0, "starter attrs initialized")
@@ -272,7 +224,7 @@ func _test_cultivation_sessions() -> void:
 	_expect_eq(state.day, 1 + session_days, "multi-day session advances calendar days")
 	_expect_gt(int(result.get("cultivation_gained", 0)), int(insight_preview.get("estimated_cultivation", 0)) - 1, "insight session cultivation")
 	_expect_gt(float(result.get("mastery_gained", 0.0)), 0.06, "insight gains extra mastery")
-	_expect_true(not (result.get("knowledge_gains", []) as Array).is_empty(), "session reports knowledge gains")
+	_expect_true((result.get("knowledge_gains", []) as Array).is_empty(), "session does not report knowledge gains")
 
 
 func _test_pill_cultivation_preview() -> void:
@@ -285,11 +237,11 @@ func _test_pill_cultivation_preview() -> void:
 		str(missing.get("error", "")).contains("丹药"),
 		"pill preview explains missing cultivation pill"
 	)
-	state.inventory["items_JuQiDan"] = min_days
+	state.inventory["items_JuQiDan"] = 1
 	var selected: Dictionary = state.preview_cultivation_session("pill", min_days, "items_JuQiDan")
 	_expect_true(bool(selected.get("ok", false)), "pill preview accepts selected pill")
 	_expect_eq(str(selected.get("pill_id", "")), "items_JuQiDan", "pill preview preserves selected pill")
-	_expect_eq((selected.get("pill_ids", []) as Array).size(), min_days, "pill preview plans one pill per day")
+	_expect_eq((selected.get("pill_ids", []) as Array).size(), 1, "pill preview plans one pill per month")
 
 
 func _test_pill_cultivation_and_instability() -> void:
@@ -305,10 +257,10 @@ func _test_pill_cultivation_and_instability() -> void:
 	)
 	var pills_before := int(state.inventory.get("items_JuQiDan", 0))
 	var result: Dictionary = state.cultivate_session("pill", min_days)
-	_expect_eq(int(state.inventory.get("items_JuQiDan", 0)), pills_before - min_days, "pill cultivation consumes pills")
+	_expect_eq(int(state.inventory.get("items_JuQiDan", 0)), pills_before - 1, "pill cultivation consumes one pill per month")
 	_expect_eq(
 		int(result.get("instability_gained", 0)),
-		state.cultivation_pill_instability("items_JuQiDan") * min_days,
+		state.cultivation_pill_instability("items_JuQiDan"),
 		"pill cultivation adds instability"
 	)
 	var settlement := {
@@ -351,12 +303,10 @@ func _test_learning_books() -> void:
 		var duplicate: Dictionary = state.use_learning_book(book_id)
 		_expect_true(not bool(duplicate.get("ok", false)), "duplicate skill book rejected: %s" % book_id)
 		_expect_eq(int(state.inventory.get(book_id, 0)), 1, "duplicate skill book not consumed: %s" % book_id)
-	state.grant_knowledge("body.tempering", 1)
 	state.inventory["book_method_iron_body"] = 1
 	var method: Dictionary = state.use_learning_book("book_method_iron_body")
 	_expect_true(bool(method.get("ok", false)), "method book learns vajra")
 	_expect_true(state.unlocked_methods.has("method.vajra.1"), "vajra unlocked")
-	state.grant_knowledge("foundation.breathing", 1)
 	state.inventory["book_method_changsheng_1"] = 1
 	var generated_method: Dictionary = state.use_learning_book("book_method_changsheng_1")
 	_expect_true(bool(generated_method.get("ok", false)), "generated method book learns changsheng method")
@@ -714,7 +664,7 @@ func _test_pre_foundation_resource_loop() -> void:
 	var pill_id := str(brew.get("product_id", ""))
 	_expect_true(state.is_cultivation_pill(pill_id), "juqi output is a cultivation pill")
 	var min_days: int = GameTimeServiceScript.days_per_month()
-	state.inventory[pill_id] = min_days
+	state.inventory[pill_id] = 1
 	var normal: Dictionary = state.preview_cultivation_session("cycle", min_days)
 	var pill: Dictionary = state.preview_cultivation_session("pill", min_days, pill_id)
 	_expect_true(bool(pill.get("ok", false)), "crafted juqi pill can be cultivated")
@@ -726,16 +676,15 @@ func _test_pre_foundation_resource_loop() -> void:
 	var pill_before := int(state.inventory.get(pill_id, 0))
 	var cultivated: Dictionary = state.cultivate_session("pill", min_days, pill_id)
 	_expect_true(bool(cultivated.get("ok", false)), "crafted juqi pill cultivation succeeds")
-	_expect_eq(int(state.inventory.get(pill_id, 0)), pill_before - min_days, "crafted pill is consumed")
+	_expect_eq(int(state.inventory.get(pill_id, 0)), pill_before - 1, "crafted pill consumes one per month")
 	_expect_eq(
 		int(cultivated.get("instability_gained", 0)),
-		state.cultivation_pill_instability(pill_id) * min_days,
+		state.cultivation_pill_instability(pill_id),
 		"crafted pill keeps instability cost"
 	)
 	state.realm_index = 2
 	state._sync_realm()
 	state.cultivation = state.breakthrough_at
-	_grant_foundation_knowledge_gate(state)
 	var breakthrough: Dictionary = state.preview_breakthrough()
 	_expect_true(bool(breakthrough.get("ok", false)), "foundation preview after resource loop")
 	_expect_true(not bool(breakthrough.get("can_attempt", true)), "one resource loop does not complete foundation prep")

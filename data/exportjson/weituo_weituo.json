@@ -5,7 +5,7 @@
     "title": "采药急件",
     "issuer": "清风洞府",
     "desc": "宗门药房急需一批草药，望道友相助。",
-    "repeatable": true,
+    "repeatable": false,
     "ui": {
       "portrait": "res://assets/art/characters/001_cutout_483x512.png",
       "badge": "可接受"
@@ -87,7 +87,7 @@
     "title": "收集灵草",
     "issuer": "丹房执事",
     "desc": "听闻灵草可炼丹所用，望道友相助。",
-    "repeatable": true,
+    "repeatable": false,
     "ui": {
       "portrait": "res://assets/art/characters/005_cutout_311x512.png",
       "badge": "可接受"

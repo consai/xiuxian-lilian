@@ -2,7 +2,6 @@ class_name AbilityService
 extends RefCounted
 
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
-const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 
 const PATH := "res://data/exportjson/jineng.json"
@@ -222,7 +221,6 @@ static func unmet_learning_requirement_lines(
 	var lines: Array[String] = []
 	if ability.is_empty():
 		return lines
-	var reqs: Dictionary = ability.get("learningRequirements", {}) as Dictionary
 	var realm := ability_realm_id(ability)
 	if player_major_realm == "":
 		player_major_realm = str(savedata.get("major_realm", "qi"))
@@ -236,26 +234,6 @@ static func unmet_learning_requirement_lines(
 				"need": DaoTreeServiceScript.realm_display_name(realm),
 				"current": current_realm,
 			}
-		))
-	for req_v in reqs.get("knowledge", []) as Array:
-		if not req_v is Dictionary:
-			continue
-		var req := req_v as Dictionary
-		var sid := str(req.get("skillId", req.get("id", ""))).strip_edges()
-		if sid == "":
-			continue
-		var need := int(req.get("level", 1))
-		var have := int(floorf(KnowledgeServiceScript.effective_level(savedata, sid)))
-		if have >= need:
-			continue
-		var skill := DaoTreeServiceScript.skill_by_id(sid)
-		var skill_name := str(skill.get("name", sid))
-		lines.append(StringsZh.format_template(
-			StringsZh.getp(
-				"item_info.learn_req_knowledge",
-				"知识要求：{name} ≥ {need} 级（当前 {current} 级）"
-			),
-			{"name": skill_name, "need": str(need), "current": str(have)}
 		))
 	return lines
 

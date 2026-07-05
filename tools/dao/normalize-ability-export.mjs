@@ -137,52 +137,6 @@ export function parsePositionalConfigEffects(effects) {
   return out;
 }
 
-function parseKnowledgeEntry(item) {
-  if (item && typeof item === "object" && !Array.isArray(item)) {
-    const skillId = String(item.skillId ?? item.skill_id ?? "").trim();
-    if (!skillId) return null;
-    return { skillId, level: Math.max(1, Number(item.level ?? 1) || 1) };
-  }
-  if (Array.isArray(item) && item.length > 0) {
-    const skillId = String(item[0]).trim();
-    if (isNullSentinel(skillId)) return null;
-    return { skillId, level: Math.max(1, Number(item[1] ?? 1) || 1) };
-  }
-  return null;
-}
-
-function parseLearningRequirements(raw) {
-  const knowledge = [];
-  const req = raw.req_knowledge ?? raw.learningRequirements;
-  if (req && typeof req === "object" && !Array.isArray(req)) {
-    for (const item of req.knowledge ?? []) {
-      const entry = parseKnowledgeEntry(item);
-      if (entry) knowledge.push(entry);
-    }
-    return { knowledge };
-  }
-  if (Array.isArray(req)) {
-    for (const item of req) {
-      const entry = parseKnowledgeEntry(item);
-      if (entry) knowledge.push(entry);
-    }
-  }
-  return { knowledge };
-}
-
-function parseGeneralKnowledgeRequirements(raw) {
-  const knowledge = [];
-  for (const slot of [1, 2]) {
-    const skillId = String(raw[`req_knowledge${slot}_id`] ?? "").trim();
-    if (isNullSentinel(skillId)) continue;
-    knowledge.push({
-      skillId,
-      level: Math.max(1, Number(raw[`req_knowledge${slot}_level`] ?? 1) || 1),
-    });
-  }
-  return { knowledge };
-}
-
 export function normalizeZhandouActiveRow(raw) {
   const abilityId = String(raw.id ?? "").trim();
   if (!abilityId) return null;
@@ -214,7 +168,7 @@ export function normalizeZhandouActiveRow(raw) {
     tags: splitCsvTags(raw.tags ?? []),
     combat,
     effects: parsePositionalConfigEffects(raw.effects ?? []),
-    learningRequirements: parseLearningRequirements(raw),
+    learningRequirements: { knowledge: [] },
     trigger: {},
     upgrade_options: [],
     evolution_conditions: [],
@@ -290,7 +244,7 @@ export function normalizeGeneralPassiveRow(raw) {
     tags: splitCsvTags(raw.tags ?? []),
     combat: null,
     effects,
-    learningRequirements: parseGeneralKnowledgeRequirements(raw),
+    learningRequirements: { knowledge: [] },
     trigger: {},
     upgrade_options: [],
     evolution_conditions: [],

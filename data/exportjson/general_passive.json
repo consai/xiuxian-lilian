@@ -18,18 +18,14 @@
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
     "effect2_id": "null",
-    "effect2_base": 0.0,
+    "effect2_base": 0,
     "effect2_operation": "null",
     "effect2_stack_group": "null",
     "effect2_stack_policy": "null",
     "effect2_scaling_mode": "null",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 0.0,
-    "req_realm": "qi",
-    "req_knowledge1_id": "null",
-    "req_knowledge1_level": 0,
-    "req_knowledge2_id": "null",
-    "req_knowledge2_level": 0
+    "effect2_clamp_max": 0,
+    "req_realm": "qi"
   },
   "g_passive_meridian_knowledge": {
     "key": "g_passive_meridian_knowledge",
@@ -50,18 +46,14 @@
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
     "effect2_id": "null",
-    "effect2_base": 0.0,
+    "effect2_base": 0,
     "effect2_operation": "null",
     "effect2_stack_group": "null",
     "effect2_stack_policy": "null",
     "effect2_scaling_mode": "null",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 0.0,
-    "req_realm": "qi",
-    "req_knowledge1_id": "null",
-    "req_knowledge1_level": 0,
-    "req_knowledge2_id": "null",
-    "req_knowledge2_level": 0
+    "effect2_clamp_max": 0,
+    "req_realm": "qi"
   },
   "g_passive_appraiser": {
     "key": "g_passive_appraiser",
@@ -82,18 +74,14 @@
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
     "effect2_id": "null",
-    "effect2_base": 0.0,
+    "effect2_base": 0,
     "effect2_operation": "null",
     "effect2_stack_group": "null",
     "effect2_stack_policy": "null",
     "effect2_scaling_mode": "null",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 0.0,
-    "req_realm": "qi",
-    "req_knowledge1_id": "null",
-    "req_knowledge1_level": 0,
-    "req_knowledge2_id": "null",
-    "req_knowledge2_level": 0
+    "effect2_clamp_max": 0,
+    "req_realm": "qi"
   },
   "g_passive_herbalist": {
     "key": "g_passive_herbalist",
@@ -114,18 +102,14 @@
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
     "effect2_id": "null",
-    "effect2_base": 0.0,
+    "effect2_base": 0,
     "effect2_operation": "null",
     "effect2_stack_group": "null",
     "effect2_stack_policy": "null",
     "effect2_scaling_mode": "null",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 0.0,
-    "req_realm": "qi",
-    "req_knowledge1_id": "null",
-    "req_knowledge1_level": 0,
-    "req_knowledge2_id": "null",
-    "req_knowledge2_level": 0
+    "effect2_clamp_max": 0,
+    "req_realm": "qi"
   },
   "g_passive_smith": {
     "key": "g_passive_smith",
@@ -152,12 +136,8 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2.0,
-    "req_realm": "foundation",
-    "req_knowledge1_id": "null",
-    "req_knowledge1_level": 0,
-    "req_knowledge2_id": "null",
-    "req_knowledge2_level": 0
+    "effect2_clamp_max": 2,
+    "req_realm": "foundation"
   },
   "g_passive_alchemist": {
     "key": "g_passive_alchemist",
@@ -184,12 +164,8 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2.0,
-    "req_realm": "foundation",
-    "req_knowledge1_id": "null",
-    "req_knowledge1_level": 0,
-    "req_knowledge2_id": "null",
-    "req_knowledge2_level": 0
+    "effect2_clamp_max": 2,
+    "req_realm": "foundation"
   },
   "g_passive_array_master": {
     "key": "g_passive_array_master",
@@ -216,12 +192,8 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2.0,
-    "req_realm": "foundation",
-    "req_knowledge1_id": "null",
-    "req_knowledge1_level": 0,
-    "req_knowledge2_id": "null",
-    "req_knowledge2_level": 0
+    "effect2_clamp_max": 2,
+    "req_realm": "foundation"
   },
   "g_passive_talisman_master": {
     "key": "g_passive_talisman_master",
@@ -248,12 +220,8 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2.0,
-    "req_realm": "foundation",
-    "req_knowledge1_id": "null",
-    "req_knowledge1_level": 0,
-    "req_knowledge2_id": "null",
-    "req_knowledge2_level": 0
+    "effect2_clamp_max": 2,
+    "req_realm": "foundation"
   },
   "g_passive_beast_master": {
     "key": "g_passive_beast_master",
@@ -274,18 +242,14 @@
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
     "effect2_id": "beast_capacity",
-    "effect2_base": 1.0,
+    "effect2_base": 1,
     "effect2_operation": "add_flat",
     "effect2_stack_group": "beast_capacity",
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 0.0,
-    "req_realm": "foundation",
-    "req_knowledge1_id": "null",
-    "req_knowledge1_level": 0,
-    "req_knowledge2_id": "null",
-    "req_knowledge2_level": 0
+    "effect2_clamp_max": 0,
+    "req_realm": "foundation"
   },
   "g_passive_geomancer": {
     "key": "g_passive_geomancer",
@@ -312,12 +276,8 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2.0,
-    "req_realm": "core",
-    "req_knowledge1_id": "world.geomancy",
-    "req_knowledge1_level": 2,
-    "req_knowledge2_id": "formation.array",
-    "req_knowledge2_level": 2
+    "effect2_clamp_max": 2,
+    "req_realm": "core"
   },
   "g_passive_void_traveler": {
     "key": "g_passive_void_traveler",
@@ -344,12 +304,8 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2.0,
-    "req_realm": "void",
-    "req_knowledge1_id": "world.void_survival",
-    "req_knowledge1_level": 2,
-    "req_knowledge2_id": "body.void_body",
-    "req_knowledge2_level": 2
+    "effect2_clamp_max": 2,
+    "req_realm": "void"
   },
   "g_passive_sect_governor": {
     "key": "g_passive_sect_governor",
@@ -376,12 +332,8 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2.0,
-    "req_realm": "merge",
-    "req_knowledge1_id": "world.civilization",
-    "req_knowledge1_level": 2,
-    "req_knowledge2_id": "world.trade",
-    "req_knowledge2_level": 2
+    "effect2_clamp_max": 2,
+    "req_realm": "merge"
   },
   "g_passive_tribulation_scholar": {
     "key": "g_passive_tribulation_scholar",
@@ -409,10 +361,6 @@
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
     "effect2_clamp_max": 0.5,
-    "req_realm": "tribulation",
-    "req_knowledge1_id": "heaven.tribulation",
-    "req_knowledge1_level": 2,
-    "req_knowledge2_id": "heaven.astrology",
-    "req_knowledge2_level": 2
+    "req_realm": "tribulation"
   }
 }

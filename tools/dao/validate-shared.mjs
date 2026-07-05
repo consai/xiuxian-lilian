@@ -1,4 +1,4 @@
-/** Node 配置校验共用：quality/tier 与 learningKnowledgeGatePolicy。 */
+/** Node 配置校验共用：quality/tier。 */
 
 export const QUALITY_MIN = 1;
 export const QUALITY_MAX = 4;
@@ -41,10 +41,6 @@ export function rejectLegacyRealmField(row, label, errors) {
   }
 }
 
-/** 从 learningKnowledgeGatePolicy 读取普通品质档位（默认 1、2）。 */
-export function ordinaryQualitiesFromPolicy(policy) {
-  return new Set(policy?.ordinaryQualities ?? [QUALITY_MIN, 2]);
-}
 
 /** 校验单行 quality/tier，并拒绝旧字段 rarity。 */
 export function validateQualityTier(row, label, errors) {

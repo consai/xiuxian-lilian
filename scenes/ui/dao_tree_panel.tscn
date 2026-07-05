@@ -289,8 +289,6 @@ value = 42.0
 layout_mode = 2
 text = "掌握度 42%
 
-影响：剑阵类技能效果
-
 前置：御剑基础 II、阵法基础 II"
 label_settings = ExtResource("12_small")
 autowrap_mode = 2
@@ -307,13 +305,14 @@ text = "查看提升途径"
 
 
 [node name="RelatedButton" type="Button" parent="MainPanel/Details/VBox" unique_id=349708364]
+visible = false
 script = ExtResource("18_auto")
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 theme_override_styles/normal = SubResource("SecondaryButton")
 theme_override_styles/pressed = SubResource("GreenButtonPressed")
 theme_override_styles/hover = SubResource("SecondaryHover")
-text = "查看相关内容"
+text = ""
 
 
 [node name="RoutePanel" type="PanelContainer" parent="." unique_id=2126428413]

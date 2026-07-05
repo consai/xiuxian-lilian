@@ -16,7 +16,6 @@ static func build(method_id: String, savedata: Dictionary, icon: Texture2D = nul
 	var quality := clampi(int(method.get("quality", family.get("quality", 1))), EnumQuality.Type.LOW, EnumQuality.Type.SUPREME)
 	var tier := EnumItemTier.clamp_tier(int(method.get("tier", 1)))
 	var mastery := XiulianMethodServiceScript.method_mastery(savedata, method_id)
-	var knowledge_bonus := XiulianMethodServiceScript.knowledge_mastery_for_method(savedata, method_id)
 	var lines: Array[String] = []
 	var desc := str(method.get("description", "")).strip_edges()
 	if desc != "":
@@ -36,19 +35,13 @@ static func build(method_id: String, savedata: Dictionary, icon: Texture2D = nul
 	var practice: Dictionary = method.get("practice", {}) as Dictionary
 	if not practice.is_empty():
 		lines.append("修炼速度：x%s" % _fmt_num(float(practice.get("efficiency", 1.0))))
-		lines.append("知识经验：%s%%" % _fmt_num(float(practice.get("knowledgeXpRatio", 0.0)) * 100.0))
 		var risk := float(practice.get("deviationRisk", 0.0))
 		if risk > 0.0:
 			lines.append("走火风险：%s%%" % _fmt_num(risk * 100.0))
 	lines.append("熟练：%s%%" % _fmt_num(mastery * 100.0))
-	if knowledge_bonus > 0.0:
-		lines.append("知识反哺：+%s%%" % _fmt_num(knowledge_bonus * 100.0))
 	var mastery_ratio := XiulianMethodServiceScript.method_mastery_value_ratio(savedata, method_id)
 	for effect_line in HoverTipEffectFormatter.format_raw_ability_lines(method.get("effects", []), mastery_ratio):
 		lines.append(effect_line)
-	var knowledge_line := _knowledge_line(method_id)
-	if knowledge_line != "":
-		lines.append(knowledge_line)
 	var payload_fields := {
 		"title": str(method.get("name", method_id)),
 		"title_color": EnumQuality.get_color(quality),
@@ -72,27 +65,6 @@ static func method_type_label(method: Dictionary) -> String:
 	if str(family.get("progressionType", method.get("progressionType", ""))) == "side_path":
 		return "旁门"
 	return "功法"
-
-
-static func _knowledge_line(method_id: String) -> String:
-	var rows := XiulianMethodServiceScript.resolved_knowledge(method_id)
-	var names: PackedStringArray = []
-	for row_v in rows:
-		if not row_v is Dictionary:
-			continue
-		var row := row_v as Dictionary
-		var sid := str(row.get("skillId", "")).strip_edges()
-		if sid == "":
-			continue
-		var skill := DaoTreeServiceScript.skill_by_id(sid)
-		var skill_name := str(skill.get("name", sid))
-		names.append(skill_name)
-		if names.size() >= 4:
-			break
-	if names.is_empty():
-		return ""
-	var suffix := " 等" if rows.size() > names.size() else ""
-	return "研习知识：%s%s" % ["、".join(names), suffix]
 
 
 static func _localize_config_text(text: String) -> String:

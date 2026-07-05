@@ -41,7 +41,7 @@
   },
   "learningPolicy": {
     "key": "learningPolicy",
-    "value": "ability_config_knowledge_requirements",
+    "value": "realm_and_tier_only",
     "onCostsAction": null,
     "offCostsAction": null,
     "defaultSingleTarget": null,
@@ -306,28 +306,5 @@
     "specialPolicy": null,
     "maxKnowledgeRequirements": null,
     "maxRequirementLevel": null
-  },
-  "learningKnowledgeGatePolicy": {
-    "key": "learningKnowledgeGatePolicy",
-    "value": null,
-    "onCostsAction": null,
-    "offCostsAction": null,
-    "defaultSingleTarget": null,
-    "lowestHpPolicy": null,
-    "backlinePolicy": null,
-    "exposedPolicy": null,
-    "areaPolicy": null,
-    "realtimeCastingTarget": null,
-    "priorityTarget": null,
-    "sealPolicy": null,
-    "triggerField": null,
-    "ordinaryQualities": [
-      1,
-      2
-    ],
-    "ordinaryPolicy": "realm_only_no_knowledge_requirements",
-    "specialPolicy": "quality_3_or_above_may_require_knowledge",
-    "maxKnowledgeRequirements": "2",
-    "maxRequirementLevel": "2"
   }
 }

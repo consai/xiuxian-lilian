@@ -453,7 +453,7 @@ func max_cultivation_days(
 		var resolved_pill_id := resolve_cultivation_pill_id(pill_id)
 		if resolved_pill_id == "":
 			return min_cultivation_days()
-		return mini(cap, maxi(min_cultivation_days(), int(inventory.get(resolved_pill_id, 0))))
+		return mini(cap, maxi(min_cultivation_days(), int(inventory.get(resolved_pill_id, 0)) * GameTimeService.days_per_month()))
 	return cap
 
 
@@ -559,15 +559,16 @@ func preview_cultivation_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, 
 				"error": "背包中没有可用于修炼的丹药。",
 			}
 		var owned_pills := int(inventory.get(resolved_pill_id, 0))
-		if owned_pills < safe_days:
+		var required_pills := _cultivation_pill_count(safe_days)
+		if owned_pills < required_pills:
 			return {
 				"ok": false,
-				"error": "丹药炼化每日至少需要一枚%s，当前仅有 %d 枚。" % [
+				"error": "丹药炼化每月需要一枚%s，当前仅有 %d 枚。" % [
 					ConfigManager.get_item_display_name(resolved_pill_id),
 					owned_pills,
 				],
 			}
-		for _day_index in safe_days:
+		for _pill_index in required_pills:
 			pill_ids.append(resolved_pill_id)
 	var method_id := XiulianMethodService.active_cultivation_method_id(DataStore.savedata)
 	var method := XiulianMethodService.by_id(method_id)
@@ -585,8 +586,8 @@ func preview_cultivation_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, 
 		var speed_part := 0
 		var pill_gain := 0
 		if EnumXiulianMode.is_pill_mode(mode_id):
-			# 丹药炼化：直接叠加丹药配置的修为数值，不再乘闭关倍率
-			pill_gain = cultivation_pill_gain(str(pill_ids[_day_index]))
+			# 丹药炼化：每月消耗一颗丹药，药力在当月闭关期间持续生效。
+			pill_gain = cultivation_pill_gain(str(pill_ids[int(_day_index / GameTimeService.days_per_month())]))
 			speed_part = pill_gain
 		else:
 			var multiplier := float(mode["cultivation_multiplier"])
@@ -615,6 +616,7 @@ func preview_cultivation_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, 
 		remaining_injury = maxi(0, remaining_injury - 1)
 	first_day_formula["days"] = safe_days
 	first_day_formula["daily_gains"] = daily_gains
+	first_day_formula["pill_count"] = pill_ids.size()
 	var recommended_days := max_cultivation_days(mode_id, resolved_pill_id)
 	return {
 		"ok": true,
@@ -632,12 +634,12 @@ func preview_cultivation_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, 
 		"method_id": method_id,
 		"method_name": str(method.get("name", "未选择修炼功法")),
 		"method_mastery": XiulianMethodService.method_mastery(DataStore.savedata, method_id),
-		"knowledge_rows": XiulianMethodService.resolved_knowledge(method_id),
 		"base_daily_gain": base_gain,
 		"cultivation_speed": speed,
 		"method_base_gain": method_base_gain,
 		"cultivation_formula": first_day_formula,
 		"pill_ids": pill_ids,
+		"pill_count": pill_ids.size(),
 		"pill_id": resolved_pill_id,
 		"instability_gain": _cultivation_pill_instability_total(pill_ids) if EnumXiulianMode.is_pill_mode(mode_id) else 0,
 		"cultivation_instability": cultivation_instability,
@@ -656,7 +658,6 @@ func cultivate_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, days: int 
 	var realm_before := realm_name
 	var instability_before := cultivation_instability
 	var pill_ids := preview.get("pill_ids", []) as Array
-	var knowledge_summary: Dictionary = {}
 	var layer_advances := 0
 	for day_index in safe_days:
 		var base_gain := RealmBalanceService.base_daily_cultivation_gain(_realm_row(realm_index))
@@ -664,40 +665,25 @@ func cultivate_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, days: int 
 		var method_base_gain := XiulianMethodService.base_cultivation_gain(method_id)
 		var raw_gain := 0
 		if EnumXiulianMode.is_pill_mode(mode_id):
-			var active_pill_id := str(pill_ids[day_index])
-			InventoryService.remove_item(inventory, active_pill_id, 1)
+			var active_pill_id := str(pill_ids[int(day_index / GameTimeService.days_per_month())])
+			if day_index % GameTimeService.days_per_month() == 0:
+				InventoryService.remove_item(inventory, active_pill_id, 1)
+				cultivation_instability += cultivation_pill_instability(active_pill_id)
 			raw_gain = cultivation_pill_gain(active_pill_id) + method_base_gain
-			cultivation_instability += cultivation_pill_instability(active_pill_id)
 		else:
 			var multiplier := float(mode["cultivation_multiplier"])
 			raw_gain = int(round(float(base_gain) * speed * multiplier)) + method_base_gain
 		var injury_multiplier := 0.5 if injury_days > 0 else 1.0
 		var gain := maxi(1, int(round(float(raw_gain) * injury_multiplier)))
 		cultivation += gain
-		var cycle := XiulianMethodService.apply_cultivation_cycle(
+		XiulianMethodService.apply_cultivation_cycle(
 			DataStore.savedata,
 			float(base_gain) * speed,
-			float(mode["knowledge_multiplier"]),
 			float(mode["mastery_multiplier"])
 		)
-		for row_v in cycle.get("knowledge", []) as Array:
-			var row := row_v as Dictionary
-			var skill_id := str(row.get("skillId", ""))
-			var applied := row.get("applied", {}) as Dictionary
-			var aggregate: Dictionary = knowledge_summary.get(skill_id, {
-				"skill_id": skill_id,
-				"xp": 0.0,
-				"levels_gained": 0,
-			})
-			aggregate["xp"] = float(aggregate["xp"]) + float(applied.get("applied", 0.0))
-			aggregate["levels_gained"] = int(aggregate["levels_gained"]) + int(applied.get("levels_gained", 0))
-			knowledge_summary[skill_id] = aggregate
 		injury_days = maxi(0, injury_days - 1)
 		layer_advances += _auto_advance_layers()
 	_advance_time(safe_days, false, false)
-	var knowledge_gains: Array = []
-	for row in knowledge_summary.values():
-		knowledge_gains.append(row)
 	var gained := cultivation - cultivation_before
 	var activity_text := "闭关 %s：%s，修为 +%d" % [
 		GameTimeService.duration_label(safe_days),
@@ -726,7 +712,7 @@ func cultivate_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, days: int 
 		"method_name": str(preview.get("method_name", "")),
 		"mastery_gained": XiulianMethodService.method_mastery(DataStore.savedata, method_id) - mastery_before,
 		"method_mastery": XiulianMethodService.method_mastery(DataStore.savedata, method_id),
-		"knowledge_gains": knowledge_gains,
+		"knowledge_gains": [],
 		"layer_advances": layer_advances,
 		"realm_before": realm_before,
 		"realm_name": realm_name,
@@ -794,6 +780,11 @@ func _cultivation_pill_instability_total(pill_ids: Array) -> int:
 	for pill_id_v in pill_ids:
 		total += cultivation_pill_instability(str(pill_id_v))
 	return total
+
+
+func _cultivation_pill_count(days: int) -> int:
+	var month_days := maxi(1, GameTimeService.days_per_month())
+	return maxi(1, (maxi(1, days) + month_days - 1) / month_days)
 
 
 func rest() -> void:
@@ -960,8 +951,6 @@ func breakthrough() -> Dictionary:
 	var breakdown := preview_breakthrough()
 	if not bool(breakdown.get("ok", false)):
 		return breakdown
-	if str(breakdown.get("knowledge_error", "")) != "":
-		return {"ok": false, "error": str(breakdown.get("knowledge_error", ""))}
 	if bool(breakdown.get("can_attempt", false)):
 		return attempt_breakthrough()
 	# 突破值未达新系统门槛时，沿用简易突破，确保修为达标后可跨入大境界。
@@ -1242,21 +1231,12 @@ func refresh_derived_attrs(preserve_vital_ratio: bool = true) -> void:
 	var method_mods := XiulianMethodService.build_modifiers(
 		cultivation_method_slots, DataStore.savedata
 	)
-	var knowledge_mods := KnowledgeEffectService.build_modifiers(DataStore.savedata)
-	var flat_mods: Dictionary = (method_mods.get("flat", {}) as Dictionary).duplicate(true)
-	for key in (knowledge_mods.get("flat", {}) as Dictionary).keys():
-		var stat := str(key)
-		flat_mods[stat] = float(flat_mods.get(stat, 0.0)) \
-			+ float((knowledge_mods.get("flat", {}) as Dictionary)[stat])
+	var flat_mods: Dictionary = (method_mods.get('flat', {}) as Dictionary).duplicate(true)
 	var realm_mods := CharacterStats.realm_flat_modifiers(realm_index)
 	for key in realm_mods.keys():
 		var stat := str(key)
 		flat_mods[stat] = float(flat_mods.get(stat, 0.0)) + float(realm_mods[stat])
 	var percent_mods: Dictionary = (method_mods.get("percent", {}) as Dictionary).duplicate(true)
-	for key in (knowledge_mods.get("percent", {}) as Dictionary).keys():
-		var stat := str(key)
-		percent_mods[stat] = float(percent_mods.get(stat, 0.0)) \
-			+ float((knowledge_mods.get("percent", {}) as Dictionary)[stat])
 	attrs = CharacterStats.build_combat_attrs(
 		foundations,
 		flat_mods,
@@ -1586,32 +1566,12 @@ func _apply_passive_method_practice(days_value: int) -> Dictionary:
 	var method_base_gain := XiulianMethodService.base_cultivation_gain(method_id)
 	var daily_xp := float(maxi(1, int(round(float(base_gain) * speed)) + method_base_gain))
 	var practice_xp := daily_xp * PASSIVE_METHOD_PRACTICE_RATIO
-	var knowledge_summary: Dictionary = {}
 	for _day_index in days_value:
-		var cycle := XiulianMethodService.apply_cultivation_cycle(
+		XiulianMethodService.apply_cultivation_cycle(
 			DataStore.savedata,
 			practice_xp,
-			1.0,
 			PASSIVE_METHOD_PRACTICE_RATIO
 		)
-		for row_v in cycle.get("knowledge", []) as Array:
-			if not row_v is Dictionary:
-				continue
-			var row := row_v as Dictionary
-			var skill_id := str(row.get("skillId", ""))
-			var applied := row.get("applied", {}) as Dictionary
-			var aggregate: Dictionary = knowledge_summary.get(skill_id, {
-				"skill_id": skill_id,
-				"xp": 0.0,
-				"levels_gained": 0,
-			})
-			aggregate["xp"] = float(aggregate["xp"]) + float(applied.get("applied", 0.0))
-			aggregate["levels_gained"] = int(aggregate["levels_gained"]) + int(applied.get("levels_gained", 0))
-			knowledge_summary[skill_id] = aggregate
-	var knowledge_gains: Array = []
-	for row in knowledge_summary.values():
-		knowledge_gains.append(row)
-	summary["knowledge"] = knowledge_gains
 	summary["mastery_gained"] = XiulianMethodService.method_mastery(
 		DataStore.savedata,
 		method_id

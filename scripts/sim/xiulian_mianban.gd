@@ -1,7 +1,6 @@
 extends Control
 
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
-const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const ItemViewScript := preload("res://scenes/items/item.gd")
 
 const MODE_IDS := EnumXiulianMode.MODE_IDS
@@ -47,6 +46,7 @@ func _ready() -> void:
 	_pill_slot.clicked.connect(_on_pill_slot_clicked)
 	_pill_picker.entry_picked.connect(_on_pill_picked)
 	_method_picker.selected.connect(_on_method_picked)
+	_knowledge_label.visible = false
 	_refresh()
 
 
@@ -67,7 +67,6 @@ func _refresh() -> void:
 			_method_label.text = "尚未装备主功法"
 			_mastery_label.text = "功法熟练度 0%"
 			_mastery_bar.value = 0.0
-			_knowledge_label.text = "装备主功法后方可运功修炼。"
 		_mode_description.text = _format_mode_description(
 			EnumXiulianMode.config(_mode_id),
 			preview
@@ -98,7 +97,7 @@ func _refresh() -> void:
 		var pill_name := ConfigManager.get_item_display_name(pill_id)
 		meta_text += "\n消耗%s x%d · 灵力驳杂 +%d" % [
 			pill_name,
-			_days,
+			int(preview.get("pill_count", 0)),
 			int(preview.get("instability_gain", 0)),
 		]
 	meta_text += "\n\n世界时间将在闭关期间正常流逝。"
@@ -149,7 +148,6 @@ func _bind_method_preview(preview: Dictionary) -> void:
 	var mastery := float(preview.get("method_mastery", 0.0))
 	_mastery_label.text = "功法熟练度 %d%%" % int(round(mastery * 100.0))
 	_mastery_bar.value = mastery * 100.0
-	_knowledge_label.text = _format_knowledge_routes(preview.get("knowledge_rows", []) as Array)
 
 
 func _build_preview() -> Dictionary:
@@ -220,22 +218,7 @@ func _format_cultivation_formula(preview: Dictionary) -> String:
 	return "%s + 功法 %d = %d" % [gain_label, method_gain, daily]
 
 
-func _format_knowledge_routes(rows: Array) -> String:
-	var lines: PackedStringArray = ["本功法可领悟"]
-	for row_v in rows:
-		if not row_v is Dictionary:
-			continue
-		var row := row_v as Dictionary
-		if not bool(row.get("gainFromCultivation", true)):
-			continue
-		var skill_id := str(row.get("skillId", ""))
-		var skill := DaoTreeServiceScript.skill_by_id(skill_id)
-		lines.append("· %s" % str(skill.get("name", skill_id)))
-	if lines.size() == 1:
-		lines.append("· 当前功法没有可通过修炼增长的知识")
-	return "\n".join(lines)
-
-
+func _select_mode
 func _select_mode(mode_id: String) -> void:
 	_mode_id = mode_id
 	if EnumXiulianMode.is_pill_mode(mode_id):

@@ -581,17 +581,9 @@ static func load_dao_tree() -> Dictionary:
 static func load_xiulian_methods_bundle() -> Dictionary:
 	var root := _export_settings(export_path("xiulian_methods.json"))
 	root["metadata"] = _export_settings(export_path("xiulian_methods_metadata.json"))
-	root["rules"] = _export_settings(export_path("xiulian_methods_rules.json"))
 	root["families"] = _export_row_array(export_path("xiulian_methods_families.json"))
 	root["methods"] = _export_row_array(export_path("xiulian_methods_methods.json"))
 	root["effectCatalog"] = _export_keyed_rows(export_path("xiulian_methods_effectCatalog.json"))
-	return root
-
-
-static func load_knowledge_effects_bundle() -> Dictionary:
-	var root := _export_settings(export_path("zhishi_effects.json"))
-	root["rules"] = _export_settings(export_path("zhishi_effects_rules.json"))
-	root["effects"] = _export_row_array(export_path("zhishi_effects_effects.json"))
 	return root
 
 

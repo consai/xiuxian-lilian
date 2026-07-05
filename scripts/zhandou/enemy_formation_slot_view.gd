@@ -16,6 +16,8 @@ const _SHIELD_ICON := preload("res://assets/art/ui_new/hudun_icon.png")
 @onready var sprite: Sprite2D = %Sprite
 @onready var _color_rect: ColorRect = %ColorRect
 @onready var hp_bar: ProgressBar = %HpBar
+@onready var _shield_badge: HBoxContainer = %ShieldBadge
+@onready var _shield_value: Label = %ShieldValue
 @onready var name_label: Label = %Name
 @onready var _buff_status: BuffStatusBar = %BuffStatusBar
 
@@ -58,12 +60,21 @@ func apply_slot(
 		hp_bar.min_value = 0.0
 		hp_bar.max_value = hp_max
 		hp_bar.value = clampf(unit.hp, 0.0, hp_max)
+	_apply_shield(unit)
 	if name_label != null:
 		var name_text := str(row_data.get("name", "敌人")).strip_edges()
 		name_label.text = name_text if name_text != "" else "敌人"
 	if _buff_status != null:
 		_buff_status.sync_unit(unit)
 	_apply_intent(intent_row, enabled)
+
+
+func _apply_shield(unit: ZhandouObj) -> void:
+	var amount := maxf(0.0, unit.get_attr(ZhandouAttr.SHIELD, 0.0))
+	if _shield_badge != null:
+		_shield_badge.visible = amount > 0.0
+	if _shield_value != null:
+		_shield_value.text = str(int(roundf(amount))) if amount > 0.0 else ""
 
 
 func _apply_intent(intent_row: Dictionary, enabled: bool) -> void:

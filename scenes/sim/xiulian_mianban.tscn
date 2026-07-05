@@ -275,10 +275,11 @@ theme_override_styles/fill = SubResource("Style_progress_fill")
 show_percentage = false
 
 [node name="KnowledgeLabel" type="Label" parent="MethodPanel/MethodContent" unique_id=818745388]
+visible = false
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-text = "本功法可领悟"
+text = ""
 label_settings = ExtResource("18_small")
 vertical_alignment = 1
 autowrap_mode = 2
@@ -481,7 +482,7 @@ custom_minimum_size = Vector2(172, 68)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "专心参悟
-知识 160%"
+熟练 150%"
 
 [node name="Icon" parent="ModePanel/ModeContent/ModeButtons/InsightButton" index="0"]
 visible = false
@@ -513,7 +514,7 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
-text = "修为、功法与知识均衡增长。"
+text = "修为与功法熟练度均衡增长。"
 label_settings = ExtResource("18_small")
 horizontal_alignment = 1
 vertical_alignment = 1

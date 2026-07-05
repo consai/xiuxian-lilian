@@ -4,8 +4,6 @@ extends RefCounted
 const RULES_PATH := "res://data/exportjson/yunxing_params/tupo_rules.json"
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
-const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
-const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 
 const COMPONENT_KEYS := [
 	"cultivation", "pills", "mind", "aptitude", "fortune", "special_method", "other"
@@ -44,12 +42,9 @@ static func compute_breakdown(savedata: Dictionary, realms: Array, realm_index: 
 	var total := _sum_components(components)
 	var min_total := int(transition.get("min_total", 0))
 	var tier := evaluate_tier(total, transition_id)
-	var knowledge_error := str(preview.get("knowledge_error", ""))
-	var may_attempt := total >= min_total and knowledge_error == ""
+	var may_attempt := total >= min_total
 	var hint := str(tier.get("hint", "可以尝试突破"))
-	if knowledge_error != "":
-		hint = knowledge_error
-	elif not may_attempt:
+	if not may_attempt:
 		hint = "突破值过低，无法突破"
 	return {
 		"ok": true,
@@ -61,7 +56,7 @@ static func compute_breakdown(savedata: Dictionary, realms: Array, realm_index: 
 		"target_realm_name": str(preview.get("target_realm_name", "")),
 		"current_realm_name": str(preview.get("current_realm_name", "")),
 		"can_attempt": may_attempt,
-		"knowledge_error": knowledge_error,
+		"knowledge_error": "",
 		"tier": tier,
 		"hint": hint,
 	}
@@ -113,9 +108,6 @@ static func evaluate_tier(total: int, transition_id: String) -> Dictionary:
 static func major_gap_hint(breakdown: Dictionary, max_items: int = 2) -> String:
 	if not bool(breakdown.get("ok", false)):
 		return str(breakdown.get("error", "当前条件不足"))
-	var knowledge_error := str(breakdown.get("knowledge_error", "")).strip_edges()
-	if knowledge_error != "":
-		return "主要缺口：%s。" % knowledge_error
 	var total := int(breakdown.get("total", 0))
 	var min_total := int(breakdown.get("min_total", 0))
 	if total < min_total:
@@ -373,29 +365,12 @@ static func _transition_preview(savedata: Dictionary, realms: Array, realm_index
 		"transition_id": transition_id,
 		"current_realm_name": str(current_row.get("name", "")),
 		"target_realm_name": str(next_row.get("name", "")),
-		"knowledge_error": _knowledge_gate_error(savedata, next_row),
+		"knowledge_error": "",
 	}
 
 
 static func cultivation_not_ready(savedata: Dictionary) -> bool:
 	return int(savedata.get("cultivation", 0)) < int(savedata.get("breakthrough_at", 100))
-
-
-static func _knowledge_gate_error(savedata: Dictionary, next_realm_row: Dictionary) -> String:
-	var target_major := str(next_realm_row.get("major_realm", ""))
-	for realm_v in DaoTreeServiceScript.realms():
-		if not realm_v is Dictionary:
-			continue
-		var realm := realm_v as Dictionary
-		if str(realm.get("id", "")) != target_major:
-			continue
-		var gate := int(realm.get("gate", 0))
-		if KnowledgeServiceScript.total_learned_points(savedata) < gate:
-			return "知识点不足，需要 %d 点（当前 %d）" % [
-				gate, KnowledgeServiceScript.total_learned_points(savedata),
-			]
-		break
-	return ""
 
 
 static func _transition_cfg(transition_id: String) -> Dictionary:

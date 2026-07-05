@@ -3,8 +3,6 @@ extends Control
 
 signal confirmed
 
-const KnowledgeRowScene := preload("res://scenes/ui/components/knowledge_progress_row.tscn")
-
 @onready var _status_label: Label = %StatusLabel
 @onready var _flavor_label: Label = %FlavorLabel
 @onready var _result_label: Label = %ResultLabel
@@ -35,7 +33,7 @@ func show_result(result: Dictionary) -> void:
 	_status_label.text = "周天运转完毕"
 	_flavor_label.text = _result_flavor(str(result.get("mode_id", "cycle")))
 	_result_label.text = _format_summary(result)
-	_render_knowledge_rows(result.get("knowledge_gains", []) as Array)
+	_clear_knowledge_rows()
 	visible = true
 
 
@@ -49,26 +47,6 @@ func _clear_knowledge_rows() -> void:
 	for child in _knowledge_rows.get_children():
 		child.queue_free()
 
-
-func _render_knowledge_rows(gains: Array) -> void:
-	_clear_knowledge_rows()
-	_knowledge_scroll.scroll_vertical_quiet(0)
-	for index in gains.size():
-		var row_v: Variant = gains[index]
-		if not row_v is Dictionary:
-			continue
-		var row := row_v as Dictionary
-		if float(row.get("xp", 0.0)) <= 0.0:
-			continue
-		var row_view = KnowledgeRowScene.instantiate()
-		_knowledge_rows.add_child(row_view)
-		if index > 0:
-			row_view.modulate.a = 0.0
-		row_view.apply_gain(row, true)
-		if index > 0:
-			var tween := create_tween()
-			tween.tween_interval(float(index) * 0.08)
-			tween.tween_property(row_view, "modulate:a", 1.0, 0.2)
 
 
 static func _format_summary(result: Dictionary) -> String:

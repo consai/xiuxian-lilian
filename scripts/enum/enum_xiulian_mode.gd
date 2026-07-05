@@ -22,30 +22,26 @@ const MODE_IDS: Array[String] = [
 const MODE_CONFIG: Dictionary = {
 	LABEL_CYCLE: {
 		"name": "运转周天",
-		"description": "修为、功法与知识均衡增长。",
+		"description": "修为与功法熟练度均衡增长。",
 		"cultivation_multiplier": 1.0,
-		"knowledge_multiplier": 1.0,
 		"mastery_multiplier": 1.0,
 	},
 	LABEL_INSIGHT: {
 		"name": "专心参悟",
-		"description": "放缓修为积累，专注理解功法与其中知识。",
+		"description": "放缓修为积累，专注提升功法熟练度。",
 		"cultivation_multiplier": 0.6,
-		"knowledge_multiplier": 1.6,
 		"mastery_multiplier": 1.5,
 	},
 	LABEL_BREATHING: {
 		"name": "吐纳积气",
 		"description": "集中吸纳灵气，快速积累修为。",
 		"cultivation_multiplier": 1.4,
-		"knowledge_multiplier": 0.5,
 		"mastery_multiplier": 0.6,
 	},
 	LABEL_PILL: {
 		"name": "丹药炼化",
 		"description": "服用修炼丹药后打坐炼化，获得丹药修为，但会使灵力驳杂。",
 		"cultivation_multiplier": 1.0,
-		"knowledge_multiplier": 0.8,
 		"mastery_multiplier": 0.8,
 	},
 }

@@ -5,10 +5,10 @@
   },
   "description": {
     "key": "description",
-    "value": "仿 EVE 式长期训练系统，覆盖练气至渡劫"
+    "value": "基础大道树，仅保留修行根本三大道"
   },
   "skillCount": {
     "key": "skillCount",
-    "value": "132"
+    "value": "35"
   }
 }

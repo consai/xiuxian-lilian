@@ -1,7 +1,7 @@
 import { loadDaoTree, loadEffectCatalog } from "./json-config-loader.mjs";
 import { loadAbilitiesBundle } from "./load-abilities-bundle.mjs";
 import { loadCombatEffectSchema } from "./normalize-ability-export.mjs";
-import { ordinaryQualitiesFromPolicy, validateQualityTier, realmIdForTier, rejectLegacyRealmField } from "./validate-shared.mjs";
+import { validateQualityTier, realmIdForTier, rejectLegacyRealmField } from "./validate-shared.mjs";
 
 const dao = await loadDaoTree();
 const config = await loadAbilitiesBundle();
@@ -9,14 +9,9 @@ const catalog = await loadEffectCatalog();
 const combatSchema = await loadCombatEffectSchema();
 const combatEffectIds = new Set(Object.keys(combatSchema));
 const errors = [];
-const knowledge = new Map(dao.skills.map((skill) => [skill.id, skill]));
-const realmOrder = new Map(dao.realms.map((realm) => [realm.id, realm.order]));
 const effectIds = new Set(catalog.effects.map((effect) => effect.id));
 const abilityIds = new Set();
 const v1Tiers = new Set([1, 2]);
-const ordinaryQualities = ordinaryQualitiesFromPolicy(config.rules.learningKnowledgeGatePolicy);
-const maxLearningRequirements = config.rules.learningKnowledgeGatePolicy?.maxKnowledgeRequirements ?? 2;
-const maxRequirementLevel = config.rules.learningKnowledgeGatePolicy?.maxRequirementLevel ?? 2;
 const zhandouActiveEffectIds = combatEffectIds;
 
 const runtimeCombatEffects = new Set([
@@ -98,16 +93,7 @@ for (const ability of config.abilities) {
   rejectLegacyRealmField(ability, "技能", errors);
   const abilityRealm = realmIdForTier(ability.tier);
   const learningKnowledge = ability.learningRequirements?.knowledge ?? [];
-  if (ordinaryQualities.has(ability.quality) && learningKnowledge.length > 0) {
-    errors.push(`${ability.id}: 普通技能不得配置知识学习门槛`);
-  }
-  if (learningKnowledge.length > maxLearningRequirements) errors.push(`${ability.id}: 除境界外学习门槛最多 ${maxLearningRequirements} 个`);
-  for (const gate of learningKnowledge) {
-    const source = knowledge.get(gate.skillId);
-    if (!source) errors.push(`${ability.id}: 学习门槛引用未知知识 ${gate.skillId}`);
-    else if (realmOrder.get(source.realm) > realmOrder.get(abilityRealm)) errors.push(`${ability.id}: 学习门槛引用了高于技能境界的知识 ${gate.skillId}`);
-    if (gate.level < 1 || gate.level > maxRequirementLevel) errors.push(`${ability.id}: 学习门槛等级必须在 1..${maxRequirementLevel} ${gate.skillId}`);
-  }
+  if (learningKnowledge.length > 0) errors.push(ability.id + ': 不得配置知识学习门槛');
   for (const effect of ability.effects ?? []) {
     if ("masteryGrowth" in effect) errors.push(`${ability.id}: 禁止使用 masteryGrowth ${effect.effectId}`);
     if ("knowledgeGrowth" in effect) errors.push(`${ability.id}: 禁止使用 knowledgeGrowth ${effect.effectId}`);
@@ -159,9 +145,6 @@ for (let tier = 1; tier <= 9; tier += 1) {
     (ability) => ability.tier === tier && ability.type === "combat_active",
   ).length;
   if (activeCount < 1) errors.push(`${realm}: 缺少战斗主动技能`);
-}
-for (const skill of dao.skills) {
-  if (!skill.usageDomains?.length) errors.push(`${skill.id}: 未标注 usageDomains`);
 }
 
 if (errors.length) {

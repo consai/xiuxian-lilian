@@ -16,9 +16,6 @@ func _run_all() -> void:
 	var next_quality := _breakdown(1250, 1200)
 	_expect_contains(TupoServiceScript.major_gap_hint(next_quality), "中品筑基", "reports nearest next tier")
 	_expect_contains(TupoServiceScript.major_gap_hint(next_quality), "250", "reports nearest tier gap")
-	var knowledge_blocked := _breakdown(1300, 1200)
-	knowledge_blocked["knowledge_error"] = "知识点不足，需要 20 点（当前 10）"
-	_expect_contains(TupoServiceScript.major_gap_hint(knowledge_blocked), "知识点不足", "reports knowledge gate first")
 	if _failures.is_empty():
 		print("PASS: PM-205 breakthrough feedback")
 		quit(0)

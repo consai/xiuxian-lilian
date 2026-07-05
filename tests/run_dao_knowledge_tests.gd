@@ -2,7 +2,6 @@ extends SceneTree
 
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
 const KnowledgeStudyServiceScript := preload("res://scripts/dao/knowledge_study_service.gd")
-const KnowledgeEffectServiceScript := preload("res://scripts/dao/knowledge_effect_service.gd")
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
@@ -20,9 +19,7 @@ func _initialize() -> void:
 	failed += _run("cultivation_cycle", _test_cultivation_cycle)
 	failed += _run("ability_learn_gate", _test_ability_learn)
 	failed += _run("method_slot_weights", _test_method_slot_weights)
-	failed += _run("knowledge_level_effects", _test_knowledge_level_effects)
 	failed += _run("pm204_starter_pool", _test_pm204_starter_pool)
-	failed += _run("p3_foundation_growth_hooks", _test_p3_foundation_growth_hooks)
 	quit(1 if failed > 0 else 0)
 
 
@@ -83,8 +80,10 @@ func _test_cultivation_cycle() -> void:
 		"cultivation_method_slots": {"main": "method.hunyuan.1"},
 	}
 	var result := XiulianMethodServiceScript.apply_cultivation_cycle(savedata, 40.0)
-	if (result.get("knowledge", []) as Array).is_empty():
-		push_error("cultivation cycle should grant knowledge xp")
+	if not (result.get("knowledge", []) as Array).is_empty():
+		push_error("cultivation cycle should not grant knowledge xp")
+	if float(result.get("mastery_applied", 0.0)) <= 0.0:
+		push_error("cultivation cycle should still grant method mastery")
 
 
 func _test_ability_learn() -> void:
@@ -93,11 +92,9 @@ func _test_ability_learn() -> void:
 		"method_mastery": {},
 		"cultivation_method_slots": {"main": "method.hunyuan.1"},
 	}
-	KnowledgeServiceScript.grant_level(savedata, "spell.projectile", 1)
-	KnowledgeServiceScript.grant_level(savedata, "foundation.control", 1)
 	var ok := AbilityServiceScript.can_learn("ability.combat.qi_bolt", savedata, "qi")
 	if not ok:
-		push_error("ability.combat.qi_bolt should be learnable with starter knowledge")
+		push_error("ability.combat.qi_bolt should be learnable without knowledge gates")
 
 
 func _test_method_slot_weights() -> void:
@@ -118,63 +115,6 @@ func _test_method_slot_weights() -> void:
 		push_error("support method weight should be 0.4")
 	if not is_equal_approx(float(weights.get("movement", 0.0)), 0.5):
 		push_error("movement method weight should be 0.5")
-
-
-func _test_knowledge_level_effects() -> void:
-	var rows := [
-		{
-			"skillId": "foundation.breathing",
-			"level": 1,
-			"effectId": "max_mana",
-			"base": 5.0,
-			"operation": "add_flat",
-			"stackGroup": "test_breathing_mana",
-			"stackPolicy": "add_capped",
-			"cap": 50.0,
-		},
-		{
-			"skillId": "foundation.breathing",
-			"level": 2,
-			"effectId": "max_mana",
-			"base": 7.0,
-			"operation": "add_flat",
-			"stackGroup": "test_breathing_mana",
-			"stackPolicy": "add_capped",
-			"cap": 50.0,
-		},
-		{
-			"skillId": "foundation.breathing",
-			"level": 2,
-			"effectId": "damage_bonus",
-			"base": 0.1,
-			"operation": "add_percent",
-			"stackGroup": "test_breathing_damage_bonus",
-			"stackPolicy": "add_capped",
-			"cap": 0.5,
-		},
-		{
-			"skillId": "foundation.breathing",
-			"level": 1,
-			"effectId": "unknown_effect",
-			"base": 1.0,
-		},
-	]
-	var partial := {"knowledge": {}}
-	KnowledgeServiceScript.apply_xp(partial, "foundation.breathing", 10.0, "test")
-	var partial_mods := KnowledgeEffectServiceScript.resolve_modifiers(partial, rows)
-	if not (partial_mods.get("sources", []) as Array).is_empty():
-		push_error("partial knowledge xp should not activate level effects")
-	var savedata := {"knowledge": {}}
-	KnowledgeServiceScript.grant_level(savedata, "foundation.breathing", 2)
-	var mods := KnowledgeEffectServiceScript.resolve_modifiers(savedata, rows)
-	var flat := mods.get("flat", {}) as Dictionary
-	var percent := mods.get("percent", {}) as Dictionary
-	if not is_equal_approx(float(flat.get(ZhandouAttr.MP_MAX, 0.0)), 12.0):
-		push_error("knowledge level effects should stack learned levels")
-	if not is_equal_approx(float(percent.get(ZhandouAttr.DAMAGE_BONUS, 0.0)), 0.1):
-		push_error("knowledge level percent effects should resolve")
-	if (mods.get("unmapped", []) as Array).is_empty():
-		push_error("unmapped knowledge effects should be reported")
 
 
 func _test_pm204_starter_pool() -> void:
@@ -217,32 +157,6 @@ func _test_pm204_starter_pool() -> void:
 		push_error("starter pool should contain a defensive tendency")
 	_assert_damage_budget_near(1)
 	_assert_damage_budget_near(2)
-
-
-func _test_p3_foundation_growth_hooks() -> void:
-	var required := [
-		"foundation.dao_base",
-		"cultivation.great_cycle",
-		"body.jade",
-	]
-	for skill_id in required:
-		if DaoTreeServiceScript.skill_by_id(skill_id).is_empty():
-			push_error("%s should exist for p3 foundation growth" % skill_id)
-		if KnowledgeEffectServiceScript.effects_for_skill(skill_id).is_empty():
-			push_error("%s should have a visible knowledge effect" % skill_id)
-	var savedata := {"knowledge": {}}
-	KnowledgeServiceScript.grant_level(savedata, "foundation.dao_base", 1)
-	KnowledgeServiceScript.grant_level(savedata, "cultivation.great_cycle", 2)
-	KnowledgeServiceScript.grant_level(savedata, "body.jade", 1)
-	var mods := KnowledgeEffectServiceScript.build_modifiers(savedata)
-	var flat := mods.get("flat", {}) as Dictionary
-	var percent := mods.get("percent", {}) as Dictionary
-	if float(flat.get(ZhandouAttr.HP_MAX, 0.0)) <= 0.0:
-		push_error("foundation.dao_base should add hp")
-	if float(flat.get(ZhandouAttr.MP_MAX, 0.0)) <= 0.0:
-		push_error("cultivation.great_cycle should add mp")
-	if float(percent.get(ZhandouAttr.PHYSICAL_DEF, 0.0)) <= 0.0:
-		push_error("body.jade should add physical defense")
 
 
 func _first_damage_value(runtime: Dictionary) -> float:

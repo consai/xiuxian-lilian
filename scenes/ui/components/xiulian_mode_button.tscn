@@ -51,7 +51,7 @@ theme_override_styles/disabled = SubResource("Style_pressed")
 theme_override_styles/normal = SubResource("Style_normal")
 theme_override_styles/hover = SubResource("Style_hover")
 theme_override_styles/pressed = SubResource("Style_pressed")
-text = "运转周天\n修为 100% · 知识 100%"
+text = "运转周天\n修为 100%"
 
 
 [node name="Icon" type="TextureRect" parent="."]

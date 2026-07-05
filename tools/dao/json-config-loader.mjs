@@ -74,7 +74,6 @@ export async function loadXiulianMethods() {
   return {
     ...(await settings("xiulian_methods.json")),
     metadata: await settings("xiulian_methods_metadata.json"),
-    rules: await settings("xiulian_methods_rules.json"),
     families: await rowArray("xiulian_methods_families.json"),
     methods: await rowArray("xiulian_methods_methods.json"),
     effectCatalog: await keyedRows("xiulian_methods_effectCatalog.json"),

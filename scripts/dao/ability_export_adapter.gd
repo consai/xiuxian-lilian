@@ -84,7 +84,7 @@ static func _normalize_zhandou_active_row(raw: Dictionary) -> Dictionary:
 		"tags": ZhandouEffectCodec.split_csv_tags(raw.get("tags", [])),
 		"combat": combat,
 		"effects": effects,
-		"learningRequirements": _parse_learning_requirements(raw),
+		"learningRequirements": {"knowledge": []},
 		"trigger": {},
 		"upgrade_options": [],
 		"evolution_conditions": [],
@@ -174,66 +174,11 @@ static func _normalize_general_passive_row(raw: Dictionary) -> Dictionary:
 		"tags": ZhandouEffectCodec.split_csv_tags(raw.get("tags", [])),
 		"combat": null,
 		"effects": effects,
-		"learningRequirements": _parse_general_knowledge_requirements(raw),
+		"learningRequirements": {"knowledge": []},
 		"trigger": {},
 		"upgrade_options": [],
 		"evolution_conditions": [],
 	}
-
-
-static func _parse_learning_requirements(raw: Dictionary) -> Dictionary:
-	var knowledge: Array = []
-	var req_v: Variant = raw.get("req_knowledge", raw.get("learningRequirements", null))
-	if req_v is Dictionary:
-		var lr := req_v as Dictionary
-		var nested_v: Variant = lr.get("knowledge", [])
-		if nested_v is Array:
-			for item_v in nested_v as Array:
-				var entry := _knowledge_entry_from_variant(item_v)
-				if not entry.is_empty():
-					knowledge.append(entry)
-		return {"knowledge": knowledge}
-	if req_v is Array:
-		for item_v in req_v as Array:
-			var entry := _knowledge_entry_from_variant(item_v)
-			if not entry.is_empty():
-				knowledge.append(entry)
-	return {"knowledge": knowledge}
-
-
-static func _parse_general_knowledge_requirements(raw: Dictionary) -> Dictionary:
-	var knowledge: Array = []
-	for slot in [1, 2]:
-		var skill_id := str(raw.get("req_knowledge%d_id" % slot, "")).strip_edges()
-		if ZhandouEffectCodec.is_null_sentinel(skill_id):
-			continue
-		var level := int(raw.get("req_knowledge%d_level" % slot, 1))
-		knowledge.append({"skillId": skill_id, "level": maxi(1, level)})
-	return {"knowledge": knowledge}
-
-
-static func _knowledge_entry_from_variant(item_v: Variant) -> Dictionary:
-	if item_v is Dictionary:
-		var item := item_v as Dictionary
-		var skill_id := str(item.get("skillId", item.get("skill_id", ""))).strip_edges()
-		if skill_id == "":
-			return {}
-		return {
-			"skillId": skill_id,
-			"level": maxi(1, int(item.get("level", 1))),
-		}
-	if item_v is Array:
-		var cells := item_v as Array
-		if cells.is_empty():
-			return {}
-		var skill_id := str(cells[0]).strip_edges()
-		if ZhandouEffectCodec.is_null_sentinel(skill_id):
-			return {}
-		var level := 1
-		if cells.size() > 1:
-			level = maxi(1, int(str(cells[1])))
-		return {"skillId": skill_id, "level": level}
-	return {}
 
 
 static func _trigger_from_runtype(runtype: String) -> Dictionary:

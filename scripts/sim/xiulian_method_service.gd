@@ -2,7 +2,6 @@ class_name XiulianMethodService
 extends RefCounted
 
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
-const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 
 const PATH := "res://data/exportjson/xiulian_methods.json"
@@ -15,6 +14,9 @@ const SLOT_WEIGHTS := {
 	"support_2": 0.4,
 	"movement": 0.5,
 }
+# 存档 method_mastery 为 0..1，运行时映射为 1..MASTERY_MAX_LEVEL（初学→圆满）
+const MASTERY_MAX_LEVEL := 5
+const MASTERY_VALUE_RATIOS := [0.0, 0.25, 0.5, 0.75, 1.0]
 
 static var _bundle: Dictionary = {}
 static var _methods_by_id: Dictionary = {}
@@ -75,15 +77,7 @@ static func equipped_rows(slots: Dictionary) -> Array:
 
 
 static func resolved_knowledge(method_id: String) -> Array:
-	var method := by_id(method_id)
-	if method.is_empty():
-		return []
-	var merged: Dictionary = {}
-	_collect_knowledge_chain(method, 0, merged)
-	var out: Array = []
-	for sid in merged.keys():
-		out.append((merged[sid] as Dictionary).duplicate(true))
-	return out
+	return []
 
 
 static func can_learn(method: Dictionary, savedata: Dictionary, player_major_realm: String = "") -> bool:
@@ -125,27 +119,6 @@ static func unmet_learning_requirement_lines(
 				"current": current_realm,
 			}
 		))
-	var reqs: Dictionary = method.get("learningRequirements", {}) as Dictionary
-	for req_v in reqs.get("knowledge", []) as Array:
-		if not req_v is Dictionary:
-			continue
-		var req := req_v as Dictionary
-		var sid := str(req.get("skillId", req.get("id", ""))).strip_edges()
-		if sid == "":
-			continue
-		var need := int(req.get("level", 1))
-		var have := int(floorf(KnowledgeServiceScript.effective_level(savedata, sid)))
-		if have >= need:
-			continue
-		var skill := DaoTreeServiceScript.skill_by_id(sid)
-		var skill_name := str(skill.get("name", sid))
-		lines.append(StringsZh.format_template(
-			StringsZh.getp(
-				"item_info.learn_req_knowledge",
-				"知识要求：{name} ≥ {need} 级（当前 {current} 级）"
-			),
-			{"name": skill_name, "need": str(need), "current": str(have)}
-		))
 	return lines
 
 
@@ -183,15 +156,13 @@ static func cultivation_session_speed(method_id: String, savedata: Dictionary) -
 		return 0.0
 	var speed := 1.0
 	var mastery := method_mastery_value_ratio(savedata, method_id)
-	var knowledge_bonus := 1.0 + knowledge_mastery_for_method(savedata, method_id)
 	for effect_v in method.get("effects", []) as Array:
 		if not effect_v is Dictionary:
 			continue
 		var effect := effect_v as Dictionary
 		if str(effect.get("effectId", "")) != "cultivation_speed":
 			continue
-		speed += (float(effect.get("base", 0.0)) + float(effect.get("masteryGrowth", 0.0)) * mastery) \
-			* knowledge_bonus
+		speed += float(effect.get("base", 0.0)) + float(effect.get("masteryGrowth", 0.0)) * mastery
 	return clampf(speed, 0.5, 10.0)
 
 
@@ -229,26 +200,19 @@ static func method_mastery(savedata: Dictionary, method_id: String) -> float:
 
 
 static func method_mastery_level(savedata: Dictionary, method_id: String) -> int:
-	var rules: Dictionary = bundle().get("rules", {}) as Dictionary
-	var leveling: Dictionary = rules.get("methodMasteryLeveling", {}) as Dictionary
-	var max_level := maxi(1, int(leveling.get("maxLevel", 5)))
 	var mastery := method_mastery(savedata, method_id)
 	if mastery >= 1.0:
-		return max_level
-	return clampi(int(floor(mastery * float(max_level))) + 1, 1, max_level)
+		return MASTERY_MAX_LEVEL
+	return clampi(int(floor(mastery * float(MASTERY_MAX_LEVEL))) + 1, 1, MASTERY_MAX_LEVEL)
 
 
 static func method_mastery_value_ratio(savedata: Dictionary, method_id: String) -> float:
-	var rules: Dictionary = bundle().get("rules", {}) as Dictionary
-	var leveling: Dictionary = rules.get("methodMasteryLeveling", {}) as Dictionary
-	var ratios: Array = leveling.get("valueRatios", []) as Array
 	var level := method_mastery_level(savedata, method_id)
-	if level - 1 < ratios.size():
-		return clampf(float(ratios[level - 1]), 0.0, 1.0)
-	var max_level := maxi(1, int(leveling.get("maxLevel", 5)))
-	if max_level <= 1:
+	if level - 1 < MASTERY_VALUE_RATIOS.size():
+		return clampf(float(MASTERY_VALUE_RATIOS[level - 1]), 0.0, 1.0)
+	if MASTERY_MAX_LEVEL <= 1:
 		return method_mastery(savedata, method_id)
-	return float(level - 1) / float(max_level - 1)
+	return float(level - 1) / float(MASTERY_MAX_LEVEL - 1)
 
 
 static func add_method_mastery(savedata: Dictionary, method_id: String, amount: float) -> void:
@@ -261,75 +225,19 @@ static func add_method_mastery(savedata: Dictionary, method_id: String, amount: 
 static func apply_cultivation_cycle(
 		savedata: Dictionary,
 		practice_xp: float,
-		knowledge_multiplier: float = 1.0,
 		mastery_multiplier: float = 1.0
 ) -> Dictionary:
 	var main_id := active_cultivation_method_id(savedata)
 	var method := by_id(main_id)
 	if method.is_empty() or practice_xp <= 0.0:
 		return {"knowledge": [], "method_id": main_id, "mastery_applied": 0.0}
-	var practice: Dictionary = method.get("practice", {}) as Dictionary
-	var ratio := float(practice.get("knowledgeXpRatio", 0.5))
-	var pool := practice_xp * ratio * maxf(0.0, knowledge_multiplier)
-	var rows := resolved_knowledge(main_id)
-	var weights: Array = []
-	var total_weight := 0.0
-	for row_v in rows:
-		if not row_v is Dictionary:
-			continue
-		var row := row_v as Dictionary
-		if not bool(row.get("gainFromCultivation", true)):
-			continue
-		var sid := str(row.get("skillId", ""))
-		var weight := float(row.get("growthWeight", 1.0))
-		total_weight += weight
-		weights.append({"skillId": sid, "weight": weight})
-	var applied: Array = []
 	var mastery_applied := 0.02 * maxf(0.0, mastery_multiplier)
-	if total_weight <= 0.0:
-		add_method_mastery(savedata, main_id, mastery_applied)
-		return {
-			"knowledge": applied,
-			"method_id": main_id,
-			"mastery_applied": mastery_applied,
-		}
-	for item in weights:
-		var share := pool * float(item["weight"]) / total_weight
-		var result := KnowledgeServiceScript.apply_xp(savedata, str(item["skillId"]), share, main_id)
-		if float(result.get("applied", 0.0)) > 0.0:
-			applied.append({"skillId": str(item["skillId"]), "applied": result})
 	add_method_mastery(savedata, main_id, mastery_applied)
 	return {
-		"knowledge": applied,
+		"knowledge": [],
 		"method_id": main_id,
 		"mastery_applied": mastery_applied,
 	}
-
-
-static func knowledge_mastery_for_method(savedata: Dictionary, method_id: String) -> float:
-	var rules: Dictionary = bundle().get("rules", {}) as Dictionary
-	var bonus_max := float(rules.get("masteryBonusMax", 0.5))
-	var rows := resolved_knowledge(method_id)
-	if rows.is_empty():
-		return 0.0
-	var weighted := 0.0
-	var total_weight := 0.0
-	for row_v in rows:
-		if not row_v is Dictionary:
-			continue
-		var row := row_v as Dictionary
-		var sid := str(row.get("skillId", ""))
-		var skill := DaoTreeServiceScript.skill_by_id(sid)
-		var max_level := maxi(1, int(skill.get("maxLevel", 5)))
-		var mastery_weight := float(row.get("masteryWeight", 1.0))
-		total_weight += mastery_weight
-		var rate := clampf(
-			KnowledgeServiceScript.effective_level(savedata, sid) / float(max_level), 0.0, 1.0
-		)
-		weighted += rate * mastery_weight
-	if total_weight <= 0.0:
-		return 0.0
-	return bonus_max * (weighted / total_weight)
 
 
 static func build_modifiers(slots: Dictionary, savedata: Dictionary) -> Dictionary:
@@ -345,7 +253,6 @@ static func build_modifiers(slots: Dictionary, savedata: Dictionary) -> Dictiona
 		var method_id := str(method.get("id", ""))
 		var slot_weight := float(SLOT_WEIGHTS[slot_key])
 		var mastery := method_mastery_value_ratio(savedata, method_id)
-		var knowledge_bonus := 1.0 + knowledge_mastery_for_method(savedata, method_id)
 		for effect_v in method.get("effects", []) as Array:
 			if not effect_v is Dictionary:
 				continue
@@ -356,7 +263,7 @@ static func build_modifiers(slots: Dictionary, savedata: Dictionary) -> Dictiona
 				continue
 			var base := float(effect.get("base", 0.0))
 			var growth := float(effect.get("masteryGrowth", 0.0))
-			var value := (base + growth * mastery) * knowledge_bonus * slot_weight
+			var value := (base + growth * mastery) * slot_weight
 			var operation := str(effect.get("operation", "add_flat"))
 			var group_id := str(effect.get("stackGroup", effect_id))
 			var policy := str(effect.get("stackPolicy", "highest"))
@@ -365,7 +272,7 @@ static func build_modifiers(slots: Dictionary, savedata: Dictionary) -> Dictiona
 			weighted_effect["base"] = value
 			weighted_effect["masteryGrowth"] = 0.0
 			var resolved := EffectResolverScript.resolve_method_modifiers(
-				[weighted_effect], 0.0, 1.0
+				[weighted_effect], 0.0
 			)
 			var values := resolved.get("percent", {}) as Dictionary if operation == "add_percent" \
 				else resolved.get("flat", {}) as Dictionary
@@ -413,34 +320,6 @@ static func breakthrough_bonus(method_id: String) -> float:
 		if effect_v is Dictionary and str((effect_v as Dictionary).get("effectId", "")) == "breakthrough_bonus":
 			return float((effect_v as Dictionary).get("base", 0.0))
 	return 0.0
-
-
-static func _collect_knowledge_chain(method: Dictionary, tier_distance: int, merged: Dictionary) -> void:
-	var rules: Dictionary = bundle().get("rules", {}) as Dictionary
-	var layer_rules: Dictionary = (rules.get("layerInheritance", {}) as Dictionary).get("knowledge", {}) as Dictionary
-	var distance_mul := float(layer_rules.get("inheritedGrowthWeightMultiplierPerTierDistance", 0.35))
-	for row_v in method.get("knowledge", []) as Array:
-		if not row_v is Dictionary:
-			continue
-		var row := (row_v as Dictionary).duplicate(true)
-		var sid := str(row.get("skillId", ""))
-		if sid == "":
-			continue
-		var weight := float(row.get("growthWeight", 1.0))
-		if tier_distance > 0:
-			weight *= pow(distance_mul, float(tier_distance))
-		if merged.has(sid):
-			var existing := merged[sid] as Dictionary
-			existing["growthWeight"] = maxf(float(existing.get("growthWeight", 0.0)), weight)
-			merged[sid] = existing
-		else:
-			row["growthWeight"] = weight
-			merged[sid] = row
-	var predecessor := str(method.get("predecessorId", ""))
-	if predecessor != "":
-		var parent := by_id(predecessor)
-		if not parent.is_empty():
-			_collect_knowledge_chain(parent, tier_distance + 1, merged)
 
 
 static func _is_movement_method(row: Dictionary) -> bool:

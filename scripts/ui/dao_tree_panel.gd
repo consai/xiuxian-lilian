@@ -17,7 +17,6 @@ const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd"
 @onready var _details_progress: ProgressBar = $MainPanel/Details/VBox/Progress
 @onready var _details_impact: Label = $MainPanel/Details/VBox/Impact
 @onready var _path_button: Button = $MainPanel/Details/VBox/PathButton
-@onready var _related_button: Button = $MainPanel/Details/VBox/RelatedButton
 @onready var _route_panel: PanelContainer = $RoutePanel
 @onready var _route_heading: Label = $RoutePanel/VBox/Heading
 @onready var _back: TextureButton = $BottomActions/Back
@@ -42,7 +41,6 @@ func _ready() -> void:
 	_by_dao.pressed.connect(func() -> void: _set_mode(false))
 	_by_realm.pressed.connect(func() -> void: _set_mode(true))
 	_path_button.pressed.connect(_show_routes)
-	_related_button.pressed.connect(_show_related)
 	_route_panel.visible = false
 	_refresh()
 
@@ -245,11 +243,6 @@ func _bind_details(skill_id: String) -> void:
 	var frac := 0.0 if next_req <= 0.0 else clampf(effective - float(level), 0.0, 1.0)
 	_details_progress.max_value = 100.0
 	_details_progress.value = frac * 100.0 if level < int(skill.get("maxLevel", 5)) else 100.0
-	var impact_lines: PackedStringArray = []
-	for ability in KnowledgeServiceScript.related_abilities(skill_id):
-		impact_lines.append("技能：%s" % str(ability.get("name", "")))
-	for family in KnowledgeServiceScript.related_method_families(skill_id):
-		impact_lines.append("功法：%s" % str(family.get("name", "")))
 	var prereq_lines: PackedStringArray = []
 	for req_v in skill.get("prereqs", []) as Array:
 		if not req_v is Dictionary:
@@ -265,9 +258,8 @@ func _bind_details(skill_id: String) -> void:
 				DaoTreeNodeViewScript._roman_level(int(req.get("level", 1))),
 			]
 		)
-	_details_impact.text = "掌握度 %.0f%%\n\n影响：\n%s\n\n前置：\n%s" % [
+	_details_impact.text = "掌握度 %.0f%%\n\n前置：\n%s" % [
 		frac * 100.0 if level < int(skill.get("maxLevel", 5)) else 100.0,
-		"\n".join(impact_lines) if not impact_lines.is_empty() else "暂无",
 		"\n".join(prereq_lines) if not prereq_lines.is_empty() else "无",
 	]
 
@@ -279,12 +271,6 @@ func _show_routes() -> void:
 	_route_heading.text = "提升途径 · %s" % str(
 		DaoTreeServiceScript.skill_by_id(_selected_skill_id).get("name", "")
 	)
-
-
-func _show_related() -> void:
-	if _selected_skill_id == "":
-		return
-	_bind_details(_selected_skill_id)
 
 
 func _on_reset_zoom() -> void:

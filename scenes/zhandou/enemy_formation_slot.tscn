@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://i2ey5righwn7" path="res://scripts/ui/hover/hover_tip_source.gd" id="5_hover"]
 [ext_resource type="LabelSettings" uid="uid://pnucq6q1j0qa" path="res://ui/ziti_new/16.tres" id="6_4fcsx"]
 [ext_resource type="PackedScene" uid="uid://cx0fbnjps78b1" path="res://scenes/zhandou/buff_status_bar.tscn" id="6_buffbar"]
+[ext_resource type="Texture2D" uid="uid://b2rlinwudsv5b" path="res://assets/art/ui_new/hudun_icon.png" id="7_shield"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_j46pb"]
 font = ExtResource("3_kkcco")
@@ -101,6 +102,30 @@ theme_override_styles/fill = SubResource("HpFill")
 value = 26.93
 show_percentage = false
 
+[node name="ShieldBadge" type="HBoxContainer" parent="ColorRect"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 13.0
+offset_top = 73.0
+offset_right = 61.0
+offset_bottom = 91.0
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="ShieldIcon" type="TextureRect" parent="ColorRect/ShieldBadge"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+texture = ExtResource("7_shield")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ShieldValue" type="Label" parent="ColorRect/ShieldBadge"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "50"
+label_settings = ExtResource("6_4fcsx")
+
 [node name="Name" type="Label" parent="ColorRect" unique_id=792346274]
 unique_name_in_owner = true
 layout_mode = 0
@@ -119,7 +144,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(80, 44)
 layout_mode = 0
 offset_left = -4.0
-offset_top = 75.0
+offset_top = 93.0
 offset_right = 76.0
-offset_bottom = 119.0
+offset_bottom = 137.0
 row_alignment = "center"

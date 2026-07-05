@@ -47,7 +47,7 @@ const EFFECT_TO_FIGHT := {
 }
 
 
-static func resolve_method_modifiers(effects: Array, mastery: float, knowledge_bonus: float = 1.0) -> Dictionary:
+static func resolve_method_modifiers(effects: Array, mastery: float) -> Dictionary:
 	var flat: Dictionary = {}
 	var percent: Dictionary = {}
 	for effect_v in effects:
@@ -57,7 +57,7 @@ static func resolve_method_modifiers(effects: Array, mastery: float, knowledge_b
 		var effect_id := str(effect.get("effectId", ""))
 		var base := float(effect.get("base", 0.0))
 		var growth := float(effect.get("masteryGrowth", 0.0))
-		var magnitude := (base + growth * clampf(mastery, 0.0, 1.0)) * knowledge_bonus
+		var magnitude := base + growth * clampf(mastery, 0.0, 1.0)
 		var operation := str(effect.get("operation", "add_flat"))
 		var mapping: Variant = _attr_mapping(effect_id)
 		if mapping is Dictionary:
