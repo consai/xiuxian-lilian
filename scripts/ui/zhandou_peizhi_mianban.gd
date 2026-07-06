@@ -5,11 +5,13 @@ const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 
+const TREASURE_SLOT_LABELS := ["主动法宝", "被动法宝一", "被动法宝二"]
+
 const METHOD_ROWS := [
 	{"node": "Main", "key": "main", "label": "主功法"},
 	{"node": "Support1", "key": "support_1", "label": "辅助一"},
 	{"node": "Support2", "key": "support_2", "label": "辅助二"},
-	{"node": "Movement", "key": "movement", "label": "身法"},
+	{"node": "Support3", "key": "support_3", "label": "辅助三"},
 ]
 
 @onready var _close_button: TextureButton = %CloseButton
@@ -143,7 +145,7 @@ func _bind_treasure() -> void:
 	for i in _treasure_slots.get_child_count():
 		var slot := _treasure_slots.get_child(i) as Control
 		_bind_equipment_slot(slot, _equip_entry(i))
-		slot.tooltip_text = "点击打开背包，选择法宝装备"
+		slot.tooltip_text = "点击打开背包，选择%s" % _treasure_slot_label(i)
 
 
 func _bind_items() -> void:
@@ -176,12 +178,16 @@ func _equip_entry(index: int) -> Dictionary:
 		return {"label": ConfigManager.get_item_display_name(item_id)}
 	var eid := int(GameState.equip_slots[index]) if index < GameState.equip_slots.size() else -1
 	if eid <= 0:
-		return {"label": "空"}
+		return {"label": _treasure_slot_label(index)}
 	var equip := ConfigManager.equip_by_id(eid)
 	return {
 		"label": str(equip.get("name", "空")),
 		"icon": _entry_icon(equip),
 	}
+
+
+func _treasure_slot_label(index: int) -> String:
+	return TREASURE_SLOT_LABELS[index] if index >= 0 and index < TREASURE_SLOT_LABELS.size() else "法宝"
 
 
 func _item_entry(index: int) -> Dictionary:

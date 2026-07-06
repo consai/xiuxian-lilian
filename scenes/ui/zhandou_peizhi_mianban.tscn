@@ -222,20 +222,20 @@ text = "金钟罩"
 [node name="MetaLabel" parent="Panel/MethodsCard/MethodsContainer/Support2/Row/TextColumn" index="1"]
 text = "防御"
 
-[node name="Movement" parent="Panel/MethodsCard/MethodsContainer" unique_id=1967169051 instance=ExtResource("5_method")]
+[node name="Support3" parent="Panel/MethodsCard/MethodsContainer" unique_id=1967169051 instance=ExtResource("5_method")]
 layout_mode = 2
 
-[node name="TypeLabel" parent="Panel/MethodsCard/MethodsContainer/Movement/Row" index="0"]
-text = "身法"
+[node name="TypeLabel" parent="Panel/MethodsCard/MethodsContainer/Support3/Row" index="0"]
+text = "辅助三"
 
-[node name="Icon" parent="Panel/MethodsCard/MethodsContainer/Movement/Row" index="1"]
+[node name="Icon" parent="Panel/MethodsCard/MethodsContainer/Support3/Row" index="1"]
 texture = ExtResource("10_method_blue")
 
-[node name="NameLabel" parent="Panel/MethodsCard/MethodsContainer/Movement/Row/TextColumn" index="0"]
+[node name="NameLabel" parent="Panel/MethodsCard/MethodsContainer/Support3/Row/TextColumn" index="0"]
 text = "轻身术"
 
-[node name="MetaLabel" parent="Panel/MethodsCard/MethodsContainer/Movement/Row/TextColumn" index="1"]
-text = "身法"
+[node name="MetaLabel" parent="Panel/MethodsCard/MethodsContainer/Support3/Row/TextColumn" index="1"]
+text = "辅助三"
 
 [node name="MethodSummary" type="Panel" parent="Panel/MethodsCard" unique_id=1176454561]
 layout_mode = 0
@@ -398,27 +398,24 @@ label_settings = ExtResource("18_body")
 layout_mode = 0
 offset_left = 7.0
 offset_top = 42.0
-offset_right = 179.0
+offset_right = 292.0
 offset_bottom = 150.0
 theme_override_constants/separation = 8
 
 [node name="Treasure1" parent="Panel/EquipmentCard/TreasurePanel/Slots" unique_id=123998315 instance=ExtResource("7_slot")]
 layout_mode = 2
 
-[node name="Treasure2" parent="Panel/EquipmentCard/TreasurePanel/Slots" unique_id=911427414 instance=ExtResource("7_slot")]
+[node name="Treasure2" parent="Panel/EquipmentCard/TreasurePanel/Slots" instance=ExtResource("7_slot")]
 layout_mode = 2
 
-[node name="Icon" parent="Panel/EquipmentCard/TreasurePanel/Slots/Treasure2" index="0"]
-texture = ExtResource("14_orb")
-
-[node name="NameLabel" parent="Panel/EquipmentCard/TreasurePanel/Slots/Treasure2" index="1"]
-text = "寒潭珠"
+[node name="Treasure3" parent="Panel/EquipmentCard/TreasurePanel/Slots" instance=ExtResource("7_slot")]
+layout_mode = 2
 
 [node name="Label2" type="Label" parent="Panel/EquipmentCard/TreasurePanel" unique_id=114961768]
 layout_mode = 0
-offset_left = 204.0
+offset_left = 110.0
 offset_top = 7.0
-offset_right = 292.0
+offset_right = 198.0
 offset_bottom = 35.0
 text = "道具"
 label_settings = ExtResource("18_body")
@@ -426,12 +423,12 @@ label_settings = ExtResource("18_body")
 [node name="EquipmentContainer" type="GridContainer" parent="Panel/EquipmentCard/TreasurePanel" unique_id=115341093]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 182.0
+offset_left = 96.0
 offset_top = 41.0
-offset_right = 359.0
+offset_right = 358.0
 offset_bottom = 149.0
 theme_override_constants/h_separation = 8
-columns = 4
+columns = 3
 
 [node name="Item1" parent="Panel/EquipmentCard/TreasurePanel/EquipmentContainer" unique_id=745799795 instance=ExtResource("7_slot")]
 layout_mode = 2
@@ -450,6 +447,9 @@ texture = ExtResource("15_pill")
 
 [node name="NameLabel" parent="Panel/EquipmentCard/TreasurePanel/EquipmentContainer/Item2" index="1"]
 text = "回灵丹 x5"
+
+[node name="Item3" parent="Panel/EquipmentCard/TreasurePanel/EquipmentContainer" unique_id=563120748 instance=ExtResource("7_slot")]
+layout_mode = 2
 
 [node name="ItemPanel" type="Panel" parent="Panel/EquipmentCard" unique_id=1526477802]
 layout_mode = 0
@@ -551,12 +551,14 @@ layout_mode = 1
 [editable path="Panel/MethodsCard/MethodsContainer/Main"]
 [editable path="Panel/MethodsCard/MethodsContainer/Support1"]
 [editable path="Panel/MethodsCard/MethodsContainer/Support2"]
-[editable path="Panel/MethodsCard/MethodsContainer/Movement"]
+[editable path="Panel/MethodsCard/MethodsContainer/Support3"]
 [editable path="Panel/SkillsCard/SkillsContainer/Skill1"]
 [editable path="Panel/SkillsCard/SkillsContainer/Skill2"]
 [editable path="Panel/SkillsCard/SkillsContainer/Skill3"]
 [editable path="Panel/SkillsCard/SkillsContainer/Skill4"]
 [editable path="Panel/EquipmentCard/TreasurePanel/Slots/Treasure1"]
 [editable path="Panel/EquipmentCard/TreasurePanel/Slots/Treasure2"]
+[editable path="Panel/EquipmentCard/TreasurePanel/Slots/Treasure3"]
 [editable path="Panel/EquipmentCard/TreasurePanel/EquipmentContainer/Item1"]
 [editable path="Panel/EquipmentCard/TreasurePanel/EquipmentContainer/Item2"]
+[editable path="Panel/EquipmentCard/TreasurePanel/EquipmentContainer/Item3"]

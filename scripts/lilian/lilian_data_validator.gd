@@ -247,7 +247,7 @@ static func _build_sample_battle_init(event: Dictionary, game_state: Node) -> Di
 	var runtime := {
 		"hp": 100.0,
 		"mp": 100.0,
-		"item_slots": ["", ""],
+		"item_slots": ["", "", ""],
 		"inventory": {},
 	}
 	var player: Dictionary = {}

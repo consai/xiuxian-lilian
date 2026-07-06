@@ -129,7 +129,7 @@ static func cycle_item_slot(inventory: Dictionary, slots: Array, index: int) -> 
 
 static func build_battle_item_slots(inventory: Dictionary, slots: Array) -> Array:
 	var out: Array = []
-	for i in 2:
+	for i in slots.size():
 		var iid := str(slots[i]) if i < slots.size() else ""
 		var def := _item_def(iid)
 		if def == null or not def.has_fight_config():

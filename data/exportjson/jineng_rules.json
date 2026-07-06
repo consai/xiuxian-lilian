@@ -15,9 +15,7 @@
     "triggerField": null,
     "ordinaryQualities": null,
     "ordinaryPolicy": null,
-    "specialPolicy": null,
-    "maxKnowledgeRequirements": null,
-    "maxRequirementLevel": null
+    "specialPolicy": null
   },
   "cultivationMethodConfigId": {
     "key": "cultivationMethodConfigId",
@@ -35,13 +33,11 @@
     "triggerField": null,
     "ordinaryQualities": null,
     "ordinaryPolicy": null,
-    "specialPolicy": null,
-    "maxKnowledgeRequirements": null,
-    "maxRequirementLevel": null
+    "specialPolicy": null
   },
   "learningPolicy": {
     "key": "learningPolicy",
-    "value": "realm_and_tier_only",
+    "value": "ability_config_knowledge_requirements",
     "onCostsAction": null,
     "offCostsAction": null,
     "defaultSingleTarget": null,
@@ -55,9 +51,7 @@
     "triggerField": null,
     "ordinaryQualities": null,
     "ordinaryPolicy": null,
-    "specialPolicy": null,
-    "maxKnowledgeRequirements": null,
-    "maxRequirementLevel": null
+    "specialPolicy": null
   },
   "effectFormula": {
     "key": "effectFormula",
@@ -75,9 +69,7 @@
     "triggerField": null,
     "ordinaryQualities": null,
     "ordinaryPolicy": null,
-    "specialPolicy": null,
-    "maxKnowledgeRequirements": null,
-    "maxRequirementLevel": null
+    "specialPolicy": null
   },
   "types": {
     "key": "types",
@@ -100,9 +92,7 @@
     "triggerField": null,
     "ordinaryQualities": null,
     "ordinaryPolicy": null,
-    "specialPolicy": null,
-    "maxKnowledgeRequirements": null,
-    "maxRequirementLevel": null
+    "specialPolicy": null
   },
   "generalPassivePolicy": {
     "key": "generalPassivePolicy",
@@ -120,9 +110,7 @@
     "triggerField": null,
     "ordinaryQualities": null,
     "ordinaryPolicy": null,
-    "specialPolicy": null,
-    "maxKnowledgeRequirements": null,
-    "maxRequirementLevel": null
+    "specialPolicy": null
   },
   "combatPassivePolicy": {
     "key": "combatPassivePolicy",
@@ -140,9 +128,7 @@
     "triggerField": null,
     "ordinaryQualities": null,
     "ordinaryPolicy": null,
-    "specialPolicy": null,
-    "maxKnowledgeRequirements": null,
-    "maxRequirementLevel": null
+    "specialPolicy": null
   },
   "combatUpkeepPolicy": {
     "key": "combatUpkeepPolicy",
@@ -160,9 +146,7 @@
     "triggerField": null,
     "ordinaryQualities": null,
     "ordinaryPolicy": null,
-    "specialPolicy": null,
-    "maxKnowledgeRequirements": null,
-    "maxRequirementLevel": null
+    "specialPolicy": null
   },
   "combatUpkeepTogglePolicy": {
     "key": "combatUpkeepTogglePolicy",
@@ -180,9 +164,7 @@
     "triggerField": null,
     "ordinaryQualities": null,
     "ordinaryPolicy": null,
-    "specialPolicy": null,
-    "maxKnowledgeRequirements": null,
-    "maxRequirementLevel": null
+    "specialPolicy": null
   },
   "combatActivePolicy": {
     "key": "combatActivePolicy",
@@ -200,9 +182,7 @@
     "triggerField": null,
     "ordinaryQualities": null,
     "ordinaryPolicy": null,
-    "specialPolicy": null,
-    "maxKnowledgeRequirements": null,
-    "maxRequirementLevel": null
+    "specialPolicy": null
   },
   "combatSkillSlotTypes": {
     "key": "combatSkillSlotTypes",
@@ -223,9 +203,7 @@
     "triggerField": null,
     "ordinaryQualities": null,
     "ordinaryPolicy": null,
-    "specialPolicy": null,
-    "maxKnowledgeRequirements": null,
-    "maxRequirementLevel": null
+    "specialPolicy": null
   },
   "generalPassiveStackPolicy": {
     "key": "generalPassiveStackPolicy",
@@ -243,9 +221,7 @@
     "triggerField": null,
     "ordinaryQualities": null,
     "ordinaryPolicy": null,
-    "specialPolicy": null,
-    "maxKnowledgeRequirements": null,
-    "maxRequirementLevel": null
+    "specialPolicy": null
   },
   "effectCatalogConfigId": {
     "key": "effectCatalogConfigId",
@@ -263,9 +239,7 @@
     "triggerField": null,
     "ordinaryQualities": null,
     "ordinaryPolicy": null,
-    "specialPolicy": null,
-    "maxKnowledgeRequirements": null,
-    "maxRequirementLevel": null
+    "specialPolicy": null
   },
   "targetSelectionPolicy": {
     "key": "targetSelectionPolicy",
@@ -283,9 +257,7 @@
     "triggerField": null,
     "ordinaryQualities": null,
     "ordinaryPolicy": null,
-    "specialPolicy": null,
-    "maxKnowledgeRequirements": null,
-    "maxRequirementLevel": null
+    "specialPolicy": null
   },
   "specialActionControlPolicy": {
     "key": "specialActionControlPolicy",
@@ -303,8 +275,6 @@
     "triggerField": "hasPriorityEnemy",
     "ordinaryQualities": null,
     "ordinaryPolicy": null,
-    "specialPolicy": null,
-    "maxKnowledgeRequirements": null,
-    "maxRequirementLevel": null
+    "specialPolicy": null
   }
 }

@@ -4,8 +4,8 @@ extends RefCounted
 ## 战斗场景输入：热键、槽位点击与自动战斗 UI。
 
 const SKILL_HOTKEYS: Array[Key] = [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5]
-const EQUIP_HOTKEYS: Array[Key] = [KEY_Q, KEY_W]
-const ITEM_HOTKEYS: Array[Key] = [KEY_E, KEY_R]
+const EQUIP_HOTKEYS: Array[Key] = [KEY_Q]
+const ITEM_HOTKEYS: Array[Key] = [KEY_E, KEY_R, KEY_T]
 const ESCAPE_HOTKEY := KEY_X
 
 var _ctx: ZhandouChangjingContext

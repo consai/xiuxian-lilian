@@ -7,12 +7,12 @@ const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 const PATH := "res://data/exportjson/xiulian_methods.json"
 const SLOT_MAIN := "main"
 const SLOT_SUPPORT := "support"
-const SLOT_MOVEMENT := "movement"
+const SLOT_SUPPORT_3 := "support_3"
 const SLOT_WEIGHTS := {
 	"main": 1.0,
 	"support_1": 0.4,
 	"support_2": 0.4,
-	"movement": 0.5,
+	"support_3": 0.4,
 }
 # 存档 method_mastery 为 0..1，运行时映射为 1..MASTERY_MAX_LEVEL（初学→圆满）
 const MASTERY_MAX_LEVEL := 5
@@ -69,7 +69,7 @@ static func family_by_id(family_id: String) -> Dictionary:
 
 static func equipped_rows(slots: Dictionary) -> Array:
 	var out: Array = []
-	for key in ["main", "support_1", "support_2", "movement"]:
+	for key in ["main", "support_1", "support_2", "support_3"]:
 		var row := by_id(str(slots.get(key, "")))
 		if not row.is_empty():
 			out.append(row)
@@ -124,10 +124,6 @@ static func unmet_learning_requirement_lines(
 
 static func can_equip(row: Dictionary, slot_key: String) -> bool:
 	if row.is_empty():
-		return false
-	if _is_movement_method(row):
-		return slot_key == "movement"
-	if slot_key == "movement":
 		return false
 	if slot_key == "main":
 		return true

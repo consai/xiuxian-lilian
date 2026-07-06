@@ -101,7 +101,7 @@ static func _equipped_abilities(savedata: Dictionary) -> Array:
 static func _equipped_methods(savedata: Dictionary) -> Array:
 	var out: Array = []
 	var slots := savedata.get("cultivation_method_slots", {}) as Dictionary
-	for key in ["main", "support_1", "support_2", "movement"]:
+	for key in ["main", "support_1", "support_2", "support_3"]:
 		var row := XiulianMethodServiceScript.by_id(str(slots.get(key, "")))
 		if not row.is_empty():
 			out.append(row)

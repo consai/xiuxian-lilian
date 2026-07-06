@@ -45,18 +45,18 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 	out["cultivation_instability"] = maxi(0, int(out.get("cultivation_instability", 0)))
 	out["injury_days"] = maxi(0, int(out.get("injury_days", 0)))
 	out["ling_stones"] = maxi(0, int(out.get("ling_stones", 0)))
-	var equip_slots := (out.get("equip_slots", [-1, -1]) as Array).duplicate(true)
-	while equip_slots.size() < 2:
+	var equip_slots := (out.get("equip_slots", [-1, -1, -1]) as Array).duplicate(true)
+	while equip_slots.size() < 3:
 		equip_slots.append(-1)
-	out["equip_slots"] = equip_slots.slice(0, 2)
-	var treasure_item_slots := (out.get("treasure_item_slots", ["", ""]) as Array).duplicate(true)
-	while treasure_item_slots.size() < 2:
+	out["equip_slots"] = equip_slots.slice(0, 3)
+	var treasure_item_slots := (out.get("treasure_item_slots", ["", "", ""]) as Array).duplicate(true)
+	while treasure_item_slots.size() < 3:
 		treasure_item_slots.append("")
-	out["treasure_item_slots"] = treasure_item_slots.slice(0, 2)
-	var item_slots := (out.get("item_slots", ["", ""]) as Array).duplicate(true)
-	while item_slots.size() < 2:
+	out["treasure_item_slots"] = treasure_item_slots.slice(0, 3)
+	var item_slots := (out.get("item_slots", ["", "", ""]) as Array).duplicate(true)
+	while item_slots.size() < 3:
 		item_slots.append("")
-	out["item_slots"] = item_slots.slice(0, 2)
+	out["item_slots"] = item_slots.slice(0, 3)
 	var method_slots_v: Variant = out.get("cultivation_method_slots", {})
 	var method_slots := method_slots_v as Dictionary if method_slots_v is Dictionary else {}
 	var default_main := "method.hunyuan.1"
@@ -65,7 +65,7 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 		"main": main_method,
 		"support_1": str(method_slots.get("support_1", "")),
 		"support_2": str(method_slots.get("support_2", "")),
-		"movement": str(method_slots.get("movement", "")),
+		"support_3": str(method_slots.get("support_3", method_slots.get("movement", ""))),
 	}
 	var current_method := str(out.get("current_cultivation_method_id", "")).strip_edges()
 	out["current_cultivation_method_id"] = current_method if current_method != "" else main_method
@@ -369,15 +369,15 @@ func _default_savedata() -> Dictionary:
 		"unlocked_methods": ["method.hunyuan.1"],
 		"current_cultivation_method_id": "method.hunyuan.1",
 		"cultivation_method_slots": {
-			"main": "method.hunyuan.1", "support_1": "", "support_2": "", "movement": ""
+			"main": "method.hunyuan.1", "support_1": "", "support_2": "", "support_3": ""
 		},
 		"auto_battle_enabled": false,
 		"auto_battle_preset": "balanced",
 		"auto_battle_rules": {},
 		"owned_equips": [],
-		"equip_slots": [-1, -1],
-		"treasure_item_slots": ["", ""],
-		"item_slots": ["", ""],
+		"equip_slots": [-1, -1, -1],
+		"treasure_item_slots": ["", "", ""],
+		"item_slots": ["", "", ""],
 		"inventory": {},
 		"storage": {},
 		"storage_equips": [],
@@ -581,7 +581,7 @@ func _default_lilian() -> Dictionary:
 		"days_without_event": 0,
 		"seed": 0,
 		"rng_state": 0,
-		"runtime": {"hp": 0.0, "mp": 0.0, "item_slots": ["", ""], "inventory": {}},
+		"runtime": {"hp": 0.0, "mp": 0.0, "item_slots": ["", "", ""], "inventory": {}},
 		"loot": [],
 		"current_choices": [],
 		"pending_decision_event": {},

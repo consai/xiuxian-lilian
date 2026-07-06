@@ -388,11 +388,11 @@ func _test_transfer_item_stack_cap() -> void:
 func _test_inventory_and_battle_item_slots() -> void:
 	var state := _state()
 	state.inventory["items_FightTestDan"] = 3
-	state.item_slots = ["items_FightTestDan", ""]
+	state.item_slots = ["items_FightTestDan", "", ""]
 	var slot_id := str(state.item_slots[0])
 	var before := int(state.inventory.get(slot_id, 0))
 	var slots := InventoryServiceScript.build_battle_item_slots(state.inventory, state.item_slots)
-	_expect_eq(slots.size(), 2, "battle item slot count")
+	_expect_eq(slots.size(), 3, "battle item slot count")
 	(slots[0] as Dictionary)["count"] = maxi(0, before - 1)
 	InventoryServiceScript.sync_battle_item_counts(state.inventory, state.item_slots, slots)
 	_expect_eq(int(state.inventory.get(slot_id, 0)), before - 1, "sync consumed items")
@@ -405,7 +405,7 @@ func _test_inventory_and_battle_item_slots() -> void:
 func _test_zhandou_runtime_deducts_inventory() -> void:
 	var state := _state()
 	state.inventory["items_FightTestDan"] = 3
-	state.item_slots = ["items_FightTestDan", ""]
+	state.item_slots = ["items_FightTestDan", "", ""]
 	var slot_id := str(state.item_slots[0])
 	_expect_true(slot_id != "", "battle slot configured")
 	var before := int(state.inventory.get(slot_id, 0))

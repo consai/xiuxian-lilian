@@ -83,13 +83,13 @@ var owned_equips: Array:
 	get: return DataStore.savedata.get("owned_equips", []) as Array
 	set(value): DataStore.savedata["owned_equips"] = value
 var equip_slots: Array:
-	get: return DataStore.savedata.get("equip_slots", [-1, -1]) as Array
+	get: return DataStore.savedata.get("equip_slots", [-1, -1, -1]) as Array
 	set(value): DataStore.savedata["equip_slots"] = value
 var treasure_item_slots: Array:
-	get: return DataStore.savedata.get("treasure_item_slots", ["", ""]) as Array
+	get: return DataStore.savedata.get("treasure_item_slots", ["", "", ""]) as Array
 	set(value): DataStore.savedata["treasure_item_slots"] = value
 var item_slots: Array:
-	get: return DataStore.savedata.get("item_slots", ["", ""]) as Array
+	get: return DataStore.savedata.get("item_slots", ["", "", ""]) as Array
 	set(value): DataStore.savedata["item_slots"] = value
 var inventory: Dictionary:
 	get: return DataStore.savedata.get("inventory", {}) as Dictionary
@@ -166,7 +166,7 @@ func new_game() -> void:
 	equipped_abilities = _initial_equipped_abilities(initial, unlocked_abilities)
 	unlocked_methods = _initial_method_ids(initial)
 	cultivation_method_slots = (initial.get("method_slots", {
-		"main": "method.hunyuan.1", "support_1": "", "support_2": "", "movement": "",
+		"main": "method.hunyuan.1", "support_1": "", "support_2": "", "support_3": "",
 	}) as Dictionary).duplicate(true)
 	current_cultivation_method_id = str(cultivation_method_slots.get("main", "method.hunyuan.1"))
 	_seed_starter_knowledge()
@@ -174,9 +174,9 @@ func new_game() -> void:
 	auto_battle_preset = "balanced"
 	auto_battle_rules = {}
 	owned_equips = (initial.get("equips", []) as Array).duplicate(true)
-	equip_slots = (initial.get("equip_slots", [-1, -1]) as Array).duplicate(true)
-	treasure_item_slots = (initial.get("treasure_item_slots", ["", ""]) as Array).duplicate(true)
-	item_slots = (initial.get("item_slots", ["", ""]) as Array).duplicate(true)
+	equip_slots = (initial.get("equip_slots", [-1, -1, -1]) as Array).duplicate(true)
+	treasure_item_slots = (initial.get("treasure_item_slots", ["", "", ""]) as Array).duplicate(true)
+	item_slots = (initial.get("item_slots", ["", "", ""]) as Array).duplicate(true)
 	inventory = (initial.get("inventory", {}) as Dictionary).duplicate(true)
 	liandan = LiandanService.default_state()
 	storage = (initial.get("storage", {}) as Dictionary).duplicate(true)
@@ -190,6 +190,7 @@ func new_game() -> void:
 	last_lilian_summary = {}
 	last_settled_lilian_id = ""
 	active_save_slot = 0
+	DataStore.savedata = DataStore.coalesce_savedata(DataStore.savedata)
 	if LilianState != null and LilianState.has_method("reset"):
 		LilianState.reset()
 	_initialize_map_state()

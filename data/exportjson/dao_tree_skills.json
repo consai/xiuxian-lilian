@@ -1,5 +1,5 @@
 {
-  "1": {
+  "foundation.breathing": {
     "id": "foundation.breathing",
     "name": "吐纳入门",
     "domain": "foundation",
@@ -11,7 +11,7 @@
     "prereqs": [],
     "description": "感知灵气并完成最基础的吐纳。"
   },
-  "2": {
+  "foundation.meridians": {
     "id": "foundation.meridians",
     "name": "经脉辨识",
     "domain": "foundation",
@@ -28,7 +28,7 @@
     ],
     "description": "识别经络、穴窍与灵力损伤。"
   },
-  "3": {
+  "foundation.control": {
     "id": "foundation.control",
     "name": "灵力操控",
     "domain": "foundation",
@@ -45,7 +45,7 @@
     ],
     "description": "提高施法、炼制与御物的稳定度。"
   },
-  "4": {
+  "foundation.literacy": {
     "id": "foundation.literacy",
     "name": "修真博闻",
     "domain": "foundation",
@@ -57,7 +57,7 @@
     "prereqs": [],
     "description": "识别常见灵材、术语、势力和风险。"
   },
-  "5": {
+  "foundation.dao_base": {
     "id": "foundation.dao_base",
     "name": "道基构筑",
     "domain": "foundation",
@@ -78,7 +78,7 @@
     ],
     "description": "将散乱修为固化为可持续成长的道基。"
   },
-  "6": {
+  "foundation.core_theory": {
     "id": "foundation.core_theory",
     "name": "结丹总纲",
     "domain": "foundation",
@@ -95,7 +95,7 @@
     ],
     "description": "平衡精气神并凝聚金丹。"
   },
-  "7": {
+  "foundation.nascent_theory": {
     "id": "foundation.nascent_theory",
     "name": "元婴道解",
     "domain": "foundation",
@@ -112,7 +112,7 @@
     ],
     "description": "令金丹孕化为第二生命核心。"
   },
-  "8": {
+  "foundation.spirit_theory": {
     "id": "foundation.spirit_theory",
     "name": "化神真解",
     "domain": "foundation",
@@ -129,7 +129,7 @@
     ],
     "description": "让元神与天地法理发生共鸣。"
   },
-  "9": {
+  "foundation.void_theory": {
     "id": "foundation.void_theory",
     "name": "炼虚玄章",
     "domain": "foundation",
@@ -146,7 +146,7 @@
     ],
     "description": "理解虚实转换与空间存续。"
   },
-  "10": {
+  "foundation.integration_theory": {
     "id": "foundation.integration_theory",
     "name": "合体道典",
     "domain": "foundation",
@@ -167,7 +167,7 @@
     ],
     "description": "统合肉身、元神、法相与洞天。"
   },
-  "11": {
+  "foundation.mahayana_theory": {
     "id": "foundation.mahayana_theory",
     "name": "大乘道果",
     "domain": "foundation",
@@ -184,7 +184,7 @@
     ],
     "description": "将所修大道凝为完整道果。"
   },
-  "12": {
+  "foundation.ascension": {
     "id": "foundation.ascension",
     "name": "飞升总纲",
     "domain": "foundation",
@@ -201,7 +201,7 @@
     ],
     "description": "准备渡过天劫并完成生命层次跃迁。"
   },
-  "13": {
+  "cultivation.qi_sense": {
     "id": "cultivation.qi_sense",
     "name": "引气术",
     "domain": "cultivation",
@@ -218,7 +218,7 @@
     ],
     "description": "提升灵气吸收效率。"
   },
-  "14": {
+  "cultivation.cycle": {
     "id": "cultivation.cycle",
     "name": "小周天",
     "domain": "cultivation",
@@ -239,7 +239,7 @@
     ],
     "description": "建立稳定灵力循环。"
   },
-  "15": {
+  "cultivation.purity": {
     "id": "cultivation.purity",
     "name": "真气纯化",
     "domain": "cultivation",
@@ -256,7 +256,7 @@
     ],
     "description": "减少杂质与功法冲突。"
   },
-  "16": {
+  "cultivation.great_cycle": {
     "id": "cultivation.great_cycle",
     "name": "大周天",
     "domain": "cultivation",
@@ -277,7 +277,7 @@
     ],
     "description": "贯通主要经脉并扩大储量。"
   },
-  "17": {
+  "cultivation.liquid_mana": {
     "id": "cultivation.liquid_mana",
     "name": "真元化液",
     "domain": "cultivation",
@@ -298,7 +298,7 @@
     ],
     "description": "将灵力压缩为高密度真元。"
   },
-  "18": {
+  "cultivation.core_fire": {
     "id": "cultivation.core_fire",
     "name": "丹火自生",
     "domain": "cultivation",
@@ -319,7 +319,7 @@
     ],
     "description": "驱动金丹并供给炼制与战斗。"
   },
-  "19": {
+  "cultivation.nascent_cycle": {
     "id": "cultivation.nascent_cycle",
     "name": "婴息周天",
     "domain": "cultivation",
@@ -340,7 +340,7 @@
     ],
     "description": "让元婴独立吐纳并维持本体。"
   },
-  "20": {
+  "cultivation.heaven_cycle": {
     "id": "cultivation.heaven_cycle",
     "name": "天地周天",
     "domain": "cultivation",
@@ -357,7 +357,7 @@
     ],
     "description": "借天地灵机替代部分自身消耗。"
   },
-  "21": {
+  "cultivation.void_furnace": {
     "id": "cultivation.void_furnace",
     "name": "虚空烘炉",
     "domain": "cultivation",
@@ -378,7 +378,7 @@
     ],
     "description": "从虚空乱流中提炼可用力量。"
   },
-  "22": {
+  "cultivation.endless": {
     "id": "cultivation.endless",
     "name": "法力无涯",
     "domain": "cultivation",
@@ -399,7 +399,7 @@
     ],
     "description": "形成近乎闭合的法力生态。"
   },
-  "23": {
+  "cultivation.dao_engine": {
     "id": "cultivation.dao_engine",
     "name": "道果运转",
     "domain": "cultivation",
@@ -420,7 +420,7 @@
     ],
     "description": "以道果驱动全部功法。"
   },
-  "24": {
+  "cultivation.immortal_qi": {
     "id": "cultivation.immortal_qi",
     "name": "仙灵转化",
     "domain": "cultivation",
@@ -441,7 +441,7 @@
     ],
     "description": "承载并转化劫后仙灵之气。"
   },
-  "25": {
+  "body.tempering": {
     "id": "body.tempering",
     "name": "皮肉锻炼",
     "domain": "body",
@@ -458,7 +458,7 @@
     ],
     "description": "提升基础体魄与负重。"
   },
-  "26": {
+  "body.bone": {
     "id": "body.bone",
     "name": "锻骨易筋",
     "domain": "body",
@@ -479,7 +479,7 @@
     ],
     "description": "强化骨骼、筋膜和爆发力。"
   },
-  "27": {
+  "body.recovery": {
     "id": "body.recovery",
     "name": "气血搬运",
     "domain": "body",
@@ -500,7 +500,7 @@
     ],
     "description": "加速伤势与疲劳恢复。"
   },
-  "28": {
+  "body.jade": {
     "id": "body.jade",
     "name": "玉骨灵身",
     "domain": "body",
@@ -521,7 +521,7 @@
     ],
     "description": "让肉身具备抗灵力侵蚀能力。"
   },
-  "29": {
+  "body.bloodline": {
     "id": "body.bloodline",
     "name": "血脉觉醒",
     "domain": "body",
@@ -538,7 +538,7 @@
     ],
     "description": "激活、辨识并驾驭血脉特性。"
   },
-  "30": {
+  "body.regeneration": {
     "id": "body.regeneration",
     "name": "滴血重生",
     "domain": "body",
@@ -559,7 +559,7 @@
     ],
     "description": "从重创中高速再生。"
   },
-  "31": {
+  "body.dharma_form": {
     "id": "body.dharma_form",
     "name": "法相真身",
     "domain": "body",
@@ -580,7 +580,7 @@
     ],
     "description": "以神魂法理放大肉身。"
   },
-  "32": {
+  "body.void_body": {
     "id": "body.void_body",
     "name": "虚空法体",
     "domain": "body",
@@ -601,7 +601,7 @@
     ],
     "description": "抵御空间乱流和虚实撕裂。"
   },
-  "33": {
+  "body.unity": {
     "id": "body.unity",
     "name": "精气神合一",
     "domain": "body",
@@ -618,7 +618,7 @@
     ],
     "description": "消除肉身、法力与元神间的损耗。"
   },
-  "34": {
+  "body.indestructible": {
     "id": "body.indestructible",
     "name": "不灭道身",
     "domain": "body",
@@ -639,7 +639,7 @@
     ],
     "description": "以道果维系肉身不灭性。"
   },
-  "35": {
+  "body.tribulation_body": {
     "id": "body.tribulation_body",
     "name": "劫体",
     "domain": "body",

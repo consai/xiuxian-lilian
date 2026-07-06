@@ -8,9 +8,6 @@
 .godot_test_*/
 
 # --- Excel 配置源与 inspect 中间产物 ---
-xiuxian配置表/indir/
-xiuxian配置表/**/previews/
-**/*.xlsx
 **/*.inspect.ndjson
 
 # --- 配置表导出工具本地输出（previews / 副本 xlsx / inspect）---

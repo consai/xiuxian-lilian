@@ -18,13 +18,13 @@
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
     "effect2_id": "null",
-    "effect2_base": 0,
+    "effect2_base": 0.0,
     "effect2_operation": "null",
     "effect2_stack_group": "null",
     "effect2_stack_policy": "null",
     "effect2_scaling_mode": "null",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 0,
+    "effect2_clamp_max": 0.0,
     "req_realm": "qi"
   },
   "g_passive_meridian_knowledge": {
@@ -46,13 +46,13 @@
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
     "effect2_id": "null",
-    "effect2_base": 0,
+    "effect2_base": 0.0,
     "effect2_operation": "null",
     "effect2_stack_group": "null",
     "effect2_stack_policy": "null",
     "effect2_scaling_mode": "null",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 0,
+    "effect2_clamp_max": 0.0,
     "req_realm": "qi"
   },
   "g_passive_appraiser": {
@@ -74,13 +74,13 @@
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
     "effect2_id": "null",
-    "effect2_base": 0,
+    "effect2_base": 0.0,
     "effect2_operation": "null",
     "effect2_stack_group": "null",
     "effect2_stack_policy": "null",
     "effect2_scaling_mode": "null",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 0,
+    "effect2_clamp_max": 0.0,
     "req_realm": "qi"
   },
   "g_passive_herbalist": {
@@ -102,13 +102,13 @@
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
     "effect2_id": "null",
-    "effect2_base": 0,
+    "effect2_base": 0.0,
     "effect2_operation": "null",
     "effect2_stack_group": "null",
     "effect2_stack_policy": "null",
     "effect2_scaling_mode": "null",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 0,
+    "effect2_clamp_max": 0.0,
     "req_realm": "qi"
   },
   "g_passive_smith": {
@@ -136,7 +136,7 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2,
+    "effect2_clamp_max": 2.0,
     "req_realm": "foundation"
   },
   "g_passive_alchemist": {
@@ -164,7 +164,7 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2,
+    "effect2_clamp_max": 2.0,
     "req_realm": "foundation"
   },
   "g_passive_array_master": {
@@ -192,7 +192,7 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2,
+    "effect2_clamp_max": 2.0,
     "req_realm": "foundation"
   },
   "g_passive_talisman_master": {
@@ -220,7 +220,7 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2,
+    "effect2_clamp_max": 2.0,
     "req_realm": "foundation"
   },
   "g_passive_beast_master": {
@@ -242,13 +242,13 @@
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
     "effect2_id": "beast_capacity",
-    "effect2_base": 1,
+    "effect2_base": 1.0,
     "effect2_operation": "add_flat",
     "effect2_stack_group": "beast_capacity",
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 0,
+    "effect2_clamp_max": 0.0,
     "req_realm": "foundation"
   },
   "g_passive_geomancer": {
@@ -276,7 +276,7 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2,
+    "effect2_clamp_max": 2.0,
     "req_realm": "core"
   },
   "g_passive_void_traveler": {
@@ -304,7 +304,7 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2,
+    "effect2_clamp_max": 2.0,
     "req_realm": "void"
   },
   "g_passive_sect_governor": {
@@ -332,7 +332,7 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2,
+    "effect2_clamp_max": 2.0,
     "req_realm": "merge"
   },
   "g_passive_tribulation_scholar": {

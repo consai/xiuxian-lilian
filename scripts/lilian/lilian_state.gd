@@ -770,7 +770,7 @@ func _sync_runtime_from_summary(summary: Dictionary) -> void:
 	runtime["hp"] = float(runtime_summary.get("hp", runtime.get("hp", 0.0)))
 	runtime["mp"] = float(runtime_summary.get("mp", runtime.get("mp", 0.0)))
 	var inv := runtime.get("inventory", {}) as Dictionary
-	var slots := runtime.get("item_slots", ["", ""]) as Array
+	var slots := runtime.get("item_slots", ["", "", ""]) as Array
 	InventoryServiceScript.sync_battle_item_counts(inv, slots, runtime_summary.get("items", []) as Array)
 	runtime["inventory"] = inv
 
@@ -778,10 +778,10 @@ func _sync_runtime_from_summary(summary: Dictionary) -> void:
 func use_runtime_item_slot(slot_index: int) -> Dictionary:
 	if not active:
 		return {"ok": false, "error": "历练未进行"}
-	if slot_index < 0 or slot_index >= 2:
+	if slot_index < 0 or slot_index >= 3:
 		return {"ok": false, "error": "无效丹药槽"}
-	var slots := (runtime.get("item_slots", ["", ""]) as Array).duplicate(true)
-	while slots.size() < 2:
+	var slots := (runtime.get("item_slots", ["", "", ""]) as Array).duplicate(true)
+	while slots.size() < 3:
 		slots.append("")
 	var item_id := str(slots[slot_index]).strip_edges()
 	if item_id == "":
@@ -820,8 +820,8 @@ func use_runtime_inventory_item(item_id: String) -> Dictionary:
 		inv[iid] = remaining
 	else:
 		inv.erase(iid)
-	var slots := (runtime.get("item_slots", ["", ""]) as Array).duplicate(true)
-	while slots.size() < 2:
+	var slots := (runtime.get("item_slots", ["", "", ""]) as Array).duplicate(true)
+	while slots.size() < 3:
 		slots.append("")
 	for slot_index in slots.size():
 		if str(slots[slot_index]) == iid and remaining <= 0:

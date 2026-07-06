@@ -103,7 +103,7 @@ func _test_method_slot_weights() -> void:
 		"main": "method.hunyuan.1",
 		"support_1": "method.hunyuan.1",
 		"support_2": "method.vajra.1",
-		"movement": "method.hunyuan.1",
+		"support_3": "method.hunyuan.1",
 	}, savedata)
 	var weights: Dictionary = {}
 	for source_v in result.get("sources", []) as Array:
@@ -113,8 +113,8 @@ func _test_method_slot_weights() -> void:
 		push_error("main method weight should be 1.0")
 	if not is_equal_approx(float(weights.get("support_1", 0.0)), 0.4):
 		push_error("support method weight should be 0.4")
-	if not is_equal_approx(float(weights.get("movement", 0.0)), 0.5):
-		push_error("movement method weight should be 0.5")
+	if not is_equal_approx(float(weights.get("support_3", 0.0)), 0.4):
+		push_error("support_3 method weight should be 0.4")
 
 
 func _test_pm204_starter_pool() -> void:

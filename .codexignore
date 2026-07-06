@@ -2,9 +2,6 @@
 
 .godot/
 .godot_test_*/
-xiuxian配置表/indir/
-xiuxian配置表/**/previews/
-**/*.xlsx
 **/*.inspect.ndjson
 outputs/
 **/*.import

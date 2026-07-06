@@ -789,7 +789,7 @@ func _test_battle_win_returns_to_lilian() -> void:
 
 func _test_runtime_potion_slot_can_be_used_manually() -> void:
 	var game := _state()
-	game.item_slots = ["items_HuiQiDan", ""]
+	game.item_slots = ["items_HuiQiDan", "", ""]
 	game.inventory["items_HuiQiDan"] = 2
 	var lilian := _lilian()
 	lilian.start("qinglan_mountain", game, 1313)

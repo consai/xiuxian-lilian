@@ -316,9 +316,9 @@ static func _special_method_sources(method_slots: Dictionary) -> Array:
 		"main": "主功法",
 		"support_1": "辅功法一",
 		"support_2": "辅功法二",
-		"movement": "身法",
+		"support_3": "辅功法三",
 	}
-	var weights := {"main": 1.0, "support_1": 0.6, "support_2": 0.6, "movement": 0.4}
+	var weights := {"main": 1.0, "support_1": 0.6, "support_2": 0.6, "support_3": 0.6}
 	for slot_key in weights.keys():
 		var slot_label := str(slot_labels.get(slot_key, slot_key))
 		var method_id := str(method_slots.get(slot_key, "")).strip_edges()
