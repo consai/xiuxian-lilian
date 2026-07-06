@@ -847,9 +847,9 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -806.0
+offset_left = -632.0
 offset_top = 6.777771
-offset_right = -740.0
+offset_right = -566.0
 offset_bottom = 162.77777
 grow_horizontal = 0
 texture = ExtResource("10_ropvy")
@@ -876,9 +876,9 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -731.0
+offset_left = -557.0
 offset_top = 14.0
-offset_right = -407.0
+offset_right = -435.0
 offset_bottom = 159.0
 grow_horizontal = 0
 theme_override_styles/panel = SubResource("StyleInnerCard")
@@ -892,30 +892,15 @@ offset_right = 104.0
 offset_bottom = 137.0
 hot_key = "Q"
 
-[node name="equip_2" parent="botton/Panel2" instance=ExtResource("12_s4dxh")]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 111.0
-offset_top = 23.0
-offset_right = 205.0
-offset_bottom = 137.0
-
-[node name="equip_3" parent="botton/Panel2" instance=ExtResource("12_s4dxh")]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 212.0
-offset_top = 23.0
-offset_right = 306.0
-offset_bottom = 137.0
 
 [node name="fbtip2" type="TextureRect" parent="botton" unique_id=1696474205]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -397.0
+offset_left = -425.0
 offset_top = 6.777771
-offset_right = -331.0
+offset_right = -359.0
 offset_bottom = 162.77777
 grow_horizontal = 0
 texture = ExtResource("10_ropvy")
@@ -942,7 +927,7 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -322.0
+offset_left = -350.0
 offset_top = 14.0
 offset_right = -26.0
 offset_bottom = 159.0

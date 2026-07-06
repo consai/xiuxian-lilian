@@ -153,8 +153,6 @@ func _collect_slot_arrays() -> void:
 	])
 	_ctx.equip_slots.assign([
 		%equip_1 as OneSkillView,
-		%equip_2 as OneSkillView,
-		%equip_3 as OneSkillView,
 	])
 	_ctx.item_slots.assign([
 		%item_1 as OneSkillView,
