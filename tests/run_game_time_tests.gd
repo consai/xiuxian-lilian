@@ -40,37 +40,37 @@ func _test_calendar_formats() -> void:
 
 func _test_realm_multiplier() -> void:
 	_expect_eq(
-		GameTimeServiceScript.suggested_activity_days(EnumActivityTimeScript.LABEL_CULTIVATE, "qi"),
+		GameTimeServiceScript.suggested_activity_days(EnumActivityTimeScript.LABEL_CULTIVATE, "lianqi"),
 		7,
-		"qi cultivate suggestion"
+		"lianqi cultivate suggestion"
 	)
 	_expect_eq(
-		GameTimeServiceScript.suggested_activity_days(EnumActivityTimeScript.LABEL_CULTIVATE, "core"),
+		GameTimeServiceScript.suggested_activity_days(EnumActivityTimeScript.LABEL_CULTIVATE, "jindan"),
 		28,
-		"core cultivate suggestion"
+		"jindan cultivate suggestion"
 	)
 	_expect_eq(
-		GameTimeServiceScript.suggested_activity_days(EnumActivityTimeScript.LABEL_INSIGHT, "nascent"),
+		GameTimeServiceScript.suggested_activity_days(EnumActivityTimeScript.LABEL_INSIGHT, "yuanying"),
 		800,
-		"nascent insight suggestion"
+		"yuanying insight suggestion"
 	)
 
 
 func _test_activity_days() -> void:
 	_expect_eq(
-		GameTimeServiceScript.days_for_activity(EnumActivityTimeScript.LABEL_LIANDAN, "qi"),
+		GameTimeServiceScript.days_for_activity(EnumActivityTimeScript.LABEL_LIANDAN, "lianqi"),
 		7,
-		"qi alchemy days"
+		"lianqi alchemy days"
 	)
 	_expect_eq(
-		GameTimeServiceScript.days_for_activity(EnumActivityTimeScript.LABEL_LIANDAN, "foundation"),
+		GameTimeServiceScript.days_for_activity(EnumActivityTimeScript.LABEL_LIANDAN, "zhuji"),
 		14,
-		"foundation alchemy days"
+		"zhuji alchemy days"
 	)
 	_expect_eq(
-		GameTimeServiceScript.days_for_activity(EnumActivityTimeScript.LABEL_LILIAN, "qi"),
+		GameTimeServiceScript.days_for_activity(EnumActivityTimeScript.LABEL_LILIAN, "lianqi"),
 		30,
-		"qi expedition days"
+		"lianqi expedition days"
 	)
 
 

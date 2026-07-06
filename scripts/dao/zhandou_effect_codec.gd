@@ -5,40 +5,19 @@ extends RefCounted
 
 const SCHEMA_PATH := "res://data/exportjson/战斗effects效果介绍.json"
 
-## 导出表属性名 → ZhandouAttr 键。
-const ATTR_EXPORT_TO_FIGHT: Dictionary = {
-	"castspd": ZhandouAttr.SPD,
-	"spd": ZhandouAttr.SPD,
-	"atk": ZhandouAttr.PHYSICAL_ATK,
-	"physical_atk": ZhandouAttr.PHYSICAL_ATK,
-	"magic_atk": ZhandouAttr.MAGIC_ATK,
-	"def": ZhandouAttr.PHYSICAL_DEF,
-	"physical_def": ZhandouAttr.PHYSICAL_DEF,
-	"magic_def": ZhandouAttr.MAGIC_DEF,
-	"hp_max": ZhandouAttr.HP_MAX,
-	"mp_max": ZhandouAttr.MP_MAX,
-	"hp_regen": ZhandouAttr.HP_REGEN,
-	"mp_regen": ZhandouAttr.MP_REGEN,
-	"damage_bonus": ZhandouAttr.DAMAGE_BONUS,
-	"control_resist": ZhandouAttr.CONTROL_RESIST,
-}
-
-## attrschange 属性 → 技能配置 effectId（供校验/悬停）。
-const ATTR_EXPORT_TO_EFFECT_ID: Dictionary = {
-	"castspd": "cast_speed",
-	"spd": "cast_speed",
-	"atk": "physical_attack",
-	"physical_atk": "physical_attack",
-	"magic_atk": "magic_attack",
-	"def": "physical_defense",
-	"physical_def": "physical_defense",
-	"magic_def": "magic_defense",
-	"hp_max": "max_hp",
-	"mp_max": "max_mana",
-	"hp_regen": "hp_regen",
-	"mp_regen": "mana_regen",
-	"damage_bonus": "damage_bonus",
-	"control_resist": "control_resist",
+## 战斗属性键 → attrschange 技能配置 effectId（供校验/悬停）；导出表 positional 参数须直接填左侧键名。
+const FIGHT_ATTR_TO_EFFECT_ID: Dictionary = {
+	ZhandouAttr.SPD: "cast_speed",
+	ZhandouAttr.PHYSICAL_ATK: "physical_attack",
+	ZhandouAttr.MAGIC_ATK: "magic_attack",
+	ZhandouAttr.PHYSICAL_DEF: "physical_defense",
+	ZhandouAttr.MAGIC_DEF: "magic_defense",
+	ZhandouAttr.HP_MAX: "max_hp",
+	ZhandouAttr.MP_MAX: "max_mana",
+	ZhandouAttr.HP_REGEN: "hp_regen",
+	ZhandouAttr.MP_REGEN: "mana_regen",
+	ZhandouAttr.DAMAGE_BONUS: "damage_bonus",
+	ZhandouAttr.CONTROL_RESIST: "control_resist",
 }
 
 static var _schema: Dictionary = {}
@@ -120,7 +99,9 @@ static func parse_positional_config(cells: Array) -> Dictionary:
 	match effect_id:
 		"damage", "shield", "heal_hp", "restore_mana":
 			var base := _cell_float(cells, 1, 0.0)
-			return _default_config_effect(effect_id, base, "add_flat")
+			var out := _default_config_effect(effect_id, base, "add_flat")
+			out["_cells"] = cells.duplicate(true)
+			return out
 		"attrschange":
 			return _parse_attrschange_config(cells)
 		"buff":
@@ -231,6 +212,23 @@ static func _parse_scaled_instant(effect_id: String, cells: Array) -> Dictionary
 	}
 
 
+## 结算即时效果数值：优先 positional [code]_cells[/code]，否则 base + scaling 字典。
+static func resolve_runtime_effect_value(
+		effect: Dictionary,
+		caster_attrs: Dictionary,
+		target_attrs: Dictionary = {}
+) -> float:
+	var cells_v: Variant = effect.get("_cells", [])
+	if cells_v is Array and not (cells_v as Array).is_empty():
+		return _resolve_scaled_value(cells_v as Array, caster_attrs, target_attrs)
+	var value := float(effect.get("value", 0.0))
+	var scaling_v: Variant = effect.get("scaling", {})
+	if scaling_v is Dictionary:
+		for key in (scaling_v as Dictionary).keys():
+			value += ZhandouAttr.get_attr(caster_attrs, str(key), 0.0) * float((scaling_v as Dictionary)[key])
+	return value
+
+
 static func _parse_attrschange_runtime(cells: Array) -> Dictionary:
 	var attr_key := _export_attr_key(cells, 1)
 	if attr_key == "":
@@ -270,8 +268,8 @@ static func _parse_damage_mod_runtime(effect_id: String, cells: Array) -> Dictio
 
 
 static func _parse_attrschange_config(cells: Array) -> Dictionary:
-	var export_attr := _cell_string(cells, 1, "").to_lower()
-	var effect_id := str(ATTR_EXPORT_TO_EFFECT_ID.get(export_attr, export_attr))
+	var fight_attr := _export_attr_key(cells, 1)
+	var effect_id := str(FIGHT_ATTR_TO_EFFECT_ID.get(fight_attr, fight_attr))
 	if effect_id == "":
 		return {}
 	var flat_val := _cell_float(cells, 2, 0.0)
@@ -312,11 +310,15 @@ static func _resolve_scaled_value(cells: Array, caster_attrs: Dictionary, target
 	return total
 
 
+## 读取 positional 中的战斗属性键；导出表须与 [member ZhandouAttr.ALL_KEYS] 一致，不再接受别名。
 static func _export_attr_key(cells: Array, index: int) -> String:
-	var export_name := _cell_string(cells, index, "").to_lower()
-	if export_name == "":
+	var fight_attr := _cell_string(cells, index, "").to_lower()
+	if fight_attr == "":
 		return ""
-	return str(ATTR_EXPORT_TO_FIGHT.get(export_name, export_name))
+	if fight_attr in ZhandouAttr.ALL_KEYS:
+		return fight_attr
+	push_warning("ZhandouEffectCodec: 未知战斗属性键 '%s'，请使用 ZhandouAttr 键名" % fight_attr)
+	return ""
 
 
 static func _cell_string(cells: Array, index: int, fallback: String) -> String:

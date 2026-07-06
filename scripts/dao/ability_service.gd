@@ -187,7 +187,7 @@ static func ability_id_for_combat_id(combat_id: int) -> String:
 
 
 static func ability_tier(ability: Dictionary) -> int:
-	return EnumItemTier.clamp_tier(int(ability.get("tier", EnumItemTier.Type.QI)))
+	return EnumItemTier.clamp_tier(int(ability.get("tier", EnumItemTier.Type.lianqi)))
 
 
 ## 技能配置仅用 tier；大境界 id 由阶位推导。
@@ -223,7 +223,7 @@ static func unmet_learning_requirement_lines(
 		return lines
 	var realm := ability_realm_id(ability)
 	if player_major_realm == "":
-		player_major_realm = str(savedata.get("major_realm", "qi"))
+		player_major_realm = str(savedata.get("major_realm", "lianqi"))
 	if not DaoTreeServiceScript.meets_realm_gate(realm, player_major_realm):
 		var current_realm := str(savedata.get("realm_name", "")).strip_edges()
 		if current_realm == "":
@@ -287,7 +287,6 @@ static func to_runtime_dict(ability_id: String, _savedata: Dictionary) -> Dictio
 		"mp_cost": mp_cost,
 		"cd": float(combat.get("cooldown", 0.0)),
 		"cd_total": float(combat.get("cooldown", 0.0)),
-		"power": maxf(0.0, float(combat.get("powerScale", 1.0))) * 1000.0,
 		"tier": maxi(1, int(ability.get("tier", 1))),
 		"quality": clampi(int(ability.get("quality", 1)), EnumQuality.Type.LOW, EnumQuality.Type.SUPREME),
 		"vfx_type": vfx_type,
@@ -326,7 +325,7 @@ static func _tiaoxi_row() -> Dictionary:
 		"id": TIAOXI_ID,
 		"name": "调息",
 		"type": "combat_active",
-		"realm": "qi",
+		"realm": "lianqi",
 		"description": "盘膝调息，按法力恢复速度恢复灵力。",
 		"tags": ["restore", "support"],
 		"combat": {
@@ -352,7 +351,6 @@ static func _tiaoxi_runtime() -> Dictionary:
 		"mp_cost": 0.0,
 		"cd": 0.0,
 		"cd_total": 0.0,
-		"power": 0.0,
 		"tier": 1,
 		"quality": 1,
 		"vfx_type": "buff",

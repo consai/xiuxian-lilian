@@ -232,7 +232,7 @@ func _method_brief_effect(method: Dictionary, method_id: String) -> String:
 	var practice: Dictionary = method.get("practice", {}) as Dictionary
 	if not practice.is_empty():
 		return "修炼速度 x%s" % _fmt_num(float(practice.get("efficiency", 1.0)))
-	var desc
+
 	var desc := str(method.get("description", "")).strip_edges()
 	return desc if desc != "" else "查看悬浮详情了解效果"
 

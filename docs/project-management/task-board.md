@@ -186,7 +186,7 @@ P2 通过标准：
 
 - `data/jingjie_balance.yaml`
 - `tests/run_balance_v1_tests.gd`
-- `docs/realm-balance-foundation.md`
+- `docs/realm-balance-zhuji.md`
 
 任务备注：
 
@@ -399,7 +399,7 @@ P3 通过标准：
 
 任务备注：
 
-- 2026-06-25：复用现有筑基技能 / 功法作为雾隐溪谷奖励投放，并补齐 `foundation.dao_base`、`cultivation.great_cycle`、`body.jade` 三个知识效果；`run_dao_knowledge_tests.gd` 与 `run_balance_v1_tests.gd` 通过。
+- 2026-06-25：复用现有筑基技能 / 功法作为雾隐溪谷奖励投放，并补齐 `zhuji.dao_base`、`cultivation.great_cycle`、`body.jade` 三个知识效果；`run_dao_knowledge_tests.gd` 与 `run_balance_v1_tests.gd` 通过。
 
 ### [x] PM-304：炼丹与突破辅助扩展
 

@@ -1,54 +1,54 @@
 {
-  "qi": {
-    "id": "qi",
+  "lianqi": {
+    "id": "lianqi",
     "name": "练气",
     "order": 1,
     "gate": 0
   },
-  "foundation": {
-    "id": "foundation",
+  "zhuji": {
+    "id": "zhuji",
     "name": "筑基",
     "order": 2,
     "gate": 20
   },
-  "core": {
-    "id": "core",
+  "jindan": {
+    "id": "jindan",
     "name": "金丹",
     "order": 3,
     "gate": 60
   },
-  "nascent": {
-    "id": "nascent",
+  "yuanying": {
+    "id": "yuanying",
     "name": "元婴",
     "order": 4,
     "gate": 130
   },
-  "transform": {
-    "id": "transform",
+  "huashen": {
+    "id": "huashen",
     "name": "化神",
     "order": 5,
     "gate": 240
   },
-  "void": {
-    "id": "void",
+  "lianxu": {
+    "id": "lianxu",
     "name": "炼虚",
     "order": 6,
     "gate": 400
   },
-  "merge": {
-    "id": "merge",
+  "heti": {
+    "id": "heti",
     "name": "合体",
     "order": 7,
     "gate": 620
   },
-  "great": {
-    "id": "great",
+  "dacheng": {
+    "id": "dacheng",
     "name": "大乘",
     "order": 8,
     "gate": 900
   },
-  "tribulation": {
-    "id": "tribulation",
+  "dujie": {
+    "id": "dujie",
     "name": "渡劫",
     "order": 9,
     "gate": 1250

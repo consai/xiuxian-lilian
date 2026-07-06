@@ -1,97 +1,97 @@
 {
   "hp_max": {
     "key": "hp_max",
-    "base": 50.0,
+    "base": 50,
     "scale": {
-      "body": 5
+      "roushen": 5
     }
   },
   "mp_max": {
     "key": "mp_max",
-    "base": 50.0,
+    "base": 50,
     "scale": {
-      "spirit": 5
+      "lingli": 5
     }
   },
   "physical_atk": {
     "key": "physical_atk",
-    "base": 0.0,
+    "base": 0,
     "scale": {
-      "body": 3
+      "roushen": 3
     }
   },
   "magic_atk": {
     "key": "magic_atk",
-    "base": 0.0,
+    "base": 0,
     "scale": {
-      "spirit": 2.4,
-      "sense": 0.8
+      "lingli": 2.4,
+      "shenshi": 0.8
     }
   },
   "physical_def": {
     "key": "physical_def",
-    "base": 0.0,
+    "base": 0,
     "scale": {
-      "body": 2
+      "roushen": 2
     }
   },
   "magic_def": {
     "key": "magic_def",
-    "base": 0.0,
+    "base": 0,
     "scale": {
-      "spirit": 1.2,
-      "sense": 1.2
+      "lingli": 1.2,
+      "shenshi": 1.2
     }
   },
   "spd": {
     "key": "spd",
-    "base": 50.0,
+    "base": 50,
     "scale": {
-      "agility": 3,
-      "sense": 2
+      "shenfa": 3,
+      "shenshi": 2
     }
   },
   "control_power": {
     "key": "control_power",
-    "base": 0.0,
+    "base": 0,
     "scale": {
-      "sense": 3,
-      "spirit": 1
+      "shenshi": 3,
+      "lingli": 1
     }
   },
   "control_resist": {
     "key": "control_resist",
-    "base": 0.0,
+    "base": 0,
     "scale": {
-      "sense": 2,
-      "body": 1
+      "shenshi": 2,
+      "roushen": 1
     }
   },
   "hp_regen": {
     "key": "hp_regen",
     "base": 0.5,
     "scale": {
-      "body": 0.05
+      "roushen": 0.05
     }
   },
   "mp_regen": {
     "key": "mp_regen",
     "base": 0.5,
     "scale": {
-      "spirit": 0.04,
-      "sense": 0.01
+      "lingli": 0.04,
+      "shenshi": 0.01
     }
   },
   "carry": {
     "key": "carry",
-    "base": 20.0,
+    "base": 20,
     "scale": {
-      "body": 2
+      "roushen": 2
     }
   },
   "shield": {
     "key": "shield",
-    "base": 0.0,
+    "base": 0,
     "scale": {}
   }
 }

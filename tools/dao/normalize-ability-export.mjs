@@ -6,13 +6,11 @@ import { realmIdForTier, tierForRealmId } from "./validate-shared.mjs";
 const dataDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../data");
 const SCHEMA_PATH = path.join(dataDir, "exportjson", "战斗effects效果介绍.json");
 
-const ATTR_EXPORT_TO_EFFECT_ID = {
-  castspd: "cast_speed",
+/** 战斗属性键 → attrschange 技能配置 effectId；导出表 positional 参数须直接填左侧键名。 */
+const FIGHT_ATTR_TO_EFFECT_ID = {
   spd: "cast_speed",
-  atk: "physical_attack",
   physical_atk: "physical_attack",
   magic_atk: "magic_attack",
-  def: "physical_defense",
   physical_def: "physical_defense",
   magic_def: "magic_defense",
   hp_max: "max_hp",
@@ -22,6 +20,15 @@ const ATTR_EXPORT_TO_EFFECT_ID = {
   damage_bonus: "damage_bonus",
   control_resist: "control_resist",
 };
+
+const FIGHT_ATTR_KEYS = new Set(Object.keys(FIGHT_ATTR_TO_EFFECT_ID));
+
+function exportFightAttrKey(cells, index) {
+  const fightAttr = cellString(cells, index, "").toLowerCase();
+  if (!fightAttr) return "";
+  if (FIGHT_ATTR_KEYS.has(fightAttr)) return fightAttr;
+  return "";
+}
 
 let schemaCache = null;
 
@@ -89,8 +96,9 @@ export function parsePositionalConfig(cells) {
     case "restore_mana":
       return defaultConfigEffect(effectId, cellFloat(cells, 1, 0), "add_flat");
     case "attrschange": {
-      const exportAttr = cellString(cells, 1, "").toLowerCase();
-      const mapped = ATTR_EXPORT_TO_EFFECT_ID[exportAttr] ?? exportAttr;
+      const fightAttr = exportFightAttrKey(cells, 1);
+      if (!fightAttr) return null;
+      const mapped = FIGHT_ATTR_TO_EFFECT_ID[fightAttr] ?? fightAttr;
       const flatVal = cellFloat(cells, 2, 0);
       const pctVal = cellFloat(cells, 3, 0);
       const operation = pctVal !== 0 && flatVal === 0 ? "add_percent" : "add_flat";
@@ -155,7 +163,6 @@ export function normalizeZhandouActiveRow(raw) {
     costs,
     upkeepCostsPerSecond: [],
     activation: String(raw.activation ?? "cast").trim(),
-    powerScale: Number(raw.power_scale ?? raw.powerScale ?? 1) || 1,
   };
   if (targetArg) combat.targetArg = targetArg;
   const out = {
@@ -201,7 +208,6 @@ export function normalizeZhandouPassiveRow(raw) {
       costs: [],
       upkeepCostsPerSecond: [],
       activation: "learned",
-      powerScale: 1,
     },
     effects,
     learningRequirements: { knowledge: [] },

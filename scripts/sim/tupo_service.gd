@@ -19,11 +19,7 @@ const COMPONENT_LABELS := {
 	"other": "其他",
 }
 
-const TRANSITION_BY_MAJOR := {
-	"qi": "qi_to_foundation",
-	"foundation": "foundation_to_core",
-	"core": "core_to_nascent",
-}
+const TRANSITION_BY_MAJOR := EnumMajorRealm.TRANSITION_BY_MAJOR
 
 
 static func rules() -> Dictionary:
@@ -165,7 +161,7 @@ static func _success_result(
 	savedata["realm_name"] = str(new_row.get("name", ""))
 	savedata["breakthrough_at"] = int(new_row.get("breakthrough_at", savedata.get("breakthrough_at", 100)))
 	var qualities: Dictionary = savedata.get("realm_quality", {}) as Dictionary
-	if to_major in ["foundation", "core", "nascent"]:
+	if to_major in EnumMajorRealm.BREAKTHROUGH_QUALITY_REALMS:
 		qualities[to_major] = int(tier.get("quality", 0))
 		savedata["realm_quality"] = qualities
 	return {

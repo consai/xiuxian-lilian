@@ -1559,88 +1559,88 @@
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 travel_efficiency，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_control": {
-    "id": "tribulation_control",
+  "dujie_control": {
+    "id": "dujie_control",
     "category": "control",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 tribulation_control，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_damage": {
-    "id": "tribulation_damage",
+  "dujie_damage": {
+    "id": "dujie_damage",
     "category": "offense",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 tribulation_damage，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_energy_absorption": {
-    "id": "tribulation_energy_absorption",
+  "dujie_energy_absorption": {
+    "id": "dujie_energy_absorption",
     "category": "tribulation",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 tribulation_energy_absorption，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_forecast": {
-    "id": "tribulation_forecast",
+  "dujie_forecast": {
+    "id": "dujie_forecast",
     "category": "tribulation",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 tribulation_forecast，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_mark": {
-    "id": "tribulation_mark",
+  "dujie_mark": {
+    "id": "dujie_mark",
     "category": "combat",
     "defaultTarget": "area",
     "valueType": "ratio",
     "defaultStackPolicy": "ability_instance",
     "description": "统一效果属性 tribulation_mark"
   },
-  "tribulation_plan_slots": {
-    "id": "tribulation_plan_slots",
+  "dujie_plan_slots": {
+    "id": "dujie_plan_slots",
     "category": "tribulation",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 tribulation_plan_slots，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_recovery": {
-    "id": "tribulation_recovery",
+  "dujie_recovery": {
+    "id": "dujie_recovery",
     "category": "survival",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 tribulation_recovery，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_resistance": {
-    "id": "tribulation_resistance",
+  "dujie_resistance": {
+    "id": "dujie_resistance",
     "category": "survival",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 tribulation_resistance，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_resource_efficiency": {
-    "id": "tribulation_resource_efficiency",
+  "dujie_resource_efficiency": {
+    "id": "dujie_resource_efficiency",
     "category": "tribulation",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 tribulation_resource_efficiency，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_sever": {
-    "id": "tribulation_sever",
+  "dujie_sever": {
+    "id": "dujie_sever",
     "category": "offense",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 tribulation_sever，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_warning_time": {
-    "id": "tribulation_warning_time",
+  "dujie_warning_time": {
+    "id": "dujie_warning_time",
     "category": "exploration",
     "defaultTarget": "self",
     "valueType": "ratio",
@@ -1663,72 +1663,72 @@
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 true_name_power，具体结算由 Godot 运行时映射。"
   },
-  "void_herb_growth": {
-    "id": "void_herb_growth",
+  "lianxu_herb_growth": {
+    "id": "lianxu_herb_growth",
     "category": "production",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 void_herb_growth，具体结算由 Godot 运行时映射。"
   },
-  "void_mobility": {
-    "id": "void_mobility",
+  "lianxu_mobility": {
+    "id": "lianxu_mobility",
     "category": "utility",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 void_mobility，具体结算由 Godot 运行时映射。"
   },
-  "void_resistance": {
-    "id": "void_resistance",
+  "lianxu_resistance": {
+    "id": "lianxu_resistance",
     "category": "survival",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 void_resistance，具体结算由 Godot 运行时映射。"
   },
-  "void_route_safety": {
-    "id": "void_route_safety",
+  "lianxu_route_safety": {
+    "id": "lianxu_route_safety",
     "category": "exploration",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 void_route_safety，具体结算由 Godot 运行时映射。"
   },
-  "void_ship_range": {
-    "id": "void_ship_range",
+  "lianxu_ship_range": {
+    "id": "lianxu_ship_range",
     "category": "control",
     "defaultTarget": "controlled_entity",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 void_ship_range，具体结算由 Godot 运行时映射。"
   },
-  "void_spell_accuracy": {
-    "id": "void_spell_accuracy",
+  "lianxu_spell_accuracy": {
+    "id": "lianxu_spell_accuracy",
     "category": "control",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 void_spell_accuracy，具体结算由 Godot 运行时映射。"
   },
-  "void_survival": {
-    "id": "void_survival",
+  "lianxu_survival": {
+    "id": "lianxu_survival",
     "category": "exploration",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 void_survival，具体结算由 Godot 运行时映射。"
   },
-  "void_target_accuracy": {
-    "id": "void_target_accuracy",
+  "lianxu_target_accuracy": {
+    "id": "lianxu_target_accuracy",
     "category": "control",
     "defaultTarget": "self",
     "valueType": "ratio",
     "defaultStackPolicy": "highest",
     "description": "功法效果属性 void_target_accuracy，具体结算由 Godot 运行时映射。"
   },
-  "void_travel_speed": {
-    "id": "void_travel_speed",
+  "lianxu_travel_speed": {
+    "id": "lianxu_travel_speed",
     "category": "general",
     "defaultTarget": "self",
     "valueType": "ratio",

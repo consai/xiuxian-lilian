@@ -58,8 +58,8 @@ func _test_config_has_no_errors() -> void:
 func _test_realm_balance_covers_simulation_realms() -> void:
 	var errors := RealmBalanceServiceScript.collect_config_errors(RealmService.realms())
 	_expect_true(errors.is_empty(), "realm balance errors: %s" % str(errors))
-	var qi := RealmBalanceServiceScript.major_realm_by_id("qi")
-	_expect_eq(str(qi.get("name", "")), "炼气", "qi realm configured")
+	var lianqi := RealmBalanceServiceScript.major_realm_by_id("lianqi")
+	_expect_eq(str(lianqi.get("name", "")), "练气", "lianqi realm configured")
 	var mods := RealmBalanceServiceScript.realm_flat_modifiers(2)
 	_expect_near(float(mods.get(ZhandouAttr.HP_MAX, 0.0)), 60.0, "realm layer hp modifier")
 
@@ -76,24 +76,29 @@ func _test_realm_threshold_formula() -> void:
 
 func _test_cultivation_pill_gain_formula() -> void:
 	_expect_eq(
-		RealmBalanceServiceScript.cultivation_pill_medium_gain("qi"),
+		RealmBalanceServiceScript.cultivation_pill_medium_gain("lianqi"),
 		100,
-		"qi medium pill anchor"
+		"lianqi medium pill anchor"
 	)
 	_expect_eq(
-		RealmBalanceServiceScript.cultivation_pill_medium_gain("foundation"),
+		RealmBalanceServiceScript.cultivation_pill_medium_gain("zhuji"),
 		333,
-		"foundation medium pill scales with monthly gain"
+		"zhuji medium pill scales with monthly gain"
 	)
 	_expect_eq(
-		RealmBalanceServiceScript.cultivation_pill_gain_for_item("items_JuQiDan", EnumItemTier.Type.QI),
+		RealmBalanceServiceScript.cultivation_pill_gain_for_item("items_JuQiDan", EnumItemTier.Type.lianqi),
 		100,
 		"juqi medium band"
 	)
 	_expect_eq(
-		RealmBalanceServiceScript.cultivation_pill_gain_for_item("items_GuBenDaoJiDan", EnumItemTier.Type.FOUNDATION),
+		RealmBalanceServiceScript.cultivation_pill_gain_for_item("items_GuBenDaoJiDan", EnumItemTier.Type.zhuji),
 		333,
 		"guben medium band"
+	)
+	_expect_eq(
+		RealmBalanceServiceScript.cultivation_pill_daily_gain(100),
+		10,
+		"monthly pill gain converts to daily"
 	)
 
 

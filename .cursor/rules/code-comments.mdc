@@ -45,7 +45,7 @@ end
 
 ```cpp
 // 宋辽战场：同步双方积分到客户端，仅在积分变化时推送
-void SyncCampScore(Scene* pScene, int campA, int campB)
+lianxu SyncCampScore(Scene* pScene, int campA, int campB)
 {
     ...
 }

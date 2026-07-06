@@ -105,9 +105,9 @@ static func unmet_learning_requirement_lines(
 	var lines: Array[String] = []
 	if method.is_empty():
 		return lines
-	var realm := str(method.get("realm", "qi"))
+	var realm := str(method.get("realm", "lianqi"))
 	if player_major_realm == "":
-		player_major_realm = str(savedata.get("major_realm", "qi"))
+		player_major_realm = str(savedata.get("major_realm", "lianqi"))
 	if not DaoTreeServiceScript.meets_realm_gate(realm, player_major_realm):
 		var current_realm := str(savedata.get("realm_name", "")).strip_edges()
 		if current_realm == "":

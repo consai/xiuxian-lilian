@@ -18,12 +18,14 @@ func _run(name: String, callable: Callable) -> int:
 
 
 func _test_damage_scaled() -> void:
-	var runtime: Dictionary = ZhandouEffectCodec.parse_positional_runtime(["damage", "10", "atk", "100"])
+	var runtime: Dictionary = ZhandouEffectCodec.parse_positional_runtime(
+		["damage", "10", "physical_atk", "100"]
+	)
 	if str(runtime.get("type", "")) != EnumCombatEffectType.LABEL_DAMAGE:
 		push_error("damage runtime type mismatch")
 	var caster: Dictionary = {ZhandouAttr.PHYSICAL_ATK: 50.0}
 	var value: float = ZhandouEffectCodec._resolve_scaled_value(
-		["damage", "10", "atk", "100"],
+		["damage", "10", "physical_atk", "100"],
 		caster,
 		{}
 	)
@@ -32,7 +34,7 @@ func _test_damage_scaled() -> void:
 
 
 func _test_attrschange_config() -> void:
-	var cfg: Dictionary = ZhandouEffectCodec.parse_positional_config(["attrschange", "castspd", "20"])
+	var cfg: Dictionary = ZhandouEffectCodec.parse_positional_config(["attrschange", "spd", "20"])
 	if str(cfg.get("effectId", "")) != "cast_speed":
 		push_error("attrschange should map to cast_speed")
 	if float(cfg.get("base", 0.0)) != 20.0:

@@ -18,14 +18,14 @@
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
     "effect2_id": "null",
-    "effect2_base": 0.0,
+    "effect2_base": 0,
     "effect2_operation": "null",
     "effect2_stack_group": "null",
     "effect2_stack_policy": "null",
     "effect2_scaling_mode": "null",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 0.0,
-    "req_realm": "qi"
+    "effect2_clamp_max": 0,
+    "req_realm": "lianqi"
   },
   "g_passive_meridian_knowledge": {
     "key": "g_passive_meridian_knowledge",
@@ -46,14 +46,14 @@
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
     "effect2_id": "null",
-    "effect2_base": 0.0,
+    "effect2_base": 0,
     "effect2_operation": "null",
     "effect2_stack_group": "null",
     "effect2_stack_policy": "null",
     "effect2_scaling_mode": "null",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 0.0,
-    "req_realm": "qi"
+    "effect2_clamp_max": 0,
+    "req_realm": "lianqi"
   },
   "g_passive_appraiser": {
     "key": "g_passive_appraiser",
@@ -74,14 +74,14 @@
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
     "effect2_id": "null",
-    "effect2_base": 0.0,
+    "effect2_base": 0,
     "effect2_operation": "null",
     "effect2_stack_group": "null",
     "effect2_stack_policy": "null",
     "effect2_scaling_mode": "null",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 0.0,
-    "req_realm": "qi"
+    "effect2_clamp_max": 0,
+    "req_realm": "lianqi"
   },
   "g_passive_herbalist": {
     "key": "g_passive_herbalist",
@@ -102,14 +102,14 @@
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
     "effect2_id": "null",
-    "effect2_base": 0.0,
+    "effect2_base": 0,
     "effect2_operation": "null",
     "effect2_stack_group": "null",
     "effect2_stack_policy": "null",
     "effect2_scaling_mode": "null",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 0.0,
-    "req_realm": "qi"
+    "effect2_clamp_max": 0,
+    "req_realm": "lianqi"
   },
   "g_passive_smith": {
     "key": "g_passive_smith",
@@ -136,8 +136,8 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2.0,
-    "req_realm": "foundation"
+    "effect2_clamp_max": 2,
+    "req_realm": "zhuji"
   },
   "g_passive_alchemist": {
     "key": "g_passive_alchemist",
@@ -164,8 +164,8 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2.0,
-    "req_realm": "foundation"
+    "effect2_clamp_max": 2,
+    "req_realm": "zhuji"
   },
   "g_passive_array_master": {
     "key": "g_passive_array_master",
@@ -192,8 +192,8 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2.0,
-    "req_realm": "foundation"
+    "effect2_clamp_max": 2,
+    "req_realm": "zhuji"
   },
   "g_passive_talisman_master": {
     "key": "g_passive_talisman_master",
@@ -220,8 +220,8 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2.0,
-    "req_realm": "foundation"
+    "effect2_clamp_max": 2,
+    "req_realm": "zhuji"
   },
   "g_passive_beast_master": {
     "key": "g_passive_beast_master",
@@ -242,14 +242,14 @@
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
     "effect2_id": "beast_capacity",
-    "effect2_base": 1.0,
+    "effect2_base": 1,
     "effect2_operation": "add_flat",
     "effect2_stack_group": "beast_capacity",
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 0.0,
-    "req_realm": "foundation"
+    "effect2_clamp_max": 0,
+    "req_realm": "zhuji"
   },
   "g_passive_geomancer": {
     "key": "g_passive_geomancer",
@@ -276,8 +276,8 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2.0,
-    "req_realm": "core"
+    "effect2_clamp_max": 2,
+    "req_realm": "jindan"
   },
   "g_passive_void_traveler": {
     "key": "g_passive_void_traveler",
@@ -289,23 +289,23 @@
     "tags": [
       "[]"
     ],
-    "effect1_id": "void_survival",
+    "effect1_id": "lianxu_survival",
     "effect1_base": 0.3,
     "effect1_operation": "add_percent",
-    "effect1_stack_group": "void_survival",
+    "effect1_stack_group": "lianxu_survival",
     "effect1_stack_policy": "highest",
     "effect1_scaling_mode": "positive",
     "effect1_clamp_min": 0,
     "effect1_clamp_max": 2,
-    "effect2_id": "void_travel_speed",
+    "effect2_id": "lianxu_travel_speed",
     "effect2_base": 0.15,
     "effect2_operation": "add_percent",
-    "effect2_stack_group": "void_travel_speed",
+    "effect2_stack_group": "lianxu_travel_speed",
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2.0,
-    "req_realm": "void"
+    "effect2_clamp_max": 2,
+    "req_realm": "lianxu"
   },
   "g_passive_sect_governor": {
     "key": "g_passive_sect_governor",
@@ -332,8 +332,8 @@
     "effect2_stack_policy": "highest",
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
-    "effect2_clamp_max": 2.0,
-    "req_realm": "merge"
+    "effect2_clamp_max": 2,
+    "req_realm": "heti"
   },
   "g_passive_tribulation_scholar": {
     "key": "g_passive_tribulation_scholar",
@@ -345,10 +345,10 @@
     "tags": [
       "[]"
     ],
-    "effect1_id": "tribulation_forecast",
+    "effect1_id": "dujie_forecast",
     "effect1_base": 0.35,
     "effect1_operation": "add_percent",
-    "effect1_stack_group": "tribulation_forecast",
+    "effect1_stack_group": "dujie_forecast",
     "effect1_stack_policy": "highest",
     "effect1_scaling_mode": "positive",
     "effect1_clamp_min": 0,
@@ -361,6 +361,6 @@
     "effect2_scaling_mode": "positive",
     "effect2_clamp_min": 0,
     "effect2_clamp_max": 0.5,
-    "req_realm": "tribulation"
+    "req_realm": "dujie"
   }
 }

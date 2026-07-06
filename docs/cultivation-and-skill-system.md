@@ -6,6 +6,18 @@
 - 技能负责战斗中的主动行动。
 - 功法与技能通过背包中的对应典籍学习。
 - 玩家可在人物属性页进入“配置”，管理功法与战斗槽位。
+- 设计与实现以 `data/exportjson` 导出配置为准，不再维护独立的技能设计配置副本。
+
+## 配置来源
+
+| 内容 | 配置 |
+|---|---|
+| 功法 | `data/exportjson/xiulian_methods*.json` |
+| 战斗主动/持续技能 | `data/exportjson/zhandou_active.json` |
+| 战斗被动 | `data/exportjson/zhandou_passive.json` |
+| 通用被动 | `data/exportjson/general_passive.json` |
+| 效果目录 | `data/exportjson/xiaoguo_catalog*.json` |
+| 境界与修炼平衡 | `data/exportjson/yunxing_params/jingjie_balance*.json` |
 
 ## 功法槽位
 
@@ -18,7 +30,6 @@
 修炼时必须选择一部当前修炼功法；只有这部功法的修炼效果参与本次修炼。战斗配置中的功法只在战斗中生效：
 按 `combat_mp_restore_2s` 每 2 秒恢复法力，并提供常驻属性与伤害加成。
 
-功法配置位于 `data/xiulian_methods.yaml`。
 
 ## 修炼速度构成
 
@@ -41,7 +52,7 @@
 
 | 构成 | 来源 | 建议范围 | 规则 |
 |---|---|---:|---|
-| 基础月修为 | `data/jingjie_balance.yaml > cultivation_progression.base_monthly_gain_by_realm` | 20–800 | 由当前境界决定，随小境界和大境界提升 |
+| 基础月修为 | `data/exportjson/yunxing_params/jingjie_balance_cultivation_p*.json > base_monthly_gain_by_realm` | 20–800 | 由当前境界决定，随小境界和大境界提升 |
 | 修炼速度基准 | 固定值 | 1 | 没有加成时按境界基础值修炼 |
 | 当前修炼功法效果加成 | `effectId: cultivation_speed` | 0–0.40 | 只有本次选择修炼的功法生效；战斗配置功法不生效 |
 | 主功法基础修为 | `method.practice.baseCultivationGain` | 0–200 | 高阶/高品质功法给固定月修为，放在乘法后相加 |
@@ -78,7 +89,7 @@
 
 ## 修炼丹（丹药炼化）
 
-配置锚点与公式见 `data/jingjie_balance.yaml > cultivation_progression.cultivation_pill_balance`。运行时推导见 `RealmBalanceService.cultivation_pill_gain_for_item()`。
+配置锚点与公式见 `data/exportjson/yunxing_params/jingjie_balance_cultivation_p*.json > cultivation_pill_balance`。运行时推导见 `RealmBalanceService.cultivation_pill_gain_for_item()`。
 
 ```text
 中品日修为 = round(anchor_medium × 大境界月基础修为[reference_phase] / 炼气月基础修为[reference_phase])
@@ -88,7 +99,7 @@
 
 | 参数 | 当前值 | 说明 |
 |---|---:|---|
-| `anchor_realm` | `qi` | 锚定大境界 |
+| `anchor_realm` | `lianqi` | 锚定大境界 |
 | `reference_phase` | `early` | 取各境界 `base_monthly_gain_by_realm` 的哪一档 |
 | `medium_cultivation_gain` | 100 | 练气期中品聚气丹日修为 |
 | `quality_band_multiplier.low` | 0.85 | 下品（id 后缀 `_Low`） |
@@ -112,7 +123,7 @@
 
 ### 失败状态
 
-- `item.yaml` 中 `pill_cultivation` 与公式不一致：启动配置校验报错。
+- `data/exportjson/item_items.json` 中 `pill_cultivation` 与公式不一致：启动配置校验报错。
 - 背包无修炼丹或不足闭关天数：丹药炼化模式不可选。
 
 ## 战斗配置
@@ -123,7 +134,7 @@
 - 2 个法宝
 - 2 个道具
 
-初始掌握火球术与五行功法，并自动装备到对应槽位；背包为空，后续通过历练获取典籍与道具。
+初始技能与功法以 `data/exportjson` 当前配置和存档初始化为准；背包为空，后续通过历练获取典籍与道具。
 
 ## 自动战斗
 

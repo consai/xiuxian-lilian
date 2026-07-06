@@ -6,19 +6,26 @@ extends RefCounted
 const PATH := "res://data/exportjson/yunxing_params/jingjie_balance.json"
 
 const DEFAULT_ATTRIBUTE_FORMULA := {
-	ZhandouAttr.HP_MAX: {"base": 50.0, "scale": {"body": 5.0}},
-	ZhandouAttr.MP_MAX: {"base": 50.0, "scale": {"spirit": 5.0}},
-	ZhandouAttr.PHYSICAL_ATK: {"base": 0.0, "scale": {"body": 3.0}},
-	ZhandouAttr.MAGIC_ATK: {"base": 0.0, "scale": {"spirit": 2.4, "sense": 0.8}},
-	ZhandouAttr.PHYSICAL_DEF: {"base": 0.0, "scale": {"body": 2.0}},
-	ZhandouAttr.MAGIC_DEF: {"base": 0.0, "scale": {"spirit": 1.2, "sense": 1.2}},
-	ZhandouAttr.SPD: {"base": 50.0, "scale": {"sense": 3.0, "body": 2.0}},
-	ZhandouAttr.CONTROL_POWER: {"base": 0.0, "scale": {"sense": 3.0, "spirit": 1.0}},
-	ZhandouAttr.CONTROL_RESIST: {"base": 0.0, "scale": {"sense": 2.0, "body": 1.0}},
-	ZhandouAttr.HP_REGEN: {"base": 0.5, "scale": {"body": 0.05}},
-	ZhandouAttr.MP_REGEN: {"base": 0.5, "scale": {"spirit": 0.04, "sense": 0.01}},
-	ZhandouAttr.CARRY: {"base": 20.0, "scale": {"body": 2.0}},
+	ZhandouAttr.HP_MAX: {"base": 50.0, "scale": {"roushen": 5.0}},
+	ZhandouAttr.MP_MAX: {"base": 50.0, "scale": {"lingli": 5.0}},
+	ZhandouAttr.PHYSICAL_ATK: {"base": 0.0, "scale": {"roushen": 3.0}},
+	ZhandouAttr.MAGIC_ATK: {"base": 0.0, "scale": {"lingli": 2.4, "shenshi": 0.8}},
+	ZhandouAttr.PHYSICAL_DEF: {"base": 0.0, "scale": {"roushen": 2.0}},
+	ZhandouAttr.MAGIC_DEF: {"base": 0.0, "scale": {"lingli": 1.2, "shenshi": 1.2}},
+	ZhandouAttr.SPD: {"base": 50.0, "scale": {"shenfa": 3.0, "shenshi": 2.0}},
+	ZhandouAttr.CONTROL_POWER: {"base": 0.0, "scale": {"shenshi": 3.0, "lingli": 1.0}},
+	ZhandouAttr.CONTROL_RESIST: {"base": 0.0, "scale": {"shenshi": 2.0, "roushen": 1.0}},
+	ZhandouAttr.HP_REGEN: {"base": 0.5, "scale": {"roushen": 0.05}},
+	ZhandouAttr.MP_REGEN: {"base": 0.5, "scale": {"lingli": 0.04, "shenshi": 0.01}},
+	ZhandouAttr.CARRY: {"base": 20.0, "scale": {"roushen": 2.0}},
 	ZhandouAttr.SHIELD: {"base": 0.0, "scale": {}},
+}
+
+const LEGACY_FOUNDATION_KEYS := {
+	"roushen": "body",
+	"lingli": "spirit",
+	"shenshi": "sense",
+	"shenfa": "agility",
 }
 
 const DEFAULT_REALM_FLAT_PER_LAYER := {
@@ -58,7 +65,7 @@ static func build_base_combat_attrs(foundations: Dictionary) -> Dictionary:
 		if scale_v is Dictionary:
 			for foundation_key_v in (scale_v as Dictionary).keys():
 				var foundation_key := str(foundation_key_v)
-				value += float(foundations.get(foundation_key, 0.0)) * float((scale_v as Dictionary)[foundation_key_v])
+				value += _foundation_value(foundations, foundation_key) * float((scale_v as Dictionary)[foundation_key_v])
 		attrs[stat] = value
 	return attrs
 
@@ -141,8 +148,8 @@ static func major_realm_id_for_item_tier(tier: int) -> String:
 	var realms := major_realms()
 	var index := EnumItemTier.clamp_tier(tier) - 1
 	if index >= 0 and index < realms.size():
-		return str((realms[index] as Dictionary).get("id", "qi")).strip_edges()
-	return "qi"
+		return str((realms[index] as Dictionary).get("id", EnumMajorRealm.default_id())).strip_edges()
+	return EnumMajorRealm.default_id()
 
 
 ## 修炼丹品质档位：炼丹产物以 id 后缀区分，中品无后缀（练气聚气丹中品 quality 仍为 1）。
@@ -165,10 +172,10 @@ static func cultivation_pill_quality_band_multiplier(band: String) -> float:
 	return float(table.get(key, table.get("medium", 1.0)))
 
 
-## 指定大境界、参考小境界（默认 early）下的修炼丹中品日修为。
+## 指定大境界、参考小境界（默认 early）下的修炼丹中品月修为。
 static func cultivation_pill_medium_gain(major_realm_id: String, phase: String = "") -> int:
 	var balance := cultivation_pill_balance()
-	var anchor_realm := str(balance.get("anchor_realm", "qi")).strip_edges()
+	var anchor_realm := str(balance.get("anchor_realm", EnumMajorRealm.default_id())).strip_edges()
 	var reference_phase := phase.strip_edges()
 	if reference_phase == "":
 		reference_phase = str(balance.get("reference_phase", "early")).strip_edges()
@@ -180,7 +187,7 @@ static func cultivation_pill_medium_gain(major_realm_id: String, phase: String =
 	return maxi(1, int(round(float(anchor_medium) * float(target_gain) / float(anchor_gain))))
 
 
-## 按道具阶位与品质档位计算「丹药炼化」日修为（配置公式落地）。
+## 按道具阶位与品质档位计算「丹药炼化」配置月修为（公式落地，与物品 pill_cultivation 一致）。
 static func cultivation_pill_gain_for_tier(tier: int, quality_band: String, phase: String = "") -> int:
 	var major_id := major_realm_id_for_item_tier(tier)
 	var medium := cultivation_pill_medium_gain(major_id, phase)
@@ -188,9 +195,14 @@ static func cultivation_pill_gain_for_tier(tier: int, quality_band: String, phas
 	return maxi(1, int(round(float(medium) * mult)))
 
 
-## 按物品 id 与阶位计算修炼丹日修为（品质档位由 id 后缀推断）。
+## 按物品 id 与阶位计算修炼丹月修为（品质档位由 id 后缀推断）。
 static func cultivation_pill_gain_for_item(item_id: String, tier: int, phase: String = "") -> int:
 	return cultivation_pill_gain_for_tier(tier, cultivation_pill_quality_band(item_id), phase)
+
+
+## 将丹药配置月修为换算为闭关逐日结算的日修为。
+static func cultivation_pill_daily_gain(monthly_gain: int) -> int:
+	return maxi(1, int(round(float(monthly_gain) * DAILY_CULTIVATION_GAIN_SCALE)))
 
 
 static func acceptance() -> Dictionary:
@@ -261,7 +273,7 @@ static func collect_config_errors(simulation_realms: Array = []) -> PackedString
 			errors.append("encounter_bands.%s strength_min 不得大于 strength_max" % key)
 	for profile_id in (root.get("standard_players", {}) as Dictionary).keys():
 		var row := standard_player(str(profile_id))
-		for foundation_key in ["body", "spirit", "sense", "agility"]:
+		for foundation_key in ["roushen", "lingli", "shenshi", "shenfa"]:
 			if not (row.get("foundations", {}) as Dictionary).has(foundation_key):
 				errors.append("standard_players.%s 缺少根基 %s" % [profile_id, foundation_key])
 	var pill_balance := cultivation_pill_balance()
@@ -270,6 +282,12 @@ static func collect_config_errors(simulation_realms: Array = []) -> PackedString
 	elif int(pill_balance.get("medium_cultivation_gain", 0)) <= 0:
 		errors.append("cultivation_pill_balance.medium_cultivation_gain 必须大于 0")
 	return errors
+
+
+static func _foundation_value(foundations: Dictionary, key: String) -> float:
+	if foundations.has(key):
+		return float(foundations.get(key, 0.0))
+	return float(foundations.get(LEGACY_FOUNDATION_KEYS.get(key, ""), 0.0))
 
 
 static func _formula_table() -> Dictionary:
@@ -287,6 +305,20 @@ static func _realm_flat_per_layer() -> Dictionary:
 
 
 static func _realm_phase(realm_row: Dictionary) -> String:
+	var level := int(realm_row.get("level", 0))
+	if level > 0:
+		# 每大境界块内：前 3 级初、中 3 级、余下后（炼气仅 9 级同理）
+		var pos := level - 1
+		if level >= 10:
+			for start in [80, 70, 60, 50, 40, 30, 20, 10]:
+				if level >= start:
+					pos = level - start
+					break
+		if pos <= 2:
+			return "early"
+		if pos <= 5:
+			return "mid"
+		return "late"
 	var id := str(realm_row.get("id", "")).strip_edges()
 	if id.ends_with("_early"):
 		return "early"
@@ -294,21 +326,6 @@ static func _realm_phase(realm_row: Dictionary) -> String:
 		return "mid"
 	if id.ends_with("_late"):
 		return "late"
-	var parts := id.split("_", false)
-	if parts.size() >= 2 and parts[1].is_valid_int():
-		var layer: int = int(parts[1])
-		# exportjson 三元小境：_1/_2/_3 对应初/中/后
-		match layer:
-			1:
-				return "early"
-			2:
-				return "mid"
-			3:
-				return "late"
-			_:
-				if layer <= 6:
-					return "mid"
-				return "late"
 	return "single"
 
 

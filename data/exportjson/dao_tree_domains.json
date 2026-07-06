@@ -1,6 +1,6 @@
 {
-  "foundation": {
-    "id": "foundation",
+  "zhuji": {
+    "id": "zhuji",
     "name": "修真通识",
     "description": "生存、境界与一切大道的公共根基",
     "primary": "comprehension",
@@ -11,13 +11,13 @@
     "name": "功法周天",
     "description": "纳气、真元、道基与法力循环",
     "primary": "comprehension",
-    "secondary": "body"
+    "secondary": "roushen"
   },
   "body": {
     "id": "body",
     "name": "炼体血脉",
     "description": "肉身、恢复、血脉与近战承载",
-    "primary": "body",
+    "primary": "roushen",
     "secondary": "will"
   }
 }

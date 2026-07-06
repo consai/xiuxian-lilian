@@ -1,7 +1,7 @@
 {
-  "qi_normal": {
-    "key": "qi_normal",
-    "major_realm": "qi",
+  "lianqi_normal": {
+    "key": "lianqi_normal",
+    "major_realm": "lianqi",
     "band": "normal",
     "attrs": {
       "hp_max": 230,
@@ -15,9 +15,9 @@
       "control_resist": 60
     }
   },
-  "qi_elite": {
-    "key": "qi_elite",
-    "major_realm": "qi",
+  "lianqi_elite": {
+    "key": "lianqi_elite",
+    "major_realm": "lianqi",
     "band": "elite",
     "attrs": {
       "hp_max": 260,
@@ -31,9 +31,9 @@
       "control_resist": 90
     }
   },
-  "foundation_normal": {
-    "key": "foundation_normal",
-    "major_realm": "foundation",
+  "zhuji_normal": {
+    "key": "zhuji_normal",
+    "major_realm": "zhuji",
     "band": "normal",
     "attrs": {
       "hp_max": 310,

@@ -6,11 +6,11 @@
     "per_level_all": null,
     "major_realm_pulse": null,
     "formula": null,
-    "foundation_points_per_level": null,
+    "zhuji_points_per_level": null,
     "point_value": null,
     "resonance_all_foundations": null,
     "expected_avg_gain_per_foundation": null,
-    "foundation_avg_gain": null,
+    "zhuji_avg_gain": null,
     "combat_power_jump_target": null,
     "qualitative_unlocks": null,
     "realm_flat_index": null,
@@ -21,47 +21,47 @@
     "value": [
       {
         "level": 1,
-        "id": "qi",
+        "id": "lianqi",
         "name": "炼气"
       },
       {
         "level": 10,
-        "id": "foundation",
+        "id": "zhuji",
         "name": "筑基"
       },
       {
         "level": 20,
-        "id": "core",
+        "id": "jindan",
         "name": "金丹"
       },
       {
         "level": 30,
-        "id": "nascent",
+        "id": "yuanying",
         "name": "元婴"
       },
       {
         "level": 40,
-        "id": "transform",
+        "id": "huashen",
         "name": "化神"
       },
       {
         "level": 50,
-        "id": "void",
+        "id": "lianxu",
         "name": "炼虚"
       },
       {
         "level": 60,
-        "id": "merge",
+        "id": "heti",
         "name": "合体"
       },
       {
         "level": 70,
-        "id": "great",
+        "id": "dacheng",
         "name": "大乘"
       },
       {
         "level": 80,
-        "id": "tribulation",
+        "id": "dujie",
         "name": "渡劫"
       }
     ],
@@ -69,11 +69,11 @@
     "per_level_all": null,
     "major_realm_pulse": null,
     "formula": null,
-    "foundation_points_per_level": null,
+    "zhuji_points_per_level": null,
     "point_value": null,
     "resonance_all_foundations": null,
     "expected_avg_gain_per_foundation": null,
-    "foundation_avg_gain": null,
+    "zhuji_avg_gain": null,
     "combat_power_jump_target": null,
     "qualitative_unlocks": null,
     "realm_flat_index": null,
@@ -86,11 +86,11 @@
     "per_level_all": "0.55",
     "major_realm_pulse": "2.5",
     "formula": "foundation_avg = 10 + 0.55 * (level - 1) + 2.5 * major_realm_index",
-    "foundation_points_per_level": null,
+    "zhuji_points_per_level": null,
     "point_value": null,
     "resonance_all_foundations": null,
     "expected_avg_gain_per_foundation": null,
-    "foundation_avg_gain": null,
+    "zhuji_avg_gain": null,
     "combat_power_jump_target": null,
     "qualitative_unlocks": null,
     "realm_flat_index": null,
@@ -103,11 +103,11 @@
     "per_level_all": null,
     "major_realm_pulse": null,
     "formula": null,
-    "foundation_points_per_level": "4",
+    "zhuji_points_per_level": "4",
     "point_value": "0.5",
     "resonance_all_foundations": "0.05",
     "expected_avg_gain_per_foundation": "0.55",
-    "foundation_avg_gain": null,
+    "zhuji_avg_gain": null,
     "combat_power_jump_target": null,
     "qualitative_unlocks": null,
     "realm_flat_index": null,
@@ -120,11 +120,11 @@
     "per_level_all": null,
     "major_realm_pulse": null,
     "formula": null,
-    "foundation_points_per_level": null,
+    "zhuji_points_per_level": null,
     "point_value": null,
     "resonance_all_foundations": null,
     "expected_avg_gain_per_foundation": null,
-    "foundation_avg_gain": "2.5",
+    "zhuji_avg_gain": "2.5",
     "combat_power_jump_target": {
       "min": 0.15,
       "max": 0.25
@@ -144,11 +144,11 @@
     "per_level_all": null,
     "major_realm_pulse": null,
     "formula": null,
-    "foundation_points_per_level": null,
+    "zhuji_points_per_level": null,
     "point_value": null,
     "resonance_all_foundations": null,
     "expected_avg_gain_per_foundation": null,
-    "foundation_avg_gain": null,
+    "zhuji_avg_gain": null,
     "combat_power_jump_target": null,
     "qualitative_unlocks": null,
     "realm_flat_index": "level - 1",

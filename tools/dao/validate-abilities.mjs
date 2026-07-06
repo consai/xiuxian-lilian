@@ -30,8 +30,8 @@ const tongyongPassiveEffectIds = new Set([
   "craft_quality", "material_efficiency", "pill_quality", "alchemy_success",
   "formation_power", "formation_setup_speed", "talisman_quality", "talisman_activation_speed",
   "beast_growth", "beast_capacity", "spirit_vein_detection", "rare_find_chance",
-  "void_survival", "void_travel_speed", "settlement_output", "governance_efficiency",
-  "tribulation_forecast", "ascension_success",
+  "lianxu_survival", "lianxu_travel_speed", "settlement_output", "governance_efficiency",
+  "dujie_forecast", "ascension_success",
 ]);
 
 const VALID_TARGETS = new Set(["self", "enemy"]);
@@ -132,7 +132,6 @@ for (const ability of config.abilities) {
     if (["combat_active", "combat_upkeep"].includes(ability.type)) {
       errors.push(...validateTargetPair(ability.id, "combat", ability.combat.target, ability.combat.targetArg));
     }
-    if (v1Tiers.has(ability.tier) && ability.type === "combat_active" && !(ability.combat.powerScale >= 0)) errors.push(`${ability.id}: 首版主动技能缺少有效 powerScale`);
     if (ability.type === "combat_upkeep" && !ability.combat.upkeepCostsPerSecond?.length) errors.push(`${ability.id}: 持续技能缺少每秒消耗`);
     if (ability.type === "combat_passive" && ability.combat.activation !== "learned") errors.push(`${ability.id}: 战斗被动必须学会后生效`);
     if (ability.type === "combat_upkeep" && ability.combat.activation !== "toggle") errors.push(`${ability.id}: 持续技能必须配置 toggle 激活`);

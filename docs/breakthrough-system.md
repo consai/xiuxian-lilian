@@ -72,9 +72,9 @@ flowchart LR
     "other": 0
   },
   "realm_quality": {
-    "foundation": 0,
-    "core": 0,
-    "nascent": 0
+    "zhuji": 0,
+    "jindan": 0,
+    "yuanying": 0
   },
   "breakthrough_attempt_cooldown_days": 0
 }
@@ -221,7 +221,7 @@ TupoService.resolve(savedata, realms, realm_index, rng) -> Dictionary
 - 炼气小层：修为达标仍自动升层，不打开面板。
 - 炼气九层、修为 1620、分项总和 870：`can_attempt = false`。
 - 分项总和 1200：可尝试，品质为下品筑基，成功率 65%。
-- 分项总和 2400：一品筑基，成功率 100%，`realm_quality.foundation = 1`。
+- 分项总和 2400：一品筑基，成功率 100%，`realm_quality.zhuji = 1`。
 - 旧存档无 `breakthrough_bonuses` / `realm_quality`：合并默认值后不报错。
 - 突破成功后 `foundations` 按档位成长，而非固定 +1。
 

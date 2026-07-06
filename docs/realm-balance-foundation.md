@@ -4,11 +4,11 @@
 
 ## 配置入口
 
-核心配置位于 `res://data/jingjie_balance.yaml`。
+核心配置位于 `res://data/exportjson/yunxing_params/jingjie_balance*.json`。
 
 人物 `Lv1-Lv90` 基础属性成长、大境界质变和怪物换算基准见 `res://docs/player-base-attribute-progression.md`；机器可读配置位于 `player_level_curve` 与 `monster_design_baseline`。
 
-境界突破门槛位于 `res://data/moni.yaml > realms[*].breakthrough_at`，按公式 `300 * 境界序号^2` 生成。该字段表示累计修为门槛，不是本层增量。
+境界与突破规则位于 `res://data/exportjson/realms.json` 与 `res://data/exportjson/yunxing_params/tupo_rules*.json`；设计时以导出 JSON 为准。
 
 | 区块 | 用途 |
 |---|---|
@@ -38,8 +38,8 @@ var enemy := RealmBalanceServiceScript.benchmark_enemy_attrs("qi_normal")
 
 ## 后续配置一个新境界
 
-1. 在 `data/moni.yaml` 增加境界层级，用 `major_realm` 指向大境界 ID。
-2. 在 `data/jingjie_balance.yaml > major_realms` 确认这个大境界存在，并配置内容系数与目标战斗时长。
+1. 在配置表导出 `data/exportjson/realms.json` 对应境界层级，用 `major_realm` 指向大境界 ID。
+2. 在 `data/exportjson/yunxing_params/jingjie_balance_major_realms.json` 确认这个大境界存在，并配置内容系数与目标战斗时长。
 3. 在 `standard_players` 增加该阶段的标准玩家，例如 `core_early`、`core_mature`。
 4. 在 `benchmark_enemies` 增加普通、精英、跨境界标杆敌人。
 5. 用 `tests/run_balance_v1_tests.gd` 的模式扩展新的胜率与时长验收。

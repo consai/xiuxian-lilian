@@ -6,15 +6,15 @@
     "mid": null,
     "late": null,
     "single": null,
-    "qi": null,
-    "foundation": null,
-    "core": null,
-    "nascent": null,
-    "transform": null,
-    "void": null,
-    "merge": null,
-    "great": null,
-    "tribulation": null,
+    "lianqi": null,
+    "zhuji": null,
+    "jindan": null,
+    "yuanying": null,
+    "huashen": null,
+    "lianxu": null,
+    "heti": null,
+    "dacheng": null,
+    "dujie": null,
     "anchor_realm": null,
     "reference_phase": null,
     "medium_cultivation_gain": null,
@@ -31,15 +31,15 @@
     "mid": "1.15",
     "late": "1.3",
     "single": "1",
-    "qi": null,
-    "foundation": null,
-    "core": null,
-    "nascent": null,
-    "transform": null,
-    "void": null,
-    "merge": null,
-    "great": null,
-    "tribulation": null,
+    "lianqi": null,
+    "zhuji": null,
+    "jindan": null,
+    "yuanying": null,
+    "huashen": null,
+    "lianxu": null,
+    "heti": null,
+    "dacheng": null,
+    "dujie": null,
     "anchor_realm": null,
     "reference_phase": null,
     "medium_cultivation_gain": null,
@@ -56,47 +56,47 @@
     "mid": null,
     "late": null,
     "single": null,
-    "qi": {
+    "lianqi": {
       "early": 30,
       "mid": 40,
       "late": 50
     },
-    "foundation": {
+    "zhuji": {
       "early": 100,
       "mid": 120,
       "late": 140
     },
-    "core": {
+    "jindan": {
       "early": 300,
       "mid": 360,
       "late": 420
     },
-    "nascent": {
+    "yuanying": {
       "early": 800,
       "mid": 960,
       "late": 1120
     },
-    "transform": {
+    "huashen": {
       "early": 2000,
       "mid": 2400,
       "late": 2800
     },
-    "void": {
+    "lianxu": {
       "early": 5000,
       "mid": 6000,
       "late": 7000
     },
-    "merge": {
+    "heti": {
       "early": 12000,
       "mid": 14400,
       "late": 16800
     },
-    "great": {
+    "dacheng": {
       "early": 30000,
       "mid": 36000,
       "late": 42000
     },
-    "tribulation": {
+    "dujie": {
       "single": 80000
     },
     "anchor_realm": null,
@@ -115,16 +115,16 @@
     "mid": null,
     "late": null,
     "single": null,
-    "qi": null,
-    "foundation": null,
-    "core": null,
-    "nascent": null,
-    "transform": null,
-    "void": null,
-    "merge": null,
-    "great": null,
-    "tribulation": null,
-    "anchor_realm": "qi",
+    "lianqi": null,
+    "zhuji": null,
+    "jindan": null,
+    "yuanying": null,
+    "huashen": null,
+    "lianxu": null,
+    "heti": null,
+    "dacheng": null,
+    "dujie": null,
+    "anchor_realm": "lianqi",
     "reference_phase": "early",
     "medium_cultivation_gain": "100",
     "quality_band_multiplier": {
@@ -134,15 +134,15 @@
       "supreme": 1.55
     },
     "tier_major_realm": {
-      "1": "qi",
-      "2": "foundation",
-      "3": "core",
-      "4": "nascent",
-      "5": "transform",
-      "6": "void",
-      "7": "merge",
-      "8": "great",
-      "9": "tribulation"
+      "1": "lianqi",
+      "2": "zhuji",
+      "3": "jindan",
+      "4": "yuanying",
+      "5": "huashen",
+      "6": "lianxu",
+      "7": "heti",
+      "8": "dacheng",
+      "9": "dujie"
     },
     "formula_medium": "round(medium_cultivation_gain * base_monthly_gain[major_realm][reference_phase] / base_monthly_gain[anchor_realm][reference_phase])",
     "formula_gain": "round(medium_gain * quality_band_multiplier[band])",

@@ -94,7 +94,7 @@ func _refresh() -> void:
 	]
 	if int(preview.get("instability_gain", 0)) > 0:
 		var pill_id := str(preview.get("pill_id", ""))
-		var pill_name := ConfigManager.get_item_display_name(pill_id)
+		var pill_name = ConfigManager.get_item_display_name(pill_id)
 		meta_text += "\n消耗%s x%d · 灵力驳杂 +%d" % [
 			pill_name,
 			int(preview.get("pill_count", 0)),
@@ -163,8 +163,8 @@ func _format_mode_description(mode: Dictionary, preview: Dictionary) -> String:
 	if pill_id == "":
 		return "点击选择修炼丹药后打坐炼化，修为增长极快，但会使灵力驳杂。"
 	var gain: int = GameState.cultivation_pill_gain(pill_id)
-	var pill_name := ConfigManager.get_item_display_name(pill_id)
-	return "炼化【%s】，直接增加 %d 点修为，但会使灵力驳杂。" % [
+	var pill_name = ConfigManager.get_item_display_name(pill_id)
+	return "炼化【%s】，每月药力约 %d 点月修为（逐日折算），但会使灵力驳杂。" % [
 		pill_name,
 		gain,
 	]
@@ -218,7 +218,6 @@ func _format_cultivation_formula(preview: Dictionary) -> String:
 	return "%s + 功法 %d = %d" % [gain_label, method_gain, daily]
 
 
-func _select_mode
 func _select_mode(mode_id: String) -> void:
 	_mode_id = mode_id
 	if EnumXiulianMode.is_pill_mode(mode_id):

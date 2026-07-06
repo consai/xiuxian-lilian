@@ -603,7 +603,7 @@ func _merge_equip_runtime_cfg(slot: Dictionary, equip_id: int) -> Dictionary:
 		return cfg
 	if slot.has("effects"):
 		cfg["effects"] = (slot["effects"] as Array).duplicate(true)
-	for key in ["vfx_type", "vfx", "costs", "cost_text", "mp_cost", "power", "tags"]:
+	for key in ["vfx_type", "vfx", "costs", "cost_text", "mp_cost", "tags"]:
 		if slot.has(key):
 			cfg[key] = slot[key]
 	return cfg

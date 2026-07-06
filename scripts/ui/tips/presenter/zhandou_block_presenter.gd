@@ -67,7 +67,7 @@ func _resolve_block_label() -> Label:
 	var tree := Engine.get_main_loop() as SceneTree
 	if tree == null:
 		return null
-	var scene := SceneManager.get_active_scene()
+	var scene = SceneManager.get_active_scene()
 	if scene == null:
 		return null
 	return scene.get_node_or_null("%block_reason_tip") as Label

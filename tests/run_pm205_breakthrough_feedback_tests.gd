@@ -30,7 +30,7 @@ func _breakdown(total: int, min_total: int) -> Dictionary:
 		"ok": true,
 		"total": total,
 		"min_total": min_total,
-		"transition_id": "qi_to_foundation",
+		"transition_id": "lianqi_to_zhuji",
 		"knowledge_error": "",
 		"components": {
 			"cultivation": 400,

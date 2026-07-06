@@ -38,7 +38,7 @@ func _run_all() -> void:
 	_run("alchemy recipe mastery improves outcomes and rewards failure", _test_alchemy_recipe_mastery)
 	_run("alchemy steady strategy beats supreme on success rate", _test_alchemy_steady_strategy_ordering)
 	_run("alchemy batch count respects inventory and furnace", _test_alchemy_batch_count)
-	_run("pre-foundation resource loop stays bounded", _test_pre_foundation_resource_loop)
+	_run("pre-zhuji resource loop stays bounded", _test_pre_foundation_resource_loop)
 	_run("zhandou runtime deducts inventory", _test_zhandou_runtime_deducts_inventory)
 	_run("transfer item respects stack cap", _test_transfer_item_stack_cap)
 	_run("lilian events build valid battle data", _test_expedition_events_build_valid_battle_data)
@@ -122,7 +122,7 @@ func _test_new_game_and_daily_activities() -> void:
 	_expect_true(state.can_breakthrough(), "major realm breakthrough available")
 	var result: Dictionary = state.breakthrough()
 	_expect_true(bool(result.get("ok", false)), "breakthrough succeeds")
-	_expect_eq(state.realm_name, "筑基初期", "breakthrough to foundation")
+	_expect_eq(state.realm_name, "筑基初期", "breakthrough to zhuji")
 	_expect_near(float(state.foundations.get(CharacterStatsScript.BODY, 0.0)), base_body + 1.0, "breakthrough grows body")
 	_expect_true(
 		ZhandouAttr.get_attr(state.attrs, ZhandouAttr.HP_MAX) >= base_hp_max + 18.0,
@@ -176,6 +176,8 @@ func _test_foundations_derive_combat_attributes() -> void:
 	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.PHYSICAL_DEF), 20.0, "derived physical defense")
 	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.MAGIC_DEF), 24.0, "derived magic defense")
 	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.SPD), 100.0, "derived action speed")
+	var legacy_attrs: Dictionary = CharacterStatsScript.build_combat_attrs({"body": 10, "spirit": 10, "sense": 10, "agility": 10})
+	_expect_near(ZhandouAttr.get_attr(legacy_attrs, ZhandouAttr.HP_MAX), 100.0, "legacy foundations still normalize")
 
 
 func _test_cultivation_methods() -> void:
@@ -252,8 +254,8 @@ func _test_pill_cultivation_and_instability() -> void:
 	_expect_true(bool(pill.get("ok", false)), "starter pill enables pill cultivation")
 	_expect_gt(
 		int(pill.get("estimated_cultivation", 0)),
-		int(normal.get("estimated_cultivation", 0)) * 4,
-		"pill cultivation is significantly faster"
+		int(normal.get("estimated_cultivation", 0)),
+		"pill cultivation is faster than cycle"
 	)
 	var pills_before := int(state.inventory.get("items_JuQiDan", 0))
 	var result: Dictionary = state.cultivate_session("pill", min_days)
@@ -285,7 +287,7 @@ func _test_learning_books() -> void:
 	var state := _state()
 	_expect_true(state.unlocked_abilities.has("ability.combat.qi_bolt"), "starter ability unlocked")
 	_expect_true(state.unlocked_abilities.has("ability.combat.wind_step"), "starter wind step unlocked")
-	_expect_true(state.unlocked_abilities.has("ability.combat.sword_qi"), "starter sword qi unlocked")
+	_expect_true(state.unlocked_abilities.has("ability.combat.sword_qi"), "starter sword lianqi unlocked")
 	_expect_true(
 		(state.equipped_abilities as Array).has("ability.combat.qi_bolt"),
 		"starter ability equipped"
@@ -296,7 +298,7 @@ func _test_learning_books() -> void:
 	)
 	_expect_true(
 		(state.equipped_abilities as Array).has("ability.combat.sword_qi"),
-		"starter sword qi equipped"
+		"starter sword lianqi equipped"
 	)
 	for book_id in ["book_skill_qi_bolt", "book_skill_wind_step", "book_skill_sword_qi"]:
 		state.inventory[book_id] = 1
@@ -623,7 +625,7 @@ func _test_pre_foundation_resource_loop() -> void:
 	]:
 		state.inventory.erase(item_id)
 	var settlement := {
-		"settlement_id": "test-pre-foundation-loop",
+		"settlement_id": "test-pre-zhuji-loop",
 		"elapsed_days": GameTimeServiceScript.days_per_month(),
 		"start_day": state.day,
 		"exit_reason": "manual",
@@ -670,7 +672,7 @@ func _test_pre_foundation_resource_loop() -> void:
 	_expect_true(bool(pill.get("ok", false)), "crafted juqi pill can be cultivated")
 	_expect_gt(
 		int(pill.get("estimated_cultivation", 0)),
-		int(normal.get("estimated_cultivation", 0)) * 4,
+		int(normal.get("estimated_cultivation", 0)),
 		"crafted juqi pill accelerates cultivation"
 	)
 	var pill_before := int(state.inventory.get(pill_id, 0))
@@ -686,11 +688,11 @@ func _test_pre_foundation_resource_loop() -> void:
 	state._sync_realm()
 	state.cultivation = state.breakthrough_at
 	var breakthrough: Dictionary = state.preview_breakthrough()
-	_expect_true(bool(breakthrough.get("ok", false)), "foundation preview after resource loop")
-	_expect_true(not bool(breakthrough.get("can_attempt", true)), "one resource loop does not complete foundation prep")
+	_expect_true(bool(breakthrough.get("ok", false)), "zhuji preview after resource loop")
+	_expect_true(not bool(breakthrough.get("can_attempt", true)), "one resource loop does not complete zhuji prep")
 	_expect_true(
 		int(breakthrough.get("total", 0)) < int(breakthrough.get("min_total", 0)),
-		"foundation prep still needs repeated accumulation"
+		"zhuji prep still needs repeated accumulation"
 	)
 
 

@@ -6,6 +6,9 @@ const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 
 const TREASURE_SLOT_LABELS := ["主动法宝", "被动法宝一", "被动法宝二"]
+const PAGE_METHODS := "methods"
+const PAGE_SKILLS := "skills"
+const PAGE_ITEMS := "items"
 
 const METHOD_ROWS := [
 	{"node": "Main", "key": "main", "label": "主功法"},
@@ -17,10 +20,16 @@ const METHOD_ROWS := [
 @onready var _close_button: TextureButton = %CloseButton
 @onready var _fightset_button: TextureButton = %FightsetButton
 @onready var _save_button: TextureButton = %SaveButton
+@onready var _method_tab: Button = %MethodTab
+@onready var _skill_tab: Button = %SkillTab
+@onready var _item_tab: Button = %ItemTab
+@onready var _methods_card: Panel = %MethodsCard
+@onready var _skills_card: Panel = %SkillsCard
+@onready var _equipment_card: Panel = %EquipmentCard
 @onready var _methods: VBoxContainer = %MethodsContainer
 @onready var _method_summary: Label = %MethodSummaryLabel
 @onready var _skills: VBoxContainer = %SkillsContainer
-@onready var _treasure_slots: HBoxContainer = $Panel/EquipmentCard/TreasurePanel/Slots
+@onready var _treasure_slots: HBoxContainer = %Slots
 @onready var _item_slots: GridContainer = %EquipmentContainer
 @onready var _status: Label = %StatusLabel
 @onready var _selection_popup: PeizhiXuanzeTanchuang = %SelectionPopup
@@ -29,12 +38,16 @@ const METHOD_ROWS := [
 var _selection_mode := ""
 var _selection_target: Variant = -1
 var _wired := false
+var _active_page := PAGE_METHODS
 
 
 func _ready() -> void:
 	_close_button.pressed.connect(_go_back)
 	_fightset_button.pressed.connect(_on_fightset_pressed)
 	_save_button.pressed.connect(_on_save_pressed)
+	_method_tab.pressed.connect(_show_page.bind(PAGE_METHODS))
+	_skill_tab.pressed.connect(_show_page.bind(PAGE_SKILLS))
+	_item_tab.pressed.connect(_show_page.bind(PAGE_ITEMS))
 	_selection_popup.selected.connect(_on_popup_selected)
 	_bag_popup.entry_picked.connect(_on_bag_entry_picked)
 	_wire_interactions()
@@ -78,7 +91,33 @@ func _refresh(message: String = "") -> void:
 	_bind_treasure()
 	_bind_items()
 	_bind_method_summary()
-	_status.text = message if message != "" else "点击功法、技能调整配置；点击法宝或道具槽位打开背包装备。"
+	_sync_pages()
+	_status.text = message if message != "" else _page_status_text()
+
+
+func _show_page(page: String) -> void:
+	_active_page = page
+	_sync_pages()
+	_status.text = _page_status_text()
+
+
+func _sync_pages() -> void:
+	_methods_card.visible = _active_page == PAGE_METHODS
+	_skills_card.visible = _active_page == PAGE_SKILLS
+	_equipment_card.visible = _active_page == PAGE_ITEMS
+	_method_tab.button_pressed = _active_page == PAGE_METHODS
+	_skill_tab.button_pressed = _active_page == PAGE_SKILLS
+	_item_tab.button_pressed = _active_page == PAGE_ITEMS
+
+
+func _page_status_text() -> String:
+	match _active_page:
+		PAGE_METHODS:
+			return "功法配置：1 个核心功法，3 个辅助功法。"
+		PAGE_SKILLS:
+			return "技能配置：5 个主动技能位。"
+		_:
+			return "道具配置：1 个主动法宝，2 个被动法宝，3 个主动道具。"
 
 
 func _bind_methods() -> void:

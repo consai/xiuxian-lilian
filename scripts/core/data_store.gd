@@ -96,9 +96,9 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 	var quality_v: Variant = out.get("realm_quality", {})
 	var quality := quality_v as Dictionary if quality_v is Dictionary else {}
 	out["realm_quality"] = {
-		"foundation": maxi(0, int(quality.get("foundation", 0))),
-		"core": maxi(0, int(quality.get("core", 0))),
-		"nascent": maxi(0, int(quality.get("nascent", 0))),
+		"zhuji": maxi(0, int(quality.get("zhuji", quality.get("zhuji", 0)))),
+		"jindan": maxi(0, int(quality.get("jindan", quality.get("jindan", 0)))),
+		"yuanying": maxi(0, int(quality.get("yuanying", quality.get("yuanying", 0)))),
 	}
 	out["breakthrough_attempt_cooldown_days"] = maxi(0, int(out.get("breakthrough_attempt_cooldown_days", 0)))
 	var liandan_raw: Variant = out.get("liandan", out.get("alchemy", {}))
@@ -390,9 +390,9 @@ func _default_savedata() -> Dictionary:
 			"other": 0,
 		},
 		"realm_quality": {
-			"foundation": 0,
-			"core": 0,
-			"nascent": 0,
+			"zhuji": 0,
+			"jindan": 0,
+			"yuanying": 0,
 		},
 		"breakthrough_attempt_cooldown_days": 0,
 		"liandan": LiandanServiceScript.default_state(),
@@ -551,7 +551,7 @@ func _coalesce_dao_savedata(out: Dictionary) -> Dictionary:
 	else:
 		out["equipped_abilities"] = _normalize_ability_slots(equipped_abilities_v)
 	if (out.get("knowledge", {}) as Dictionary).is_empty():
-		KnowledgeServiceScript.grant_level(out, "foundation.breathing", 1)
+		KnowledgeServiceScript.grant_level(out, "zhuji.breathing", 1)
 	return out
 
 

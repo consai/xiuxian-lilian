@@ -7,21 +7,21 @@ export const TIER_MAX = 9;
 
 /** 阶位与大境界 id 一一对应（与 EnumItemTier / dao_tree.realms.order 一致）。 */
 export const REALM_IDS_BY_TIER = [
-  "qi",
-  "foundation",
-  "core",
-  "nascent",
-  "transform",
-  "void",
-  "merge",
-  "great",
+  "lianqi",
+  "zhuji",
+  "jindan",
+  "yuanying",
+  "huashen",
+  "lianxu",
+  "heti",
+  "dacheng",
   "tribulation",
 ];
 
 /** 阶位 → 大境界 id。 */
 export function realmIdForTier(tier) {
   const t = Math.max(TIER_MIN, Math.min(TIER_MAX, Number(tier) || TIER_MIN));
-  return REALM_IDS_BY_TIER[t - 1] ?? "qi";
+  return REALM_IDS_BY_TIER[t - 1] ?? "lianqi";
 }
 
 /** 大境界 id → 阶位。 */

@@ -1021,71 +1021,71 @@
     "runtimeKey": "travel_efficiency",
     "description": "功法效果属性 travel_efficiency，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_control": {
-    "key": "tribulation_control",
+  "dujie_control": {
+    "key": "dujie_control",
     "category": "control",
     "defaultTarget": "self",
     "runtimeKey": "tribulation_control",
     "description": "功法效果属性 tribulation_control，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_damage": {
-    "key": "tribulation_damage",
+  "dujie_damage": {
+    "key": "dujie_damage",
     "category": "offense",
     "defaultTarget": "self",
     "runtimeKey": "tribulation_damage",
     "description": "功法效果属性 tribulation_damage，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_energy_absorption": {
-    "key": "tribulation_energy_absorption",
+  "dujie_energy_absorption": {
+    "key": "dujie_energy_absorption",
     "category": "tribulation",
     "defaultTarget": "self",
     "runtimeKey": "tribulation_energy_absorption",
     "description": "功法效果属性 tribulation_energy_absorption，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_forecast": {
-    "key": "tribulation_forecast",
+  "dujie_forecast": {
+    "key": "dujie_forecast",
     "category": "tribulation",
     "defaultTarget": "self",
     "runtimeKey": "tribulation_forecast",
     "description": "功法效果属性 tribulation_forecast，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_plan_slots": {
-    "key": "tribulation_plan_slots",
+  "dujie_plan_slots": {
+    "key": "dujie_plan_slots",
     "category": "tribulation",
     "defaultTarget": "self",
     "runtimeKey": "tribulation_plan_slots",
     "description": "功法效果属性 tribulation_plan_slots，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_recovery": {
-    "key": "tribulation_recovery",
+  "dujie_recovery": {
+    "key": "dujie_recovery",
     "category": "survival",
     "defaultTarget": "self",
     "runtimeKey": "tribulation_recovery",
     "description": "功法效果属性 tribulation_recovery，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_resistance": {
-    "key": "tribulation_resistance",
+  "dujie_resistance": {
+    "key": "dujie_resistance",
     "category": "survival",
     "defaultTarget": "self",
     "runtimeKey": "tribulation_resistance",
     "description": "功法效果属性 tribulation_resistance，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_resource_efficiency": {
-    "key": "tribulation_resource_efficiency",
+  "dujie_resource_efficiency": {
+    "key": "dujie_resource_efficiency",
     "category": "tribulation",
     "defaultTarget": "self",
     "runtimeKey": "tribulation_resource_efficiency",
     "description": "功法效果属性 tribulation_resource_efficiency，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_sever": {
-    "key": "tribulation_sever",
+  "dujie_sever": {
+    "key": "dujie_sever",
     "category": "offense",
     "defaultTarget": "self",
     "runtimeKey": "tribulation_sever",
     "description": "功法效果属性 tribulation_sever，具体结算由 Godot 运行时映射。"
   },
-  "tribulation_warning_time": {
-    "key": "tribulation_warning_time",
+  "dujie_warning_time": {
+    "key": "dujie_warning_time",
     "category": "exploration",
     "defaultTarget": "self",
     "runtimeKey": "tribulation_warning_time",
@@ -1105,57 +1105,57 @@
     "runtimeKey": "true_name_power",
     "description": "功法效果属性 true_name_power，具体结算由 Godot 运行时映射。"
   },
-  "void_herb_growth": {
-    "key": "void_herb_growth",
+  "lianxu_herb_growth": {
+    "key": "lianxu_herb_growth",
     "category": "production",
     "defaultTarget": "self",
     "runtimeKey": "void_herb_growth",
     "description": "功法效果属性 void_herb_growth，具体结算由 Godot 运行时映射。"
   },
-  "void_mobility": {
-    "key": "void_mobility",
+  "lianxu_mobility": {
+    "key": "lianxu_mobility",
     "category": "utility",
     "defaultTarget": "self",
     "runtimeKey": "void_mobility",
     "description": "功法效果属性 void_mobility，具体结算由 Godot 运行时映射。"
   },
-  "void_resistance": {
-    "key": "void_resistance",
+  "lianxu_resistance": {
+    "key": "lianxu_resistance",
     "category": "survival",
     "defaultTarget": "self",
     "runtimeKey": "void_resistance",
     "description": "功法效果属性 void_resistance，具体结算由 Godot 运行时映射。"
   },
-  "void_route_safety": {
-    "key": "void_route_safety",
+  "lianxu_route_safety": {
+    "key": "lianxu_route_safety",
     "category": "exploration",
     "defaultTarget": "self",
     "runtimeKey": "void_route_safety",
     "description": "功法效果属性 void_route_safety，具体结算由 Godot 运行时映射。"
   },
-  "void_ship_range": {
-    "key": "void_ship_range",
+  "lianxu_ship_range": {
+    "key": "lianxu_ship_range",
     "category": "control",
     "defaultTarget": "controlled_entity",
     "runtimeKey": "void_ship_range",
     "description": "功法效果属性 void_ship_range，具体结算由 Godot 运行时映射。"
   },
-  "void_spell_accuracy": {
-    "key": "void_spell_accuracy",
+  "lianxu_spell_accuracy": {
+    "key": "lianxu_spell_accuracy",
     "category": "control",
     "defaultTarget": "self",
     "runtimeKey": "void_spell_accuracy",
     "description": "功法效果属性 void_spell_accuracy，具体结算由 Godot 运行时映射。"
   },
-  "void_survival": {
-    "key": "void_survival",
+  "lianxu_survival": {
+    "key": "lianxu_survival",
     "category": "exploration",
     "defaultTarget": "self",
     "runtimeKey": "void_survival",
     "description": "功法效果属性 void_survival，具体结算由 Godot 运行时映射。"
   },
-  "void_target_accuracy": {
-    "key": "void_target_accuracy",
+  "lianxu_target_accuracy": {
+    "key": "lianxu_target_accuracy",
     "category": "control",
     "defaultTarget": "self",
     "runtimeKey": "void_target_accuracy",

@@ -1,8 +1,8 @@
 {
-  "qi_to_foundation": {
-    "key": "qi_to_foundation",
-    "from_major": "qi",
-    "to_major": "foundation",
+  "lianqi_to_zhuji": {
+    "key": "lianqi_to_zhuji",
+    "from_major": "lianqi",
+    "to_major": "zhuji",
     "label_suffix": "筑基",
     "min_total": 1200,
     "cultivation_cap": 400,
@@ -58,10 +58,10 @@
       }
     ]
   },
-  "foundation_to_core": {
-    "key": "foundation_to_core",
-    "from_major": "foundation",
-    "to_major": "core",
+  "zhuji_to_jindan": {
+    "key": "zhuji_to_jindan",
+    "from_major": "zhuji",
+    "to_major": "jindan",
     "label_suffix": "金丹",
     "min_total": 1800,
     "cultivation_cap": 450,
@@ -116,10 +116,10 @@
       }
     ]
   },
-  "core_to_nascent": {
-    "key": "core_to_nascent",
-    "from_major": "core",
-    "to_major": "nascent",
+  "jindan_to_yuanying": {
+    "key": "jindan_to_yuanying",
+    "from_major": "jindan",
+    "to_major": "yuanying",
     "label_suffix": "元婴",
     "min_total": 2400,
     "cultivation_cap": 500,

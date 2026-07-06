@@ -38,12 +38,6 @@ static func build_from_runtime(cfg: Dictionary, icon: Texture2D = null) -> Dicti
 			StringsZh.getp("hover.skill.cd", "冷却：{value}秒"),
 			{"value": _fmt_num(cd)}
 		))
-	var power := float(cfg.get("power", 0.0))
-	if power > 0.0 and int(cfg.get("id", -1)) != 0:
-		lines.append(StringsZh.format_template(
-			StringsZh.getp("hover.skill.power", "威力：{value}"),
-			{"value": _fmt_num(power)}
-		))
 	for effect_line in HoverTipEffectFormatter.format_lines(
 		cfg.get("effects", []),
 		str(cfg.get("target", "")),

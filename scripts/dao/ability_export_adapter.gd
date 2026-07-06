@@ -46,7 +46,7 @@ static func _normalize_zhandou_active_row(raw: Dictionary) -> Dictionary:
 	var ability_type := str(raw.get("type", "combat_active")).strip_edges()
 	if ability_type == "":
 		ability_type = "combat_active"
-	var tier := int(raw.get("tier", EnumItemTier.Type.QI))
+	var tier := int(raw.get("tier", EnumItemTier.Type.lianqi))
 	if not raw.has("tier") and raw.has("req_realm"):
 		tier = EnumItemTier.tier_for_realm_id(str(raw.get("req_realm", "")))
 	var costs: Array = []
@@ -68,7 +68,6 @@ static func _normalize_zhandou_active_row(raw: Dictionary) -> Dictionary:
 		"costs": costs,
 		"upkeepCostsPerSecond": [],
 		"activation": str(raw.get("activation", "cast")).strip_edges(),
-		"powerScale": float(raw.get("power_scale", raw.get("powerScale", 1.0))),
 	}
 	if target_arg != "":
 		combat["targetArg"] = target_arg
@@ -98,7 +97,7 @@ static func _normalize_zhandou_passive_row(raw: Dictionary) -> Dictionary:
 	var ability_id := str(raw.get("id", "")).strip_edges()
 	if ability_id == "":
 		return {}
-	var tier := int(raw.get("tier", EnumItemTier.Type.QI))
+	var tier := int(raw.get("tier", EnumItemTier.Type.lianqi))
 	var effects := ZhandouEffectCodec.parse_positional_config_effects(raw.get("effects", []))
 	# heal_hp 在战斗被动校验中映射为 hp_regen
 	for i in effects.size():
@@ -128,7 +127,6 @@ static func _normalize_zhandou_passive_row(raw: Dictionary) -> Dictionary:
 			"costs": [],
 			"upkeepCostsPerSecond": [],
 			"activation": "learned",
-			"powerScale": 1.0,
 		},
 		"effects": effects,
 		"learningRequirements": {"knowledge": []},
@@ -142,7 +140,7 @@ static func _normalize_general_passive_row(raw: Dictionary) -> Dictionary:
 	var ability_id := str(raw.get("id", "")).strip_edges()
 	if ability_id == "":
 		return {}
-	var tier := int(raw.get("tier", EnumItemTier.Type.QI))
+	var tier := int(raw.get("tier", EnumItemTier.Type.lianqi))
 	if not raw.has("tier") and raw.has("req_realm"):
 		tier = EnumItemTier.tier_for_realm_id(str(raw.get("req_realm", "")))
 	var effects: Array = []

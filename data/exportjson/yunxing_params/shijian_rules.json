@@ -15,40 +15,40 @@
     "key": "calendar:days_per_year",
     "value": "360"
   },
-  "major_realm_multipliers:qi": {
-    "key": "major_realm_multipliers:qi",
+  "major_realm_multipliers:lianqi": {
+    "key": "major_realm_multipliers:lianqi",
     "value": "1"
   },
-  "major_realm_multipliers:foundation": {
-    "key": "major_realm_multipliers:foundation",
+  "major_realm_multipliers:zhuji": {
+    "key": "major_realm_multipliers:zhuji",
     "value": "2"
   },
-  "major_realm_multipliers:core": {
-    "key": "major_realm_multipliers:core",
+  "major_realm_multipliers:jindan": {
+    "key": "major_realm_multipliers:jindan",
     "value": "4"
   },
-  "major_realm_multipliers:nascent": {
-    "key": "major_realm_multipliers:nascent",
+  "major_realm_multipliers:yuanying": {
+    "key": "major_realm_multipliers:yuanying",
     "value": "8"
   },
-  "major_realm_multipliers:transform": {
-    "key": "major_realm_multipliers:transform",
+  "major_realm_multipliers:huashen": {
+    "key": "major_realm_multipliers:huashen",
     "value": "16"
   },
-  "major_realm_multipliers:void": {
-    "key": "major_realm_multipliers:void",
+  "major_realm_multipliers:lianxu": {
+    "key": "major_realm_multipliers:lianxu",
     "value": "32"
   },
-  "major_realm_multipliers:merge": {
-    "key": "major_realm_multipliers:merge",
+  "major_realm_multipliers:heti": {
+    "key": "major_realm_multipliers:heti",
     "value": "64"
   },
-  "major_realm_multipliers:great": {
-    "key": "major_realm_multipliers:great",
+  "major_realm_multipliers:dacheng": {
+    "key": "major_realm_multipliers:dacheng",
     "value": "128"
   },
-  "major_realm_multipliers:tribulation": {
-    "key": "major_realm_multipliers:tribulation",
+  "major_realm_multipliers:dujie": {
+    "key": "major_realm_multipliers:dujie",
     "value": "256"
   },
   "activity_base_days:cultivate": {

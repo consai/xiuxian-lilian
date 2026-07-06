@@ -228,7 +228,7 @@ func _initial_equipped_abilities(initial: Dictionary, unlocked: Array) -> Array:
 
 
 func _seed_starter_knowledge() -> void:
-	KnowledgeService.grant_level(DataStore.savedata, "foundation.breathing", 1)
+	KnowledgeService.grant_level(DataStore.savedata, "zhuji.breathing", 1)
 
 
 func can_persist() -> bool:
@@ -588,7 +588,7 @@ func preview_cultivation_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, 
 		var pill_gain := 0
 		if EnumXiulianMode.is_pill_mode(mode_id):
 			# 丹药炼化：每月消耗一颗丹药，药力在当月闭关期间持续生效。
-			pill_gain = cultivation_pill_gain(str(pill_ids[int(_day_index / GameTimeService.days_per_month())]))
+			pill_gain = cultivation_pill_daily_gain(str(pill_ids[int(_day_index / GameTimeService.days_per_month())]))
 			speed_part = pill_gain
 		else:
 			var multiplier := float(mode["cultivation_multiplier"])
@@ -670,7 +670,7 @@ func cultivate_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, days: int 
 			if day_index % GameTimeService.days_per_month() == 0:
 				InventoryService.remove_item(inventory, active_pill_id, 1)
 				cultivation_instability += cultivation_pill_instability(active_pill_id)
-			raw_gain = cultivation_pill_gain(active_pill_id) + method_base_gain
+			raw_gain = cultivation_pill_daily_gain(active_pill_id) + method_base_gain
 		else:
 			var multiplier := float(mode["cultivation_multiplier"])
 			raw_gain = int(round(float(base_gain) * speed * multiplier)) + method_base_gain
@@ -754,12 +754,17 @@ func is_cultivation_pill(item_id: String) -> bool:
 	return def != null and def.is_cultivation_pill()
 
 
-## 修炼丹药在「丹药炼化」模式下直接增加的修为（来自物品 use_effect.pill_cultivation）。
+## 修炼丹药配置的月修为（来自物品 use_effect.pill_cultivation）。
 func cultivation_pill_gain(item_id: String) -> int:
 	var def := ConfigManager.item_def_by_id(item_id)
 	if def == null:
 		return 0
 	return maxi(0, int(round(def.get_use_effect_amount("pill_cultivation"))))
+
+
+## 丹药炼化闭关逐日结算用的日修为（配置月修为 × DAILY_CULTIVATION_GAIN_SCALE）。
+func cultivation_pill_daily_gain(item_id: String) -> int:
+	return RealmBalanceService.cultivation_pill_daily_gain(cultivation_pill_gain(item_id))
 
 
 func cultivation_pill_instability(item_id: String) -> int:
@@ -1616,13 +1621,13 @@ func _realm_row(index: int) -> Dictionary:
 
 
 func _major_realm_id(row: Dictionary) -> String:
-	var major := str(row.get("major_realm", "")).strip_edges()
-	if major != "":
+	var major := EnumMajorRealm.normalize_id(str(row.get("major_realm", "")))
+	if major != "" and EnumMajorRealm.is_valid_id(major):
 		return major
 	var id := str(row.get("id", "")).strip_edges()
 	if id == "":
-		return ""
-	return id.split("_", false, 1)[0]
+		return EnumMajorRealm.default_id()
+	return EnumMajorRealm.normalize_id(id.split("_", false, 1)[0])
 
 
 func _same_major_realm(index_a: int, index_b: int) -> bool:

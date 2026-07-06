@@ -328,7 +328,7 @@ func _new_game() -> void:
 
 
 func _grant_dao_knowledge() -> void:
-	GameState.grant_knowledge("foundation.breathing", 3)
+	GameState.grant_knowledge("zhuji.breathing", 3)
 	GameState.grant_knowledge("cultivation.cycle", 2)
 	GameState.learn_ability("ability.combat.qi_bolt")
 	_flash("已授予入门知识与御气弹")

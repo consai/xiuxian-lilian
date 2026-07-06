@@ -8,7 +8,6 @@ var name: String = ""
 var icon: String = ""
 var mp_cost: float = 0.0
 var cd: float = 0.0
-var power: float = 1000.0
 var quality: int = 1
 var vfx_type: String = ""
 ## 表现 preset id，或含 [code]preset[/code]/[code]overrides[/code] 的字典。
@@ -31,7 +30,6 @@ static func from_dict(data: Dictionary) -> SkillDef:
 	skill.icon = str(data.get("icon", data.get("icon_path", ""))).strip_edges()
 	skill.mp_cost = maxf(0.0, float(data.get("mp_cost", 0.0)))
 	skill.cd = maxf(0.0, float(data.get("cd", data.get("cd_total", 0.0))))
-	skill.power = float(data.get("power", 1000.0))
 	skill.quality = maxi(1, int(data.get("quality", 1)))
 	skill.vfx_type = str(data.get("vfx_type", "")).strip_edges().to_lower()
 	if data.has("vfx"):
@@ -56,7 +54,6 @@ func to_runtime_dict() -> Dictionary:
 		"mp_cost": mp_cost,
 		"cd": cd,
 		"cd_total": cd,
-		"power": power,
 		"quality": quality,
 		"effects": effects.duplicate(true),
 	}

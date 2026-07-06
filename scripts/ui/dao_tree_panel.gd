@@ -24,7 +24,7 @@ const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd"
 
 var _graph: DaoTreeGraphViewScript
 var _selected_skill_id := ""
-var _current_domain := "foundation"
+var _current_domain := "zhuji"
 var _realm_mode := false
 var _category_buttons: Array = []
 var _tree_initialized := false
@@ -201,7 +201,7 @@ func _sync_tree_data() -> void:
 	_graph.setup(GameState.to_dict(), GameState.major_realm_id())
 	if not _tree_initialized:
 		_tree_initialized = true
-		_current_domain = str((DaoTreeServiceScript.domains().front() as Dictionary).get("id", "foundation"))
+		_current_domain = str((DaoTreeServiceScript.domains().front() as Dictionary).get("id", "zhuji"))
 		_highlight_category(_current_domain)
 	_focus_view()
 

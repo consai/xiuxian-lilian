@@ -1,7 +1,7 @@
 {
-  "qi": {
-    "id": "qi",
-    "name": "炼气",
+  "lianqi": {
+    "id": "lianqi",
+    "name": "练气",
     "content_coefficient": 1.0,
     "normal_duration_sec": [
       8,
@@ -16,8 +16,8 @@
       70
     ]
   },
-  "foundation": {
-    "id": "foundation",
+  "zhuji": {
+    "id": "zhuji",
     "name": "筑基",
     "content_coefficient": 1.7,
     "normal_duration_sec": [
@@ -33,8 +33,8 @@
       80
     ]
   },
-  "core": {
-    "id": "core",
+  "jindan": {
+    "id": "jindan",
     "name": "金丹",
     "content_coefficient": 2.8,
     "normal_duration_sec": [
@@ -50,8 +50,8 @@
       90
     ]
   },
-  "nascent": {
-    "id": "nascent",
+  "yuanying": {
+    "id": "yuanying",
     "name": "元婴",
     "content_coefficient": 4.5,
     "normal_duration_sec": [
@@ -67,8 +67,8 @@
       100
     ]
   },
-  "transform": {
-    "id": "transform",
+  "huashen": {
+    "id": "huashen",
     "name": "化神",
     "content_coefficient": 7.0,
     "normal_duration_sec": [
@@ -84,8 +84,8 @@
       110
     ]
   },
-  "void": {
-    "id": "void",
+  "lianxu": {
+    "id": "lianxu",
     "name": "炼虚",
     "content_coefficient": 11.0,
     "normal_duration_sec": [
@@ -101,8 +101,8 @@
       120
     ]
   },
-  "merge": {
-    "id": "merge",
+  "heti": {
+    "id": "heti",
     "name": "合体",
     "content_coefficient": 17.0,
     "normal_duration_sec": [
@@ -118,8 +118,8 @@
       130
     ]
   },
-  "great": {
-    "id": "great",
+  "dacheng": {
+    "id": "dacheng",
     "name": "大乘",
     "content_coefficient": 26.0,
     "normal_duration_sec": [
@@ -135,8 +135,8 @@
       145
     ]
   },
-  "tribulation": {
-    "id": "tribulation",
+  "dujie": {
+    "id": "dujie",
     "name": "渡劫",
     "content_coefficient": 40.0,
     "normal_duration_sec": [

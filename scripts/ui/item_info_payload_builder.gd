@@ -185,7 +185,7 @@ static func _format_learning_lines(def: ItemDef) -> Array[String]:
 	var lines: Array[String] = []
 	var ctx := _learning_context()
 	var savedata: Dictionary = ctx.get("savedata", {})
-	var major_realm := str(ctx.get("major_realm", "qi"))
+	var major_realm := str(ctx.get("major_realm", "lianqi"))
 	if def.learn_ability_id != "":
 		var ability := AbilityServiceScript.by_id(def.learn_ability_id)
 		var name := str(ability.get("name", def.learn_ability_id))
@@ -223,7 +223,7 @@ static func _append_unmet_learning_req_lines(lines: Array[String], req_lines: Ar
 
 static func _learning_context() -> Dictionary:
 	var savedata: Dictionary = DataStore.savedata if DataStore != null else {}
-	var major_realm := str(savedata.get("major_realm", "qi"))
+	var major_realm := str(savedata.get("major_realm", "lianqi"))
 	if GameState != null:
 		major_realm = GameState.major_realm_id()
 	return {"savedata": savedata, "major_realm": major_realm}
@@ -307,7 +307,7 @@ static func format_use_effect_lines(use_effect: Array) -> Array[String]:
 			"pill_cultivation":
 				if amount != 0.0:
 					lines.append(StringsZh.format_template(
-						StringsZh.getp("item_info.use_pill_cultivation", "使用效果：修炼「丹药炼化」修为 +{value}"),
+						StringsZh.getp("item_info.use_pill_cultivation", "使用效果：修炼「丹药炼化」月修为 +{value}"),
 						{"value": _fmt_num(amount)}
 					))
 			"injury":
@@ -353,7 +353,7 @@ static func learning_book_condition_unmet(def: ItemDef) -> bool:
 		return false
 	var ctx := _learning_context()
 	var savedata: Dictionary = ctx.get("savedata", {})
-	var major_realm := str(ctx.get("major_realm", "qi"))
+	var major_realm := str(ctx.get("major_realm", "lianqi"))
 	if def.learn_method_id != "":
 		var method_id := def.learn_method_id.strip_edges()
 		if method_id == "":

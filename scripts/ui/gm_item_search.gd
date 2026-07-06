@@ -73,14 +73,14 @@ static func _fuzzy_score_single(query: String, text: String) -> int:
 
 
 static func _subsequence_score(query: String, text: String) -> int:
-	var qi := 0
+	var lianqi := 0
 	var score := 0
 	var run := 0
 	var last_pos := -2
 	for i in range(text.length()):
-		if qi >= query.length():
+		if lianqi >= query.length():
 			break
-		if text.substr(i, 1) == query.substr(qi, 1):
+		if text.substr(i, 1) == query.substr(lianqi, 1):
 			if last_pos == i - 1:
 				run += 1
 			else:
@@ -89,5 +89,5 @@ static func _subsequence_score(query: String, text: String) -> int:
 			if i == 0 or (i > 0 and text.substr(i - 1, 1) in [" ", "_", "·"]):
 				score += 12
 			last_pos = i
-			qi += 1
-	return score if qi >= query.length() else -1
+			lianqi += 1
+	return score if lianqi >= query.length() else -1

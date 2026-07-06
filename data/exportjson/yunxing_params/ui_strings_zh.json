@@ -247,6 +247,10 @@
     "key": "item_info:learn_req_realm",
     "value": "境界要求：{need}（当前：{current}）"
   },
+  "item_info:learn_req_knowledge": {
+    "key": "item_info:learn_req_knowledge",
+    "value": "知识要求：{name} ≥ {need} 级（当前 {current} 级）"
+  },
   "item_info:learn_hub_hint": {
     "key": "item_info:learn_hub_hint",
     "value": "在洞府底部「研读」使用"

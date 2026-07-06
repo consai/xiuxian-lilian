@@ -5,19 +5,6 @@ extends RefCounted
 
 const PATH := "res://data/exportjson/realms.json"
 
-## realms.json 境界 id 前缀 → jingjie_balance / dao_tree 大境界 id
-const MAJOR_REALM_BY_PREFIX: Dictionary = {
-	"lianqi": "qi",
-	"zhuji": "foundation",
-	"jindan": "core",
-	"yuanying": "nascent",
-	"huashen": "transform",
-	"lianxu": "void",
-	"heti": "merge",
-	"dacheng": "great",
-	"dujie": "tribulation",
-}
-
 static var _realms: Array = []
 
 
@@ -34,8 +21,11 @@ static func realms() -> Array:
 static func realm_by_id(realm_id: String) -> Dictionary:
 	var id := realm_id.strip_edges()
 	for row_v in realms():
-		if row_v is Dictionary and str((row_v as Dictionary).get("id", "")) == id:
-			return (row_v as Dictionary).duplicate(true)
+		if not row_v is Dictionary:
+			continue
+		var row := row_v as Dictionary
+		if str(row.get("id", "")) == id or str(row.get("level", "")) == id:
+			return row.duplicate(true)
 	return {}
 
 
@@ -47,20 +37,22 @@ static func _build_realms() -> Array:
 		if row_v is Dictionary:
 			rows.append(_normalize_row(row_v as Dictionary))
 	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
-		return int(a.get("breakthrough_at", 0)) < int(b.get("breakthrough_at", 0))
+		return int(a.get("level", 0)) < int(b.get("level", 0))
 	)
 	return rows
 
 
-## 将 exportjson 行转为模拟层使用的境界字典（含 major_realm / breakthrough_at）。
+## 将 exportjson 行转为模拟层使用的境界字典（level 为索引，realm 为英文枚举）。
 static func _normalize_row(export_row: Dictionary) -> Dictionary:
-	var id: String = str(export_row.get("id", "")).strip_edges()
-	var prefix: String = id.split("_", false)[0] if id.contains("_") else id
-	var major_realm: String = str(MAJOR_REALM_BY_PREFIX.get(prefix, ""))
+	var level: int = int(export_row.get("level", 0))
+	var realm_enum: String = str(export_row.get("realm", "")).strip_edges().to_lower()
+	var major_realm: String = EnumMajorRealm.normalize_id(realm_enum)
 	var xiuwei: int = int(export_row.get("xiuwei", 0))
 	return {
-		"id": id,
+		"id": str(level),
+		"level": level,
 		"name": str(export_row.get("name", "")),
+		"realm": realm_enum,
 		"major_realm": major_realm,
 		"breakthrough_at": xiuwei,
 		"xiuwei": xiuwei,

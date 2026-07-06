@@ -25,7 +25,7 @@ func _run_all() -> void:
 	_run("event pick ignores configured difficulty", _test_event_pick_ignores_configured_difficulty)
 	_run("common events use location generation", _test_common_events_use_location_generation)
 	_run("location declares monsters and materials", _test_location_declares_monsters_and_materials)
-	_run("qi lilian combat bands are readable", _test_qi_expedition_combat_bands_are_readable)
+	_run("lianqi lilian combat bands are readable", _test_qi_expedition_combat_bands_are_readable)
 	_run("difficulty rolls material grade variants", _test_difficulty_rolls_material_grade_variants)
 	_run("monster drops materialize from map enemy", _test_monster_drops_materialize_from_map_enemy)
 	_run("early common battles form small groups", _test_early_common_battles_form_small_groups)
@@ -530,7 +530,7 @@ func _test_p3_mist_valley_chain() -> void:
 	_expect_eq(str(seal.get("enemy_pool", "")), "sealed_creek_boss", "p3 chain boss uses sealed creek boss")
 	var rewards := (seal.get("results", []) as Array)[1] as Dictionary
 	var reward := (rewards.get("rewards", []) as Array)[0] as Dictionary
-	_expect_eq(str(reward.get("id", "")), "book_method_hunyuan_2", "p3 chain points to foundation method")
+	_expect_eq(str(reward.get("id", "")), "book_method_hunyuan_2", "p3 chain points to zhuji method")
 
 
 func _test_non_battle_events_advance() -> void:
@@ -635,10 +635,10 @@ func _test_defeat_loot_drops_fixed_twenty_percent() -> void:
 
 
 func _test_elapsed_days_track_expedition_days() -> void:
-	_expect_eq(LilianRulesServiceScript.elapsed_days(0, "qi"), 30, "0 days -> qi lilian duration")
-	_expect_eq(LilianRulesServiceScript.elapsed_days(1, "qi"), 30, "1 day -> qi lilian duration")
-	_expect_eq(LilianRulesServiceScript.elapsed_days(31, "qi"), 31, "31 days -> actual elapsed")
-	_expect_eq(LilianRulesServiceScript.elapsed_days(0, "foundation"), 60, "foundation duration scales")
+	_expect_eq(LilianRulesServiceScript.elapsed_days(0, "lianqi"), 30, "0 days -> lianqi lilian duration")
+	_expect_eq(LilianRulesServiceScript.elapsed_days(1, "lianqi"), 30, "1 day -> lianqi lilian duration")
+	_expect_eq(LilianRulesServiceScript.elapsed_days(31, "lianqi"), 31, "31 days -> actual elapsed")
+	_expect_eq(LilianRulesServiceScript.elapsed_days(0, "zhuji"), 60, "zhuji duration scales")
 
 
 func _test_quiet_days_advance_without_logs() -> void:

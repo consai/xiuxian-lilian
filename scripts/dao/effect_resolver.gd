@@ -126,6 +126,8 @@ static func resolve_combat_effects(
 				"value": magnitude,
 				"target": skill_target_fields["target"],
 			}
+			if effect.has("_cells"):
+				row["_cells"] = (effect["_cells"] as Array).duplicate(true)
 			if skill_target_fields.has("target_arg"):
 				row["target_arg"] = skill_target_fields["target_arg"]
 			out.append(row)
@@ -158,7 +160,7 @@ static func has_combat_mapping(effect_id: String) -> bool:
 	if EnumZhandouActiveEffect.is_valid_label(effect_id):
 		return true
 	# attrschange 经 ZhandouEffectCodec 展开为具体属性 effectId
-	for mapped_v in ZhandouEffectCodec.ATTR_EXPORT_TO_EFFECT_ID.values():
+	for mapped_v in ZhandouEffectCodec.FIGHT_ATTR_TO_EFFECT_ID.values():
 		if str(mapped_v) == effect_id:
 			return true
 	return false

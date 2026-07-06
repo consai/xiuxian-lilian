@@ -42,7 +42,7 @@ static func from_dict(data: Dictionary) -> BuffDef:
 	return buff
 
 
-## 支持 [code]{"atk": 10}[/code]、[code][{"atk": 10}, {"def": 5}][/code] 或 export positional attrschange 行。
+## 支持 [code]{"physical_atk": 10}[/code] 字典或 export positional attrschange 行（属性键与 ZhandouAttr 一致）。
 static func normalize_modifiers(raw: Variant) -> Dictionary:
 	if raw is Dictionary:
 		var source := raw as Dictionary

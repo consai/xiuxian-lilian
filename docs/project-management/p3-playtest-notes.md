@@ -31,7 +31,7 @@
 - 雾隐溪谷普通、精英、Boss 怪物引用与掉落池通过配置校验。
 - `mist_creek_chain_*` 事件链包含起点、消耗、普通战、选择、精英、Boss 和终点奖励。
 - 新丹方材料来自雾隐溪谷或已有高难历练，旧存档会合并默认已知丹方。
-- `foundation.dao_base`、`cultivation.great_cycle`、`body.jade` 的知识效果能进入派生属性。
+- `zhuji.dao_base`、`cultivation.great_cycle`、`body.jade` 的知识效果能进入派生属性。
 - 采药人 NPC 与三类 P3 敌人有可加载的占位立绘。
 
 ## 路线核对

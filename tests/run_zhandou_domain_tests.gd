@@ -43,7 +43,7 @@ func _init() -> void:
 	_run("runtime modifier expires cleanly", _test_runtime_modifier_expires)
 	_run("buff reapply stacks and refreshes duration", _test_buff_reapply_stacks_and_refreshes_duration)
 	_run("self buff float targets caster", _test_self_buff_float_targets_caster)
-	_run("qi and foundation active abilities resolve effects", _test_v1_abilities_resolve_effects)
+	_run("lianqi and zhuji active abilities resolve effects", _test_v1_abilities_resolve_effects)
 	_run("PM-206 projectile presets are bound", _test_pm206_projectile_presets_are_bound)
 	_run("melee strike point works across formation slot parents", _test_melee_strike_across_formation_slots)
 	_run("intent preview subtracts defender shield", _test_intent_preview_subtracts_shield)
@@ -192,7 +192,7 @@ func _test_damage_types_use_matching_defense() -> void:
 		ZhandouAttr.MAGIC_DEF: 300.0,
 	}
 	var physical := ZhandouAttr.calc_basic_damage(attacker, defender)
-	var magic := ZhandouAttr.calc_skill_damage(attacker, defender, 1.0, 0.0, ZhandouAttr.DAMAGE_MAGIC)
+	var magic := ZhandouAttr.calc_skill_damage(attacker, defender, 100.0, ZhandouAttr.DAMAGE_MAGIC)
 	_expect_near(float(physical["damage"]), 50.0, "physical soft mitigation")
 	_expect_near(float(magic["damage"]), 25.0, "magic soft mitigation")
 
@@ -206,8 +206,8 @@ func _test_true_damage_bypasses_defense() -> void:
 		ZhandouAttr.PHYSICAL_DEF: 999.0,
 		ZhandouAttr.MAGIC_DEF: 999.0,
 	}
-	var hit := ZhandouAttr.calc_skill_damage(attacker, defender, 1.0, 20.0, ZhandouAttr.DAMAGE_TRUE)
-	_expect_near(float(hit["damage"]), 120.0, "true damage ignores defense but keeps attack scaling")
+	var hit := ZhandouAttr.calc_skill_damage(attacker, defender, 120.0, ZhandouAttr.DAMAGE_TRUE)
+	_expect_near(float(hit["damage"]), 120.0, "true damage ignores defense")
 
 
 func _test_non_mana_ability_costs_are_paid() -> void:
@@ -516,8 +516,8 @@ func _test_method_mp_recovery() -> void:
 func _test_pierce_and_vulnerability() -> void:
 	var attacker := {ZhandouAttr.MAGIC_ATK: 100.0}
 	var defender := {ZhandouAttr.MAGIC_DEF: 100.0, ZhandouAttr.DAMAGE_TAKEN: 0.2}
-	var normal := ZhandouAttr.calc_skill_damage(attacker, defender, 1.0, 0.0, ZhandouAttr.DAMAGE_MAGIC)
-	var pierced := ZhandouAttr.calc_skill_damage(attacker, defender, 1.0, 0.0, ZhandouAttr.DAMAGE_MAGIC, 0.5)
+	var normal := ZhandouAttr.calc_skill_damage(attacker, defender, 100.0, ZhandouAttr.DAMAGE_MAGIC)
+	var pierced := ZhandouAttr.calc_skill_damage(attacker, defender, 100.0, ZhandouAttr.DAMAGE_MAGIC, 0.5)
 	_expect_near(float(normal["damage"]), 60.0, "vulnerability increases post-defense damage")
 	_expect_true(float(pierced["damage"]) > float(normal["damage"]), "pierce increases damage")
 
@@ -625,13 +625,13 @@ func _test_melee_strike_across_formation_slots() -> void:
 
 func _test_pm206_projectile_presets_are_bound() -> void:
 	AbilityServiceScript.reload()
-	var qi := AbilityServiceScript.to_runtime_dict("ability.combat.qi_bolt", {})
+	var lianqi := AbilityServiceScript.to_runtime_dict("ability.combat.qi_bolt", {})
 	var sword := AbilityServiceScript.to_runtime_dict("ability.combat.sword_qi", {})
-	_expect_eq(str(qi.get("vfx", "")), "qi_bolt_projectile", "qi bolt vfx preset")
-	_expect_eq(str(sword.get("vfx", "")), "sword_qi_projectile", "sword qi vfx preset")
+	_expect_eq(str(lianqi.get("vfx", "")), "qi_bolt_projectile", "lianqi bolt vfx preset")
+	_expect_eq(str(sword.get("vfx", "")), "sword_qi_projectile", "sword lianqi vfx preset")
 	var lib := ZhandouVfxPresetLibrary.load_default()
-	_expect_true(_has_projectile_texture(lib.get_sequence("qi_bolt_projectile")), "qi bolt projectile texture")
-	_expect_true(_has_projectile_texture(lib.get_sequence("sword_qi_projectile")), "sword qi projectile texture")
+	_expect_true(_has_projectile_texture(lib.get_sequence("qi_bolt_projectile")), "lianqi bolt projectile texture")
+	_expect_true(_has_projectile_texture(lib.get_sequence("sword_qi_projectile")), "sword lianqi projectile texture")
 	_expect_eq(ZhandouVfxPresetLibrary.legacy_preset_for_vfx_type("shield"), "status_cast", "shield fallback")
 	_expect_eq(EnumBattleVfxSkillType.from_label("shield"), EnumBattleVfxSkillType.Type.BUFF, "shield skill type")
 
@@ -651,16 +651,21 @@ func _test_intent_preview_subtracts_shield() -> void:
 		int(skill_cfg.get("id", -1)),
 	)
 	var estimated := int(row.get("estimated_damage", -1))
+	var effect := (skill_cfg.get("effects", []) as Array)[0] as Dictionary
+	var effect_value := ZhandouEffectCodec.resolve_runtime_effect_value(
+		effect,
+		attacker.attrs,
+		defender.attrs
+	)
 	var raw := ZhandouAttr.estimate_skill_damage(
 		attacker.attrs,
 		defender.attrs,
-		float(skill_cfg.get("power", 1000.0)) / 1000.0,
-		float(((skill_cfg.get("effects", []) as Array)[0] as Dictionary).get("value", 0.0)),
+		effect_value,
 		ZhandouAttr.DAMAGE_MAGIC,
 	)
 	var expected_hp_damage := maxi(0, int(roundf(float(raw) - 24.0)))
 	_expect_eq(estimated, expected_hp_damage, "intent preview shows hp damage after shield")
-	_expect_true(estimated < int(roundf(float(raw))), "shielded preview is lower than raw damage")
+	_expect_true(estimated < int(roundf(raw)), "shielded preview is lower than raw damage")
 
 
 func _test_intent_preview_enemy_lowest_hp_shows_damage() -> void:
@@ -687,7 +692,6 @@ func _test_intent_preview_matches_use_skill_damage() -> void:
 	var defender := _make_unit()
 	defender.attrs[ZhandouObjScript.ATTR_MAGIC_DEF] = 20.0
 	var cfg := {
-		"power": 1000.0,
 		"effects": [
 			{
 				"type": EnumCombatEffectType.LABEL_DAMAGE,

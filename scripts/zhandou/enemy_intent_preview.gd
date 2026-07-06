@@ -42,7 +42,6 @@ static func _resolve_overlay(
 		}
 	var damage_total := 0.0
 	var has_shield := false
-	var power_scale := float(skill_cfg.get("power", 1000.0)) / 1000.0
 	var default_damage_type := _damage_type_from_cfg(skill_cfg)
 	for eff_v in skill_cfg.get("effects", []) as Array:
 		if not eff_v is Dictionary:
@@ -56,8 +55,7 @@ static func _resolve_overlay(
 				damage_total += ZhandouAttr.estimate_skill_damage(
 					attacker.attrs,
 					defender.attrs,
-					power_scale,
-					_scaled_effect_value(attacker, eff),
+					_scaled_effect_value(attacker, eff, defender),
 					str(eff.get("damage_type", default_damage_type)),
 					float(eff.get("armor_pierce", 0.0)),
 				)
@@ -76,7 +74,7 @@ static func _resolve_overlay(
 	return {}
 
 
-## 与 [method ZhandouObj.use_skill] 一致：合并攻击方技能槽上的缩放与覆盖。
+## 与 [method ZhandouObj.use_skill] 一致：合并攻击方技能槽上的覆盖。
 static func _attacker_skill_cfg(attacker: ZhandouObj, skill_cfg: Dictionary, skill_id: int) -> Dictionary:
 	if skill_id <= 0 or attacker == null or skill_cfg.is_empty():
 		return skill_cfg
@@ -96,14 +94,13 @@ static func _targets_player(effect: Dictionary) -> bool:
 	)
 
 
-static func _scaled_effect_value(attacker: ZhandouObj, effect: Dictionary) -> float:
-	var value := float(effect.get("value", 0.0))
-	var scaling_v: Variant = effect.get("scaling", {})
-	if not scaling_v is Dictionary:
-		return value
-	for key in (scaling_v as Dictionary).keys():
-		value += attacker.get_attr(str(key), 0.0) * float((scaling_v as Dictionary)[key])
-	return value
+static func _scaled_effect_value(
+		attacker: ZhandouObj,
+		effect: Dictionary,
+		defender: ZhandouObj = null
+) -> float:
+	var target_attrs: Dictionary = defender.attrs if defender != null else {}
+	return ZhandouEffectCodec.resolve_runtime_effect_value(effect, attacker.attrs, target_attrs)
 
 
 static func _damage_type_from_cfg(cfg: Dictionary) -> String:

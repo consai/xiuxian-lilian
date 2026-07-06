@@ -5,10 +5,17 @@ extends RefCounted
 
 const RealmBalanceServiceScript := preload("res://scripts/sim/realm_balance_service.gd")
 
-const BODY := "body"
-const SPIRIT := "spirit"
-const SENSE := "sense"
-const AGILITY := "agility"
+const BODY := "roushen"
+const SPIRIT := "lingli"
+const SENSE := "shenshi"
+const AGILITY := "shenfa"
+
+const LEGACY_FOUNDATION_KEYS := {
+	BODY: "body",
+	SPIRIT: "spirit",
+	SENSE: "sense",
+	AGILITY: "agility",
+}
 
 const COMPREHENSION := "comprehension"
 const WILL := "will"
@@ -42,7 +49,10 @@ static func normalize_foundations(raw: Variant) -> Dictionary:
 	var out := default_foundations()
 	if raw is Dictionary:
 		for key in out.keys():
-			out[key] = maxf(0.0, _number((raw as Dictionary).get(key, out[key]), out[key]))
+			var value: Variant = (raw as Dictionary).get(key, null)
+			if value == null:
+				value = (raw as Dictionary).get(LEGACY_FOUNDATION_KEYS.get(key, ""), out[key])
+			out[key] = maxf(0.0, _number(value, out[key]))
 	return out
 
 
@@ -76,15 +86,15 @@ static func build_combat_attrs(
 		percent_modifiers: Dictionary = {}
 ) -> Dictionary:
 	var base := normalize_foundations(foundations)
-	var body := float(base[BODY])
-	var spirit := float(base[SPIRIT])
-	var sense := float(base[SENSE])
-	var agility := float(base[AGILITY])
+	var roushen := float(base[BODY])
+	var lingli := float(base[SPIRIT])
+	var shenshi := float(base[SENSE])
+	var shenfa := float(base[AGILITY])
 	var attrs := RealmBalanceServiceScript.build_base_combat_attrs({
-		BODY: body,
-		SPIRIT: spirit,
-		SENSE: sense,
-		AGILITY: agility,
+		BODY: roushen,
+		SPIRIT: lingli,
+		SENSE: shenshi,
+		AGILITY: shenfa,
 	})
 	for key in flat_modifiers.keys():
 		var stat := str(key)

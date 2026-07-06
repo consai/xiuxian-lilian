@@ -874,10 +874,6 @@ static func merged_slot_runtime_cfg(slot: Dictionary, base_cfg: Dictionary) -> D
 	for key in ["costs", "cost_text", "mp_cost"]:
 		if slot.has(key):
 			cfg[key] = slot[key]
-	if slot.has("power_scale"):
-		cfg["power"] = float(cfg.get("power", 1000.0)) * float(slot.get("power_scale", 1.0))
-	elif slot.has("power"):
-		cfg["power"] = slot["power"]
 	return cfg
 
 
@@ -971,7 +967,6 @@ func _apply_skill_effects(cfg: Dictionary, target: ZhandouObj) -> Dictionary:
 
 
 func _apply_effects_with_routing(cfg: Dictionary, default_target: ZhandouObj = null) -> Dictionary:
-	var power_scale := float(cfg.get("power", 1000.0)) / 1000.0
 	var damage_type := _damage_type_from_cfg(cfg)
 	var report := _empty_fx_report()
 	var buff_names: Array = report["buff_names"] as Array
@@ -992,8 +987,11 @@ func _apply_effects_with_routing(cfg: Dictionary, default_target: ZhandouObj = n
 			"damage":
 				if target == null:
 					continue
+				var effect_value := ZhandouEffectCodec.resolve_runtime_effect_value(
+					eff, attrs, target.attrs
+				)
 				var hit := ZhandouAttr.calc_skill_damage(
-					attrs, target.attrs, power_scale, _scaled_effect_value(eff),
+					attrs, target.attrs, effect_value,
 					str(eff.get("damage_type", damage_type)),
 					float(eff.get("armor_pierce", 0.0))
 				)
@@ -1013,15 +1011,15 @@ func _apply_effects_with_routing(cfg: Dictionary, default_target: ZhandouObj = n
 					report[ZhandouReportScript.KEY_RAW_DAMAGE]
 				)
 			"heal":
-				var heal_val := _scaled_effect_value(eff)
+				var heal_val := _scaled_effect_value(eff, target if target != null else self)
 				var heal_target := target if target != null else self
 				heal_target.change_hp(heal_val)
 				report[ZhandouReportScript.KEY_HEAL] = float(report[ZhandouReportScript.KEY_HEAL]) + heal_val
 			"shield":
 				var shield_target := target if target != null else self
-				shield_target.change_shield(_scaled_effect_value(eff))
+				shield_target.change_shield(_scaled_effect_value(eff, shield_target))
 			"restore_mp":
-				var mp_val := _scaled_effect_value(eff)
+				var mp_val := _scaled_effect_value(eff, target if target != null else self)
 				var mp_target := target if target != null else self
 				mp_target.change_mp(mp_val)
 				report[ZhandouReportScript.KEY_MP_GAIN] = float(
@@ -1044,11 +1042,15 @@ func _apply_effects_with_routing(cfg: Dictionary, default_target: ZhandouObj = n
 			"control":
 				if target == null:
 					continue
-				# 控制类效果必定命中，不再用 control_power / control_resist 做概率判定
 				var control_id := str(eff.get("id", "runtime_control"))
+				var duration := ZhandouAttr.control_duration_after_resist(
+						float(eff.get("duration", 0.5)),
+						get_attr(ZhandouAttr.CONTROL_POWER, 0.0),
+						target.get_attr(ZhandouAttr.CONTROL_RESIST, 0.0)
+				)
 				if target.add_runtime_modifier_buff(
 						control_id,
-						float(eff.get("duration", 0.5)),
+						duration,
 						{},
 						{ZhandouAttr.SPD: -0.95}
 				):
@@ -1057,14 +1059,9 @@ func _apply_effects_with_routing(cfg: Dictionary, default_target: ZhandouObj = n
 	return report
 
 
-func _scaled_effect_value(effect: Dictionary) -> float:
-	var value := float(effect.get("value", 0.0))
-	var scaling_v: Variant = effect.get("scaling", {})
-	if not scaling_v is Dictionary:
-		return value
-	for key in (scaling_v as Dictionary).keys():
-		value += get_attr(str(key), 0.0) * float((scaling_v as Dictionary)[key])
-	return value
+func _scaled_effect_value(effect: Dictionary, target: ZhandouObj = null) -> float:
+	var target_attrs: Dictionary = target.attrs if target != null else {}
+	return ZhandouEffectCodec.resolve_runtime_effect_value(effect, attrs, target_attrs)
 
 
 static func _damage_type_from_cfg(cfg: Dictionary) -> String:

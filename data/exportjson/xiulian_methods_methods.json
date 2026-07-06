@@ -4,7 +4,7 @@
     "name": "混元归一经·练气篇",
     "familyId": "method.hunyuan",
     "tier": 1,
-    "realm": "qi",
+    "realm": "lianqi",
     "quality": 3,
     "predecessorId": null,
     "nextMethodId": "method.hunyuan.2",
@@ -83,7 +83,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "qi",
+      "realm": "lianqi",
       "knowledge": []
     },
     "recommendedProgression": null,
@@ -96,7 +96,7 @@
     "name": "混元归一经·筑基篇",
     "familyId": "method.hunyuan",
     "tier": 2,
-    "realm": "foundation",
+    "realm": "zhuji",
     "quality": 3,
     "predecessorId": "method.hunyuan.1",
     "nextMethodId": "method.hunyuan.3",
@@ -159,7 +159,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "foundation",
+      "realm": "zhuji",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -175,7 +175,7 @@
     "name": "混元归一经·金丹篇",
     "familyId": "method.hunyuan",
     "tier": 3,
-    "realm": "core",
+    "realm": "jindan",
     "quality": 3,
     "predecessorId": "method.hunyuan.2",
     "nextMethodId": "method.hunyuan.4",
@@ -238,7 +238,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "core",
+      "realm": "jindan",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -254,7 +254,7 @@
     "name": "混元归一经·元婴篇",
     "familyId": "method.hunyuan",
     "tier": 4,
-    "realm": "nascent",
+    "realm": "yuanying",
     "quality": 3,
     "predecessorId": "method.hunyuan.3",
     "nextMethodId": "method.hunyuan.5",
@@ -317,7 +317,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "nascent",
+      "realm": "yuanying",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -333,7 +333,7 @@
     "name": "混元归一经·化神篇",
     "familyId": "method.hunyuan",
     "tier": 5,
-    "realm": "transform",
+    "realm": "huashen",
     "quality": 3,
     "predecessorId": "method.hunyuan.4",
     "nextMethodId": "method.hunyuan.6",
@@ -397,7 +397,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "transform",
+      "realm": "huashen",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -413,7 +413,7 @@
     "name": "混元归一经·炼虚篇",
     "familyId": "method.hunyuan",
     "tier": 6,
-    "realm": "void",
+    "realm": "lianxu",
     "quality": 3,
     "predecessorId": "method.hunyuan.5",
     "nextMethodId": "method.hunyuan.7",
@@ -425,10 +425,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "void_resistance",
+        "effectId": "lianxu_resistance",
         "base": 0.2,
         "operation": "add_percent",
-        "stackGroup": "void_resistance",
+        "stackGroup": "lianxu_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,
@@ -477,7 +477,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "void",
+      "realm": "lianxu",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -493,7 +493,7 @@
     "name": "混元归一经·合体篇",
     "familyId": "method.hunyuan",
     "tier": 7,
-    "realm": "merge",
+    "realm": "heti",
     "quality": 3,
     "predecessorId": "method.hunyuan.6",
     "nextMethodId": "method.hunyuan.8",
@@ -556,7 +556,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "merge",
+      "realm": "heti",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -572,7 +572,7 @@
     "name": "混元归一经·大乘篇",
     "familyId": "method.hunyuan",
     "tier": 8,
-    "realm": "great",
+    "realm": "dacheng",
     "quality": 3,
     "predecessorId": "method.hunyuan.7",
     "nextMethodId": "method.hunyuan.9",
@@ -636,7 +636,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "great",
+      "realm": "dacheng",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -652,7 +652,7 @@
     "name": "混元归一经·渡劫篇",
     "familyId": "method.hunyuan",
     "tier": 9,
-    "realm": "tribulation",
+    "realm": "dujie",
     "quality": 3,
     "predecessorId": "method.hunyuan.8",
     "nextMethodId": null,
@@ -664,10 +664,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "tribulation_resistance",
+        "effectId": "dujie_resistance",
         "base": 0.24,
         "operation": "add_percent",
-        "stackGroup": "tribulation_resistance",
+        "stackGroup": "dujie_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,
@@ -706,7 +706,7 @@
         "activation": "active_method",
         "cap": 2,
         "attributes": {
-          "category": "tribulation",
+          "category": "dujie",
           "target": "self",
           "polarity": "positive",
           "valueType": "ratio",
@@ -716,7 +716,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "tribulation",
+      "realm": "dujie",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -732,7 +732,7 @@
     "name": "青木长生诀·练气篇",
     "familyId": "method.changsheng",
     "tier": 1,
-    "realm": "qi",
+    "realm": "lianqi",
     "quality": 3,
     "predecessorId": null,
     "nextMethodId": "method.changsheng.2",
@@ -796,7 +796,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "qi",
+      "realm": "lianqi",
       "knowledge": []
     },
     "recommendedProgression": null,
@@ -809,7 +809,7 @@
     "name": "青木长生诀·筑基篇",
     "familyId": "method.changsheng",
     "tier": 2,
-    "realm": "foundation",
+    "realm": "zhuji",
     "quality": 3,
     "predecessorId": "method.changsheng.1",
     "nextMethodId": "method.changsheng.3",
@@ -872,7 +872,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "foundation",
+      "realm": "zhuji",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -888,7 +888,7 @@
     "name": "青木长生诀·金丹篇",
     "familyId": "method.changsheng",
     "tier": 3,
-    "realm": "core",
+    "realm": "jindan",
     "quality": 3,
     "predecessorId": "method.changsheng.2",
     "nextMethodId": "method.changsheng.4",
@@ -952,7 +952,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "core",
+      "realm": "jindan",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -968,7 +968,7 @@
     "name": "青木长生诀·元婴篇",
     "familyId": "method.changsheng",
     "tier": 4,
-    "realm": "nascent",
+    "realm": "yuanying",
     "quality": 3,
     "predecessorId": "method.changsheng.3",
     "nextMethodId": "method.changsheng.5",
@@ -1032,7 +1032,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "nascent",
+      "realm": "yuanying",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -1048,7 +1048,7 @@
     "name": "青木长生诀·化神篇",
     "familyId": "method.changsheng",
     "tier": 5,
-    "realm": "transform",
+    "realm": "huashen",
     "quality": 3,
     "predecessorId": "method.changsheng.4",
     "nextMethodId": "method.changsheng.6",
@@ -1112,7 +1112,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "transform",
+      "realm": "huashen",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -1128,7 +1128,7 @@
     "name": "青木长生诀·炼虚篇",
     "familyId": "method.changsheng",
     "tier": 6,
-    "realm": "void",
+    "realm": "lianxu",
     "quality": 3,
     "predecessorId": "method.changsheng.5",
     "nextMethodId": "method.changsheng.7",
@@ -1140,10 +1140,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "void_survival",
+        "effectId": "lianxu_survival",
         "base": 0.24,
         "operation": "add_percent",
-        "stackGroup": "void_survival",
+        "stackGroup": "lianxu_survival",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -1174,10 +1174,10 @@
         "masteryGrowth": 0.025
       },
       {
-        "effectId": "void_herb_growth",
+        "effectId": "lianxu_herb_growth",
         "base": 0.2,
         "operation": "add_percent",
-        "stackGroup": "void_herb_growth",
+        "stackGroup": "lianxu_herb_growth",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -1192,7 +1192,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "void",
+      "realm": "lianxu",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -1208,7 +1208,7 @@
     "name": "青木长生诀·合体篇",
     "familyId": "method.changsheng",
     "tier": 7,
-    "realm": "merge",
+    "realm": "heti",
     "quality": 3,
     "predecessorId": "method.changsheng.6",
     "nextMethodId": "method.changsheng.8",
@@ -1271,7 +1271,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "merge",
+      "realm": "heti",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -1287,7 +1287,7 @@
     "name": "青木长生诀·大乘篇",
     "familyId": "method.changsheng",
     "tier": 8,
-    "realm": "great",
+    "realm": "dacheng",
     "quality": 3,
     "predecessorId": "method.changsheng.7",
     "nextMethodId": "method.changsheng.9",
@@ -1351,7 +1351,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "great",
+      "realm": "dacheng",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -1367,7 +1367,7 @@
     "name": "青木长生诀·渡劫篇",
     "familyId": "method.changsheng",
     "tier": 9,
-    "realm": "tribulation",
+    "realm": "dujie",
     "quality": 3,
     "predecessorId": "method.changsheng.8",
     "nextMethodId": null,
@@ -1379,10 +1379,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "tribulation_recovery",
+        "effectId": "dujie_recovery",
         "base": 0.28,
         "operation": "add_percent",
-        "stackGroup": "tribulation_recovery",
+        "stackGroup": "dujie_recovery",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -1396,10 +1396,10 @@
         "masteryGrowth": 0.035
       },
       {
-        "effectId": "tribulation_resistance",
+        "effectId": "dujie_resistance",
         "base": 0.14,
         "operation": "add_percent",
-        "stackGroup": "tribulation_resistance",
+        "stackGroup": "dujie_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,
@@ -1431,7 +1431,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "tribulation",
+      "realm": "dujie",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -1447,7 +1447,7 @@
     "name": "太虚剑典·练气篇",
     "familyId": "method.taixu_sword",
     "tier": 1,
-    "realm": "qi",
+    "realm": "lianqi",
     "quality": 4,
     "predecessorId": null,
     "nextMethodId": "method.taixu_sword.2",
@@ -1511,7 +1511,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "qi",
+      "realm": "lianqi",
       "knowledge": []
     },
     "recommendedProgression": null,
@@ -1524,7 +1524,7 @@
     "name": "太虚剑典·筑基篇",
     "familyId": "method.taixu_sword",
     "tier": 2,
-    "realm": "foundation",
+    "realm": "zhuji",
     "quality": 4,
     "predecessorId": "method.taixu_sword.1",
     "nextMethodId": "method.taixu_sword.3",
@@ -1588,7 +1588,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "foundation",
+      "realm": "zhuji",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -1604,7 +1604,7 @@
     "name": "太虚剑典·金丹篇",
     "familyId": "method.taixu_sword",
     "tier": 3,
-    "realm": "core",
+    "realm": "jindan",
     "quality": 4,
     "predecessorId": "method.taixu_sword.2",
     "nextMethodId": "method.taixu_sword.4",
@@ -1667,7 +1667,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "core",
+      "realm": "jindan",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -1683,7 +1683,7 @@
     "name": "太虚剑典·元婴篇",
     "familyId": "method.taixu_sword",
     "tier": 4,
-    "realm": "nascent",
+    "realm": "yuanying",
     "quality": 4,
     "predecessorId": "method.taixu_sword.3",
     "nextMethodId": "method.taixu_sword.5",
@@ -1747,7 +1747,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "nascent",
+      "realm": "yuanying",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -1763,7 +1763,7 @@
     "name": "太虚剑典·化神篇",
     "familyId": "method.taixu_sword",
     "tier": 5,
-    "realm": "transform",
+    "realm": "huashen",
     "quality": 4,
     "predecessorId": "method.taixu_sword.4",
     "nextMethodId": "method.taixu_sword.6",
@@ -1827,7 +1827,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "transform",
+      "realm": "huashen",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -1843,7 +1843,7 @@
     "name": "太虚剑典·炼虚篇",
     "familyId": "method.taixu_sword",
     "tier": 6,
-    "realm": "void",
+    "realm": "lianxu",
     "quality": 4,
     "predecessorId": "method.taixu_sword.5",
     "nextMethodId": "method.taixu_sword.7",
@@ -1889,10 +1889,10 @@
         "masteryGrowth": 0.039
       },
       {
-        "effectId": "void_target_accuracy",
+        "effectId": "lianxu_target_accuracy",
         "base": 0.242,
         "operation": "add_percent",
-        "stackGroup": "void_target_accuracy",
+        "stackGroup": "lianxu_target_accuracy",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -1907,7 +1907,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "void",
+      "realm": "lianxu",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -1923,7 +1923,7 @@
     "name": "太虚剑典·合体篇",
     "familyId": "method.taixu_sword",
     "tier": 7,
-    "realm": "merge",
+    "realm": "heti",
     "quality": 4,
     "predecessorId": "method.taixu_sword.6",
     "nextMethodId": "method.taixu_sword.8",
@@ -1987,7 +1987,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "merge",
+      "realm": "heti",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -2003,7 +2003,7 @@
     "name": "太虚剑典·大乘篇",
     "familyId": "method.taixu_sword",
     "tier": 8,
-    "realm": "great",
+    "realm": "dacheng",
     "quality": 4,
     "predecessorId": "method.taixu_sword.7",
     "nextMethodId": "method.taixu_sword.9",
@@ -2067,7 +2067,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "great",
+      "realm": "dacheng",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -2083,7 +2083,7 @@
     "name": "太虚剑典·渡劫篇",
     "familyId": "method.taixu_sword",
     "tier": 9,
-    "realm": "tribulation",
+    "realm": "dujie",
     "quality": 4,
     "predecessorId": "method.taixu_sword.8",
     "nextMethodId": null,
@@ -2095,10 +2095,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "tribulation_damage",
+        "effectId": "dujie_damage",
         "base": 0.44,
         "operation": "add_percent",
-        "stackGroup": "tribulation_damage",
+        "stackGroup": "dujie_damage",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -2129,10 +2129,10 @@
         "masteryGrowth": 0.05
       },
       {
-        "effectId": "tribulation_sever",
+        "effectId": "dujie_sever",
         "base": 0.352,
         "operation": "add_percent",
-        "stackGroup": "tribulation_sever",
+        "stackGroup": "dujie_sever",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -2147,7 +2147,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "tribulation",
+      "realm": "dujie",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -2163,7 +2163,7 @@
     "name": "金刚不灭身·练气篇",
     "familyId": "method.vajra",
     "tier": 1,
-    "realm": "qi",
+    "realm": "lianqi",
     "quality": 3,
     "predecessorId": null,
     "nextMethodId": "method.vajra.2",
@@ -2226,7 +2226,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "qi",
+      "realm": "lianqi",
       "knowledge": []
     },
     "recommendedProgression": null,
@@ -2239,7 +2239,7 @@
     "name": "金刚不灭身·筑基篇",
     "familyId": "method.vajra",
     "tier": 2,
-    "realm": "foundation",
+    "realm": "zhuji",
     "quality": 3,
     "predecessorId": "method.vajra.1",
     "nextMethodId": "method.vajra.3",
@@ -2302,7 +2302,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "foundation",
+      "realm": "zhuji",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -2318,7 +2318,7 @@
     "name": "金刚不灭身·金丹篇",
     "familyId": "method.vajra",
     "tier": 3,
-    "realm": "core",
+    "realm": "jindan",
     "quality": 3,
     "predecessorId": "method.vajra.2",
     "nextMethodId": "method.vajra.4",
@@ -2381,7 +2381,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "core",
+      "realm": "jindan",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -2397,7 +2397,7 @@
     "name": "金刚不灭身·元婴篇",
     "familyId": "method.vajra",
     "tier": 4,
-    "realm": "nascent",
+    "realm": "yuanying",
     "quality": 3,
     "predecessorId": "method.vajra.3",
     "nextMethodId": "method.vajra.5",
@@ -2461,7 +2461,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "nascent",
+      "realm": "yuanying",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -2477,7 +2477,7 @@
     "name": "金刚不灭身·化神篇",
     "familyId": "method.vajra",
     "tier": 5,
-    "realm": "transform",
+    "realm": "huashen",
     "quality": 3,
     "predecessorId": "method.vajra.4",
     "nextMethodId": "method.vajra.6",
@@ -2540,7 +2540,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "transform",
+      "realm": "huashen",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -2556,7 +2556,7 @@
     "name": "金刚不灭身·炼虚篇",
     "familyId": "method.vajra",
     "tier": 6,
-    "realm": "void",
+    "realm": "lianxu",
     "quality": 3,
     "predecessorId": "method.vajra.5",
     "nextMethodId": "method.vajra.7",
@@ -2568,10 +2568,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "void_resistance",
+        "effectId": "lianxu_resistance",
         "base": 0.3,
         "operation": "add_percent",
-        "stackGroup": "void_resistance",
+        "stackGroup": "lianxu_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,
@@ -2601,10 +2601,10 @@
         "masteryGrowth": 110
       },
       {
-        "effectId": "void_mobility",
+        "effectId": "lianxu_mobility",
         "base": 0.2,
         "operation": "add_percent",
-        "stackGroup": "void_mobility",
+        "stackGroup": "lianxu_mobility",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -2619,7 +2619,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "void",
+      "realm": "lianxu",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -2635,7 +2635,7 @@
     "name": "金刚不灭身·合体篇",
     "familyId": "method.vajra",
     "tier": 7,
-    "realm": "merge",
+    "realm": "heti",
     "quality": 3,
     "predecessorId": "method.vajra.6",
     "nextMethodId": "method.vajra.8",
@@ -2699,7 +2699,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "merge",
+      "realm": "heti",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -2715,7 +2715,7 @@
     "name": "金刚不灭身·大乘篇",
     "familyId": "method.vajra",
     "tier": 8,
-    "realm": "great",
+    "realm": "dacheng",
     "quality": 3,
     "predecessorId": "method.vajra.7",
     "nextMethodId": "method.vajra.9",
@@ -2778,7 +2778,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "great",
+      "realm": "dacheng",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -2794,7 +2794,7 @@
     "name": "金刚不灭身·渡劫篇",
     "familyId": "method.vajra",
     "tier": 9,
-    "realm": "tribulation",
+    "realm": "dujie",
     "quality": 3,
     "predecessorId": "method.vajra.8",
     "nextMethodId": null,
@@ -2806,10 +2806,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "tribulation_resistance",
+        "effectId": "dujie_resistance",
         "base": 0.4,
         "operation": "add_percent",
-        "stackGroup": "tribulation_resistance",
+        "stackGroup": "dujie_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,
@@ -2840,15 +2840,15 @@
         "masteryGrowth": 0.035
       },
       {
-        "effectId": "tribulation_energy_absorption",
+        "effectId": "dujie_energy_absorption",
         "base": 0.3,
         "operation": "add_percent",
-        "stackGroup": "tribulation_energy_absorption",
+        "stackGroup": "dujie_energy_absorption",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
         "attributes": {
-          "category": "tribulation",
+          "category": "dujie",
           "target": "self",
           "polarity": "positive",
           "valueType": "ratio",
@@ -2858,7 +2858,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "tribulation",
+      "realm": "dujie",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -2874,7 +2874,7 @@
     "name": "太阴炼神录·练气篇",
     "familyId": "method.taiyin",
     "tier": 1,
-    "realm": "qi",
+    "realm": "lianqi",
     "quality": 4,
     "predecessorId": null,
     "nextMethodId": "method.taiyin.2",
@@ -2938,7 +2938,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "qi",
+      "realm": "lianqi",
       "knowledge": []
     },
     "recommendedProgression": null,
@@ -2951,7 +2951,7 @@
     "name": "太阴炼神录·筑基篇",
     "familyId": "method.taiyin",
     "tier": 2,
-    "realm": "foundation",
+    "realm": "zhuji",
     "quality": 4,
     "predecessorId": "method.taiyin.1",
     "nextMethodId": "method.taiyin.3",
@@ -3015,7 +3015,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "foundation",
+      "realm": "zhuji",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -3031,7 +3031,7 @@
     "name": "太阴炼神录·金丹篇",
     "familyId": "method.taiyin",
     "tier": 3,
-    "realm": "core",
+    "realm": "jindan",
     "quality": 4,
     "predecessorId": "method.taiyin.2",
     "nextMethodId": "method.taiyin.4",
@@ -3095,7 +3095,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "core",
+      "realm": "jindan",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -3111,7 +3111,7 @@
     "name": "太阴炼神录·元婴篇",
     "familyId": "method.taiyin",
     "tier": 4,
-    "realm": "nascent",
+    "realm": "yuanying",
     "quality": 4,
     "predecessorId": "method.taiyin.3",
     "nextMethodId": "method.taiyin.5",
@@ -3174,7 +3174,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "nascent",
+      "realm": "yuanying",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -3190,7 +3190,7 @@
     "name": "太阴炼神录·化神篇",
     "familyId": "method.taiyin",
     "tier": 5,
-    "realm": "transform",
+    "realm": "huashen",
     "quality": 4,
     "predecessorId": "method.taiyin.4",
     "nextMethodId": "method.taiyin.6",
@@ -3254,7 +3254,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "transform",
+      "realm": "huashen",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -3270,7 +3270,7 @@
     "name": "太阴炼神录·炼虚篇",
     "familyId": "method.taiyin",
     "tier": 6,
-    "realm": "void",
+    "realm": "lianxu",
     "quality": 4,
     "predecessorId": "method.taiyin.5",
     "nextMethodId": "method.taiyin.7",
@@ -3334,7 +3334,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "void",
+      "realm": "lianxu",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -3350,7 +3350,7 @@
     "name": "太阴炼神录·合体篇",
     "familyId": "method.taiyin",
     "tier": 7,
-    "realm": "merge",
+    "realm": "heti",
     "quality": 4,
     "predecessorId": "method.taiyin.6",
     "nextMethodId": "method.taiyin.8",
@@ -3404,7 +3404,7 @@
         "activation": "active_method",
         "cap": 2,
         "attributes": {
-          "category": "tribulation",
+          "category": "dujie",
           "target": "self",
           "polarity": "positive",
           "valueType": "ratio",
@@ -3414,7 +3414,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "merge",
+      "realm": "heti",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -3430,7 +3430,7 @@
     "name": "太阴炼神录·大乘篇",
     "familyId": "method.taiyin",
     "tier": 8,
-    "realm": "great",
+    "realm": "dacheng",
     "quality": 4,
     "predecessorId": "method.taiyin.7",
     "nextMethodId": "method.taiyin.9",
@@ -3494,7 +3494,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "great",
+      "realm": "dacheng",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -3510,7 +3510,7 @@
     "name": "太阴炼神录·渡劫篇",
     "familyId": "method.taiyin",
     "tier": 9,
-    "realm": "tribulation",
+    "realm": "dujie",
     "quality": 4,
     "predecessorId": "method.taiyin.8",
     "nextMethodId": null,
@@ -3539,10 +3539,10 @@
         "masteryGrowth": 0.055
       },
       {
-        "effectId": "tribulation_control",
+        "effectId": "dujie_control",
         "base": 0.242,
         "operation": "add_percent",
-        "stackGroup": "tribulation_control",
+        "stackGroup": "dujie_control",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -3564,7 +3564,7 @@
         "activation": "active_method",
         "cap": 2,
         "attributes": {
-          "category": "tribulation",
+          "category": "dujie",
           "target": "self",
           "polarity": "positive",
           "valueType": "ratio",
@@ -3574,7 +3574,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "tribulation",
+      "realm": "dujie",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -3590,7 +3590,7 @@
     "name": "赤霄雷火典·练气篇",
     "familyId": "method.leihuo",
     "tier": 1,
-    "realm": "qi",
+    "realm": "lianqi",
     "quality": 4,
     "predecessorId": null,
     "nextMethodId": "method.leihuo.2",
@@ -3654,7 +3654,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "qi",
+      "realm": "lianqi",
       "knowledge": []
     },
     "recommendedProgression": null,
@@ -3667,7 +3667,7 @@
     "name": "赤霄雷火典·筑基篇",
     "familyId": "method.leihuo",
     "tier": 2,
-    "realm": "foundation",
+    "realm": "zhuji",
     "quality": 4,
     "predecessorId": "method.leihuo.1",
     "nextMethodId": "method.leihuo.3",
@@ -3731,7 +3731,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "foundation",
+      "realm": "zhuji",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -3747,7 +3747,7 @@
     "name": "赤霄雷火典·金丹篇",
     "familyId": "method.leihuo",
     "tier": 3,
-    "realm": "core",
+    "realm": "jindan",
     "quality": 4,
     "predecessorId": "method.leihuo.2",
     "nextMethodId": "method.leihuo.4",
@@ -3810,7 +3810,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "core",
+      "realm": "jindan",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -3826,7 +3826,7 @@
     "name": "赤霄雷火典·元婴篇",
     "familyId": "method.leihuo",
     "tier": 4,
-    "realm": "nascent",
+    "realm": "yuanying",
     "quality": 4,
     "predecessorId": "method.leihuo.3",
     "nextMethodId": "method.leihuo.5",
@@ -3890,7 +3890,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "nascent",
+      "realm": "yuanying",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -3906,7 +3906,7 @@
     "name": "赤霄雷火典·化神篇",
     "familyId": "method.leihuo",
     "tier": 5,
-    "realm": "transform",
+    "realm": "huashen",
     "quality": 4,
     "predecessorId": "method.leihuo.4",
     "nextMethodId": "method.leihuo.6",
@@ -3970,7 +3970,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "transform",
+      "realm": "huashen",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -3986,7 +3986,7 @@
     "name": "赤霄雷火典·炼虚篇",
     "familyId": "method.leihuo",
     "tier": 6,
-    "realm": "void",
+    "realm": "lianxu",
     "quality": 4,
     "predecessorId": "method.leihuo.5",
     "nextMethodId": "method.leihuo.7",
@@ -4032,10 +4032,10 @@
         "masteryGrowth": 0.05
       },
       {
-        "effectId": "void_spell_accuracy",
+        "effectId": "lianxu_spell_accuracy",
         "base": 0.242,
         "operation": "add_percent",
-        "stackGroup": "void_spell_accuracy",
+        "stackGroup": "lianxu_spell_accuracy",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -4050,7 +4050,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "void",
+      "realm": "lianxu",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -4066,7 +4066,7 @@
     "name": "赤霄雷火典·合体篇",
     "familyId": "method.leihuo",
     "tier": 7,
-    "realm": "merge",
+    "realm": "heti",
     "quality": 4,
     "predecessorId": "method.leihuo.6",
     "nextMethodId": "method.leihuo.8",
@@ -4086,7 +4086,7 @@
         "activation": "active_method",
         "cap": 2,
         "attributes": {
-          "category": "tribulation",
+          "category": "dujie",
           "target": "self",
           "polarity": "positive",
           "valueType": "ratio",
@@ -4120,7 +4120,7 @@
         "activation": "active_method",
         "cap": 2,
         "attributes": {
-          "category": "tribulation",
+          "category": "dujie",
           "target": "self",
           "polarity": "positive",
           "valueType": "ratio",
@@ -4130,7 +4130,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "merge",
+      "realm": "heti",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -4146,7 +4146,7 @@
     "name": "赤霄雷火典·大乘篇",
     "familyId": "method.leihuo",
     "tier": 8,
-    "realm": "great",
+    "realm": "dacheng",
     "quality": 4,
     "predecessorId": "method.leihuo.7",
     "nextMethodId": "method.leihuo.9",
@@ -4210,7 +4210,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "great",
+      "realm": "dacheng",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -4226,7 +4226,7 @@
     "name": "赤霄雷火典·渡劫篇",
     "familyId": "method.leihuo",
     "tier": 9,
-    "realm": "tribulation",
+    "realm": "dujie",
     "quality": 4,
     "predecessorId": "method.leihuo.8",
     "nextMethodId": null,
@@ -4238,10 +4238,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "tribulation_damage",
+        "effectId": "dujie_damage",
         "base": 0.605,
         "operation": "add_percent",
-        "stackGroup": "tribulation_damage",
+        "stackGroup": "dujie_damage",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -4255,10 +4255,10 @@
         "masteryGrowth": 0.061
       },
       {
-        "effectId": "tribulation_resistance",
+        "effectId": "dujie_resistance",
         "base": 0.22,
         "operation": "add_percent",
-        "stackGroup": "tribulation_resistance",
+        "stackGroup": "dujie_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,
@@ -4272,15 +4272,15 @@
         "masteryGrowth": 0.033
       },
       {
-        "effectId": "tribulation_energy_absorption",
+        "effectId": "dujie_energy_absorption",
         "base": 0.33,
         "operation": "add_percent",
-        "stackGroup": "tribulation_energy_absorption",
+        "stackGroup": "dujie_energy_absorption",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
         "attributes": {
-          "category": "tribulation",
+          "category": "dujie",
           "target": "self",
           "polarity": "positive",
           "valueType": "ratio",
@@ -4290,7 +4290,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "tribulation",
+      "realm": "dujie",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -4306,7 +4306,7 @@
     "name": "周天阵器录·练气篇",
     "familyId": "method.zhoutian_craft",
     "tier": 1,
-    "realm": "qi",
+    "realm": "lianqi",
     "quality": 3,
     "predecessorId": null,
     "nextMethodId": "method.zhoutian_craft.2",
@@ -4370,7 +4370,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "qi",
+      "realm": "lianqi",
       "knowledge": []
     },
     "recommendedProgression": null,
@@ -4383,7 +4383,7 @@
     "name": "周天阵器录·筑基篇",
     "familyId": "method.zhoutian_craft",
     "tier": 2,
-    "realm": "foundation",
+    "realm": "zhuji",
     "quality": 3,
     "predecessorId": "method.zhoutian_craft.1",
     "nextMethodId": "method.zhoutian_craft.3",
@@ -4447,7 +4447,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "foundation",
+      "realm": "zhuji",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -4463,7 +4463,7 @@
     "name": "周天阵器录·金丹篇",
     "familyId": "method.zhoutian_craft",
     "tier": 3,
-    "realm": "core",
+    "realm": "jindan",
     "quality": 3,
     "predecessorId": "method.zhoutian_craft.2",
     "nextMethodId": "method.zhoutian_craft.4",
@@ -4526,7 +4526,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "core",
+      "realm": "jindan",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -4542,7 +4542,7 @@
     "name": "周天阵器录·元婴篇",
     "familyId": "method.zhoutian_craft",
     "tier": 4,
-    "realm": "nascent",
+    "realm": "yuanying",
     "quality": 3,
     "predecessorId": "method.zhoutian_craft.3",
     "nextMethodId": "method.zhoutian_craft.5",
@@ -4606,7 +4606,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "nascent",
+      "realm": "yuanying",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -4622,7 +4622,7 @@
     "name": "周天阵器录·化神篇",
     "familyId": "method.zhoutian_craft",
     "tier": 5,
-    "realm": "transform",
+    "realm": "huashen",
     "quality": 3,
     "predecessorId": "method.zhoutian_craft.4",
     "nextMethodId": "method.zhoutian_craft.6",
@@ -4686,7 +4686,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "transform",
+      "realm": "huashen",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -4702,7 +4702,7 @@
     "name": "周天阵器录·炼虚篇",
     "familyId": "method.zhoutian_craft",
     "tier": 6,
-    "realm": "void",
+    "realm": "lianxu",
     "quality": 3,
     "predecessorId": "method.zhoutian_craft.5",
     "nextMethodId": "method.zhoutian_craft.7",
@@ -4748,10 +4748,10 @@
         "masteryGrowth": 0.035
       },
       {
-        "effectId": "void_ship_range",
+        "effectId": "lianxu_ship_range",
         "base": 0.22,
         "operation": "add_percent",
-        "stackGroup": "void_ship_range",
+        "stackGroup": "lianxu_ship_range",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -4766,7 +4766,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "void",
+      "realm": "lianxu",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -4782,7 +4782,7 @@
     "name": "周天阵器录·合体篇",
     "familyId": "method.zhoutian_craft",
     "tier": 7,
-    "realm": "merge",
+    "realm": "heti",
     "quality": 3,
     "predecessorId": "method.zhoutian_craft.6",
     "nextMethodId": "method.zhoutian_craft.8",
@@ -4846,7 +4846,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "merge",
+      "realm": "heti",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -4862,7 +4862,7 @@
     "name": "周天阵器录·大乘篇",
     "familyId": "method.zhoutian_craft",
     "tier": 8,
-    "realm": "great",
+    "realm": "dacheng",
     "quality": 3,
     "predecessorId": "method.zhoutian_craft.7",
     "nextMethodId": "method.zhoutian_craft.9",
@@ -4926,7 +4926,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "great",
+      "realm": "dacheng",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -4942,7 +4942,7 @@
     "name": "周天阵器录·渡劫篇",
     "familyId": "method.zhoutian_craft",
     "tier": 9,
-    "realm": "tribulation",
+    "realm": "dujie",
     "quality": 3,
     "predecessorId": "method.zhoutian_craft.8",
     "nextMethodId": null,
@@ -4971,10 +4971,10 @@
         "masteryGrowth": 0.055
       },
       {
-        "effectId": "tribulation_control",
+        "effectId": "dujie_control",
         "base": 0.36,
         "operation": "add_percent",
-        "stackGroup": "tribulation_control",
+        "stackGroup": "dujie_control",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -5006,7 +5006,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "tribulation",
+      "realm": "dujie",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -5022,7 +5022,7 @@
     "name": "万象御灵经·练气篇",
     "familyId": "method.wanxiang",
     "tier": 1,
-    "realm": "qi",
+    "realm": "lianqi",
     "quality": 2,
     "predecessorId": null,
     "nextMethodId": "method.wanxiang.2",
@@ -5086,7 +5086,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "qi",
+      "realm": "lianqi",
       "knowledge": []
     },
     "recommendedProgression": null,
@@ -5099,7 +5099,7 @@
     "name": "万象御灵经·筑基篇",
     "familyId": "method.wanxiang",
     "tier": 2,
-    "realm": "foundation",
+    "realm": "zhuji",
     "quality": 2,
     "predecessorId": "method.wanxiang.1",
     "nextMethodId": "method.wanxiang.3",
@@ -5162,7 +5162,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "foundation",
+      "realm": "zhuji",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -5178,7 +5178,7 @@
     "name": "万象御灵经·金丹篇",
     "familyId": "method.wanxiang",
     "tier": 3,
-    "realm": "core",
+    "realm": "jindan",
     "quality": 2,
     "predecessorId": "method.wanxiang.2",
     "nextMethodId": "method.wanxiang.4",
@@ -5242,7 +5242,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "core",
+      "realm": "jindan",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -5258,7 +5258,7 @@
     "name": "万象御灵经·元婴篇",
     "familyId": "method.wanxiang",
     "tier": 4,
-    "realm": "nascent",
+    "realm": "yuanying",
     "quality": 2,
     "predecessorId": "method.wanxiang.3",
     "nextMethodId": "method.wanxiang.5",
@@ -5322,7 +5322,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "nascent",
+      "realm": "yuanying",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -5338,7 +5338,7 @@
     "name": "万象御灵经·化神篇",
     "familyId": "method.wanxiang",
     "tier": 5,
-    "realm": "transform",
+    "realm": "huashen",
     "quality": 2,
     "predecessorId": "method.wanxiang.4",
     "nextMethodId": "method.wanxiang.6",
@@ -5402,7 +5402,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "transform",
+      "realm": "huashen",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -5418,7 +5418,7 @@
     "name": "万象御灵经·炼虚篇",
     "familyId": "method.wanxiang",
     "tier": 6,
-    "realm": "void",
+    "realm": "lianxu",
     "quality": 2,
     "predecessorId": "method.wanxiang.5",
     "nextMethodId": "method.wanxiang.7",
@@ -5430,10 +5430,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "void_survival",
+        "effectId": "lianxu_survival",
         "base": 0.313,
         "operation": "add_percent",
-        "stackGroup": "void_survival",
+        "stackGroup": "lianxu_survival",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -5464,10 +5464,10 @@
         "masteryGrowth": 0.023
       },
       {
-        "effectId": "void_route_safety",
+        "effectId": "lianxu_route_safety",
         "base": 0.202,
         "operation": "add_percent",
-        "stackGroup": "void_route_safety",
+        "stackGroup": "lianxu_route_safety",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -5482,7 +5482,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "void",
+      "realm": "lianxu",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -5498,7 +5498,7 @@
     "name": "万象御灵经·合体篇",
     "familyId": "method.wanxiang",
     "tier": 7,
-    "realm": "merge",
+    "realm": "heti",
     "quality": 2,
     "predecessorId": "method.wanxiang.6",
     "nextMethodId": "method.wanxiang.8",
@@ -5562,7 +5562,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "merge",
+      "realm": "heti",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -5578,7 +5578,7 @@
     "name": "万象御灵经·大乘篇",
     "familyId": "method.wanxiang",
     "tier": 8,
-    "realm": "great",
+    "realm": "dacheng",
     "quality": 2,
     "predecessorId": "method.wanxiang.7",
     "nextMethodId": "method.wanxiang.9",
@@ -5642,7 +5642,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "great",
+      "realm": "dacheng",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -5658,7 +5658,7 @@
     "name": "万象御灵经·渡劫篇",
     "familyId": "method.wanxiang",
     "tier": 9,
-    "realm": "tribulation",
+    "realm": "dujie",
     "quality": 2,
     "predecessorId": "method.wanxiang.8",
     "nextMethodId": null,
@@ -5721,7 +5721,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "tribulation",
+      "realm": "dujie",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -5737,7 +5737,7 @@
     "name": "九劫飞升录·化神篇",
     "familyId": "method.jiuji",
     "tier": 5,
-    "realm": "transform",
+    "realm": "huashen",
     "quality": 4,
     "predecessorId": null,
     "nextMethodId": "method.jiuji.2",
@@ -5749,15 +5749,15 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "tribulation_forecast",
+        "effectId": "dujie_forecast",
         "base": 0.198,
         "operation": "add_percent",
-        "stackGroup": "tribulation_forecast",
+        "stackGroup": "dujie_forecast",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
         "attributes": {
-          "category": "tribulation",
+          "category": "dujie",
           "target": "self",
           "polarity": "positive",
           "valueType": "ratio",
@@ -5783,10 +5783,10 @@
         "masteryGrowth": 0.024
       },
       {
-        "effectId": "tribulation_warning_time",
+        "effectId": "dujie_warning_time",
         "base": 0.198,
         "operation": "add_percent",
-        "stackGroup": "tribulation_warning_time",
+        "stackGroup": "dujie_warning_time",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -5801,7 +5801,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "transform",
+      "realm": "huashen",
       "knowledge": []
     },
     "recommendedProgression": null,
@@ -5814,7 +5814,7 @@
     "name": "九劫飞升录·炼虚篇",
     "familyId": "method.jiuji",
     "tier": 6,
-    "realm": "void",
+    "realm": "lianxu",
     "quality": 4,
     "predecessorId": "method.jiuji.1",
     "nextMethodId": "method.jiuji.3",
@@ -5843,15 +5843,15 @@
         "masteryGrowth": 0.033
       },
       {
-        "effectId": "tribulation_forecast",
+        "effectId": "dujie_forecast",
         "base": 0.308,
         "operation": "add_percent",
-        "stackGroup": "tribulation_forecast",
+        "stackGroup": "dujie_forecast",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
         "attributes": {
-          "category": "tribulation",
+          "category": "dujie",
           "target": "self",
           "polarity": "positive",
           "valueType": "ratio",
@@ -5868,7 +5868,7 @@
         "activation": "active_method",
         "cap": 2,
         "attributes": {
-          "category": "tribulation",
+          "category": "dujie",
           "target": "self",
           "polarity": "positive",
           "valueType": "ratio",
@@ -5878,7 +5878,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "void",
+      "realm": "lianxu",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -5894,7 +5894,7 @@
     "name": "九劫飞升录·合体篇",
     "familyId": "method.jiuji",
     "tier": 7,
-    "realm": "merge",
+    "realm": "heti",
     "quality": 4,
     "predecessorId": "method.jiuji.2",
     "nextMethodId": "method.jiuji.4",
@@ -5923,10 +5923,10 @@
         "masteryGrowth": 0.044
       },
       {
-        "effectId": "tribulation_control",
+        "effectId": "dujie_control",
         "base": 0.198,
         "operation": "add_percent",
-        "stackGroup": "tribulation_control",
+        "stackGroup": "dujie_control",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -5940,14 +5940,14 @@
         "masteryGrowth": 0.031
       },
       {
-        "effectId": "tribulation_plan_slots",
+        "effectId": "dujie_plan_slots",
         "base": 1.1,
         "operation": "add_flat",
-        "stackGroup": "tribulation_plan_slots",
+        "stackGroup": "dujie_plan_slots",
         "stackPolicy": "highest",
         "activation": "active_method",
         "attributes": {
-          "category": "tribulation",
+          "category": "dujie",
           "target": "self",
           "polarity": "positive",
           "valueType": "flat",
@@ -5957,7 +5957,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "merge",
+      "realm": "heti",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -5973,7 +5973,7 @@
     "name": "九劫飞升录·大乘篇",
     "familyId": "method.jiuji",
     "tier": 8,
-    "realm": "great",
+    "realm": "dacheng",
     "quality": 4,
     "predecessorId": "method.jiuji.3",
     "nextMethodId": "method.jiuji.5",
@@ -5985,10 +5985,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "tribulation_resistance",
+        "effectId": "dujie_resistance",
         "base": 0.352,
         "operation": "add_percent",
-        "stackGroup": "tribulation_resistance",
+        "stackGroup": "dujie_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,
@@ -6019,15 +6019,15 @@
         "masteryGrowth": 0.044
       },
       {
-        "effectId": "tribulation_resource_efficiency",
+        "effectId": "dujie_resource_efficiency",
         "base": 0.308,
         "operation": "add_percent",
-        "stackGroup": "tribulation_resource_efficiency",
+        "stackGroup": "dujie_resource_efficiency",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
         "attributes": {
-          "category": "tribulation",
+          "category": "dujie",
           "target": "self",
           "polarity": "positive",
           "valueType": "ratio",
@@ -6037,7 +6037,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "great",
+      "realm": "dacheng",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -6053,7 +6053,7 @@
     "name": "九劫飞升录·渡劫篇",
     "familyId": "method.jiuji",
     "tier": 9,
-    "realm": "tribulation",
+    "realm": "dujie",
     "quality": 4,
     "predecessorId": "method.jiuji.4",
     "nextMethodId": null,
@@ -6065,10 +6065,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "tribulation_resistance",
+        "effectId": "dujie_resistance",
         "base": 0.55,
         "operation": "add_percent",
-        "stackGroup": "tribulation_resistance",
+        "stackGroup": "dujie_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,
@@ -6090,7 +6090,7 @@
         "activation": "active_method",
         "cap": 0.75,
         "attributes": {
-          "category": "tribulation",
+          "category": "dujie",
           "target": "self",
           "polarity": "positive",
           "valueType": "ratio",
@@ -6107,7 +6107,7 @@
         "activation": "active_method",
         "cap": 2,
         "attributes": {
-          "category": "tribulation",
+          "category": "dujie",
           "target": "self",
           "polarity": "positive",
           "valueType": "ratio",
@@ -6117,7 +6117,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "tribulation",
+      "realm": "dujie",
       "knowledge": []
     },
     "recommendedProgression": {
@@ -6133,7 +6133,7 @@
     "name": "燃血断脉术",
     "familyId": "method.blood_burst",
     "tier": 3,
-    "realm": "core",
+    "realm": "jindan",
     "quality": 2,
     "predecessorId": null,
     "nextMethodId": null,
@@ -6197,7 +6197,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "core",
+      "realm": "jindan",
       "knowledge": []
     },
     "recommendedProgression": null,
@@ -6210,7 +6210,7 @@
     "name": "浮光掠影诀",
     "familyId": "method.escape_art",
     "tier": 2,
-    "realm": "foundation",
+    "realm": "zhuji",
     "quality": 2,
     "predecessorId": null,
     "nextMethodId": null,
@@ -6257,7 +6257,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "foundation",
+      "realm": "zhuji",
       "knowledge": []
     },
     "recommendedProgression": null,
@@ -6270,7 +6270,7 @@
     "name": "百毒真经",
     "familyId": "method.poison_codex",
     "tier": 3,
-    "realm": "core",
+    "realm": "jindan",
     "quality": 2,
     "predecessorId": null,
     "nextMethodId": null,
@@ -6334,7 +6334,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "core",
+      "realm": "jindan",
       "knowledge": []
     },
     "recommendedProgression": null,
@@ -6347,7 +6347,7 @@
     "name": "望气寻机篇",
     "familyId": "method.fate_gaze",
     "tier": 2,
-    "realm": "foundation",
+    "realm": "zhuji",
     "quality": 2,
     "predecessorId": null,
     "nextMethodId": null,
@@ -6411,7 +6411,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "foundation",
+      "realm": "zhuji",
       "knowledge": []
     },
     "recommendedProgression": null,
@@ -6424,7 +6424,7 @@
     "name": "万符归藏录",
     "familyId": "method.talisman_archive",
     "tier": 3,
-    "realm": "core",
+    "realm": "jindan",
     "quality": 2,
     "predecessorId": null,
     "nextMethodId": null,
@@ -6488,7 +6488,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "core",
+      "realm": "jindan",
       "knowledge": []
     },
     "recommendedProgression": null,
@@ -6501,7 +6501,7 @@
     "name": "无锋重剑诀",
     "familyId": "method.heavy_sword",
     "tier": 2,
-    "realm": "foundation",
+    "realm": "zhuji",
     "quality": 2,
     "predecessorId": null,
     "nextMethodId": null,
@@ -6565,7 +6565,7 @@
       }
     ],
     "learningRequirements": {
-      "realm": "foundation",
+      "realm": "zhuji",
       "knowledge": []
     },
     "recommendedProgression": null,

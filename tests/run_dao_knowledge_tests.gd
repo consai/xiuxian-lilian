@@ -31,44 +31,44 @@ func _run(name: String, callable: Callable) -> int:
 
 func _test_prereqs() -> void:
 	var savedata := {"knowledge": {}}
-	KnowledgeServiceScript.grant_level(savedata, "foundation.breathing", 3)
-	var ok := DaoTreeServiceScript.prereqs_met("foundation.control", KnowledgeServiceScript.effective_levels_map(savedata))
+	KnowledgeServiceScript.grant_level(savedata, "zhuji.breathing", 3)
+	var ok := DaoTreeServiceScript.prereqs_met("zhuji.control", KnowledgeServiceScript.effective_levels_map(savedata))
 	if not ok:
-		push_error("foundation.control prereqs should pass with breathing III")
+		push_error("zhuji.control prereqs should pass with breathing III")
 
 
 func _test_apply_xp() -> void:
 	var savedata := {"knowledge": {}}
-	var result := KnowledgeServiceScript.apply_xp(savedata, "foundation.breathing", 500.0, "test")
+	var result := KnowledgeServiceScript.apply_xp(savedata, "zhuji.breathing", 500.0, "test")
 	if int(result.get("levels_gained", 0)) <= 0:
-		push_error("apply_xp should level up foundation.breathing")
+		push_error("apply_xp should level up zhuji.breathing")
 
 
 func _test_self_study() -> void:
 	var savedata := {
 		"knowledge": {},
-		"foundations": {"body": 16, "spirit": 16, "sense": 14, "agility": 14},
+		"foundations": {"roushen": 16, "lingli": 16, "shenshi": 14, "shenfa": 14},
 		"aptitudes": {"comprehension": 12, "fortune": 10},
 	}
-	var result := KnowledgeStudyServiceScript.apply_study(savedata, "foundation.breathing", 30, "qi")
+	var result := KnowledgeStudyServiceScript.apply_study(savedata, "zhuji.breathing", 30, "lianqi")
 	if float(result.get("xp", 0.0)) <= 0.0:
 		push_error("self study should apply knowledge xp")
-	KnowledgeServiceScript.grant_level(savedata, "foundation.breathing", 3)
-	result = KnowledgeStudyServiceScript.apply_study(savedata, "foundation.breathing", 1000, "qi")
-	if KnowledgeServiceScript.effective_level(savedata, "foundation.breathing") <= 3.0:
+	KnowledgeServiceScript.grant_level(savedata, "zhuji.breathing", 3)
+	result = KnowledgeStudyServiceScript.apply_study(savedata, "zhuji.breathing", 1000, "lianqi")
+	if KnowledgeServiceScript.effective_level(savedata, "zhuji.breathing") <= 3.0:
 		push_error("self study should not be capped at default max level III")
 	var slow := {
 		"knowledge": {},
-		"foundations": {"body": 10, "spirit": 10, "sense": 10, "agility": 10},
+		"foundations": {"roushen": 10, "lingli": 10, "shenshi": 10, "shenfa": 10},
 		"aptitudes": {"comprehension": 8, "will": 8, "fortune": 8},
 	}
 	var fast := {
 		"knowledge": {},
-		"foundations": {"body": 10, "spirit": 10, "sense": 10, "agility": 10},
+		"foundations": {"roushen": 10, "lingli": 10, "shenshi": 10, "shenfa": 10},
 		"aptitudes": {"comprehension": 20, "will": 20, "fortune": 8},
 	}
-	var slow_preview := KnowledgeStudyServiceScript.preview(slow, "foundation.breathing", 10, "qi")
-	var fast_preview := KnowledgeStudyServiceScript.preview(fast, "foundation.breathing", 10, "qi")
+	var slow_preview := KnowledgeStudyServiceScript.preview(slow, "zhuji.breathing", 10, "lianqi")
+	var fast_preview := KnowledgeStudyServiceScript.preview(fast, "zhuji.breathing", 10, "lianqi")
 	if float(fast_preview.get("xp", 0.0)) <= float(slow_preview.get("xp", 0.0)):
 		push_error("higher learning attributes should increase self-study training points")
 
@@ -92,7 +92,7 @@ func _test_ability_learn() -> void:
 		"method_mastery": {},
 		"cultivation_method_slots": {"main": "method.hunyuan.1"},
 	}
-	var ok := AbilityServiceScript.can_learn("ability.combat.qi_bolt", savedata, "qi")
+	var ok := AbilityServiceScript.can_learn("ability.combat.qi_bolt", savedata, "lianqi")
 	if not ok:
 		push_error("ability.combat.qi_bolt should be learnable without knowledge gates")
 
@@ -131,7 +131,7 @@ func _test_pm204_starter_pool() -> void:
 			push_error("%s should exist in starter pool" % ability_id)
 			continue
 		if AbilityService.ability_tier(row) != 1:
-			push_error("%s should stay in qi tier 1 starter scope" % ability_id)
+			push_error("%s should stay in lianqi tier 1 starter scope" % ability_id)
 		var runtime := AbilityServiceScript.to_runtime_dict(ability_id, {"knowledge": {}})
 		for effect_v in runtime.get("effects", []) as Array:
 			if not effect_v is Dictionary:
@@ -142,7 +142,7 @@ func _test_pm204_starter_pool() -> void:
 			if str(effect.get("target", "")) == EnumZhandouTarget.LABEL_SELF:
 				has_defense = true
 	var full_knowledge := {"knowledge": {}}
-	for skill_id in ["spell.projectile", "foundation.control"]:
+	for skill_id in ["spell.projectile", "zhuji.control"]:
 		KnowledgeServiceScript.grant_level(full_knowledge, skill_id, 5)
 	var base := AbilityServiceScript.to_runtime_dict("ability.combat.qi_bolt", {"knowledge": {}})
 	var grown := AbilityServiceScript.to_runtime_dict("ability.combat.qi_bolt", full_knowledge)

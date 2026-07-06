@@ -1,152 +1,542 @@
 {
-  "lianqi_1": {
-    "key": "lianqi_1",
-    "id": "lianqi_1",
-    "name": "练气初期",
+  "1": {
+    "level": 1,
+    "name": "炼气一层",
+    "realm": "lianqi",
     "xiuwei": 300
   },
-  "lianqi_2": {
-    "key": "lianqi_2",
-    "id": "lianqi_2",
-    "name": "练气中期",
+  "2": {
+    "level": 2,
+    "name": "炼气二层",
+    "realm": "lianqi",
+    "xiuwei": 467
+  },
+  "3": {
+    "level": 3,
+    "name": "炼气三层",
+    "realm": "lianqi",
+    "xiuwei": 633
+  },
+  "4": {
+    "level": 4,
+    "name": "炼气四层",
+    "realm": "lianqi",
     "xiuwei": 800
   },
-  "lianqi_3": {
-    "key": "lianqi_3",
-    "id": "lianqi_3",
-    "name": "练气后期",
+  "5": {
+    "level": 5,
+    "name": "炼气五层",
+    "realm": "lianqi",
+    "xiuwei": 1067
+  },
+  "6": {
+    "level": 6,
+    "name": "炼气六层",
+    "realm": "lianqi",
+    "xiuwei": 1333
+  },
+  "7": {
+    "level": 7,
+    "name": "炼气七层",
+    "realm": "lianqi",
     "xiuwei": 1600
   },
-  "zhuji_1": {
-    "key": "zhuji_1",
-    "id": "zhuji_1",
-    "name": "筑基初期",
+  "8": {
+    "level": 8,
+    "name": "炼气八层",
+    "realm": "lianqi",
+    "xiuwei": 2400
+  },
+  "9": {
+    "level": 9,
+    "name": "炼气九层",
+    "realm": "lianqi",
+    "xiuwei": 3200
+  },
+  "10": {
+    "level": 10,
+    "name": "筑基一层",
+    "realm": "zhuji",
     "xiuwei": 4000
   },
-  "zhuji_2": {
-    "key": "zhuji_2",
-    "id": "zhuji_2",
-    "name": "筑基中期",
+  "11": {
+    "level": 11,
+    "name": "筑基二层",
+    "realm": "zhuji",
+    "xiuwei": 4967
+  },
+  "12": {
+    "level": 12,
+    "name": "筑基三层",
+    "realm": "zhuji",
+    "xiuwei": 5933
+  },
+  "13": {
+    "level": 13,
+    "name": "筑基四层",
+    "realm": "zhuji",
     "xiuwei": 6900
   },
-  "zhuji_3": {
-    "key": "zhuji_3",
-    "id": "zhuji_3",
-    "name": "筑基后期",
+  "14": {
+    "level": 14,
+    "name": "筑基五层",
+    "realm": "zhuji",
+    "xiuwei": 8067
+  },
+  "15": {
+    "level": 15,
+    "name": "筑基六层",
+    "realm": "zhuji",
+    "xiuwei": 9233
+  },
+  "16": {
+    "level": 16,
+    "name": "筑基七层",
+    "realm": "zhuji",
     "xiuwei": 10400
   },
-  "jindan_1": {
-    "key": "jindan_1",
-    "id": "jindan_1",
-    "name": "金丹初期",
+  "17": {
+    "level": 17,
+    "name": "筑基八层",
+    "realm": "zhuji",
+    "xiuwei": 13025
+  },
+  "18": {
+    "level": 18,
+    "name": "筑基九层",
+    "realm": "zhuji",
+    "xiuwei": 15650
+  },
+  "19": {
+    "level": 19,
+    "name": "筑基十层",
+    "realm": "zhuji",
+    "xiuwei": 18275
+  },
+  "20": {
+    "level": 20,
+    "name": "金丹一层",
+    "realm": "jindan",
     "xiuwei": 20900
   },
-  "jindan_2": {
-    "key": "jindan_2",
-    "id": "jindan_2",
-    "name": "金丹中期",
+  "21": {
+    "level": 21,
+    "name": "金丹二层",
+    "realm": "jindan",
+    "xiuwei": 24667
+  },
+  "22": {
+    "level": 22,
+    "name": "金丹三层",
+    "realm": "jindan",
+    "xiuwei": 28433
+  },
+  "23": {
+    "level": 23,
+    "name": "金丹四层",
+    "realm": "jindan",
     "xiuwei": 32200
   },
-  "jindan_3": {
-    "key": "jindan_3",
-    "id": "jindan_3",
-    "name": "金丹后期",
+  "24": {
+    "level": 24,
+    "name": "金丹五层",
+    "realm": "jindan",
+    "xiuwei": 36267
+  },
+  "25": {
+    "level": 25,
+    "name": "金丹六层",
+    "realm": "jindan",
+    "xiuwei": 40333
+  },
+  "26": {
+    "level": 26,
+    "name": "金丹七层",
+    "realm": "jindan",
     "xiuwei": 44400
   },
-  "yuanying_1": {
-    "key": "yuanying_1",
-    "id": "yuanying_1",
-    "name": "元婴初期",
+  "27": {
+    "level": 27,
+    "name": "金丹八层",
+    "realm": "jindan",
+    "xiuwei": 53550
+  },
+  "28": {
+    "level": 28,
+    "name": "金丹九层",
+    "realm": "jindan",
+    "xiuwei": 62700
+  },
+  "29": {
+    "level": 29,
+    "name": "金丹十层",
+    "realm": "jindan",
+    "xiuwei": 71850
+  },
+  "30": {
+    "level": 30,
+    "name": "元婴一层",
+    "realm": "yuanying",
     "xiuwei": 81000
   },
-  "yuanying_2": {
-    "key": "yuanying_2",
-    "id": "yuanying_2",
-    "name": "元婴中期",
+  "31": {
+    "level": 31,
+    "name": "元婴二层",
+    "realm": "yuanying",
+    "xiuwei": 93567
+  },
+  "32": {
+    "level": 32,
+    "name": "元婴三层",
+    "realm": "yuanying",
+    "xiuwei": 106133
+  },
+  "33": {
+    "level": 33,
+    "name": "元婴四层",
+    "realm": "yuanying",
     "xiuwei": 118700
   },
-  "yuanying_3": {
-    "key": "yuanying_3",
-    "id": "yuanying_3",
-    "name": "元婴后期",
+  "34": {
+    "level": 34,
+    "name": "元婴五层",
+    "realm": "yuanying",
+    "xiuwei": 131667
+  },
+  "35": {
+    "level": 35,
+    "name": "元婴六层",
+    "realm": "yuanying",
+    "xiuwei": 144633
+  },
+  "36": {
+    "level": 36,
+    "name": "元婴七层",
+    "realm": "yuanying",
     "xiuwei": 157600
   },
-  "huashen_1": {
-    "key": "huashen_1",
-    "id": "huashen_1",
-    "name": "化神初期",
+  "37": {
+    "level": 37,
+    "name": "元婴八层",
+    "realm": "yuanying",
+    "xiuwei": 186775
+  },
+  "38": {
+    "level": 38,
+    "name": "元婴九层",
+    "realm": "yuanying",
+    "xiuwei": 215950
+  },
+  "39": {
+    "level": 39,
+    "name": "元婴十层",
+    "realm": "yuanying",
+    "xiuwei": 245125
+  },
+  "40": {
+    "level": 40,
+    "name": "化神一层",
+    "realm": "huashen",
     "xiuwei": 274300
   },
-  "huashen_2": {
-    "key": "huashen_2",
-    "id": "huashen_2",
-    "name": "化神中期",
+  "41": {
+    "level": 41,
+    "name": "化神二层",
+    "realm": "huashen",
+    "xiuwei": 313667
+  },
+  "42": {
+    "level": 42,
+    "name": "化神三层",
+    "realm": "huashen",
+    "xiuwei": 353033
+  },
+  "43": {
+    "level": 43,
+    "name": "化神四层",
+    "realm": "huashen",
     "xiuwei": 392400
   },
-  "huashen_3": {
-    "key": "huashen_3",
-    "id": "huashen_3",
-    "name": "化神后期",
+  "44": {
+    "level": 44,
+    "name": "化神五层",
+    "realm": "huashen",
+    "xiuwei": 432267
+  },
+  "45": {
+    "level": 45,
+    "name": "化神六层",
+    "realm": "huashen",
+    "xiuwei": 472133
+  },
+  "46": {
+    "level": 46,
+    "name": "化神七层",
+    "realm": "huashen",
     "xiuwei": 512000
   },
-  "lianxu_1": {
-    "key": "lianxu_1",
-    "id": "lianxu_1",
-    "name": "炼虚初期",
+  "47": {
+    "level": 47,
+    "name": "化神八层",
+    "realm": "huashen",
+    "xiuwei": 542300
+  },
+  "48": {
+    "level": 48,
+    "name": "化神九层",
+    "realm": "huashen",
+    "xiuwei": 572600
+  },
+  "49": {
+    "level": 49,
+    "name": "化神十层",
+    "realm": "huashen",
+    "xiuwei": 602900
+  },
+  "50": {
+    "level": 50,
+    "name": "炼虚一层",
+    "realm": "lianxu",
     "xiuwei": 633200
   },
-  "lianxu_2": {
-    "key": "lianxu_2",
-    "id": "lianxu_2",
-    "name": "炼虚中期",
+  "51": {
+    "level": 51,
+    "name": "炼虚二层",
+    "realm": "lianxu",
+    "xiuwei": 674167
+  },
+  "52": {
+    "level": 52,
+    "name": "炼虚三层",
+    "realm": "lianxu",
+    "xiuwei": 715133
+  },
+  "53": {
+    "level": 53,
+    "name": "炼虚四层",
+    "realm": "lianxu",
     "xiuwei": 756100
   },
-  "lianxu_3": {
-    "key": "lianxu_3",
-    "id": "lianxu_3",
-    "name": "炼虚后期",
+  "54": {
+    "level": 54,
+    "name": "炼虚五层",
+    "realm": "lianxu",
+    "xiuwei": 879000
+  },
+  "55": {
+    "level": 55,
+    "name": "炼虚六层",
+    "realm": "lianxu",
+    "xiuwei": 1001900
+  },
+  "56": {
+    "level": 56,
+    "name": "炼虚七层",
+    "realm": "lianxu",
     "xiuwei": 1124800
   },
-  "heti_1": {
-    "key": "heti_1",
-    "id": "heti_1",
-    "name": "合体初期",
+  "57": {
+    "level": 57,
+    "name": "炼虚八层",
+    "realm": "lianxu",
+    "xiuwei": 1217450
+  },
+  "58": {
+    "level": 58,
+    "name": "炼虚九层",
+    "realm": "lianxu",
+    "xiuwei": 1310100
+  },
+  "59": {
+    "level": 59,
+    "name": "炼虚十层",
+    "realm": "lianxu",
+    "xiuwei": 1402750
+  },
+  "60": {
+    "level": 60,
+    "name": "合体一层",
+    "realm": "heti",
     "xiuwei": 1495400
   },
-  "heti_2": {
-    "key": "heti_2",
-    "id": "heti_2",
-    "name": "合体中期",
+  "61": {
+    "level": 61,
+    "name": "合体二层",
+    "realm": "heti",
+    "xiuwei": 1619600
+  },
+  "62": {
+    "level": 62,
+    "name": "合体三层",
+    "realm": "heti",
+    "xiuwei": 1743800
+  },
+  "63": {
+    "level": 63,
+    "name": "合体四层",
+    "realm": "heti",
     "xiuwei": 1868000
   },
-  "heti_3": {
-    "key": "heti_3",
-    "id": "heti_3",
-    "name": "合体后期",
+  "64": {
+    "level": 64,
+    "name": "合体五层",
+    "realm": "heti",
+    "xiuwei": 1992900
+  },
+  "65": {
+    "level": 65,
+    "name": "合体六层",
+    "realm": "heti",
+    "xiuwei": 2117800
+  },
+  "66": {
+    "level": 66,
+    "name": "合体七层",
+    "realm": "heti",
     "xiuwei": 2242700
   },
-  "dacheng_1": {
-    "key": "dacheng_1",
-    "id": "dacheng_1",
-    "name": "大乘初期",
+  "67": {
+    "level": 67,
+    "name": "合体八层",
+    "realm": "heti",
+    "xiuwei": 2336925
+  },
+  "68": {
+    "level": 68,
+    "name": "合体九层",
+    "realm": "heti",
+    "xiuwei": 2431150
+  },
+  "69": {
+    "level": 69,
+    "name": "合体十层",
+    "realm": "heti",
+    "xiuwei": 2525375
+  },
+  "70": {
+    "level": 70,
+    "name": "大乘一层",
+    "realm": "dacheng",
     "xiuwei": 2619600
   },
-  "dacheng_2": {
-    "key": "dacheng_2",
-    "id": "dacheng_2",
-    "name": "大乘中期",
+  "71": {
+    "level": 71,
+    "name": "大乘二层",
+    "realm": "dacheng",
+    "xiuwei": 2996500
+  },
+  "72": {
+    "level": 72,
+    "name": "大乘三层",
+    "realm": "dacheng",
+    "xiuwei": 3373400
+  },
+  "73": {
+    "level": 73,
+    "name": "大乘四层",
+    "realm": "dacheng",
     "xiuwei": 3750300
   },
-  "dacheng_3": {
-    "key": "dacheng_3",
-    "id": "dacheng_3",
-    "name": "大乘后期",
+  "74": {
+    "level": 74,
+    "name": "大乘五层",
+    "realm": "dacheng",
+    "xiuwei": 4128000
+  },
+  "75": {
+    "level": 75,
+    "name": "大乘六层",
+    "realm": "dacheng",
+    "xiuwei": 4505700
+  },
+  "76": {
+    "level": 76,
+    "name": "大乘七层",
+    "realm": "dacheng",
     "xiuwei": 4883400
   },
-  "dujie_1": {
-    "key": "dujie_1",
-    "id": "dujie_1",
-    "name": "渡劫期",
+  "77": {
+    "level": 77,
+    "name": "大乘八层",
+    "realm": "dacheng",
+    "xiuwei": 5167300
+  },
+  "78": {
+    "level": 78,
+    "name": "大乘九层",
+    "realm": "dacheng",
+    "xiuwei": 5451200
+  },
+  "79": {
+    "level": 79,
+    "name": "大乘十层",
+    "realm": "dacheng",
+    "xiuwei": 5735100
+  },
+  "80": {
+    "level": 80,
+    "name": "渡劫一层",
+    "realm": "dujie",
     "xiuwei": 6019000
+  },
+  "81": {
+    "level": 81,
+    "name": "渡劫二层",
+    "realm": "dujie",
+    "xiuwei": 6302900
+  },
+  "82": {
+    "level": 82,
+    "name": "渡劫三层",
+    "realm": "dujie",
+    "xiuwei": 6586800
+  },
+  "83": {
+    "level": 83,
+    "name": "渡劫四层",
+    "realm": "dujie",
+    "xiuwei": 6870700
+  },
+  "84": {
+    "level": 84,
+    "name": "渡劫五层",
+    "realm": "dujie",
+    "xiuwei": 7154600
+  },
+  "85": {
+    "level": 85,
+    "name": "渡劫六层",
+    "realm": "dujie",
+    "xiuwei": 7438500
+  },
+  "86": {
+    "level": 86,
+    "name": "渡劫七层",
+    "realm": "dujie",
+    "xiuwei": 7722400
+  },
+  "87": {
+    "level": 87,
+    "name": "渡劫八层",
+    "realm": "dujie",
+    "xiuwei": 8006300
+  },
+  "88": {
+    "level": 88,
+    "name": "渡劫九层",
+    "realm": "dujie",
+    "xiuwei": 8290200
+  },
+  "89": {
+    "level": 89,
+    "name": "渡劫十层",
+    "realm": "dujie",
+    "xiuwei": 8574100
+  },
+  "90": {
+    "level": 90,
+    "name": "渡劫十一层",
+    "realm": "dujie",
+    "xiuwei": 8858000
   }
 }

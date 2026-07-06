@@ -458,12 +458,12 @@ static func _select_ingredients(recipe: Dictionary, inventory: Dictionary, selec
 
 
 static func _attribute_score(foundations: Dictionary, aptitudes: Dictionary) -> float:
-	var sense := float(foundations.get("sense", 10))
+	var shenshi := float(foundations.get("shenshi", foundations.get("sense", 10)))
 	var comprehension := float(aptitudes.get("comprehension", 10))
 	var roots_v: Variant = aptitudes.get("roots", {})
 	var roots := roots_v as Dictionary if roots_v is Dictionary else {}
 	var root_fit := maxf(float(roots.get("fire", 0)), float(roots.get("wood", 0))) / 100.0 * 3.0
-	return minf(10.0, clampf((sense - 10.0) * 0.25, 0.0, 5.0) + clampf((comprehension - 10.0) * 0.2, 0.0, 4.0) + root_fit)
+	return minf(10.0, clampf((shenshi - 10.0) * 0.25, 0.0, 5.0) + clampf((comprehension - 10.0) * 0.2, 0.0, 4.0) + root_fit)
 
 
 static func _strategy_spread_bounds(strategy: Dictionary) -> Array:

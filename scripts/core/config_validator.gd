@@ -96,13 +96,9 @@ static func _validate_v1_abilities() -> PackedStringArray:
 		if ability_type_all not in ["combat_active", "combat_upkeep"]:
 			continue
 		var combat := ability.get("combat", {}) as Dictionary
-		var ability_type := str(ability.get("type", ""))
-		if not combat.has("powerScale") or float(combat.get("powerScale", -1.0)) < 0.0:
-			if ability_type == "combat_active":
-				errors.append("技能 %s 缺少有效 powerScale" % str(ability.get("id", "")))
 		errors.append_array(_validate_combat_costs(ability, combat))
 		errors.append_array(_validate_combat_target_fields(ability, combat))
-		if ability_type != "combat_active":
+		if ability_type_all != "combat_active":
 			continue
 		for effect_v in ability.get("effects", []) as Array:
 			var effect := effect_v as Dictionary

@@ -16,12 +16,12 @@ func _initialize() -> void:
 	RealmBalanceServiceScript.reload()
 	var config := RealmBalanceServiceScript.bundle()
 	var acceptance := config.get("acceptance", {}) as Dictionary
-	var qi_normal := _run_scenario(config, "qi_early", "qi_normal")
-	var qi_elite := _run_scenario(config, "qi_early", "qi_elite")
-	var cross_realm := _run_scenario(config, "qi_mature", "foundation_normal")
-	_print_result("qi_early_vs_normal", qi_normal)
-	_print_result("qi_early_vs_elite", qi_elite)
-	_print_result("qi_mature_vs_foundation_normal", cross_realm)
+	var qi_normal := _run_scenario(config, "lianqi_early", "lianqi_normal")
+	var qi_elite := _run_scenario(config, "lianqi_early", "lianqi_elite")
+	var cross_realm := _run_scenario(config, "lianqi_mature", "zhuji_normal")
+	_print_result("lianqi_early_vs_normal", qi_normal)
+	_print_result("lianqi_early_vs_elite", qi_elite)
+	_print_result("lianqi_mature_vs_zhuji_normal", cross_realm)
 	_expect_between(
 		float(qi_normal["win_rate"]),
 		float(acceptance["normal_win_rate_min"]),
@@ -46,8 +46,8 @@ func _initialize() -> void:
 		float(acceptance["resource_remaining_ratio_max"]),
 		"normal winning hp ratio"
 	)
-	if float(cross_realm["win_rate"]) >= float(acceptance["qi_mature_vs_foundation_normal_win_rate_max"]):
-		_failures.append("cross-realm win rate must stay below %.2f" % acceptance["qi_mature_vs_foundation_normal_win_rate_max"])
+	if float(cross_realm["win_rate"]) >= float(acceptance["lianqi_mature_vs_zhuji_normal_win_rate_max"]):
+		_failures.append("cross-realm win rate must stay below %.2f" % acceptance["lianqi_mature_vs_zhuji_normal_win_rate_max"])
 	if _failures.is_empty():
 		print("PASS: balance_v1 deterministic benchmarks")
 		quit(0)
@@ -108,7 +108,6 @@ func _simulate(player_attrs: Dictionary, enemy_attrs: Dictionary) -> Dictionary:
 			var hit := ZhandouAttr.calc_skill_damage(
 				player_attrs,
 				enemy_attrs,
-				float(skill["power"]) / 1000.0 if use_skill else 1.0,
 				float(((skill["effects"] as Array)[0] as Dictionary)["value"]) if use_skill else 0.0,
 				ZhandouAttr.DAMAGE_MAGIC if use_skill else ZhandouAttr.DAMAGE_PHYSICAL
 			)

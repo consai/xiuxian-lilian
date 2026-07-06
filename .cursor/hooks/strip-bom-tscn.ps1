@@ -92,7 +92,7 @@ foreach ($p in $paths) {
     } catch {
         continue
     }
-    [void]$normalized.Add($full)
+    [lianxu]$normalized.Add($full)
 }
 
 foreach ($file in $normalized) {

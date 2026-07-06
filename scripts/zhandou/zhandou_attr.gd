@@ -23,7 +23,6 @@ const COMBAT_MP_RESTORE_2S := "combat_mp_restore_2s"
 const DAMAGE_PHYSICAL := "physical"
 const DAMAGE_MAGIC := "magic"
 const DAMAGE_TRUE := "true"
-const DEFENSE_CONSTANT := 100.0
 
 ## 进战校验必填（与 [ZhandouInitData] 一致）。
 const CORE_KEYS: Array[String] = [
@@ -65,11 +64,11 @@ static func test_defaults() -> Dictionary:
 ## 由显式数值块生成完整 attrs（缺省键用 [method test_defaults] 补齐）。
 static func from_stat_block(block: Dictionary, fill_missing: bool = true) -> Dictionary:
 	var base := test_defaults() if fill_missing else {}
-	return merge(base, block)
+	return heti(base, block)
 
 
 ## 叠加一层属性；[param overlay] 中非数值键也会被写入（与 [ZhandouObj._merge_attrs] 一致）。
-static func merge(base: Dictionary, overlay: Dictionary) -> Dictionary:
+static func heti(base: Dictionary, overlay: Dictionary) -> Dictionary:
 	var out := base.duplicate(true)
 	for k in overlay.keys():
 		out[str(k)] = overlay[k]
@@ -153,10 +152,12 @@ static func build_combatant_row(
 	return row
 
 
-static func damage_after_defense(raw_damage: float, defense: float) -> float:
-	var safe_def := maxf(0.0, defense)
-	var reduction := safe_def / (safe_def + DEFENSE_CONSTANT)
-	return maxf(1.0, raw_damage * (1.0 - reduction))
+static func damage_after_attack_defense(raw_damage: float, attack: float, defense: float) -> float:
+	var safe_attack := maxf(0.0, attack)
+	var safe_defense := maxf(0.0, defense)
+	if safe_attack <= 0.0:
+		return 0.0
+	return maxf(1.0, raw_damage * safe_attack / maxf(1.0, safe_attack + safe_defense))
 
 
 static func attack_for(attrs: Dictionary, damage_type: String) -> float:
@@ -177,33 +178,37 @@ static func defense_for(attrs: Dictionary, damage_type: String) -> float:
 
 ## 普攻使用物理攻防与软减伤。
 static func calc_basic_damage(attacker: Dictionary, defender: Dictionary) -> Dictionary:
-	var raw := attack_for(attacker, DAMAGE_PHYSICAL)
-	var dmg := damage_after_defense(raw, defense_for(defender, DAMAGE_PHYSICAL))
+	var attack := attack_for(attacker, DAMAGE_PHYSICAL)
+	var dmg := damage_after_attack_defense(attack, attack, defense_for(defender, DAMAGE_PHYSICAL))
 	dmg *= 1.0 + maxf(0.0, get_attr(attacker, DAMAGE_BONUS, 0.0))
 	return {"damage": dmg, "damage_type": DAMAGE_PHYSICAL}
 
 
-## 技能伤害段： [code]max(1, atk * power_scale + flat - def)[/code]。
+## 技能伤害段：伤害值 × 攻击 / (攻击 + 防御)。
 static func calc_skill_damage(
 		attacker: Dictionary,
 		defender: Dictionary,
-		power_scale: float,
-		flat_bonus: float,
+		effect_value: float,
 		damage_type: String = DAMAGE_MAGIC,
 		armor_pierce: float = 0.0
 ) -> Dictionary:
 	var resolved_type := resolve_damage_type(damage_type)
-	var raw := attack_for(attacker, resolved_type) * power_scale + flat_bonus
+	var raw := effect_value
 	var dmg := maxf(1.0, raw)
 	if resolved_type != DAMAGE_TRUE:
+		var attack := attack_for(attacker, resolved_type)
 		var effective_defense := defense_for(defender, resolved_type) * (1.0 - clampf(armor_pierce, 0.0, 0.7))
-		dmg = damage_after_defense(raw, effective_defense)
+		dmg = damage_after_attack_defense(raw, attack, effective_defense)
 	dmg *= 1.0 + maxf(0.0, get_attr(attacker, DAMAGE_BONUS, 0.0))
 	dmg *= 1.0 + maxf(-0.75, get_attr(defender, DAMAGE_TAKEN, 0.0))
 	return {"damage": dmg, "damage_type": resolved_type}
 
+static func control_duration_after_resist(base_duration: float, control_power: float, control_resist: float) -> float:
+	var power := maxf(0.0, control_power)
+	if power <= 0.0:
+		return 0.0
+	return maxf(0.0, base_duration) * power / maxf(1.0, power + maxf(0.0, control_resist))
 
-## 调息回蓝量：按法力恢复速度 × [member ZhandouBalance.TIAOXI_MP_REGEN_MULTIPLIER]。
 static func calc_tiaoxi_mp_restore(attrs: Dictionary) -> float:
 	var regen: float = maxf(0.0, get_attr(attrs, MP_REGEN, 0.0))
 	return regen * ZhandouBalance.TIAOXI_MP_REGEN_MULTIPLIER
@@ -215,8 +220,8 @@ static func estimate_tiaoxi_mp_restore(attrs: Dictionary) -> float:
 
 ## 意图预览：按期望伤害估算，避免随机波动。
 static func estimate_basic_damage(attacker: Dictionary, defender: Dictionary) -> float:
-	var raw := attack_for(attacker, DAMAGE_PHYSICAL)
-	var dmg := damage_after_defense(raw, defense_for(defender, DAMAGE_PHYSICAL))
+	var attack := attack_for(attacker, DAMAGE_PHYSICAL)
+	var dmg := damage_after_attack_defense(attack, attack, defense_for(defender, DAMAGE_PHYSICAL))
 	dmg *= 1.0 + maxf(0.0, get_attr(attacker, DAMAGE_BONUS, 0.0))
 	return maxf(0.0, dmg)
 
@@ -224,21 +229,20 @@ static func estimate_basic_damage(attacker: Dictionary, defender: Dictionary) ->
 static func estimate_skill_damage(
 		attacker: Dictionary,
 		defender: Dictionary,
-		power_scale: float,
-		flat_bonus: float,
+		effect_value: float,
 		damage_type: String = DAMAGE_MAGIC,
 		armor_pierce: float = 0.0
 ) -> float:
 	var resolved_type := resolve_damage_type(damage_type)
-	var raw := attack_for(attacker, resolved_type) * power_scale + flat_bonus
+	var raw := effect_value
 	var dmg := maxf(1.0, raw)
 	if resolved_type != DAMAGE_TRUE:
+		var attack := attack_for(attacker, resolved_type)
 		var effective_defense := defense_for(defender, resolved_type) * (1.0 - clampf(armor_pierce, 0.0, 0.7))
-		dmg = damage_after_defense(raw, effective_defense)
+		dmg = damage_after_attack_defense(raw, attack, effective_defense)
 	dmg *= 1.0 + maxf(0.0, get_attr(attacker, DAMAGE_BONUS, 0.0))
 	dmg *= 1.0 + maxf(-0.75, get_attr(defender, DAMAGE_TAKEN, 0.0))
 	return maxf(0.0, dmg)
-
 
 static func resolve_damage_type(damage_type: String) -> String:
 	var normalized := damage_type.strip_edges().to_lower()
