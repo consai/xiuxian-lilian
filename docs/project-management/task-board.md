@@ -19,7 +19,7 @@
 
 - `scripts/core/scene_manager.gd`
 - `scripts/lilian/lilian_battle_flow.gd`
-- `scripts/lilian/expedition_loop.gd`
+- `scripts/lilian/lilian_xunhuan.gd`
 - `scripts/ui/beibao_panel.gd`
 
 ### [x] PM-002：补齐历练背包验收
@@ -61,14 +61,14 @@
 验收：
 
 - `tests/run_config_validation_tests.gd` 通过。
-- `data/didian.yaml`、`data/lilian_events.yaml`、`data/guaiwu.yaml`、`data/item.yaml` 的 P0 引用无错误。
+- `data/exportjson/didian_locations.json`、`data/exportjson/lilian_events_events.json`、`data/exportjson/guaiwu.json`、`data/exportjson/item_items.json` 的 P0 引用无错误。
 - 新增配置不需要手动进游戏才发现坏引用。
 
 涉及文件：
 
 - `scripts/core/config_validator.gd`
 - `tests/run_config_validation_tests.gd`
-- `data/*.yaml`
+- `data/exportjson/*.json`
 
 ### [x] PM-005：手动游玩脚本
 
@@ -106,7 +106,7 @@
 
 - `scripts/core/data_store.gd`
 - `scripts/story/tutorial_service.gd`
-- `data/gushi/prologue_tutorial.yaml`
+- `data/exportjson/gushi_prologue_tutorial*.json`
 
 ### [x] PM-102：第一场战斗奖励闭环
 
@@ -141,7 +141,7 @@
 
 - `assets/art`
 - `scenes/story`
-- `scenes/fightScene.tscn`
+- `scenes/zhandou/zhandou_changjing.tscn`
 
 ### [x] PM-104：洞府改为小道观
 
@@ -156,10 +156,10 @@
 
 涉及文件：
 
-- `scenes/sim/cave_hub.tscn`
-- `scripts/sim/cave_hub.gd`
+- `scenes/sim/dongfu.tscn`
+- `scripts/sim/dongfu.gd`
 - `assets/art`
-- `data/gushi/prologue_tutorial.yaml`
+- `data/exportjson/gushi_prologue_tutorial*.json`
 
 ## 当前冲刺：P2 数值与内容校准
 
@@ -174,19 +174,19 @@ P2 通过标准：
 
 ### [x] PM-201：平衡基准复核
 
-描述：把当前 `jingjie_balance.yaml` 的练气初期、练气成型、筑基初期基准和自动测试结果对齐，先确认目标线，不急着调内容。
+描述：把当前 `jingjie_balance*.json` 的练气初期、练气成型、筑基初期基准和自动测试结果对齐，先确认目标线，不急着调内容。
 
 验收：
 
 - `run_balance_v1_tests.gd` 输出记录到任务备注或数值文档。
 - 普通敌胜率、普通战时长、精英胜率、跨境界压制都在 acceptance 范围内。
-- 如需调参，只改 `data/jingjie_balance.yaml` 或直接相关配置，不做新平衡系统。
+- 如需调参，只改 `data/exportjson/yunxing_params/jingjie_balance*.json` 或直接相关配置，不做新平衡系统。
 
 涉及文件：
 
-- `data/jingjie_balance.yaml`
+- `data/exportjson/yunxing_params/jingjie_balance*.json`
 - `tests/run_balance_v1_tests.gd`
-- `docs/realm-balance-zhuji.md`
+- `docs/realm-balance-foundation.md`
 
 任务备注：
 
@@ -205,9 +205,9 @@ P2 通过标准：
 
 涉及文件：
 
-- `data/guaiwu.yaml`
-- `data/didian.yaml`
-- `data/lilian_events.yaml`
+- `data/exportjson/guaiwu.json`
+- `data/exportjson/didian_locations.json`
+- `data/exportjson/lilian_events_events.json`
 - `tests/run_lilian_tests.gd`
 
 任务备注：
@@ -227,10 +227,10 @@ P2 通过标准：
 
 涉及文件：
 
-- `data/item.yaml`
-- `data/liandan.yaml`
-- `data/lilian_rules.yaml`
-- `data/tupo_rules.yaml`
+- `data/exportjson/item_items.json`
+- `data/exportjson/liandan*.json`
+- `data/exportjson/yunxing_params/lilian_rules.json`
+- `data/exportjson/yunxing_params/tupo_rules*.json`
 - `scripts/sim/liandan_service.gd`
 - `scripts/sim/tupo_service.gd`
 
@@ -247,19 +247,19 @@ P2 通过标准：
 - 新手默认技能组能应对普通历练。
 - 至少有 2 种可理解的战斗倾向：稳健 / 输出。
 - 技能知识成长能在 UI 和战斗结果中被感知。
-- 同层技能强度差异控制在 `jingjie_balance.yaml` budgets 附近。
+- 同层技能强度差异控制在 `jingjie_balance*.json` budgets 附近。
 
 涉及文件：
 
-- `data/jineng.yaml`
-- `data/xiulian_methods.yaml`
-- `data/zhishi_effects.yaml`
-- `data/dao_tree.yaml`
+- `data/exportjson/jineng*.json`
+- `data/exportjson/xiulian_methods*.json`
+- `data/exportjson/zhishi_effects*.json`
+- `data/exportjson/dao_tree*.json`
 - `tests/run_dao_knowledge_tests.gd`
 
 任务备注：
 
-- 2026-06-24：新手默认技能组保持御气弹 / 流风步 / 破空剑气，补齐输出与防御标签；破空剑气基准伤害从 55 收敛到 54，使练气同阶伤害贴近 `jingjie_balance.yaml` 预算。新增练气知识效果与 PM-204 回归，知识成长会影响运行时技能数值和派生属性。`validate-abilities.mjs`、`validate-xiulian-methods.mjs`、`run_dao_knowledge_tests.gd`、`run_config_validation_tests.gd`、`run_zhandou_domain_tests.gd`、`run_simulation_tests.gd`、`run_balance_v1_tests.gd` 通过。
+- 2026-06-24：新手默认技能组保持御气弹 / 流风步 / 破空剑气，补齐输出与防御标签；破空剑气基准伤害从 55 收敛到 54，使练气同阶伤害贴近 `jingjie_balance*.json` 预算。新增练气知识效果与 PM-204 回归，知识成长会影响运行时技能数值和派生属性。`validate-abilities.mjs`、`validate-xiulian-methods.mjs`、`run_dao_knowledge_tests.gd`、`run_config_validation_tests.gd`、`run_zhandou_domain_tests.gd`、`run_simulation_tests.gd`、`run_balance_v1_tests.gd` 通过。
 
 ### [x] PM-205：突破前目标可读性
 
@@ -273,9 +273,9 @@ P2 通过标准：
 
 涉及文件：
 
-- `scenes/sim/breakthrough_summary.tscn`
-- `scripts/sim/breakthrough_summary.gd`
-- `data/tupo_rules.yaml`
+- `scenes/sim/tupo_zongjie.tscn`
+- `scripts/sim/tupo_zongjie.gd`
+- `data/exportjson/yunxing_params/tupo_rules*.json`
 - `docs/breakthrough-system.md`
 
 任务备注：
@@ -294,9 +294,9 @@ P2 通过标准：
 
 涉及文件：
 
-- `scripts/fight/vfx`
-- `scripts/fight/fight_vfx_manager.gd`
-- `data/zhandou/presets`
+- `scripts/zhandou/vfx`
+- `scripts/zhandou/zhandou_vfx_manager.gd`
+- `data/exportjson/zhandou_presets_*.json`
 
 ### [x] PM-207：P2 手动游玩验收
 
@@ -310,7 +310,7 @@ P2 通过标准：
 
 产物：
 
-- `docs/project-management/p2-playtest-notes.md`
+- `docs/project-management/task-board.md`
 
 ## 已完成：P3 内容扩展
 
@@ -344,9 +344,9 @@ P3 通过标准：
 
 涉及文件：
 
-- `data/shijie_map.yaml`
-- `data/didian.yaml`
-- `data/guaiwu.yaml`
+- `data/exportjson/shijie_map*.json`
+- `data/exportjson/didian_locations.json`
+- `data/exportjson/guaiwu.json`
 - `scenes/map`
 - `tests/run_world_map_tests.gd`
 - `tests/run_config_validation_tests.gd`
@@ -368,9 +368,9 @@ P3 通过标准：
 
 涉及文件：
 
-- `data/lilian_events.yaml`
-- `data/lilian_common_events.yaml`
-- `scripts/expedition`
+- `data/exportjson/lilian_events_events.json`
+- `data/exportjson/lilian_common_events_events.json`
+- `scripts/lilian`
 - `tests/run_lilian_tests.gd`
 
 任务备注：
@@ -385,15 +385,15 @@ P3 通过标准：
 
 - 至少新增 2 个技能、2 个功法、3 个知识节点。
 - 新内容有学习条件和展示文案。
-- 技能强度贴近 `jingjie_balance.yaml` 预算，不压过全部旧技能。
+- 技能强度贴近 `jingjie_balance*.json` 预算，不压过全部旧技能。
 - 默认练气技能仍可用，但筑基内容有升级价值。
 
 涉及文件：
 
-- `data/jineng.yaml`
-- `data/xiulian_methods.yaml`
-- `data/dao_tree.yaml`
-- `data/zhishi_effects.yaml`
+- `data/exportjson/jineng*.json`
+- `data/exportjson/xiulian_methods*.json`
+- `data/exportjson/dao_tree*.json`
+- `data/exportjson/zhishi_effects*.json`
 - `tests/run_dao_knowledge_tests.gd`
 - `tests/run_balance_v1_tests.gd`
 
@@ -414,9 +414,9 @@ P3 通过标准：
 
 涉及文件：
 
-- `data/liandan.yaml`
-- `data/item.yaml`
-- `data/didian.yaml`
+- `data/exportjson/liandan*.json`
+- `data/exportjson/item_items.json`
+- `data/exportjson/didian_locations.json`
 - `scripts/sim/liandan_service.gd`
 - `tests/run_simulation_tests.gd`
 
@@ -439,9 +439,9 @@ P3 通过标准：
 
 - `assets/art/characters`
 - `assets/art`
-- `data/guaiwu.yaml`
-- `data/gushi`
-- `scenes/fightScene.tscn`
+- `data/exportjson/guaiwu.json`
+- `data/exportjson/gushi_*.json`
+- `scenes/zhandou/zhandou_changjing.tscn`
 
 任务备注：
 
@@ -488,7 +488,7 @@ P3 通过标准：
 
 涉及文件：
 
-- `data/lilian_rules.yaml`
+- `data/exportjson/yunxing_params/lilian_rules.json`
 - `scripts/lilian/lilian_reward_service.gd`
 - `tests/run_lilian_tests.gd`
 
@@ -522,9 +522,9 @@ P3 通过标准：
 
 涉及文件：
 
-- `data/didian.yaml`
-- `data/lilian_common_events.yaml`
-- `data/lilian_rules.yaml`
+- `data/exportjson/didian_locations.json`
+- `data/exportjson/lilian_common_events_events.json`
+- `data/exportjson/yunxing_params/lilian_rules.json`
 
 ### [ ] PM-401D：功法与技能学习路径提示
 
@@ -538,7 +538,7 @@ P3 通过标准：
 
 涉及文件：
 
-- `data/item.yaml`
+- `data/exportjson/item_items.json`
 - `scripts/ui/item_info_payload_builder.gd`
 - `scripts/sim/dongfu.gd`
 
@@ -592,9 +592,9 @@ P3 通过标准：
 
 涉及文件：
 
-- `data/item.yaml`
-- `data/didian.yaml`
-- `data/lilian_events.yaml`
+- `data/exportjson/item_items.json`
+- `data/exportjson/didian_locations.json`
+- `data/exportjson/lilian_events_events.json`
 
 ### [ ] PM-502：丹药与丹方扩容
 
@@ -608,8 +608,8 @@ P3 通过标准：
 
 涉及文件：
 
-- `data/liandan.yaml`
-- `data/item.yaml`
+- `data/exportjson/liandan*.json`
+- `data/exportjson/item_items.json`
 - `tests/run_simulation_tests.gd`
 
 ### [ ] PM-503：怪物族群扩容
@@ -624,8 +624,8 @@ P3 通过标准：
 
 涉及文件：
 
-- `data/guaiwu.yaml`
-- `data/didian.yaml`
+- `data/exportjson/guaiwu.json`
+- `data/exportjson/didian_locations.json`
 - `tests/run_config_validation_tests.gd`
 
 ### [ ] PM-504：配置回归

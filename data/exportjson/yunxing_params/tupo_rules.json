@@ -30,9 +30,5 @@
   "realm_unstable_days": {
     "key": "realm_unstable_days",
     "value": "3"
-  },
-  "realm_unstable_cultivation_multiplier": {
-    "key": "realm_unstable_cultivation_multiplier",
-    "value": "0.7"
   }
 }

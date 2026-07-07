@@ -19,9 +19,9 @@
 
 ```mermaid
 flowchart LR
-  Hub[洞府 cave_hub] -->|大境界可突破| Panel[突破面板 breakthrough_panel]
+  Hub[洞府 dongfu] -->|大境界可突破| Panel[突破面板 tupo_zongjie]
   Panel -->|开始突破| Resolve[TupoService.resolve]
-  Resolve -->|成功| Summary[突破摘要 breakthrough_summary]
+  Resolve -->|成功| Summary[突破摘要 tupo_zongjie]
   Resolve -->|失败| Hub
   Summary --> Hub
 ```
@@ -88,7 +88,7 @@ flowchart LR
 
 ## 3. 品质档位与效果
 
-仅 **大境界突破**（`major_realm` 变化）使用品质表。配置位于 `data/breakthrough_rules.json` 的 `major_breakthroughs`。
+仅 **大境界突破**（`major_realm` 变化）使用品质表。配置位于 `data/exportjson/yunxing_params/tupo_rules*.json` 的 `major_breakthroughs`。
 
 ### 3.1 炼气九层 → 筑基（示例，与 UI 稿一致）
 
@@ -119,7 +119,7 @@ flowchart LR
 
 ## 4. UI 设计（对齐原型稿）
 
-场景：`scenes/sim/breakthrough_panel.tscn`（新建）
+场景：`scenes/sim/tupo_zongjie.tscn`（已实现）
 
 | 区域 | 节点职责 |
 |------|----------|
@@ -132,9 +132,9 @@ flowchart LR
 
 ### 场景流改造
 
-1. `cave_hub`：`can_breakthrough()` 为真时，点击突破 → `SceneManager.go_tupo_mianban()`（不再直接 `GameState.breakthrough()`）。
+1. `dongfu`：`can_breakthrough()` 为真时，点击突破 → `SceneManager.go_tupo_mianban()`（不再直接 `GameState.breakthrough()`）。
 2. 面板确认后调用 `GameState.attempt_major_breakthrough()` → 内部 `TupoService.resolve()`。
-3. 成功 → 现有 `breakthrough_summary`；失败 → 回洞府并刷新 debuff 文案。
+3. 成功 → 现有 `tupo_zongjie`；失败 → 回洞府并刷新 debuff 文案。
 
 ---
 
@@ -144,11 +144,11 @@ flowchart LR
 
 | 模块 | 路径 | 职责 |
 |------|------|------|
-| 规则表 | `data/breakthrough_rules.json` | 分项上限、大境界门槛与品质区间 |
+| 规则表 | `data/exportjson/yunxing_params/tupo_rules*.json` | 分项上限、大境界门槛与品质区间 |
 | 计算服务 | `scripts/sim/tupo_service.gd` | 分项聚合、档位判定、结算预览 |
 | 状态写入 | `scripts/sim/game_state.gd` | `attempt_major_breakthrough()`、`can_breakthrough()` 扩展 |
-| 突破面板 | `scenes/sim/breakthrough_panel.tscn` + `.gd` | 数据绑定与按钮 |
-| 洞府入口 | `scripts/sim/cave_hub.gd` | 跳转突破面板 |
+| 突破面板 | `scenes/sim/tupo_zongjie.tscn` + `.gd` | 数据绑定与按钮 |
+| 洞府入口 | `scripts/sim/dongfu.gd` | 跳转突破面板 |
 
 ### 5.2 服务 API（摘要）
 
@@ -190,7 +190,7 @@ TupoService.resolve(savedata, realms, realm_index, rng) -> Dictionary
 
 ### 5.3 配置结构
 
-见 `data/breakthrough_rules.json`：
+见 `data/exportjson/yunxing_params/tupo_rules*.json`：
 
 - `component_caps`：七项理论上限（UI 分母、平衡用）。
 - `major_breakthroughs.<transition_id>`：`from_major`、`to_major`、`min_total`、`tiers[]`。

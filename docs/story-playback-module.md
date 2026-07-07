@@ -34,7 +34,7 @@
 | `scripts/story/story_player.gd` | 运行剧情、选择分支、生成剧情帧、快照恢复 |
 | `scripts/story/story_condition.gd` | 判断条件并应用剧情局部变量效果 |
 | `scripts/story/story_validator.gd` | 校验节点类型、跳转引用、条件与效果 |
-| `data/gushi/*.json` | 剧情配置 |
+| `data/exportjson/gushi_*.json/*.json` | 剧情配置 |
 | 未来 `story_presenter.gd` | 将 `line`、`choice` 帧渲染为具体 UI |
 | 未来 `story_command_router.gd` | 将命令映射到场景、奖励、引导等业务服务 |
 

@@ -28,7 +28,7 @@
 
 ### [ ] SF-03：典籍物品提示补研读入口
 
-位置：`data/item.yaml`、`scripts/ui/item_info_payload_builder.gd`
+位置：`data/exportjson/item_items.json`、`scripts/ui/item_info_payload_builder.gd`
 
 现象：玩家觉得没有新功法 / 技能学习，实际问题是学习入口不够明显。
 
@@ -36,7 +36,7 @@
 
 ### [ ] SF-04：疗伤丹描述与效果一致
 
-位置：`data/item.yaml`
+位置：`data/exportjson/item_items.json`
 
 现象：疗伤丹如果只恢复气血，描述不能暗示会治疗伤势。
 

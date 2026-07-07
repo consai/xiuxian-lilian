@@ -103,7 +103,7 @@
 **输入**：玩家打开修炼，选择丹药炼化，点击开始闭关。
 **输出**：按至少 1 个月结算修为、时间和灵力驳杂。
 **失败状态**：文案仍写“1日”“约 200 修为/日”，或引导要求一天修炼。
-**涉及**：`cultivation_panel.gd`、`prologue_tutorial.yaml`。
+**涉及**：`cultivation_panel.gd`、`data/exportjson/gushi_prologue_tutorial*.json`。
 
 ### 5.3 路线图历练
 
@@ -111,7 +111,7 @@
 **输入**：玩家进入历练路线图。
 **输出**：引导玩家点击可前往节点，遇到事件/战斗正常处理，直到首战胜利。
 **失败状态**：只高亮旧 `EventCards`，玩家不知道要点路线图节点。
-**涉及**：`expedition_loop.tscn`、`LilianState.settle_pending_battle()`、`prologue_tutorial.yaml`。
+**涉及**：`lilian_xunhuan.tscn`、`LilianState.settle_pending_battle()`、`data/exportjson/gushi_prologue_tutorial*.json`。
 
 ### 5.4 背包关闭
 
@@ -119,7 +119,7 @@
 **输入**：玩家打开背包查看首战带回的灵草。
 **输出**：下一步先等待 `tutorial.backpack_closed`，再引导 `FurnaceButton`。
 **失败状态**：背包未关闭时高亮丹炉。
-**涉及**：`beibao_panel.gd`、`TutorialService`、`prologue_tutorial.yaml`。
+**涉及**：`beibao_panel.gd`、`TutorialService`、`data/exportjson/gushi_prologue_tutorial*.json`。
 
 ### 5.5 Esc / 关闭键护栏
 
@@ -141,7 +141,7 @@
 **输入**：关闭背包后打开丹炉。
 **输出**：默认选中聚气丹方，玩家确认预览后炼制。
 **失败状态**：玩家缺材料、缺丹方、找不到按钮。
-**涉及**：`AlchemyPanel`、`prologue_tutorial.yaml`。
+**涉及**：`AlchemyPanel`、`data/exportjson/gushi_prologue_tutorial*.json`。
 
 ## 6. 小道观首屏方向
 

@@ -230,7 +230,7 @@ scenes/map/popups/travel_confirm_popup.tscn
 }
 ```
 
-运行时位置、发现状态和路线状态应经 `DataStore` 管理；静态地图配置建议放入 `res://data/world_map.json`。
+运行时位置、发现状态和路线状态应经 `DataStore` 管理；静态地图配置建议放入 `res://data/exportjson/shijie_map.json`。
 
 ## 8. 后续实施顺序
 

@@ -18,12 +18,12 @@
 
 已存在的可复用基础：
 
-- VFX 调度：`scripts/fight/fight_vfx_manager.gd`
-- 动作序列：`scripts/fight/vfx`
-- 预设配置：`data/zhandou/presets`
-- 预设索引：`data/zhandou/vfx_index.yaml`
-- 浮字样式：`data/zhandou/float_styles.yaml`
-- 战斗表现衔接：`scripts/fight/scene/fight_scene_presentation.gd`
+- VFX 调度：`scripts/zhandou/zhandou_vfx_manager.gd`
+- 动作序列：`scripts/zhandou/vfx`
+- 预设配置：`data/exportjson/zhandou_presets_*.json`
+- 预设索引：`data/exportjson/zhandou_vfx_index.json`
+- 浮字样式：`data/exportjson/zhandou_float_styles.json`
+- 战斗表现衔接：`scripts/zhandou/scene/zhandou_changjing_presentation.gd`
 
 当前已有表现：
 
@@ -76,7 +76,7 @@
 - `ZhandouVfxSettings.melee_*`
 - `ZhandouVfxSettings.hit_*`
 - `ZhandouVfxSettings.crit_*`
-- `data/zhandou/float_styles.yaml` 的 `damage / crit`
+- `data/exportjson/zhandou_float_styles.json` 的 `damage / crit`
 
 ### 4.2 弹道 / 法术远程
 
@@ -129,7 +129,7 @@
 输出：
 
 - 本期优先复用 `status_cast`。
-- 新增配置时可建 `shield_cast.yaml`，只用现有 `tween / wait / modulate` 能力，不加新系统。
+- 新增配置时可建 `data/exportjson/zhandou_presets_status_cast_s.json`，只用现有 `tween / wait / modulate` 能力，不加新系统。
 - 浮字使用 `shield`。
 - 护盾条同步更新。
 
@@ -146,8 +146,8 @@
 
 调参杠杆：
 
-- `status_cast` 或 `shield_cast.yaml`
-- `data/zhandou/float_styles.yaml` 的 `shield`
+- `status_cast` 或 `data/exportjson/zhandou_presets_status_cast_s.json`
+- `data/exportjson/zhandou_float_styles.json` 的 `shield`
 - `ZhandouVfxSettings.ranged_recoil_*` 可复用为施法收势
 
 ### 4.4 治疗 / 回蓝
@@ -182,7 +182,7 @@
 
 调参杠杆：
 
-- `data/zhandou/float_styles.yaml` 的 `heal / mp_gain`
+- `data/exportjson/zhandou_float_styles.json` 的 `heal / mp_gain`
 - `status_cast`
 
 ### 4.5 持续伤害 / 灼烧
@@ -200,7 +200,7 @@
 
 - 不播放完整施法动作。
 - 使用 `ZhandouFloatPresenter.build_buff_tick_spawns()` 生成状态名与伤害。
-- 可选新增 `dot_tick.yaml`，只做轻微闪色或短促抖动。
+- 可选新增 `data/exportjson/zhandou_presets_*.json`，只做轻微闪色或短促抖动。
 
 成功标准：
 
@@ -215,9 +215,9 @@
 
 调参杠杆：
 
-- `data/zhandou/float_styles.yaml` 的 `buff_add / damage`
+- `data/exportjson/zhandou_float_styles.json` 的 `buff_add / damage`
 - `ZhandouFloatLayer.max_per_unit_per_frame`
-- 可选 `dot_tick.yaml`
+- 可选 `data/exportjson/zhandou_presets_*.json`
 
 ## 5. 最小实现清单
 
@@ -238,9 +238,9 @@
 
 ### 可选
 
-- 新增 `shield_cast.yaml`：短促收势 + 自身提亮 + 回待机。
-- 新增 `dot_tick.yaml`：目标轻微闪色，不击退。
-- 新增 `heal_cast.yaml`：自身提亮，不移动。
+- 新增 `data/exportjson/zhandou_presets_status_cast_s.json`：短促收势 + 自身提亮 + 回待机。
+- 新增 `data/exportjson/zhandou_presets_*.json`：目标轻微闪色，不击退。
+- 新增 `data/exportjson/zhandou_presets_status_cast_s.json`：自身提亮，不移动。
 
 ## 6. 不做内容
 
@@ -304,9 +304,9 @@
 
 只改现有三处：
 
-- `scripts/fight/combat_projectile_vfx.gd`：把当前 `ColorRect` 占位弹道扩展为可选 `Texture2D`。无贴图时继续走 `ColorRect` fallback。
-- `scripts/fight/vfx/combat_action_executor.gd`：让 `op: "projectile"` 读取 step 上的 `texture`、`visual_size`、`rotation_offset_deg`、`use_bezier`。
-- `data/zhandou/presets`：新增两个 projectile preset，不新增管理器。
+- `scripts/zhandou/zhandou_projectile_vfx.gd`：把当前 `ColorRect` 占位弹道扩展为可选 `Texture2D`。无贴图时继续走 `ColorRect` fallback。
+- `scripts/zhandou/vfx/zhandou_action_executor.gd`：让 `op: "projectile"` 读取 step 上的 `texture`、`visual_size`、`rotation_offset_deg`、`use_bezier`。
+- `data/exportjson/zhandou_presets_*.json`：新增两个 projectile preset，不新增管理器。
 
 不新增内容：
 
@@ -317,7 +317,7 @@
 
 ### 11.3 新增 preset
 
-新增 `data/zhandou/presets/qi_bolt_projectile.yaml`：
+新增 `data/exportjson/zhandou_presets_qi_bolt_proje.json`：
 
 ```yaml
 _comment: "御气弹：施法动作 + 金色弹道 + 受击"
@@ -355,7 +355,7 @@ sequence:
           - op: "impact"
 ```
 
-新增 `data/zhandou/presets/sword_qi_projectile.yaml`：
+新增 `data/exportjson/zhandou_presets_sword_qi_proj.json`：
 
 ```yaml
 _comment: "破空剑气：高速飞剑 / 剑气弹道 + 受击"
@@ -396,7 +396,7 @@ sequence:
 
 ### 11.4 技能绑定
 
-在 `data/jineng.yaml` 只给首版常用技能补绑定：
+在 `data/exportjson/jineng*.json` 只给首版常用技能补绑定：
 
 ```yaml
 # 御气弹

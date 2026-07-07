@@ -24,7 +24,7 @@
 
 ```mermaid
 flowchart LR
-  Hub[小道观 cave_hub] --> Board[委托榜]
+  Hub[小道观 dongfu] --> Board[委托榜]
   Board --> Accept[接受委托]
   Accept --> Activity[历练 / 炼丹 / 背包提交]
   Activity --> Check[达成条件]
@@ -56,8 +56,8 @@ flowchart LR
 
 | # | 功能 | 简述 | 实现要点 |
 |---|------|------|----------|
-| F01 | 道观入口 | 小道观增加「委托榜」入口 | `cave_hub` 进入委托面板；固定 UI 写 `.tscn` |
-| F02 | 委托列表 | 展示当前可见委托、进行中委托、可提交委托 | 数据来自 `data/weituo.yaml` + `DataStore.savedata["weituo"]` |
+| F01 | 道观入口 | 小道观增加「委托榜」入口 | `dongfu` 进入委托面板；固定 UI 写 `.tscn` |
+| F02 | 委托列表 | 展示当前可见委托、进行中委托、可提交委托 | 数据来自 `data/exportjson/weituo*.json` + `DataStore.savedata["weituo"]` |
 | F03 | 接受委托 | 玩家接受后写入存档 | 限制同时进行数量 `[PLACEHOLDER] 3`，避免刷满无决策 |
 | F04 | 条件追踪 | 材料、炼丹成品、历练结果三类条件 | 优先复用背包、炼丹、历练结算，不做新小游戏 |
 | F05 | 提交委托 | 条件满足后在道观提交 | 消耗交付物，调用 `RewardService.apply_rewards()` 发固定奖励 |
@@ -141,7 +141,7 @@ flowchart LR
 
 ### 6.1 配置文件
 
-新增 `res://data/weituo.yaml`。
+新增 `res://data/exportjson/weituo*.json`。
 
 ```yaml
 schema_version: 1
@@ -289,7 +289,7 @@ scripts/sim/weituo_service.gd
 
 ### `WeituoService`
 
-- 读取 `data/weituo.yaml`。
+- 读取 `data/exportjson/weituo*.json`。
 - 返回当前可见委托列表。
 - `accept(weituo_id)`：写入 active。
 - `can_submit(instance_id)`：检查需求是否满足。
@@ -318,7 +318,7 @@ scripts/sim/weituo_service.gd
 
 ## 11. 最小实施顺序
 
-1. 新增 `data/weituo.yaml`，先放 2 个委托：采药急件、巡青岚山路。
+1. 新增 `data/exportjson/weituo*.json`，先放 2 个委托：采药急件、巡青岚山路。
 2. 在 `DataStore` 增加 `weituo` 默认值和合并逻辑。
 3. 新增 `WeituoService`，只实现交付、接受、提交、固定奖励。
 4. 新增委托榜面板和卡片子场景，接到小道观入口。

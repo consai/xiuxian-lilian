@@ -2,7 +2,7 @@
 
 > 目标：所有玩家、怪物、精英、Boss 的首版面板都以本文为基准生成。先定“同等级标准玩家”，再按遭遇强度带和怪物模板换算敌人。
 
-配置落点：玩家每级基础四维与基础战斗面板在 `data/exportjson/realms.json`，怪物基准在 `data/exportjson/yunxing_params/jingjie_balance_monster_desig.json`。
+配置落点：玩家每级基础四维与基础战斗面板在 `data/exportjson/realms.json`，怪物基准在 `data/exportjson/yunxing_params/jingjie_balance_benchmark_ene.json`。
 
 ---
 

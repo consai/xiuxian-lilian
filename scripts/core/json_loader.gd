@@ -689,7 +689,6 @@ static func load_lilian_rules_bundle() -> Dictionary:
 
 static func load_moni_bundle() -> Dictionary:
 	var root := _export_settings(yunxing_params_path("moni.json"))
-	root["rules"] = _export_settings(yunxing_params_path("moni_rules.json"))
 	root["activities"] = _export_keyed_rows(yunxing_params_path("moni_activities.json"))
 	root["initial_player"] = _export_settings(yunxing_params_path("moni_initial_player.json"))
 	return root

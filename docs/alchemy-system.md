@@ -36,7 +36,7 @@
 -> 使用、出售或为下一次炼制继续积累
 ```
 
-一次炼制默认消耗 `shijian_rules.yaml` 中的炼丹基础耗时，并随境界倍率拉长。玩家可以连续炼制多炉，但每炉独立结算，方便展示结果和控制资源。
+一次炼制默认消耗 `data/exportjson/yunxing_params/shijian_rules.json` 中的炼丹基础耗时，并随境界倍率拉长。玩家可以连续炼制多炉，但每炉独立结算，方便展示结果和控制资源。
 
 ## 3. 固定丹方
 
@@ -327,7 +327,7 @@ pill.juqi.supreme
 
 ## 12. 数据结构建议
 
-### 丹方 `data/alchemy_recipes.json`
+### 丹方 `data/exportjson/liandan_recipes.json`
 
 ```json
 {
@@ -347,7 +347,7 @@ pill.juqi.supreme
 }
 ```
 
-### 丹炉 `data/alchemy_furnaces.json`
+### 丹炉 `data/exportjson/liandan_furnaces.json`
 
 ```json
 {

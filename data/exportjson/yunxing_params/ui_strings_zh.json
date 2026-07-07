@@ -23,10 +23,6 @@
     "key": "hover:skill:cd",
     "value": "冷却：{value}秒"
   },
-  "hover:skill:power": {
-    "key": "hover:skill:power",
-    "value": "威力：{value}"
-  },
   "hover:skill:tags": {
     "key": "hover:skill:tags",
     "value": "标签：{value}"
@@ -98,10 +94,6 @@
   "hover:equip:kind": {
     "key": "hover:equip:kind",
     "value": "战斗法宝"
-  },
-  "hover:buff:stacks": {
-    "key": "hover:buff:stacks",
-    "value": "层数：{value}"
   },
   "hover:buff:duration": {
     "key": "hover:buff:duration",
@@ -263,10 +255,6 @@
     "key": "combat:float:tiaoxi",
     "value": "调息"
   },
-  "combat:float:basic_attack": {
-    "key": "combat:float:basic_attack",
-    "value": "调息"
-  },
   "combat:float:damage": {
     "key": "combat:float:damage",
     "value": "-{value}"
@@ -275,17 +263,9 @@
     "key": "combat:float:heal",
     "value": "+{value}"
   },
-  "combat:float:mp_cost": {
-    "key": "combat:float:mp_cost",
-    "value": "-{value} MP"
-  },
   "combat:float:mp_gain": {
     "key": "combat:float:mp_gain",
     "value": "+{value} MP"
-  },
-  "combat:float:shield": {
-    "key": "combat:float:shield",
-    "value": "盾 -{value}"
   },
   "combat:float:shield_absorb": {
     "key": "combat:float:shield_absorb",

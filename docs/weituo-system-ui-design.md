@@ -30,7 +30,7 @@
 
 接入点：
 
-- 规范目标：`scenes/sim/cave_hub.tscn` / `scripts/sim/cave_hub.gd`
+- 规范目标：`scenes/sim/dongfu.tscn` / `scripts/sim/dongfu.gd`
 - 当前项目实际据点场景可按现有命名接：`scenes/sim/dongfu.tscn`
 
 ### 2.2 打开方式

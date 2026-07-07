@@ -12,12 +12,12 @@
 
 ```mermaid
 flowchart LR
-  Hub[洞府 cave_hub] --> Map[世界地图 world_map]
+  Hub[洞府 dongfu] --> Map[世界地图 world_map]
   Map --> Start[SceneManager.start_lilian]
-  Start --> Loop[历练主循环 expedition_loop]
-  Loop -->|战斗| Fight[战斗 fight_scene]
+  Start --> Loop[历练主循环 lilian_xunhuan]
+  Loop -->|战斗| Fight[战斗 zhandou_changjing]
   Fight --> Loop
-  Loop -->|返程/战败| Result[结算 expedition_result]
+  Loop -->|返程/战败| Result[结算 lilian_jiesuan]
   Result --> Hub
 ```
 
@@ -27,8 +27,8 @@ flowchart LR
 
 | # | 功能 | 简述 | 实现要点 |
 |---|------|------|----------|
-| F01 | 入口与互斥 | 洞府「外出历练」进世界地图；历练进行中禁止重复出发 | `cave_hub` → `SceneManager.go_world_map()`；`SceneManager` 拦截活跃历练 |
-| F02 | 地点选择与启程 | 地图弹窗展示危险度、推荐境界、预览奖励、探索深度档；确认后启程 | `world_map_controller.gd` 野外/地点弹窗 + `data/didian.yaml` |
+| F01 | 入口与互斥 | 洞府「外出历练」进世界地图；历练进行中禁止重复出发 | `dongfu` → `SceneManager.go_world_map()`；`SceneManager` 拦截活跃历练 |
+| F02 | 地点选择与启程 | 地图弹窗展示危险度、推荐境界、预览奖励、探索深度档；确认后启程 | `world_map_controller.gd` 野外/地点弹窗 + `data/exportjson/didian_locations.json` |
 | F03 | 启程 | 校验地点、快照玩家、初始化 RNG/统计/日志，并生成本局路线图 | `LilianState.start()` + `LilianMapService.generate()` |
 | F04 | 路线选择 | 玩家点击可达节点推进历练；不可跳层或重复访问已完成节点 | `choose_map_node()` + `current_available_nodes()` |
 | F05 | 节点事件解析 | 根据节点类型从地点事件池按权重抽事件，具体内容仍复用现有事件配置 | `LilianEventService.roll_event_for_node()` |
@@ -51,7 +51,7 @@ flowchart LR
 | F21 | 主动返程 | 非待战、非待抉择时可退出；战前弹窗关闭后的待战状态点返程走战前撤退 | `can_exit()` / `_is_pending_battle_dismissed()` + `go_lilian_jiesuan("manual")` |
 | F22 | 战败 | 战斗失败强制结算；固定掉落 30% 本次收获、伤势、气血下限 | `settle_pending_battle()` → `finish("defeated")` |
 | F23 | 战前撤退 | 关闭战前弹窗后点「主动返程」，记手动返程 | `retreat_from_pending_battle()` |
-| F24 | 结算页 | 统计、战利品、损失、世界变化、历练纪要 | `expedition_result.gd` |
+| F24 | 结算页 | 统计、战利品、损失、世界变化、历练纪要 | `lilian_jiesuan.gd` |
 | F25 | 存档回写 | 推进天数、同步物品、累计 totals、活动日志 | `GameState.settle_lilian()` |
 | F26 | 配置校验 | 地点池、事件、战斗初始化、奖励合法性 | `LilianDataValidator` + 测试 |
 
@@ -64,8 +64,8 @@ flowchart LR
 | 场景 ID | 路径 | 脚本 |
 |---------|------|------|
 | `world_map` | `scenes/map/map.tscn` | `world_map_controller.gd`（历练入口） |
-| `expedition_loop` | `scenes/lilian/expedition_loop.tscn` | `expedition_loop.gd` |
-| `expedition_result` | `scenes/lilian/expedition_result.tscn` | `expedition_result.gd` |
+| `lilian_xunhuan` | `scenes/lilian/lilian_xunhuan.tscn` | `lilian_xunhuan.gd` |
+| `lilian_jiesuan` | `scenes/lilian/lilian_jiesuan.tscn` | `lilian_jiesuan.gd` |
 | `lilian_zhandou_tanchuang` | `scenes/lilian/lilian_zhandou_tanchuang.tscn` | `lilian_zhandou_tanchuang_view.gd` |
 | `lilian_shijian_kapian` | `scenes/lilian/lilian_shijian_kapian.tscn` | `lilian_shijian_kapian.gd` |
 
@@ -89,12 +89,12 @@ flowchart LR
 
 | 文件 | 内容 |
 |------|------|
-| `data/didian.yaml` | 地点元数据、难度范围、`event_pool`、地图材料池、地图怪物池与掉落池 |
-| `data/lilian_common_events.yaml` | 已绑定地点的通用事件模板（赶路、采集、恢复、普通战斗等） |
-| `data/lilian_events.yaml` | 与地图绑定的唯一事件（抉择、剧情战斗、精英、首领等） |
-| `data/lilian_rules.yaml` | 全局规则（遭遇概率、战败惩罚、自动推进间隔、奖励预算等） |
+| `data/exportjson/didian_locations.json` | 地点元数据、难度范围、`event_pool`、地图材料池、地图怪物池与掉落池 |
+| `data/exportjson/lilian_common_events_events.json` | 已绑定地点的通用事件模板（赶路、采集、恢复、普通战斗等） |
+| `data/exportjson/lilian_events_events.json` | 与地图绑定的唯一事件（抉择、剧情战斗、精英、首领等） |
+| `data/exportjson/yunxing_params/lilian_rules.json` | 全局规则（遭遇概率、战败惩罚、自动推进间隔、奖励预算等） |
 
-地点统一通过 `event_pool` 引用事件。资源地图通常引用 `lilian_common_events.yaml` 中的地点模板；剧情地图可以引用 `lilian_events.yaml` 中的专属事件。
+地点统一通过 `event_pool` 引用事件。资源地图通常引用 `data/exportjson/lilian_common_events_events.json` 中的地点模板；剧情地图可以引用 `data/exportjson/lilian_events_events.json` 中的专属事件。
 
 ---
 
@@ -237,7 +237,7 @@ choose_map_node(node_id)
 
 ---
 
-## 7. 规则参数（`lilian_rules.yaml`）
+## 7. 规则参数（`data/exportjson/yunxing_params/lilian_rules.json`）
 
 | 键 | 默认 | 含义 |
 |----|------|------|
