@@ -7,6 +7,13 @@
 # 配置表导出工具本地输出（previews / inspect / 副本 xlsx）
 /outputs/
 **/*.inspect.ndjson
+/.codex_spreadsheet_work/
+__pycache__/
+~$*.xlsx
+/backpack_preview*.png
+/backpack_preview*.wav
+/backpack_preview*.png.import
+/backpack_preview*.wav.import
 
 # Editor/user-specific caches (never commit)
 /.godot/editor/

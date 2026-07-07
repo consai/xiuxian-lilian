@@ -1,35 +1,29 @@
 {
   "lianqi_early": {
     "key": "lianqi_early",
-    "realm_index": 0,
-    "major_realm": "lianqi",
     "foundations": {
-      "roushen": 10,
-      "lingli": 10,
-      "shenshi": 10,
-      "shenfa": 10
+      "body": 10,
+      "spirit": 10,
+      "sense": 10,
+      "agility": 10
     }
   },
   "lianqi_mature": {
     "key": "lianqi_mature",
-    "realm_index": 6,
-    "major_realm": "lianqi",
     "foundations": {
-      "roushen": 13,
-      "lingli": 13,
-      "shenshi": 13,
-      "shenfa": 13
+      "body": 13,
+      "spirit": 13,
+      "sense": 13,
+      "agility": 13
     }
   },
   "zhuji_early": {
     "key": "zhuji_early",
-    "realm_index": 9,
-    "major_realm": "zhuji",
     "foundations": {
-      "roushen": 16,
-      "lingli": 16,
-      "shenshi": 16,
-      "shenfa": 16
+      "body": 16,
+      "spirit": 16,
+      "sense": 16,
+      "agility": 16
     }
   }
 }

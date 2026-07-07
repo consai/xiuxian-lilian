@@ -1,61 +1,7 @@
 {
-  "base_monthly_gain_formula": {
-    "key": "base_monthly_gain_formula",
-    "value": "round(20 * major_realm.content_coefficient * layer_multiplier)",
-    "early": null,
-    "mid": null,
-    "late": null,
-    "single": null,
-    "lianqi": null,
-    "zhuji": null,
-    "jindan": null,
-    "yuanying": null,
-    "huashen": null,
-    "lianxu": null,
-    "heti": null,
-    "dacheng": null,
-    "dujie": null,
-    "anchor_realm": null,
-    "reference_phase": null,
-    "medium_cultivation_gain": null,
-    "quality_band_multiplier": null,
-    "tier_major_realm": null,
-    "formula_medium": null,
-    "formula_gain": null,
-    "design_note": null
-  },
-  "layer_multiplier": {
-    "key": "layer_multiplier",
-    "value": null,
-    "early": "1",
-    "mid": "1.15",
-    "late": "1.3",
-    "single": "1",
-    "lianqi": null,
-    "zhuji": null,
-    "jindan": null,
-    "yuanying": null,
-    "huashen": null,
-    "lianxu": null,
-    "heti": null,
-    "dacheng": null,
-    "dujie": null,
-    "anchor_realm": null,
-    "reference_phase": null,
-    "medium_cultivation_gain": null,
-    "quality_band_multiplier": null,
-    "tier_major_realm": null,
-    "formula_medium": null,
-    "formula_gain": null,
-    "design_note": null
-  },
   "base_monthly_gain_by_realm": {
     "key": "base_monthly_gain_by_realm",
     "value": null,
-    "early": null,
-    "mid": null,
-    "late": null,
-    "single": null,
     "lianqi": {
       "early": 30,
       "mid": 40,
@@ -103,18 +49,11 @@
     "reference_phase": null,
     "medium_cultivation_gain": null,
     "quality_band_multiplier": null,
-    "tier_major_realm": null,
-    "formula_medium": null,
-    "formula_gain": null,
-    "design_note": null
+    "tier_major_realm": null
   },
   "cultivation_pill_balance": {
     "key": "cultivation_pill_balance",
     "value": null,
-    "early": null,
-    "mid": null,
-    "late": null,
-    "single": null,
     "lianqi": null,
     "zhuji": null,
     "jindan": null,
@@ -143,9 +82,6 @@
       "7": "heti",
       "8": "dacheng",
       "9": "dujie"
-    },
-    "formula_medium": "round(medium_cultivation_gain * base_monthly_gain[major_realm][reference_phase] / base_monthly_gain[anchor_realm][reference_phase])",
-    "formula_gain": "round(medium_gain * quality_band_multiplier[band])",
-    "design_note": "相对同境界日常修炼（日修为=月修为×0.1）加速比恒定为 medium_cultivation_gain / (anchor月修为×0.1)；练气为 100/3≈33×。品质档位由物品 id 后缀 _Low/_High/_Supreme 判定，无后缀为中品。"
+    }
   }
 }

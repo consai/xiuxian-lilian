@@ -204,7 +204,7 @@
   "cultivation.qi_sense": {
     "id": "cultivation.qi_sense",
     "name": "引气术",
-    "domain": "cultivation",
+    "domain": "zhuji",
     "realm": "lianqi",
     "tier": 1,
     "rank": 1,
@@ -221,7 +221,7 @@
   "cultivation.cycle": {
     "id": "cultivation.cycle",
     "name": "小周天",
-    "domain": "cultivation",
+    "domain": "zhuji",
     "realm": "lianqi",
     "tier": 1,
     "rank": 2,
@@ -242,7 +242,7 @@
   "cultivation.purity": {
     "id": "cultivation.purity",
     "name": "真气纯化",
-    "domain": "cultivation",
+    "domain": "zhuji",
     "realm": "lianqi",
     "tier": 1,
     "rank": 2,
@@ -259,7 +259,7 @@
   "cultivation.great_cycle": {
     "id": "cultivation.great_cycle",
     "name": "大周天",
-    "domain": "cultivation",
+    "domain": "zhuji",
     "realm": "zhuji",
     "tier": 2,
     "rank": 4,
@@ -280,7 +280,7 @@
   "cultivation.liquid_mana": {
     "id": "cultivation.liquid_mana",
     "name": "真元化液",
-    "domain": "cultivation",
+    "domain": "zhuji",
     "realm": "zhuji",
     "tier": 2,
     "rank": 4,
@@ -301,7 +301,7 @@
   "cultivation.core_fire": {
     "id": "cultivation.core_fire",
     "name": "丹火自生",
-    "domain": "cultivation",
+    "domain": "zhuji",
     "realm": "jindan",
     "tier": 3,
     "rank": 6,
@@ -322,7 +322,7 @@
   "cultivation.nascent_cycle": {
     "id": "cultivation.nascent_cycle",
     "name": "婴息周天",
-    "domain": "cultivation",
+    "domain": "zhuji",
     "realm": "yuanying",
     "tier": 4,
     "rank": 8,
@@ -343,7 +343,7 @@
   "cultivation.heaven_cycle": {
     "id": "cultivation.heaven_cycle",
     "name": "天地周天",
-    "domain": "cultivation",
+    "domain": "zhuji",
     "realm": "huashen",
     "tier": 5,
     "rank": 10,
@@ -360,7 +360,7 @@
   "cultivation.void_furnace": {
     "id": "cultivation.void_furnace",
     "name": "虚空烘炉",
-    "domain": "cultivation",
+    "domain": "zhuji",
     "realm": "lianxu",
     "tier": 6,
     "rank": 14,
@@ -381,7 +381,7 @@
   "cultivation.endless": {
     "id": "cultivation.endless",
     "name": "法力无涯",
-    "domain": "cultivation",
+    "domain": "zhuji",
     "realm": "heti",
     "tier": 7,
     "rank": 18,
@@ -402,7 +402,7 @@
   "cultivation.dao_engine": {
     "id": "cultivation.dao_engine",
     "name": "道果运转",
-    "domain": "cultivation",
+    "domain": "zhuji",
     "realm": "dacheng",
     "tier": 8,
     "rank": 24,
@@ -423,7 +423,7 @@
   "cultivation.immortal_qi": {
     "id": "cultivation.immortal_qi",
     "name": "仙灵转化",
-    "domain": "cultivation",
+    "domain": "zhuji",
     "realm": "dujie",
     "tier": 9,
     "rank": 36,
@@ -444,7 +444,7 @@
   "body.tempering": {
     "id": "body.tempering",
     "name": "皮肉锻炼",
-    "domain": "body",
+    "domain": "zhuji",
     "realm": "lianqi",
     "tier": 1,
     "rank": 1,
@@ -461,7 +461,7 @@
   "body.bone": {
     "id": "body.bone",
     "name": "锻骨易筋",
-    "domain": "body",
+    "domain": "zhuji",
     "realm": "lianqi",
     "tier": 1,
     "rank": 2,
@@ -482,7 +482,7 @@
   "body.recovery": {
     "id": "body.recovery",
     "name": "气血搬运",
-    "domain": "body",
+    "domain": "zhuji",
     "realm": "lianqi",
     "tier": 1,
     "rank": 2,
@@ -503,7 +503,7 @@
   "body.jade": {
     "id": "body.jade",
     "name": "玉骨灵身",
-    "domain": "body",
+    "domain": "zhuji",
     "realm": "zhuji",
     "tier": 2,
     "rank": 4,
@@ -524,7 +524,7 @@
   "body.bloodline": {
     "id": "body.bloodline",
     "name": "血脉觉醒",
-    "domain": "body",
+    "domain": "zhuji",
     "realm": "jindan",
     "tier": 3,
     "rank": 6,
@@ -541,7 +541,7 @@
   "body.regeneration": {
     "id": "body.regeneration",
     "name": "滴血重生",
-    "domain": "body",
+    "domain": "zhuji",
     "realm": "yuanying",
     "tier": 4,
     "rank": 9,
@@ -562,7 +562,7 @@
   "body.dharma_form": {
     "id": "body.dharma_form",
     "name": "法相真身",
-    "domain": "body",
+    "domain": "zhuji",
     "realm": "huashen",
     "tier": 5,
     "rank": 11,
@@ -583,7 +583,7 @@
   "body.void_body": {
     "id": "body.void_body",
     "name": "虚空法体",
-    "domain": "body",
+    "domain": "zhuji",
     "realm": "lianxu",
     "tier": 6,
     "rank": 15,
@@ -604,7 +604,7 @@
   "body.unity": {
     "id": "body.unity",
     "name": "精气神合一",
-    "domain": "body",
+    "domain": "zhuji",
     "realm": "heti",
     "tier": 7,
     "rank": 19,
@@ -621,7 +621,7 @@
   "body.indestructible": {
     "id": "body.indestructible",
     "name": "不灭道身",
-    "domain": "body",
+    "domain": "zhuji",
     "realm": "dacheng",
     "tier": 8,
     "rank": 26,
@@ -642,7 +642,7 @@
   "body.tribulation_body": {
     "id": "body.tribulation_body",
     "name": "劫体",
-    "domain": "body",
+    "domain": "zhuji",
     "realm": "dujie",
     "tier": 9,
     "rank": 38,

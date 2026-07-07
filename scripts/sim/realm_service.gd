@@ -56,4 +56,29 @@ static func _normalize_row(export_row: Dictionary) -> Dictionary:
 		"major_realm": major_realm,
 		"breakthrough_at": xiuwei,
 		"xiuwei": xiuwei,
+		"foundations": _foundation_attrs(export_row),
+		"combat_attrs": _combat_attrs(export_row),
 	}
+
+static func _foundation_attrs(row: Dictionary) -> Dictionary:
+	return {
+		CharacterStats.BODY: float(row.get(CharacterStats.BODY, 0.0)),
+		CharacterStats.SPIRIT: float(row.get(CharacterStats.SPIRIT, 0.0)),
+		CharacterStats.SENSE: float(row.get(CharacterStats.SENSE, 0.0)),
+		CharacterStats.AGILITY: float(row.get(CharacterStats.AGILITY, 0.0)),
+	}
+
+
+static func _combat_attrs(row: Dictionary) -> Dictionary:
+	var attrs := {}
+	for key in [
+		ZhandouAttr.HP_MAX, ZhandouAttr.MP_MAX,
+		ZhandouAttr.PHYSICAL_ATK, ZhandouAttr.MAGIC_ATK,
+		ZhandouAttr.PHYSICAL_DEF, ZhandouAttr.MAGIC_DEF,
+		ZhandouAttr.SPD, ZhandouAttr.CONTROL_RESIST,
+	]:
+		if row.has(key):
+			attrs[key] = float(row[key])
+	if row.has("control"):
+		attrs[ZhandouAttr.CONTROL_POWER] = float(row["control"])
+	return attrs

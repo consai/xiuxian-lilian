@@ -945,7 +945,6 @@ static func _merge_use_success(fx_report: Dictionary) -> Dictionary:
 		ZhandouReportScript.KEY_BUFF_NAMES: _duplicate_buff_names(
 			normalized.get(ZhandouReportScript.KEY_BUFF_NAMES, [])
 		),
-		ZhandouReportScript.KEY_MISSED: bool(normalized.get(ZhandouReportScript.KEY_MISSED, false)),
 		ZhandouReportScript.KEY_CONTROL_RESISTED: bool(
 			normalized.get(ZhandouReportScript.KEY_CONTROL_RESISTED, false)
 		),

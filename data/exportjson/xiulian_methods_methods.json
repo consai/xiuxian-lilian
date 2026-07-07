@@ -425,10 +425,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "lianxu_resistance",
+        "effectId": "void_resistance",
         "base": 0.2,
         "operation": "add_percent",
-        "stackGroup": "lianxu_resistance",
+        "stackGroup": "void_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,
@@ -664,10 +664,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "dujie_resistance",
+        "effectId": "tribulation_resistance",
         "base": 0.24,
         "operation": "add_percent",
-        "stackGroup": "dujie_resistance",
+        "stackGroup": "tribulation_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,
@@ -1140,10 +1140,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "lianxu_survival",
+        "effectId": "void_survival",
         "base": 0.24,
         "operation": "add_percent",
-        "stackGroup": "lianxu_survival",
+        "stackGroup": "void_survival",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -1174,10 +1174,10 @@
         "masteryGrowth": 0.025
       },
       {
-        "effectId": "lianxu_herb_growth",
+        "effectId": "void_herb_growth",
         "base": 0.2,
         "operation": "add_percent",
-        "stackGroup": "lianxu_herb_growth",
+        "stackGroup": "void_herb_growth",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -1379,10 +1379,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "dujie_recovery",
+        "effectId": "tribulation_recovery",
         "base": 0.28,
         "operation": "add_percent",
-        "stackGroup": "dujie_recovery",
+        "stackGroup": "tribulation_recovery",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -1396,10 +1396,10 @@
         "masteryGrowth": 0.035
       },
       {
-        "effectId": "dujie_resistance",
+        "effectId": "tribulation_resistance",
         "base": 0.14,
         "operation": "add_percent",
-        "stackGroup": "dujie_resistance",
+        "stackGroup": "tribulation_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,
@@ -1889,10 +1889,10 @@
         "masteryGrowth": 0.039
       },
       {
-        "effectId": "lianxu_target_accuracy",
+        "effectId": "void_target_accuracy",
         "base": 0.242,
         "operation": "add_percent",
-        "stackGroup": "lianxu_target_accuracy",
+        "stackGroup": "void_target_accuracy",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -2095,10 +2095,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "dujie_damage",
+        "effectId": "tribulation_damage",
         "base": 0.44,
         "operation": "add_percent",
-        "stackGroup": "dujie_damage",
+        "stackGroup": "tribulation_damage",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -2129,10 +2129,10 @@
         "masteryGrowth": 0.05
       },
       {
-        "effectId": "dujie_sever",
+        "effectId": "tribulation_sever",
         "base": 0.352,
         "operation": "add_percent",
-        "stackGroup": "dujie_sever",
+        "stackGroup": "tribulation_sever",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -2568,10 +2568,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "lianxu_resistance",
+        "effectId": "void_resistance",
         "base": 0.3,
         "operation": "add_percent",
-        "stackGroup": "lianxu_resistance",
+        "stackGroup": "void_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,
@@ -2601,10 +2601,10 @@
         "masteryGrowth": 110
       },
       {
-        "effectId": "lianxu_mobility",
+        "effectId": "void_mobility",
         "base": 0.2,
         "operation": "add_percent",
-        "stackGroup": "lianxu_mobility",
+        "stackGroup": "void_mobility",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -2806,10 +2806,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "dujie_resistance",
+        "effectId": "tribulation_resistance",
         "base": 0.4,
         "operation": "add_percent",
-        "stackGroup": "dujie_resistance",
+        "stackGroup": "tribulation_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,
@@ -2840,10 +2840,10 @@
         "masteryGrowth": 0.035
       },
       {
-        "effectId": "dujie_energy_absorption",
+        "effectId": "tribulation_energy_absorption",
         "base": 0.3,
         "operation": "add_percent",
-        "stackGroup": "dujie_energy_absorption",
+        "stackGroup": "tribulation_energy_absorption",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -3539,10 +3539,10 @@
         "masteryGrowth": 0.055
       },
       {
-        "effectId": "dujie_control",
+        "effectId": "tribulation_control",
         "base": 0.242,
         "operation": "add_percent",
-        "stackGroup": "dujie_control",
+        "stackGroup": "tribulation_control",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -4032,10 +4032,10 @@
         "masteryGrowth": 0.05
       },
       {
-        "effectId": "lianxu_spell_accuracy",
+        "effectId": "void_spell_accuracy",
         "base": 0.242,
         "operation": "add_percent",
-        "stackGroup": "lianxu_spell_accuracy",
+        "stackGroup": "void_spell_accuracy",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -4238,10 +4238,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "dujie_damage",
+        "effectId": "tribulation_damage",
         "base": 0.605,
         "operation": "add_percent",
-        "stackGroup": "dujie_damage",
+        "stackGroup": "tribulation_damage",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -4255,10 +4255,10 @@
         "masteryGrowth": 0.061
       },
       {
-        "effectId": "dujie_resistance",
+        "effectId": "tribulation_resistance",
         "base": 0.22,
         "operation": "add_percent",
-        "stackGroup": "dujie_resistance",
+        "stackGroup": "tribulation_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,
@@ -4272,10 +4272,10 @@
         "masteryGrowth": 0.033
       },
       {
-        "effectId": "dujie_energy_absorption",
+        "effectId": "tribulation_energy_absorption",
         "base": 0.33,
         "operation": "add_percent",
-        "stackGroup": "dujie_energy_absorption",
+        "stackGroup": "tribulation_energy_absorption",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -4748,10 +4748,10 @@
         "masteryGrowth": 0.035
       },
       {
-        "effectId": "lianxu_ship_range",
+        "effectId": "void_ship_range",
         "base": 0.22,
         "operation": "add_percent",
-        "stackGroup": "lianxu_ship_range",
+        "stackGroup": "void_ship_range",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -4971,10 +4971,10 @@
         "masteryGrowth": 0.055
       },
       {
-        "effectId": "dujie_control",
+        "effectId": "tribulation_control",
         "base": 0.36,
         "operation": "add_percent",
-        "stackGroup": "dujie_control",
+        "stackGroup": "tribulation_control",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -5430,10 +5430,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "lianxu_survival",
+        "effectId": "void_survival",
         "base": 0.313,
         "operation": "add_percent",
-        "stackGroup": "lianxu_survival",
+        "stackGroup": "void_survival",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -5464,10 +5464,10 @@
         "masteryGrowth": 0.023
       },
       {
-        "effectId": "lianxu_route_safety",
+        "effectId": "void_route_safety",
         "base": 0.202,
         "operation": "add_percent",
-        "stackGroup": "lianxu_route_safety",
+        "stackGroup": "void_route_safety",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -5749,10 +5749,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "dujie_forecast",
+        "effectId": "tribulation_forecast",
         "base": 0.198,
         "operation": "add_percent",
-        "stackGroup": "dujie_forecast",
+        "stackGroup": "tribulation_forecast",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -5783,10 +5783,10 @@
         "masteryGrowth": 0.024
       },
       {
-        "effectId": "dujie_warning_time",
+        "effectId": "tribulation_warning_time",
         "base": 0.198,
         "operation": "add_percent",
-        "stackGroup": "dujie_warning_time",
+        "stackGroup": "tribulation_warning_time",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -5843,10 +5843,10 @@
         "masteryGrowth": 0.033
       },
       {
-        "effectId": "dujie_forecast",
+        "effectId": "tribulation_forecast",
         "base": 0.308,
         "operation": "add_percent",
-        "stackGroup": "dujie_forecast",
+        "stackGroup": "tribulation_forecast",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -5923,10 +5923,10 @@
         "masteryGrowth": 0.044
       },
       {
-        "effectId": "dujie_control",
+        "effectId": "tribulation_control",
         "base": 0.198,
         "operation": "add_percent",
-        "stackGroup": "dujie_control",
+        "stackGroup": "tribulation_control",
         "stackPolicy": "highest",
         "activation": "active_method",
         "cap": 2,
@@ -5940,10 +5940,10 @@
         "masteryGrowth": 0.031
       },
       {
-        "effectId": "dujie_plan_slots",
+        "effectId": "tribulation_plan_slots",
         "base": 1.1,
         "operation": "add_flat",
-        "stackGroup": "dujie_plan_slots",
+        "stackGroup": "tribulation_plan_slots",
         "stackPolicy": "highest",
         "activation": "active_method",
         "attributes": {
@@ -5985,10 +5985,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "dujie_resistance",
+        "effectId": "tribulation_resistance",
         "base": 0.352,
         "operation": "add_percent",
-        "stackGroup": "dujie_resistance",
+        "stackGroup": "tribulation_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,
@@ -6019,10 +6019,10 @@
         "masteryGrowth": 0.044
       },
       {
-        "effectId": "dujie_resource_efficiency",
+        "effectId": "tribulation_resource_efficiency",
         "base": 0.308,
         "operation": "add_percent",
-        "stackGroup": "dujie_resource_efficiency",
+        "stackGroup": "tribulation_resource_efficiency",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 2,
@@ -6065,10 +6065,10 @@
     "knowledge": [],
     "effects": [
       {
-        "effectId": "dujie_resistance",
+        "effectId": "tribulation_resistance",
         "base": 0.55,
         "operation": "add_percent",
-        "stackGroup": "dujie_resistance",
+        "stackGroup": "tribulation_resistance",
         "stackPolicy": "add_capped",
         "activation": "active_method",
         "cap": 0.85,

@@ -1,26 +1,6 @@
 {
   "ability_same_tier_variance": {
     "key": "ability_same_tier_variance",
-    "value": 0.15,
-    "main": null,
-    "support_1": null,
-    "support_2": null,
-    "movement": null
-  },
-  "method_same_tier_variance": {
-    "key": "method_same_tier_variance",
-    "value": 0.12,
-    "main": null,
-    "support_1": null,
-    "support_2": null,
-    "movement": null
-  },
-  "slot_weights": {
-    "key": "slot_weights",
-    "value": null,
-    "main": "1",
-    "support_1": "0.4",
-    "support_2": "0.4",
-    "movement": "0.5"
+    "value": 0.15
   }
 }

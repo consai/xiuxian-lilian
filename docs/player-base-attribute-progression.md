@@ -2,7 +2,7 @@
 
 > 目标：所有玩家、怪物、精英、Boss 的首版面板都以本文为基准生成。先定“同等级标准玩家”，再按遭遇强度带和怪物模板换算敌人。
 
-配置落点：`data/exportjson/yunxing_params/jingjie_balance_player_level_.json` 与 `data/exportjson/yunxing_params/jingjie_balance_monster_desig.json`。
+配置落点：玩家每级基础四维与基础战斗面板在 `data/exportjson/realms.json`，怪物基准在 `data/exportjson/yunxing_params/jingjie_balance_monster_desig.json`。
 
 ---
 
@@ -34,8 +34,8 @@
 |---|---|---|---|
 | 肉身 | `roushen` | 气血、物攻、物防、控制抗性 | 负重、采集、环境承载 |
 | 灵力 | `lingli` | 法力、法攻、法防、控制强度 | 阵法驱动、飞行续航 |
-| 神识 | `shenshi` | 命中、控制、反应、法攻补正 | 感知、炼丹炼器精度 |
-| 身法 | `shenfa` | 闪避、追逃、行动速度 | 探索机动、旅行安全 |
+| 神识 | `shenshi` | 控制、反应、法攻补正 | 感知、炼丹炼器精度 |
+| 身法 | `shenfa` | 追逃、行动速度 | 探索机动、旅行安全 |
 
 资质属性不直接堆战斗面板：
 
@@ -87,36 +87,27 @@
 
 ## 4. 战斗面板公式
 
-进入战斗时统一走 `CharacterStats.build_combat_attrs()`：
+进入战斗时先取当前 `realms.json` 行的基础面板，再叠加功法、装备等运行时修正：
 
 ```text
-基础面板 = combat_attribute_formula(四维根基)
-境界固定值 = realm_flat_per_layer * (level - 1)
-最终面板 = (基础面板 + 境界固定值 + 其他固定值) * (1 + 同类百分比之和)
+基础面板 = realms.json[当前等级].combat_attrs
+最终面板 = (基础面板 + 其他固定值) * (1 + 同类百分比之和)
 ```
 
 核心推导公式来自 `data/exportjson/yunxing_params/jingjie_balance_combat_attrib.json`：
 
 | 面板 | 公式 |
 |---|---|
-| 气血 | `50 + roushen * 5 + realm_flat` |
-| 法力 | `50 + lingli * 5 + realm_flat` |
-| 物攻 | `roushen * 3 + realm_flat` |
-| 法攻 | `lingli * 2.4 + shenshi * 0.8 + realm_flat` |
-| 物防 | `roushen * 2 + realm_flat` |
-| 法防 | `lingli * 1.2 + shenshi * 1.2 + realm_flat` |
-| 速度 | `50 + shenfa * 3 + shenshi * 2 + realm_flat` |
-| 命中 | `50 + shenshi * 3 + shenfa` |
-| 闪避 | `50 + shenfa * 3 + shenshi` |
-| 控制强度 | `shenshi * 3 + lingli` |
-| 控制抗性 | `shenshi * 2 + roushen` |
+| 气血 | `roushen * 10 + 80` |
+| 法力 | `lingli * 5 + 80` |
+| 物攻 | `roushen * 2.5` |
+| 法攻 | `lingli * 2.3 + shenshi * 0.5` |
+| 物防 | `roushen * 1.2` |
+| 法防 | `lingli * 1.1 + shenshi * 0.8` |
+| 速度 | `shenfa * 2 + shenshi * 0.5 + 100` |
+| 控制强度 | `shenshi * 1.6 + lingli * 0.5` |
+| 控制抗性 | `roushen + shenshi * 1.2` |
 
-`realm_flat_per_layer` 当前为：
-
-```text
-hp_max +30, mp_max +24, physical_atk +5.5, magic_atk +6.0,
-physical_def +3.5, magic_def +4.2, spd +2.0
-```
 
 ---
 

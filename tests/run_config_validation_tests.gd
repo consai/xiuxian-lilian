@@ -60,8 +60,9 @@ func _test_realm_balance_covers_simulation_realms() -> void:
 	_expect_true(errors.is_empty(), "realm balance errors: %s" % str(errors))
 	var lianqi := RealmBalanceServiceScript.major_realm_by_id("lianqi")
 	_expect_eq(str(lianqi.get("name", "")), "练气", "lianqi realm configured")
-	var mods := RealmBalanceServiceScript.realm_flat_modifiers(2)
-	_expect_near(float(mods.get(ZhandouAttr.HP_MAX, 0.0)), 60.0, "realm layer hp modifier")
+	var first_realm := RealmService.realms()[0] as Dictionary
+	var attrs := first_realm.get("combat_attrs", {}) as Dictionary
+	_expect_near(float(attrs.get(ZhandouAttr.HP_MAX, 0.0)), 180.0, "realm row hp configured")
 
 
 func _test_realm_threshold_formula() -> void:

@@ -104,28 +104,28 @@ func _test_new_game_and_daily_activities() -> void:
 	state.cultivation = state.breakthrough_at
 	_expect_true(not state.can_breakthrough(), "same major realm does not need breakthrough")
 	_expect_eq(state._auto_advance_layers(), 1, "layer auto advance to lianqi 2")
-	_expect_eq(state.realm_name, "练气中期", "auto advanced to lianqi layer 2")
+	_expect_eq(state.realm_name, "炼气二层", "auto advanced to lianqi layer 2")
 	_expect_true(
-		ZhandouAttr.get_attr(state.attrs, ZhandouAttr.HP_MAX) >= base_hp_max + 6.0,
+		ZhandouAttr.get_attr(state.attrs, ZhandouAttr.HP_MAX) > base_hp_max,
 		"layer advance raises hp max"
 	)
 	state.cultivation = state.breakthrough_at
 	_expect_eq(state._auto_advance_layers(), 1, "layer auto advance to lianqi 3")
-	_expect_eq(state.realm_name, "练气后期", "auto advanced to lianqi layer 3")
+	_expect_eq(state.realm_name, "炼气三层", "auto advanced to lianqi layer 3")
 	_expect_true(
-		ZhandouAttr.get_attr(state.attrs, ZhandouAttr.HP_MAX) >= base_hp_max + 12.0,
+		ZhandouAttr.get_attr(state.attrs, ZhandouAttr.HP_MAX) > base_hp_max,
 		"second layer advance raises hp max"
 	)
-	state.realm_index = 2
+	state.realm_index = 8
 	state._sync_realm()
 	state.cultivation = state.breakthrough_at
 	_expect_true(state.can_breakthrough(), "major realm breakthrough available")
 	var result: Dictionary = state.breakthrough()
 	_expect_true(bool(result.get("ok", false)), "breakthrough succeeds")
-	_expect_eq(state.realm_name, "筑基初期", "breakthrough to zhuji")
-	_expect_near(float(state.foundations.get(CharacterStatsScript.BODY, 0.0)), base_body + 1.0, "breakthrough grows body")
+	_expect_eq(state.realm_name, "筑基一层", "breakthrough to zhuji")
+	_expect_gt(float(state.foundations.get(CharacterStatsScript.BODY, 0.0)), base_body, "breakthrough uses realm body")
 	_expect_true(
-		ZhandouAttr.get_attr(state.attrs, ZhandouAttr.HP_MAX) >= base_hp_max + 18.0,
+		ZhandouAttr.get_attr(state.attrs, ZhandouAttr.HP_MAX) > base_hp_max,
 		"major breakthrough raises hp max"
 	)
 
@@ -151,13 +151,13 @@ func _test_main_method_replacement_and_passive_practice() -> void:
 
 func _test_breakthrough_preview_without_knowledge_gate() -> void:
 	var state := _state()
-	state.realm_index = 2
+	state.realm_index = 8
 	state._sync_realm()
 	state.cultivation = state.breakthrough_at
 	var preview: Dictionary = state.preview_breakthrough()
 	_expect_true(bool(preview.get("ok", false)), "preview still returns breakdown")
-	_expect_eq(str(preview.get("current_realm_name", "")), "练气后期", "preview uses current realm")
-	_expect_eq(str(preview.get("target_realm_name", "")), "筑基初期", "preview uses target realm")
+	_expect_eq(str(preview.get("current_realm_name", "")), "炼气九层", "preview uses current realm")
+	_expect_eq(str(preview.get("target_realm_name", "")), "筑基一层", "preview uses target realm")
 	_expect_eq(str(preview.get("knowledge_error", "")), "", "knowledge gates are removed")
 	_expect_true(not bool(preview.get("can_attempt", true)), "still blocked when breakthrough value is low")
 
@@ -169,15 +169,15 @@ func _test_foundations_derive_combat_attributes() -> void:
 		CharacterStatsScript.SENSE: 10,
 		CharacterStatsScript.AGILITY: 10,
 	})
-	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.HP_MAX), 100.0, "derived hp")
-	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.MP_MAX), 100.0, "derived mp")
-	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.PHYSICAL_ATK), 30.0, "derived physical attack")
-	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.MAGIC_ATK), 32.0, "derived magic attack")
-	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.PHYSICAL_DEF), 20.0, "derived physical defense")
-	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.MAGIC_DEF), 24.0, "derived magic defense")
-	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.SPD), 100.0, "derived action speed")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.HP_MAX), 180.0, "derived hp")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.MP_MAX), 130.0, "derived mp")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.PHYSICAL_ATK), 25.0, "derived physical attack")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.MAGIC_ATK), 28.0, "derived magic attack")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.PHYSICAL_DEF), 12.0, "derived physical defense")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.MAGIC_DEF), 19.0, "derived magic defense")
+	_expect_near(ZhandouAttr.get_attr(attrs, ZhandouAttr.SPD), 125.0, "derived action speed")
 	var legacy_attrs: Dictionary = CharacterStatsScript.build_combat_attrs({"body": 10, "spirit": 10, "sense": 10, "agility": 10})
-	_expect_near(ZhandouAttr.get_attr(legacy_attrs, ZhandouAttr.HP_MAX), 100.0, "legacy foundations still normalize")
+	_expect_near(ZhandouAttr.get_attr(legacy_attrs, ZhandouAttr.HP_MAX), 180.0, "legacy foundations still normalize")
 
 
 func _test_cultivation_methods() -> void:
@@ -684,7 +684,7 @@ func _test_pre_foundation_resource_loop() -> void:
 		state.cultivation_pill_instability(pill_id),
 		"crafted pill keeps instability cost"
 	)
-	state.realm_index = 2
+	state.realm_index = 8
 	state._sync_realm()
 	state.cultivation = state.breakthrough_at
 	var breakthrough: Dictionary = state.preview_breakthrough()

@@ -6,18 +6,17 @@
 
 核心配置位于 `res://data/exportjson/yunxing_params/jingjie_balance*.json`。
 
-人物 `Lv1-Lv90` 基础属性成长、大境界质变和怪物换算基准见 `res://docs/player-base-attribute-progression.md`；机器可读配置位于 `player_level_curve` 与 `monster_design_baseline`。
+人物每级基础四维与基础战斗面板位于 `res://data/exportjson/realms.json`；怪物换算基准位于 `monster_design_baseline`。
 
 境界与突破规则位于 `res://data/exportjson/realms.json` 与 `res://data/exportjson/yunxing_params/tupo_rules*.json`；设计时以导出 JSON 为准。
 
 | 区块 | 用途 |
 |---|---|
-| `rules` | 记录防御、命中、控制和速度的全局常数。当前运行时常数仍在 `ZhandouAttr` / `ZhandouBalance` 中定义，本区块是设计基准与后续迁移入口。 |
+| `rules` | 记录防御、控制和速度的全局常数。当前运行时常数仍在 `ZhandouAttr` / `ZhandouBalance` 中定义，本区块是设计基准与后续迁移入口。 |
 | `major_realms` | 大境界顺序、内容系数与普通/精英/Boss 战目标时长。 |
-| `player_level_curve` | 人物内容等级、每级根基成长、大境界脉冲和标准面板生成规则。 |
+| `realms.json` | 人物每级基础四维、修为门槛与基础战斗面板。 |
 | `monster_design_baseline` | 怪物以标准玩家为母板时的强度换算、模板系数与 Boss 预算约束。 |
 | `combat_attribute_formula` | 四维根基推导战斗面板的公式。 |
-| `realm_flat_per_layer` | 每提升一个小境界给的固定面板加成。 |
 | `standard_players` | 自动化平衡测试使用的标准玩家快照。 |
 | `benchmark_enemies` | 自动化平衡测试使用的标杆敌人。 |
 | `encounter_bands` | 弱敌、普通、强敌、精英、Boss 的强度预算区间。 |
@@ -29,12 +28,12 @@
 ```gdscript
 const RealmBalanceServiceScript := preload("res://scripts/sim/realm_balance_service.gd")
 
-var attrs := RealmBalanceServiceScript.build_base_combat_attrs(foundations)
-var realm_mods := RealmBalanceServiceScript.realm_flat_modifiers(realm_index)
+var realm := RealmService.realms()[realm_index]
+var attrs := realm.get("combat_attrs", {})
 var enemy := RealmBalanceServiceScript.benchmark_enemy_attrs("qi_normal")
 ```
 
-`CharacterStats.build_combat_attrs()` 已经接入 `RealmBalanceService`，因此角色面板公式和境界固定加成现在都从配置生成。
+角色基础面板直接使用当前 `realms.json` 行，功法、装备等修正再在运行时叠加。
 
 ## 后续配置一个新境界
 
@@ -44,14 +43,13 @@ var enemy := RealmBalanceServiceScript.benchmark_enemy_attrs("qi_normal")
 4. 在 `benchmark_enemies` 增加普通、精英、跨境界标杆敌人。
 5. 用 `tests/run_balance_v1_tests.gd` 的模式扩展新的胜率与时长验收。
 
-## 当前保持不变的数值
+## 当前基础公式
 
-本次只是把硬编码基础抽成配置，不主动改战斗手感。
+基础面板由 `realms.json` 每级四维按公式导出，运行时只叠加功法、装备等额外修正。
 
-- 四维 10 的基础面板仍是：气血 100、法力 100、物攻 30、法攻 32、物防 20、法防 24、速度 100。
-- 速度现在由身法主导、神识辅助，避免肉身同时支撑气血、物攻、物防和出手频率。
-- 每个小境界仍提供：气血 +6、法力 +6、物攻 +1.8、法攻 +1.92、物防 +1.2、法防 +1.44、速度 +3。
-- 现有练气/筑基平衡测试仍使用御气弹、练气普通敌、练气精英敌和筑基普通敌作为首版纵切。
+- 四维 10 的基础面板：气血 180、法力 130、物攻 25、法攻 28、物防 12、法防 19、速度 125。
+- 出手速度 = 身法 * 2 + 神识 * 0.5 + 100。
+- 控制强度 = 神识 * 1.6 + 灵力 * 0.5；控制抗性 = 肉身 + 神识 * 1.2。
 
 ## PM-201 基准复核记录
 

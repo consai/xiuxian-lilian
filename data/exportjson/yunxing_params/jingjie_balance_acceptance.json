@@ -23,8 +23,8 @@
     "key": "elite_win_rate_max",
     "value": 0.55
   },
-  "lianqi_mature_vs_foundation_normal_win_rate_max": {
-    "key": "lianqi_mature_vs_foundation_normal_win_rate_max",
+  "lianqi_mature_vs_zhuji_normal_win_rate_max": {
+    "key": "lianqi_mature_vs_zhuji_normal_win_rate_max",
     "value": 0.5
   },
   "resource_remaining_ratio_min": {

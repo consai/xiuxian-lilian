@@ -1,5 +1,0 @@
-[gd_scene format=3 uid="uid://cke80ltqvraof"]
-
-[ext_resource type="PackedScene" path="res://scenes/lilian/didian_xuanze.tscn" id="1"]
-
-[node name="EncounterSelect" unique_id=1462481031 instance=ExtResource("1")]

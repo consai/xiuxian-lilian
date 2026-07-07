@@ -76,7 +76,6 @@ static func evaluate_tier(total: int, transition_id: String) -> Dictionary:
 			"quality": 0,
 			"label": "不可突破",
 			"success_rate": 0.0,
-			"foundation_growth": 0.0,
 			"perks": [],
 			"hint": "突破值过低，无法突破",
 		}
@@ -86,7 +85,6 @@ static func evaluate_tier(total: int, transition_id: String) -> Dictionary:
 				"quality": int(row.get("quality", 5)),
 				"label": str(row.get("label", "")),
 				"success_rate": float(row.get("success_rate", 0.0)),
-				"foundation_growth": float(row.get("foundation_growth", 1.0)),
 				"perks": (row.get("perks", []) as Array).duplicate(),
 				"hint": _tier_hint(str(row.get("label", "")), float(row.get("success_rate", 0.0))),
 			}
@@ -95,7 +93,6 @@ static func evaluate_tier(total: int, transition_id: String) -> Dictionary:
 		"quality": int(fallback.get("quality", 5)),
 		"label": str(fallback.get("label", "")),
 		"success_rate": float(fallback.get("success_rate", 0.0)),
-		"foundation_growth": float(fallback.get("foundation_growth", 1.0)),
 		"perks": (fallback.get("perks", []) as Array).duplicate(),
 		"hint": _tier_hint(str(fallback.get("label", "")), float(fallback.get("success_rate", 0.0))),
 	}
@@ -152,11 +149,6 @@ static func _success_result(
 	var old_row := realms[realm_index] as Dictionary
 	var new_row := realms[next_index] as Dictionary
 	var to_major := str(new_row.get("major_realm", ""))
-	var growth := float(tier.get("foundation_growth", 1.0))
-	var grown: Dictionary = CharacterStatsScript.normalize_foundations(savedata.get("foundations", {}))
-	for key in grown.keys():
-		grown[key] = float(grown[key]) + growth
-	savedata["foundations"] = grown
 	savedata["realm_index"] = next_index
 	savedata["realm_name"] = str(new_row.get("name", ""))
 	savedata["breakthrough_at"] = int(new_row.get("breakthrough_at", savedata.get("breakthrough_at", 100)))
@@ -171,7 +163,6 @@ static func _success_result(
 		"new_realm": str(new_row.get("name", "")),
 		"tier_label": str(tier.get("label", "")),
 		"quality": int(tier.get("quality", 0)),
-		"foundation_growth": growth,
 		"perks": (tier.get("perks", []) as Array).duplicate(),
 		"breakdown": breakdown,
 	}

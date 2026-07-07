@@ -962,10 +962,6 @@ func breakthrough() -> Dictionary:
 	# 突破值未达新系统门槛时，沿用简易突破，确保修为达标后可跨入大境界。
 	var old_name := realm_name
 	realm_index += 1
-	var grown: Dictionary = CharacterStats.normalize_foundations(foundations)
-	for key in grown.keys():
-		grown[key] = float(grown[key]) + 1.0
-	foundations = grown
 	_apply_breakthrough_vitals()
 	_sync_realm()
 	_append_activity("突破成功：%s → %s" % [old_name, realm_name])
@@ -990,7 +986,6 @@ func _breakthrough_result_dict(old_name: String, service_result: Dictionary) -> 
 	if not service_result.is_empty():
 		payload["tier_label"] = str(service_result.get("tier_label", ""))
 		payload["quality"] = int(service_result.get("quality", 0))
-		payload["foundation_growth"] = float(service_result.get("foundation_growth", 0.0))
 		payload["perks"] = (service_result.get("perks", []) as Array).duplicate()
 	return payload
 
@@ -1238,16 +1233,17 @@ func refresh_derived_attrs(preserve_vital_ratio: bool = true) -> void:
 		cultivation_method_slots, DataStore.savedata
 	)
 	var flat_mods: Dictionary = (method_mods.get('flat', {}) as Dictionary).duplicate(true)
-	var realm_mods := CharacterStats.realm_flat_modifiers(realm_index)
-	for key in realm_mods.keys():
-		var stat := str(key)
-		flat_mods[stat] = float(flat_mods.get(stat, 0.0)) + float(realm_mods[stat])
 	var percent_mods: Dictionary = (method_mods.get("percent", {}) as Dictionary).duplicate(true)
-	attrs = CharacterStats.build_combat_attrs(
-		foundations,
-		flat_mods,
-		percent_mods
-	)
+	var next_attrs := _realm_combat_attrs()
+	if next_attrs.is_empty():
+		next_attrs = CharacterStats.build_combat_attrs(foundations)
+	for key in flat_mods.keys():
+		var stat := str(key)
+		next_attrs[stat] = ZhandouAttr.get_attr(next_attrs, stat) + float(flat_mods[key])
+	for key in percent_mods.keys():
+		var stat := str(key)
+		next_attrs[stat] = ZhandouAttr.get_attr(next_attrs, stat) * (1.0 + float(percent_mods[key]))
+	attrs = CharacterStats.finalize_combat_attrs(next_attrs)
 	if preserve_vital_ratio:
 		hp = float(attrs.get(ZhandouAttr.HP_MAX, 100.0)) * hp_ratio
 		mp = float(attrs.get(ZhandouAttr.MP_MAX, 100.0)) * mp_ratio
@@ -1662,7 +1658,14 @@ func _apply_realm_row() -> void:
 	var row := _realm_row(index)
 	realm_name = str(row.get("name", "练气初期"))
 	breakthrough_at = maxi(cultivation + 100, int(row.get("breakthrough_at", 100))) if realm_index >= realms.size() else int(row.get("breakthrough_at", 100))
+	var row_foundations_v: Variant = row.get("foundations", {})
+	if row_foundations_v is Dictionary and not (row_foundations_v as Dictionary).is_empty():
+		foundations = row_foundations_v as Dictionary
 
+
+func _realm_combat_attrs() -> Dictionary:
+	var attrs_v: Variant = _realm_row(realm_index).get("combat_attrs", {})
+	return (attrs_v as Dictionary).duplicate(true) if attrs_v is Dictionary else {}
 
 func _sync_realm() -> void:
 	_apply_realm_row()

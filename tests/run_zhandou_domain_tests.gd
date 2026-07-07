@@ -193,9 +193,10 @@ func _test_damage_types_use_matching_defense() -> void:
 	}
 	var physical := ZhandouAttr.calc_basic_damage(attacker, defender)
 	var magic := ZhandouAttr.calc_skill_damage(attacker, defender, 100.0, ZhandouAttr.DAMAGE_MAGIC)
+	var low_attack_magic := ZhandouAttr.calc_skill_damage({ZhandouAttr.MAGIC_ATK: 50.0}, {ZhandouAttr.MAGIC_DEF: 150.0}, 80.0, ZhandouAttr.DAMAGE_MAGIC)
 	_expect_near(float(physical["damage"]), 50.0, "physical soft mitigation")
 	_expect_near(float(magic["damage"]), 25.0, "magic soft mitigation")
-
+	_expect_near(float(low_attack_magic["damage"]), 20.0, "magic damage scales by attack over attack plus defense")
 
 func _test_true_damage_bypasses_defense() -> void:
 	var attacker := {
@@ -243,12 +244,12 @@ func _test_tiaoxi_restores_mp() -> void:
 	}
 	var used := attacker.use_skill(1, cfg, defender)
 	_expect_true(bool(used.get("ok", false)), "damage skill resolves")
-	_expect_false(bool(used.get(ZhandouReportScript.KEY_MISSED, false)), "damage skill should not miss")
 
 
 func _test_control_effects_always_apply() -> void:
 	var attacker := _make_unit(100.0, 100.0)
 	var defender := _make_unit(100.0, 100.0)
+	attacker.attrs[ZhandouAttr.CONTROL_POWER] = 100.0
 	defender.attrs[ZhandouAttr.CONTROL_RESIST] = 9999.0
 	attacker.skills = [{"id": 1, "cd": 0.0}]
 	var cfg := {
@@ -273,6 +274,7 @@ func _test_control_effects_always_apply() -> void:
 		"control should not be resisted"
 	)
 	_expect_true(defender.buffs.has("test_seal"), "control buff should apply")
+	_expect_near(float((defender.buffs["test_seal"] as Dictionary).get("duration_left", 0.0)), 2.0 * 100.0 / (100.0 + 9999.0), "control duration scales by control over resist")
 
 
 func _test_effect_scaling() -> void:

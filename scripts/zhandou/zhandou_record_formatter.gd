@@ -25,7 +25,6 @@ func format_entry(entry: Dictionary, names: Dictionary = {}) -> String:
 	var hp_damage := float(report.get(ZhandouReportScript.KEY_HP_DAMAGE, 0.0))
 	var heal := float(report.get(ZhandouReportScript.KEY_HEAL, 0.0))
 	var shield_abs := float(report.get(ZhandouReportScript.KEY_SHIELD_ABSORBED, 0.0))
-	var missed := bool(report.get(ZhandouReportScript.KEY_MISSED, false))
 	var resisted := bool(report.get(ZhandouReportScript.KEY_CONTROL_RESISTED, false))
 
 	var parts: PackedStringArray = PackedStringArray()
@@ -71,8 +70,6 @@ func format_entry(entry: Dictionary, names: Dictionary = {}) -> String:
 	_append_buff_names(parts, report)
 
 	var tail: PackedStringArray = PackedStringArray()
-	if missed:
-		tail.append("未命中")
 	if resisted:
 		tail.append("抵抗")
 	if hp_damage > 0.0:

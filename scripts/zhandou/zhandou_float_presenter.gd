@@ -25,8 +25,6 @@ static func build_spawns(
 		is_tiaoxi = true
 	if not suppress_skill_line and not is_tiaoxi:
 		_append_spawn(out, skill_name, source_id, "skill", 2)
-	if bool(report.get(ZhandouReportScript.KEY_MISSED, false)):
-		_append_spawn(out, "未命中", target_id, "buff_expire", 8)
 	if bool(report.get(ZhandouReportScript.KEY_CONTROL_RESISTED, false)):
 		_append_spawn(out, "抵抗", target_id, "buff_expire", 8)
 	_append_shield_spawn(out, _status_effect_unit_id(source_id, target_id, cfg), float(report.get("shield_absorbed", 0.0)))

@@ -9,7 +9,6 @@ const KEY_HEAL := "heal"
 const KEY_MP_GAIN := "mp_gain"
 const KEY_BUFF_NAMES := "buff_names"
 const KEY_BUFF_NAME := "buff_name"
-const KEY_MISSED := "missed"
 const KEY_CONTROL_RESISTED := "control_resisted"
 
 
@@ -23,7 +22,6 @@ static func empty_fx_report() -> Dictionary:
 		KEY_SHIELD_ABSORBED: 0.0,
 		KEY_BUFF_NAMES: [],
 		KEY_BUFF_NAME: "",
-		KEY_MISSED: false,
 		KEY_CONTROL_RESISTED: false,
 	}
 
@@ -32,13 +30,11 @@ static func normalize_report(raw: Dictionary) -> Dictionary:
 	var out := empty_fx_report()
 	out[KEY_DAMAGE] = float(raw.get(KEY_DAMAGE, raw.get(KEY_RAW_DAMAGE, 0.0)))
 	out[KEY_RAW_DAMAGE] = float(raw.get(KEY_RAW_DAMAGE, out[KEY_DAMAGE]))
-	out[KEY_HP_DAMAGE] = float(raw.get(KEY_HP_DAMAGE, maxf(0.0, out[KEY_RAW_DAMAGE] - float(raw.get(KEY_SHIELD_ABSORBED, 0.0))))
-	)
+	out[KEY_HP_DAMAGE] = float(raw.get(KEY_HP_DAMAGE, maxf(0.0, out[KEY_RAW_DAMAGE] - float(raw.get(KEY_SHIELD_ABSORBED, 0.0)))))
 	out[KEY_HEAL] = float(raw.get(KEY_HEAL, 0.0))
 	out[KEY_MP_GAIN] = float(raw.get(KEY_MP_GAIN, 0.0))
 	out[KEY_SHIELD_ABSORBED] = float(raw.get(KEY_SHIELD_ABSORBED, 0.0))
 	out[KEY_BUFF_NAMES] = raw.get(KEY_BUFF_NAMES, [])
 	out[KEY_BUFF_NAME] = str(raw.get(KEY_BUFF_NAME, "")).strip_edges()
-	out[KEY_MISSED] = bool(raw.get(KEY_MISSED, false))
 	out[KEY_CONTROL_RESISTED] = bool(raw.get(KEY_CONTROL_RESISTED, false))
 	return out

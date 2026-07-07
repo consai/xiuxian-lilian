@@ -6,15 +6,15 @@ extends RefCounted
 const PATH := "res://data/exportjson/yunxing_params/jingjie_balance.json"
 
 const DEFAULT_ATTRIBUTE_FORMULA := {
-	ZhandouAttr.HP_MAX: {"base": 50.0, "scale": {"roushen": 5.0}},
-	ZhandouAttr.MP_MAX: {"base": 50.0, "scale": {"lingli": 5.0}},
-	ZhandouAttr.PHYSICAL_ATK: {"base": 0.0, "scale": {"roushen": 3.0}},
-	ZhandouAttr.MAGIC_ATK: {"base": 0.0, "scale": {"lingli": 2.4, "shenshi": 0.8}},
-	ZhandouAttr.PHYSICAL_DEF: {"base": 0.0, "scale": {"roushen": 2.0}},
-	ZhandouAttr.MAGIC_DEF: {"base": 0.0, "scale": {"lingli": 1.2, "shenshi": 1.2}},
-	ZhandouAttr.SPD: {"base": 50.0, "scale": {"shenfa": 3.0, "shenshi": 2.0}},
-	ZhandouAttr.CONTROL_POWER: {"base": 0.0, "scale": {"shenshi": 3.0, "lingli": 1.0}},
-	ZhandouAttr.CONTROL_RESIST: {"base": 0.0, "scale": {"shenshi": 2.0, "roushen": 1.0}},
+	ZhandouAttr.HP_MAX: {"base": 80.0, "scale": {"roushen": 10.0}},
+	ZhandouAttr.MP_MAX: {"base": 80.0, "scale": {"lingli": 5.0}},
+	ZhandouAttr.PHYSICAL_ATK: {"base": 0.0, "scale": {"roushen": 2.5}},
+	ZhandouAttr.MAGIC_ATK: {"base": 0.0, "scale": {"lingli": 2.3, "shenshi": 0.5}},
+	ZhandouAttr.PHYSICAL_DEF: {"base": 0.0, "scale": {"roushen": 1.2}},
+	ZhandouAttr.MAGIC_DEF: {"base": 0.0, "scale": {"lingli": 1.1, "shenshi": 0.8}},
+	ZhandouAttr.SPD: {"base": 100.0, "scale": {"shenfa": 2.0, "shenshi": 0.5}},
+	ZhandouAttr.CONTROL_POWER: {"base": 0.0, "scale": {"shenshi": 1.6, "lingli": 0.5}},
+	ZhandouAttr.CONTROL_RESIST: {"base": 0.0, "scale": {"roushen": 1.0, "shenshi": 1.2}},
 	ZhandouAttr.HP_REGEN: {"base": 0.5, "scale": {"roushen": 0.05}},
 	ZhandouAttr.MP_REGEN: {"base": 0.5, "scale": {"lingli": 0.04, "shenshi": 0.01}},
 	ZhandouAttr.CARRY: {"base": 20.0, "scale": {"roushen": 2.0}},
@@ -28,14 +28,11 @@ const LEGACY_FOUNDATION_KEYS := {
 	"shenfa": "agility",
 }
 
-const DEFAULT_REALM_FLAT_PER_LAYER := {
-	ZhandouAttr.HP_MAX: 6.0,
-	ZhandouAttr.MP_MAX: 6.0,
-	ZhandouAttr.PHYSICAL_ATK: 1.8,
-	ZhandouAttr.MAGIC_ATK: 1.92,
-	ZhandouAttr.PHYSICAL_DEF: 1.2,
-	ZhandouAttr.MAGIC_DEF: 1.44,
-	ZhandouAttr.SPD: 3.0,
+const EXPORT_FOUNDATION_KEYS := {
+	"body": "roushen",
+	"spirit": "lingli",
+	"sense": "shenshi",
+	"agility": "shenfa",
 }
 
 static var _bundle: Dictionary = {}
@@ -69,14 +66,6 @@ static func build_base_combat_attrs(foundations: Dictionary) -> Dictionary:
 		attrs[stat] = value
 	return attrs
 
-
-static func realm_flat_modifiers(realm_index: int) -> Dictionary:
-	var layer := float(maxi(0, realm_index))
-	var out: Dictionary = {}
-	var per_layer := _realm_flat_per_layer()
-	for stat_v in per_layer.keys():
-		out[str(stat_v)] = float(per_layer[stat_v]) * layer
-	return out
 
 
 static func major_realms() -> Array:
@@ -222,11 +211,7 @@ static func build_standard_player_attrs(profile_id: String, include_realm: bool 
 		return {}
 	var foundations_v: Variant = row.get("foundations", {})
 	var foundations := foundations_v as Dictionary if foundations_v is Dictionary else {}
-	var flat := realm_flat_modifiers(int(row.get("realm_index", 0))) if include_realm else {}
 	var attrs := build_base_combat_attrs(foundations)
-	for key in flat.keys():
-		var stat := str(key)
-		attrs[stat] = ZhandouAttr.get_attr(attrs, stat) + float(flat[key])
 	for key in ZhandouAttr.ALL_KEYS:
 		if not attrs.has(key):
 			attrs[key] = ZhandouAttr.get_attr(ZhandouAttr.TEST_DEFAULTS, key, 0.0)
@@ -273,8 +258,9 @@ static func collect_config_errors(simulation_realms: Array = []) -> PackedString
 			errors.append("encounter_bands.%s strength_min 不得大于 strength_max" % key)
 	for profile_id in (root.get("standard_players", {}) as Dictionary).keys():
 		var row := standard_player(str(profile_id))
+		var foundations := row.get("foundations", {}) as Dictionary
 		for foundation_key in ["roushen", "lingli", "shenshi", "shenfa"]:
-			if not (row.get("foundations", {}) as Dictionary).has(foundation_key):
+			if not foundations.has(foundation_key) and not foundations.has(LEGACY_FOUNDATION_KEYS.get(foundation_key, "")):
 				errors.append("standard_players.%s 缺少根基 %s" % [profile_id, foundation_key])
 	var pill_balance := cultivation_pill_balance()
 	if pill_balance.is_empty():
@@ -287,7 +273,8 @@ static func collect_config_errors(simulation_realms: Array = []) -> PackedString
 static func _foundation_value(foundations: Dictionary, key: String) -> float:
 	if foundations.has(key):
 		return float(foundations.get(key, 0.0))
-	return float(foundations.get(LEGACY_FOUNDATION_KEYS.get(key, ""), 0.0))
+	var legacy_key := str(LEGACY_FOUNDATION_KEYS.get(key, EXPORT_FOUNDATION_KEYS.get(key, "")))
+	return float(foundations.get(legacy_key, 0.0))
 
 
 static func _formula_table() -> Dictionary:
@@ -296,12 +283,6 @@ static func _formula_table() -> Dictionary:
 		return table_v as Dictionary
 	return DEFAULT_ATTRIBUTE_FORMULA.duplicate(true)
 
-
-static func _realm_flat_per_layer() -> Dictionary:
-	var table_v: Variant = bundle().get("realm_flat_per_layer", {})
-	if table_v is Dictionary and not (table_v as Dictionary).is_empty():
-		return table_v as Dictionary
-	return DEFAULT_REALM_FLAT_PER_LAYER.duplicate(true)
 
 
 static func _realm_phase(realm_row: Dictionary) -> String:

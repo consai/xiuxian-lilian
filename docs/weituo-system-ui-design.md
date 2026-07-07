@@ -49,12 +49,10 @@
 scenes/ui/weituo_board_panel.tscn
 scenes/ui/components/weituo_card.tscn
 scenes/ui/components/weituo_requirement_row.tscn
-scenes/ui/components/weituo_reward_row.tscn
 
 scripts/ui/weituo_board_panel.gd
 scripts/ui/components/weituo_card.gd
 scripts/ui/components/weituo_requirement_row.gd
-scripts/ui/components/weituo_reward_row.gd
 ```
 
 可复用节点：
@@ -179,14 +177,7 @@ RequirementRow (HBoxContainer)
 └─ StatusLabel (Label) unique
 ```
 
-`weituo_reward_row.tscn`：
-
-```text
-RewardRow (HBoxContainer)
-├─ Icon (TextureRect) unique
-├─ NameLabel (Label) unique
-└─ CountLabel (Label) unique
-```
+奖励展示复用 `scenes/items/item.tscn` 或现有奖励展示逻辑，不再单独维护委托奖励行组件。
 
 ---
 

@@ -696,7 +696,7 @@ static func load_moni_bundle() -> Dictionary:
 
 
 static func load_jingjie_balance_bundle() -> Dictionary:
-	var root := _export_settings(yunxing_params_path("jingjie_balance.json"))
+	var root := {}
 	root["acceptance"] = _export_settings(yunxing_params_path("jingjie_balance_acceptance.json"))
 	root["benchmark_enemies"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_benchmark_ene.json"))
 	root["budgets"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_budgets.json"))
@@ -704,10 +704,6 @@ static func load_jingjie_balance_bundle() -> Dictionary:
 	root["cultivation_progression"] = _export_settings(yunxing_params_path("jingjie_balance_cultivation_p.json"))
 	root["encounter_bands"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_encounter_ban.json"))
 	root["major_realms"] = _export_row_array(yunxing_params_path("jingjie_balance_major_realms.json"))
-	root["monster_design_baseline"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_monster_desig.json"))
-	root["player_level_curve"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_player_level_.json"))
-	root["realm_flat_per_layer"] = _export_settings(yunxing_params_path("jingjie_balance_realm_flat_pe.json"))
-	root["rules"] = _export_settings(yunxing_params_path("jingjie_balance_rules.json"))
 	root["standard_players"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_standard_play.json"))
 	return root
 

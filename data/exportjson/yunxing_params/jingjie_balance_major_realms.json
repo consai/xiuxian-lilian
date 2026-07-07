@@ -2,154 +2,46 @@
   "lianqi": {
     "id": "lianqi",
     "name": "练气",
-    "content_coefficient": 1.0,
-    "normal_duration_sec": [
-      8,
-      14
-    ],
-    "elite_duration_sec": [
-      20,
-      30
-    ],
-    "boss_duration_sec": [
-      45,
-      70
-    ]
+    "content_coefficient": 1.0
   },
   "zhuji": {
     "id": "zhuji",
     "name": "筑基",
-    "content_coefficient": 1.7,
-    "normal_duration_sec": [
-      9,
-      15
-    ],
-    "elite_duration_sec": [
-      22,
-      34
-    ],
-    "boss_duration_sec": [
-      50,
-      80
-    ]
+    "content_coefficient": 1.7
   },
   "jindan": {
     "id": "jindan",
     "name": "金丹",
-    "content_coefficient": 2.8,
-    "normal_duration_sec": [
-      10,
-      16
-    ],
-    "elite_duration_sec": [
-      24,
-      38
-    ],
-    "boss_duration_sec": [
-      55,
-      90
-    ]
+    "content_coefficient": 2.8
   },
   "yuanying": {
     "id": "yuanying",
     "name": "元婴",
-    "content_coefficient": 4.5,
-    "normal_duration_sec": [
-      10,
-      18
-    ],
-    "elite_duration_sec": [
-      26,
-      42
-    ],
-    "boss_duration_sec": [
-      60,
-      100
-    ]
+    "content_coefficient": 4.5
   },
   "huashen": {
     "id": "huashen",
     "name": "化神",
-    "content_coefficient": 7.0,
-    "normal_duration_sec": [
-      12,
-      20
-    ],
-    "elite_duration_sec": [
-      30,
-      48
-    ],
-    "boss_duration_sec": [
-      70,
-      110
-    ]
+    "content_coefficient": 7.0
   },
   "lianxu": {
     "id": "lianxu",
     "name": "炼虚",
-    "content_coefficient": 11.0,
-    "normal_duration_sec": [
-      12,
-      22
-    ],
-    "elite_duration_sec": [
-      32,
-      52
-    ],
-    "boss_duration_sec": [
-      75,
-      120
-    ]
+    "content_coefficient": 11.0
   },
   "heti": {
     "id": "heti",
     "name": "合体",
-    "content_coefficient": 17.0,
-    "normal_duration_sec": [
-      14,
-      24
-    ],
-    "elite_duration_sec": [
-      36,
-      58
-    ],
-    "boss_duration_sec": [
-      80,
-      130
-    ]
+    "content_coefficient": 17.0
   },
   "dacheng": {
     "id": "dacheng",
     "name": "大乘",
-    "content_coefficient": 26.0,
-    "normal_duration_sec": [
-      14,
-      26
-    ],
-    "elite_duration_sec": [
-      40,
-      65
-    ],
-    "boss_duration_sec": [
-      90,
-      145
-    ]
+    "content_coefficient": 26.0
   },
   "dujie": {
     "id": "dujie",
     "name": "渡劫",
-    "content_coefficient": 40.0,
-    "normal_duration_sec": [
-      16,
-      28
-    ],
-    "elite_duration_sec": [
-      45,
-      72
-    ],
-    "boss_duration_sec": [
-      100,
-      160
-    ]
+    "content_coefficient": 40.0
   }
 }

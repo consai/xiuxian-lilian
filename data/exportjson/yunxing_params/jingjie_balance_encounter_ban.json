@@ -1,18 +1,8 @@
 {
-  "weak": {
-    "key": "weak",
-    "strength_min": 55,
-    "strength_max": 70
-  },
   "normal": {
     "key": "normal",
     "strength_min": 80,
     "strength_max": 95
-  },
-  "strong": {
-    "key": "strong",
-    "strength_min": 105,
-    "strength_max": 120
   },
   "elite": {
     "key": "elite",

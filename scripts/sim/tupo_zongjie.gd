@@ -134,13 +134,12 @@ func _show_success(result: Dictionary) -> void:
 		str(result.get("new_realm", GameState.realm_name)),
 	]
 	var tier_label := str(result.get("tier_label", ""))
-	var growth := float(result.get("foundation_growth", 0.0))
 	_value_label.text = "突破成功"
 	_progress.value = _progress.max_value
 	_warning.text = "历时%s" % GameState.time_date_label(int(result.get("day", GameState.day)))
 	_warning.add_theme_color_override("font_color", Color(0.22, 0.42, 0.12, 1))
 	_tier_result.text = "突破成功" if tier_label == "" else tier_label
-	_tier_effect.text = _format_success_effect(result, tier_label, growth)
+	_tier_effect.text = _format_success_effect(result, tier_label)
 	_explain.text = _format_success_stats(result)
 	_start_label.text = "继续修行"
 	_start_button.disabled = false
@@ -155,21 +154,16 @@ func _format_tier_effect(tier: Dictionary) -> String:
 	var success_rate := float(tier.get("success_rate", 0.0))
 	if success_rate > 0.0:
 		lines.append("成功率：%d%%" % int(round(success_rate * 100.0)))
-	var growth := float(tier.get("foundation_growth", 0.0))
-	if growth > 0.0:
-		lines.append("根基成长：四维各 +%.1f" % growth)
 	var perks := tier.get("perks", []) as Array
 	for perk in perks:
 		lines.append(_perk_label(str(perk)))
 	return "\n".join(lines) if not lines.is_empty() else "继续积累突破值可提升品质"
 
 
-func _format_success_effect(result: Dictionary, tier_label: String, growth: float) -> String:
+func _format_success_effect(result: Dictionary, tier_label: String) -> String:
 	var lines: PackedStringArray = []
 	if tier_label != "":
 		lines.append("达成品质：%s" % tier_label)
-	if growth > 0.0:
-		lines.append("根基成长：四维各 +%.1f" % growth)
 	var perks := result.get("perks", []) as Array
 	for perk in perks:
 		lines.append(_perk_label(str(perk)))

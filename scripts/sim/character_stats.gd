@@ -75,11 +75,6 @@ static func normalize_aptitudes(raw: Variant) -> Dictionary:
 	return out
 
 
-## 境界层数提供的固定战斗加成（对应设计文档中的「境界气血 / 境界法力」等项）。
-static func realm_flat_modifiers(realm_index: int) -> Dictionary:
-	return RealmBalanceServiceScript.realm_flat_modifiers(realm_index)
-
-
 static func build_combat_attrs(
 		foundations: Variant,
 		flat_modifiers: Dictionary = {},

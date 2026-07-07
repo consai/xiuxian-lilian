@@ -1,8 +1,6 @@
 {
   "lianqi_normal": {
     "key": "lianqi_normal",
-    "major_realm": "lianqi",
-    "band": "normal",
     "attrs": {
       "hp_max": 230,
       "mp_max": 40,
@@ -17,8 +15,6 @@
   },
   "lianqi_elite": {
     "key": "lianqi_elite",
-    "major_realm": "lianqi",
-    "band": "elite",
     "attrs": {
       "hp_max": 260,
       "mp_max": 80,
@@ -33,8 +29,6 @@
   },
   "zhuji_normal": {
     "key": "zhuji_normal",
-    "major_realm": "zhuji",
-    "band": "normal",
     "attrs": {
       "hp_max": 310,
       "mp_max": 100,
