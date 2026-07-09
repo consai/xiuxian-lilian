@@ -1,202 +1,267 @@
 {
   "buff_0001": {
-    "key": "buff_0001",
     "id": "buff_0001",
     "name": "流风护身",
     "icon": "ui_new/skill_03.png",
     "desc": "身形随风而动，短时间提高出手速度。",
     "type": "buff",
-    "duration": 3,
-    "max_stacks": 5,
+    "duration": 4,
+    "max_stacks": 3,
     "ticktime": -1.0,
     "modifiers": [
       [
         "attrschange",
-        "castspd",
+        "spd",
         "20"
       ]
     ],
     "tick_effects": []
   },
   "buff_0002": {
-    "key": "buff_0002",
     "id": "buff_0002",
     "name": "五行易伤",
     "icon": "ui_new/huo.png",
     "desc": "五行气机失衡，受到伤害提高。",
     "type": "debuff",
-    "duration": 3,
-    "max_stacks": 1,
+    "duration": 5,
+    "max_stacks": 3,
     "ticktime": -1.0,
-    "modifiers": [],
+    "modifiers": [
+      [
+        "attrschange",
+        "damage_taken",
+        "0.12"
+      ]
+    ],
     "tick_effects": []
   },
   "buff_0003": {
-    "key": "buff_0003",
     "id": "buff_0003",
     "name": "神识压制",
     "icon": "ui_new/skill_03.png",
     "desc": "神识受制，控制抗性降低。",
     "type": "debuff",
-    "duration": 3,
-    "max_stacks": 1,
+    "duration": 4,
+    "max_stacks": 2,
     "ticktime": -1.0,
-    "modifiers": [],
+    "modifiers": [
+      [
+        "attrschange",
+        "control_resist",
+        "-30"
+      ]
+    ],
     "tick_effects": []
   },
   "buff_0004": {
-    "key": "buff_0004",
     "id": "buff_0004",
     "name": "抗性崩解",
     "icon": "ui_new/skill_03.png",
-    "desc": "护体灵机破散，受到伤害提高。",
+    "desc": "护体灵机破散，物法防御降低。",
     "type": "debuff",
-    "duration": 3,
-    "max_stacks": 1,
+    "duration": 5,
+    "max_stacks": 2,
     "ticktime": -1.0,
-    "modifiers": [],
+    "modifiers": [
+      [
+        "attrschange",
+        "physical_def",
+        "-18"
+      ],
+      [
+        "attrschange",
+        "magic_def",
+        "-18"
+      ]
+    ],
     "tick_effects": []
   },
   "buff_0005": {
-    "key": "buff_0005",
     "id": "buff_0005",
     "name": "劫痕",
     "icon": "ui_new/huo.png",
-    "desc": "劫力留痕，受到伤害提高。",
+    "desc": "劫力留痕，受到伤害提高且出手略慢。",
     "type": "debuff",
-    "duration": 3,
-    "max_stacks": 1,
+    "duration": 6,
+    "max_stacks": 3,
     "ticktime": -1.0,
-    "modifiers": [],
+    "modifiers": [
+      [
+        "attrschange",
+        "damage_taken",
+        "0.08"
+      ],
+      [
+        "attrschange",
+        "spd",
+        "-5"
+      ]
+    ],
     "tick_effects": []
   },
   "buff_0006": {
-    "key": "buff_0006",
     "id": "buff_0006",
     "name": "疗愈阻断",
     "icon": "ui_new/skill_03.png",
     "desc": "生机流转受阻，生命恢复降低。",
     "type": "debuff",
-    "duration": 3,
-    "max_stacks": 1,
+    "duration": 5,
+    "max_stacks": 2,
     "ticktime": -1.0,
-    "modifiers": [],
+    "modifiers": [
+      [
+        "attrschange",
+        "hp_regen",
+        "-30"
+      ]
+    ],
     "tick_effects": []
   },
   "buff_0007": {
-    "key": "buff_0007",
     "id": "buff_0007",
     "name": "踉跄",
     "icon": "ui_new/skill_03.png",
     "desc": "身形不稳，行动速度大幅降低。",
     "type": "debuff,control",
-    "duration": 3,
+    "duration": 1,
     "max_stacks": 1,
     "ticktime": -1.0,
-    "modifiers": [],
+    "modifiers": [
+      [
+        "attrschange",
+        "spd",
+        "-45"
+      ]
+    ],
     "tick_effects": []
   },
   "buff_0008": {
-    "key": "buff_0008",
     "id": "buff_0008",
     "name": "封印",
     "icon": "ui_new/skill_03.png",
     "desc": "灵机被封，行动速度大幅降低。",
     "type": "debuff,control",
-    "duration": 3,
+    "duration": 2,
     "max_stacks": 1,
     "ticktime": -1.0,
-    "modifiers": [],
+    "modifiers": [
+      [
+        "attrschange",
+        "spd",
+        "-80"
+      ]
+    ],
     "tick_effects": []
   },
   "buff_0009": {
-    "key": "buff_0009",
     "id": "buff_0009",
     "name": "麻痹",
     "icon": "ui_new/skill_03.png",
     "desc": "经脉麻痹，行动速度大幅降低。",
     "type": "debuff,control",
-    "duration": 3,
+    "duration": 2,
     "max_stacks": 1,
     "ticktime": -1.0,
-    "modifiers": [],
+    "modifiers": [
+      [
+        "attrschange",
+        "spd",
+        "-60"
+      ]
+    ],
     "tick_effects": []
   },
   "buff_0010": {
-    "key": "buff_0010",
     "id": "buff_0010",
     "name": "打断",
     "icon": "ui_new/skill_03.png",
-    "desc": "施法被扰，行动速度大幅降低。",
+    "desc": "施法被扰，短时间降低行动速度。",
     "type": "debuff,control",
-    "duration": 3,
+    "duration": 1,
     "max_stacks": 1,
     "ticktime": -1.0,
-    "modifiers": [],
+    "modifiers": [
+      [
+        "attrschange",
+        "spd",
+        "-35"
+      ]
+    ],
     "tick_effects": []
   },
   "buff_0011": {
-    "key": "buff_0011",
     "id": "buff_0011",
     "name": "击倒",
     "icon": "ui_new/skill_03.png",
     "desc": "被击倒在地，行动速度大幅降低。",
     "type": "debuff,control",
-    "duration": 3,
+    "duration": 1,
     "max_stacks": 1,
     "ticktime": -1.0,
-    "modifiers": [],
+    "modifiers": [
+      [
+        "attrschange",
+        "spd",
+        "-75"
+      ]
+    ],
     "tick_effects": []
   },
   "buff_0012": {
-    "key": "buff_0012",
     "id": "buff_0012",
     "name": "律令压制",
     "icon": "ui_new/skill_03.png",
-    "desc": "受律令镇压，行动速度大幅降低。",
+    "desc": "受律令镇压，行动速度与控制抗性降低。",
     "type": "debuff,control",
-    "duration": 3,
+    "duration": 2,
     "max_stacks": 1,
     "ticktime": -1.0,
-    "modifiers": [],
+    "modifiers": [
+      [
+        "attrschange",
+        "spd",
+        "-55"
+      ],
+      [
+        "attrschange",
+        "control_resist",
+        "-20"
+      ]
+    ],
     "tick_effects": []
   },
   "buff_0013": {
-    "key": "buff_0013",
     "id": "buff_0013",
     "name": "迟缓",
     "icon": "ui_new/skill_03.png",
     "desc": "神识受扰，出手速度降低。",
     "type": "debuff",
-    "duration": 3,
+    "duration": 4,
     "max_stacks": 5,
     "ticktime": -1.0,
     "modifiers": [
       [
         "attrschange",
-        "castspd",
+        "spd",
         "-20"
       ]
     ],
     "tick_effects": []
   },
   "buff_0014": {
-    "key": "buff_0014",
     "id": "buff_0014",
     "name": "灼烧",
     "icon": "ui_new/huo.png",
-    "desc": "灵毒灼烧经脉，周期损失气血。",
+    "desc": "灵火灼烧经脉，周期损失气血。",
     "type": "debuff",
-    "duration": 3,
+    "duration": 4,
     "max_stacks": 5,
     "ticktime": 0.5,
     "modifiers": [],
     "tick_effects": [
       [
         "damage",
-        "10",
-        "atk",
-        "100"
+        "8"
       ]
     ]
   }

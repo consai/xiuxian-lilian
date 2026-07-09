@@ -1,219 +1,49 @@
 {
   "name": {
     "key": "name",
-    "value": "小观主",
-    "body": null,
-    "spirit": null,
-    "sense": null,
-    "agility": null,
-    "comprehension": null,
-    "fortune": null,
-    "roots": null,
-    "main": null,
-    "support_1": null,
-    "support_2": null,
-    "support_3": null,
-    "items_JuQiDan": null,
-    "items_LingCao": null,
-    "items_LingGuo": null,
-    "items_YaoDan": null,
-    "items_AlchemyNotes_JuQi": null
+    "value": "小观主"
   },
   "icon": {
     "key": "icon",
-    "value": "characters/001_cutout_483x512.png",
-    "body": null,
-    "spirit": null,
-    "sense": null,
-    "agility": null,
-    "comprehension": null,
-    "fortune": null,
-    "roots": null,
-    "main": null,
-    "support_1": null,
-    "support_2": null,
-    "support_3": null,
-    "items_JuQiDan": null,
-    "items_LingCao": null,
-    "items_LingGuo": null,
-    "items_YaoDan": null,
-    "items_AlchemyNotes_JuQi": null
+    "value": "characters/001_cutout_483x512.png"
   },
-  "foundations": {
-    "key": "foundations",
-    "value": null,
-    "body": "16",
-    "spirit": "16",
-    "sense": "14",
-    "agility": "14",
-    "comprehension": null,
-    "fortune": null,
-    "roots": null,
-    "main": null,
-    "support_1": null,
-    "support_2": null,
-    "support_3": null,
-    "items_JuQiDan": null,
-    "items_LingCao": null,
-    "items_LingGuo": null,
-    "items_YaoDan": null,
-    "items_AlchemyNotes_JuQi": null
+  "attrs": {
+    "key": "attrs",
+    "value": null
   },
-  "aptitudes": {
-    "key": "aptitudes",
-    "value": null,
-    "body": null,
-    "spirit": null,
-    "sense": null,
-    "agility": null,
-    "comprehension": "12",
-    "fortune": "10",
-    "roots": {
-      "fire": 80,
-      "wood": 35
-    },
-    "main": null,
-    "support_1": null,
-    "support_2": null,
-    "support_3": null,
-    "items_JuQiDan": null,
-    "items_LingCao": null,
-    "items_LingGuo": null,
-    "items_YaoDan": null,
-    "items_AlchemyNotes_JuQi": null
+  "linggen": {
+    "key": "linggen",
+    "value": null
   },
-  "abilities": {
-    "key": "abilities",
+  "jineng": {
+    "key": "jineng",
     "value": [
-      "ability.combat.qi_bolt",
-      "ability.combat.wind_step",
-      "ability.combat.sword_qi"
-    ],
-    "body": null,
-    "spirit": null,
-    "sense": null,
-    "agility": null,
-    "comprehension": null,
-    "fortune": null,
-    "roots": null,
-    "main": null,
-    "support_1": null,
-    "support_2": null,
-    "support_3": null,
-    "items_JuQiDan": null,
-    "items_LingCao": null,
-    "items_LingGuo": null,
-    "items_YaoDan": null,
-    "items_AlchemyNotes_JuQi": null
+      " factive_lq_001",
+      " factive_lq_002",
+      " factive_lq_003"
+    ]
   },
-  "equipped_abilities": {
-    "key": "equipped_abilities",
+  "jineng_use": {
+    "key": "jineng_use",
     "value": [
-      "ability.combat.qi_bolt",
-      "ability.combat.wind_step",
-      "ability.combat.sword_qi",
-      "",
-      "",
-      ""
-    ],
-    "body": null,
-    "spirit": null,
-    "sense": null,
-    "agility": null,
-    "comprehension": null,
-    "fortune": null,
-    "roots": null,
-    "main": null,
-    "support_1": null,
-    "support_2": null,
-    "support_3": null,
-    "items_JuQiDan": null,
-    "items_LingCao": null,
-    "items_LingGuo": null,
-    "items_YaoDan": null,
-    "items_AlchemyNotes_JuQi": null
+      " factive_lq_001",
+      " factive_lq_002",
+      " factive_lq_003"
+    ]
   },
-  "methods": {
-    "key": "methods",
+  "gongfa": {
+    "key": "gongfa",
     "value": [
       "method.hunyuan.1"
-    ],
-    "body": null,
-    "spirit": null,
-    "sense": null,
-    "agility": null,
-    "comprehension": null,
-    "fortune": null,
-    "roots": null,
-    "main": null,
-    "support_1": null,
-    "support_2": null,
-    "support_3": null,
-    "items_JuQiDan": null,
-    "items_LingCao": null,
-    "items_LingGuo": null,
-    "items_YaoDan": null,
-    "items_AlchemyNotes_JuQi": null
-  },
-  "method_slots": {
-    "key": "method_slots",
-    "value": null,
-    "body": null,
-    "spirit": null,
-    "sense": null,
-    "agility": null,
-    "comprehension": null,
-    "fortune": null,
-    "roots": null,
-    "main": "method.hunyuan.1",
-    "support_1": null,
-    "support_2": null,
-    "support_3": null,
-    "items_JuQiDan": null,
-    "items_LingCao": null,
-    "items_LingGuo": null,
-    "items_YaoDan": null,
-    "items_AlchemyNotes_JuQi": null
+    ]
   },
   "equips": {
     "key": "equips",
-    "value": [],
-    "body": null,
-    "spirit": null,
-    "sense": null,
-    "agility": null,
-    "comprehension": null,
-    "fortune": null,
-    "roots": null,
-    "main": null,
-    "support_1": null,
-    "support_2": null,
-    "support_3": null,
-    "items_JuQiDan": null,
-    "items_LingCao": null,
-    "items_LingGuo": null,
-    "items_YaoDan": null,
-    "items_AlchemyNotes_JuQi": null
+    "value": []
   },
-  "inventory": {
-    "key": "inventory",
-    "value": null,
-    "body": null,
-    "spirit": null,
-    "sense": null,
-    "agility": null,
-    "comprehension": null,
-    "fortune": null,
-    "roots": null,
-    "main": null,
-    "support_1": null,
-    "support_2": null,
-    "support_3": null,
-    "items_JuQiDan": "30",
-    "items_LingCao": "2",
-    "items_LingGuo": "1",
-    "items_YaoDan": "1",
-    "items_AlchemyNotes_JuQi": "1"
+  "items": {
+    "key": "items",
+    "value": null
   },
   "item_slots": {
     "key": "item_slots",
@@ -221,23 +51,7 @@
       "",
       "",
       ""
-    ],
-    "body": null,
-    "spirit": null,
-    "sense": null,
-    "agility": null,
-    "comprehension": null,
-    "fortune": null,
-    "roots": null,
-    "main": null,
-    "support_1": null,
-    "support_2": null,
-    "support_3": null,
-    "items_JuQiDan": null,
-    "items_LingCao": null,
-    "items_LingGuo": null,
-    "items_YaoDan": null,
-    "items_AlchemyNotes_JuQi": null
+    ]
   },
   "equip_slots": {
     "key": "equip_slots",
@@ -245,22 +59,6 @@
       -1,
       -1,
       -1
-    ],
-    "body": null,
-    "spirit": null,
-    "sense": null,
-    "agility": null,
-    "comprehension": null,
-    "fortune": null,
-    "roots": null,
-    "main": null,
-    "support_1": null,
-    "support_2": null,
-    "support_3": null,
-    "items_JuQiDan": null,
-    "items_LingCao": null,
-    "items_LingGuo": null,
-    "items_YaoDan": null,
-    "items_AlchemyNotes_JuQi": null
+    ]
   }
 }

@@ -205,6 +205,7 @@ func _play_sequence_event(event: ZhandouVfxEvent) -> void:
 		"windup偏移": settings.melee_windup_offset if settings != null else -1.0,
 		"冲锋时长": settings.melee_dash_duration if settings != null else -1.0,
 	})
+	_play_caster_animation(event, caster_vfx)
 	ctx.prepare_caster_action()
 	var caster_after := ctx.get_vfx(event.source_id)
 	ZhandouDebugLog.write("特效", "施法者动作前快照", {
@@ -229,6 +230,16 @@ func _play_sequence_event(event: ZhandouVfxEvent) -> void:
 		"施法者": _vfx_actor_snapshot(ctx.get_vfx(event.source_id)),
 		"目标": _vfx_actor_snapshot(ctx.get_vfx(event.target_id)),
 	})
+
+
+func _play_caster_animation(event: ZhandouVfxEvent, caster_vfx: ZhandouActorVfx) -> void:
+	if event == null or caster_vfx == null or not is_instance_valid(caster_vfx):
+		return
+	match event.skill_type:
+		EnumBattleVfxSkillType.Type.MELEE:
+			caster_vfx.play_attack_animation()
+		_:
+			caster_vfx.play_cast_animation()
 
 
 func _run_sequence_async(ctx: ZhandouVfxContext, steps: Array, on_done: Callable) -> void:

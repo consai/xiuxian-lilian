@@ -131,11 +131,6 @@ static func _validate_ability_effect_id(ability: Dictionary, effect_id: String) 
 				errors.append(
 					"技能 %s 的效果 %s 不在 EnumZhandouPassiveEffect" % [ability_id, effect_id]
 				)
-		"general_passive":
-			if not EnumTongyongPassiveEffect.is_valid_label(effect_id):
-				errors.append(
-					"技能 %s 的效果 %s 不在 EnumTongyongPassiveEffect" % [ability_id, effect_id]
-				)
 	return errors
 
 

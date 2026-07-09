@@ -1,6 +1,8 @@
 class_name EnumWeituoState
 extends RefCounted
 
+## 委托任务在列表和存档中的生命周期状态。
+
 enum State {
 	LOCKED,
 	AVAILABLE,

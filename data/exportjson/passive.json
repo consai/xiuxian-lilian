@@ -1,0 +1,149 @@
+{
+  "fpassive_0001": {
+    "id": "fpassive_0001",
+    "name": "铁骨",
+    "tier": 1,
+    "quality": 1,
+    "icon": null,
+    "tag": [],
+    "cd": 0,
+    "runtype": "get",
+    "effects": [
+      [
+        "attrschange",
+        "physical_def",
+        "12"
+      ],
+      [
+        "attrschange",
+        "magic_def",
+        "8"
+      ]
+    ],
+    "desc": "战斗开始时提高物理防御与法术防御。"
+  },
+  "fpassive_0002": {
+    "id": "fpassive_0002",
+    "name": "剑心通明",
+    "tier": 4,
+    "quality": 4,
+    "icon": null,
+    "tag": [],
+    "cd": 5,
+    "runtype": "attack",
+    "effects": [
+      [
+        "attrschange",
+        "damage_bonus",
+        "0.08"
+      ]
+    ],
+    "desc": "攻击前短暂提高伤害加成。"
+  },
+  "fpassive_0003": {
+    "id": "fpassive_0003",
+    "name": "固魂守一",
+    "tier": 3,
+    "quality": 3,
+    "icon": null,
+    "tag": [],
+    "cd": 8,
+    "runtype": "beattack",
+    "effects": [
+      [
+        "attrschange",
+        "control_resist",
+        "35"
+      ]
+    ],
+    "desc": "被攻击前提高控制抗性。"
+  },
+  "fpassive_0004": {
+    "id": "fpassive_0004",
+    "name": "滴血不灭",
+    "tier": 4,
+    "quality": 4,
+    "icon": null,
+    "tag": [],
+    "cd": 20,
+    "runtype": "ondie",
+    "effects": [
+      [
+        "heal_hp",
+        "18",
+        "hp_max",
+        "80"
+      ]
+    ],
+    "desc": "濒死时恢复少量气血。"
+  },
+  "fpassive_0005": {
+    "id": "fpassive_0005",
+    "name": "人兵相契",
+    "tier": 7,
+    "quality": 4,
+    "icon": null,
+    "tag": [],
+    "cd": 6,
+    "runtype": "beattacked",
+    "effects": [
+      [
+        "attrschange",
+        "physical_atk",
+        "15"
+      ],
+      [
+        "attrschange",
+        "magic_atk",
+        "15"
+      ]
+    ],
+    "desc": "被攻击后提高双攻，适合反打。"
+  },
+  "fpassive_0006": {
+    "id": "fpassive_0006",
+    "name": "不坏道心",
+    "tier": 8,
+    "quality": 4,
+    "icon": null,
+    "tag": [],
+    "cd": 10,
+    "runtype": "attacked",
+    "effects": [
+      [
+        "attrschange",
+        "physical_def",
+        "20"
+      ],
+      [
+        "attrschange",
+        "magic_def",
+        "20"
+      ]
+    ],
+    "desc": "攻击后稳固防御。"
+  },
+  "fpassive_0007": {
+    "id": "fpassive_0007",
+    "name": "万劫不坏",
+    "tier": 9,
+    "quality": 4,
+    "icon": null,
+    "tag": [],
+    "cd": 12,
+    "runtype": "get",
+    "effects": [
+      [
+        "attrschange",
+        "hp_max",
+        "60"
+      ],
+      [
+        "attrschange",
+        "control_resist",
+        "40"
+      ]
+    ],
+    "desc": "战斗开始时提高气血上限与控制抗性。"
+  }
+}

@@ -105,10 +105,7 @@ func _configure_spin_ranges() -> void:
 
 func _build_catalogs() -> void:
 	_passive_catalog.clear()
-	for row_v in AbilityService.zhandou_passive_abilities():
-		if row_v is Dictionary:
-			_passive_catalog.append(row_v as Dictionary)
-	for row_v in AbilityService.tongyong_passive_abilities():
+	for row_v in AbilityService.passive_abilities():
 		if row_v is Dictionary:
 			_passive_catalog.append(row_v as Dictionary)
 	_passive_catalog.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
@@ -163,8 +160,7 @@ func _rebuild_passive_catalog_option() -> void:
 		var aid: String = str(row.get("id", ""))
 		if aid == "":
 			continue
-		var type_label: String = "战斗被动" if str(row.get("type", "")) == "combat_passive" else "通用被动"
-		_passive_option.add_item("%s · %s" % [type_label, str(row.get("name", aid))])
+		_passive_option.add_item("被动 · %s" % str(row.get("name", aid)))
 		_passive_option.set_item_metadata(_passive_option.item_count - 1, aid)
 	if _passive_option.item_count > 0:
 		_passive_option.select(0)

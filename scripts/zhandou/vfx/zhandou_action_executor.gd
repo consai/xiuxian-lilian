@@ -73,6 +73,8 @@ func _op_tween(ctx: ZhandouVfxContext, step: Dictionary) -> void:
 		_log_tween_skip(role, "Sprite 节点无效", step)
 		return
 	var prop := str(step.get("prop", "position")).strip_edges()
+	if prop == "scale" or prop == "modulate":
+		return
 	var from_pos := actor.position
 	var from_scale := actor.scale
 	var target_value: Variant = ctx.resolve_tween_target(step)
@@ -184,6 +186,7 @@ func _op_impact(ctx: ZhandouVfxContext) -> void:
 	var hit_steps := ctx.preset_library.get_sequence(hit_id) if ctx.preset_library != null else []
 	var target_vfx := ctx.get_vfx(ctx.target_id)
 	if target_vfx != null and not hit_steps.is_empty():
+		target_vfx.play_hit_animation()
 		target_vfx.stop_idle()
 		target_vfx.kill_hit_tween()
 		await _run_steps(ctx, hit_steps)

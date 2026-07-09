@@ -82,8 +82,7 @@ export async function loadXiulianMethods() {
 
 const ABILITY_TABLE_FILES = {
   zhandou_active: "zhandou_active.json",
-  zhandou_passive: "zhandou_passive.json",
-  tongyong_passive: "general_passive.json",
+  passive: "passive.json",
 };
 
 export async function loadAbilitiesBundle() {

@@ -25,14 +25,6 @@ const zhandouPassiveEffectIds = new Set([
   "max_hp", "max_mana", "mana_regen", "buff",
 ]);
 
-const tongyongPassiveEffectIds = new Set([
-  "cultivation_speed", "injury_diagnosis", "appraisal_accuracy", "herb_yield",
-  "craft_quality", "material_efficiency", "pill_quality", "alchemy_success",
-  "formation_power", "formation_setup_speed", "talisman_quality", "talisman_activation_speed",
-  "beast_growth", "beast_capacity", "spirit_vein_detection", "rare_find_chance",
-  "lianxu_survival", "lianxu_travel_speed", "settlement_output", "governance_efficiency",
-  "dujie_forecast", "ascension_success",
-]);
 
 const VALID_TARGETS = new Set(["self", "enemy"]);
 const VALID_TARGET_ARGS = new Set([
@@ -74,7 +66,7 @@ function validateTargetPair(abilityId, label, target, targetArg) {
 if ("skillBooks" in config) errors.push("技能配置不得包含外部学习物品数据");
 if (config.metadata.abilityCount !== config.abilities.length) errors.push("metadata.abilityCount 不一致");
 if (config.abilityTables) {
-  const tableKeys = ["zhandou_active", "zhandou_passive", "tongyong_passive"];
+  const tableKeys = ["zhandou_active", "passive"];
   for (const tableKey of tableKeys) {
     const rel = config.abilityTables[tableKey];
     if (!rel) errors.push(`缺少技能分表映射 ${tableKey}`);
@@ -82,7 +74,6 @@ if (config.abilityTables) {
 }
 if (effectIds.size !== catalog.effects.length) errors.push("统一效果目录存在重复 ID");
 if (catalog.metadata.effectCount !== catalog.effects.length) errors.push("effect_catalog metadata.effectCount 不一致");
-if (config.rules.generalPassiveStackPolicy !== "highest") errors.push("通用被动必须同类型只取最高");
 
 for (const ability of config.abilities) {
   if (abilityIds.has(ability.id)) errors.push(`${ability.id}: 重复技能 ID`);
@@ -107,11 +98,7 @@ for (const ability of config.abilities) {
     if (ability.type === "combat_passive" && !zhandouPassiveEffectIds.has(effect.effectId)) {
       errors.push(`${ability.id}: 战斗被动效果 ID 不在 EnumZhandouPassiveEffect ${effect.effectId}`);
     }
-    if (ability.type === "general_passive" && !tongyongPassiveEffectIds.has(effect.effectId)) {
-      errors.push(`${ability.id}: 通用被动效果 ID 不在 EnumTongyongPassiveEffect ${effect.effectId}`);
-    }
     if (!effect.stackGroup || !effect.stackPolicy || !effect.scalingMode) errors.push(`${ability.id}: 效果执行字段不完整 ${effect.effectId}`);
-    if (ability.type === "general_passive" && effect.stackPolicy !== "highest") errors.push(`${ability.id}: 通用被动效果必须取最高 ${effect.effectId}`);
     if (effect.operation === "add_percent" && (typeof effect.clampMin !== "number" || typeof effect.clampMax !== "number")) {
       errors.push(`${ability.id}: 百分比效果缺少上下限 ${effect.effectId}`);
     }
@@ -123,9 +110,7 @@ for (const ability of config.abilities) {
       if (!runtimeCombatEffects.has(effect.effectId)) errors.push(`${ability.id}: 首版效果未映射到战斗运行时 ${effect.effectId}`);
     }
   }
-  if (ability.type === "general_passive") {
-    if (ability.combat !== null) errors.push(`${ability.id}: 通用被动不得配置 combat`);
-  } else if (!ability.combat) {
+  if (!ability.combat) {
     errors.push(`${ability.id}: 战斗技能缺少 combat`);
   } else {
     if (ability.type === "combat_active" && ability.combat.cooldown <= 0) errors.push(`${ability.id}: 战斗主动缺少冷却`);

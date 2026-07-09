@@ -17,12 +17,10 @@ static func normalize_table_rows(table_key: String, root: Dictionary) -> Array:
 			row["id"] = str(key_v).strip_edges()
 		var normalized: Dictionary = {}
 		match table_key.strip_edges().to_lower():
-			EnumAbilityTable.LABEL_ZHANDOU_ACTIVE:
+			EnumSkill.LABEL_ZHANDOU_ACTIVE:
 				normalized = _normalize_zhandou_active_row(row)
-			EnumAbilityTable.LABEL_ZHANDOU_PASSIVE:
+			EnumSkill.LABEL_PASSIVE:
 				normalized = _normalize_zhandou_passive_row(row)
-			EnumAbilityTable.LABEL_TONGYONG_PASSIVE:
-				normalized = _normalize_general_passive_row(row)
 			_:
 				push_warning("AbilityExportAdapter: unknown table %s" % table_key)
 				continue
@@ -131,49 +129,6 @@ static func _normalize_zhandou_passive_row(raw: Dictionary) -> Dictionary:
 		"effects": effects,
 		"learningRequirements": {"knowledge": []},
 		"trigger": _trigger_from_runtype(str(raw.get("runtype", ""))),
-		"upgrade_options": [],
-		"evolution_conditions": [],
-	}
-
-
-static func _normalize_general_passive_row(raw: Dictionary) -> Dictionary:
-	var ability_id := str(raw.get("id", "")).strip_edges()
-	if ability_id == "":
-		return {}
-	var tier := int(raw.get("tier", EnumItemTier.Type.lianqi))
-	if not raw.has("tier") and raw.has("req_realm"):
-		tier = EnumItemTier.tier_for_realm_id(str(raw.get("req_realm", "")))
-	var effects: Array = []
-	for slot in [1, 2]:
-		var effect_id := str(raw.get("effect%d_id" % slot, "")).strip_edges()
-		if ZhandouEffectCodec.is_null_sentinel(effect_id):
-			continue
-		var operation := str(raw.get("effect%d_operation" % slot, "add_flat")).strip_edges()
-		if ZhandouEffectCodec.is_null_sentinel(operation):
-			operation = "add_flat"
-		effects.append({
-			"effectId": effect_id,
-			"base": float(raw.get("effect%d_base" % slot, 0.0)),
-			"operation": operation,
-			"target": "self",
-			"stackGroup": str(raw.get("effect%d_stack_group" % slot, effect_id)),
-			"stackPolicy": str(raw.get("effect%d_stack_policy" % slot, "highest")),
-			"scalingMode": str(raw.get("effect%d_scaling_mode" % slot, "positive")),
-			"clampMin": float(raw.get("effect%d_clamp_min" % slot, 0.0)),
-			"clampMax": float(raw.get("effect%d_clamp_max" % slot, 2.0)),
-		})
-	return {
-		"id": ability_id,
-		"name": str(raw.get("name", ability_id)),
-		"type": "general_passive",
-		"tier": EnumItemTier.clamp_tier(tier),
-		"quality": clampi(int(raw.get("quality", 1)), EnumQuality.Type.LOW, EnumQuality.Type.SUPREME),
-		"description": str(raw.get("description", raw.get("desc", ""))),
-		"tags": ZhandouEffectCodec.split_csv_tags(raw.get("tags", [])),
-		"combat": null,
-		"effects": effects,
-		"learningRequirements": {"knowledge": []},
-		"trigger": {},
 		"upgrade_options": [],
 		"evolution_conditions": [],
 	}

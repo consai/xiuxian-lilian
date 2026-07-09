@@ -157,18 +157,20 @@ func new_game() -> void:
 	ling_stones = 0
 	player_name = str(initial.get("name", "修士"))
 	player_icon = str(initial.get("icon", ""))
-	foundations = initial.get("foundations", CharacterStats.default_foundations()) as Dictionary
-	aptitudes = initial.get("aptitudes", CharacterStats.default_aptitudes()) as Dictionary
+	# 新表使用 attrs/linggen；保留旧键以兼容尚未重新导出的配置。
+	foundations = initial.get("attrs", initial.get("foundations", CharacterStats.default_foundations())) as Dictionary
+	aptitudes = initial.get("linggen", initial.get("aptitudes", CharacterStats.default_aptitudes())) as Dictionary
 	refresh_derived_attrs(false)
 	hp = float(attrs.get(ZhandouAttr.HP_MAX, 100.0))
 	mp = float(attrs.get(ZhandouAttr.MP_MAX, 100.0))
 	unlocked_abilities = _initial_ability_ids(initial)
 	equipped_abilities = _initial_equipped_abilities(initial, unlocked_abilities)
 	unlocked_methods = _initial_method_ids(initial)
+	var default_method := str(unlocked_methods[0]) if not unlocked_methods.is_empty() else "method.hunyuan.1"
 	cultivation_method_slots = (initial.get("method_slots", {
-		"main": "method.hunyuan.1", "support_1": "", "support_2": "", "support_3": "",
+		"main": default_method, "support_1": "", "support_2": "", "support_3": "",
 	}) as Dictionary).duplicate(true)
-	current_cultivation_method_id = str(cultivation_method_slots.get("main", "method.hunyuan.1"))
+	current_cultivation_method_id = str(cultivation_method_slots.get("main", default_method))
 	_seed_starter_knowledge()
 	auto_battle_enabled = false
 	auto_battle_preset = "balanced"
@@ -177,7 +179,7 @@ func new_game() -> void:
 	equip_slots = (initial.get("equip_slots", [-1, -1, -1]) as Array).duplicate(true)
 	treasure_item_slots = (initial.get("treasure_item_slots", ["", "", ""]) as Array).duplicate(true)
 	item_slots = (initial.get("item_slots", ["", "", ""]) as Array).duplicate(true)
-	inventory = (initial.get("inventory", {}) as Dictionary).duplicate(true)
+	inventory = (initial.get("items", initial.get("inventory", {})) as Dictionary).duplicate(true)
 	liandan = LiandanService.default_state()
 	storage = (initial.get("storage", {}) as Dictionary).duplicate(true)
 	storage_equips = (initial.get("storage_equips", []) as Array).duplicate(true)
@@ -199,7 +201,7 @@ func new_game() -> void:
 
 func _initial_ability_ids(initial: Dictionary) -> Array:
 	var out: Array = []
-	for aid_v in initial.get("abilities", ["ability.combat.qi_bolt"]) as Array:
+	for aid_v in initial.get("jineng", initial.get("abilities", ["factive_lq_001"])) as Array:
 		var aid := str(aid_v).strip_edges()
 		if aid != "" and not out.has(aid):
 			out.append(aid)
@@ -208,7 +210,7 @@ func _initial_ability_ids(initial: Dictionary) -> Array:
 
 func _initial_method_ids(initial: Dictionary) -> Array:
 	var out: Array = []
-	for method_id_v in initial.get("methods", ["method.hunyuan.1"]) as Array:
+	for method_id_v in initial.get("gongfa", initial.get("methods", ["method.hunyuan.1"])) as Array:
 		var method_id := str(method_id_v).strip_edges()
 		if method_id != "":
 			out.append(method_id)
@@ -216,7 +218,7 @@ func _initial_method_ids(initial: Dictionary) -> Array:
 
 
 func _initial_equipped_abilities(initial: Dictionary, unlocked: Array) -> Array:
-	var raw_v: Variant = initial.get("equipped_abilities", [])
+	var raw_v: Variant = initial.get("jineng_use", initial.get("equipped_abilities", []))
 	if raw_v is Array and not (raw_v as Array).is_empty():
 		return DataStore._normalize_ability_slots(raw_v)
 	var slots: Array = ["", "", "", "", ""]

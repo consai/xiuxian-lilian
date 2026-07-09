@@ -593,10 +593,10 @@ static func load_abilities_bundle() -> Dictionary:
 	bundle["rules"] = _export_settings(export_path("jineng_rules.json"))
 	var merged: Array = []
 	var tables_out: Dictionary = {}
-	# 分表路径以 EnumAbilityTable 为准，不再读独立 abilityTables 配置文件。
+	# 分表路径以 EnumSkill 为准，不再读独立 abilityTables 配置文件。
 	var tables: Dictionary = {}
-	for table_key in EnumAbilityTable.LOAD_ORDER:
-		tables[table_key] = EnumAbilityTable.default_path(table_key)
+	for table_key in EnumSkill.LOAD_ORDER:
+		tables[table_key] = EnumSkill.default_path(table_key)
 	for table_key in _ability_table_load_order(tables):
 		var rows := _load_ability_table_file(str(table_key), tables)
 		tables_out[str(table_key)] = rows
@@ -617,7 +617,7 @@ static func load_ability_table(table_key: String) -> Dictionary:
 
 static func _ability_table_load_order(tables: Dictionary) -> Array:
 	var out: Array = []
-	for table_key in EnumAbilityTable.LOAD_ORDER:
+	for table_key in EnumSkill.LOAD_ORDER:
 		if tables.has(table_key):
 			out.append(table_key)
 	for table_key in tables.keys():
@@ -630,7 +630,7 @@ static func _ability_table_load_order(tables: Dictionary) -> Array:
 static func _load_ability_table_file(table_key: String, tables: Dictionary) -> Array:
 	var rel := str(tables.get(table_key, "")).strip_edges()
 	if rel == "":
-		rel = EnumAbilityTable.default_path(table_key)
+		rel = EnumSkill.default_path(table_key)
 	var path := rel if rel.begins_with("res://") else "res://data/%s" % rel.trim_prefix("/")
 	var table := _read_json_root_object(path)
 	var rows_v: Variant = table.get("abilities", [])
@@ -642,7 +642,7 @@ static func _load_ability_table_file(table_key: String, tables: Dictionary) -> A
 
 
 static func _ability_table_path(table_key: String) -> String:
-	var rel := EnumAbilityTable.default_path(table_key)
+	var rel := EnumSkill.default_path(table_key)
 	return rel if rel.begins_with("res://") else "res://data/%s" % rel.trim_prefix("/")
 
 

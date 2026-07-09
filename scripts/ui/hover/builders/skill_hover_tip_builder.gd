@@ -147,9 +147,7 @@ static func ability_type_label(type_name: String) -> String:
 		"combat_upkeep":
 			return "主动·持续"
 		"combat_passive":
-			return "战斗被动"
-		"general_passive":
-			return "通用被动"
+			return "被动"
 		_:
 			return "技能"
 
@@ -157,9 +155,7 @@ static func ability_type_label(type_name: String) -> String:
 static func _ability_policy_lines(type_name: String) -> Array[String]:
 	match type_name:
 		"combat_passive":
-			return ["生效：学会后立即生效（仅战斗属性，不占技能栏）"]
-		"general_passive":
-			return ["生效：学会后立即生效（通用加成，不占技能栏）"]
+			return ["生效：学会后立即生效（不占技能栏）"]
 		"combat_upkeep":
 			return ["操作：战斗中手动开关；开启消耗一次行动，关闭不消耗行动"]
 		_:

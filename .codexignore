@@ -7,7 +7,6 @@ outputs/
 **/*.import
 **/*.uid
 **/*.translation
-assets/**/*.png
 assets/**/*.jpg
 assets/**/*.jpeg
 assets/**/*.webp
@@ -17,7 +16,6 @@ assets/**/*.otf
 assets/**/*.woff
 assets/**/*.woff2
 **/*.wav
-docs/**/*.png
 .DS_Store
 Thumbs.db
 *.tmp

@@ -62,10 +62,10 @@ static func _normalize_row(export_row: Dictionary) -> Dictionary:
 
 static func _foundation_attrs(row: Dictionary) -> Dictionary:
 	return {
-		CharacterStats.BODY: float(row.get(CharacterStats.BODY, 0.0)),
-		CharacterStats.SPIRIT: float(row.get(CharacterStats.SPIRIT, 0.0)),
-		CharacterStats.SENSE: float(row.get(CharacterStats.SENSE, 0.0)),
-		CharacterStats.AGILITY: float(row.get(CharacterStats.AGILITY, 0.0)),
+		CharacterStats.BODY: _number(row.get(CharacterStats.BODY, 0.0)),
+		CharacterStats.SPIRIT: _number(row.get(CharacterStats.SPIRIT, 0.0)),
+		CharacterStats.SENSE: _number(row.get(CharacterStats.SENSE, 0.0)),
+		CharacterStats.AGILITY: _number(row.get(CharacterStats.AGILITY, 0.0)),
 	}
 
 
@@ -78,7 +78,15 @@ static func _combat_attrs(row: Dictionary) -> Dictionary:
 		ZhandouAttr.SPD, ZhandouAttr.CONTROL_RESIST,
 	]:
 		if row.has(key):
-			attrs[key] = float(row[key])
+			attrs[key] = _number(row[key])
 	if row.has("control"):
-		attrs[ZhandouAttr.CONTROL_POWER] = float(row["control"])
+		attrs[ZhandouAttr.CONTROL_POWER] = _number(row["control"])
 	return attrs
+
+static func _number(value: Variant, fallback: float = 0.0) -> float:
+	if value is int or value is float:
+		return value
+	if value is String or value is StringName:
+		var text := str(value).strip_edges()
+		return text.to_float() if text.is_valid_float() else fallback
+	return fallback

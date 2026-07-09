@@ -39,6 +39,7 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 			out[key] = (value as Array).duplicate(true)
 		else:
 			out[key] = value
+	# 所有读档兼容和下限修正集中在这里，业务脚本只处理当前 schema。
 	out["day"] = maxi(1, int(out.get("day", 1)))
 	out["realm_index"] = maxi(0, int(out.get("realm_index", 0)))
 	out["cultivation"] = maxi(0, int(out.get("cultivation", 0)))
@@ -61,6 +62,7 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 	var method_slots := method_slots_v as Dictionary if method_slots_v is Dictionary else {}
 	var default_main := "method.hunyuan.1"
 	var main_method := str(method_slots.get("main", default_main))
+	# movement 旧槽位并入 support_3，保留旧存档兼容。
 	out["cultivation_method_slots"] = {
 		"main": main_method,
 		"support_1": str(method_slots.get("support_1", "")),
@@ -242,6 +244,7 @@ func reset_scene_runtime() -> void:
 
 func set_scene_payload(scene_id: String, payload: Dictionary) -> void:
 	ensure_initialized()
+	# payload 是跨场景一次性信封；写入副本避免来源场景后续修改串味。
 	var payloads_v: Variant = scene_runtime().get("payloads", {})
 	var payloads: Dictionary = payloads_v as Dictionary if payloads_v is Dictionary else {}
 	payloads[scene_id] = payload.duplicate(true)
@@ -250,6 +253,7 @@ func set_scene_payload(scene_id: String, payload: Dictionary) -> void:
 
 func take_scene_payload(scene_id: String) -> Dictionary:
 	ensure_initialized()
+	# take 语义：读取后立即清除，防止返回上个界面时重复消费。
 	var payloads_v: Variant = scene_runtime().get("payloads", {})
 	var payloads: Dictionary = payloads_v as Dictionary if payloads_v is Dictionary else {}
 	var payload_v: Variant = payloads.get(scene_id, {})

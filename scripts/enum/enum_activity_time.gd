@@ -1,6 +1,8 @@
 class_name EnumActivityTime
 extends RefCounted
 
+## 闭关、历练、赶路、学习等活动消耗时间的配置 id。
+
 enum Type {
 	CULTIVATE,
 	LILIAN,

@@ -9,12 +9,11 @@ default_permissions = "xiuxian-workspace"
 extends = ":workspace"
 
 [permissions.xiuxian-workspace.filesystem.":workspace_roots"]
-"." = "write"
+
 ".godot" = "deny"
 "**/*.import" = "deny"
 "**/*.uid" = "deny"
 "**/*.translation" = "deny"
-"assets/**/*.png" = "deny"
 "assets/**/*.jpg" = "deny"
 "assets/**/*.jpeg" = "deny"
 "assets/**/*.webp" = "deny"

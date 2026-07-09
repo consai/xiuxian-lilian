@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cacywilhlbfpq"]
 
 [ext_resource type="Script" uid="uid://bggejgtife81d" path="res://scripts/zhandou/enemy_formation_slot_view.gd" id="1_slot"]
-[ext_resource type="Texture2D" uid="uid://c0splu5su3u3u" path="res://assets/art/characters/003_cutout_407x512.png" id="2_rfuso"]
+[ext_resource type="PackedScene" path="res://scenes/characters/juese_006_anim.tscn" id="2_anim"]
 [ext_resource type="FontFile" uid="uid://btkp4vukwqrul" path="res://assets/art/AlimamaDaoLiTi.ttf" id="3_kkcco"]
 [ext_resource type="Texture2D" uid="uid://dgasoy4txpadq" path="res://assets/art/ui_new/item_jian.png" id="3_sword"]
 [ext_resource type="Script" uid="uid://i2ey5righwn7" path="res://scripts/ui/hover/hover_tip_source.gd" id="5_hover"]
@@ -37,9 +37,8 @@ script = ExtResource("1_slot")
 position = Vector2(0, -3)
 scale = Vector2(0.16, 0.16)
 
-[node name="Sprite" type="Sprite2D" parent="role" unique_id=1112236993]
+[node name="Juese006Anim" parent="role" unique_id=1457771514 instance=ExtResource("2_anim")]
 unique_name_in_owner = true
-texture = ExtResource("2_rfuso")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=88724672]
 unique_name_in_owner = true

@@ -39,5 +39,19 @@ func _run() -> void:
 		printerr("LingGuo not consumed")
 		quit(1)
 		return
-	print("PASS: weituo submit consumes items")
+	WeituoServiceScript._cached_config = {
+		"rules": {"board_offer_count": 2},
+		"weituo": {
+			"zero": {"id": "zero", "repeatable": true, "weight": 0},
+			"one": {"id": "one", "repeatable": true, "weight": 1},
+			"two": {"id": "two", "repeatable": true, "weight": 1},
+		},
+	}
+	var picks: Array = WeituoServiceScript._pick_board_offer_ids({"day": 1, "weituo": WeituoServiceScript.default_savedata()})
+	WeituoServiceScript._cached_config = {}
+	if picks.size() != 2 or "zero" in picks:
+		printerr("weighted board pick failed: %s" % str(picks))
+		quit(1)
+		return
+	print("PASS: weituo submit consumes items and weighted board picks")
 	quit(0)

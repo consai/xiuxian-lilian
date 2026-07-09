@@ -1,4 +1,5 @@
 extends Node
+## 剧情编排层：连接 StoryPlayer、剧情 UI、DataStore 快照和外部游戏事件。
 
 signal story_finished(story_id: String, result: String)
 
@@ -79,6 +80,7 @@ func _consume(frame: Dictionary) -> Dictionary:
 		push_warning("StoryDirector: %s" % str(frame.get("error", "unknown_error")))
 		return frame
 	_save_snapshot()
+	# command 节点可能连续推进，所以统一从这里递归消费下一帧。
 	match str(frame.get("type", "")):
 		"line", "choice":
 			_presenter.show_frame(frame)
@@ -102,6 +104,7 @@ func _consume_commands(commands: Array) -> void:
 				reason = str(command.get("reason", ""))
 			"await_game_event":
 				_waiting_event = str(command.get("event", ""))
+	# 引导遮罩与等待事件可以共存：遮罩先展示，流程停在 pending_event。
 	if target != "":
 		_presenter.show_guide(target, reason)
 	elif _waiting_event != "":
@@ -146,6 +149,7 @@ func _save_snapshot() -> void:
 func _restore_active() -> void:
 	var snapshot_v: Variant = DataStore.story_runtime().get("active_snapshot", {})
 	if not snapshot_v is Dictionary or (snapshot_v as Dictionary).is_empty():
+		# 切场景优先读 rundata，读档/重启时再回退到 savedata。
 		snapshot_v = (DataStore.savedata.get("story", {}) as Dictionary).get("active_snapshot", {})
 	if not snapshot_v is Dictionary or (snapshot_v as Dictionary).is_empty():
 		return

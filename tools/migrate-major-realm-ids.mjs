@@ -167,7 +167,7 @@ function migrateGd(filePath) {
 
 const jsonFiles = [
   "data/exportjson/dao_tree_realms.json",
-  "data/exportjson/general_passive.json",
+  "data/exportjson/passive.json",
   "data/exportjson/zhandou_active.json",
   "data/exportjson/xiulian_methods_methods.json",
   "data/exportjson/dao_tree_skills.json",

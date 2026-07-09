@@ -256,19 +256,12 @@ layout_mode = 2
 theme_type_variation = "TabIdle"
 text = "持续"
 
-[node name="FilterCombatPassive" type="Button" parent="Panel/SkillsCard/SkillFilters"]
+[node name="FilterPassive" type="Button" parent="Panel/SkillsCard/SkillFilters"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(96, 38)
+custom_minimum_size = Vector2(76, 38)
 layout_mode = 2
 theme_type_variation = "TabIdle"
-text = "战斗被动"
-
-[node name="FilterGeneralPassive" type="Button" parent="Panel/SkillsCard/SkillFilters"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(96, 38)
-layout_mode = 2
-theme_type_variation = "TabIdle"
-text = "通用被动"
+text = "被动"
 
 [node name="Footer" type="Panel" parent="Panel"]
 layout_mode = 0

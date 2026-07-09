@@ -1,6 +1,8 @@
 class_name EnumLilianNodeType
 extends RefCounted
 
+## 历练地图节点类型，用于节点生成、事件分派与结算展示。
+
 enum Type {
 	START,
 	TRAVEL,

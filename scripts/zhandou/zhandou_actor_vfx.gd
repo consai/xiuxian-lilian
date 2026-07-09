@@ -104,6 +104,8 @@ func start_idle() -> void:
 	if not is_instance_valid(_actor) or settings == null or not settings.idle_enabled:
 		return
 	_kill_idle()
+	if _play_actor_animation("play_idle"):
+		return
 	var period := 1.0 / maxf(settings.idle_frequency_hz, 0.01)
 	_idle_tween = _actor.create_tween().set_loops()
 	_idle_tween.set_trans(settings.idle_transition).set_ease(settings.idle_ease)
@@ -186,6 +188,24 @@ func _global_to_actor_local(global_pos: Vector2) -> Vector2:
 		return (parent as CanvasItem).get_global_transform_with_canvas().affine_inverse() * global_pos
 	return global_pos
 
+
+func play_attack_animation() -> void:
+	_play_actor_animation("play_attack")
+
+
+func play_cast_animation() -> void:
+	_play_actor_animation("play_cast")
+
+
+func play_hit_animation() -> void:
+	_play_actor_animation("play_hit")
+
+
+func _play_actor_animation(method_name: String) -> bool:
+	if not is_instance_valid(_actor) or not _actor.has_method(method_name):
+		return false
+	_actor.call(method_name)
+	return true
 
 func _kill_idle() -> void:
 	if _idle_tween != null and _idle_tween.is_valid():

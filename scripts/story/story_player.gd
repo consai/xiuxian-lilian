@@ -1,5 +1,6 @@
 class_name StoryPlayer
 extends RefCounted
+## 纯剧情状态机：只解析节点、条件和选择，不直接操作 UI 或存档。
 
 const StoryConditionScript := preload("res://scripts/story/story_condition.gd")
 const StoryValidatorScript := preload("res://scripts/story/story_validator.gd")
@@ -36,6 +37,7 @@ func current_frame() -> Dictionary:
 	var node := _node(_current_node_id)
 	if node.is_empty():
 		return _error("unknown_node:%s" % _current_node_id)
+	# Frame 是 StoryDirector/Presenter 的唯一契约，避免 UI 层读取原始剧情表。
 	var node_type := str(node.get("type", ""))
 	var frame := {
 		"ok": true,
@@ -87,6 +89,7 @@ func select_choice(choice_id: String) -> Dictionary:
 			continue
 		if not StoryConditionScript.matches_all(choice.get("requires", []), _state):
 			return _error("choice_not_available:%s" % choice_id)
+		# 选择效果只写入本次剧情快照，由 Director 决定何时持久化。
 		StoryConditionScript.apply_effects(choice.get("effects", []), _state)
 		return _move_to(str(choice.get("next", "")))
 	return _error("choice_not_available:%s" % choice_id)

@@ -1,5 +1,6 @@
 class_name WeituoService
 extends RefCounted
+## 委托领域服务：配置读取、榜单刷新、接取/提交和历练进度回填。
 
 const WEITUO_CONFIG_PATH := "res://data/exportjson/weituo.json"
 
@@ -87,6 +88,7 @@ static func visible_entries(savedata: Dictionary, game_state: Node = null) -> Ar
 		if weituo_def.is_empty():
 			continue
 		active_weituo_ids[weituo_id] = instance_id
+		# 已接取委托优先以 active 记录展示，避免同一委托在榜单重复出现。
 		entries.append(
 			_build_entry(
 				savedata,
@@ -268,6 +270,7 @@ static func record_lilian_result(result: Dictionary, savedata: Dictionary) -> Di
 		var applied_ids: Array = progress.get("settlement_ids", []) as Array
 		if settlement_id != "" and settlement_id in applied_ids:
 			continue
+		# 一次历练结算只回填匹配地点的委托，并用 settlement_id 防重复累计。
 		var matched := false
 		for req_v in weituo_def.get("requirements", []) as Array:
 			if not req_v is Dictionary:
@@ -307,6 +310,7 @@ static func refresh_board_if_needed(savedata: Dictionary, _game_state: Node = nu
 	var offer_ids: Array = board.get("offer_ids", []) as Array
 	var refreshed := false
 	if offer_ids.is_empty():
+		# 空榜立即补齐；正常刷新按配置天数滚动。
 		board["offer_ids"] = _pick_board_offer_ids(savedata, _game_state)
 		refreshed = true
 	elif day >= refresh_day + refresh_days:
@@ -436,6 +440,7 @@ static func _build_entry(
 		"title": str(weituo_def.get("title", "")),
 		"issuer": str(weituo_def.get("issuer", "")),
 		"desc": str(weituo_def.get("desc", "")),
+		"rarity": str(weituo_def.get("rarity", "common")),
 		"type_label": _type_label(weituo_def),
 		"summary": summary,
 		"progress_ratio": progress_ratio,
@@ -601,7 +606,7 @@ static func _active_instance_for_weituo(active: Dictionary, weituo_id: String) -
 	return ""
 
 
-## 从已解锁委托池中随机抽取本周期榜单位（ponytail: 无种子 shuffle，读档后空榜重抽可能变化）。
+## 从已解锁委托池中按 weight 抽取本周期榜单位（ponytail: 无种子随机，读档后空榜重抽可能变化）。
 static func _pick_board_offer_ids(savedata: Dictionary, game_state: Node = null) -> Array:
 	var weituo_data := weituo_block(savedata)
 	var completed_once: Array = weituo_data.get("completed_once", []) as Array
@@ -613,10 +618,26 @@ static func _pick_board_offer_ids(savedata: Dictionary, game_state: Node = null)
 			continue
 		if not bool(weituo_def.get("repeatable", true)) and weituo_id in completed_once:
 			continue
-		candidates.append(weituo_id)
-	candidates.shuffle()
+		var weight := maxi(0, int(weituo_def.get("weight", 1)))
+		if weight > 0:
+			candidates.append({"id": weituo_id, "weight": weight})
 	var pick_count := mini(board_offer_count(), candidates.size())
-	return candidates.slice(0, pick_count)
+	var picked: Array = []
+	while picked.size() < pick_count:
+		var total := 0
+		for entry_v in candidates:
+			total += int((entry_v as Dictionary).get("weight", 0))
+		if total <= 0:
+			break
+		var roll := randi_range(1, total)
+		for i in candidates.size():
+			var entry := candidates[i] as Dictionary
+			roll -= int(entry.get("weight", 0))
+			if roll <= 0:
+				picked.append(str(entry.get("id", "")))
+				candidates.remove_at(i)
+				break
+	return picked
 
 
 static func _item_label(req: Dictionary, item_id: String) -> String:

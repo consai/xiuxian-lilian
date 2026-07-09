@@ -14,8 +14,7 @@
 |---|---|
 | 功法 | `data/exportjson/xiulian_methods*.json` |
 | 战斗主动/持续技能 | `data/exportjson/zhandou_active.json` |
-| 战斗被动 | `data/exportjson/zhandou_passive.json` |
-| 通用被动 | `data/exportjson/general_passive.json` |
+| 被动 | `data/exportjson/passive.json` |
 | 效果目录 | `data/exportjson/xiaoguo_catalog*.json` |
 | 境界与修炼平衡 | `data/exportjson/yunxing_params/jingjie_balance*.json` |
 

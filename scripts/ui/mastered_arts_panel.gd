@@ -10,8 +10,7 @@ const SkillRowScene := preload("res://scenes/ui/components/mastered_skill_row.ts
 const FILTER_ALL := "all"
 const FILTER_ACTIVE := "combat_active"
 const FILTER_UPKEEP := "combat_upkeep"
-const FILTER_COMBAT_PASSIVE := "combat_passive"
-const FILTER_GENERAL_PASSIVE := "general_passive"
+const FILTER_PASSIVE := "combat_passive"
 
 var _skill_filter := FILTER_ALL
 
@@ -24,8 +23,7 @@ var _skill_filter := FILTER_ALL
 @onready var _filter_all: Button = %FilterAll
 @onready var _filter_active: Button = %FilterActive
 @onready var _filter_upkeep: Button = %FilterUpkeep
-@onready var _filter_combat_passive: Button = %FilterCombatPassive
-@onready var _filter_general_passive: Button = %FilterGeneralPassive
+@onready var _filter_passive: Button = %FilterPassive
 
 
 func _ready() -> void:
@@ -34,8 +32,7 @@ func _ready() -> void:
 	_filter_all.pressed.connect(_set_skill_filter.bind(FILTER_ALL))
 	_filter_active.pressed.connect(_set_skill_filter.bind(FILTER_ACTIVE))
 	_filter_upkeep.pressed.connect(_set_skill_filter.bind(FILTER_UPKEEP))
-	_filter_combat_passive.pressed.connect(_set_skill_filter.bind(FILTER_COMBAT_PASSIVE))
-	_filter_general_passive.pressed.connect(_set_skill_filter.bind(FILTER_GENERAL_PASSIVE))
+	_filter_passive.pressed.connect(_set_skill_filter.bind(FILTER_PASSIVE))
 	refresh()
 
 
@@ -132,8 +129,7 @@ func _refresh_filter_buttons() -> void:
 		[_filter_all, FILTER_ALL],
 		[_filter_active, FILTER_ACTIVE],
 		[_filter_upkeep, FILTER_UPKEEP],
-		[_filter_combat_passive, FILTER_COMBAT_PASSIVE],
-		[_filter_general_passive, FILTER_GENERAL_PASSIVE],
+		[_filter_passive, FILTER_PASSIVE],
 	]:
 		var button := pair[0] as Button
 		button.theme_type_variation = "TabActive" if str(pair[1]) == _skill_filter else "TabIdle"

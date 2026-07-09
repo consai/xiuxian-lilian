@@ -1,5 +1,6 @@
 class_name AbilityService
 extends RefCounted
+## 技能配置索引与运行时转换：表格 id 对外，战斗技能栏用连续数字 id。
 
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
@@ -24,7 +25,8 @@ static func reload() -> void:
 	_ability_by_combat_id.clear()
 	_ability_by_combat_id[0] = _tiaoxi_row()
 	_combat_id_by_ability[TIAOXI_ID] = 0
-	for table_key in EnumAbilityTable.LOAD_ORDER:
+	# 新导出按 tables 分表；旧导出只有 abilities，下面保留双路径读取。
+	for table_key in EnumSkill.LOAD_ORDER:
 		_abilities_by_table[table_key] = {}
 	var tables_v: Variant = _bundle.get("tables", {})
 	if tables_v is Dictionary and not (tables_v as Dictionary).is_empty():
@@ -36,6 +38,7 @@ static func reload() -> void:
 	else:
 		_index_table_rows_from_merged(_bundle.get("abilities", []) as Array)
 	var next_id := 1
+	# 战斗层历史上使用数字 skill_id；这里集中生成映射，避免配置表泄漏数字 id。
 	for ability_v in _bundle.get("abilities", []) as Array:
 		if not ability_v is Dictionary:
 			continue
@@ -84,11 +87,9 @@ static func _index_table_rows_from_merged(rows: Array) -> void:
 static func _infer_table_key(ability_type: String) -> String:
 	match ability_type:
 		"combat_active", "combat_upkeep":
-			return EnumAbilityTable.LABEL_ZHANDOU_ACTIVE
+			return EnumSkill.LABEL_ZHANDOU_ACTIVE
 		"combat_passive":
-			return EnumAbilityTable.LABEL_ZHANDOU_PASSIVE
-		"general_passive":
-			return EnumAbilityTable.LABEL_TONGYONG_PASSIVE
+			return EnumSkill.LABEL_PASSIVE
 		_:
 			return ""
 
@@ -96,7 +97,7 @@ static func _infer_table_key(ability_type: String) -> String:
 static func table_keys() -> Array[String]:
 	bundle()
 	var out: Array[String] = []
-	for table_key in EnumAbilityTable.LOAD_ORDER:
+	for table_key in EnumSkill.LOAD_ORDER:
 		if (_abilities_by_table.get(table_key, {}) as Dictionary).size() > 0:
 			out.append(table_key)
 	for table_key in _abilities_by_table.keys():
@@ -124,15 +125,11 @@ static func table_key_for(ability_id: String) -> String:
 
 
 static func zhandou_active_abilities() -> Array:
-	return abilities_in_table(EnumAbilityTable.LABEL_ZHANDOU_ACTIVE)
+	return abilities_in_table(EnumSkill.LABEL_ZHANDOU_ACTIVE)
 
 
-static func zhandou_passive_abilities() -> Array:
-	return abilities_in_table(EnumAbilityTable.LABEL_ZHANDOU_PASSIVE)
-
-
-static func tongyong_passive_abilities() -> Array:
-	return abilities_in_table(EnumAbilityTable.LABEL_TONGYONG_PASSIVE)
+static func passive_abilities() -> Array:
+	return abilities_in_table(EnumSkill.LABEL_PASSIVE)
 
 
 ## 需编入战斗技能栏的类型（主动施放或手动开关的持续技）。
@@ -142,7 +139,7 @@ static func uses_combat_skill_slot(ability_type: String) -> bool:
 
 ## 学会后常驻生效、不占技能栏的类型。
 static func is_always_active_passive(ability_type: String) -> bool:
-	return ability_type in ["combat_passive", "general_passive"]
+	return ability_type == "combat_passive"
 
 
 static func bundle() -> Dictionary:
@@ -254,6 +251,7 @@ static func to_runtime_dict(ability_id: String, _savedata: Dictionary) -> Dictio
 	var vfx_type := str(ability.get("vfx_type", "")).strip_edges().to_lower()
 	if vfx_type == "":
 		vfx_type = "melee"
+		# 未配置 VFX 时按标签给保守默认值，保证战斗按钮总能播放表现。
 		if tags.has("spell") or tags.has("ranged"):
 			vfx_type = "ranged"
 		if tags.has("mobility") or tags.has("shield"):
@@ -275,6 +273,7 @@ static func to_runtime_dict(ability_id: String, _savedata: Dictionary) -> Dictio
 		combat.get("target", EnumZhandouTarget.LABEL_ENEMY),
 		combat.get("targetArg", combat.get("target_arg", ""))
 	)
+	# effects 在进入战斗前解析成统一目标结构，战斗域不再理解表格字段别名。
 	var out := {
 		"id": combat_id,
 		"ability_id": ability_id,

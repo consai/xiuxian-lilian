@@ -13,7 +13,7 @@ const _SHIELD_ICON := preload("res://assets/art/ui_new/hudun_icon.png")
 @onready var _intent_icon: TextureRect = %IntentIcon
 @onready var _intent_damage: Label = %IntentDamage
 @onready var _intent_hover: HoverTipSource = %IntentHover
-@onready var sprite: Sprite2D = %Sprite
+@onready var _actor: JueseAnimPlayer = %Juese006Anim
 @onready var _color_rect: ColorRect = %ColorRect
 @onready var hp_bar: ProgressBar = %HpBar
 @onready var _shield_badge: HBoxContainer = %ShieldBadge
@@ -27,12 +27,12 @@ func _ready() -> void:
 
 
 func _apply_sprite_flip() -> void:
-	if sprite != null:
-		sprite.flip_h = flip_sprite_horizontal
+	if _actor != null:
+		_actor.set_flip_h(flip_sprite_horizontal)
 
 
-func actor_sprite() -> Sprite2D:
-	return sprite
+func actor_sprite() -> Node2D:
+	return _actor
 
 
 func apply_slot(
@@ -53,8 +53,8 @@ func apply_slot(
 		_color_rect.visible = active
 	modulate = Color(1, 1, 1, 1) if enabled else Color(0.66, 0.66, 0.66, 0.72)
 	var avatar := ZhandouInitData._resolve_avatar_texture(row_data)
-	if sprite != null:
-		sprite.texture = avatar
+	if _actor != null:
+		_actor.set_texture(avatar)
 	if hp_bar != null:
 		var hp_max := maxf(unit.get_hp_max(), 0.001)
 		hp_bar.min_value = 0.0

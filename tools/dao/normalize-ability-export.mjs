@@ -217,46 +217,6 @@ export function normalizeZhandouPassiveRow(raw) {
   };
 }
 
-export function normalizeGeneralPassiveRow(raw) {
-  const abilityId = String(raw.id ?? "").trim();
-  if (!abilityId) return null;
-  let tier = Number(raw.tier ?? 1) || 1;
-  if (!raw.tier && raw.req_realm) tier = tierForRealmId(raw.req_realm);
-  const effects = [];
-  for (const slot of [1, 2]) {
-    const effectId = String(raw[`effect${slot}_id`] ?? "").trim();
-    if (isNullSentinel(effectId)) continue;
-    let operation = String(raw[`effect${slot}_operation`] ?? "add_flat").trim();
-    if (isNullSentinel(operation)) operation = "add_flat";
-    effects.push({
-      effectId,
-      base: Number(raw[`effect${slot}_base`] ?? 0) || 0,
-      operation,
-      target: "self",
-      stackGroup: String(raw[`effect${slot}_stack_group`] ?? effectId),
-      stackPolicy: String(raw[`effect${slot}_stack_policy`] ?? "highest"),
-      scalingMode: String(raw[`effect${slot}_scaling_mode`] ?? "positive"),
-      clampMin: Number(raw[`effect${slot}_clamp_min`] ?? 0) || 0,
-      clampMax: Number(raw[`effect${slot}_clamp_max`] ?? 2) || 2,
-    });
-  }
-  return {
-    id: abilityId,
-    name: String(raw.name ?? abilityId),
-    type: "general_passive",
-    tier,
-    quality: Number(raw.quality ?? 1) || 1,
-    description: String(raw.description ?? raw.desc ?? ""),
-    tags: splitCsvTags(raw.tags ?? []),
-    combat: null,
-    effects,
-    learningRequirements: { knowledge: [] },
-    trigger: {},
-    upgrade_options: [],
-    evolution_conditions: [],
-  };
-}
-
 export function isExportRoot(table) {
   if (!table || typeof table !== "object") return false;
   if (Array.isArray(table.abilities) && table.abilities.length > 0) return false;
@@ -266,8 +226,7 @@ export function isExportRoot(table) {
 export function normalizeTableRows(tableKey, root) {
   const normalizers = {
     zhandou_active: normalizeZhandouActiveRow,
-    zhandou_passive: normalizeZhandouPassiveRow,
-    tongyong_passive: normalizeGeneralPassiveRow,
+    passive: normalizeZhandouPassiveRow,
   };
   const normalize = normalizers[tableKey];
   if (!normalize) return [];

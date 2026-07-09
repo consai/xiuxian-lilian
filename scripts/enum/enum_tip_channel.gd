@@ -1,6 +1,8 @@
 class_name EnumTipChannel
 extends RefCounted
 
+## 统一提示协议中的展示通道，决定提示进入状态栏或浮层队列。
+
 enum Channel {
 	BAR,
 	COMBAT_BLOCK,

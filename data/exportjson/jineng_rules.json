@@ -76,27 +76,8 @@
     "value": [
       "combat_active",
       "combat_passive",
-      "combat_upkeep",
-      "general_passive"
+      "combat_upkeep"
     ],
-    "onCostsAction": null,
-    "offCostsAction": null,
-    "defaultSingleTarget": null,
-    "lowestHpPolicy": null,
-    "backlinePolicy": null,
-    "exposedPolicy": null,
-    "areaPolicy": null,
-    "realtimeCastingTarget": null,
-    "priorityTarget": null,
-    "sealPolicy": null,
-    "triggerField": null,
-    "ordinaryQualities": null,
-    "ordinaryPolicy": null,
-    "specialPolicy": null
-  },
-  "generalPassivePolicy": {
-    "key": "generalPassivePolicy",
-    "value": "always_active_after_learning_same_stack_group_uses_highest",
     "onCostsAction": null,
     "offCostsAction": null,
     "defaultSingleTarget": null,
@@ -190,24 +171,6 @@
       "combat_active",
       "combat_upkeep"
     ],
-    "onCostsAction": null,
-    "offCostsAction": null,
-    "defaultSingleTarget": null,
-    "lowestHpPolicy": null,
-    "backlinePolicy": null,
-    "exposedPolicy": null,
-    "areaPolicy": null,
-    "realtimeCastingTarget": null,
-    "priorityTarget": null,
-    "sealPolicy": null,
-    "triggerField": null,
-    "ordinaryQualities": null,
-    "ordinaryPolicy": null,
-    "specialPolicy": null
-  },
-  "generalPassiveStackPolicy": {
-    "key": "generalPassiveStackPolicy",
-    "value": "highest",
     "onCostsAction": null,
     "offCostsAction": null,
     "defaultSingleTarget": null,

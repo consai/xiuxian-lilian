@@ -85,7 +85,7 @@ function migrateJson(relativePath) {
 for (const fileName of [
   "dao_tree_skills.json",
   "xiulian_methods_methods.json",
-  "general_passive.json",
+  "passive.json",
 ]) {
   migrateJson(fileName);
 }
