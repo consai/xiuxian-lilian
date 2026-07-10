@@ -329,7 +329,7 @@ P3 通过标准：
 
 验收记录：
 
-- 2026-06-25：P3 最小内容包「雾隐溪谷」已落地；自动回归通过，配置路径与可复测路线记录见 `docs/project-management/p3-playtest-notes.md`。
+- 2026-06-25：P3 最小内容包「雾隐溪谷」已落地；自动回归与配置路径核对通过。
 
 ### [x] PM-301：新区域最小内容包
 
@@ -456,10 +456,6 @@ P3 通过标准：
 - `run_config_validation_tests.gd`、`run_world_map_tests.gd`、`run_lilian_tests.gd`、`run_simulation_tests.gd` 通过。
 - 手动路线：筑基前目标完成 -> 发现新区域 -> 完成事件链关键节点 -> 获得新功法 / 丹方目标。
 - 输出 P3 验收记录。
-
-产物：
-
-- `docs/project-management/p3-playtest-notes.md`
 
 任务备注：
 

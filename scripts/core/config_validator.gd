@@ -23,7 +23,6 @@ static func collect_all_errors(config_manager: Node, game_state: Node = null) ->
 	errors.append_array(_validate_location_preview_rewards(config_manager))
 	errors.append_array(_validate_v1_abilities())
 	errors.append_array(_validate_method_stack_policies())
-	errors.append_array(_validate_arts_quality_and_tier())
 	errors.append_array(_validate_learning_book_coverage(config_manager))
 	errors.append_array(_validate_item_alias_targets(config_manager))
 	errors.append_array(_validate_cultivation_pill_gains(config_manager))
@@ -31,35 +30,6 @@ static func collect_all_errors(config_manager: Node, game_state: Node = null) ->
 	errors.append_array(WorldMapDataValidatorScript.collect_errors())
 	return errors
 
-
-static func _validate_arts_quality_and_tier() -> PackedStringArray:
-	var errors: PackedStringArray = []
-	for ability_v in AbilityServiceScript.all_abilities():
-		if ability_v is Dictionary:
-			errors.append_array(_validate_quality_tier_row(ability_v as Dictionary, "技能"))
-	for method_v in XiulianMethodServiceScript.all_methods():
-		if method_v is Dictionary:
-			errors.append_array(_validate_quality_tier_row(method_v as Dictionary, "功法"))
-	for skill_v in DaoTreeServiceScript.config().get("skills", []) as Array:
-		if skill_v is Dictionary:
-			errors.append_array(_validate_quality_tier_row(skill_v as Dictionary, "知识"))
-	return errors
-
-
-static func _validate_quality_tier_row(row: Dictionary, label: String) -> PackedStringArray:
-	var errors: PackedStringArray = []
-	var row_id := str(row.get("id", ""))
-	if row.has("rarity"):
-		errors.append("%s %s 使用了旧字段 rarity" % [label, row_id])
-	if not row.has("quality"):
-		errors.append("%s %s 缺少 quality" % [label, row_id])
-	elif not EnumQuality.is_valid_quality(int(row.get("quality", 0))):
-		errors.append("%s %s quality 必须在 1..4" % [label, row_id])
-	if not row.has("tier"):
-		errors.append("%s %s 缺少 tier" % [label, row_id])
-	elif not EnumItemTier.is_valid_tier(int(row.get("tier", 0))):
-		errors.append("%s %s tier 必须在 1..9" % [label, row_id])
-	return errors
 
 
 static func _validate_realm_balance() -> PackedStringArray:

@@ -1,9 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://cffjyl371e8fv"]
+[gd_scene format=3 uid="uid://cffjyl371e8fv"]
 
 [ext_resource type="Theme" uid="uid://cqcxyqjqsly8l" path="res://ui/theme_tuhuang.tres" id="1_theme"]
 [ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="2_bg"]
 [ext_resource type="Texture2D" uid="uid://db6yxps2ypebg" path="res://assets/art/characters/001_cutout_483x512.png" id="3_portrait"]
-[ext_resource type="Script" path="res://scripts/ui/juese_chuangjian.gd" id="4_script"]
+[ext_resource type="Script" uid="uid://c8xkk46m1fxaq" path="res://scripts/ui/juese_chuangjian.gd" id="4_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/components/xiulian_primary_button.tscn" id="5_button"]
 [ext_resource type="PackedScene" path="res://scenes/ui/components/juese_choice_card.tscn" id="6_card"]
 
@@ -21,7 +21,7 @@ corner_radius_bottom_left = 22
 shadow_color = Color(0.12, 0.08, 0.04, 0.32)
 shadow_size = 8
 
-[node name="CharacterCreation" type="Control"]
+[node name="CharacterCreation" type="Control" unique_id=153733251]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -31,7 +31,7 @@ grow_vertical = 2
 theme = ExtResource("1_theme")
 script = ExtResource("4_script")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=1253454732]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -43,7 +43,7 @@ texture = ExtResource("2_bg")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="SkyTint" type="ColorRect" parent="."]
+[node name="SkyTint" type="ColorRect" parent="." unique_id=531254421]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -53,7 +53,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.18, 0.62, 0.94, 0.42)
 
-[node name="Content" type="MarginContainer" parent="."]
+[node name="Content" type="MarginContainer" parent="." unique_id=1431411187]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -65,11 +65,11 @@ theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 34
 theme_override_constants/margin_bottom = 24
 
-[node name="Layout" type="VBoxContainer" parent="Content"]
+[node name="Layout" type="VBoxContainer" parent="Content" unique_id=434847693]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Title" type="Label" parent="Content/Layout"]
+[node name="Title" type="Label" parent="Content/Layout" unique_id=684163592]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.82, 0.25, 1)
 theme_override_colors/font_outline_color = Color(0.08, 0.06, 0.03, 1)
@@ -78,24 +78,24 @@ theme_override_font_sizes/font_size = 42
 text = "踏 入 仙 途"
 horizontal_alignment = 1
 
-[node name="Steps" type="HBoxContainer" parent="Content/Layout"]
+[node name="Steps" type="HBoxContainer" parent="Content/Layout" unique_id=1244223308]
 layout_mode = 2
 theme_override_constants/separation = 18
 alignment = 1
 
-[node name="Step1" type="Button" parent="Content/Layout/Steps"]
+[node name="Step1" type="Button" parent="Content/Layout/Steps" unique_id=615076480]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(230, 54)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "选择出身"
 
-[node name="Arrow1" type="Label" parent="Content/Layout/Steps"]
+[node name="Arrow1" type="Label" parent="Content/Layout/Steps" unique_id=1559479662]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "➜"
 
-[node name="Step2" type="Button" parent="Content/Layout/Steps"]
+[node name="Step2" type="Button" parent="Content/Layout/Steps" unique_id=142199582]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(230, 54)
 layout_mode = 2
@@ -103,12 +103,12 @@ theme_type_variation = &"TabIdle"
 theme_override_font_sizes/font_size = 22
 text = "选择灵根"
 
-[node name="Arrow2" type="Label" parent="Content/Layout/Steps"]
+[node name="Arrow2" type="Label" parent="Content/Layout/Steps" unique_id=1197373124]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "➜"
 
-[node name="Step3" type="Button" parent="Content/Layout/Steps"]
+[node name="Step3" type="Button" parent="Content/Layout/Steps" unique_id=95998447]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(230, 54)
 layout_mode = 2
@@ -116,43 +116,43 @@ theme_type_variation = &"TabIdle"
 theme_override_font_sizes/font_size = 22
 text = "选择天赋"
 
-[node name="MainPanel" type="PanelContainer" parent="Content/Layout"]
+[node name="MainPanel" type="PanelContainer" parent="Content/Layout" unique_id=122994804]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("main")
 
-[node name="Body" type="HBoxContainer" parent="Content/Layout/MainPanel"]
+[node name="Body" type="HBoxContainer" parent="Content/Layout/MainPanel" unique_id=1195175383]
 layout_mode = 2
 theme_override_constants/separation = 26
 
-[node name="Character" type="VBoxContainer" parent="Content/Layout/MainPanel/Body"]
+[node name="Character" type="VBoxContainer" parent="Content/Layout/MainPanel/Body" unique_id=245381625]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Heading" type="Label" parent="Content/Layout/MainPanel/Body/Character"]
+[node name="Heading" type="Label" parent="Content/Layout/MainPanel/Body/Character" unique_id=1280437902]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "初入修行"
 horizontal_alignment = 1
 
-[node name="Portrait" type="TextureRect" parent="Content/Layout/MainPanel/Body/Character"]
+[node name="Portrait" type="TextureRect" parent="Content/Layout/MainPanel/Body/Character" unique_id=401713410]
 custom_minimum_size = Vector2(280, 300)
 layout_mode = 2
 texture = ExtResource("3_portrait")
 expand_mode = 3
 stretch_mode = 5
 
-[node name="NameRow" type="HBoxContainer" parent="Content/Layout/MainPanel/Body/Character"]
+[node name="NameRow" type="HBoxContainer" parent="Content/Layout/MainPanel/Body/Character" unique_id=1378482409]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="NameTitle" type="Label" parent="Content/Layout/MainPanel/Body/Character/NameRow"]
+[node name="NameTitle" type="Label" parent="Content/Layout/MainPanel/Body/Character/NameRow" unique_id=442200244]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "道号"
 
-[node name="NameInput" type="LineEdit" parent="Content/Layout/MainPanel/Body/Character/NameRow"]
+[node name="NameInput" type="LineEdit" parent="Content/Layout/MainPanel/Body/Character/NameRow" unique_id=534697581]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
@@ -160,63 +160,63 @@ size_flags_horizontal = 3
 placeholder_text = "请输入角色名称"
 max_length = 12
 
-[node name="Picker" type="VBoxContainer" parent="Content/Layout/MainPanel/Body"]
+[node name="Picker" type="VBoxContainer" parent="Content/Layout/MainPanel/Body" unique_id=1991567015]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 12
 
-[node name="StepHeading" type="Label" parent="Content/Layout/MainPanel/Body/Picker"]
+[node name="StepHeading" type="Label" parent="Content/Layout/MainPanel/Body/Picker" unique_id=2099455962]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 horizontal_alignment = 1
 
-[node name="StepHint" type="Label" parent="Content/Layout/MainPanel/Body/Picker"]
+[node name="StepHint" type="Label" parent="Content/Layout/MainPanel/Body/Picker" unique_id=371261852]
 unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
 
-[node name="ChoiceCards" type="HBoxContainer" parent="Content/Layout/MainPanel/Body/Picker"]
+[node name="ChoiceCards" type="HBoxContainer" parent="Content/Layout/MainPanel/Body/Picker" unique_id=280045785]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="Card1" parent="Content/Layout/MainPanel/Body/Picker/ChoiceCards" instance=ExtResource("6_card")]
+[node name="Card1" parent="Content/Layout/MainPanel/Body/Picker/ChoiceCards" unique_id=1093896600 instance=ExtResource("6_card")]
 layout_mode = 2
 
-[node name="Card2" parent="Content/Layout/MainPanel/Body/Picker/ChoiceCards" instance=ExtResource("6_card")]
+[node name="Card2" parent="Content/Layout/MainPanel/Body/Picker/ChoiceCards" unique_id=525030859 instance=ExtResource("6_card")]
 layout_mode = 2
 
-[node name="Card3" parent="Content/Layout/MainPanel/Body/Picker/ChoiceCards" instance=ExtResource("6_card")]
+[node name="Card3" parent="Content/Layout/MainPanel/Body/Picker/ChoiceCards" unique_id=485816819 instance=ExtResource("6_card")]
 layout_mode = 2
 
-[node name="Card4" parent="Content/Layout/MainPanel/Body/Picker/ChoiceCards" instance=ExtResource("6_card")]
+[node name="Card4" parent="Content/Layout/MainPanel/Body/Picker/ChoiceCards" unique_id=2085620390 instance=ExtResource("6_card")]
 layout_mode = 2
 
-[node name="Card5" parent="Content/Layout/MainPanel/Body/Picker/ChoiceCards" instance=ExtResource("6_card")]
+[node name="Card5" parent="Content/Layout/MainPanel/Body/Picker/ChoiceCards" unique_id=1344621634 instance=ExtResource("6_card")]
 layout_mode = 2
 
-[node name="MessageLabel" type="Label" parent="Content/Layout"]
+[node name="MessageLabel" type="Label" parent="Content/Layout" unique_id=863260827]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.45, 0.08, 0.04, 1)
 horizontal_alignment = 1
 
-[node name="Footer" type="HBoxContainer" parent="Content/Layout"]
+[node name="Footer" type="HBoxContainer" parent="Content/Layout" unique_id=1039137213]
 layout_mode = 2
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="BackButton" type="Button" parent="Content/Layout/Footer"]
+[node name="BackButton" type="Button" parent="Content/Layout/Footer" unique_id=912274854]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 58)
 layout_mode = 2
 theme_override_font_sizes/font_size = 23
 text = "返回"
 
-[node name="NextButton" parent="Content/Layout/Footer" instance=ExtResource("5_button")]
+[node name="NextButton" parent="Content/Layout/Footer" unique_id=452779869 instance=ExtResource("5_button")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(320, 58)
 layout_mode = 2

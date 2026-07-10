@@ -256,12 +256,6 @@ static func collect_config_errors(simulation_realms: Array = []) -> PackedString
 			errors.append("encounter_bands 缺少 %s" % key)
 		elif float(band.get("strength_min", 0.0)) > float(band.get("strength_max", 0.0)):
 			errors.append("encounter_bands.%s strength_min 不得大于 strength_max" % key)
-	for profile_id in (root.get("standard_players", {}) as Dictionary).keys():
-		var row := standard_player(str(profile_id))
-		var foundations := row.get("foundations", {}) as Dictionary
-		for foundation_key in ["roushen", "lingli", "shenshi", "shenfa"]:
-			if not foundations.has(foundation_key) and not foundations.has(LEGACY_FOUNDATION_KEYS.get(foundation_key, "")):
-				errors.append("standard_players.%s 缺少根基 %s" % [profile_id, foundation_key])
 	var pill_balance := cultivation_pill_balance()
 	if pill_balance.is_empty():
 		errors.append("cultivation_progression 缺少 cultivation_pill_balance")

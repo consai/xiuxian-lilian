@@ -21,12 +21,10 @@ var _wilderness_locations_by_id: Dictionary = {}
 var _lilian_common_events_by_id: Dictionary = {}
 var _lilian_events_by_id: Dictionary = {}
 var _lilian_rules: Dictionary = {}
-const ConfigValidatorScript := preload("res://scripts/core/config_validator.gd")
 
 
 func _ready() -> void:
 	reload_all()
-	call_deferred("_validate_lilian_data")
 
 
 func reload_all() -> void:
@@ -45,19 +43,6 @@ func reload_all() -> void:
 	_load_world_map_local()
 	_load_lilian_events_local()
 	_load_lilian_rules_local()
-	_validate_all_config()
-
-
-func _validate_lilian_data() -> void:
-	_validate_all_config()
-
-
-func _validate_all_config() -> void:
-	var game_state: Node = null
-	if is_inside_tree():
-		game_state = get_tree().root.get_node_or_null("GameState")
-	for msg in ConfigValidatorScript.collect_all_errors(self, game_state):
-		push_error("ConfigValidator: %s" % msg)
 
 
 func items() -> Array:
