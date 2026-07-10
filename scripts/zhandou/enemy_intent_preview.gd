@@ -1,4 +1,4 @@
-class_name EnemyIntentPreview
+﻿class_name EnemyIntentPreview
 extends RefCounted
 
 const OVERLAY_DAMAGE := "damage"
@@ -105,16 +105,16 @@ static func _scaled_effect_value(
 
 static func _damage_type_from_cfg(cfg: Dictionary) -> String:
 	var explicit := str(cfg.get("damage_type", "")).strip_edges().to_lower()
-	if explicit in [ZhandouAttr.DAMAGE_PHYSICAL, ZhandouAttr.DAMAGE_MAGIC, ZhandouAttr.DAMAGE_TRUE]:
+	if explicit in [EnumPlayerAttr.DAMAGE_PHYSICAL, EnumPlayerAttr.DAMAGE_MAGIC, EnumPlayerAttr.DAMAGE_TRUE]:
 		return explicit
 	var tags_v: Variant = cfg.get("tags", [])
 	if tags_v is Array:
 		for tag_v in tags_v as Array:
-			if str(tag_v).strip_edges().to_lower() == ZhandouAttr.DAMAGE_PHYSICAL:
-				return ZhandouAttr.DAMAGE_PHYSICAL
-			if str(tag_v).strip_edges().to_lower() == ZhandouAttr.DAMAGE_TRUE:
-				return ZhandouAttr.DAMAGE_TRUE
-	return ZhandouAttr.DAMAGE_MAGIC
+			if str(tag_v).strip_edges().to_lower() == EnumPlayerAttr.DAMAGE_PHYSICAL:
+				return EnumPlayerAttr.DAMAGE_PHYSICAL
+			if str(tag_v).strip_edges().to_lower() == EnumPlayerAttr.DAMAGE_TRUE:
+				return EnumPlayerAttr.DAMAGE_TRUE
+	return EnumPlayerAttr.DAMAGE_MAGIC
 
 
 static func _cfg_has_shield_tag(cfg: Dictionary) -> bool:
@@ -131,7 +131,7 @@ static func _cfg_has_shield_tag(cfg: Dictionary) -> bool:
 static func _hp_damage_after_shield(raw_damage: float, defender: ZhandouObj) -> float:
 	if defender == null or raw_damage <= 0.0:
 		return maxf(0.0, raw_damage)
-	var shield := maxf(0.0, defender.get_attr(ZhandouAttr.SHIELD, 0.0))
+	var shield := maxf(0.0, defender.get_attr(EnumPlayerAttr.SHIELD, 0.0))
 	return maxf(0.0, raw_damage - shield)
 
 

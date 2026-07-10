@@ -1,4 +1,4 @@
-class_name ZhandouEffectCodec
+﻿class_name ZhandouEffectCodec
 extends RefCounted
 
 ## 解析 exportjson 中 positional effects。
@@ -7,17 +7,17 @@ const SCHEMA_PATH := "res://data/exportjson/战斗effects效果介绍.json"
 
 ## 战斗属性键 → attrschange 技能配置 effectId（供校验/悬停）；导出表 positional 参数须直接填左侧键名。
 const FIGHT_ATTR_TO_EFFECT_ID: Dictionary = {
-	ZhandouAttr.SPD: "cast_speed",
-	ZhandouAttr.PHYSICAL_ATK: "physical_attack",
-	ZhandouAttr.MAGIC_ATK: "magic_attack",
-	ZhandouAttr.PHYSICAL_DEF: "physical_defense",
-	ZhandouAttr.MAGIC_DEF: "magic_defense",
-	ZhandouAttr.HP_MAX: "max_hp",
-	ZhandouAttr.MP_MAX: "max_mana",
-	ZhandouAttr.HP_REGEN: "hp_regen",
-	ZhandouAttr.MP_REGEN: "mana_regen",
-	ZhandouAttr.DAMAGE_BONUS: "damage_bonus",
-	ZhandouAttr.CONTROL_RESIST: "control_resist",
+	EnumPlayerAttr.SPD: "cast_speed",
+	EnumPlayerAttr.PHYSICAL_ATK: "physical_attack",
+	EnumPlayerAttr.MAGIC_ATK: "magic_attack",
+	EnumPlayerAttr.PHYSICAL_DEF: "physical_defense",
+	EnumPlayerAttr.MAGIC_DEF: "magic_defense",
+	EnumPlayerAttr.HP_MAX: "max_hp",
+	EnumPlayerAttr.MP_MAX: "max_mana",
+	EnumPlayerAttr.HP_REGEN: "hp_regen",
+	EnumPlayerAttr.MP_REGEN: "mana_regen",
+	EnumPlayerAttr.DAMAGE_BONUS: "damage_bonus",
+	EnumPlayerAttr.CONTROL_RESIST: "control_resist",
 }
 
 static var _schema: Dictionary = {}
@@ -255,7 +255,7 @@ static func _parse_buff_runtime(cells: Array) -> Dictionary:
 
 
 static func _parse_damage_mod_runtime(effect_id: String, cells: Array) -> Dictionary:
-	var attr_key := ZhandouAttr.DAMAGE_TAKEN if effect_id == "damage_def" else ZhandouAttr.DAMAGE_BONUS
+	var attr_key := EnumPlayerAttr.DAMAGE_TAKEN if effect_id == "damage_def" else EnumPlayerAttr.DAMAGE_BONUS
 	var flat_val := _cell_float(cells, 1, 0.0)
 	var pct_val := _cell_float(cells, 2, 0.0)
 	return {
@@ -310,12 +310,12 @@ static func _resolve_scaled_value(cells: Array, caster_attrs: Dictionary, target
 	return total
 
 
-## 读取 positional 中的战斗属性键；导出表须与 [member ZhandouAttr.ALL_KEYS] 一致，不再接受别名。
+## 读取 positional 中的战斗属性键；导出表须与 [member EnumPlayerAttr.ALL_COMBAT_KEYS] 一致，不再接受别名。
 static func _export_attr_key(cells: Array, index: int) -> String:
 	var fight_attr := _cell_string(cells, index, "").to_lower()
 	if fight_attr == "":
 		return ""
-	if fight_attr in ZhandouAttr.ALL_KEYS:
+	if fight_attr in EnumPlayerAttr.ALL_COMBAT_KEYS:
 		return fight_attr
 	push_warning("ZhandouEffectCodec: 未知战斗属性键 '%s'，请使用 ZhandouAttr 键名" % fight_attr)
 	return ""

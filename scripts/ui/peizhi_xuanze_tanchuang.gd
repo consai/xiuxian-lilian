@@ -1,4 +1,4 @@
-class_name PeizhiXuanzeTanchuang
+﻿class_name PeizhiXuanzeTanchuang
 extends Control
 
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
@@ -165,7 +165,7 @@ func _method_category(row: Dictionary) -> String:
 	if slot_type == "movement":
 		return "movement"
 	var flat := row.get("flat_attrs", {}) as Dictionary
-	if flat.has(ZhandouAttr.HP_MAX) or flat.has(ZhandouAttr.PHYSICAL_DEF):
+	if flat.has(EnumPlayerAttr.HP_MAX) or flat.has(EnumPlayerAttr.PHYSICAL_DEF):
 		return "defense"
 	if float(row.get("combat_mp_restore_2s", 0.0)) > 0.0:
 		return "recover"

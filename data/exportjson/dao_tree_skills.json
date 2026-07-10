@@ -20,12 +20,7 @@
     "rank": 1,
     "quality": 1,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "foundation.breathing",
-        "level": 2
-      }
-    ],
+    "prereqs": [],
     "description": "识别经络、穴窍与灵力损伤。"
   },
   "foundation.control": {
@@ -37,12 +32,7 @@
     "rank": 2,
     "quality": 1,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "foundation.breathing",
-        "level": 3
-      }
-    ],
+    "prereqs": [],
     "description": "提高施法、炼制与御物的稳定度。"
   },
   "foundation.literacy": {
@@ -66,16 +56,7 @@
     "rank": 3,
     "quality": 2,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "foundation.meridians",
-        "level": 4
-      },
-      {
-        "id": "foundation.control",
-        "level": 4
-      }
-    ],
+    "prereqs": [],
     "description": "将散乱修为固化为可持续成长的道基。"
   },
   "foundation.core_theory": {
@@ -87,12 +68,7 @@
     "rank": 5,
     "quality": 2,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "foundation.dao_base",
-        "level": 4
-      }
-    ],
+    "prereqs": [],
     "description": "平衡精气神并凝聚金丹。"
   },
   "foundation.nascent_theory": {
@@ -104,12 +80,7 @@
     "rank": 7,
     "quality": 3,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "foundation.core_theory",
-        "level": 4
-      }
-    ],
+    "prereqs": [],
     "description": "令金丹孕化为第二生命核心。"
   },
   "foundation.spirit_theory": {
@@ -121,12 +92,7 @@
     "rank": 9,
     "quality": 3,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "foundation.nascent_theory",
-        "level": 4
-      }
-    ],
+    "prereqs": [],
     "description": "让元神与天地法理发生共鸣。"
   },
   "foundation.void_theory": {
@@ -138,12 +104,7 @@
     "rank": 12,
     "quality": 4,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "foundation.spirit_theory",
-        "level": 4
-      }
-    ],
+    "prereqs": [],
     "description": "理解虚实转换与空间存续。"
   },
   "foundation.integration_theory": {
@@ -155,16 +116,7 @@
     "rank": 16,
     "quality": 4,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "foundation.void_theory",
-        "level": 4
-      },
-      {
-        "id": "body.unity",
-        "level": 3
-      }
-    ],
+    "prereqs": [],
     "description": "统合肉身、元神、法相与洞天。"
   },
   "foundation.mahayana_theory": {
@@ -176,12 +128,7 @@
     "rank": 22,
     "quality": 4,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "foundation.integration_theory",
-        "level": 4
-      }
-    ],
+    "prereqs": [],
     "description": "将所修大道凝为完整道果。"
   },
   "foundation.ascension": {
@@ -193,12 +140,7 @@
     "rank": 32,
     "quality": 4,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "foundation.mahayana_theory",
-        "level": 5
-      }
-    ],
+    "prereqs": [],
     "description": "准备渡过天劫并完成生命层次跃迁。"
   },
   "cultivation.qi_sense": {
@@ -210,12 +152,7 @@
     "rank": 1,
     "quality": 1,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "foundation.breathing",
-        "level": 1
-      }
-    ],
+    "prereqs": [],
     "description": "提升灵气吸收效率。"
   },
   "cultivation.cycle": {
@@ -227,16 +164,7 @@
     "rank": 2,
     "quality": 1,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "cultivation.qi_sense",
-        "level": 3
-      },
-      {
-        "id": "foundation.meridians",
-        "level": 2
-      }
-    ],
+    "prereqs": [],
     "description": "建立稳定灵力循环。"
   },
   "cultivation.purity": {
@@ -248,12 +176,7 @@
     "rank": 2,
     "quality": 1,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "cultivation.cycle",
-        "level": 3
-      }
-    ],
+    "prereqs": [],
     "description": "减少杂质与功法冲突。"
   },
   "cultivation.great_cycle": {
@@ -265,16 +188,7 @@
     "rank": 4,
     "quality": 2,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "cultivation.cycle",
-        "level": 5
-      },
-      {
-        "id": "foundation.dao_base",
-        "level": 2
-      }
-    ],
+    "prereqs": [],
     "description": "贯通主要经脉并扩大储量。"
   },
   "cultivation.liquid_mana": {
@@ -286,16 +200,7 @@
     "rank": 4,
     "quality": 2,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "cultivation.purity",
-        "level": 4
-      },
-      {
-        "id": "cultivation.great_cycle",
-        "level": 3
-      }
-    ],
+    "prereqs": [],
     "description": "将灵力压缩为高密度真元。"
   },
   "cultivation.core_fire": {
@@ -307,16 +212,7 @@
     "rank": 6,
     "quality": 3,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "cultivation.liquid_mana",
-        "level": 5
-      },
-      {
-        "id": "foundation.core_theory",
-        "level": 2
-      }
-    ],
+    "prereqs": [],
     "description": "驱动金丹并供给炼制与战斗。"
   },
   "cultivation.nascent_cycle": {
@@ -328,16 +224,7 @@
     "rank": 8,
     "quality": 3,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "cultivation.core_fire",
-        "level": 4
-      },
-      {
-        "id": "foundation.nascent_theory",
-        "level": 2
-      }
-    ],
+    "prereqs": [],
     "description": "让元婴独立吐纳并维持本体。"
   },
   "cultivation.heaven_cycle": {
@@ -349,12 +236,7 @@
     "rank": 10,
     "quality": 3,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "cultivation.nascent_cycle",
-        "level": 4
-      }
-    ],
+    "prereqs": [],
     "description": "借天地灵机替代部分自身消耗。"
   },
   "cultivation.void_furnace": {
@@ -366,16 +248,7 @@
     "rank": 14,
     "quality": 4,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "cultivation.heaven_cycle",
-        "level": 4
-      },
-      {
-        "id": "foundation.void_theory",
-        "level": 2
-      }
-    ],
+    "prereqs": [],
     "description": "从虚空乱流中提炼可用力量。"
   },
   "cultivation.endless": {
@@ -387,16 +260,7 @@
     "rank": 18,
     "quality": 4,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "cultivation.void_furnace",
-        "level": 4
-      },
-      {
-        "id": "foundation.integration_theory",
-        "level": 3
-      }
-    ],
+    "prereqs": [],
     "description": "形成近乎闭合的法力生态。"
   },
   "cultivation.dao_engine": {
@@ -408,16 +272,7 @@
     "rank": 24,
     "quality": 4,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "cultivation.endless",
-        "level": 5
-      },
-      {
-        "id": "foundation.mahayana_theory",
-        "level": 3
-      }
-    ],
+    "prereqs": [],
     "description": "以道果驱动全部功法。"
   },
   "cultivation.immortal_qi": {
@@ -429,16 +284,7 @@
     "rank": 36,
     "quality": 4,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "cultivation.dao_engine",
-        "level": 5
-      },
-      {
-        "id": "foundation.ascension",
-        "level": 2
-      }
-    ],
+    "prereqs": [],
     "description": "承载并转化劫后仙灵之气。"
   },
   "body.tempering": {
@@ -450,12 +296,7 @@
     "rank": 1,
     "quality": 1,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "foundation.breathing",
-        "level": 1
-      }
-    ],
+    "prereqs": [],
     "description": "提升基础体魄与负重。"
   },
   "body.bone": {
@@ -467,16 +308,7 @@
     "rank": 2,
     "quality": 1,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "body.tempering",
-        "level": 3
-      },
-      {
-        "id": "foundation.meridians",
-        "level": 2
-      }
-    ],
+    "prereqs": [],
     "description": "强化骨骼、筋膜和爆发力。"
   },
   "body.recovery": {
@@ -488,16 +320,7 @@
     "rank": 2,
     "quality": 1,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "body.tempering",
-        "level": 2
-      },
-      {
-        "id": "cultivation.cycle",
-        "level": 2
-      }
-    ],
+    "prereqs": [],
     "description": "加速伤势与疲劳恢复。"
   },
   "body.jade": {
@@ -509,16 +332,7 @@
     "rank": 4,
     "quality": 2,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "body.bone",
-        "level": 4
-      },
-      {
-        "id": "foundation.dao_base",
-        "level": 2
-      }
-    ],
+    "prereqs": [],
     "description": "让肉身具备抗灵力侵蚀能力。"
   },
   "body.bloodline": {
@@ -530,12 +344,7 @@
     "rank": 6,
     "quality": 3,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "body.jade",
-        "level": 4
-      }
-    ],
+    "prereqs": [],
     "description": "激活、辨识并驾驭血脉特性。"
   },
   "body.regeneration": {
@@ -547,16 +356,7 @@
     "rank": 9,
     "quality": 3,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "body.bloodline",
-        "level": 4
-      },
-      {
-        "id": "body.recovery",
-        "level": 5
-      }
-    ],
+    "prereqs": [],
     "description": "从重创中高速再生。"
   },
   "body.dharma_form": {
@@ -568,16 +368,7 @@
     "rank": 11,
     "quality": 3,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "body.regeneration",
-        "level": 3
-      },
-      {
-        "id": "foundation.spirit_theory",
-        "level": 2
-      }
-    ],
+    "prereqs": [],
     "description": "以神魂法理放大肉身。"
   },
   "body.void_body": {
@@ -589,16 +380,7 @@
     "rank": 15,
     "quality": 4,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "body.dharma_form",
-        "level": 4
-      },
-      {
-        "id": "foundation.void_theory",
-        "level": 2
-      }
-    ],
+    "prereqs": [],
     "description": "抵御空间乱流和虚实撕裂。"
   },
   "body.unity": {
@@ -610,12 +392,7 @@
     "rank": 19,
     "quality": 4,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "body.void_body",
-        "level": 4
-      }
-    ],
+    "prereqs": [],
     "description": "消除肉身、法力与元神间的损耗。"
   },
   "body.indestructible": {
@@ -627,16 +404,7 @@
     "rank": 26,
     "quality": 4,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "body.unity",
-        "level": 5
-      },
-      {
-        "id": "foundation.mahayana_theory",
-        "level": 3
-      }
-    ],
+    "prereqs": [],
     "description": "以道果维系肉身不灭性。"
   },
   "body.tribulation_body": {
@@ -648,12 +416,7 @@
     "rank": 38,
     "quality": 4,
     "maxLevel": 5,
-    "prereqs": [
-      {
-        "id": "body.indestructible",
-        "level": 5
-      }
-    ],
+    "prereqs": [],
     "description": "利用劫雷完成最终淬体。"
   }
 }

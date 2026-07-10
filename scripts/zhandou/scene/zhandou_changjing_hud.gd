@@ -1,4 +1,4 @@
-class_name ZhandouChangjingHud
+﻿class_name ZhandouChangjingHud
 extends RefCounted
 
 ## 战斗 HUD：头像/血法/护盾/走条/Buff 栏与槽位外观绑定。
@@ -77,7 +77,7 @@ func apply_combatant(ctx: ZhandouChangjingContext, side: String, row: Dictionary
 	var shield := 0.0
 	var attrs_v: Variant = row.get("attrs", null)
 	if attrs_v is Dictionary:
-		shield = float((attrs_v as Dictionary).get(ZhandouAttr.SHIELD, 0.0))
+		shield = float((attrs_v as Dictionary).get(EnumPlayerAttr.SHIELD, 0.0))
 	set_combatant_shield(side, shield, hp_max)
 	if side == "left":
 		_apply_player_slot(ctx, row)
@@ -152,7 +152,7 @@ func sync_from_domain(ctx: ZhandouChangjingContext) -> void:
 	)
 	set_combatant_shield(
 		"left",
-		ctx.domain.player.get_attr(ZhandouAttr.SHIELD),
+		ctx.domain.player.get_attr(EnumPlayerAttr.SHIELD),
 		ctx.domain.player.get_hp_max()
 	)
 	_sync_head_status_bars(ctx)

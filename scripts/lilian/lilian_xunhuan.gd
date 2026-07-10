@@ -1,4 +1,4 @@
-extends Control
+﻿extends Control
 
 const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
 const LilianEventServiceScript := preload("res://scripts/lilian/lilian_event_service.gd")
@@ -124,9 +124,9 @@ func _on_runtime_vitals_changed(feedback: String = "") -> void:
 func _refresh_status_panel() -> void:
 	var attrs := LilianState.player_snapshot.get("attrs", {}) as Dictionary
 	var hp := float(LilianState.runtime.get("hp", 0.0))
-	var hp_max := maxf(1.0, float(attrs.get(ZhandouAttr.HP_MAX, 100.0)))
+	var hp_max := maxf(1.0, float(attrs.get(EnumPlayerAttr.HP_MAX, 100.0)))
 	var mp := float(LilianState.runtime.get("mp", 0.0))
-	var mp_max := maxf(1.0, float(attrs.get(ZhandouAttr.MP_MAX, 100.0)))
+	var mp_max := maxf(1.0, float(attrs.get(EnumPlayerAttr.MP_MAX, 100.0)))
 	(%HudHpLabel as Label).text = "气血  %.0f / %.0f" % [hp, hp_max]
 	var hud_hp_bar := %HudHpBar as ProgressBar
 	hud_hp_bar.max_value = hp_max

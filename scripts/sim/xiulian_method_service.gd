@@ -1,4 +1,4 @@
-class_name XiulianMethodService
+﻿class_name XiulianMethodService
 extends RefCounted
 
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
@@ -273,7 +273,7 @@ static func build_modifiers(slots: Dictionary, savedata: Dictionary) -> Dictiona
 			var values := resolved.get("percent", {}) as Dictionary if operation == "add_percent" \
 				else resolved.get("flat", {}) as Dictionary
 			if effect_id == "combat_mp_restore_2s":
-				values = {ZhandouAttr.COMBAT_MP_RESTORE_2S: value}
+				values = {EnumPlayerAttr.COMBAT_MP_RESTORE_2S: value}
 				operation = "add_flat"
 			for attr_key in values.keys():
 				var aggregate_key := "%s|%s|%s" % [operation, group_id, str(attr_key)]

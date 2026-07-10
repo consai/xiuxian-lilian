@@ -1,4 +1,4 @@
-class_name EnemyFormationSlotView
+﻿class_name EnemyFormationSlotView
 extends Node2D
 
 ## 战斗阵型单格：布局由 enemy_formation_slot.tscn 定义，代码只负责绑定显示数据。
@@ -70,7 +70,7 @@ func apply_slot(
 
 
 func _apply_shield(unit: ZhandouObj) -> void:
-	var amount := maxf(0.0, unit.get_attr(ZhandouAttr.SHIELD, 0.0))
+	var amount := maxf(0.0, unit.get_attr(EnumPlayerAttr.SHIELD, 0.0))
 	if _shield_badge != null:
 		_shield_badge.visible = amount > 0.0
 	if _shield_value != null:

@@ -1,4 +1,4 @@
-extends RefCounted
+﻿extends RefCounted
 class_name HoverTipEffectFormatter
 
 ## 战斗效果行文案格式化，供技能/道具/法宝 hover tip 共用。
@@ -380,21 +380,21 @@ static func _effect_value_label(effect: Dictionary, value: float) -> String:
 
 static func _attr_label(key: String) -> String:
 	var labels := {
-		ZhandouAttr.PHYSICAL_ATK: "物攻",
-		ZhandouAttr.MAGIC_ATK: "法攻",
-		ZhandouAttr.PHYSICAL_DEF: "物防",
-		ZhandouAttr.MAGIC_DEF: "法防",
-		ZhandouAttr.SPD: "速度",
-		ZhandouAttr.HP_MAX: "气血上限",
-		ZhandouAttr.MP_MAX: "法力上限",
-		ZhandouAttr.SHIELD: "护盾",
-		ZhandouAttr.CONTROL_POWER: "控制",
-		ZhandouAttr.CONTROL_RESIST: "控制抵抗",
-		ZhandouAttr.HP_REGEN: "气血回复",
-		ZhandouAttr.MP_REGEN: "法力回复",
-		ZhandouAttr.CARRY: "携带",
-		ZhandouAttr.DAMAGE_BONUS: "伤害加成",
-		ZhandouAttr.DAMAGE_TAKEN: "承伤",
-		ZhandouAttr.COMBAT_MP_RESTORE_2S: "战斗回蓝",
+		EnumPlayerAttr.PHYSICAL_ATK: "物攻",
+		EnumPlayerAttr.MAGIC_ATK: "法攻",
+		EnumPlayerAttr.PHYSICAL_DEF: "物防",
+		EnumPlayerAttr.MAGIC_DEF: "法防",
+		EnumPlayerAttr.SPD: "速度",
+		EnumPlayerAttr.HP_MAX: "气血上限",
+		EnumPlayerAttr.MP_MAX: "法力上限",
+		EnumPlayerAttr.SHIELD: "护盾",
+		EnumPlayerAttr.CONTROL_POWER: "控制",
+		EnumPlayerAttr.CONTROL_RESIST: "控制抵抗",
+		EnumPlayerAttr.HP_REGEN: "气血回复",
+		EnumPlayerAttr.MP_REGEN: "法力回复",
+		EnumPlayerAttr.CARRY: "携带",
+		EnumPlayerAttr.DAMAGE_BONUS: "伤害加成",
+		EnumPlayerAttr.DAMAGE_TAKEN: "承伤",
+		EnumPlayerAttr.COMBAT_MP_RESTORE_2S: "战斗回蓝",
 	}
 	return str(labels.get(key, key))

@@ -1,4 +1,4 @@
-class_name RealmService
+﻿class_name RealmService
 extends RefCounted
 
 ## 境界阶梯：从 exportjson/realms.json 加载，供模拟层按索引遍历。
@@ -62,25 +62,25 @@ static func _normalize_row(export_row: Dictionary) -> Dictionary:
 
 static func _foundation_attrs(row: Dictionary) -> Dictionary:
 	return {
-		CharacterStats.BODY: _number(row.get(CharacterStats.BODY, 0.0)),
-		CharacterStats.SPIRIT: _number(row.get(CharacterStats.SPIRIT, 0.0)),
-		CharacterStats.SENSE: _number(row.get(CharacterStats.SENSE, 0.0)),
-		CharacterStats.AGILITY: _number(row.get(CharacterStats.AGILITY, 0.0)),
+		EnumPlayerAttr.BODY: _number(row.get(EnumPlayerAttr.BODY, 0.0)),
+		EnumPlayerAttr.SPIRIT: _number(row.get(EnumPlayerAttr.SPIRIT, 0.0)),
+		EnumPlayerAttr.SENSE: _number(row.get(EnumPlayerAttr.SENSE, 0.0)),
+		EnumPlayerAttr.AGILITY: _number(row.get(EnumPlayerAttr.AGILITY, 0.0)),
 	}
 
 
 static func _combat_attrs(row: Dictionary) -> Dictionary:
 	var attrs := {}
 	for key in [
-		ZhandouAttr.HP_MAX, ZhandouAttr.MP_MAX,
-		ZhandouAttr.PHYSICAL_ATK, ZhandouAttr.MAGIC_ATK,
-		ZhandouAttr.PHYSICAL_DEF, ZhandouAttr.MAGIC_DEF,
-		ZhandouAttr.SPD, ZhandouAttr.CONTROL_RESIST,
+		EnumPlayerAttr.HP_MAX, EnumPlayerAttr.MP_MAX,
+		EnumPlayerAttr.PHYSICAL_ATK, EnumPlayerAttr.MAGIC_ATK,
+		EnumPlayerAttr.PHYSICAL_DEF, EnumPlayerAttr.MAGIC_DEF,
+		EnumPlayerAttr.SPD, EnumPlayerAttr.CONTROL_RESIST,
 	]:
 		if row.has(key):
 			attrs[key] = _number(row[key])
 	if row.has("control"):
-		attrs[ZhandouAttr.CONTROL_POWER] = _number(row["control"])
+		attrs[EnumPlayerAttr.CONTROL_POWER] = _number(row["control"])
 	return attrs
 
 static func _number(value: Variant, fallback: float = 0.0) -> float:

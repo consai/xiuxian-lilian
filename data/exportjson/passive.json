@@ -130,7 +130,7 @@
     "quality": 4,
     "icon": null,
     "tag": [],
-    "cd": 12,
+    "cd": 0,
     "runtype": "get",
     "effects": [
       [
@@ -145,5 +145,41 @@
       ]
     ],
     "desc": "战斗开始时提高气血上限与控制抗性。"
+  },
+  "fpassive_0008": {
+    "id": "fpassive_0008",
+    "name": "山村散修",
+    "tier": 1,
+    "quality": 1,
+    "icon": null,
+    "tag": [],
+    "cd": null,
+    "runtype": "get",
+    "effects": [],
+    "desc": null
+  },
+  "fpassive_0009": {
+    "id": "fpassive_0009",
+    "name": "没落世家",
+    "tier": 1,
+    "quality": 1,
+    "icon": null,
+    "tag": [],
+    "cd": null,
+    "runtype": "get",
+    "effects": [],
+    "desc": null
+  },
+  "fpassive_0010": {
+    "id": "fpassive_0010",
+    "name": "宗门杂役",
+    "tier": 1,
+    "quality": 1,
+    "icon": null,
+    "tag": [],
+    "cd": null,
+    "runtype": "get",
+    "effects": [],
+    "desc": null
   }
 }

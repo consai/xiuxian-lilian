@@ -3,25 +3,20 @@ extends RefCounted
 
 ## 单场战斗中的单位快照：气血/法力、属性、技能与物品冷却、下次行动时间。
 
-const ATTR_HP_MAX := ZhandouAttr.HP_MAX
-const ATTR_MP_MAX := ZhandouAttr.MP_MAX
-const ATTR_SHIELD := ZhandouAttr.SHIELD
-const ATTR_SPD := ZhandouAttr.SPD
-const ATTR_PHYSICAL_ATK := ZhandouAttr.PHYSICAL_ATK
-const ATTR_MAGIC_ATK := ZhandouAttr.MAGIC_ATK
-const ATTR_PHYSICAL_DEF := ZhandouAttr.PHYSICAL_DEF
-const ATTR_MAGIC_DEF := ZhandouAttr.MAGIC_DEF
+const ATTR_HP_MAX := EnumPlayerAttr.HP_MAX
+const ATTR_MP_MAX := EnumPlayerAttr.MP_MAX
+const ATTR_SHIELD := EnumPlayerAttr.SHIELD
+const ATTR_SPD := EnumPlayerAttr.SPD
+const ATTR_PHYSICAL_ATK := EnumPlayerAttr.PHYSICAL_ATK
+const ATTR_MAGIC_ATK := EnumPlayerAttr.MAGIC_ATK
+const ATTR_PHYSICAL_DEF := EnumPlayerAttr.PHYSICAL_DEF
+const ATTR_MAGIC_DEF := EnumPlayerAttr.MAGIC_DEF
 const ZhandouEventScript = preload("res://scripts/zhandou/zhandou_event.gd")
 const ZhandouReportScript = preload("res://scripts/zhandou/zhandou_report.gd")
 
 const RESOURCE_MANA := "mana"
 const RESOURCE_SPIRIT := "spirit"
 const RESOURCE_STAMINA := "stamina"
-
-# ponytail: headless 测试注入 buff 定义，避免 ConfigManager autoload 未就绪
-static var _test_buff_defs: Dictionary = {}
-
-const test_attr: Dictionary = ZhandouAttr.TEST_DEFAULTS
 
 var hp: float = 0.0
 var mp: float = 0.0
@@ -65,38 +60,6 @@ func apply_dict(data: Dictionary) -> void:
 	if buffs_in is Dictionary:
 		buffs = _duplicate_nested_dict(buffs_in as Dictionary)
 	_apply_passives_from_row(data)
-
-# 创建stub
-static func create_stub(side: String = "player") -> ZhandouObj:
-	var attrs := test_attr.duplicate(true)
-	attrs[ATTR_SHIELD] = 0.0
-	var hp_max := float(attrs[ATTR_HP_MAX])
-	var mp_max := float(attrs[ATTR_MP_MAX])
-	var skill_cd_total := 5.0
-	var cm := _get_config_manager()
-	if cm != null and cm.has_method("skill_by_id"):
-		var cfg: Dictionary = cm.call("skill_by_id", 1) as Dictionary
-		if not cfg.is_empty():
-			skill_cd_total = float(cfg.get("cd", skill_cd_total))
-	var row := {
-		"hp": hp_max,
-		"mp": mp_max,
-		"attrs": attrs,
-		"skills": [
-			{"id": 1, "cd": 0.0, "cd_total": skill_cd_total},
-		],
-		"items": [
-			{"id": 9001, "cd": 0.0, "count": 5},
-		],
-		"equips": [
-			{"id": -1, "cd": 0.0},
-		],
-		"next_action_time": 0.0,
-	}
-	var unit := ZhandouObj.new(row)
-	unit.clamp_vitals()
-	return unit
-
 
 static func _get_config_manager() -> Node:
 	var loop: MainLoop = Engine.get_main_loop()
@@ -229,24 +192,12 @@ func _lookup_buff_def(buff_id: String) -> Dictionary:
 	var bid := buff_id.strip_edges()
 	if bid == "":
 		return {}
-	if _test_buff_defs.has(bid):
-		var test_cfg_v: Variant = _test_buff_defs[bid]
-		if test_cfg_v is Dictionary:
-			return (test_cfg_v as Dictionary).duplicate(true)
 	var cm := _get_config_manager()
 	if cm != null and cm.has_method("buff_by_id"):
 		var cfg: Dictionary = cm.call("buff_by_id", bid) as Dictionary
 		if not cfg.is_empty():
 			return cfg
 	return {}
-
-
-static func set_test_buff_defs(defs: Dictionary) -> void:
-	_test_buff_defs = defs.duplicate(true)
-
-
-static func clear_test_buff_defs() -> void:
-	_test_buff_defs.clear()
 
 
 func add_buff(buff_id: String, stacks_add: int = 1, duration_override: float = -1.0) -> int:
@@ -597,7 +548,7 @@ func apply_advancing_projection(advancing_seconds: float) -> void:
 	tick_cooldowns(advancing_seconds)
 	var mp_ticks := int(floor(advancing_seconds / 2.0))
 	if mp_ticks > 0:
-		var mp_gain := get_attr(ZhandouAttr.COMBAT_MP_RESTORE_2S, 0.0) * float(mp_ticks)
+		var mp_gain := get_attr(EnumPlayerAttr.COMBAT_MP_RESTORE_2S, 0.0) * float(mp_ticks)
 		if mp_gain > 0.0:
 			change_mp(mp_gain)
 	clamp_vitals()
@@ -1044,14 +995,14 @@ func _apply_effects_with_routing(cfg: Dictionary, default_target: ZhandouObj = n
 				var control_id := str(eff.get("id", "runtime_control"))
 				var duration := ZhandouAttr.control_duration_after_resist(
 						float(eff.get("duration", 0.5)),
-						get_attr(ZhandouAttr.CONTROL_POWER, 0.0),
-						target.get_attr(ZhandouAttr.CONTROL_RESIST, 0.0)
+						get_attr(EnumPlayerAttr.CONTROL_POWER, 0.0),
+						target.get_attr(EnumPlayerAttr.CONTROL_RESIST, 0.0)
 				)
 				if target.add_runtime_modifier_buff(
 						control_id,
 						duration,
 						{},
-						{ZhandouAttr.SPD: -0.95}
+						{EnumPlayerAttr.SPD: -0.95}
 				):
 					buff_names.append(target._runtime_buff_display_name(eff, control_id))
 	report["buff_names"] = buff_names
@@ -1065,16 +1016,16 @@ func _scaled_effect_value(effect: Dictionary, target: ZhandouObj = null) -> floa
 
 static func _damage_type_from_cfg(cfg: Dictionary) -> String:
 	var explicit := str(cfg.get("damage_type", "")).strip_edges().to_lower()
-	if explicit in [ZhandouAttr.DAMAGE_PHYSICAL, ZhandouAttr.DAMAGE_MAGIC, ZhandouAttr.DAMAGE_TRUE]:
+	if explicit in [EnumPlayerAttr.DAMAGE_PHYSICAL, EnumPlayerAttr.DAMAGE_MAGIC, EnumPlayerAttr.DAMAGE_TRUE]:
 		return explicit
 	var tags_v: Variant = cfg.get("tags", [])
 	if tags_v is Array:
 		for tag_v in tags_v as Array:
-			if str(tag_v).strip_edges().to_lower() == ZhandouAttr.DAMAGE_PHYSICAL:
-				return ZhandouAttr.DAMAGE_PHYSICAL
-			if str(tag_v).strip_edges().to_lower() == ZhandouAttr.DAMAGE_TRUE:
-				return ZhandouAttr.DAMAGE_TRUE
-	return ZhandouAttr.DAMAGE_MAGIC
+			if str(tag_v).strip_edges().to_lower() == EnumPlayerAttr.DAMAGE_PHYSICAL:
+				return EnumPlayerAttr.DAMAGE_PHYSICAL
+			if str(tag_v).strip_edges().to_lower() == EnumPlayerAttr.DAMAGE_TRUE:
+				return EnumPlayerAttr.DAMAGE_TRUE
+	return EnumPlayerAttr.DAMAGE_MAGIC
 
 
 func pop_runtime_events(unit_id: String) -> Array:

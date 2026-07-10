@@ -2,49 +2,15 @@
   "base_monthly_gain_by_realm": {
     "key": "base_monthly_gain_by_realm",
     "value": null,
-    "lianqi": {
-      "early": 30,
-      "mid": 40,
-      "late": 50
-    },
-    "zhuji": {
-      "early": 100,
-      "mid": 120,
-      "late": 140
-    },
-    "jindan": {
-      "early": 300,
-      "mid": 360,
-      "late": 420
-    },
-    "yuanying": {
-      "early": 800,
-      "mid": 960,
-      "late": 1120
-    },
-    "huashen": {
-      "early": 2000,
-      "mid": 2400,
-      "late": 2800
-    },
-    "lianxu": {
-      "early": 5000,
-      "mid": 6000,
-      "late": 7000
-    },
-    "heti": {
-      "early": 12000,
-      "mid": 14400,
-      "late": 16800
-    },
-    "dacheng": {
-      "early": 30000,
-      "mid": 36000,
-      "late": 42000
-    },
-    "dujie": {
-      "single": 80000
-    },
+    "lianqi": "{\"early\": 30, \"mid\": 40, \"late\": 50}",
+    "zhuji": "{\"early\": 100, \"mid\": 120, \"late\": 140}",
+    "jindan": "{\"early\": 300, \"mid\": 360, \"late\": 420}",
+    "yuanying": "{\"early\": 800, \"mid\": 960, \"late\": 1120}",
+    "huashen": "{\"early\": 2000, \"mid\": 2400, \"late\": 2800}",
+    "lianxu": "{\"early\": 5000, \"mid\": 6000, \"late\": 7000}",
+    "heti": "{\"early\": 12000, \"mid\": 14400, \"late\": 16800}",
+    "dacheng": "{\"early\": 30000, \"mid\": 36000, \"late\": 42000}",
+    "dujie": "{\"single\": 80000}",
     "anchor_realm": null,
     "reference_phase": null,
     "medium_cultivation_gain": null,
@@ -66,22 +32,7 @@
     "anchor_realm": "lianqi",
     "reference_phase": "early",
     "medium_cultivation_gain": "100",
-    "quality_band_multiplier": {
-      "low": 0.85,
-      "medium": 1,
-      "high": 1.25,
-      "supreme": 1.55
-    },
-    "tier_major_realm": {
-      "1": "lianqi",
-      "2": "zhuji",
-      "3": "jindan",
-      "4": "yuanying",
-      "5": "huashen",
-      "6": "lianxu",
-      "7": "heti",
-      "8": "dacheng",
-      "9": "dujie"
-    }
+    "quality_band_multiplier": "{\"low\": 0.85, \"medium\": 1, \"high\": 1.25, \"supreme\": 1.55}",
+    "tier_major_realm": "{\"1\": \"lianqi\", \"2\": \"zhuji\", \"3\": \"jindan\", \"4\": \"yuanying\", \"5\": \"huashen\", \"6\": \"lianxu\", \"7\": \"heti\", \"8\": \"dacheng\", \"9\": \"dujie\"}"
   }
 }

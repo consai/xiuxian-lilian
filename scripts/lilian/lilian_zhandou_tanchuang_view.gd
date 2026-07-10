@@ -1,4 +1,4 @@
-class_name LilianZhandouTanchuangView
+﻿class_name LilianZhandouTanchuangView
 extends Control
 
 signal fight_requested
@@ -58,20 +58,20 @@ func apply_event(event: Dictionary, _depth: int = 0) -> void:
 		if row_v is Dictionary:
 			var row := row_v as Dictionary
 			var row_attrs := row.get("attrs", {}) as Dictionary
-			total_hp += float(row.get("hp", row_attrs.get(ZhandouAttr.HP_MAX, 0.0)))
+			total_hp += float(row.get("hp", row_attrs.get(EnumPlayerAttr.HP_MAX, 0.0)))
 	if total_hp <= 0.0:
-		total_hp = float(enemy.get("hp", attrs.get(ZhandouAttr.HP_MAX, 0.0)))
+		total_hp = float(enemy.get("hp", attrs.get(EnumPlayerAttr.HP_MAX, 0.0)))
 	var stat_lines: PackedStringArray = PackedStringArray([
 		"气血  %.0f" % total_hp,
 		"物攻  %.0f    法攻  %.0f" % [
-			float(attrs.get(ZhandouAttr.PHYSICAL_ATK, 0.0)),
-			float(attrs.get(ZhandouAttr.MAGIC_ATK, 0.0)),
+			float(attrs.get(EnumPlayerAttr.PHYSICAL_ATK, 0.0)),
+			float(attrs.get(EnumPlayerAttr.MAGIC_ATK, 0.0)),
 		],
 		"物防  %.0f    法防  %.0f" % [
-			float(attrs.get(ZhandouAttr.PHYSICAL_DEF, 0.0)),
-			float(attrs.get(ZhandouAttr.MAGIC_DEF, 0.0)),
+			float(attrs.get(EnumPlayerAttr.PHYSICAL_DEF, 0.0)),
+			float(attrs.get(EnumPlayerAttr.MAGIC_DEF, 0.0)),
 		],
-		"速度  %.0f" % float(attrs.get(ZhandouAttr.SPD, 0.0)),
+		"速度  %.0f" % float(attrs.get(EnumPlayerAttr.SPD, 0.0)),
 	])
 	_stats_label.text = "\n".join(stat_lines)
 

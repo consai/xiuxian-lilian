@@ -1,26 +1,26 @@
-extends Control
+﻿extends Control
 
 ## GM 战斗调试面板：战斗中实时查看/修改单位属性、被动与 Buff。
 
 signal closed
 
 const ATTR_LABELS: Dictionary = {
-	ZhandouAttr.HP_MAX: "气血上限",
-	ZhandouAttr.MP_MAX: "法力上限",
-	ZhandouAttr.SHIELD: "护盾",
-	ZhandouAttr.SPD: "出手速度",
-	ZhandouAttr.PHYSICAL_ATK: "物理攻击",
-	ZhandouAttr.MAGIC_ATK: "法术攻击",
-	ZhandouAttr.PHYSICAL_DEF: "物理防御",
-	ZhandouAttr.MAGIC_DEF: "法术防御",
-	ZhandouAttr.CONTROL_POWER: "控制强度",
-	ZhandouAttr.CONTROL_RESIST: "控制抗性",
-	ZhandouAttr.HP_REGEN: "气血回复",
-	ZhandouAttr.MP_REGEN: "法力回复",
-	ZhandouAttr.CARRY: "负重",
-	ZhandouAttr.DAMAGE_BONUS: "伤害加成",
-	ZhandouAttr.DAMAGE_TAKEN: "受伤加成",
-	ZhandouAttr.COMBAT_MP_RESTORE_2S: "战斗回蓝/2秒",
+	EnumPlayerAttr.HP_MAX: "气血上限",
+	EnumPlayerAttr.MP_MAX: "法力上限",
+	EnumPlayerAttr.SHIELD: "护盾",
+	EnumPlayerAttr.SPD: "出手速度",
+	EnumPlayerAttr.PHYSICAL_ATK: "物理攻击",
+	EnumPlayerAttr.MAGIC_ATK: "法术攻击",
+	EnumPlayerAttr.PHYSICAL_DEF: "物理防御",
+	EnumPlayerAttr.MAGIC_DEF: "法术防御",
+	EnumPlayerAttr.CONTROL_POWER: "控制强度",
+	EnumPlayerAttr.CONTROL_RESIST: "控制抗性",
+	EnumPlayerAttr.HP_REGEN: "气血回复",
+	EnumPlayerAttr.MP_REGEN: "法力回复",
+	EnumPlayerAttr.CARRY: "负重",
+	EnumPlayerAttr.DAMAGE_BONUS: "伤害加成",
+	EnumPlayerAttr.DAMAGE_TAKEN: "受伤加成",
+	EnumPlayerAttr.COMBAT_MP_RESTORE_2S: "战斗回蓝/2秒",
 }
 
 @onready var _status_label: Label = %StatusLabel
@@ -213,7 +213,7 @@ func _rebuild_attr_inputs(entry: Dictionary) -> void:
 	var unit_v: Variant = entry.get("unit")
 	if not unit_v is ZhandouObj:
 		return
-	for key in ZhandouAttr.ALL_KEYS:
+	for key in EnumPlayerAttr.ALL_COMBAT_KEYS:
 		var row := HBoxContainer.new()
 		var name_label := Label.new()
 		name_label.text = str(ATTR_LABELS.get(key, key))
@@ -221,7 +221,7 @@ func _rebuild_attr_inputs(entry: Dictionary) -> void:
 		var spin := SpinBox.new()
 		spin.min_value = -99999.0
 		spin.max_value = 999999.0
-		spin.step = 1.0 if key != ZhandouAttr.DAMAGE_BONUS and key != ZhandouAttr.DAMAGE_TAKEN else 0.01
+		spin.step = 1.0 if key != EnumPlayerAttr.DAMAGE_BONUS and key != EnumPlayerAttr.DAMAGE_TAKEN else 0.01
 		spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		spin.value = (unit_v as ZhandouObj).get_attr(key, 0.0)
 		var attr_key: String = key
@@ -296,10 +296,10 @@ func _on_attr_changed(key: String, value: float) -> void:
 		return
 	var unit: ZhandouObj = unit_v as ZhandouObj
 	unit.set_attr(key, value)
-	if key == ZhandouAttr.HP_MAX:
+	if key == EnumPlayerAttr.HP_MAX:
 		unit.clamp_vitals()
 		_hp_input.value = unit.hp
-	elif key == ZhandouAttr.MP_MAX:
+	elif key == EnumPlayerAttr.MP_MAX:
 		unit.clamp_vitals()
 		_mp_input.value = unit.mp
 	GmBattleAccess.sync_hud()

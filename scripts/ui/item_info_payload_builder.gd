@@ -1,4 +1,4 @@
-class_name ItemInfoPayloadBuilder
+﻿class_name ItemInfoPayloadBuilder
 extends RefCounted
 
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
@@ -6,6 +6,7 @@ const LiandanServiceScript := preload("res://scripts/sim/liandan_service.gd")
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const ItemDefScript := preload("res://scripts/core/item_def.gd")
+const ZhandouAttrScript := preload("res://scripts/zhandou/zhandou_attr.gd")
 
 
 static func is_empty(payload: Dictionary) -> bool:
@@ -133,7 +134,7 @@ static func _item_meta(def: ItemDef) -> String:
 			StringsZh.getp("item_info.quality", "品质：{value}"),
 			{"value": quality_label}
 		))
-	if def.stackable and def.max_stack > 1:
+	if def.stackable == 1 and def.max_stack > 1:
 		parts.append(StringsZh.format_template(
 			StringsZh.getp("item_info.stack", "可堆叠（上限 {value}）"),
 			{"value": str(def.max_stack)}
@@ -286,38 +287,12 @@ static func format_use_effect_lines(use_effect: Array) -> Array[String]:
 						StringsZh.getp("item_info.use_mp", "使用效果：恢复法力 {value}"),
 						{"value": _fmt_signed_num(amount)}
 					))
-			"heart_demon":
-				if amount != 0.0:
-					lines.append(StringsZh.format_template(
-						StringsZh.getp("item_info.use_heart_demon", "使用效果：心魔 {value}"),
-						{"value": _fmt_signed_num(amount)}
-					))
-			"cultivation":
-				if amount != 0.0:
-					lines.append(StringsZh.format_template(
-						StringsZh.getp("item_info.use_cultivation", "使用效果：修为 +{value}"),
-						{"value": _fmt_num(amount)}
-					))
-			"instability":
-				if amount != 0.0:
-					lines.append(StringsZh.format_template(
-						StringsZh.getp("item_info.use_instability", "使用效果：灵力驳杂 {value}"),
-						{"value": _fmt_signed_num(amount)}
-					))
 			"pill_cultivation":
 				if amount != 0.0:
 					lines.append(StringsZh.format_template(
 						StringsZh.getp("item_info.use_pill_cultivation", "使用效果：修炼「丹药炼化」月修为 +{value}"),
 						{"value": _fmt_num(amount)}
 					))
-			"injury":
-				if amount != 0.0:
-					lines.append(StringsZh.format_template(
-						StringsZh.getp("item_info.use_injury", "使用效果：缩短伤势 {value} 日"),
-						{"value": _fmt_signed_num(amount)}
-					))
-			"sell_only":
-				lines.append(StringsZh.getp("item_info.use_sell_only", "使用效果：无药效，仅可出售"))
 			"alchemy_mastery":
 				var recipe_name := "丹方"
 				var mastery_gain := 180.0
@@ -331,7 +306,41 @@ static func format_use_effect_lines(use_effect: Array) -> Array[String]:
 					StringsZh.getp("item_info.use_alchemy_mastery", "使用效果：{recipe} 熟练度 +{value}"),
 					{"recipe": recipe_name, "value": _fmt_num(mastery_gain)}
 				))
+			"attrs":
+				if args_v is Array and (args_v as Array).size() >= 2:
+					var args := args_v as Array
+					var attr_key := str(args[0]).strip_edges()
+					var delta := float(args[1])
+					if attr_key != "" and delta != 0.0:
+						var attr_label := _attr_label(attr_key)
+						lines.append(StringsZh.format_template(
+							StringsZh.getp("item_info.use_attrs", "使用效果：{attr} {value}"),
+							{"attr": attr_label, "value": _fmt_signed_num(delta)}
+						))
 	return lines
+
+
+static func _attr_label(attr_key: String) -> String:
+	for k in EnumPlayerAttr.ALL_COMBAT_KEYS:
+		if str(k) == attr_key:
+			match attr_key:
+				EnumPlayerAttr.HP_MAX: return "气血上限"
+				EnumPlayerAttr.MP_MAX: return "法力上限"
+				EnumPlayerAttr.SHIELD: return "护盾"
+				EnumPlayerAttr.SPD: return "速度"
+				EnumPlayerAttr.PHYSICAL_ATK: return "物攻"
+				EnumPlayerAttr.MAGIC_ATK: return "法攻"
+				EnumPlayerAttr.PHYSICAL_DEF: return "物防"
+				EnumPlayerAttr.MAGIC_DEF: return "法防"
+				EnumPlayerAttr.CONTROL_POWER: return "控制力"
+				EnumPlayerAttr.CONTROL_RESIST: return "抗控"
+				EnumPlayerAttr.HP_REGEN: return "气血回复"
+				EnumPlayerAttr.MP_REGEN: return "法力回复"
+				EnumPlayerAttr.CARRY: return "负重"
+				EnumPlayerAttr.DAMAGE_BONUS: return "伤害加成"
+				EnumPlayerAttr.DAMAGE_TAKEN: return "承受伤害"
+				EnumPlayerAttr.COMBAT_MP_RESTORE_2S: return "战斗法力回复"
+	return attr_key
 
 
 static func _fmt_num(value: float) -> String:

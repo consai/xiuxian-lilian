@@ -1,0 +1,66 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/components/juese_choice_card.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="panel"]
+bg_color = Color(1, 0.93, 0.76, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.22, 0.14, 0.07, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[node name="JueseChoiceCard" type="Button"]
+custom_minimum_size = Vector2(200, 330)
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = SubResource("panel")
+theme_override_styles/hover = SubResource("panel")
+theme_override_styles/pressed = SubResource("panel")
+script = ExtResource("1_script")
+
+[node name="Box" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="Box"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(176, 170)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 25
+horizontal_alignment = 1
+
+[node name="DescLabel" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="BonusLabel" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.16, 0.38, 0.2, 1)
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+autowrap_mode = 2

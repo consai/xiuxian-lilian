@@ -2,14 +2,16 @@ class_name CharacterStats
 extends RefCounted
 
 ## 永久根基数据与战斗面板之间的唯一计算入口。
+## 属性键常量委托给 [EnumPlayerAttr] 统一管理。
 
 const RealmBalanceServiceScript := preload("res://scripts/sim/realm_balance_service.gd")
 
-const BODY := "roushen"
-const SPIRIT := "lingli"
-const SENSE := "shenshi"
-const AGILITY := "shenfa"
+const BODY := EnumPlayerAttr.BODY
+const SPIRIT := EnumPlayerAttr.SPIRIT
+const SENSE := EnumPlayerAttr.SENSE
+const AGILITY := EnumPlayerAttr.AGILITY
 
+## 新键 → 旧键映射（normalize 时兼容旧存档格式）
 const LEGACY_FOUNDATION_KEYS := {
 	BODY: "body",
 	SPIRIT: "spirit",
@@ -17,24 +19,14 @@ const LEGACY_FOUNDATION_KEYS := {
 	AGILITY: "agility",
 }
 
-const COMPREHENSION := "comprehension"
-const WILL := "will"
-const FORTUNE := "fortune"
-const ROOTS := "roots"
+const COMPREHENSION := EnumPlayerAttr.COMPREHENSION
+const WILL := EnumPlayerAttr.WILL
+const FORTUNE := EnumPlayerAttr.FORTUNE
+const ROOTS := EnumPlayerAttr.ROOTS
 
-const DEFAULT_FOUNDATIONS := {
-	BODY: 10.0,
-	SPIRIT: 10.0,
-	SENSE: 10.0,
-	AGILITY: 10.0,
-}
+const DEFAULT_FOUNDATIONS := EnumPlayerAttr.DEFAULT_FOUNDATIONS
 
-const DEFAULT_APTITUDES := {
-	COMPREHENSION: 10.0,
-	WILL: 10.0,
-	FORTUNE: 10.0,
-	ROOTS: {"fire": 80.0},
-}
+const DEFAULT_APTITUDES := EnumPlayerAttr.DEFAULT_APTITUDES
 
 
 static func default_foundations() -> Dictionary:
@@ -102,9 +94,9 @@ static func build_combat_attrs(
 
 static func finalize_combat_attrs(raw: Dictionary) -> Dictionary:
 	var out := raw.duplicate(true)
-	for key in ZhandouAttr.ALL_KEYS:
+	for key in EnumPlayerAttr.ALL_COMBAT_KEYS:
 		if not out.has(key):
-			out[key] = ZhandouAttr.get_attr(ZhandouAttr.TEST_DEFAULTS, key, 0.0)
+			out[key] = ZhandouAttr.get_attr(EnumPlayerAttr.COMBAT_DEFAULTS, key, 0.0)
 	return out
 
 

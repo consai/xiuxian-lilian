@@ -87,9 +87,6 @@ const ABILITY_TABLE_FILES = {
 
 export async function loadAbilitiesBundle() {
   const bundle = {
-    ...(await settings("jineng.json")),
-    metadata: await settings("jineng_metadata.json"),
-    rules: await settings("jineng_rules.json"),
     abilityTables: Object.fromEntries(
       Object.entries(ABILITY_TABLE_FILES).map(([key, fileName]) => [key, `exportjson/${fileName}`]),
     ),
@@ -104,6 +101,5 @@ export async function loadAbilitiesBundle() {
   }
   bundle.tables = tables;
   bundle.abilities = merged;
-  if (bundle.metadata) bundle.metadata.abilityCount = merged.length;
   return bundle;
 }

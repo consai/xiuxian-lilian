@@ -1,29 +1,14 @@
 {
   "lianqi_early": {
     "key": "lianqi_early",
-    "foundations": {
-      "body": 10,
-      "spirit": 10,
-      "sense": 10,
-      "agility": 10
-    }
+    "foundations": "{\"body\": 10, \"spirit\": 10, \"sense\": 10, \"agility\": 10}"
   },
   "lianqi_mature": {
     "key": "lianqi_mature",
-    "foundations": {
-      "body": 13,
-      "spirit": 13,
-      "sense": 13,
-      "agility": 13
-    }
+    "foundations": "{\"body\": 13, \"spirit\": 13, \"sense\": 13, \"agility\": 13}"
   },
   "zhuji_early": {
     "key": "zhuji_early",
-    "foundations": {
-      "body": 16,
-      "spirit": 16,
-      "sense": 16,
-      "agility": 16
-    }
+    "foundations": "{\"body\": 16, \"spirit\": 16, \"sense\": 16, \"agility\": 16}"
   }
 }

@@ -1,4 +1,4 @@
-class_name ZhandouDomainService
+﻿class_name ZhandouDomainService
 extends RefCounted
 ## 战斗域：四态状态机、实时速度行动进度、CD、整场时限与出手结算。
 const ZhandouEventScript = preload("res://scripts/zhandou/zhandou_event.gd")
@@ -192,7 +192,7 @@ func _tick_passive_recovery(delta: float) -> void:
 		for unit in _all_alive_units():
 			if unit == null or unit.is_dead():
 				continue
-			var mp_gain: float = unit.get_attr(ZhandouAttr.COMBAT_MP_RESTORE_2S, 0.0)
+			var mp_gain: float = unit.get_attr(EnumPlayerAttr.COMBAT_MP_RESTORE_2S, 0.0)
 			if mp_gain > 0.0:
 				unit.change_mp(mp_gain)
 
@@ -305,8 +305,8 @@ func _apply_escape_chase_damage() -> float:
 	if fastest == null or player == null:
 		return 0.0
 	var atk := maxf(
-		fastest.get_attr(ZhandouAttr.PHYSICAL_ATK),
-		fastest.get_attr(ZhandouAttr.MAGIC_ATK)
+		fastest.get_attr(EnumPlayerAttr.PHYSICAL_ATK),
+		fastest.get_attr(EnumPlayerAttr.MAGIC_ATK)
 	)
 	var dmg := ZhandouBalance.escape_chase_damage(atk)
 	player.be_attacked(dmg)

@@ -3,6 +3,7 @@ extends Node
 signal active_scene_changed(scene: Node)
 
 const MAIN_MENU := "main_menu"
+const CHARACTER_CREATION := "character_creation"
 const HUB := "hub"
 const WORLD_MAP := "world_map"
 const LILIAN_XUNHUAN := "lilian_xunhuan"
@@ -24,6 +25,7 @@ const DAO_TREE_PANEL := "dao_tree_panel"
 
 const SCENE_PATHS := {
 	MAIN_MENU: "res://scenes/ui/main_menu.tscn",
+	CHARACTER_CREATION: "res://scenes/ui/character_creation.tscn",
 	HUB: "res://scenes/sim/dongfu.tscn",
 	WORLD_MAP: "res://scenes/map/map.tscn",
 	LILIAN_XUNHUAN: "res://scenes/lilian/lilian_xunhuan.tscn",
@@ -153,6 +155,10 @@ func go_to(scene_id: String, payload: Dictionary = {}, options: Dictionary = {})
 
 func go_hub(payload: Dictionary = {}, options: Dictionary = {}) -> Dictionary:
 	return go_to(HUB, payload, options)
+
+
+func go_character_creation() -> Dictionary:
+	return go_to(CHARACTER_CREATION, {}, {"reset_history": true})
 
 
 func go_world_map() -> Dictionary:

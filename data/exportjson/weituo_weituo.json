@@ -6,43 +6,9 @@
     "issuer": "清风洞府",
     "desc": "宗门药房急需一批草药，望道友相助。",
     "repeatable": false,
-    "ui": {
-      "portrait": "res://assets/art/characters/001_cutout_483x512.png",
-      "badge": "可接受"
-    },
-    "requirements": [
-      {
-        "kind": "item",
-        "id": "items_LingCao",
-        "label": "清心草",
-        "count": 3,
-        "consume": true
-      },
-      {
-        "kind": "item",
-        "id": "items_LingGuo",
-        "label": "灵芝",
-        "count": 2,
-        "consume": true
-      }
-    ],
-    "rewards": [
-      {
-        "kind": "item",
-        "id": "items_LingCao",
-        "count": 10
-      },
-      {
-        "kind": "item",
-        "id": "items_XuanJin",
-        "count": 20
-      },
-      {
-        "kind": "currency",
-        "id": "ling_stones",
-        "count": 500
-      }
-    ]
+    "ui": "{\"portrait\": \"res://assets/art/characters/001_cutout_483x512.png\", \"badge\": \"可接受\"}",
+    "requirements": "[{\"kind\": \"item\", \"id\": \"items_LingCao\", \"label\": \"清心草\", \"count\": 3, \"consume\": true}, {\"kind\": \"item\", \"id\": \"items_LingGuo\", \"label\": \"灵芝\", \"count\": 2, \"consume\": true}]",
+    "rewards": "[{\"kind\": \"item\", \"id\": \"items_LingCao\", \"count\": 10}, {\"kind\": \"item\", \"id\": \"items_XuanJin\", \"count\": 20}, {\"kind\": \"currency\", \"id\": \"ling_stones\", \"count\": 500}]"
   },
   "qinglan_patrol_001": {
     "key": "qinglan_patrol_001",
@@ -51,35 +17,9 @@
     "issuer": "山下村正",
     "desc": "青岚山路近日妖兽出没，烦请清理。",
     "repeatable": true,
-    "ui": {
-      "portrait": "res://assets/art/characters/004_cutout_502x512.png",
-      "badge": "进行中"
-    },
-    "requirements": [
-      {
-        "kind": "lilian",
-        "location_id": "qinglan_mountain",
-        "min_steps": 3,
-        "require_not_defeated": false
-      }
-    ],
-    "rewards": [
-      {
-        "kind": "item",
-        "id": "items_LingCao",
-        "count": 5
-      },
-      {
-        "kind": "item",
-        "id": "items_XuanJin",
-        "count": 10
-      },
-      {
-        "kind": "currency",
-        "id": "ling_stones",
-        "count": 300
-      }
-    ]
+    "ui": "{\"portrait\": \"res://assets/art/characters/004_cutout_502x512.png\", \"badge\": \"进行中\"}",
+    "requirements": "[{\"kind\": \"lilian\", \"location_id\": \"qinglan_mountain\", \"min_steps\": 3, \"require_not_defeated\": false}]",
+    "rewards": "[{\"kind\": \"item\", \"id\": \"items_LingCao\", \"count\": 5}, {\"kind\": \"item\", \"id\": \"items_XuanJin\", \"count\": 10}, {\"kind\": \"currency\", \"id\": \"ling_stones\", \"count\": 300}]"
   },
   "lingcao_collection_001": {
     "key": "lingcao_collection_001",
@@ -88,35 +28,8 @@
     "issuer": "丹房执事",
     "desc": "听闻灵草可炼丹所用，望道友相助。",
     "repeatable": false,
-    "ui": {
-      "portrait": "res://assets/art/characters/005_cutout_311x512.png",
-      "badge": "可接受"
-    },
-    "requirements": [
-      {
-        "kind": "item",
-        "id": "items_LingCao",
-        "label": "灵草",
-        "count": 8,
-        "consume": true
-      }
-    ],
-    "rewards": [
-      {
-        "kind": "item",
-        "id": "items_LingCao",
-        "count": 8
-      },
-      {
-        "kind": "item",
-        "id": "items_XuanJin",
-        "count": 15
-      },
-      {
-        "kind": "currency",
-        "id": "ling_stones",
-        "count": 400
-      }
-    ]
+    "ui": "{\"portrait\": \"res://assets/art/characters/005_cutout_311x512.png\", \"badge\": \"可接受\"}",
+    "requirements": "[{\"kind\": \"item\", \"id\": \"items_LingCao\", \"label\": \"灵草\", \"count\": 8, \"consume\": true}]",
+    "rewards": "[{\"kind\": \"item\", \"id\": \"items_LingCao\", \"count\": 8}, {\"kind\": \"item\", \"id\": \"items_XuanJin\", \"count\": 15}, {\"kind\": \"currency\", \"id\": \"ling_stones\", \"count\": 400}]"
   }
 }

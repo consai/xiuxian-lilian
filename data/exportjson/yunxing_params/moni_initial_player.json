@@ -17,29 +17,19 @@
   },
   "jineng": {
     "key": "jineng",
-    "value": [
-      " factive_lq_001",
-      " factive_lq_002",
-      " factive_lq_003"
-    ]
+    "value": "factive_lq_001: factive_lq_002: factive_lq_003"
   },
   "jineng_use": {
     "key": "jineng_use",
-    "value": [
-      " factive_lq_001",
-      " factive_lq_002",
-      " factive_lq_003"
-    ]
+    "value": "factive_lq_001: factive_lq_002: factive_lq_003"
   },
   "gongfa": {
     "key": "gongfa",
-    "value": [
-      "method.hunyuan.1"
-    ]
+    "value": "method.hunyuan.1"
   },
   "equips": {
     "key": "equips",
-    "value": []
+    "value": null
   },
   "items": {
     "key": "items",
@@ -47,18 +37,10 @@
   },
   "item_slots": {
     "key": "item_slots",
-    "value": [
-      "",
-      "",
-      ""
-    ]
+    "value": "::"
   },
   "equip_slots": {
     "key": "equip_slots",
-    "value": [
-      -1,
-      -1,
-      -1
-    ]
+    "value": "-1:-1:-1"
   }
 }

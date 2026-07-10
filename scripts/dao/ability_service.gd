@@ -5,7 +5,6 @@ extends RefCounted
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 
-const PATH := "res://data/exportjson/jineng.json"
 const TIAOXI_ID := "ability.combat.tiaoxi"
 
 static var _bundle: Dictionary = {}

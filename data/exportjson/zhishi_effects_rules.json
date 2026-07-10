@@ -5,9 +5,6 @@
   },
   "supportedOperations": {
     "key": "supportedOperations",
-    "value": [
-      "add_flat",
-      "add_percent"
-    ]
+    "value": "add_flat:add_percent"
   }
 }

@@ -1,4 +1,4 @@
-class_name ZhandouInitData
+﻿class_name ZhandouInitData
 extends RefCounted
 ## 进战唯一入口：外部只提交 combatant 字典，由 [method resolve] 生成 [ZhandouSetup]（[ZhandouObj] + UI 快照）。
 ## 进战前经 [method set_pending] 写入 DataStore，由 [ZhandouChangjing] 在 _ready 消费；切场景请用 [SceneManager.go_zhandou]。
@@ -9,7 +9,7 @@ const META_SCHEMA_VERSION := 2
 
 const SETUP_KEYS := ["player", "battle_time_limit"]
 const COMBATANT_KEYS := ["hp", "mp", "attrs", "skills"]
-const ATTR_KEYS := ZhandouAttr.CORE_KEYS
+const ATTR_KEYS := EnumPlayerAttr.COMBAT_CORE_KEYS
 
 ## 进战时出手速度 [member ZhandouObj.ATTR_SPD] 相对基础值的随机浮动比例（±5% → 0.95~1.05）。
 const DEFAULT_SPD_JITTER_RATIO := 0.05
@@ -966,9 +966,9 @@ static func sample_for_editor() -> Dictionary:
 				],
 			},
 			"attrs": ZhandouAttr.from_stat_block({
-				ZhandouAttr.MP_MAX: 50.0,
-				ZhandouAttr.PHYSICAL_ATK: 80.0,
-				ZhandouAttr.MAGIC_ATK: 80.0,
+				EnumPlayerAttr.MP_MAX: 50.0,
+				EnumPlayerAttr.PHYSICAL_ATK: 80.0,
+				EnumPlayerAttr.MAGIC_ATK: 80.0,
 			}),
 			"skills": [
 				{"id": 3, "cd": 0.0},

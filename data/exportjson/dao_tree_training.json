@@ -1,28 +1,16 @@
 {
-  "maxLevel": {
-    "key": "maxLevel",
-    "value": 5
-  },
-  "basePoints": {
-    "key": "basePoints",
-    "value": 250
-  },
-  "levelMultipliers": {
-    "key": "levelMultipliers",
-    "value": [
+  "base": {
+    "key": "base",
+    "maxLevel": 5,
+    "basePoints": 250,
+    "levelMultipliers": [
       1,
       2,
       4,
       8,
       16
-    ]
-  },
-  "speedFormula": {
-    "key": "speedFormula",
-    "value": "primary + secondary / 2"
-  },
-  "pointsFormula": {
-    "key": "pointsFormula",
-    "value": "basePoints * rank * levelMultipliers[level - 1]"
+    ],
+    "speedFormula": "primary + secondary / 2",
+    "pointsFormula": "basePoints * rank * levelMultipliers[level - 1]"
   }
 }

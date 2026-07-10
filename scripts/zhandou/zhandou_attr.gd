@@ -2,27 +2,28 @@ class_name ZhandouAttr
 extends RefCounted
 ## 战斗属性：键名约定、面板初始化/合并、Buff 修正与伤害公式。
 ## [ZhandouObj] 持有运行时 [member ZhandouObj.attrs] 字典；本类负责生成与演算。
+## 属性键常量委托给 [EnumPlayerAttr] 统一管理。
 
-const HP_MAX := "hp_max"
-const MP_MAX := "mp_max"
-const SHIELD := "shield"
-const SPD := "spd"
-const PHYSICAL_ATK := "physical_atk"
-const MAGIC_ATK := "magic_atk"
-const PHYSICAL_DEF := "physical_def"
-const MAGIC_DEF := "magic_def"
-const CONTROL_POWER := "control_power"
-const CONTROL_RESIST := "control_resist"
-const HP_REGEN := "hp_regen"
-const MP_REGEN := "mp_regen"
-const CARRY := "carry"
-const DAMAGE_BONUS := "damage_bonus"
-const DAMAGE_TAKEN := "damage_taken"
-const COMBAT_MP_RESTORE_2S := "combat_mp_restore_2s"
+const HP_MAX := EnumPlayerAttr.HP_MAX
+const MP_MAX := EnumPlayerAttr.MP_MAX
+const SHIELD := EnumPlayerAttr.SHIELD
+const SPD := EnumPlayerAttr.SPD
+const PHYSICAL_ATK := EnumPlayerAttr.PHYSICAL_ATK
+const MAGIC_ATK := EnumPlayerAttr.MAGIC_ATK
+const PHYSICAL_DEF := EnumPlayerAttr.PHYSICAL_DEF
+const MAGIC_DEF := EnumPlayerAttr.MAGIC_DEF
+const CONTROL_POWER := EnumPlayerAttr.CONTROL_POWER
+const CONTROL_RESIST := EnumPlayerAttr.CONTROL_RESIST
+const HP_REGEN := EnumPlayerAttr.HP_REGEN
+const MP_REGEN := EnumPlayerAttr.MP_REGEN
+const CARRY := EnumPlayerAttr.CARRY
+const DAMAGE_BONUS := EnumPlayerAttr.DAMAGE_BONUS
+const DAMAGE_TAKEN := EnumPlayerAttr.DAMAGE_TAKEN
+const COMBAT_MP_RESTORE_2S := EnumPlayerAttr.COMBAT_MP_RESTORE_2S
 
-const DAMAGE_PHYSICAL := "physical"
-const DAMAGE_MAGIC := "magic"
-const DAMAGE_TRUE := "true"
+const DAMAGE_PHYSICAL := EnumPlayerAttr.DAMAGE_PHYSICAL
+const DAMAGE_MAGIC := EnumPlayerAttr.DAMAGE_MAGIC
+const DAMAGE_TRUE := EnumPlayerAttr.DAMAGE_TRUE
 
 ## 进战校验必填（与 [ZhandouInitData] 一致）。
 const CORE_KEYS: Array[String] = [

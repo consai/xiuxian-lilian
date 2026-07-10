@@ -1,22 +1,18 @@
 import { loadDaoTree, loadEffectCatalog } from "./json-config-loader.mjs";
 import { loadAbilitiesBundle } from "./load-abilities-bundle.mjs";
-import { loadCombatEffectSchema } from "./normalize-ability-export.mjs";
 import { validateQualityTier, realmIdForTier, rejectLegacyRealmField } from "./validate-shared.mjs";
 
 const dao = await loadDaoTree();
 const config = await loadAbilitiesBundle();
 const catalog = await loadEffectCatalog();
-const combatSchema = await loadCombatEffectSchema();
-const combatEffectIds = new Set(Object.keys(combatSchema));
 const errors = [];
 const effectIds = new Set(catalog.effects.map((effect) => effect.id));
 const abilityIds = new Set();
 const v1Tiers = new Set([1, 2]);
-const zhandouActiveEffectIds = combatEffectIds;
-
 const runtimeCombatEffects = new Set([
   "damage", "shield", "heal_hp", "restore_mana", "buff",
 ]);
+const zhandouActiveEffectIds = runtimeCombatEffects;
 
 const zhandouPassiveEffectIds = new Set([
   "physical_def", "magic_def", "all_resistance", "damage_bonus", "hp_regen",
@@ -24,6 +20,8 @@ const zhandouPassiveEffectIds = new Set([
   "cast_speed", "physical_attack", "magic_attack", "physical_defense", "magic_defense",
   "max_hp", "max_mana", "mana_regen", "buff",
 ]);
+
+const ABILITY_TYPES = new Set(["combat_active", "combat_passive", "combat_upkeep"]);
 
 
 const VALID_TARGETS = new Set(["self", "enemy"]);
@@ -64,7 +62,6 @@ function validateTargetPair(abilityId, label, target, targetArg) {
 }
 
 if ("skillBooks" in config) errors.push("技能配置不得包含外部学习物品数据");
-if (config.metadata.abilityCount !== config.abilities.length) errors.push("metadata.abilityCount 不一致");
 if (config.abilityTables) {
   const tableKeys = ["zhandou_active", "passive"];
   for (const tableKey of tableKeys) {
@@ -79,7 +76,7 @@ for (const ability of config.abilities) {
   if (abilityIds.has(ability.id)) errors.push(`${ability.id}: 重复技能 ID`);
   abilityIds.add(ability.id);
   if ("learnedFromBookId" in ability) errors.push(`${ability.id}: 不得包含外部学习物品引用`);
-  if (!config.rules.types.includes(ability.type)) errors.push(`${ability.id}: 未知技能类型 ${ability.type}`);
+  if (!ABILITY_TYPES.has(ability.type)) errors.push(`${ability.id}: 未知技能类型 ${ability.type}`);
   validateQualityTier(ability, "技能", errors);
   rejectLegacyRealmField(ability, "技能", errors);
   const abilityRealm = realmIdForTier(ability.tier);
@@ -88,7 +85,7 @@ for (const ability of config.abilities) {
   for (const effect of ability.effects ?? []) {
     if ("masteryGrowth" in effect) errors.push(`${ability.id}: 禁止使用 masteryGrowth ${effect.effectId}`);
     if ("knowledgeGrowth" in effect) errors.push(`${ability.id}: 禁止使用 knowledgeGrowth ${effect.effectId}`);
-    const isCombatSchemaEffect = combatEffectIds.has(effect.effectId);
+    const isCombatSchemaEffect = zhandouActiveEffectIds.has(effect.effectId) || zhandouPassiveEffectIds.has(effect.effectId);
     if (!isCombatSchemaEffect && !effectIds.has(effect.effectId)) {
       errors.push(`${ability.id}: 效果未登记 ${effect.effectId}`);
     }
@@ -137,5 +134,5 @@ if (errors.length) {
   process.exitCode = 1;
 } else {
   console.log(`技能配置校验通过：${config.abilities.length} 个技能，统一效果目录 ${catalog.effects.length} 项。`);
-  for (const type of config.rules.types) console.log(`${type}: ${config.abilities.filter((ability) => ability.type === type).length} 个`);
+  for (const type of ABILITY_TYPES) console.log(`${type}: ${config.abilities.filter((ability) => ability.type === type).length} 个`);
 }

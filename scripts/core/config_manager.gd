@@ -1,4 +1,4 @@
-extends Node
+﻿extends Node
 
 ## 全局配置中心：启动时预处理战斗配置表，并提供缓存读取接口。
 
@@ -342,10 +342,10 @@ func _normalize_monster_row(monster_id: String, row: Dictionary) -> Dictionary:
 			out["icon"] = icon_path
 	var attrs: Dictionary = (out.get("attrs", {}) as Dictionary).duplicate(true)
 	for attr_key in [
-		ZhandouAttr.HP_MAX, ZhandouAttr.MP_MAX, ZhandouAttr.SHIELD,
-		ZhandouAttr.PHYSICAL_ATK, ZhandouAttr.MAGIC_ATK,
-		ZhandouAttr.PHYSICAL_DEF, ZhandouAttr.MAGIC_DEF, ZhandouAttr.SPD,
-		ZhandouAttr.CONTROL_POWER, ZhandouAttr.CONTROL_RESIST,
+		EnumPlayerAttr.HP_MAX, EnumPlayerAttr.MP_MAX, EnumPlayerAttr.SHIELD,
+		EnumPlayerAttr.PHYSICAL_ATK, EnumPlayerAttr.MAGIC_ATK,
+		EnumPlayerAttr.PHYSICAL_DEF, EnumPlayerAttr.MAGIC_DEF, EnumPlayerAttr.SPD,
+		EnumPlayerAttr.CONTROL_POWER, EnumPlayerAttr.CONTROL_RESIST,
 	]:
 		if out.has(attr_key) and not attrs.has(attr_key):
 			attrs[attr_key] = out[attr_key]
@@ -580,7 +580,145 @@ func _load_locations_local() -> void:
 	for key in (raw_v as Dictionary).keys():
 		var row_v: Variant = (raw_v as Dictionary)[key]
 		if row_v is Dictionary:
-				_locations_by_id[str(key)] = (row_v as Dictionary).duplicate(true)
+			var row := row_v as Dictionary
+			_normalize_location(row)
+			_locations_by_id[str(key)] = row
+
+
+func _normalize_location(row: Dictionary) -> void:
+	# event_pool: 支持字符串 "id:weight|id:weight|..." 以及旧数组格式
+	var event_pool_v: Variant = row.get("event_pool")
+	if event_pool_v is String:
+		var text := str(event_pool_v).strip_edges()
+		row["event_pool"] = _parse_event_pool_entries(text) if text != "" else []
+	elif event_pool_v is Array:
+		var out: Array = []
+		for id_v in event_pool_v as Array:
+			if id_v is String:
+				out.append({"id": str(id_v), "weight": 1})
+			elif id_v is Dictionary:
+				out.append(id_v.duplicate(true))
+		row["event_pool"] = out
+	# drop_pools: 支持字符串 JSON 以及字典中子池值为字符串 "id:weight|..."
+	var drop_pools_v: Variant = row.get("drop_pools")
+	if drop_pools_v is String:
+		var text := str(drop_pools_v).strip_edges()
+		if text != "" and text != "{}":
+			var parsed: Variant = JSON.parse_string(text)
+			if parsed is Dictionary:
+				row["drop_pools"] = _normalize_drop_pools(parsed as Dictionary)
+			else:
+				row["drop_pools"] = {}
+		else:
+			row["drop_pools"] = {}
+	elif drop_pools_v is Dictionary:
+		row["drop_pools"] = _normalize_drop_pools(drop_pools_v as Dictionary)
+	# materials: 在 drop_pools 解析之后处理，以便推导 item_ids
+	var materials_v: Variant = row.get("materials")
+	if materials_v is String:
+		var text := str(materials_v).strip_edges()
+		row["materials"] = _parse_materials_entries(text, row.get("drop_pools", {}) as Dictionary) if text != "" else []
+	elif materials_v is Array:
+		row["materials"] = (materials_v as Array).duplicate(true)
+
+
+func _parse_event_pool_entries(text: String) -> Array:
+	var out: Array = []
+	for part in text.split("|", false):
+		var trimmed := part.strip_edges()
+		if trimmed == "":
+			continue
+		var colon_pos := trimmed.rfind(":")
+		var id := trimmed
+		var weight := 1
+		if colon_pos >= 0:
+			id = trimmed.substr(0, colon_pos).strip_edges()
+			var weight_str := trimmed.substr(colon_pos + 1).strip_edges()
+			if weight_str.is_valid_int():
+				weight = int(weight_str)
+		if id != "":
+			out.append({"id": id, "weight": weight})
+	return out
+
+
+func _parse_materials_entries(text: String, drop_pools: Dictionary) -> Array:
+	var out: Array = []
+	for part in text.split("|", false):
+		var trimmed := part.strip_edges()
+		if trimmed == "":
+			continue
+		var colon_pos := trimmed.find(":")
+		var id := trimmed
+		var drop_pool := ""
+		if colon_pos >= 0:
+			id = trimmed.substr(0, colon_pos).strip_edges()
+			drop_pool = trimmed.substr(colon_pos + 1).strip_edges()
+		if id == "":
+			continue
+		var item_ids: Array = []
+		var pool := drop_pools.get(drop_pool, {}) as Dictionary
+		var entries: Array = pool.get("entries", []) as Array
+		for entry_v in entries:
+			if entry_v is Dictionary:
+				var entry := entry_v as Dictionary
+				if str(entry.get("kind", "item")) == "item":
+					var item_id := str(entry.get("id", ""))
+					if item_id != "" and not item_ids.has(item_id):
+						item_ids.append(item_id)
+		out.append({
+			"id": id,
+			"drop_pool": drop_pool,
+			"name": id,
+			"category": drop_pool,
+			"item_ids": item_ids,
+		})
+	return out
+
+
+func _normalize_drop_pools(pools: Dictionary) -> Dictionary:
+	var out := {}
+	for pool_key in pools.keys():
+		var pool_v: Variant = pools[pool_key]
+		if pool_v is Dictionary:
+			out[pool_key] = pool_v.duplicate(true)
+		elif pool_v is String:
+			var text := str(pool_v).strip_edges()
+			out[pool_key] = _parse_drop_pool_entries(text) if text != "" else {"entries": []}
+		else:
+			out[pool_key] = {"entries": []}
+	return out
+
+
+func _parse_drop_pool_entries(text: String) -> Dictionary:
+	var entries: Array = []
+	for part in text.split("|", false):
+		var trimmed := part.strip_edges()
+		if trimmed == "":
+			continue
+		var colon_pos := trimmed.rfind(":")
+		var id := trimmed
+		var weight := 1
+		if colon_pos >= 0:
+			id = trimmed.substr(0, colon_pos).strip_edges()
+			var weight_str := trimmed.substr(colon_pos + 1).strip_edges()
+			if weight_str.is_valid_int():
+				weight = int(weight_str)
+		if id == "":
+			continue
+		var kind := "item"
+		if id == "ling_stones":
+			kind = "currency"
+		elif id.is_valid_int():
+			kind = "equip"
+		entries.append({
+			"kind": kind,
+			"id": id,
+			"weight": weight,
+			"min": 1,
+			"max": 1,
+			"material_grade": 1,
+		})
+	return {"entries": entries}
 
 
 func _load_monsters_local() -> void:

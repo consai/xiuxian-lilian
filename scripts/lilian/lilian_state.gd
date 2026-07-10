@@ -1,4 +1,4 @@
-extends Node
+﻿extends Node
 
 const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
 const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
@@ -634,7 +634,7 @@ func finish(exit_reason: String) -> Dictionary:
 		var loot_loss := LilianRewardServiceScript.apply_loot_loss_on_defeat(settlement_loot)
 		loot_lost.append_array(loot_loss.get("lost", []) as Array)
 		var rules: Dictionary = LilianRulesServiceScript.rules()
-		var hp_max := float((player_snapshot.get("attrs", {}) as Dictionary).get(ZhandouAttr.HP_MAX, 100.0))
+		var hp_max := float((player_snapshot.get("attrs", {}) as Dictionary).get(EnumPlayerAttr.HP_MAX, 100.0))
 		runtime["hp"] = maxf(float(runtime.get("hp", 0.0)), hp_max * float(rules.get("defeat_hp_floor_ratio", 0.25)))
 	var result := LilianResult.to_dict({
 		"ok": true,
@@ -848,8 +848,8 @@ func _blocks_runtime_item_use() -> bool:
 
 func _apply_runtime_item_effects(def: ItemDef, player_attrs: Dictionary) -> PackedStringArray:
 	var feedback_parts: PackedStringArray = []
-	var hp_max := maxf(1.0, float(player_attrs.get(ZhandouAttr.HP_MAX, 100.0)))
-	var mp_max := maxf(1.0, float(player_attrs.get(ZhandouAttr.MP_MAX, 100.0)))
+	var hp_max := maxf(1.0, float(player_attrs.get(EnumPlayerAttr.HP_MAX, 100.0)))
+	var mp_max := maxf(1.0, float(player_attrs.get(EnumPlayerAttr.MP_MAX, 100.0)))
 	if def.has_fight_config():
 		for effect_v in def.fight_effect:
 			if not effect_v is Dictionary:
@@ -1023,7 +1023,7 @@ func _escape_bonus_from_player(player: Dictionary) -> float:
 	var attrs_v: Variant = player.get("attrs", {})
 	if not attrs_v is Dictionary:
 		return 0.0
-	var spd := ZhandouAttr.get_attr(attrs_v as Dictionary, ZhandouAttr.SPD, 100.0)
+	var spd := ZhandouAttr.get_attr(attrs_v as Dictionary, EnumPlayerAttr.SPD, 100.0)
 	return clampf(spd / 2500.0, 0.0, 0.12)
 
 

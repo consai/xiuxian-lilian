@@ -1,4 +1,4 @@
-extends Control
+﻿extends Control
 
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
@@ -83,8 +83,8 @@ func _bind_identity() -> void:
 
 
 func _bind_vitals() -> void:
-	var hp_max := ZhandouAttr.get_attr(GameState.attrs, ZhandouAttr.HP_MAX, 100.0)
-	var mp_max := ZhandouAttr.get_attr(GameState.attrs, ZhandouAttr.MP_MAX, 100.0)
+	var hp_max := ZhandouAttr.get_attr(GameState.attrs, EnumPlayerAttr.HP_MAX, 100.0)
+	var mp_max := ZhandouAttr.get_attr(GameState.attrs, EnumPlayerAttr.MP_MAX, 100.0)
 	_hp_bar.max_value = hp_max
 	_hp_bar.value = GameState.hp
 	_hp_value.text = "%.0f/%.0f" % [GameState.hp, hp_max]
@@ -96,11 +96,11 @@ func _bind_vitals() -> void:
 func _bind_combat_stats() -> void:
 	var attrs := GameState.attrs
 	_attributes_heading.text = "战斗面板"
-	_set_stat_slot(_attack, "物攻", "%.0f" % ZhandouAttr.get_attr(attrs, ZhandouAttr.PHYSICAL_ATK))
-	_set_stat_slot(_defense, "法攻", "%.0f" % ZhandouAttr.get_attr(attrs, ZhandouAttr.MAGIC_ATK))
-	_set_stat_slot(_speed, "物防", "%.0f" % ZhandouAttr.get_attr(attrs, ZhandouAttr.PHYSICAL_DEF))
-	_set_stat_slot(_magic_def, "法防", "%.0f" % ZhandouAttr.get_attr(attrs, ZhandouAttr.MAGIC_DEF))
-	_set_stat_slot(_action_spd, "出手", "%.0f" % ZhandouAttr.get_attr(attrs, ZhandouAttr.SPD))
+	_set_stat_slot(_attack, "物攻", "%.0f" % ZhandouAttr.get_attr(attrs, EnumPlayerAttr.PHYSICAL_ATK))
+	_set_stat_slot(_defense, "法攻", "%.0f" % ZhandouAttr.get_attr(attrs, EnumPlayerAttr.MAGIC_ATK))
+	_set_stat_slot(_speed, "物防", "%.0f" % ZhandouAttr.get_attr(attrs, EnumPlayerAttr.PHYSICAL_DEF))
+	_set_stat_slot(_magic_def, "法防", "%.0f" % ZhandouAttr.get_attr(attrs, EnumPlayerAttr.MAGIC_DEF))
+	_set_stat_slot(_action_spd, "出手", "%.0f" % ZhandouAttr.get_attr(attrs, EnumPlayerAttr.SPD))
 	_shield.visible = false
 
 
@@ -149,22 +149,22 @@ func _foundation_text() -> String:
 	var attrs := GameState.attrs
 	return "\n".join([
 		"根基",
-		"肉身  %.0f    灵力  %.0f" % [float(base[CharacterStatsScript.BODY]), float(base[CharacterStatsScript.SPIRIT])],
-		"神识  %.0f    身法  %.0f" % [float(base[CharacterStatsScript.SENSE]), float(base[CharacterStatsScript.AGILITY])],
+		"肉身  %.0f    灵力  %.0f" % [float(base[EnumPlayerAttr.BODY]), float(base[EnumPlayerAttr.SPIRIT])],
+		"神识  %.0f    身法  %.0f" % [float(base[EnumPlayerAttr.SENSE]), float(base[EnumPlayerAttr.AGILITY])],
 		"",
 		"资质",
 		"灵根  %s" % CharacterStatsScript.root_label(aptitude),
 		"悟性  %.0f    福缘  %.0f" % [
-			float(aptitude[CharacterStatsScript.COMPREHENSION]),
-			float(aptitude[CharacterStatsScript.FORTUNE]),
+			float(aptitude[EnumPlayerAttr.COMPREHENSION]),
+			float(aptitude[EnumPlayerAttr.FORTUNE]),
 		],
 		"",
 		"辅助",
 		"气血恢复 %.1f    法力恢复 %.1f" % [
-			ZhandouAttr.get_attr(attrs, ZhandouAttr.HP_REGEN),
-			ZhandouAttr.get_attr(attrs, ZhandouAttr.MP_REGEN),
+			ZhandouAttr.get_attr(attrs, EnumPlayerAttr.HP_REGEN),
+			ZhandouAttr.get_attr(attrs, EnumPlayerAttr.MP_REGEN),
 		],
-		"负重 %.0f" % ZhandouAttr.get_attr(attrs, ZhandouAttr.CARRY),
+		"负重 %.0f" % ZhandouAttr.get_attr(attrs, EnumPlayerAttr.CARRY),
 	])
 
 

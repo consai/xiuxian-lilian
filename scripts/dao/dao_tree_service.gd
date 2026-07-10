@@ -1,4 +1,4 @@
-class_name DaoTreeService
+﻿class_name DaoTreeService
 extends RefCounted
 
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
@@ -139,10 +139,11 @@ static func required_xp_for_level(skill_id: String, target_level: int) -> float:
 	if skill.is_empty():
 		return 1.0
 	var training: Dictionary = config().get("training", {}) as Dictionary
-	var multipliers: Array = training.get("levelMultipliers", [1, 2, 4, 8, 16]) as Array
+	var base: Dictionary = training.get("base", {}) as Dictionary
+	var multipliers: Array = base.get("levelMultipliers", [1, 2, 4, 8, 16]) as Array
 	var level_index := clampi(target_level - 1, 0, multipliers.size() - 1)
 	var rank := maxf(1.0, float(skill.get("rank", 1)))
-	var base_points := maxf(1.0, float(training.get("basePoints", 250)))
+	var base_points := maxf(1.0, float(base.get("basePoints", 250)))
 	return base_points * rank * float(multipliers[level_index])
 
 
@@ -195,9 +196,9 @@ static func node_display_state(
 
 static func _attr_value(attr_id: String, foundations: Dictionary, aptitudes: Dictionary) -> float:
 	match attr_id:
-		CharacterStatsScript.BODY, CharacterStatsScript.SENSE, CharacterStatsScript.SPIRIT, CharacterStatsScript.AGILITY:
+		EnumPlayerAttr.BODY, EnumPlayerAttr.SENSE, EnumPlayerAttr.SPIRIT, EnumPlayerAttr.AGILITY:
 			return float(foundations.get(attr_id, 0.0))
-		CharacterStatsScript.COMPREHENSION, CharacterStatsScript.WILL, CharacterStatsScript.FORTUNE:
+		EnumPlayerAttr.COMPREHENSION, EnumPlayerAttr.WILL, EnumPlayerAttr.FORTUNE:
 			return float(aptitudes.get(attr_id, 0.0))
 		_:
 			return 0.0

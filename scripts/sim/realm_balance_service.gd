@@ -6,19 +6,19 @@ extends RefCounted
 const PATH := "res://data/exportjson/yunxing_params/jingjie_balance.json"
 
 const DEFAULT_ATTRIBUTE_FORMULA := {
-	ZhandouAttr.HP_MAX: {"base": 80.0, "scale": {"roushen": 10.0}},
-	ZhandouAttr.MP_MAX: {"base": 80.0, "scale": {"lingli": 5.0}},
-	ZhandouAttr.PHYSICAL_ATK: {"base": 0.0, "scale": {"roushen": 2.5}},
-	ZhandouAttr.MAGIC_ATK: {"base": 0.0, "scale": {"lingli": 2.3, "shenshi": 0.5}},
-	ZhandouAttr.PHYSICAL_DEF: {"base": 0.0, "scale": {"roushen": 1.2}},
-	ZhandouAttr.MAGIC_DEF: {"base": 0.0, "scale": {"lingli": 1.1, "shenshi": 0.8}},
-	ZhandouAttr.SPD: {"base": 100.0, "scale": {"shenfa": 2.0, "shenshi": 0.5}},
-	ZhandouAttr.CONTROL_POWER: {"base": 0.0, "scale": {"shenshi": 1.6, "lingli": 0.5}},
-	ZhandouAttr.CONTROL_RESIST: {"base": 0.0, "scale": {"roushen": 1.0, "shenshi": 1.2}},
-	ZhandouAttr.HP_REGEN: {"base": 0.5, "scale": {"roushen": 0.05}},
-	ZhandouAttr.MP_REGEN: {"base": 0.5, "scale": {"lingli": 0.04, "shenshi": 0.01}},
-	ZhandouAttr.CARRY: {"base": 20.0, "scale": {"roushen": 2.0}},
-	ZhandouAttr.SHIELD: {"base": 0.0, "scale": {}},
+	EnumPlayerAttr.HP_MAX: {"base": 80.0, "scale": {"roushen": 10.0}},
+	EnumPlayerAttr.MP_MAX: {"base": 80.0, "scale": {"lingli": 5.0}},
+	EnumPlayerAttr.PHYSICAL_ATK: {"base": 0.0, "scale": {"roushen": 2.5}},
+	EnumPlayerAttr.MAGIC_ATK: {"base": 0.0, "scale": {"lingli": 2.3, "shenshi": 0.5}},
+	EnumPlayerAttr.PHYSICAL_DEF: {"base": 0.0, "scale": {"roushen": 1.2}},
+	EnumPlayerAttr.MAGIC_DEF: {"base": 0.0, "scale": {"lingli": 1.1, "shenshi": 0.8}},
+	EnumPlayerAttr.SPD: {"base": 100.0, "scale": {"shenfa": 2.0, "shenshi": 0.5}},
+	EnumPlayerAttr.CONTROL_POWER: {"base": 0.0, "scale": {"shenshi": 1.6, "lingli": 0.5}},
+	EnumPlayerAttr.CONTROL_RESIST: {"base": 0.0, "scale": {"roushen": 1.0, "shenshi": 1.2}},
+	EnumPlayerAttr.HP_REGEN: {"base": 0.5, "scale": {"roushen": 0.05}},
+	EnumPlayerAttr.MP_REGEN: {"base": 0.5, "scale": {"lingli": 0.04, "shenshi": 0.01}},
+	EnumPlayerAttr.CARRY: {"base": 20.0, "scale": {"roushen": 2.0}},
+	EnumPlayerAttr.SHIELD: {"base": 0.0, "scale": {}},
 }
 
 const LEGACY_FOUNDATION_KEYS := {
@@ -212,9 +212,9 @@ static func build_standard_player_attrs(profile_id: String, include_realm: bool 
 	var foundations_v: Variant = row.get("foundations", {})
 	var foundations := foundations_v as Dictionary if foundations_v is Dictionary else {}
 	var attrs := build_base_combat_attrs(foundations)
-	for key in ZhandouAttr.ALL_KEYS:
+	for key in EnumPlayerAttr.ALL_COMBAT_KEYS:
 		if not attrs.has(key):
-			attrs[key] = ZhandouAttr.get_attr(ZhandouAttr.TEST_DEFAULTS, key, 0.0)
+			attrs[key] = ZhandouAttr.get_attr(EnumPlayerAttr.COMBAT_DEFAULTS, key, 0.0)
 	return attrs
 
 
@@ -247,7 +247,7 @@ static func collect_config_errors(simulation_realms: Array = []) -> PackedString
 			errors.append("simulation.realm %s 引用了未配置的大境界 %s" % [
 				str((realm_v as Dictionary).get("id", "")), major,
 			])
-	for stat in [ZhandouAttr.HP_MAX, ZhandouAttr.MP_MAX, ZhandouAttr.PHYSICAL_ATK, ZhandouAttr.MAGIC_ATK, ZhandouAttr.PHYSICAL_DEF, ZhandouAttr.MAGIC_DEF, ZhandouAttr.SPD]:
+	for stat in [EnumPlayerAttr.HP_MAX, EnumPlayerAttr.MP_MAX, EnumPlayerAttr.PHYSICAL_ATK, EnumPlayerAttr.MAGIC_ATK, EnumPlayerAttr.PHYSICAL_DEF, EnumPlayerAttr.MAGIC_DEF, EnumPlayerAttr.SPD]:
 		if not _formula_table().has(stat):
 			errors.append("combat_attribute_formula 缺少核心属性 %s" % stat)
 	for key in ["normal", "elite", "boss"]:

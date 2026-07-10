@@ -10,17 +10,7 @@
       "magic",
       "lightning"
     ],
-    "effects": [
-      {
-        "type": "damage",
-        "damage_type": "magic",
-        "value": 18,
-        "scaling": {
-          "magic_atk": 1.8
-        },
-        "target": "enemy"
-      }
-    ]
+    "effects": "[{\"type\": \"damage\", \"damage_type\": \"magic\", \"value\": 18, \"scaling\": {\"magic_atk\": 1.8}, \"target\": \"enemy\"}]"
   },
   "5002": {
     "key": "5002",
@@ -34,16 +24,7 @@
       "shield",
       "ice"
     ],
-    "effects": [
-      {
-        "type": "shield",
-        "value": 12,
-        "scaling": {
-          "magic_atk": 0.9
-        },
-        "target": "self"
-      }
-    ]
+    "effects": "[{\"type\": \"shield\", \"value\": 12, \"scaling\": {\"magic_atk\": 0.9}, \"target\": \"self\"}]"
   },
   "5003": {
     "key": "5003",
@@ -57,25 +38,6 @@
       "fire",
       "control"
     ],
-    "effects": [
-      {
-        "type": "damage",
-        "damage_type": "magic",
-        "value": 8,
-        "scaling": {
-          "magic_atk": 0.8
-        },
-        "target": "enemy"
-      },
-      {
-        "type": "buff",
-        "modifiers": {
-          "buff_dot": 1
-        },
-        "control": true,
-        "control_chance": 0.75,
-        "target": "enemy"
-      }
-    ]
+    "effects": "[{\"type\": \"damage\", \"damage_type\": \"magic\", \"value\": 8, \"scaling\": {\"magic_atk\": 0.8}, \"target\": \"enemy\"}, {\"type\": \"buff\", \"modifiers\": {\"buff_dot\": 1}, \"control\": true, \"control_chance\": 0.75, \"target\": \"enemy\"}]"
   }
 }

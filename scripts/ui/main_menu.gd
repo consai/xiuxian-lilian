@@ -13,8 +13,9 @@ func _ready() -> void:
 
 
 func _on_start_pressed() -> void:
-	GameState.new_game()
-	_enter_game()
+	var result: Dictionary = SceneManager.go_character_creation()
+	if not bool(result.get("ok", false)):
+		_set_message(str(result.get("error", "进入新建角色失败")))
 
 
 func _on_load_pressed() -> void:

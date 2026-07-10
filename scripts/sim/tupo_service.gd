@@ -1,4 +1,4 @@
-class_name TupoService
+﻿class_name TupoService
 extends RefCounted
 
 const RULES_PATH := "res://data/exportjson/yunxing_params/tupo_rules.json"
@@ -249,7 +249,7 @@ static func _compute_component_detail(savedata: Dictionary, transition: Dictiona
 	for key in foundations.keys():
 		foundation_avg += float(foundations[key])
 	foundation_avg /= maxf(1.0, float(foundations.size()))
-	var roots_v: Variant = aptitudes.get(CharacterStatsScript.ROOTS, {})
+	var roots_v: Variant = aptitudes.get(EnumPlayerAttr.ROOTS, {})
 	var root_peak := 0.0
 	if roots_v is Dictionary:
 		for value in (roots_v as Dictionary).values():
@@ -259,7 +259,7 @@ static func _compute_component_detail(savedata: Dictionary, transition: Dictiona
 	var foundation_points := int(round(foundation_avg * foundation_weight))
 	var roots_points := int(round(root_peak * roots_weight))
 	var aptitude_points := foundation_points + roots_points
-	var fortune_value := float(aptitudes.get(CharacterStatsScript.FORTUNE, 0.0))
+	var fortune_value := float(aptitudes.get(EnumPlayerAttr.FORTUNE, 0.0))
 	var fortune_unit := float(cfg.get("fortune_points_per_unit", 8))
 	var fortune_points := int(round(fortune_value * fortune_unit))
 	var method_slots: Dictionary = savedata.get("cultivation_method_slots", {}) as Dictionary

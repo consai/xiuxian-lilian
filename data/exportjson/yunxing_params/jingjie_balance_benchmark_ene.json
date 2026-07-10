@@ -1,44 +1,14 @@
 {
   "lianqi_normal": {
     "key": "lianqi_normal",
-    "attrs": {
-      "hp_max": 230,
-      "mp_max": 40,
-      "physical_atk": 17.5,
-      "magic_atk": 20,
-      "physical_def": 16,
-      "magic_def": 19,
-      "spd": 92,
-      "control_power": 50,
-      "control_resist": 60
-    }
+    "attrs": "{\"hp_max\": 230, \"mp_max\": 40, \"physical_atk\": 17.5, \"magic_atk\": 20, \"physical_def\": 16, \"magic_def\": 19, \"spd\": 92, \"control_power\": 50, \"control_resist\": 60}"
   },
   "lianqi_elite": {
     "key": "lianqi_elite",
-    "attrs": {
-      "hp_max": 260,
-      "mp_max": 80,
-      "physical_atk": 19,
-      "magic_atk": 22,
-      "physical_def": 18,
-      "magic_def": 22,
-      "spd": 98,
-      "control_power": 80,
-      "control_resist": 90
-    }
+    "attrs": "{\"hp_max\": 260, \"mp_max\": 80, \"physical_atk\": 19, \"magic_atk\": 22, \"physical_def\": 18, \"magic_def\": 22, \"spd\": 98, \"control_power\": 80, \"control_resist\": 90}"
   },
   "zhuji_normal": {
     "key": "zhuji_normal",
-    "attrs": {
-      "hp_max": 310,
-      "mp_max": 100,
-      "physical_atk": 34,
-      "magic_atk": 38,
-      "physical_def": 26,
-      "magic_def": 31,
-      "spd": 108,
-      "control_power": 105,
-      "control_resist": 110
-    }
+    "attrs": "{\"hp_max\": 310, \"mp_max\": 100, \"physical_atk\": 34, \"magic_atk\": 38, \"physical_def\": 26, \"magic_def\": 31, \"spd\": 108, \"control_power\": 105, \"control_resist\": 110}"
   }
 }

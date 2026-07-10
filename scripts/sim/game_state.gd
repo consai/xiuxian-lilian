@@ -1,4 +1,4 @@
-extends Node
+﻿extends Node
 
 const SIM_PATH := "res://data/exportjson/yunxing_params/moni.json"
 const HUB_SCENE := "res://scenes/sim/dongfu.tscn"
@@ -144,7 +144,7 @@ func _bootstrap_savedata() -> void:
 	pass
 
 
-func new_game() -> void:
+func new_game(profile: Dictionary = {}) -> void:
 	DataStore.reset_all()
 	DataStore.start_tutorial()
 	var root := JsonLoader.load_moni_bundle()
@@ -161,8 +161,8 @@ func new_game() -> void:
 	foundations = initial.get("attrs", initial.get("foundations", CharacterStats.default_foundations())) as Dictionary
 	aptitudes = initial.get("linggen", initial.get("aptitudes", CharacterStats.default_aptitudes())) as Dictionary
 	refresh_derived_attrs(false)
-	hp = float(attrs.get(ZhandouAttr.HP_MAX, 100.0))
-	mp = float(attrs.get(ZhandouAttr.MP_MAX, 100.0))
+	hp = float(attrs.get(EnumPlayerAttr.HP_MAX, 100.0))
+	mp = float(attrs.get(EnumPlayerAttr.MP_MAX, 100.0))
 	unlocked_abilities = _initial_ability_ids(initial)
 	equipped_abilities = _initial_equipped_abilities(initial, unlocked_abilities)
 	unlocked_methods = _initial_method_ids(initial)
@@ -193,10 +193,30 @@ func new_game() -> void:
 	last_settled_lilian_id = ""
 	active_save_slot = 0
 	DataStore.savedata = DataStore.coalesce_savedata(DataStore.savedata)
+	_apply_character_profile(profile)
 	if LilianState != null and LilianState.has_method("reset"):
 		LilianState.reset()
 	_initialize_map_state()
 	_sync_realm()
+
+
+func _apply_character_profile(profile: Dictionary) -> void:
+	if profile.is_empty():
+		return
+	var name := str(profile.get("player_name", "")).strip_edges()
+	if name != "":
+		player_name = name
+	DataStore.savedata["character_origin_id"] = str(profile.get("origin_id", ""))
+	DataStore.savedata["character_root_id"] = str(profile.get("root_id", ""))
+	DataStore.savedata["character_talent_id"] = str(profile.get("talent_id", ""))
+	var root_id := str(profile.get("root_id", "")).strip_edges()
+	if root_id != "":
+		var next_aptitudes := aptitudes.duplicate(true)
+		next_aptitudes[EnumPlayerAttr.ROOTS] = {root_id: 80.0}
+		aptitudes = next_aptitudes
+		refresh_derived_attrs(false)
+		hp = float(attrs.get(EnumPlayerAttr.HP_MAX, 100.0))
+		mp = float(attrs.get(EnumPlayerAttr.MP_MAX, 100.0))
 
 
 func _initial_ability_ids(initial: Dictionary) -> Array:
@@ -644,7 +664,7 @@ func preview_cultivation_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, 
 		"pill_ids": pill_ids,
 		"pill_count": pill_ids.size(),
 		"pill_id": resolved_pill_id,
-		"instability_gain": _cultivation_pill_instability_total(pill_ids) if EnumXiulianMode.is_pill_mode(mode_id) else 0,
+		"instability_gain": 0,
 		"cultivation_instability": cultivation_instability,
 	}
 
@@ -671,7 +691,6 @@ func cultivate_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, days: int 
 			var active_pill_id := str(pill_ids[int(day_index / GameTimeService.days_per_month())])
 			if day_index % GameTimeService.days_per_month() == 0:
 				InventoryService.remove_item(inventory, active_pill_id, 1)
-				cultivation_instability += cultivation_pill_instability(active_pill_id)
 			raw_gain = cultivation_pill_daily_gain(active_pill_id) + method_base_gain
 		else:
 			var multiplier := float(mode["cultivation_multiplier"])
@@ -769,25 +788,11 @@ func cultivation_pill_daily_gain(item_id: String) -> int:
 	return RealmBalanceService.cultivation_pill_daily_gain(cultivation_pill_gain(item_id))
 
 
-func cultivation_pill_instability(item_id: String) -> int:
-	var def := ConfigManager.item_def_by_id(item_id)
-	if def == null:
-		return 0
-	return maxi(0, int(round(def.get_use_effect_amount("instability"))))
-
-
 func cultivation_pill_rank(item_id: String) -> int:
 	var def := ConfigManager.item_def_by_id(item_id)
 	if def == null:
 		return 0
 	return def.quality * 1000 + cultivation_pill_gain(item_id)
-
-
-func _cultivation_pill_instability_total(pill_ids: Array) -> int:
-	var total := 0
-	for pill_id_v in pill_ids:
-		total += cultivation_pill_instability(str(pill_id_v))
-	return total
 
 
 func _cultivation_pill_count(days: int) -> int:
@@ -796,8 +801,8 @@ func _cultivation_pill_count(days: int) -> int:
 
 
 func rest() -> void:
-	hp = float(attrs.get(ZhandouAttr.HP_MAX, 100.0))
-	mp = float(attrs.get(ZhandouAttr.MP_MAX, 100.0))
+	hp = float(attrs.get(EnumPlayerAttr.HP_MAX, 100.0))
+	mp = float(attrs.get(EnumPlayerAttr.MP_MAX, 100.0))
 	injury_days = maxi(0, injury_days - maxi(0, int(_activity_cfg("rest").get("injury_recovery", 2))))
 	_finish_activity("休息：恢复气血与法力", false)
 
@@ -972,8 +977,8 @@ func breakthrough() -> Dictionary:
 
 func _apply_breakthrough_vitals() -> void:
 	refresh_derived_attrs(false)
-	hp = float(attrs.get(ZhandouAttr.HP_MAX, 100.0))
-	mp = float(attrs.get(ZhandouAttr.MP_MAX, 100.0))
+	hp = float(attrs.get(EnumPlayerAttr.HP_MAX, 100.0))
+	mp = float(attrs.get(EnumPlayerAttr.MP_MAX, 100.0))
 
 
 func _breakthrough_result_dict(old_name: String, service_result: Dictionary) -> Dictionary:
@@ -1118,7 +1123,7 @@ func settle_lilian(result: Dictionary) -> Dictionary:
 	mp = float(result.get("mp", mp))
 	if exit_reason == "defeated":
 		var rules := LilianRulesService.rules()
-		hp = maxf(hp, float(attrs.get(ZhandouAttr.HP_MAX, 100.0)) * float(rules.get("defeat_hp_floor_ratio", 0.25)))
+		hp = maxf(hp, float(attrs.get(EnumPlayerAttr.HP_MAX, 100.0)) * float(rules.get("defeat_hp_floor_ratio", 0.25)))
 		injury_days = maxi(injury_days, int(rules.get("defeat_injury_days", 3)))
 	elif exit_reason == "fled":
 		var fled_rules := LilianRulesService.rules()
@@ -1215,8 +1220,8 @@ func apply_dict(data: Dictionary) -> bool:
 		return false
 	refresh_derived_attrs(true)
 	var attrs_dict := attrs
-	hp = clampf(hp, 0.0, float(attrs_dict.get(ZhandouAttr.HP_MAX, 100.0)))
-	mp = clampf(mp, 0.0, float(attrs_dict.get(ZhandouAttr.MP_MAX, 100.0)))
+	hp = clampf(hp, 0.0, float(attrs_dict.get(EnumPlayerAttr.HP_MAX, 100.0)))
+	mp = clampf(mp, 0.0, float(attrs_dict.get(EnumPlayerAttr.MP_MAX, 100.0)))
 	if Engine.get_main_loop() is SceneTree:
 		var lilian := (Engine.get_main_loop() as SceneTree).root.get_node_or_null("LilianState")
 		if lilian != null and lilian.has_method("reset"):
@@ -1227,8 +1232,8 @@ func apply_dict(data: Dictionary) -> bool:
 
 
 func refresh_derived_attrs(preserve_vital_ratio: bool = true) -> void:
-	var old_hp_max := maxf(1.0, float(attrs.get(ZhandouAttr.HP_MAX, 100.0)))
-	var old_mp_max := maxf(1.0, float(attrs.get(ZhandouAttr.MP_MAX, 100.0)))
+	var old_hp_max := maxf(1.0, float(attrs.get(EnumPlayerAttr.HP_MAX, 100.0)))
+	var old_mp_max := maxf(1.0, float(attrs.get(EnumPlayerAttr.MP_MAX, 100.0)))
 	var hp_ratio := clampf(hp / old_hp_max, 0.0, 1.0)
 	var mp_ratio := clampf(mp / old_mp_max, 0.0, 1.0)
 	var method_mods := XiulianMethodService.build_modifiers(
@@ -1247,8 +1252,8 @@ func refresh_derived_attrs(preserve_vital_ratio: bool = true) -> void:
 		next_attrs[stat] = ZhandouAttr.get_attr(next_attrs, stat) * (1.0 + float(percent_mods[key]))
 	attrs = CharacterStats.finalize_combat_attrs(next_attrs)
 	if preserve_vital_ratio:
-		hp = float(attrs.get(ZhandouAttr.HP_MAX, 100.0)) * hp_ratio
-		mp = float(attrs.get(ZhandouAttr.MP_MAX, 100.0)) * mp_ratio
+		hp = float(attrs.get(EnumPlayerAttr.HP_MAX, 100.0)) * hp_ratio
+		mp = float(attrs.get(EnumPlayerAttr.MP_MAX, 100.0)) * mp_ratio
 
 
 func major_realm_id() -> String:
@@ -1314,11 +1319,46 @@ func use_inventory_item(item_id: String) -> Dictionary:
 		result = use_learning_book(iid)
 	elif _has_alchemy_mastery_effect(def):
 		result = _use_alchemy_mastery_notes(iid, def)
+	elif _has_attrs_effect(def):
+		result = _use_attrs_effect(iid, def)
 	else:
 		return {"ok": false, "error": "该物品无法直接使用"}
 	if bool(result.get("ok", false)):
 		DataEvents.emit_inventory_changed()
 	return result
+
+
+func _has_attrs_effect(def: ItemDef) -> bool:
+	for row_v in def.use_effect:
+		if not row_v is Dictionary:
+			continue
+		if str((row_v as Dictionary).get("op", "")).strip_edges().to_lower() == "attrs":
+			return true
+	return false
+
+
+func _use_attrs_effect(item_id: String, def: ItemDef) -> Dictionary:
+	var applied: Array = []
+	for row_v in def.use_effect:
+		if not row_v is Dictionary:
+			continue
+		var row := row_v as Dictionary
+		if str(row.get("op", "")).strip_edges().to_lower() != "attrs":
+			continue
+		var args_v: Variant = row.get("args", [])
+		if not (args_v is Array) or (args_v as Array).size() < 2:
+			continue
+		var args := args_v as Array
+		var attr_key := str(args[0]).strip_edges()
+		var delta := float(args[1])
+		if attr_key == "" or delta == 0.0:
+			continue
+		attrs[attr_key] = ZhandouAttr.get_attr(attrs, attr_key, 0.0) + delta
+		applied.append({"attr": attr_key, "delta": delta})
+	if applied.is_empty():
+		return {"ok": false, "error": "无有效的属性修改"}
+	InventoryService.remove_item(inventory, item_id, 1)
+	return {"ok": true, "attrs": applied, "feedback": "属性已变化"}
 
 
 func use_learning_book(item_id: String) -> Dictionary:

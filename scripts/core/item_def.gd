@@ -12,7 +12,7 @@ var secondary_type: String = ""
 var quality: int = 1
 var tier: int = 1
 var desc: String = ""
-var stackable: bool = true
+var stackable: int = 1
 var max_stack: int = 999
 ## 灵石基准价（收购参考）；未配置则为 0，部分商店不出价收购。
 var base_ling_shi: int = 0
@@ -133,7 +133,7 @@ static func from_dict(data: Dictionary) -> ItemDef:
 		push_error("ItemDef.from_dict: invalid tier %s in %s" % [str(data.get("tier")), item.id])
 		return null
 	item.desc = str(data.get("desc", ""))
-	item.stackable = bool(data.get("stackable", true))
+	item.stackable = int(data.get("stackable", 1))
 	item.max_stack = maxi(1, int(data.get("max_stack", 999)))
 	item.base_ling_shi = maxi(0, int(data.get("ling_shi", data.get("base_ling_shi", 0))))
 	item.icon_path = str(data.get("icon", data.get("icon_path", data.get("tuBiao", "")))).strip_edges()
@@ -152,6 +152,6 @@ static func from_dict(data: Dictionary) -> ItemDef:
 	item.fight_mp_cost = maxf(0.0, float(data.get("fight_mp_cost", data.get("mp_cost", 0.0))))
 	item.learn_ability_id = str(data.get("learn_ability_id", "")).strip_edges()
 	item.learn_method_id = str(data.get("learn_method_id", "")).strip_edges()
-	if not item.stackable:
+	if item.stackable == 0:
 		item.max_stack = 1
 	return item

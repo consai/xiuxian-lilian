@@ -1,4 +1,4 @@
-class_name LilianDataValidator
+﻿class_name LilianDataValidator
 extends RefCounted
 
 const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
@@ -14,7 +14,7 @@ static func collect_errors(game_state: Node = null) -> PackedStringArray:
 		var location_id := str(location.get("id", ""))
 		errors.append_array(_validate_location(location, location_id))
 		for event_id_v in location.get("event_pool", []) as Array:
-			var event_id := str(event_id_v)
+			var event_id := _extract_event_id(event_id_v)
 			var event := _static_event_by_id(event_id)
 			if event.is_empty():
 				errors.append("地点 %s 引用了不存在的事件 %s" % [location_id, event_id])
@@ -68,7 +68,7 @@ static func _validate_location_node_support(location: Dictionary, location_id: S
 	var errors: PackedStringArray = []
 	var supported_types := {}
 	for event_id_v in location.get("event_pool", []) as Array:
-		var event := _static_event_by_id(str(event_id_v))
+		var event := _static_event_by_id(_extract_event_id(event_id_v))
 		if event.is_empty():
 			continue
 		var event_type := str(event.get("type", "")).strip_edges()
@@ -160,9 +160,9 @@ static func _validate_monster(monster: Dictionary, monster_id: String) -> Packed
 				errors.append("怪物 %s 引用了未知技能 %d" % [monster_id, sid])
 	var attrs := (LilianEventServiceScript.build_battle_enemy({"enemy": monster}).get("attrs", {}) as Dictionary)
 	for key in [
-		ZhandouAttr.PHYSICAL_ATK, ZhandouAttr.MAGIC_ATK,
-		ZhandouAttr.PHYSICAL_DEF, ZhandouAttr.MAGIC_DEF,
-		ZhandouAttr.CONTROL_POWER, ZhandouAttr.CONTROL_RESIST,
+		EnumPlayerAttr.PHYSICAL_ATK, EnumPlayerAttr.MAGIC_ATK,
+		EnumPlayerAttr.PHYSICAL_DEF, EnumPlayerAttr.MAGIC_DEF,
+		EnumPlayerAttr.CONTROL_POWER, EnumPlayerAttr.CONTROL_RESIST,
 	]:
 		if not attrs.has(key):
 			errors.append("怪物 %s 缺少首版属性 %s" % [monster_id, key])
@@ -234,9 +234,9 @@ static func _validate_v1_enemy_attrs(event: Dictionary, event_id: String) -> Pac
 	if enemy.is_empty() or attrs.is_empty():
 		return errors
 	for key in [
-		ZhandouAttr.PHYSICAL_ATK, ZhandouAttr.MAGIC_ATK,
-		ZhandouAttr.PHYSICAL_DEF, ZhandouAttr.MAGIC_DEF,
-		ZhandouAttr.CONTROL_POWER, ZhandouAttr.CONTROL_RESIST,
+		EnumPlayerAttr.PHYSICAL_ATK, EnumPlayerAttr.MAGIC_ATK,
+		EnumPlayerAttr.PHYSICAL_DEF, EnumPlayerAttr.MAGIC_DEF,
+		EnumPlayerAttr.CONTROL_POWER, EnumPlayerAttr.CONTROL_RESIST,
 	]:
 		if not attrs.has(key):
 			errors.append("事件 %s 的敌人缺少首版属性 %s" % [event_id, key])
@@ -260,13 +260,13 @@ static func _build_sample_battle_init(event: Dictionary, game_state: Node) -> Di
 			"hp": 100.0,
 			"mp": 100.0,
 			"attrs": ZhandouAttr.from_stat_block({
-				ZhandouAttr.HP_MAX: 100.0,
-				ZhandouAttr.MP_MAX: 100.0,
-				ZhandouAttr.PHYSICAL_ATK: 100.0,
-				ZhandouAttr.MAGIC_ATK: 100.0,
-				ZhandouAttr.PHYSICAL_DEF: 100.0,
-				ZhandouAttr.MAGIC_DEF: 100.0,
-				ZhandouAttr.SPD: 100.0,
+				EnumPlayerAttr.HP_MAX: 100.0,
+				EnumPlayerAttr.MP_MAX: 100.0,
+				EnumPlayerAttr.PHYSICAL_ATK: 100.0,
+				EnumPlayerAttr.MAGIC_ATK: 100.0,
+				EnumPlayerAttr.PHYSICAL_DEF: 100.0,
+				EnumPlayerAttr.MAGIC_DEF: 100.0,
+				EnumPlayerAttr.SPD: 100.0,
 			}),
 			"skills": [{"id": 0, "cd": 0.0}, {"id": -1, "cd": 0.0}, {"id": -1, "cd": 0.0}, {"id": -1, "cd": 0.0}, {"id": -1, "cd": 0.0}],
 			"items": [],
@@ -346,6 +346,12 @@ static func _validate_decision_event(event: Dictionary, event_id: String, locati
 			if result_v is Dictionary:
 				errors.append_array(_validate_result(result_v as Dictionary, "抉择事件 %s option %s" % [event_id, oid], location))
 	return errors
+
+
+static func _extract_event_id(entry_v: Variant) -> String:
+	if entry_v is Dictionary:
+		return str((entry_v as Dictionary).get("id", ""))
+	return str(entry_v)
 
 
 static func _config_manager() -> Node:

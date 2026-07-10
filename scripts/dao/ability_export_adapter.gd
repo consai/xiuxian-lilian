@@ -110,6 +110,7 @@ static func _normalize_zhandou_passive_row(raw: Dictionary) -> Dictionary:
 		tags = ZhandouEffectCodec.split_csv_tags(raw.get("tag"))
 	elif raw.has("tags"):
 		tags = ZhandouEffectCodec.split_csv_tags(raw.get("tags"))
+	var cooldown_v: Variant = raw.get("cd", 0.0)
 	return {
 		"id": ability_id,
 		"name": str(raw.get("name", ability_id)),
@@ -121,7 +122,7 @@ static func _normalize_zhandou_passive_row(raw: Dictionary) -> Dictionary:
 		"combat": {
 			"target": EnumZhandouTarget.LABEL_SELF,
 			"castTime": 0.0,
-			"cooldown": float(raw.get("cd", 0.0)),
+			"cooldown": float(cooldown_v) if cooldown_v != null else 0.0,
 			"costs": [],
 			"upkeepCostsPerSecond": [],
 			"activation": "learned",

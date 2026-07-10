@@ -1,4 +1,4 @@
-extends Control
+﻿extends Control
 
 @onready var _realm_label: Label = %RealmLabel
 @onready var _status_label: Label = %StatusLabel
@@ -50,8 +50,8 @@ func _connect_actions() -> void:
 
 
 func _refresh(message: String = "") -> void:
-	var hp_max := float(GameState.attrs.get(ZhandouAttr.HP_MAX, 100.0))
-	var mp_max := float(GameState.attrs.get(ZhandouAttr.MP_MAX, 100.0))
+	var hp_max := float(GameState.attrs.get(EnumPlayerAttr.HP_MAX, 100.0))
+	var mp_max := float(GameState.attrs.get(EnumPlayerAttr.MP_MAX, 100.0))
 	_realm_label.text = "%s · 修为 %d/%d" % [
 		GameState.realm_name, GameState.cultivation, GameState.breakthrough_at
 	]

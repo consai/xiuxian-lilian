@@ -15,9 +15,7 @@
     "op": "tween",
     "actor": "caster",
     "prop": "position",
-    "to": {
-      "anchor": "recoil"
-    },
+    "to": "{\"anchor\": \"recoil\"}",
     "duration_key": "ranged.recoil_duration",
     "trans_key": "ranged.recoil_trans",
     "ease_key": "ranged.recoil_ease",
@@ -28,9 +26,7 @@
     "op": "tween",
     "actor": "caster",
     "prop": "position",
-    "to": {
-      "anchor": "release"
-    },
+    "to": "{\"anchor\": \"release\"}",
     "duration_key": "ranged.release_duration",
     "trans_key": "ranged.release_trans",
     "ease_key": "ranged.release_ease",
@@ -45,22 +41,6 @@
     "duration_key": null,
     "trans_key": null,
     "ease_key": null,
-    "steps": [
-      {
-        "op": "tween",
-        "actor": "caster",
-        "prop": "position",
-        "to": {
-          "anchor": "rest"
-        },
-        "duration_key": "ranged.settle_duration",
-        "trans_key": "ranged.settle_trans",
-        "ease_key": "ranged.settle_ease"
-      },
-      {
-        "op": "resume_idle",
-        "actor": "caster"
-      }
-    ]
+    "steps": "[{\"op\": \"tween\", \"actor\": \"caster\", \"prop\": \"position\", \"to\": {\"anchor\": \"rest\"}, \"duration_key\": \"ranged.settle_duration\", \"trans_key\": \"ranged.settle_trans\", \"ease_key\": \"ranged.settle_ease\"}, {\"op\": \"resume_idle\", \"actor\": \"caster\"}]"
   }
 }

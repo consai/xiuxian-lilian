@@ -301,7 +301,7 @@ static func _build_generated_learning_book(
 			EnumQuality.Type.SUPREME
 		),
 		"tier": EnumItemTier.clamp_tier(int(source_row.get("tier", template.get("tier", 1)))),
-		"stackable": bool(template.get("stackable", true)),
+		"stackable": int(template.get("stackable", 1)),
 		"max_stack": maxi(1, int(template.get("max_stack", 9))),
 		"desc": StringsZh.format_template(
 			str(template.get("desc_template", "研读后习得{name}。")),
@@ -588,9 +588,7 @@ static func load_xiulian_methods_bundle() -> Dictionary:
 
 
 static func load_abilities_bundle() -> Dictionary:
-	var bundle := _export_settings(export_path("jineng.json"))
-	bundle["metadata"] = _export_settings(export_path("jineng_metadata.json"))
-	bundle["rules"] = _export_settings(export_path("jineng_rules.json"))
+	var bundle: Dictionary = {}
 	var merged: Array = []
 	var tables_out: Dictionary = {}
 	# 分表路径以 EnumSkill 为准，不再读独立 abilityTables 配置文件。
@@ -604,9 +602,6 @@ static func load_abilities_bundle() -> Dictionary:
 	bundle["abilityTables"] = tables
 	bundle["tables"] = tables_out
 	bundle["abilities"] = merged
-	var meta_v: Variant = bundle.get("metadata", {})
-	if meta_v is Dictionary:
-		(meta_v as Dictionary)["abilityCount"] = merged.size()
 	return bundle
 
 

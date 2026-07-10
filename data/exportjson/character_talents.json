@@ -1,0 +1,32 @@
+{
+  "clear_sword_heart": {
+    "id": "clear_sword_heart",
+    "name": "剑心通明",
+    "description": "天生剑感，出手更易命中要害",
+    "effectKey": "crit_rate_pct",
+    "effectValue": 0.1,
+    "iconPath": "res://assets/art/ui_new/jian.png",
+    "sortOrder": 10,
+    "enabled": true
+  },
+  "earth_fate": {
+    "id": "earth_fate",
+    "name": "厚土命格",
+    "description": "命格沉稳，开战时获得护盾",
+    "effectKey": "opening_shield_pct",
+    "effectValue": 0.15,
+    "iconPath": "res://assets/art/ui_new/hudun_icon.png",
+    "sortOrder": 20,
+    "enabled": true
+  },
+  "breakthrough_prodigy": {
+    "id": "breakthrough_prodigy",
+    "name": "破境之才",
+    "description": "悟性过人，修为积累更快",
+    "effectKey": "cultivation_gain_pct",
+    "effectValue": 0.1,
+    "iconPath": "res://assets/art/ui_new/fulu.png",
+    "sortOrder": 30,
+    "enabled": true
+  }
+}

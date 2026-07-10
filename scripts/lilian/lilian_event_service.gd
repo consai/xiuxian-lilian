@@ -1,4 +1,4 @@
-class_name LilianEventService
+﻿class_name LilianEventService
 extends RefCounted
 
 const LilianRulesServiceScript := preload("res://scripts/lilian/lilian_rules_service.gd")
@@ -26,7 +26,13 @@ static func by_id(event_id: String) -> Dictionary:
 static func event_pool_for_location(location: Dictionary) -> Array:
 	var pool: Array = []
 	for event_id_v in location.get("event_pool", []) as Array:
-		var event_id := str(event_id_v)
+		var event_id := ""
+		if event_id_v is Dictionary:
+			event_id = str((event_id_v as Dictionary).get("id", ""))
+		else:
+			event_id = str(event_id_v)
+		if event_id == "":
+			continue
 		var event := by_id(event_id)
 		if not event.is_empty():
 			pool.append(event)
@@ -514,12 +520,12 @@ static func _normalize_battle_enemy(enemy_src: Dictionary) -> Dictionary:
 	else:
 		attrs = CharacterStatsScript.finalize_combat_attrs(attrs)
 	enemy["attrs"] = attrs
-	if attrs.has(ZhandouAttr.HP_MAX):
-		enemy["hp"] = float(attrs[ZhandouAttr.HP_MAX])
+	if attrs.has(EnumPlayerAttr.HP_MAX):
+		enemy["hp"] = float(attrs[EnumPlayerAttr.HP_MAX])
 	elif enemy.has("hp"):
 		enemy["hp"] = float(enemy["hp"])
-	if attrs.has(ZhandouAttr.MP_MAX):
-		enemy["mp"] = float(attrs[ZhandouAttr.MP_MAX])
+	if attrs.has(EnumPlayerAttr.MP_MAX):
+		enemy["mp"] = float(attrs[EnumPlayerAttr.MP_MAX])
 	elif enemy.has("mp"):
 		enemy["mp"] = float(enemy["mp"])
 	var enemy_skills: Array = []
@@ -559,20 +565,20 @@ static func _scale_enemy_for_difficulty_and_group(
 	var enemy := base.duplicate(true)
 	var attrs := (enemy.get("attrs", {}) as Dictionary).duplicate(true)
 	var difficulty_scale := _enemy_difficulty_scale(event)
-	if attrs.has(ZhandouAttr.HP_MAX):
-		attrs[ZhandouAttr.HP_MAX] = maxf(1.0, float(attrs[ZhandouAttr.HP_MAX]) * difficulty_scale)
-	for key in [ZhandouAttr.PHYSICAL_ATK, ZhandouAttr.MAGIC_ATK]:
+	if attrs.has(EnumPlayerAttr.HP_MAX):
+		attrs[EnumPlayerAttr.HP_MAX] = maxf(1.0, float(attrs[EnumPlayerAttr.HP_MAX]) * difficulty_scale)
+	for key in [EnumPlayerAttr.PHYSICAL_ATK, EnumPlayerAttr.MAGIC_ATK]:
 		if attrs.has(key):
 			attrs[key] = maxf(1.0, float(attrs[key]) * difficulty_scale)
-	for key in [ZhandouAttr.PHYSICAL_DEF, ZhandouAttr.MAGIC_DEF]:
+	for key in [EnumPlayerAttr.PHYSICAL_DEF, EnumPlayerAttr.MAGIC_DEF]:
 		if attrs.has(key):
 			attrs[key] = maxf(0.0, float(attrs[key]) * (1.0 + (difficulty_scale - 1.0) * 0.65))
-	if attrs.has(ZhandouAttr.SPD):
+	if attrs.has(EnumPlayerAttr.SPD):
 		var offset := (float(index) - float(count - 1) * 0.5) * 3.0
-		attrs[ZhandouAttr.SPD] = maxf(1.0, float(attrs[ZhandouAttr.SPD]) * (1.0 + (difficulty_scale - 1.0) * 0.35) + offset)
+		attrs[EnumPlayerAttr.SPD] = maxf(1.0, float(attrs[EnumPlayerAttr.SPD]) * (1.0 + (difficulty_scale - 1.0) * 0.35) + offset)
 	enemy["attrs"] = attrs
-	if attrs.has(ZhandouAttr.HP_MAX):
-		enemy["hp"] = float(attrs[ZhandouAttr.HP_MAX])
+	if attrs.has(EnumPlayerAttr.HP_MAX):
+		enemy["hp"] = float(attrs[EnumPlayerAttr.HP_MAX])
 	var base_name := str(base.get("name", "敌人")).strip_edges()
 	if count > 1:
 		enemy["name"] = "%s·%d" % [base_name, index + 1]
@@ -603,7 +609,7 @@ static func _apply_effects(
 		var value := float(effect.get("value", 0.0))
 		match effect_type:
 			"heal_hp_percent":
-				var hp_max := float(player_attrs.get(ZhandouAttr.HP_MAX, 100.0))
+				var hp_max := float(player_attrs.get(EnumPlayerAttr.HP_MAX, 100.0))
 				var before := float(runtime.get("hp", 0.0))
 				var healed := minf(hp_max - before, hp_max * value)
 				runtime["hp"] = before + healed
@@ -612,7 +618,7 @@ static func _apply_effects(
 				else:
 					feedback_parts.append("伤势已无大碍。")
 			"restore_mp_percent":
-				var mp_max := float(player_attrs.get(ZhandouAttr.MP_MAX, 100.0))
+				var mp_max := float(player_attrs.get(EnumPlayerAttr.MP_MAX, 100.0))
 				var mp_before := float(runtime.get("mp", 0.0))
 				var restored := minf(mp_max - mp_before, mp_max * value)
 				runtime["mp"] = mp_before + restored
@@ -621,7 +627,7 @@ static func _apply_effects(
 				else:
 					feedback_parts.append("法力充盈，难以再进。")
 			"damage_hp_percent":
-				var hp_max_d := float(player_attrs.get(ZhandouAttr.HP_MAX, 100.0))
+				var hp_max_d := float(player_attrs.get(EnumPlayerAttr.HP_MAX, 100.0))
 				var hp_before := float(runtime.get("hp", 0.0))
 				var damage := minf(hp_before - 1.0, hp_max_d * value)
 				runtime["hp"] = maxf(1.0, hp_before - hp_max_d * value)
@@ -633,7 +639,7 @@ static func _apply_effects(
 				else:
 					feedback_parts.append("虽有磕碰，所幸无大碍。")
 			"drain_mp_percent":
-				var mp_max_d := float(player_attrs.get(ZhandouAttr.MP_MAX, 100.0))
+				var mp_max_d := float(player_attrs.get(EnumPlayerAttr.MP_MAX, 100.0))
 				var mp_now := float(runtime.get("mp", 0.0))
 				var drained := minf(mp_now, mp_max_d * value)
 				runtime["mp"] = maxf(0.0, mp_now - mp_max_d * value)
