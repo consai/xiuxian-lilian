@@ -4,6 +4,7 @@ const CONFIG_PATH := "character_creation.json"
 const ORIGINS_PATH := "character_origins.json"
 const ROOTS_PATH := "character_roots.json"
 const TALENTS_PATH := "character_talents.json"
+const ChoiceCardScene := preload("res://scenes/ui/components/juese_choice_card.tscn")
 
 var _step := 0
 var _settings: Dictionary = {}
@@ -41,6 +42,11 @@ func _show_step() -> void:
 	%Step2.theme_type_variation = &"" if _step == 1 else &"TabIdle"
 	%Step3.theme_type_variation = &"" if _step == 2 else &"TabIdle"
 	var rows: Array = _rows(str(meta["path"]))
+	while _cards.size() < rows.size():
+		var card := ChoiceCardScene.instantiate()
+		%ChoiceCards.add_child(card)
+		_cards.append(card)
+		card.chosen.connect(_choose)
 	for i in _cards.size():
 		var card: Button = _cards[i]
 		card.visible = i < rows.size()
