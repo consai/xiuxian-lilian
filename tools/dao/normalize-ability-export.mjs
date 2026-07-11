@@ -104,6 +104,7 @@ export function parsePositionalConfig(cells) {
       const operation = pctVal !== 0 && flatVal === 0 ? "add_percent" : "add_flat";
       const base = operation === "add_percent" ? pctVal / 1000 : flatVal;
       const out = defaultConfigEffect(mapped, base, operation);
+      out.sourceEffectId = effectId;
       if (operation === "add_percent") {
         out.clampMin = 0;
         out.clampMax = 2;
@@ -140,7 +141,10 @@ export function parsePositionalConfigEffects(effects) {
   for (const row of effects) {
     if (!Array.isArray(row)) continue;
     const cfg = parsePositionalConfig(row);
-    if (cfg) out.push(cfg);
+    if (cfg) {
+      cfg.sourceCells = row;
+      out.push(cfg);
+    }
   }
   return out;
 }
@@ -197,6 +201,7 @@ export function normalizeZhandouPassiveRow(raw) {
     id: abilityId,
     name: String(raw.name ?? abilityId),
     type: "combat_passive",
+    sourceType: Number(raw.type ?? 0),
     tier: Number(raw.tier ?? 1) || 1,
     quality: Number(raw.quality ?? 1) || 1,
     description: String(raw.desc ?? raw.description ?? ""),

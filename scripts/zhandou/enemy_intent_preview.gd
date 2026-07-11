@@ -4,7 +4,7 @@ extends RefCounted
 const OVERLAY_DAMAGE := "damage"
 const OVERLAY_SHIELD := "shield"
 
-const _SHIELD_ICON := preload("res://assets/art/ui_new/hudun_icon.png")
+static var _SHIELD_ICON := Tools.load_image("res://assets/art/ui_new/hudun_icon.png")
 const EnemyAiActionPickerScript := preload("res://scripts/zhandou/ai/enemy_ai_action_picker.gd")
 
 

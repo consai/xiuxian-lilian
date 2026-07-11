@@ -3,8 +3,8 @@ extends Node2D
 
 ## 战斗阵型单格：布局由 enemy_formation_slot.tscn 定义，代码只负责绑定显示数据。
 
-const _SWORD_ICON := preload("res://assets/art/ui_new/item_jian.png")
-const _SHIELD_ICON := preload("res://assets/art/ui_new/hudun_icon.png")
+var _SWORD_ICON := Tools.load_image("res://assets/art/ui_new/item_jian.png")
+var _SHIELD_ICON := Tools.load_image("res://assets/art/ui_new/hudun_icon.png")
 
 ## 敌人站位朝左，立绘需水平翻转；玩家复用本场景时关闭。
 @export var flip_sprite_horizontal := true

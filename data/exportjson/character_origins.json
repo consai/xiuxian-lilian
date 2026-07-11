@@ -3,27 +3,27 @@
     "id": "village_wanderer",
     "name": "山村散修",
     "description": "生于山野，体魄强健",
-    "passiveid": "山村散修",
-    "iconPath": "res://assets/art/ui_new/beibao.png",
+    "passiveid": "passive_1001",
     "sortOrder": 10,
-    "enabled": true
+    "enabled": true,
+    "iconPath": "ui_new/item_pingzi_3.png"
   },
   "fallen_family": {
     "id": "fallen_family",
     "name": "没落世家",
     "description": "承袭旧学，家藏尚存",
-    "passiveid": "没落世家",
-    "iconPath": "res://assets/art/ui_new/beibao.png",
+    "passiveid": "passive_1002",
     "sortOrder": 20,
-    "enabled": true
+    "enabled": true,
+    "iconPath": "ui_new/item_pingzi_4.png"
   },
   "sect_servant": {
     "id": "sect_servant",
     "name": "宗门杂役",
     "description": "耳濡目染，熟知门道",
-    "passiveid": "宗门杂役",
-    "iconPath": "res://assets/art/ui_new/beibao.png",
+    "passiveid": "passive_1002",
     "sortOrder": 30,
-    "enabled": true
+    "enabled": true,
+    "iconPath": "ui_new/item_pingzi_5.png"
   }
 }

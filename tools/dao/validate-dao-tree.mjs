@@ -9,12 +9,12 @@ const realmOrder = new Map(realms.map((realm) => [realm.id, realm.order]));
 const domainIds = new Set(domains.map((domain) => domain.id));
 const realmIds = new Set(realms.map((realm) => realm.id));
 const attributeIds = new Set(Object.keys(config.attributes));
+const levelMultipliers = config.training.base?.levelMultipliers ?? [];
 
 if (config.schemaVersion !== 1) errors.push(`不支持的 schemaVersion: ${config.schemaVersion}`);
 if (config.metadata?.skillCount !== skills.length) errors.push("metadata.skillCount 与实际节点数量不一致");
 if (domainIds.size !== domains.length) errors.push("存在重复大道 ID");
 if (realmIds.size !== realms.length) errors.push("存在重复境界 ID");
-if (config.training.levelMultipliers?.length !== config.training.maxLevel) errors.push("等级倍率数量与等级上限不一致");
 if (skillById.size !== skills.length) errors.push("存在重复技能 ID");
 
 for (const domain of domains) {
@@ -25,7 +25,7 @@ for (const domain of domains) {
 for (const skill of skills) {
   if (!domainIds.has(skill.domain)) errors.push(`${skill.id}: 未知大道 ${skill.domain}`);
   if (!realmIds.has(skill.realm)) errors.push(`${skill.id}: 未知境界 ${skill.realm}`);
-  if (skill.rank < 1 || skill.maxLevel !== config.training.maxLevel) errors.push(`${skill.id}: 训练倍率或等级上限非法`);
+  if (skill.rank < 1 || skill.maxLevel < 1 || skill.maxLevel > levelMultipliers.length) errors.push(`${skill.id}: 训练倍率或等级上限非法`);
   if (skill.prereqs.length > 2) errors.push(`${skill.id}: 除境界外前置最多 2 个`);
   for (const req of skill.prereqs) {
     const parent = skillById.get(req.id);

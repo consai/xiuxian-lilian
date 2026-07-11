@@ -1,7 +1,6 @@
 {
   "base": {
     "key": "base",
-    "maxLevel": 5,
     "basePoints": 250,
     "levelMultipliers": [
       1,

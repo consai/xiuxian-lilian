@@ -1,11 +1,12 @@
 {
-  "factive_lq_001": {
-    "id": "factive_lq_001",
+  "skill_lq_001": {
+    "id": "skill_lq_001",
     "name": "引火诀",
     "type": "combat_active",
     "tier": 1,
     "quality": 1,
     "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_1.png",
     "tags": null,
     "vfx_preset": null,
     "description": "低耗补刀，默认单体输出。",
@@ -24,13 +25,14 @@
       ]
     ]
   },
-  "factive_lq_002": {
-    "id": "factive_lq_002",
+  "skill_lq_002": {
+    "id": "skill_lq_002",
     "name": "聚气护身",
     "type": "combat_active",
-    "tier": 1,
-    "quality": 1,
+    "tier": 2,
+    "quality": 2,
     "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_2.png",
     "tags": null,
     "vfx_preset": null,
     "description": "被 3-5 怪围攻时给一层缓冲。",
@@ -49,13 +51,14 @@
       ]
     ]
   },
-  "factive_lq_003": {
-    "id": "factive_lq_003",
+  "skill_lq_003": {
+    "id": "skill_lq_003",
     "name": "回春小术",
     "type": "combat_active",
-    "tier": 1,
-    "quality": 1,
+    "tier": 3,
+    "quality": 3,
     "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_3.png",
     "tags": null,
     "vfx_preset": null,
     "description": "低阶续航，不替代丹药。",
@@ -74,13 +77,14 @@
       ]
     ]
   },
-  "factive_lq_004": {
-    "id": "factive_lq_004",
+  "skill_lq_004": {
+    "id": "skill_lq_004",
     "name": "凝神调息",
     "type": "combat_active",
-    "tier": 1,
-    "quality": 1,
+    "tier": 4,
+    "quality": 4,
     "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_4.png",
     "tags": null,
     "vfx_preset": null,
     "description": "法力见底时恢复一次，避免自动战斗空转。",
@@ -99,13 +103,14 @@
       ]
     ]
   },
-  "factive_lq_005": {
-    "id": "factive_lq_005",
+  "skill_lq_005": {
+    "id": "skill_lq_005",
     "name": "轻身术",
     "type": "combat_active",
     "tier": 1,
     "quality": 1,
     "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_5.png",
     "tags": null,
     "vfx_preset": null,
     "description": "短时间提速，适合先手或逃过集火节奏。",
@@ -122,13 +127,14 @@
       ]
     ]
   },
-  "factive_lq_006": {
-    "id": "factive_lq_006",
+  "skill_lq_006": {
+    "id": "skill_lq_006",
     "name": "金针术",
     "type": "combat_active",
     "tier": 1,
     "quality": 2,
     "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_1.png",
     "tags": null,
     "vfx_preset": null,
     "description": "点慢最快敌人，给 1v多一点节奏控制。",
@@ -151,13 +157,14 @@
       ]
     ]
   },
-  "factive_lq_007": {
-    "id": "factive_lq_007",
+  "skill_lq_007": {
+    "id": "skill_lq_007",
     "name": "火鸦术",
     "type": "combat_active",
     "tier": 1,
     "quality": 2,
     "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_2.png",
     "tags": null,
     "vfx_preset": null,
     "description": "面对 4-5 怪的低伤群压，不做清屏。",
@@ -180,13 +187,14 @@
       ]
     ]
   },
-  "factive_lq_008": {
-    "id": "factive_lq_008",
+  "skill_lq_008": {
+    "id": "skill_lq_008",
     "name": "青木生息",
     "type": "combat_active",
     "tier": 1,
     "quality": 2,
     "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_3.png",
     "tags": null,
     "vfx_preset": null,
     "description": "中低血时稳住资源，偏保守流派。",
@@ -211,13 +219,14 @@
       ]
     ]
   },
-  "factive_lq_009": {
-    "id": "factive_lq_009",
+  "skill_lq_009": {
+    "id": "skill_lq_009",
     "name": "碎石击",
     "type": "combat_active",
     "tier": 1,
     "quality": 2,
     "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_4.png",
     "tags": null,
     "vfx_preset": null,
     "description": "给体修/低蓝角色一个物理单体技。",
@@ -236,13 +245,14 @@
       ]
     ]
   },
-  "factive_lq_010": {
-    "id": "factive_lq_010",
+  "skill_lq_010": {
+    "id": "skill_lq_010",
     "name": "小五行冲",
     "type": "combat_active",
     "tier": 1,
     "quality": 3,
     "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_5.png",
     "tags": null,
     "vfx_preset": null,
     "description": "练气期小爆发，专门处理 1v5，但不能连发。",
@@ -261,13 +271,14 @@
       ]
     ]
   },
-  "factive_lq_011": {
-    "id": "factive_lq_011",
+  "skill_lq_011": {
+    "id": "skill_lq_011",
     "name": "定身符",
     "type": "combat_active",
     "tier": 1,
     "quality": 3,
     "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_5.png",
     "tags": null,
     "vfx_preset": null,
     "description": "压住高血精英，让玩家先清小怪。",
@@ -284,13 +295,14 @@
       ]
     ]
   },
-  "factive_lq_012": {
-    "id": "factive_lq_012",
+  "skill_lq_012": {
+    "id": "skill_lq_012",
     "name": "灵刃连斩",
     "type": "combat_active",
     "tier": 1,
     "quality": 3,
     "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_5.png",
     "tags": null,
     "vfx_preset": null,
     "description": "混合双段收割，作为练气毕业输出。",
@@ -312,6 +324,144 @@
         "20",
         "magic_atk",
         "100"
+      ]
+    ]
+  },
+  "skill_lq_2001": {
+    "id": "skill_lq_2001",
+    "name": "破甲一击",
+    "type": "combat_active",
+    "tier": 1,
+    "quality": 3,
+    "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_1.png",
+    "tags": null,
+    "vfx_preset": null,
+    "description": "攻势凌厉，造成额外伤害",
+    "target": "enemy",
+    "cast_time": 0.9,
+    "cooldown": 6,
+    "cost_resource": "mana",
+    "cost_value": 20,
+    "activation": null,
+    "effects": [
+      [
+        "damage",
+        "60",
+        "physical_atk",
+        "120",
+        "physical_def",
+        "0"
+      ]
+    ]
+  },
+  "skill_lq_2002": {
+    "id": "skill_lq_2002",
+    "name": "灵火术",
+    "type": "combat_active",
+    "tier": 1,
+    "quality": 3,
+    "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_2.png",
+    "tags": null,
+    "vfx_preset": null,
+    "description": "引动灵火，对目标造成法术伤害",
+    "target": "enemy",
+    "cast_time": 0.9,
+    "cooldown": 6,
+    "cost_resource": "mana",
+    "cost_value": 20,
+    "activation": null,
+    "effects": [
+      [
+        "damage",
+        "50",
+        "magic_atk",
+        "130",
+        "magic_def",
+        "0"
+      ]
+    ]
+  },
+  "skill_lq_2003": {
+    "id": "skill_lq_2003",
+    "name": "回春术",
+    "type": "combat_active",
+    "tier": 1,
+    "quality": 3,
+    "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_3.png",
+    "tags": null,
+    "vfx_preset": null,
+    "description": "调息回元，恢复生命",
+    "target": "self",
+    "cast_time": 6.0,
+    "cooldown": 6,
+    "cost_resource": "mana",
+    "cost_value": 20,
+    "activation": null,
+    "effects": [
+      [
+        "heal_hp",
+        "80",
+        "magic_atk",
+        "80",
+        "hp_max",
+        "0"
+      ]
+    ]
+  },
+  "skill_lq_2004": {
+    "id": "skill_lq_2004",
+    "name": "聚灵诀",
+    "type": "combat_active",
+    "tier": 1,
+    "quality": 3,
+    "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_4.png",
+    "tags": null,
+    "vfx_preset": null,
+    "description": "聚拢灵气，恢复法力",
+    "target": "self",
+    "cast_time": 6.0,
+    "cooldown": 6,
+    "cost_resource": "mana",
+    "cost_value": 20,
+    "activation": null,
+    "effects": [
+      [
+        "restore_mana",
+        "60",
+        "mp_max",
+        "8",
+        "mp_max",
+        "0"
+      ]
+    ]
+  },
+  "skill_lq_2005": {
+    "id": "skill_lq_2005",
+    "name": "战意激发",
+    "type": "combat_active",
+    "tier": 1,
+    "quality": 3,
+    "req_realm": "lianqi",
+    "icon": "ui_new/item_pingzi_5.png",
+    "tags": null,
+    "vfx_preset": null,
+    "description": "临战爆发，短时间提升攻击",
+    "target": "self",
+    "cast_time": 6.0,
+    "cooldown": 6,
+    "cost_resource": "mana",
+    "cost_value": 20,
+    "activation": null,
+    "effects": [
+      [
+        "attrschange",
+        "physical_atk",
+        "30",
+        "10"
       ]
     ]
   }

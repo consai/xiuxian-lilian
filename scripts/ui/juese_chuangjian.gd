@@ -106,7 +106,7 @@ func _rows(file_name: String, ids: Array) -> Array:
 		var row_v: Variant = rows.get(str(id), {})
 		if not row_v is Dictionary:
 			continue
-		var row: Dictionary = row_v as Dictionary
+		var row: Dictionary = (row_v as Dictionary).duplicate(true)		
 		if not row.is_empty() and bool(row.get("enabled", true)):
 			out.append(row)
 	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.get("sortOrder", 0)) < int(b.get("sortOrder", 0)))
@@ -130,9 +130,16 @@ func _ids(value: Variant) -> Array:
 
 func _bonus(row: Dictionary) -> String:
 	if row.has("starterSkillId"):
-		return "初始术法：%s" % str(row.get("starterSkillId", ""))
+		var names: Array[String] = []
+		for skill_id in _ids(row.get("starterSkillId", [])):
+			var skill := AbilityService.by_id(skill_id)
+			if skill.is_empty():
+				push_error("%s 的 starterSkillId 不存在: %s" % [str(row.get("id", "")), skill_id])
+				continue
+			names.append(str(skill.get("name", skill_id)))
+		return "初始术法：%s" % "、".join(names)
 	if row.has("passiveid"):
-		return "特性：%s" % str(row.get("passiveid", ""))
+		return "特性：%s" % str(row.get("name", ""))
 	if row.has("effectValue"):
 		return "%s +%d%%" % [str(row.get("effectKey", "")), int(round(float(row.get("effectValue", 0.0)) * 100.0))]
 	return ""

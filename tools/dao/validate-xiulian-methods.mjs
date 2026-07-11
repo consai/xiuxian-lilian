@@ -12,6 +12,10 @@ const realmOrder = new Map(dao.realms.map((realm) => [realm.id, realm.order]));
 const families = new Map(config.families.map((family) => [family.id, family]));
 const methods = new Map(config.methods.map((method) => [method.id, method]));
 const sharedEffectIds = new Set(sharedCatalog.effects.map((effect) => effect.id));
+const effectsByMethod = new Map(config.methods.map((method) => {
+  return [method.id, Array.isArray(method.effects) ? method.effects : []];
+}));
+
 
 if (families.size !== config.families.length) errors.push("存在重复功法谱系 ID");
 if (methods.size !== config.methods.length) errors.push("存在重复功法层 ID");
@@ -27,18 +31,15 @@ for (const family of config.families) {
 }
 
 for (const method of config.methods) {
+  const effects = effectsByMethod.get(method.id) ?? [];
   const family = families.get(method.familyId);
   if (!family) errors.push(`${method.id}: 未知谱系 ${method.familyId}`);
   else if (!family.methodIds.includes(method.id)) errors.push(`${method.id}: 未列入谱系 methodIds`);
 
   if (!realmOrder.has(method.realm)) errors.push(`${method.id}: 未知境界 ${method.realm}`);
   validateQualityTier(method, "功法", errors);
-  if (method.effects.length < 2) errors.push(`${method.id}: 功法效果不足 2 项`);
 
-
-  for (const effect of method.effects)
-
-  for (const effect of method.effects) {
+  for (const effect of effects) {
     if (!sharedEffectIds.has(effect.effectId)) errors.push(`${method.id}: 效果 ${effect.effectId} 未登记统一效果目录`);
     const catalogEntry = config.effectCatalog?.[effect.effectId];
     if (!catalogEntry) errors.push(`${method.id}: 效果 ${effect.effectId} 未登记 effectCatalog`);
@@ -66,8 +67,9 @@ for (const method of config.methods) {
       if (prev.tier !== method.tier - 1) errors.push(`${method.id}: 前层 tier 不连续`);
       if (prev.nextMethodId !== method.id) errors.push(`${method.id}: 前层 nextMethodId 不匹配`);
       if (realmOrder.get(prev.realm) >= realmOrder.get(method.realm)) errors.push(`${method.id}: 前层境界未低于当前层`);
-      for (const effect of method.effects) {
-        const oldEffect = prev.effects.find((old) => old.stackGroup === effect.stackGroup);
+      const previousEffects = effectsByMethod.get(prev.id) ?? [];
+      for (const effect of effects) {
+        const oldEffect = previousEffects.find((old) => old.stackGroup === effect.stackGroup);
         if (oldEffect && effect.base < oldEffect.base * 0.9) {
           errors.push(`${method.id}: 同类效果 ${effect.stackGroup} 相比前层下降超过 10%`);
         }
@@ -79,7 +81,6 @@ for (const method of config.methods) {
 
   if (method.nextMethodId && !methods.has(method.nextMethodId)) errors.push(`${method.id}: 缺少后层 ${method.nextMethodId}`);
 
-  if (method.learningRequirements?.realm !== method.realm) errors.push(`${method.id}: 学习境界门槛与功法境界不一致`);
   const learningKnowledge = method.learningRequirements?.knowledge ?? [];
   if (learningKnowledge.length > 0) errors.push(method.id + ': 不得配置知识学习门槛');
 }

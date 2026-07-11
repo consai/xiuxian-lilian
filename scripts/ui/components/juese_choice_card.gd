@@ -20,8 +20,7 @@ func set_choice(row: Dictionary, bonus_text: String = "") -> void:
 	_desc_label.text = str(row.get("description", ""))
 	_bonus_label.text = bonus_text
 	var icon_path := str(row.get("iconPath", "")).strip_edges()
-	if icon_path != "" and ResourceLoader.exists(icon_path):
-		_icon.texture = load(icon_path)
+	_icon.texture = Tools.load_image(icon_path) if icon_path != "" else null
 
 
 func set_selected(active: bool) -> void:

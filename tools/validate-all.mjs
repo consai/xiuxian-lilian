@@ -8,6 +8,7 @@ const validators = [
   "validate-dao-tree.mjs",
   "validate-xiulian-methods.mjs",
   "validate-abilities.mjs",
+  "validate-items.mjs",
 ];
 
 let failed = false;

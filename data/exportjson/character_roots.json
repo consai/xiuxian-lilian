@@ -3,9 +3,12 @@
     "id": "metal",
     "name": "金灵根",
     "description": "锋锐果决，善破坚甲",
-    "starterSkillId": "skill_flying_sword",
+    "starterSkillId": [
+      "skill_lq_001",
+      "skill_lq_002"
+    ],
     "trait": "armor_break",
-    "iconPath": "res://assets/art/ui_new/jian.png",
+    "iconPath": "ui_new/jian.png",
     "sortOrder": 10,
     "enabled": true
   },
@@ -13,9 +16,12 @@
     "id": "wood",
     "name": "木灵根",
     "description": "生机绵长，善于恢复",
-    "starterSkillId": "skill_green_wood",
+    "starterSkillId": [
+      "skill_lq_003",
+      "skill_lq_004"
+    ],
     "trait": "regeneration",
-    "iconPath": "res://assets/art/ui_new/shuye.png",
+    "iconPath": "ui_new/shuye.png",
     "sortOrder": 20,
     "enabled": true
   },
@@ -23,9 +29,12 @@
     "id": "water",
     "name": "水灵根",
     "description": "柔中带刚，擅长控制",
-    "starterSkillId": "skill_water_bolt",
+    "starterSkillId": [
+      "skill_lq_005",
+      "skill_lq_006"
+    ],
     "trait": "wet",
-    "iconPath": "res://assets/art/ui_new/shuijing.png",
+    "iconPath": "ui_new/shuijing.png",
     "sortOrder": 30,
     "enabled": true
   },
@@ -33,9 +42,12 @@
     "id": "fire",
     "name": "火灵根",
     "description": "烈焰迅猛，擅长爆发",
-    "starterSkillId": "skill_fireball",
+    "starterSkillId": [
+      "skill_lq_007",
+      "skill_lq_008"
+    ],
     "trait": "burn",
-    "iconPath": "res://assets/art/ui_new/huo.png",
+    "iconPath": "ui_new/huo.png",
     "sortOrder": 40,
     "enabled": true
   },
@@ -43,9 +55,12 @@
     "id": "earth",
     "name": "土灵根",
     "description": "厚重稳固，善守御敌",
-    "starterSkillId": "skill_rock_armor",
+    "starterSkillId": [
+      "skill_lq_009",
+      "skill_lq_0010"
+    ],
     "trait": "guard",
-    "iconPath": "res://assets/art/ui_new/tup.png",
+    "iconPath": "ui_new/tup.png",
     "sortOrder": 50,
     "enabled": true
   }

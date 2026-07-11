@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "effects": {
+    "damage": {"parameters": ["固定值", "自身属性类型", "自身属性百分比", "目标属性类型", "目标属性百分比"], "required": 1},
+    "shield": {"parameters": ["固定值", "自身属性类型", "自身属性百分比", "目标属性类型", "目标属性百分比"], "required": 1},
+    "heal_hp": {"parameters": ["固定值", "自身属性类型", "自身属性百分比", "目标属性类型", "目标属性百分比"], "required": 1},
+    "restore_mana": {"parameters": ["固定值", "自身属性类型", "自身属性百分比", "目标属性类型", "目标属性百分比"], "required": 1},
+    "attrschange": {"parameters": ["属性类型", "固定修改值", "百分比修改值"], "required": 2},
+    "buff": {"parameters": ["buffid"], "required": 1},
+    "hp": {"parameters": ["固定恢复值"], "required": 1},
+    "mp": {"parameters": ["固定恢复值"], "required": 1},
+    "pill_cultivation": {"parameters": ["月修为值"], "required": 1},
+    "alchemy_mastery": {"parameters": ["丹方ID", "熟练度增益值"], "required": 2},
+    "attrs": {"parameters": ["属性类型", "变化值"], "required": 2}
+  }
+}

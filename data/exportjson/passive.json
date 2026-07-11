@@ -1,7 +1,9 @@
 {
-  "fpassive_0001": {
-    "id": "fpassive_0001",
+  "passive_0001": {
+    "id": "passive_0001",
     "name": "铁骨",
+    "desc": "战斗开始时提高物理防御与法术防御。",
+    "type": 1,
     "tier": 1,
     "quality": 1,
     "icon": null,
@@ -19,12 +21,13 @@
         "magic_def",
         "8"
       ]
-    ],
-    "desc": "战斗开始时提高物理防御与法术防御。"
+    ]
   },
-  "fpassive_0002": {
-    "id": "fpassive_0002",
+  "passive_0002": {
+    "id": "passive_0002",
     "name": "剑心通明",
+    "desc": "攻击前短暂提高伤害加成。",
+    "type": 1,
     "tier": 4,
     "quality": 4,
     "icon": null,
@@ -37,12 +40,13 @@
         "damage_bonus",
         "0.08"
       ]
-    ],
-    "desc": "攻击前短暂提高伤害加成。"
+    ]
   },
-  "fpassive_0003": {
-    "id": "fpassive_0003",
+  "passive_0003": {
+    "id": "passive_0003",
     "name": "固魂守一",
+    "desc": "被攻击前提高控制抗性。",
+    "type": 1,
     "tier": 3,
     "quality": 3,
     "icon": null,
@@ -55,12 +59,13 @@
         "control_resist",
         "35"
       ]
-    ],
-    "desc": "被攻击前提高控制抗性。"
+    ]
   },
-  "fpassive_0004": {
-    "id": "fpassive_0004",
+  "passive_0004": {
+    "id": "passive_0004",
     "name": "滴血不灭",
+    "desc": "濒死时恢复少量气血。",
+    "type": 1,
     "tier": 4,
     "quality": 4,
     "icon": null,
@@ -74,12 +79,13 @@
         "hp_max",
         "80"
       ]
-    ],
-    "desc": "濒死时恢复少量气血。"
+    ]
   },
-  "fpassive_0005": {
-    "id": "fpassive_0005",
+  "passive_0005": {
+    "id": "passive_0005",
     "name": "人兵相契",
+    "desc": "被攻击后提高双攻，适合反打。",
+    "type": 1,
     "tier": 7,
     "quality": 4,
     "icon": null,
@@ -97,12 +103,13 @@
         "magic_atk",
         "15"
       ]
-    ],
-    "desc": "被攻击后提高双攻，适合反打。"
+    ]
   },
-  "fpassive_0006": {
-    "id": "fpassive_0006",
+  "passive_0006": {
+    "id": "passive_0006",
     "name": "不坏道心",
+    "desc": "攻击后稳固防御。",
+    "type": 1,
     "tier": 8,
     "quality": 4,
     "icon": null,
@@ -120,12 +127,13 @@
         "magic_def",
         "20"
       ]
-    ],
-    "desc": "攻击后稳固防御。"
+    ]
   },
-  "fpassive_0007": {
-    "id": "fpassive_0007",
+  "passive_0007": {
+    "id": "passive_0007",
     "name": "万劫不坏",
+    "desc": "战斗开始时提高气血上限与控制抗性。",
+    "type": 1,
     "tier": 9,
     "quality": 4,
     "icon": null,
@@ -143,43 +151,293 @@
         "control_resist",
         "40"
       ]
-    ],
-    "desc": "战斗开始时提高气血上限与控制抗性。"
+    ]
   },
-  "fpassive_0008": {
-    "id": "fpassive_0008",
+  "passive_1001": {
+    "id": "passive_1001",
     "name": "山村散修",
+    "desc": "生于山野，体魄强健",
+    "type": 0,
     "tier": 1,
     "quality": 1,
     "icon": null,
     "tag": [],
     "cd": null,
     "runtype": "get",
-    "effects": [],
-    "desc": null
+    "effects": [
+      [
+        "attrs",
+        "hp_max",
+        "120"
+      ]
+    ]
   },
-  "fpassive_0009": {
-    "id": "fpassive_0009",
+  "passive_1002": {
+    "id": "passive_1002",
     "name": "没落世家",
-    "tier": 1,
-    "quality": 1,
+    "desc": "承袭旧学，家藏尚存",
+    "type": 0,
+    "tier": 2,
+    "quality": 2,
     "icon": null,
     "tag": [],
     "cd": null,
     "runtype": "get",
-    "effects": [],
-    "desc": null
+    "effects": [
+      [
+        "attrs",
+        "mp_max",
+        "80"
+      ]
+    ]
   },
-  "fpassive_0010": {
-    "id": "fpassive_0010",
+  "passive_1003": {
+    "id": "passive_1003",
     "name": "宗门杂役",
+    "desc": "耳濡目染，熟知门道",
+    "type": 0,
+    "tier": 3,
+    "quality": 3,
+    "icon": null,
+    "tag": [],
+    "cd": null,
+    "runtype": "get",
+    "effects": [
+      [
+        "attrs",
+        "control_resist",
+        "5"
+      ]
+    ]
+  },
+  "passive_1004": {
+    "id": "passive_1004",
+    "name": "剑心通明",
+    "desc": "天生剑感，出手更易命中要害",
+    "type": 0,
+    "tier": 4,
+    "quality": 4,
+    "icon": null,
+    "tag": [],
+    "cd": null,
+    "runtype": "get",
+    "effects": [
+      [
+        "attrs",
+        "physical_atk",
+        "18"
+      ]
+    ]
+  },
+  "passive_1005": {
+    "id": "passive_1005",
+    "name": "厚土命格",
+    "desc": "命格沉稳，开战时获得护盾",
+    "type": 0,
+    "tier": 5,
+    "quality": 1,
+    "icon": null,
+    "tag": [],
+    "cd": null,
+    "runtype": "get",
+    "effects": [
+      [
+        "shield",
+        "80",
+        "hp_max",
+        "10",
+        "hp_max",
+        "0"
+      ]
+    ]
+  },
+  "passive_1006": {
+    "id": "passive_1006",
+    "name": "破境之才",
+    "desc": "悟性过人，修为积累更快",
+    "type": 0,
+    "tier": 6,
+    "quality": 1,
+    "icon": null,
+    "tag": [],
+    "cd": null,
+    "runtype": "get",
+    "effects": [
+      [
+        "pill_cultivation",
+        "60"
+      ]
+    ]
+  },
+  "passive_1007": {
+    "id": "passive_1007",
+    "name": "灵根初醒",
+    "desc": "灵气亲和，法力更充沛",
+    "type": 0,
+    "tier": 7,
+    "quality": 1,
+    "icon": null,
+    "tag": [],
+    "cd": null,
+    "runtype": "get",
+    "effects": [
+      [
+        "attrs",
+        "mp_max",
+        "120"
+      ]
+    ]
+  },
+  "passive_1008": {
+    "id": "passive_1008",
+    "name": "武骨天成",
+    "desc": "筋骨强横，近战威力提升",
+    "type": 0,
+    "tier": 8,
+    "quality": 1,
+    "icon": null,
+    "tag": [],
+    "cd": null,
+    "runtype": "get",
+    "effects": [
+      [
+        "attrs",
+        "physical_atk",
+        "25"
+      ]
+    ]
+  },
+  "passive_1009": {
+    "id": "passive_1009",
+    "name": "清心诀",
+    "desc": "心神澄明，控制抗性提升",
+    "type": 0,
+    "tier": 9,
+    "quality": 1,
+    "icon": null,
+    "tag": [],
+    "cd": null,
+    "runtype": "get",
+    "effects": [
+      [
+        "attrs",
+        "control_resist",
+        "12"
+      ]
+    ]
+  },
+  "passive_1010": {
+    "id": "passive_1010",
+    "name": "丹火入门",
+    "desc": "初窥丹道，炼丹熟练度提升",
+    "type": 0,
     "tier": 1,
     "quality": 1,
     "icon": null,
     "tag": [],
     "cd": null,
     "runtype": "get",
-    "effects": [],
-    "desc": null
+    "effects": [
+      [
+        "alchemy_mastery",
+        "alchemy_fire_basic",
+        "50"
+      ]
+    ]
+  },
+  "passive_1011": {
+    "id": "passive_1011",
+    "name": "血气方刚",
+    "desc": "气血旺盛，生命恢复增强",
+    "type": 0,
+    "tier": 1,
+    "quality": 1,
+    "icon": null,
+    "tag": [],
+    "cd": null,
+    "runtype": "get",
+    "effects": [
+      [
+        "attrs",
+        "hp_max",
+        "100"
+      ]
+    ]
+  },
+  "passive_1012": {
+    "id": "passive_1012",
+    "name": "疾风步",
+    "desc": "身法轻灵，出手速度提升",
+    "type": 0,
+    "tier": 1,
+    "quality": 1,
+    "icon": null,
+    "tag": [],
+    "cd": null,
+    "runtype": "get",
+    "effects": [
+      [
+        "attrs",
+        "spd",
+        "15"
+      ]
+    ]
+  },
+  "passive_1013": {
+    "id": "passive_1013",
+    "name": "铁衣护体",
+    "desc": "皮肉坚韧，物理防御提高",
+    "type": 0,
+    "tier": 1,
+    "quality": 1,
+    "icon": null,
+    "tag": [],
+    "cd": null,
+    "runtype": "get",
+    "effects": [
+      [
+        "attrs",
+        "physical_def",
+        "20"
+      ]
+    ]
+  },
+  "passive_1014": {
+    "id": "passive_1014",
+    "name": "玄水护身",
+    "desc": "灵气化盾，法术防御提高",
+    "type": 0,
+    "tier": 1,
+    "quality": 1,
+    "icon": null,
+    "tag": [],
+    "cd": null,
+    "runtype": "get",
+    "effects": [
+      [
+        "attrs",
+        "magic_def",
+        "20"
+      ]
+    ]
+  },
+  "passive_1015": {
+    "id": "passive_1015",
+    "name": "灵刃术",
+    "desc": "灵力凝刃，法术攻击提高",
+    "type": 0,
+    "tier": 1,
+    "quality": 1,
+    "icon": null,
+    "tag": [],
+    "cd": null,
+    "runtype": "get",
+    "effects": [
+      [
+        "attrs",
+        "magic_atk",
+        "24"
+      ]
+    ]
   }
 }

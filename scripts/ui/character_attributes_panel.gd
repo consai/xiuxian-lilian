@@ -2,8 +2,8 @@
 
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
-const BTN_ACTIVE := preload("res://assets/art/ui_new/btn_lv.png")
-const BTN_INACTIVE := preload("res://assets/art/ui_new/btn_mihuang.png")
+var BTN_ACTIVE := Tools.load_image("res://assets/art/ui_new/btn_lv.png")
+var BTN_INACTIVE := Tools.load_image("res://assets/art/ui_new/btn_mihuang.png")
 
 enum Tab { ATTRIBUTES, EXPERIENCE, STATISTICS }
 

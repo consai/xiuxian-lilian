@@ -86,6 +86,9 @@ static func _normalize_zhandou_active_row(raw: Dictionary) -> Dictionary:
 		"upgrade_options": [],
 		"evolution_conditions": [],
 	}
+	var icon_v: Variant = raw.get("icon", null)
+	if icon_v != null and str(icon_v).strip_edges() != "":
+		out["icon"] = str(icon_v).strip_edges()
 	if vfx_preset != null and not ZhandouEffectCodec.is_null_sentinel(vfx_preset):
 		out["vfx_preset"] = str(vfx_preset).strip_edges()
 	return out
@@ -111,10 +114,11 @@ static func _normalize_zhandou_passive_row(raw: Dictionary) -> Dictionary:
 	elif raw.has("tags"):
 		tags = ZhandouEffectCodec.split_csv_tags(raw.get("tags"))
 	var cooldown_v: Variant = raw.get("cd", 0.0)
-	return {
+	var out := {
 		"id": ability_id,
 		"name": str(raw.get("name", ability_id)),
 		"type": "combat_passive",
+		"sourceType": int(raw.get("type", 0)),
 		"tier": EnumItemTier.clamp_tier(tier),
 		"quality": clampi(int(raw.get("quality", 1)), EnumQuality.Type.LOW, EnumQuality.Type.SUPREME),
 		"description": str(raw.get("desc", raw.get("description", ""))),
@@ -133,6 +137,10 @@ static func _normalize_zhandou_passive_row(raw: Dictionary) -> Dictionary:
 		"upgrade_options": [],
 		"evolution_conditions": [],
 	}
+	var icon_v: Variant = raw.get("icon", null)
+	if icon_v != null and str(icon_v).strip_edges() != "":
+		out["icon"] = str(icon_v).strip_edges()
+	return out
 
 
 static func _trigger_from_runtype(runtype: String) -> Dictionary:

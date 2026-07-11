@@ -199,7 +199,8 @@ func _op_projectile(ctx: ZhandouVfxContext, step: Dictionary) -> void:
 		return
 	var parent := ctx.projectile_parent if ctx.projectile_parent != null else ctx.host
 	var projectile := ZhandouProjectileVfx.new()
-	projectile.visual_texture = _load_texture(str(step.get("texture", "")))
+	var tex_path := str(step.get("texture", "")).strip_edges()
+	projectile.visual_texture = Tools.load_image(tex_path) if tex_path != "" else null
 	projectile.visual_size = _vector2_from_value(step.get("visual_size", projectile.visual_size), projectile.visual_size)
 	projectile.rotation_offset_deg = float(step.get("rotation_offset_deg", 0.0))
 	parent.add_child(projectile)
@@ -221,17 +222,6 @@ func _op_projectile(ctx: ZhandouVfxContext, step: Dictionary) -> void:
 		if wait_sec >= MAX_WAIT:
 			push_warning("ZhandouActionExecutor: projectile timeout")
 			break
-
-
-static func _load_texture(path: String) -> Texture2D:
-	var p := path.strip_edges()
-	if p == "":
-		return null
-	var res := ResourceLoader.load(p)
-	if res is Texture2D:
-		return res as Texture2D
-	push_warning("ZhandouActionExecutor: projectile texture load failed '%s'" % p)
-	return null
 
 
 static func _vector2_from_value(value: Variant, fallback: Vector2) -> Vector2:

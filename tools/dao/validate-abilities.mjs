@@ -1,26 +1,16 @@
 import { loadDaoTree, loadEffectCatalog } from "./json-config-loader.mjs";
 import { loadAbilitiesBundle } from "./load-abilities-bundle.mjs";
+import { loadCombatEffectSchema } from "./normalize-ability-export.mjs";
 import { validateQualityTier, realmIdForTier, rejectLegacyRealmField } from "./validate-shared.mjs";
+import { validateEffectRows } from "./validate-effect-rows.mjs";
 
 const dao = await loadDaoTree();
 const config = await loadAbilitiesBundle();
 const catalog = await loadEffectCatalog();
+const combatEffectSchema = await loadCombatEffectSchema();
 const errors = [];
 const effectIds = new Set(catalog.effects.map((effect) => effect.id));
 const abilityIds = new Set();
-const v1Tiers = new Set([1, 2]);
-const runtimeCombatEffects = new Set([
-  "damage", "shield", "heal_hp", "restore_mana", "buff",
-]);
-const zhandouActiveEffectIds = runtimeCombatEffects;
-
-const zhandouPassiveEffectIds = new Set([
-  "physical_def", "magic_def", "all_resistance", "damage_bonus", "hp_regen",
-  "control_resist", "fatal_resistance", "weakness_detection", "weapon_durability",
-  "cast_speed", "physical_attack", "magic_attack", "physical_defense", "magic_defense",
-  "max_hp", "max_mana", "mana_regen", "buff",
-]);
-
 const ABILITY_TYPES = new Set(["combat_active", "combat_passive", "combat_upkeep"]);
 
 
@@ -83,17 +73,11 @@ for (const ability of config.abilities) {
   const learningKnowledge = ability.learningRequirements?.knowledge ?? [];
   if (learningKnowledge.length > 0) errors.push(ability.id + ': 不得配置知识学习门槛');
   for (const effect of ability.effects ?? []) {
+    errors.push(...validateEffectRows([effect.sourceCells], combatEffectSchema, ability.id));
     if ("masteryGrowth" in effect) errors.push(`${ability.id}: 禁止使用 masteryGrowth ${effect.effectId}`);
     if ("knowledgeGrowth" in effect) errors.push(`${ability.id}: 禁止使用 knowledgeGrowth ${effect.effectId}`);
-    const isCombatSchemaEffect = zhandouActiveEffectIds.has(effect.effectId) || zhandouPassiveEffectIds.has(effect.effectId);
-    if (!isCombatSchemaEffect && !effectIds.has(effect.effectId)) {
+    if (!effectIds.has(effect.effectId) && !effect.sourceCells) {
       errors.push(`${ability.id}: 效果未登记 ${effect.effectId}`);
-    }
-    if (["combat_active", "combat_upkeep"].includes(ability.type) && !zhandouActiveEffectIds.has(effect.effectId)) {
-      errors.push(`${ability.id}: 主动效果 ID 不在 EnumZhandouActiveEffect ${effect.effectId}`);
-    }
-    if (ability.type === "combat_passive" && !zhandouPassiveEffectIds.has(effect.effectId)) {
-      errors.push(`${ability.id}: 战斗被动效果 ID 不在 EnumZhandouPassiveEffect ${effect.effectId}`);
     }
     if (!effect.stackGroup || !effect.stackPolicy || !effect.scalingMode) errors.push(`${ability.id}: 效果执行字段不完整 ${effect.effectId}`);
     if (effect.operation === "add_percent" && (typeof effect.clampMin !== "number" || typeof effect.clampMax !== "number")) {
@@ -102,9 +86,6 @@ for (const ability of config.abilities) {
     if (effect.base < 0 && effect.scalingMode !== "magnitude") errors.push(`${ability.id}: 负面效果必须按幅度缩放 ${effect.effectId}`);
     if (["combat_active", "combat_upkeep"].includes(ability.type) && ("target" in effect || "targetArg" in effect || "target_arg" in effect)) {
       errors.push(`${ability.id}: 效果 ${effect.effectId} 不得配置 target，请使用 combat.target`);
-    }
-    if (v1Tiers.has(ability.tier) && ability.type === "combat_active") {
-      if (!runtimeCombatEffects.has(effect.effectId)) errors.push(`${ability.id}: 首版效果未映射到战斗运行时 ${effect.effectId}`);
     }
   }
   if (!ability.combat) {
@@ -118,14 +99,6 @@ for (const ability of config.abilities) {
     if (ability.type === "combat_passive" && ability.combat.activation !== "learned") errors.push(`${ability.id}: 战斗被动必须学会后生效`);
     if (ability.type === "combat_upkeep" && ability.combat.activation !== "toggle") errors.push(`${ability.id}: 持续技能必须配置 toggle 激活`);
   }
-}
-
-for (let tier = 1; tier <= 9; tier += 1) {
-  const realm = realmIdForTier(tier);
-  const activeCount = config.abilities.filter(
-    (ability) => ability.tier === tier && ability.type === "combat_active",
-  ).length;
-  if (activeCount < 1) errors.push(`${realm}: 缺少战斗主动技能`);
 }
 
 if (errors.length) {

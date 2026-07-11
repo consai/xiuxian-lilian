@@ -277,6 +277,7 @@ static func _parse_attrschange_config(cells: Array) -> Dictionary:
 	var operation := "add_percent" if pct_val != 0.0 and flat_val == 0.0 else "add_flat"
 	var base := pct_val / 1000.0 if operation == "add_percent" else flat_val
 	var out := _default_config_effect(effect_id, base, operation)
+	out["sourceEffectId"] = "attrschange"
 	if operation == "add_percent":
 		out["clampMin"] = 0.0
 		out["clampMax"] = 2.0
