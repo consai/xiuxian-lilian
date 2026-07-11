@@ -52,9 +52,9 @@ func _show_step() -> void:
 
 func _meta() -> Dictionary:
 	return [
-		{"title": "选择出身", "hint": "不同出身，将为你的修行带来不同助益", "next": "确认出身", "path": ORIGINS_PATH, "ids": "originIds", "selected": "origin_id"},
-		{"title": "选择灵根", "hint": "灵根决定修行资质与功法契合", "next": "确认灵根", "path": ROOTS_PATH, "ids": "rootIds", "selected": "root_id"},
-		{"title": "先天天赋 · 三选一", "hint": "选择一个伴随开局的天赋", "next": "踏入仙途", "path": TALENTS_PATH, "ids": "talentIds", "selected": "talent_id"},
+		{"title": "选择出身", "hint": "不同出身，将为你的修行带来不同助益", "next": "确认出身", "path": ORIGINS_PATH, "selected": "origin_id"},
+		{"title": "选择灵根", "hint": "灵根决定修行资质与功法契合", "next": "确认灵根", "path": ROOTS_PATH, "selected": "root_id"},
+		{"title": "先天天赋 · 三选一", "hint": "选择一个伴随开局的天赋", "next": "踏入仙途", "path": TALENTS_PATH, "selected": "talent_id"},
 	][_step]
 
 

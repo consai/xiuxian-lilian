@@ -4,15 +4,6 @@
     "schemaVersion": 1,
     "defaultPortrait": "res://assets/art/characters/001_cutout_483x512.png",
     "nameMinLength": 1,
-    "nameMaxLength": 12,
-    "originIds": [
-      "village_wanderer,fallen_family,sect_servant"
-    ],
-    "rootIds": [
-      "metal,wood,water,fire,earth"
-    ],
-    "talentIds": [
-      "clear_sword_heart,earth_fate,breakthrough_prodigy"
-    ]
+    "nameMaxLength": 12
   }
 }
