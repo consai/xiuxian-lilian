@@ -40,7 +40,7 @@ func _show_step() -> void:
 	%Step1.theme_type_variation = &"" if _step == 0 else &"TabIdle"
 	%Step2.theme_type_variation = &"" if _step == 1 else &"TabIdle"
 	%Step3.theme_type_variation = &"" if _step == 2 else &"TabIdle"
-	var rows: Array = _rows(str(meta["path"]), _ids(_settings.get(meta["ids"], [])))
+	var rows: Array = _rows(str(meta["path"]))
 	for i in _cards.size():
 		var card: Button = _cards[i]
 		card.visible = i < rows.size()
@@ -99,14 +99,13 @@ func _finish() -> void:
 		_message_label.text = str(nav.get("error", "进入游戏失败"))
 
 
-func _rows(file_name: String, ids: Array) -> Array:
+func _rows(file_name: String) -> Array:
 	var rows: Dictionary = JsonLoader._export_keyed_rows(JsonLoader.export_path(file_name))
 	var out: Array = []
-	for id in ids:
-		var row_v: Variant = rows.get(str(id), {})
+	for row_v in rows.values():
 		if not row_v is Dictionary:
 			continue
-		var row: Dictionary = (row_v as Dictionary).duplicate(true)		
+		var row: Dictionary = (row_v as Dictionary).duplicate(true)
 		if not row.is_empty() and bool(row.get("enabled", true)):
 			out.append(row)
 	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.get("sortOrder", 0)) < int(b.get("sortOrder", 0)))

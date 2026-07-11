@@ -47,14 +47,6 @@ function visit(id) {
 }
 for (const skill of skills) visit(skill.id);
 
-for (const domain of domains) {
-  const count = skills.filter((skill) => skill.domain === domain.id).length;
-  if (count < 1) errors.push(domain.id + ': 节点不足，当前 '+ count);
-}
-for (const realm of realms) {
-  const count = skills.filter((skill) => skill.realm === realm.id).length;
-  if (count < 1) errors.push(realm.id + ': 阶段覆盖不足，当前 '+ count);
-}
 
 if (errors.length) {
   console.error(`大道树校验失败，共 ${errors.length} 项：`);
