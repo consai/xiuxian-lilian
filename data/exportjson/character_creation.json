@@ -1,9 +1,0 @@
-{
-  "default": {
-    "key": "default",
-    "schemaVersion": 1,
-    "defaultPortrait": "res://assets/art/characters/001_cutout_483x512.png",
-    "nameMinLength": 1,
-    "nameMaxLength": 12
-  }
-}
