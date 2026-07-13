@@ -1,0 +1,572 @@
+[
+  {
+    "rule": "presentation_datastore",
+    "path": "scripts/lilian/lilian_xunhuan.gd",
+    "source": "DataStore.ui_runtime()[\"lilian_bag_feedback\"] = \"\"",
+    "count": 1
+  },
+  {
+    "rule": "presentation_datastore",
+    "path": "scripts/lilian/lilian_xunhuan.gd",
+    "source": "var ui_rt: Dictionary = DataStore.ui_runtime()",
+    "count": 1
+  },
+  {
+    "rule": "presentation_datastore",
+    "path": "scripts/sim/dongfu.gd",
+    "source": "var result: Dictionary = WeituoService.abandon(instance_id, DataStore.savedata)",
+    "count": 1
+  },
+  {
+    "rule": "presentation_datastore",
+    "path": "scripts/sim/dongfu.gd",
+    "source": "var result: Dictionary = WeituoService.accept(weituo_id, DataStore.savedata, GameState)",
+    "count": 1
+  },
+  {
+    "rule": "presentation_datastore",
+    "path": "scripts/sim/dongfu.gd",
+    "source": "var result: Dictionary = WeituoService.submit(instance_id, DataStore.savedata, GameState)",
+    "count": 1
+  },
+  {
+    "rule": "presentation_datastore",
+    "path": "scripts/sim/liandan_mianban.gd",
+    "source": "var flags := (DataStore.savedata.get(\"tutorial\", {}) as Dictionary).get(\"flags\", {}) as Dictionary",
+    "count": 2
+  },
+  {
+    "rule": "presentation_datastore",
+    "path": "scripts/ui/beibao_panel.gd",
+    "source": "DataStore.ui_runtime()[\"lilian_bag_feedback\"] = feedback",
+    "count": 1
+  },
+  {
+    "rule": "presentation_datastore",
+    "path": "scripts/ui/gm_panel.gd",
+    "source": "var scene_id := str(DataStore.scene_runtime().get(\"current_id\", \"unknown\"))",
+    "count": 1
+  },
+  {
+    "rule": "presentation_datastore",
+    "path": "scripts/ui/item_info_payload_builder.gd",
+    "source": "var savedata: Dictionary = DataStore.savedata if DataStore != null else {}",
+    "count": 1
+  },
+  {
+    "rule": "presentation_datastore",
+    "path": "scripts/ui/weituo_board_panel.gd",
+    "source": "_entries = entries if not entries.is_empty() else WeituoService.visible_entries(DataStore.savedata, GameState)",
+    "count": 1
+  },
+  {
+    "rule": "presentation_datastore",
+    "path": "scripts/ui/weituo_board_panel.gd",
+    "source": "var header := WeituoService.refresh_header(DataStore.savedata)",
+    "count": 1
+  },
+  {
+    "rule": "presentation_datastore",
+    "path": "scripts/ui/weituo_board_panel.gd",
+    "source": "WeituoService.refresh_board_if_needed(DataStore.savedata, GameState)",
+    "count": 1
+  },
+  {
+    "rule": "presentation_datastore",
+    "path": "scripts/ui/zhandou_peizhi_mianban.gd",
+    "source": "var slots := DataStore._normalize_ability_slots(GameState.equipped_abilities)",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scenes/items/bag_base.gd",
+    "source": "var tip := view.get_node_or_null(\"BagHoverTip\") as HoverTipSource",
+    "count": 2
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scenes/items/oneskill.gd",
+    "source": "@onready var _press: Control = $Control",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scenes/items/oneskill.gd",
+    "source": "@onready var _skill_num: TextureRect = $skill_num",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/liandan_jieguo_tanchuang.gd",
+    "source": "@onready var _days_label: Label = $Dialog/Content/Stats/Days/Text",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/liandan_jieguo_tanchuang.gd",
+    "source": "@onready var _description_label: Label = $Dialog/Content/RewardRow/RewardInfo/Description",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/liandan_jieguo_tanchuang.gd",
+    "source": "@onready var _durability_label: Label = $Dialog/Content/Stats/Durability/Text",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/liandan_jieguo_tanchuang.gd",
+    "source": "@onready var _experience_label: Label = $Dialog/Content/Stats/Experience/Text",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/liandan_jieguo_tanchuang.gd",
+    "source": "@onready var _materials_row: HBoxContainer = $Dialog/Content/Materials",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/liandan_jieguo_tanchuang.gd",
+    "source": "@onready var _name_label: Label = $Dialog/Content/RewardRow/RewardInfo/Name",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/liandan_jieguo_tanchuang.gd",
+    "source": "@onready var _quality_label: Label = $Dialog/Content/RewardRow/RewardInfo/Quality/Text",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/liandan_jieguo_tanchuang.gd",
+    "source": "@onready var _quality_panel: PanelContainer = $Dialog/Content/RewardRow/RewardInfo/Quality",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/liandan_jieguo_tanchuang.gd",
+    "source": "@onready var _score_label: Label = $Dialog/Content/Stats/Score/Text",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/liandan_jindu_quanping.gd",
+    "source": "$Milestones/AddHerb/Text,",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/liandan_jindu_quanping.gd",
+    "source": "$Milestones/ControlFire/Text,",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/liandan_jindu_quanping.gd",
+    "source": "$Milestones/FormPill/Text,",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/liandan_jindu_quanping.gd",
+    "source": "$Milestones/OpenFurnace/Text,",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/liandan_mianban.gd",
+    "source": "@onready var _player_label: Label = $PlayerChip/Text",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/tupo_zongjie.gd",
+    "source": "var value_label := row.get_node_or_null(\"Value\") as Label",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/sim/xiulian_jindu_quanping.gd",
+    "source": "@onready var _qi_rings: Array[Panel] = [$OuterQiRing, $MiddleQiRing, $InnerQiRing]",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/story/story_playback_presenter.gd",
+    "source": "@onready var _choice_prompt_label: Label = _choice_panel.get_node(\"PromptBack/PromptLabel\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/story/story_playback_presenter.gd",
+    "source": "@onready var _choice_template_b: Button = _choice_panel.get_node(\"Choices/ChoiceB\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/story/story_playback_presenter.gd",
+    "source": "@onready var _choice_template: Button = _choice_panel.get_node(\"Choices/ChoiceA\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/story/story_playback_presenter.gd",
+    "source": "@onready var _choices: VBoxContainer = _choice_panel.get_node(\"Choices\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/story/story_playback_presenter.gd",
+    "source": "@onready var _continue_indicator: Control = _dialogue.get_node(\"ContinueIndicator\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/story/story_playback_presenter.gd",
+    "source": "@onready var _dialogue_label: Label = _dialogue.get_node(\"DialogueLabel\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/story/story_playback_presenter.gd",
+    "source": "@onready var _focus_prompt_label: Label = _focus_prompt.get_node(\"Label\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/story/story_playback_presenter.gd",
+    "source": "@onready var _name_plate: Control = _dialogue.get_node(\"NamePlate\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/story/story_playback_presenter.gd",
+    "source": "@onready var _portrait_back: Control = _dialogue.get_node(\"PortraitBack\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/story/story_playback_presenter.gd",
+    "source": "@onready var _portrait: TextureRect = _dialogue.get_node(\"PortraitBack/Portrait\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/story/story_playback_presenter.gd",
+    "source": "@onready var _speaker_label: Label = _dialogue.get_node(\"NamePlate/SpeakerLabel\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/story/story_playback_presenter.gd",
+    "source": "var scene_manager := tree.root.get_node_or_null(\"SceneManager\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/character_attributes_panel.gd",
+    "source": "@onready var _attributes_heading: Label = $Panel/AttributesCard/Heading",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/character_attributes_panel.gd",
+    "source": "var label := panel.get_node(\"Label\") as Label",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/components/tupo_value_row.gd",
+    "source": "@onready var _hover_tip: HoverTipSource = $Help/HoverTipSource",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/components/tupo_value_row.gd",
+    "source": "@onready var _name_label: Label = $Name",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/components/tupo_value_row.gd",
+    "source": "@onready var _value_label: Label = $Value",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/components/weituo_card.gd",
+    "source": "var count_node := slot.get_node_or_null(\"Count\") as Label",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/components/weituo_card.gd",
+    "source": "var icon_node := slot.get_node_or_null(\"Icon\") as TextureRect",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_node_view.gd",
+    "source": "@onready var _rank: Label = $VBox/Rank",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_node_view.gd",
+    "source": "@onready var _title: Label = $VBox/Title",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _back: TextureButton = $BottomActions/Back",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _by_dao: Button = $ModeTabs/Tabs/ByDao",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _by_realm: Button = $ModeTabs/Tabs/ByRealm",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _categories: VBoxContainer = $MainPanel/CategoryScroll/Categories",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _close: TextureButton = $Close",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _details_desc: Label = $MainPanel/Details/VBox/Description",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _details_heading: Label = $MainPanel/Details/VBox/Heading",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _details_impact: Label = $MainPanel/Details/VBox/Impact",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _details_progress: ProgressBar = $MainPanel/Details/VBox/Progress",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _details_state: Label = $MainPanel/Details/VBox/State",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _path_button: Button = $MainPanel/Details/VBox/PathButton",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _player_card: Label = $PlayerCard/Text",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _route_heading: Label = $RoutePanel/VBox/Heading",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _route_panel: PanelContainer = $RoutePanel",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _tree_area: Control = $MainPanel/TreeArea",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/dao_tree_panel.gd",
+    "source": "@onready var _zoom: TextureButton = $BottomActions/Zoom",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/gm_battle_access.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"GameState\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/gm_battle_access.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"SceneManager\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/gm_battle_panel.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/gm_item_grant_panel.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/gm_item_grant_panel.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"DataEvents\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/gm_item_grant_panel.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"GameState\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/item_info_popup_view.gd",
+    "source": "@onready var _use_button_label: Label = %UseButton.get_node(\"Label\") as Label",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/skill_release_strategy_panel.gd",
+    "source": "_make_clickable(row.get_node(\"Condition\"), _edit_strategy.bind(index))",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/skill_release_strategy_panel.gd",
+    "source": "_make_clickable(row.get_node(\"Drag\") as Control, _move_strategy_up.bind(index))",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/skill_release_strategy_panel.gd",
+    "source": "_make_clickable(row.get_node(\"Target\"), _edit_strategy.bind(index))",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/skill_release_strategy_panel.gd",
+    "source": "@onready var _mode_description: Label = $Panel/ModeCard/Description",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/tips_host.gd",
+    "source": "var de: Node = get_node_or_null(\"/root/DataEvents\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/ui/tips/core/reward_tip_builder.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/zhandou/scene/zhandou_changjing_hud.gd",
+    "source": "var press := slot.get_node_or_null(\"Control\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_hardcoded_nodepath",
+    "path": "scripts/zhandou/zhandou_float_presenter.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_raw_json",
+    "path": "scripts/ui/tips_host.gd",
+    "source": "return JsonLoader.load_tip_policy_bundle()",
+    "count": 1
+  },
+  {
+    "rule": "presentation_root_lookup",
+    "path": "scripts/story/story_playback_presenter.gd",
+    "source": "var scene_manager := tree.root.get_node_or_null(\"SceneManager\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_root_lookup",
+    "path": "scripts/ui/gm_battle_access.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"GameState\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_root_lookup",
+    "path": "scripts/ui/gm_battle_access.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"SceneManager\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_root_lookup",
+    "path": "scripts/ui/gm_battle_panel.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_root_lookup",
+    "path": "scripts/ui/gm_item_grant_panel.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_root_lookup",
+    "path": "scripts/ui/gm_item_grant_panel.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"DataEvents\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_root_lookup",
+    "path": "scripts/ui/gm_item_grant_panel.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"GameState\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_root_lookup",
+    "path": "scripts/ui/tips_host.gd",
+    "source": "var de: Node = get_node_or_null(\"/root/DataEvents\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_root_lookup",
+    "path": "scripts/ui/tips/core/reward_tip_builder.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
+    "count": 1
+  },
+  {
+    "rule": "presentation_root_lookup",
+    "path": "scripts/zhandou/zhandou_float_presenter.gd",
+    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
+    "count": 1
+  }
+]

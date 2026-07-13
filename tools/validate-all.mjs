@@ -33,6 +33,8 @@ if (failed) {
 console.log(`\nPASS: ${validators.length - 1} config validators`);
 
 failed = run(process.execPath, [path.join(root, "tools", "validate-project-files.mjs")]) || failed;
+failed = run(process.execPath, [path.join(root, "tools", "test-validate-architecture-boundaries.mjs")]) || failed;
+failed = run(process.execPath, [path.join(root, "tools", "validate-architecture-boundaries.mjs")]) || failed;
 
 const godot = process.env.GODOT_BIN ?? (process.platform === "win32"
   ? "C:\\Godot_v4.6.2-stable_win64_console.exe"

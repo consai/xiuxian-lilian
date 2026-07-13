@@ -556,13 +556,3 @@ static func load_story_bundle(story_id: String) -> Dictionary:
 	var root := _export_settings(export_path("gushi_%s.json" % name))
 	root["nodes"] = _export_keyed_rows(export_path("gushi_%s_nodes.json" % name))
 	return root
-
-
-static func load_zhandou_vfx_presets() -> Dictionary:
-	var index := load_zhandou_vfx_index()
-	return {
-		"version": index.get("version", 1),
-		"defaults": index.get("default", "melee_default"),
-		"impact_preset": index.get("impact_preset", "hit_default"),
-		"preset_names": zhandou_vfx_preset_ids(),
-	}
