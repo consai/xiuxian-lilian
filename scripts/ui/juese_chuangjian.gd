@@ -1,13 +1,11 @@
 extends Control
 
-const CONFIG_PATH := "character_creation.json"
-const ORIGINS_PATH := "character_origins.json"
-const ROOTS_PATH := "character_roots.json"
-const TALENTS_PATH := "character_talents.json"
+const ORIGIN_TYPE := "origin"
+const ROOT_TYPE := "root"
+const TALENT_TYPE := "talent"
 const ChoiceCardScene := preload("res://scenes/ui/components/juese_choice_card.tscn")
 
 var _step := 0
-var _settings: Dictionary = {}
 var _selected: Dictionary = {"origin_id": "", "root_id": "", "talent_id": ""}
 var _cards: Array = []
 
@@ -20,8 +18,6 @@ var _cards: Array = []
 
 
 func _ready() -> void:
-	_settings = JsonLoader._export_keyed_rows(JsonLoader.export_path(CONFIG_PATH)).get("default", {})
-	_name_input.max_length = int(_settings.get("nameMaxLength", 12))
 	for child in %ChoiceCards.get_children():
 		_cards.append(child)
 		child.connect("chosen", Callable(self, "_choose"))
@@ -41,7 +37,7 @@ func _show_step() -> void:
 	%Step1.theme_type_variation = &"" if _step == 0 else &"TabIdle"
 	%Step2.theme_type_variation = &"" if _step == 1 else &"TabIdle"
 	%Step3.theme_type_variation = &"" if _step == 2 else &"TabIdle"
-	var rows: Array = _rows(str(meta["path"]))
+	var rows: Array = ConfigManager.character_creation_choices(str(meta["choice_type"]))
 	while _cards.size() < rows.size():
 		var card := ChoiceCardScene.instantiate()
 		%ChoiceCards.add_child(card)
@@ -58,9 +54,9 @@ func _show_step() -> void:
 
 func _meta() -> Dictionary:
 	return [
-		{"title": "选择出身", "hint": "不同出身，将为你的修行带来不同助益", "next": "确认出身", "path": ORIGINS_PATH, "selected": "origin_id"},
-		{"title": "选择灵根", "hint": "灵根决定修行资质与功法契合", "next": "确认灵根", "path": ROOTS_PATH, "selected": "root_id"},
-		{"title": "先天天赋 · 三选一", "hint": "选择一个伴随开局的天赋", "next": "踏入仙途", "path": TALENTS_PATH, "selected": "talent_id"},
+		{"title": "选择出身", "hint": "不同出身，将为你的修行带来不同助益", "next": "确认出身", "choice_type": ORIGIN_TYPE, "selected": "origin_id"},
+		{"title": "选择灵根", "hint": "灵根决定修行资质与功法契合", "next": "确认灵根", "choice_type": ROOT_TYPE, "selected": "root_id"},
+		{"title": "先天天赋 · 三选一", "hint": "选择一个伴随开局的天赋", "next": "踏入仙途", "choice_type": TALENT_TYPE, "selected": "talent_id"},
 	][_step]
 
 
@@ -91,8 +87,8 @@ func _back() -> void:
 
 func _finish() -> void:
 	var name := _name_input.text.strip_edges()
-	if name.length() < int(_settings.get("nameMinLength", 1)):
-		_message_label.text = "请输入角色名称。"
+	if name.length() < 1 or name.length() > 12:
+		_message_label.text = "角色名称须为 1–12 个字符。"
 		return
 	GameState.new_game({
 		"player_name": name,
@@ -100,22 +96,14 @@ func _finish() -> void:
 		"root_id": _selected["root_id"],
 		"talent_id": _selected["talent_id"],
 	})
-	var nav: Dictionary = SceneManager.go_hub({}, {"reset_history": true})
+	var nav: Dictionary = LilianFlowService.open_hub(
+		LilianState,
+		SceneManager,
+		{},
+		{"reset_history": true}
+	)
 	if not bool(nav.get("ok", false)):
 		_message_label.text = str(nav.get("error", "进入游戏失败"))
-
-
-func _rows(file_name: String) -> Array:
-	var rows: Dictionary = JsonLoader._export_keyed_rows(JsonLoader.export_path(file_name))
-	var out: Array = []
-	for row_v in rows.values():
-		if not row_v is Dictionary:
-			continue
-		var row: Dictionary = (row_v as Dictionary).duplicate(true)
-		if not row.is_empty() and bool(row.get("enabled", true)):
-			out.append(row)
-	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.get("sortOrder", 0)) < int(b.get("sortOrder", 0)))
-	return out
 
 
 func _ids(value: Variant) -> Array:

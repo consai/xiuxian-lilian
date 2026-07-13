@@ -1,0 +1,88 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/app/app_root.gd" id="1_app_root"]
+[ext_resource type="Script" path="res://scripts/ui/tips_host.gd" id="2_tips_host"]
+[ext_resource type="Script" path="res://scripts/ui/hover/hover_tip_host.gd" id="3_hover_tip_host"]
+[ext_resource type="Script" path="res://scripts/ui/item_info_popup_host.gd" id="4_item_info_host"]
+[ext_resource type="Script" path="res://scripts/ui/gm_panel_host.gd" id="5_gm_panel_host"]
+[ext_resource type="PackedScene" path="res://scenes/story/story_playback_ui.tscn" id="6_story_playback"]
+[ext_resource type="Script" path="res://scripts/story/story_director.gd" id="7_story_director"]
+
+[node name="AppRoot" type="Node"]
+script = ExtResource("1_app_root")
+
+[node name="SceneHost" type="Node" parent="."]
+unique_name_in_owner = true
+
+[node name="ModalLayer" type="CanvasLayer" parent="."]
+layer = 1000
+
+[node name="ModalHost" type="Control" parent="ModalLayer"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TransientLayer" type="CanvasLayer" parent="."]
+layer = 1001
+
+[node name="TransientHost" type="Control" parent="TransientLayer"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TipsHost" type="CanvasLayer" parent="."]
+layer = 1010
+follow_viewport_enabled = true
+process_mode = 3
+script = ExtResource("2_tips_host")
+
+[node name="HoverTipHost" type="CanvasLayer" parent="." groups=["hover_tip_host"]]
+layer = 1001
+follow_viewport_enabled = true
+process_mode = 3
+script = ExtResource("3_hover_tip_host")
+
+[node name="ItemInfoPopupHost" type="CanvasLayer" parent="." groups=["item_info_popup_host"]]
+layer = 1002
+follow_viewport_enabled = true
+process_mode = 3
+script = ExtResource("4_item_info_host")
+
+[node name="GmPanelHost" type="CanvasLayer" parent="." groups=["gm_panel_host"]]
+layer = 1003
+follow_viewport_enabled = true
+process_mode = 3
+script = ExtResource("5_gm_panel_host")
+
+[node name="StoryDirector" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("7_story_director")
+
+[node name="StoryLayer" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="StoryPlaybackUI" parent="StoryLayer" instance=ExtResource("6_story_playback")]
+unique_name_in_owner = true
+
+[node name="TransitionLayer" type="CanvasLayer" parent="."]
+layer = 1002
+
+[node name="TransitionHost" type="Control" parent="TransitionLayer"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

@@ -30,7 +30,7 @@ static func realm_by_id(realm_id: String) -> Dictionary:
 
 
 static func _build_realms() -> Array:
-	var root: Dictionary = JsonLoader._read_json_root_object(PATH)
+	var root: Dictionary = JsonReader.read_object(PATH)
 	var rows: Array = []
 	for key in root.keys():
 		var row_v: Variant = root[key]

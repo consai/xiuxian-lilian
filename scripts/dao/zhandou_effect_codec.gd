@@ -3,8 +3,6 @@ extends RefCounted
 
 ## 解析 exportjson 中 positional effects。
 
-const SCHEMA_PATH := "res://data/exportjson/战斗effects效果介绍.json"
-
 ## 战斗属性键 → attrschange 技能配置 effectId（供校验/悬停）；导出表 positional 参数须直接填左侧键名。
 const FIGHT_ATTR_TO_EFFECT_ID: Dictionary = {
 	EnumPlayerAttr.SPD: "cast_speed",
@@ -26,7 +24,7 @@ static var _schema: Dictionary = {}
 static func load_schema() -> Dictionary:
 	if not _schema.is_empty():
 		return _schema
-	_schema = JsonLoader.load_zhandou_effect_schema()
+	_schema = preload("res://scripts/zhandou/zhandou_effect_catalog.gd").load_schema()
 	return _schema
 
 
@@ -81,10 +79,16 @@ static func parse_positional_runtime(cells: Array) -> Dictionary:
 	match effect_id:
 		"damage", "shield", "heal_hp", "restore_mana":
 			return _parse_scaled_instant(effect_id, cells)
+		"hp":
+			return _parse_recovery_runtime("heal_hp", effect_id, cells)
+		"mp":
+			return _parse_recovery_runtime("restore_mana", effect_id, cells)
 		"attrschange":
 			return _parse_attrschange_runtime(cells)
 		"buff":
 			return _parse_buff_runtime(cells)
+		"pill_cultivation", "alchemy_mastery", "attrs":
+			return _parse_generic_effect(effect_id, cells)
 		"damage_def", "damage_add":
 			return _parse_damage_mod_runtime(effect_id, cells)
 		_:
@@ -102,6 +106,12 @@ static func parse_positional_config(cells: Array) -> Dictionary:
 			var out := _default_config_effect(effect_id, base, "add_flat")
 			out["_cells"] = cells.duplicate(true)
 			return out
+		"hp", "mp":
+			var mapped := "heal_hp" if effect_id == "hp" else "restore_mana"
+			var out := _default_config_effect(mapped, _cell_float(cells, 1, 0.0), "add_flat")
+			out["sourceEffectId"] = effect_id
+			out["_cells"] = cells.duplicate(true)
+			return out
 		"attrschange":
 			return _parse_attrschange_config(cells)
 		"buff":
@@ -117,6 +127,8 @@ static func parse_positional_config(cells: Array) -> Dictionary:
 				"scalingMode": "positive",
 				"buffId": buff_id,
 			}
+		"pill_cultivation", "alchemy_mastery", "attrs":
+			return _parse_generic_effect(effect_id, cells)
 		"damage_def", "damage_add":
 			var flat := _cell_float(cells, 1, 0.0)
 			var mapped := "physical_def" if effect_id == "damage_def" else "damage_bonus"
@@ -138,7 +150,7 @@ static func parse_positional_effects(
 			var runtime := parse_positional_runtime(row_v as Array)
 			if runtime.is_empty():
 				continue
-			if not caster_attrs.is_empty() or not target_attrs.is_empty():
+			if runtime.has("_cells") and (not caster_attrs.is_empty() or not target_attrs.is_empty()):
 				runtime["value"] = _resolve_scaled_value(row_v as Array, caster_attrs, target_attrs)
 			out.append(runtime)
 	return out
@@ -210,6 +222,20 @@ static func _parse_scaled_instant(effect_id: String, cells: Array) -> Dictionary
 		"value": _cell_float(cells, 1, 0.0),
 		"_cells": cells.duplicate(true),
 	}
+
+
+static func _parse_recovery_runtime(mapped_id: String, source_id: String, cells: Array) -> Dictionary:
+	var out := _parse_scaled_instant(mapped_id, cells)
+	out["source_effect_id"] = source_id
+	return out
+
+
+## 非战斗通用效果保留为 op/args；无 type/effectId，不会映射为战斗执行效果。
+static func _parse_generic_effect(effect_id: String, cells: Array) -> Dictionary:
+	var args: Array = cells.slice(1).duplicate(true)
+	while not args.is_empty() and is_null_sentinel(args.back()):
+		args.pop_back()
+	return {"op": effect_id, "args": args}
 
 
 ## 结算即时效果数值：优先 positional [code]_cells[/code]，否则 base + scaling 字典。

@@ -21,11 +21,16 @@ func _ready() -> void:
 	var payload: Dictionary = SceneManager.peek_payload(SceneManager.LILIAN_JIESUAN)
 	var reason: String = str(payload.get("reason", "manual"))
 	if LilianState.active:
-		_result = LilianFlowService.settle_active_lilian(reason)
+		_result = LilianFlowService.settle_active_lilian(
+			reason,
+			LilianState,
+			GameState,
+			TutorialService
+		)
 	elif not GameState.last_lilian_summary.is_empty():
 		_result = GameState.last_lilian_summary.duplicate(true)
 	else:
-		SceneManager.go_hub()
+		LilianFlowService.open_hub(LilianState, SceneManager)
 		return
 	(%ReturnButton as Button).pressed.connect(_on_return_pressed)
 	(%LogButton as Button).pressed.connect(_on_log_pressed)
@@ -233,6 +238,4 @@ func _on_log_pressed() -> void:
 
 
 func _on_return_pressed() -> void:
-	TutorialService.game_event("tutorial.result_closed")
-	SceneManager.take_payload(SceneManager.LILIAN_JIESUAN)
-	SceneManager.go_hub()
+	LilianFlowService.close_settlement(LilianState, SceneManager, TutorialService)

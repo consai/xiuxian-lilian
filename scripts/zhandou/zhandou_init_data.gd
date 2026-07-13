@@ -1,7 +1,7 @@
 ﻿class_name ZhandouInitData
 extends RefCounted
 ## 进战唯一入口：外部只提交 combatant 字典，由 [method resolve] 生成 [ZhandouSetup]（[ZhandouObj] + UI 快照）。
-## 进战前经 [method set_pending] 写入 DataStore，由 [ZhandouChangjing] 在 _ready 消费；切场景请用 [SceneManager.go_zhandou]。
+## 进战前经 [method start_battle] 写入 DataStore，由 [ZhandouChangjing] 在 _ready 消费。
 const ZhandouSetupScript = preload("res://scripts/zhandou/zhandou_setup.gd")
 const ZhandouRecordTypesScript = preload("res://scripts/zhandou/zhandou_record_types.gd")
 
@@ -39,6 +39,27 @@ static func set_pending(
 	return sid
 
 
+static func start_battle(
+		tree: SceneTree,
+		data: Dictionary,
+		source: String,
+		scene_manager: Node,
+		prefer_overlay: bool
+) -> Dictionary:
+	var merged := merge_skill_cfg_from_tables(data)
+	var errors := collect_errors(merged)
+	if not errors.is_empty():
+		return {"ok": false, "error": errors[0]}
+	var preflight: Dictionary = scene_manager.preflight_transition()
+	if not bool(preflight.get("ok", false)):
+		return preflight
+	set_pending(tree, merged, source)
+	var nav: Dictionary = scene_manager.open_zhandou(prefer_overlay)
+	if not bool(nav.get("ok", false)):
+		take_pending_envelope(tree)
+	return nav
+
+
 static func take_pending_envelope(tree: SceneTree = null) -> Dictionary:
 	var active_tree := tree if tree != null else Engine.get_main_loop() as SceneTree
 	var store := active_tree.root.get_node_or_null("DataStore") if active_tree != null else null
@@ -65,16 +86,6 @@ static func take_pending(tree: SceneTree = null, required_session_id: String = "
 		var payload_v: Variant = envelope.get("payload", {})
 		return payload_v as Dictionary if payload_v is Dictionary else {}
 	return envelope
-
-
-static func goto_fight_scene(tree: SceneTree, data: Dictionary, _scene_path: String = "") -> bool:
-	push_warning("ZhandouInitData.goto_fight_scene 已废弃，请改用 SceneManager.go_zhandou()")
-	var scene_manager := tree.root.get_node_or_null("SceneManager")
-	if scene_manager == null or not scene_manager.has_method("go_zhandou"):
-		push_error("ZhandouInitData.goto_fight_scene: 缺少 SceneManager")
-		return false
-	var nav: Dictionary = scene_manager.go_zhandou(data, "deprecated_goto_fight_scene")
-	return bool(nav.get("ok", false))
 
 
 ## 合并表、校验并构建 [ZhandouSetup]；失败返回 [code]null[/code]（默认 [method push_error]）。
@@ -147,16 +158,12 @@ static func merge_skill_cfg_from_tables(data: Dictionary) -> Dictionary:
 		item_partial = (existing_item as Dictionary).duplicate(true)
 	if cm != null and cm.has_method("build_item_cfg"):
 		out["item_cfg"] = cm.call("build_item_cfg", item_partial)
-	else:
-		out["item_cfg"] = _build_item_cfg_fallback(item_partial)
 	var equip_partial: Dictionary = {}
 	var existing_equip: Variant = out.get("equip_cfg")
 	if existing_equip is Dictionary and not (existing_equip as Dictionary).is_empty():
 		equip_partial = (existing_equip as Dictionary).duplicate(true)
 	if cm != null and cm.has_method("build_equip_cfg"):
 		out["equip_cfg"] = cm.call("build_equip_cfg", equip_partial)
-	else:
-		out["equip_cfg"] = _build_equip_cfg_fallback(equip_partial)
 	if not out.has("battle_time_limit"):
 		if cm != null and cm.has_method("battle_time_limit_default"):
 			out["battle_time_limit"] = cm.call("battle_time_limit_default")
@@ -213,9 +220,11 @@ static func validate_setup(data: Dictionary) -> PackedStringArray:
 	if data.has("equip_cfg") and not data.get("equip_cfg") is Dictionary:
 		errors.append("equip_cfg 必须为 Dictionary")
 	var equip_cfg_v: Variant = data.get("equip_cfg")
-	if player_v is Dictionary and equip_cfg_v is Dictionary:
+	if player_v is Dictionary:
 		var p_equips: Variant = (player_v as Dictionary).get("equips", [])
-		if p_equips is Array:
+		if _slot_array_has_item(p_equips) and not data.has("equip_cfg"):
+			errors.append("player.equips 含有效法宝时必须提供 equip_cfg")
+		elif p_equips is Array and equip_cfg_v is Dictionary:
 			_validate_equip_slot_ids(errors, "player.equips", p_equips, equip_cfg_v)
 	if data.has("enemy_formation") and not data.get("enemy_formation") is Dictionary:
 		errors.append("enemy_formation 必须为 Dictionary")
@@ -953,7 +962,7 @@ static func sample_for_editor() -> Dictionary:
 								"when": {"skill_ready": 3},
 								"action": {"type": "skill", "skill_id": 3},
 							},
-							{"action": {"type": "tiaoxi"}},
+							{"action": {"type": "basic"}},
 						],
 					},
 					{
@@ -1026,65 +1035,6 @@ static func _build_skill_cfg_fallback(partial: Dictionary) -> Dictionary:
 				out[0] = merged
 				out["0"] = merged
 			continue
-		var ev: Variant = partial[k]
-		if not ev is Dictionary:
-			continue
-		var entry := (ev as Dictionary).duplicate(true)
-		if key_str.is_valid_int():
-			var iid := int(key_str)
-			out[iid] = entry
-			out[str(iid)] = entry
-		else:
-			out[key_str] = entry
-	return out
-
-
-static func _build_item_cfg_fallback(partial: Dictionary) -> Dictionary:
-	var out: Dictionary = {}
-	for it in JsonLoader.load_items():
-		if it == null or not it is ItemDef:
-			continue
-		var def := it as ItemDef
-		if not def.has_fight_config():
-			continue
-		var row := def.to_fight_runtime_dict()
-		var fid := int(row.get("id", 0))
-		if fid <= 0:
-			continue
-		out[fid] = row
-		out[str(fid)] = row
-	if partial.is_empty():
-		return out
-	for k in partial.keys():
-		var key_str := str(k)
-		var ev: Variant = partial[k]
-		if not ev is Dictionary:
-			continue
-		var entry := (ev as Dictionary).duplicate(true)
-		if key_str.is_valid_int():
-			var iid := int(key_str)
-			out[iid] = entry
-			out[str(iid)] = entry
-		else:
-			out[key_str] = entry
-	return out
-
-
-static func _build_equip_cfg_fallback(partial: Dictionary) -> Dictionary:
-	var out: Dictionary = {}
-	for ev in JsonLoader.load_equips_bundle().get("equips", []):
-		if ev == null or not ev is EquipDef:
-			continue
-		var row := (ev as EquipDef).to_runtime_dict()
-		var eid := int(row.get("id", 0))
-		if eid <= 0:
-			continue
-		out[eid] = row
-		out[str(eid)] = row
-	if partial.is_empty():
-		return out
-	for k in partial.keys():
-		var key_str := str(k)
 		var ev: Variant = partial[k]
 		if not ev is Dictionary:
 			continue

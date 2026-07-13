@@ -403,8 +403,7 @@ func _on_close_pressed() -> void:
 	visible = false
 	set_process(false)
 	closed.emit()
-	if GmPanelHost != null and GmPanelHost.has_method("show_panel"):
-		GmPanelHost.show_panel()
+	get_tree().call_group("gm_panel_host", "show_panel")
 
 
 func _config_manager() -> Node:

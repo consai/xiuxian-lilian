@@ -13,7 +13,6 @@ var _hide_delay_timer: Timer
 
 
 func _ready() -> void:
-	layer = 1001
 	follow_viewport_enabled = true
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_panel = HoverTipPanelScene.instantiate() as HoverTipPanel

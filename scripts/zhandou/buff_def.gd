@@ -16,7 +16,7 @@ var tags: Array = []
 
 
 static func from_dict(data: Dictionary) -> BuffDef:
-	var bid := JsonLoader.config_id_to_string(data.get("id", ""))
+	var bid := str(data.get("id", "")).strip_edges()
 	if bid == "":
 		push_error("BuffDef.from_dict: missing or empty id in %s" % str(data))
 		return null

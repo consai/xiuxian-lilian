@@ -6,17 +6,11 @@ const EXPORT_DIR := "res://data/exportjson"
 const YUNXING_PARAMS_DIR := "%s/yunxing_params" % EXPORT_DIR
 const ITEMS_PATH := "%s/item_items.json" % EXPORT_DIR
 const ITEM_GENERATED_BOOKS_PATH := "%s/item_generated_learning_books.json" % EXPORT_DIR
-const ITEM_ALIASES_PATH := "%s/item_legacy_learning_book_ali.json" % EXPORT_DIR
-const EQUIPS_PATH := "%s/zhuangbei_equips.json" % EXPORT_DIR
-const BUFFS_PATH := "%s/buff.json" % EXPORT_DIR
-const ZHANDOU_EFFECT_SCHEMA_PATH := "%s/战斗effects效果介绍.json" % EXPORT_DIR
 const ZHANDOU_VFX_INDEX_PATH := "%s/zhandou_vfx_index.json" % EXPORT_DIR
 const ZHANDOU_FLOAT_STYLES_PATH := "%s/zhandou_float_styles.json" % EXPORT_DIR
 const ZHANDOU_FLOAT_STYLE_ROWS_PATH := "%s/zhandou_float_styles_styles.json" % EXPORT_DIR
 
 const ItemDefScript = preload("res://scripts/core/item_def.gd")
-const EquipDefScript = preload("res://scripts/zhandou/equip_def.gd")
-const BuffDefScript = preload("res://scripts/zhandou/buff_def.gd")
 
 ## 配置文件中的文档用元数据键（加载后剔除）。
 const JSON_COMMENT_KEYS: Array[String] = ["_comment", "_说明", "_doc", "_备注"]
@@ -67,6 +61,12 @@ static func _strip_null_fields(value: Variant) -> Variant:
 		for cell in value:
 			out.append(_strip_null_fields(cell))
 		return out
+	if value is String:
+		var text := str(value).strip_edges()
+		if text.begins_with("{") or text.begins_with("["):
+			var parser := JSON.new()
+			if parser.parse(text) == OK and (parser.data is Dictionary or parser.data is Array):
+				return _strip_null_fields(parser.data)
 	return value
 
 
@@ -138,29 +138,15 @@ static func _sort_config_keys(a: Variant, b: Variant) -> bool:
 
 
 static func _read_json_root_object(path: String) -> Dictionary:
-	var v: Variant = _read_config_variant(path)
-	if v == null:
-		return {}
-	if v is Dictionary:
-		return v as Dictionary
-	push_error("JsonLoader: root must be a JSON object: %s" % path)
-	return {}
+	return JsonReader.read_object(path)
 
 
 static func _read_json_variant(path: String) -> Variant:
-	return _read_config_variant(path)
+	return JsonReader.read_variant(path)
 
 
 static func _read_config_variant(path: String) -> Variant:
-	if not FileAccess.file_exists(path):
-		push_error("JsonLoader: file not found: %s" % path)
-		return null
-	var text := FileAccess.get_file_as_string(path)
-	var parsed: Variant = JSON.parse_string(text)
-	if parsed == null:
-		push_error("JsonLoader: invalid JSON: %s" % path)
-		return null
-	return parsed
+	return JsonReader.read_variant(path)
 
 static func load_items() -> Array:
 	var out: Array = []
@@ -173,18 +159,6 @@ static func load_items() -> Array:
 		var it = ItemDefScript.from_dict(item as Dictionary)
 		if it != null:
 			out.append(it)
-	return out
-
-
-static func load_item_aliases() -> Dictionary:
-	var rows := _export_settings(ITEM_ALIASES_PATH)
-	var out := {}
-	for from_v in rows.keys():
-		var from_id := config_id_to_string(from_v)
-		var to_id := config_id_to_string(rows.get(from_v, ""))
-		if from_id == "" or to_id == "":
-			continue
-		out[from_id] = to_id
 	return out
 
 
@@ -339,159 +313,6 @@ static func _template_lookup_int(table_v: Variant, key: String, fallback: int) -
 	if table_v is Dictionary:
 		return int((table_v as Dictionary).get(key, fallback))
 	return fallback
-
-
-static func _sort_skill_dict_keys(a: Variant, b: Variant) -> bool:
-	var sa := str(a)
-	var sb := str(b)
-	if sa.is_valid_int() and sb.is_valid_int():
-		return int(sa) < int(sb)
-	return sa.naturalnocasecmp_to(sb) < 0
-
-
-static func load_equips_bundle() -> Dictionary:
-	var root := _read_json_root_object(EQUIPS_PATH)
-	if root.is_empty():
-		return {"equips": []}
-	return {"equips": _parse_equip_rows(root)}
-
-
-static func _parse_equip_rows(raw: Variant) -> Array:
-	var equips_out: Array = []
-	if not raw is Dictionary:
-		push_error("JsonLoader: equip config 'equips' must be an object keyed by equip id")
-		return equips_out
-	var d := raw as Dictionary
-	var keys: Array = d.keys()
-	keys.sort_custom(_sort_skill_dict_keys)
-	for k in keys:
-		var key_str := str(k).strip_edges()
-		if not key_str.is_valid_int():
-			push_error("JsonLoader: equip config equips key must be numeric id, got '%s'" % key_str)
-			continue
-		var eid := int(key_str)
-		if eid <= 0:
-			push_error("JsonLoader: equip id must be positive, got %d" % eid)
-			continue
-		var row_v: Variant = d[k]
-		if not row_v is Dictionary:
-			push_error("JsonLoader: equip %d entry must be an object" % eid)
-			continue
-		var row := (row_v as Dictionary).duplicate(true)
-		row["id"] = eid
-		var equip = EquipDefScript.from_dict(row)
-		if equip != null:
-			equips_out.append(equip)
-	return equips_out
-
-
-static func load_buffs() -> Array:
-	var root := _read_json_root_object(BUFFS_PATH)
-	var out: Array = []
-	if root.is_empty():
-		return out
-	var raw: Variant = root.get("buffs", root)
-	if not raw is Dictionary:
-		push_error("JsonLoader: buff config root must be an object keyed by buff id")
-		return out
-	var d := raw as Dictionary
-	for k in d.keys():
-		var bid := str(k).strip_edges()
-		if bid == "":
-			push_error("JsonLoader: buff config buffs key must be non-empty string")
-			continue
-		var row_v: Variant = d[k]
-		if not row_v is Dictionary:
-			push_error("JsonLoader: buff '%s' entry must be an object" % bid)
-			continue
-		var row := _normalize_export_buff_row(bid, row_v as Dictionary)
-		_validate_zhandou_effects_schema(
-			row.get("tick_effects", []),
-			"buff config buffs['%s'].tick_effects" % bid,
-			false
-		)
-		var buff = BuffDefScript.from_dict(row)
-		if buff != null:
-			out.append(buff)
-	return out
-
-
-static func load_zhandou_effect_schema() -> Dictionary:
-	return _read_json_root_object(ZHANDOU_EFFECT_SCHEMA_PATH)
-
-
-static func _normalize_export_buff_row(buff_id: String, raw: Dictionary) -> Dictionary:
-	var row := raw.duplicate(true)
-	row["id"] = buff_id
-	if row.has("type") and not row.has("tags"):
-		row["tags"] = ZhandouEffectCodec.split_csv_tags(row.get("type", ""))
-	var ticktime := float(row.get("ticktime", 1.0))
-	if ticktime < 0.0:
-		row["ticktime"] = 0.0
-	var mods_v: Variant = row.get("modifiers", {})
-	if mods_v is Array:
-		row["modifiers"] = ZhandouEffectCodec.normalize_buff_modifiers(mods_v)
-	var tick_v: Variant = row.get("tick_effects", [])
-	if tick_v is Array:
-		row["tick_effects"] = ZhandouEffectCodec.normalize_buff_tick_effects(tick_v)
-	return row
-
-
-static func _validate_zhandou_effects_schema(raw: Variant, path_label: String, allow_target: bool) -> void:
-	if raw == null:
-		return
-	if not raw is Array:
-		push_error("JsonLoader: %s must be Array" % path_label)
-		return
-	for i in (raw as Array).size():
-		var item_v: Variant = (raw as Array)[i]
-		if item_v is Array:
-			var cells := item_v as Array
-			if cells.is_empty():
-				push_error("JsonLoader: %s[%d] positional effect is empty" % [path_label, i])
-				continue
-			var effect_id := str(cells[0]).strip_edges().to_lower()
-			if not ZhandouEffectCodec.is_schema_effect_id(effect_id):
-				push_error("JsonLoader: %s[%d] effect '%s' is unsupported" % [path_label, i, effect_id])
-			continue
-		if not item_v is Dictionary:
-			push_error("JsonLoader: %s[%d] must be object or positional array" % [path_label, i])
-			continue
-		var item := item_v as Dictionary
-		if item.has("type"):
-			var etype := str(item.get("type", "")).strip_edges().to_lower()
-			if etype == "":
-				push_error("JsonLoader: %s[%d].type is required" % [path_label, i])
-				continue
-			if not EnumCombatEffectType.is_valid_label(etype):
-				push_error("JsonLoader: %s[%d].type '%s' is unsupported" % [path_label, i, etype])
-			if allow_target and item.has("target"):
-				var target := str(item.get("target", "")).strip_edges().to_lower()
-				if target != "" and not EnumZhandouTarget.is_valid_label(target):
-					push_error("JsonLoader: %s[%d].target '%s' is unsupported" % [path_label, i, target])
-				if item.has("target_arg") or item.has("targetArg"):
-					var target_arg := str(item.get("target_arg", item.get("targetArg", ""))).strip_edges().to_lower()
-					if target_arg != "" and not EnumZhandouTargetArg.is_valid_label(target_arg):
-						push_error("JsonLoader: %s[%d].target_arg '%s' is unsupported" % [path_label, i, target_arg])
-			if EnumCombatEffectType.requires_value(etype) and not item.has("value"):
-				push_error("JsonLoader: %s[%d].value is required for type '%s'" % [path_label, i, etype])
-			continue
-		var etype := str(item.get("type", "")).strip_edges().to_lower()
-		if etype == "":
-			push_error("JsonLoader: %s[%d].type is required" % [path_label, i])
-			continue
-		if not EnumCombatEffectType.is_valid_label(etype):
-			push_error("JsonLoader: %s[%d].type '%s' is unsupported" % [path_label, i, etype])
-		if allow_target and item.has("target"):
-			var target := str(item.get("target", "")).strip_edges().to_lower()
-			if target != "" and not EnumZhandouTarget.is_valid_label(target):
-				push_error("JsonLoader: %s[%d].target '%s' is unsupported" % [path_label, i, target])
-			if item.has("target_arg") or item.has("targetArg"):
-				var target_arg := str(item.get("target_arg", item.get("targetArg", ""))).strip_edges().to_lower()
-				if target_arg != "" and not EnumZhandouTargetArg.is_valid_label(target_arg):
-					push_error("JsonLoader: %s[%d].target_arg '%s' is unsupported" % [path_label, i, target_arg])
-		if EnumCombatEffectType.requires_value(etype) and not item.has("value"):
-			push_error("JsonLoader: %s[%d].value is required for type '%s'" % [path_label, i, etype])
 
 
 static func strip_json_comments(variant: Variant) -> Variant:
@@ -708,10 +529,6 @@ static func load_liandan_bundle() -> Dictionary:
 	root["recipes"] = _export_row_array(export_path("liandan_recipes.json"))
 	root["strategies"] = _export_row_array(export_path("liandan_strategies.json"))
 	return root
-
-
-static func load_shijian_rules_bundle() -> Dictionary:
-	return _export_settings(yunxing_params_path("shijian_rules.json"))
 
 
 static func load_tupo_rules_bundle() -> Dictionary:

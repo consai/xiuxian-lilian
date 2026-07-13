@@ -21,6 +21,7 @@ var _wilderness_locations_by_id: Dictionary = {}
 var _lilian_common_events_by_id: Dictionary = {}
 var _lilian_events_by_id: Dictionary = {}
 var _lilian_rules: Dictionary = {}
+var _character_choices_by_type: Dictionary = {}
 
 
 func _ready() -> void:
@@ -28,12 +29,7 @@ func _ready() -> void:
 
 
 func reload_all() -> void:
-	const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
-	const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
-	const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
-	DaoTreeServiceScript.reload()
-	XiulianMethodServiceScript.reload()
-	AbilityServiceScript.reload()
+	_character_choices_by_type.clear()
 	_load_items_local()
 	_load_skills_local()
 	_load_equips_local()
@@ -47,6 +43,19 @@ func reload_all() -> void:
 
 func items() -> Array:
 	return _items.duplicate()
+
+
+func character_creation_choices(choice_type: String) -> Array:
+	var type_id := choice_type.strip_edges().to_lower()
+	if type_id not in ["origin", "root", "talent"]:
+		push_error("ConfigManager: unknown character choice type '%s'" % choice_type)
+		return []
+	if not _character_choices_by_type.has(type_id):
+		const CharacterCreationCatalogScript := preload(
+			"res://scripts/sim/character_creation_catalog.gd"
+		)
+		_character_choices_by_type[type_id] = CharacterCreationCatalogScript.load_choices(type_id)
+	return (_character_choices_by_type[type_id] as Array).duplicate(true)
 
 
 func item_def_by_id(item_id: String) -> ItemDef:
@@ -514,9 +523,10 @@ func get_item_display_name(item_id: String) -> String:
 
 
 func _load_items_local() -> void:
+	const ItemAliasCatalogScript := preload("res://scripts/sim/item_alias_catalog.gd")
 	_items = JsonLoader.load_items()
 	_item_name_by_id.clear()
-	_item_id_aliases = JsonLoader.load_item_aliases()
+	_item_id_aliases = ItemAliasCatalogScript.load_all()
 	_items_by_id.clear()
 	_items_by_fight_id.clear()
 	for it in _items:
@@ -708,7 +718,7 @@ func _parse_drop_pool_entries(text: String) -> Dictionary:
 
 func _load_monsters_local() -> void:
 	_monsters_by_id.clear()
-	var root := JsonLoader._read_json_root_object(JsonLoader.export_path("guaiwu.json"))
+	var root := JsonReader.read_object("res://data/exportjson/guaiwu.json")
 	if not root is Dictionary:
 		return
 	for key in (root as Dictionary).keys():
@@ -799,8 +809,9 @@ func _load_skills_local() -> void:
 
 
 func _load_equips_local() -> void:
+	const EquipCatalogScript := preload("res://scripts/zhandou/equip_catalog.gd")
 	_equips_by_id.clear()
-	var bundle: Dictionary = JsonLoader.load_equips_bundle()
+	var bundle: Dictionary = EquipCatalogScript.load_bundle()
 	var equips_v: Variant = bundle.get("equips", [])
 	if not equips_v is Array:
 		return
@@ -814,8 +825,9 @@ func _load_equips_local() -> void:
 
 
 func _load_buffs_local() -> void:
+	const BuffCatalogScript := preload("res://scripts/zhandou/buff_catalog.gd")
 	_buff_by_id.clear()
-	for bv in JsonLoader.load_buffs():
+	for bv in BuffCatalogScript.load_all():
 		if bv is BuffDef:
 			_buff_by_id[(bv as BuffDef).id] = bv
 		elif bv is Dictionary:

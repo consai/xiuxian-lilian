@@ -139,7 +139,7 @@ static func from_dict(data: Dictionary) -> ItemDef:
 	item.icon_path = str(data.get("icon", data.get("icon_path", data.get("tuBiao", "")))).strip_edges()
 	var ue: Variant = data.get("use_effect", data.get("shiYongXiaoGuo", null))
 	if ue is Array:
-		item.use_effect = (ue as Array).duplicate(true)
+		item.use_effect = _normalize_use_effects(ue as Array)
 	else:
 		item.use_effect = []
 	var fe: Variant = data.get("fight_effect", null)
@@ -155,3 +155,24 @@ static func from_dict(data: Dictionary) -> ItemDef:
 	if item.stackable == 0:
 		item.max_stack = 1
 	return item
+
+
+static func _normalize_use_effects(rows: Array) -> Array:
+	var out: Array = []
+	for row_v in rows:
+		if row_v is Dictionary:
+			out.append((row_v as Dictionary).duplicate(true))
+			continue
+		if not row_v is Array or (row_v as Array).is_empty():
+			push_error("ItemDef: use_effect row must be a non-empty Array or Dictionary")
+			continue
+		var cells := row_v as Array
+		var op := str(cells[0]).strip_edges().to_lower()
+		if op == "":
+			push_error("ItemDef: use_effect op cannot be empty")
+			continue
+		var args := cells.slice(1).duplicate(true)
+		while not args.is_empty() and (args.back() == null or str(args.back()).strip_edges() == ""):
+			args.pop_back()
+		out.append({"op": op, "args": args})
+	return out

@@ -328,17 +328,17 @@ func _on_event_chosen(event_id: String) -> void:
 func _on_exit_pressed() -> void:
 	if _is_pending_battle_dismissed():
 		LilianState.retreat_from_pending_battle()
-		SceneManager.go_lilian_jiesuan("manual")
+		LilianFlowService.open_settlement("manual", LilianState, GameState, SceneManager)
 		return
 	if not LilianState.can_exit():
 		return
-	SceneManager.go_lilian_jiesuan("manual")
+	LilianFlowService.open_settlement("manual", LilianState, GameState, SceneManager)
 
 
 func _on_bag_pressed() -> void:
 	if not _can_open_utility_panels():
 		return
-	var nav: Dictionary = SceneManager.go_beibao_panel()
+	var nav: Dictionary = SceneManager.go_beibao_panel({"context": "lilian"})
 	if not bool(nav.get("ok", false)):
 		var err := str(nav.get("error", "无法打开储物袋")).strip_edges()
 		if err != "":
@@ -348,7 +348,7 @@ func _on_bag_pressed() -> void:
 func _on_fightsetting_pressed() -> void:
 	if not _can_open_utility_panels():
 		return
-	var nav: Dictionary = SceneManager.go_zhandou_peizhi_mianban()
+	var nav: Dictionary = SceneManager.go_zhandou_peizhi_mianban(true)
 	if not bool(nav.get("ok", false)):
 		var err := str(nav.get("error", "无法打开战斗设置")).strip_edges()
 		if err != "":
@@ -454,14 +454,14 @@ func _refresh_map_after_layout() -> void:
 
 
 func _fallback_hub() -> void:
-	SceneManager.go_hub()
+	LilianFlowService.open_hub(LilianState, SceneManager)
 
 
 func _go_completed_result() -> void:
 	var reason := LilianState.pending_exit_reason
 	if reason == "":
 		reason = "defeated"
-	SceneManager.go_lilian_jiesuan(reason)
+	LilianFlowService.open_settlement(reason, LilianState, GameState, SceneManager)
 
 
 func _prepare_battle_popup() -> void:
@@ -490,7 +490,9 @@ func _on_battle_fight_requested() -> void:
 		return
 	var popup := %BattlePopup as LilianZhandouTanchuangView
 	var battle_data := LilianState.build_battle_init()
-	var nav: Dictionary = SceneManager.go_zhandou(battle_data, "lilian")
+	var nav: Dictionary = ZhandouInitData.start_battle(
+		get_tree(), battle_data, "lilian", SceneManager, true
+	)
 	if not bool(nav.get("ok", false)):
 		LilianState.clear_pending_battle()
 		_locked = false

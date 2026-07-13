@@ -7,8 +7,8 @@ export function validateEffectRows(rows, schema, label) {
       continue;
     }
     const effectId = String(row[0] ?? "").trim().toLowerCase();
-    const definition = schema.effects?.[effectId];
-    if (!definition) {
+    const definition = effectDefinition(schema, effectId);
+    if (definition == null) {
       errors.push(`${label}.effects[${index}]: 未登记效果 ${effectId}`);
       continue;
     }
@@ -22,4 +22,17 @@ export function validateEffectRows(rows, schema, label) {
     }
   }
   return errors;
+}
+
+function effectDefinition(schema, effectId) {
+  const raw = (schema.effects ?? schema)?.[effectId];
+  if (!raw) return null;
+  if (Array.isArray(raw.parameters)) return raw;
+
+  const parameters = [];
+  for (let i = 1; i <= 5; i += 1) {
+    const value = raw[`参数${i}`];
+    if (value != null && String(value).trim() !== "") parameters.push(String(value));
+  }
+  return { parameters, required: parameters.length > 0 ? 1 : 0 };
 }

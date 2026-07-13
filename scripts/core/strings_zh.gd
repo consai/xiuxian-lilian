@@ -15,10 +15,21 @@ static func _ensure_loaded() -> void:
 	if _loaded:
 		return
 	_loaded = true
-	if not FileAccess.file_exists(DATA_PATH):
-		push_error("StringsZh: 缺少文件 %s" % DATA_PATH)
-		return
-	_root = JsonLoader._export_settings(DATA_PATH)
+	var rows := JsonReader.read_object(DATA_PATH)
+	for outer_key in rows.keys():
+		var row_v: Variant = rows[outer_key]
+		if not row_v is Dictionary:
+			push_error("StringsZh: row '%s' must be an object" % str(outer_key))
+			continue
+		var row := row_v as Dictionary
+		var key := str(row.get("key", outer_key)).strip_edges()
+		if key == "":
+			push_error("StringsZh: row '%s' has empty key" % str(outer_key))
+			continue
+		if not row.has("value"):
+			push_error("StringsZh: row '%s' is missing value" % key)
+			continue
+		_root[key] = row["value"]
 
 
 ## 将调用方路径规范为配置键：`.` 与 `:` 均可，统一为 `:`。

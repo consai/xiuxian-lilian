@@ -1,358 +1,464 @@
-# 项目重构架构设计
+# 游戏生产级重构执行路线图
 
-> 扫描基线：2026-07-10。本文只设计重构，不修改现有业务行为。仓库当前存在未提交改动，实施前应先形成独立基线提交，避免把功能开发与架构迁移混在一起。
+> 状态：执行基线 v2.0
+>
+> 扫描日期：2026-07-12
+>
+> 规范优先级：`AGENTS.md`、`docs/project_architecture_rules.md` 高于本文。本文只负责把生产规范落成可执行迁移路线，不替代规范。
+>
+> 目标：在不改变已完成玩法结果和主要界面行为的前提下，将项目重构为可验证、可维护、适合 AI 持续执行的生产级 Godot 模块化单体。
 
-## 1. 结论
+## 1. 已确认的产品边界
 
-项目不需要推倒重写。已有战斗、历练、地图、剧情和配置服务具备可复用基础，主要问题是边界没有被强制执行：全局状态承担过多业务、核心层反向依赖功能层、UI 可直接接触可变状态、配置读取和兼容逻辑分散。
+### 1.1 本轮必须完成
 
-重构采用“稳定门面 + 纵向切片”的渐进方案：
+- 覆盖全部已经完成且当前可运行的功能，保持玩法结果和主要界面行为不变。
+- 重构技能系统，包括当前主动技能、被动技能、Buff、释放策略和战斗接入。
+- 保留并重构功法系统，包括当前选择、装备、熟练度及其对修炼和属性的既有效果。
+- 保留现有 UI 视觉、布局和交互结果；允许调整 `.tscn` 节点组织、信号、绑定和脚本。
+- 建立新的单自动存档、独立设置、配置查询、状态所有权、导航和测试体系。
+- 允许调整所有代码目录、脚本、内部 API、Autoload 和数据结构。
+- 最终删除迁移期门面、旧兼容和无调用代码，不把临时架构留在成品中。
 
-1. 先修复验证基线，保证每次改动可判定是否破坏功能。
-2. 保留 `GameState`、`ConfigManager`、`LilianState` 现有公共方法作为临时兼容门面。
-3. 按修炼、炼丹、突破、背包、委托、历练、战斗逐模块抽离状态与用例。
-4. UI 只发命令和渲染快照，不直接修改游戏状态。
-5. 最后删除门面中的转发代码和无效兼容层，不做无收益的纯目录搬家。
+### 1.2 只保留界面和设计
 
-## 2. 当前项目基线
+- 大道系统。
+- 自主研读与知识成长；保留现有界面和数据设计，后续可独立重新开发。
+- 经 Phase 0 审计判定为尚未完成或只有占位界面的其他功能。
 
-| 范围 | 数量/规模 | 观察 |
-| --- | ---: | --- |
-| GDScript | 221 个，42,544 行，2,844 个函数 | 597 个函数返回 `Dictionary`，跨模块契约偏弱 |
-| 场景 | 85 个 | 612 个 `unique_name_in_owner`，节点引用约定执行良好 |
-| JSON 配置 | 80 个 | 配置已外置，但加载、归一化和默认降级职责混杂 |
-| Autoload | 13 个 | 状态、UI Host、剧情和功能服务均全局化 |
-| 战斗模块 | 55 文件，10,803 行 | 最大模块，已有 domain/scene/vfx/ai 子结构 |
-| UI 模块 | 53 文件，8,576 行 | 仍有 6 个脚本动态创建固定 UI 节点 |
-| 模拟模块 | 25 文件，7,171 行 | `GameState` 成为事实上的上帝对象 |
-| 历练模块 | 17 文件，4,377 行 | `LilianState` 同时持有状态、流程和跨场景编排 |
+这些功能保留现有界面资产和未来模块边界，但本轮不补玩法、不建立空 service/factory/interface，也不伪造可运行数据。技能和功法系统不属于此范围。
 
-最大职责聚集点：
+### 1.3 明确不做
 
-| 文件 | 行数 | 当前职责 |
-| --- | ---: | --- |
-| `scripts/sim/game_state.gd` | 1,748 | 存档门面、新游戏、修炼、炼丹、突破、地图、奖励、时间、战斗快照、装备与物品 |
-| `scripts/zhandou/zhandou_domain_service.gd` | 1,204 | 战斗时序、技能/物品/装备、资源、效果路由与事件 |
-| `scripts/zhandou/zhandou_init_data.gd` | 1,136 | 战斗输入装配、配置合并、图标解析、旧结构降级 |
-| `scripts/zhandou/zhandou_obj.gd` | 1,096 | 战斗单位状态、冷却、效果、费用、事件与查询 |
-| `scripts/lilian/lilian_state.gd` | 1,045 | 局内状态、地图推进、事件、战斗衔接、结算、日志和背包 |
-| `scripts/core/config_manager.gd` | 824 | 物品、技能、装备、Buff、怪物、地点、地图、历练事件与规则缓存 |
-| `scripts/core/json_loader.gd` | 751 | 文件读取、导出格式解析、各功能配置装配与部分业务归一化 |
-| `scenes/items/bag_base.gd` | 793 | 虚拟列表、筛选、排序、数据转换、悬浮提示与物品/装备解释 |
+- 不兼容任何旧存档；新架构使用全新 schema。
+- 不开发新玩法，不调整伤害、价格、掉落、概率等数值平衡。
+- 不接入 Steamworks、成就、云存档、创意工坊、联机或手柄。
+- 不做性能专项，也不预建对象池、异步加载、页面缓存或复杂虚拟化。
+- 不重新设计现有美术与 UI 视觉。
+- 不为每个函数绘制 UML 或维护易过期的静态调用图。
 
-## 3. 当前主要风险
+### 1.4 发布约束
 
-### P0：验证基线不可用
+- 平台：Windows Steam 单机游戏。
+- 输入：键盘和鼠标。
+- 设计分辨率：`1920×1080`；最低支持：`1280×720`。
+- 显示模式：窗口化、无边框窗口、全屏。
+- 首发语言：简体中文；玩家可见文本使用 `tr()`/翻译资源入口，但本轮不制作其他语言内容。
 
-- `node tools/validate-all.mjs` 当前失败：大道树 37 项、技能 8 项，修炼功法校验器在 `prev.effects.find` 处抛出类型异常。
-- Godot 4.6.2 headless 启动能进入主场景，但报告 4 个缺失历练配置文件：`lilian_common_events*.json`、`lilian_events*.json`。
-- 4 个 `.gd.uid` 没有对应脚本：`battle_summary.gd`、两个旧战斗 enum、`combat_block_presenter.gd`。
-- `npm run validate` 受本机 PowerShell 执行策略影响；CI 和本地入口应直接调用 `node tools/validate-all.mjs`，或使用可执行的 `.cmd`/PowerShell 包装。
+## 2. 当前基线与不一致
 
-在基线变绿前开始大规模重构，会无法区分“旧问题”和“新回归”。
+Phase 0 从 HEAD `29766807` 和仅本文未提交改写的工作区开始。以下数字只记录 2026-07-12 的阶段验收结果，不作为永久验收逻辑。
 
-### P1：状态所有权不唯一
+| 项目 | Phase 0 初始 | Phase 0 验收 |
+| --- | --- | --- |
+| GDScript | 221 个 | 227 个（新增测试） |
+| 场景 | 85 个 | 84 个（删除失效场景） |
+| Autoload | 13 个 | 13 个；Phase 1 开始收敛 |
+| `npm run validate` | 仅 4 个 Node 检查且失败 | 完整门禁通过 |
+| 技能配置 | 33 项未登记效果错误 | 39 个技能通过 |
+| 道具配置 | 34 项未登记效果错误 | 47 个道具通过 |
+| 大道配置 | 通过；仅保留设计 | 通过；仅保留设计 |
+| 功法配置 | 通过 | 15 个谱系、83 层通过；必须保留 |
+| 孤立 `.gd.uid` | 4 个 | 0 个 |
+| Route smoke | 未覆盖 | 20 个场景通过，无 ERROR |
 
-`DataStore.savedata` 是实际数据源，`GameState` 通过大量 getter/setter 暴露同一字典，多个 service 又接收并原地修改该字典；剧情、教程和委托仍直接写 `DataStore.savedata`。因此目前没有单一写入口，也无法可靠记录一次业务操作改变了哪些字段。
+Phase 0 已处理：
 
-### P1：依赖方向倒置
+1. 确认历练 JSON 已齐全，旧文档记录过时。
+2. 删除 `character_creation.json` 残余依赖，姓名固定为 1–12 个字符。
+3. 修正 Node 校验器对受保护效果表原样结构的误读，并保护 11 个合法效果 ID。
+4. 将配置、UID/资源、Godot characterization、20 route smoke、启动和 `git diff --check` 接入唯一 `npm run validate`。
+5. 删除 4 个孤立 UID 和无引用且缺脚本的旧地点选择场景。
+6. 最终目标保持 3 个 Autoload；Overlay 由 `AppRoot` 持有，不建立万能 Result。
 
-当前 `core` 直接依赖 `sim`、`dao`、`lilian`、`map`、`zhandou`。例如 `DataStore` preload 角色、知识和炼丹服务，`ConfigManager` 认识所有功能配置与战斗定义。核心层无法独立启动或测试，任一功能配置错误都会污染全局启动。
+## 3. 重构原则
 
-### P1：UI 与业务耦合
+1. **完整目标、小步落地。** 最终架构一次设计清楚，实施必须拆成始终可验证、可回滚的垂直阶段。
+2. **先刻画行为，再移动代码。** 没有最小行为检查的模块不得开始结构迁移。
+3. **依赖向内。** `presentation -> application -> domain/core`；基础设施实现依赖领域定义的边界，不反向污染领域。
+4. **状态唯一所有者。** 静态配置、长期存档、局内 session、UI 临时状态和缓存必须分开。
+5. **UI 只表达意图。** UI 渲染快照并发出用户操作，不读取可变存档、不计算业务规则、不直接提交状态。
+6. **原表直接查询。** Excel 原样导出的 JSON 是运行时配置；只允许薄查询封装，不生成第二份中间配置或通用 Definition 层。
+7. **边界才建 Contract。** 只在跨模块、跨场景、存档和稳定 UI 快照处使用 typed contract；模块内部使用普通值和明确类型。
+8. **失败要明确。** 配置、资源、存档和 payload 非法时返回具名错误或在开发/CI fail-fast，禁止静默默认假数据。
+9. **删除胜过兼容。** 本轮无旧存档兼容要求；仓库调用迁完后立即删除旧 API、fallback 和转发。
+10. **测试可复用。** 测试通过公共命令、query 和 contract 驱动，不绑定私有函数与临时目录结构。
 
-UI 大量读取 `GameState`，部分 UI 直接调用会改变状态的 service；`ItemInfoPopupHost` 甚至执行物品使用。`bag_base.gd` 同时把库存模型转成显示模型。固定 UI 仍在 6 个脚本中动态创建，不符合项目的 `.tscn` 约定。
-
-### P2：跨模块契约以 Dictionary 为主
-
-现有 `ScenePayload`、`LilianResult`、`PlayerBattleSnapshot`、`ZhandouSummary` 是正确方向，但大量关键边界仍依赖隐式字符串键。配置、场景、战斗和结算之间的错误通常只能在运行到具体分支后发现。
-
-### P2：兼容和降级逻辑持续扩散
-
-旧字段映射、默认配置、fallback 战斗配置和静默空字典分布在 loader、enum、service 与 UI 中。这与项目“开发阶段非法数据直接报错”的约定冲突，也让真实配置错误在更远处才暴露。
-
-## 4. 目标架构
-
-```mermaid
-flowchart TD
-    UI["Presentation：.tscn + View/Presenter"] --> APP["Application：用例/流程编排"]
-    APP --> DOMAIN["Domain：规则、实体、纯服务"]
-    APP --> STATE["State Store：savedata/rundata 唯一所有者"]
-    DOMAIN --> CONTRACTS["Contracts：模块边界 DTO"]
-    REPO["Feature Catalog：配置校验、归一化、缓存"] --> DOMAIN
-    JSON["Core JsonReader：只负责读取/解析"] --> REPO
-    SAVE["Save Repository：文件持久化与 schema 迁移"] --> STATE
-    NAV["SceneManager：只负责导航和 payload"] --> UI
-```
-
-依赖只能向下：
-
-`presentation -> application -> domain -> core contracts`
-
-`feature catalog -> generic json reader`
-
-禁止：
-
-- `core -> feature`
-- `domain -> UI/SceneTree/autoload`
-- `UI -> DataStore.savedata`
-- 功能 A 直接修改功能 B 的状态切片
-- loader 对缺失业务配置构造“可运行的假数据”
-
-## 5. 模块职责
-
-| 模块 | 唯一职责 | 可依赖 | 不允许 |
-| --- | --- | --- | --- |
-| `core/state` | 保存 savedata/rundata、schema 版本、导入导出 | contracts | 业务计算、UI、功能 service |
-| `core/config` | 通用 JSON 读取与格式错误报告 | Godot FileAccess/JSON | 知道物品、战斗、历练字段 |
-| `core/navigation` | 场景注册、切换、返回栈、payload | SceneTree、contracts | 结算与业务状态修改 |
-| `sim/*` | 玩家长期状态的垂直功能：时间、修炼、炼丹、突破、库存、委托 | core、各自 catalog | UI 节点、跨功能原地写状态 |
-| `lilian` | 一次历练 session、事件、地图与结算用例 | sim 的公开命令、battle contracts | 直接写玩家长期状态 |
-| `zhandou` | 一次战斗 session、规则、AI、记录和 VFX 事件 | battle catalog、contracts | 读取全局 GameState 或 LilianState |
-| `map` | 世界图查询、寻路、旅行用例 | map catalog、time command | 直接推进玩家其他状态 |
-| `story` | 剧情状态机和教程触发 | story catalog、application events | 直接写任意 savedata 字段 |
-| `ui` | 渲染 ViewModel、发出用户意图 | application API | 业务规则、配置归一化、状态写入 |
-
-## 6. 状态与命令模型
-
-### 长期状态
-
-`DataStore.savedata` 保持唯一持有者，但不再公开可变引用。对外只返回深拷贝快照。长期状态按功能键分区：
+## 4. 最终运行时架构
 
 ```text
-savedata
-├── profile / progression / vitals
-├── inventory / equipment
-├── cultivation / knowledge / alchemy
-├── map / commissions
-└── story / tutorial / statistics
+AppRoot（唯一 main_scene，常驻）
+├── SceneHost                 当前唯一可导航 Page/Game Scene
+├── ModalLayer / ModalHost    阻塞弹窗
+├── TransientLayer            Toast、Tooltip、Item Popup、GM
+├── TransitionLayer           加载遮罩和重复导航阻断
+└── Feature Roots             Story/Tutorial 等长于页面但非全局基础设施的节点
+
+Autoload（最终仅 3 个）
+├── DataStore                 长期状态和 session 值的唯一容器
+├── ConfigCatalog             原样 JSON 的只读、按需查询入口
+└── SceneManager              路由、payload、场景原子替换
 ```
 
-每个功能只有一个 application service 可以提交本功能状态。跨功能操作由用例编排，例如“炼丹”按顺序调用库存扣除、炼丹结算、时间推进，再统一产生结果和事件。
+### 4.1 AppRoot
 
-### 局内状态
+- `AppRoot` 成为唯一 `main_scene`，组合固定 Host 并完成启动检查。
+- Overlay、GM、剧情和教程不得成为 Autoload；由 `AppRoot` 或所属功能场景持有。
+- 页面离开默认释放，不缓存隐藏页面。
+- 全局 CanvasLayer 层级只在 `app_root.tscn` 定义。
 
-`rundata` 只存可恢复的 session 数据，不保存 Node、Texture、Callable 或 service 实例：
+### 4.2 Autoload
 
-- `lilian_session`
-- `battle_session`
-- `scene_payloads`
-- `ui_transient`
+最终只保留：
 
-`LilianState` 迁移后变为 `LilianSessionService`，以 session 字典为输入并返回新 session/结果；战斗场景只消费 `BattleInit`，只返回 `ZhandouSummary`。
+| 名称 | 唯一职责 |
+| --- | --- |
+| `DataStore` | 持有已校验的长期状态和可恢复 session；不含业务算法和文件 I/O |
+| `ConfigCatalog` | 按需读取单个导出 JSON，校验并提供只读查询 |
+| `SceneManager` | 路由注册、payload 校验、过渡锁、返回栈和场景原子替换 |
 
-### 业务操作返回值
+`GameState`、`LilianState`、`SaveService`、`DataEvents`、各 UI Host、`StoryDirector`、`TutorialService` 均为迁移对象，不是最终 Autoload。
 
-跨模块操作统一返回明确 contract，至少包含：
-
-```text
-ok, error_code, message, state_changes, events, payload
-```
-
-不要为所有内部函数创建 DTO；只在存档、场景、战斗、历练结算、奖励和公共命令边界使用 typed contract。
-
-## 7. 建议目录
-
-保持现有顶层结构，按触碰到的功能逐步整理，不进行一次性移动：
+### 4.3 模块化单体
 
 ```text
 scripts/
+├── app/                     AppRoot 启动与组合
 ├── core/
-│   ├── state/          # data_store、schema、migration
-│   ├── config/         # json_reader、通用校验工具
-│   ├── navigation/     # scene_manager
-│   └── contracts/      # 跨模块 DTO
-├── sim/
-│   ├── player/
-│   ├── inventory/
-│   ├── cultivation/
-│   ├── alchemy/
-│   ├── breakthrough/
-│   ├── commission/
-│   └── time/
-├── lilian/
-│   ├── domain/
-│   ├── application/
-│   └── presentation/
-├── zhandou/
-│   ├── domain/
-│   ├── application/
-│   ├── ai/
-│   ├── vfx/
-│   └── presentation/
-├── map/
-├── story/
-└── ui/
-    ├── shared/
-    └── overlays/
+│   ├── state/               DataStore、全新存档 schema
+│   ├── config/              通用 JSON reader、ConfigCatalog
+│   ├── navigation/          SceneManager、route/payload
+│   └── contracts/           真正跨模块的稳定数据契约
+├── features/
+│   ├── character/           创建、属性、境界
+│   ├── inventory/           背包、物品、装备、负重
+│   ├── cultivation/         已有修炼行为
+│   ├── alchemy/             已有炼丹行为
+│   ├── breakthrough/        已有突破行为
+│   ├── commission/          已有委托行为
+│   ├── world_map/           地图与旅行
+│   ├── lilian/              历练 session、事件、结算
+│   ├── battle/              战斗、主动/被动技能、Buff、AI
+│   ├── story/               当前已完成部分
+│   ├── tutorial/            当前已完成部分
+│   ├── gongfa/               现有功法、装备、熟练度与效果
+│   └── dao_design/           界面与设计占位，不实现玩法
+└── ui/shared/               无业务规则的共享 View/Host
 ```
 
-场景继续放在 `scenes/<feature>/`。固定控件、样式和布局必须在 `.tscn`；脚本只绑定数据、状态和信号。纯绘图或运行时数量不定的节点（地图连线、战斗浮字等）可保留动态创建。
+实际目录迁移必须按阶段逐步完成；禁止先创建空目录和空层。文件名继续遵守项目角色后缀，不新增 `manager/helper/utils/common` 万能脚本。
 
-## 8. Autoload 收敛
+### 4.4 模块内最小分层
 
-目标从 13 个降到 4 个全局入口：
+仅在真实职责存在时创建：
 
-| 保留/目标 | 职责 |
-| --- | --- |
-| `DataStore` | 纯状态容器与 schema，不含业务规则 |
-| `ConfigCatalog` | 只读配置入口；内部按功能延迟加载 catalog |
-| `SceneManager` | 导航与 typed payload |
-| `UiOverlayHost` | 一个 `.tscn` 组合 tips、hover、item popup 和开发期 GM 子场景 |
+```text
+presentation  页面、Panel、Dialog、View
+      ↓ intent / snapshot
+application   用例编排、跨状态切片的原子提交
+      ↓
+domain        纯规则、不变量、确定性计算
+      ↓ query
+catalog       本模块原始 JSON 查询函数
+```
 
-迁移期保留 `GameState`、`LilianState`、`DataEvents` 作为兼容入口。`SaveService` 改为由存档用例持有；`StoryDirector`、`TutorialService` 由应用根或剧情模块场景持有；各 UI Host 变为 `UiOverlayHost` 的子节点而非 autoload。
+- 简单模块可以只有 application + view，不强制四层齐全。
+- Catalog 不转换成第二套数据模型，不执行伤害、奖励、价格等玩法计算。
+- Domain 不依赖 Node、SceneTree、Autoload、FileAccess 或 UI。
+- Application 是唯一允许协调多个状态切片和触发自动存档的层。
 
-## 9. 关键文件拆分
+## 5. 配置与 Excel 边界
 
-### `game_state.gd`
+### 5.1 数据链
 
-先保持所有公开方法签名不变，仅把实现委托给现有/新增功能 service：
+```text
+C:\godot\excel_config\indir\*.xlsx
+        ↓ 通用导出器：原样、确定性
+data/exportjson/**/*.json
+        ↓ JsonReader + 对应模块薄查询函数
+Application / Domain
+```
 
-| 当前方法组 | 目标服务 |
-| --- | --- |
-| `save_game/load_game/to_dict/apply_dict` | `GameSaveApplication` |
-| `cultivate*`、`preview_cultivation*` | `CultivationApplication` |
-| `liandan*`、`brew*` | `AlchemyApplication` |
-| `preview_breakthrough/attempt_breakthrough` | `BreakthroughApplication` |
-| `travel_to_city/map_data` | `WorldTravelApplication` |
-| `use_inventory_item/assign_*_slot` | `InventoryApplication`、`LoadoutApplication` |
-| `begin_lilian/settle_lilian` | `LilianApplication` |
-| `build_battle_*` | `BattleGateway` |
-| `_advance_time` | `GameTimeApplication` |
+- Godot 运行时只读取导出的 JSON，不读取 `.xlsx`。
+- 导出阶段禁止添加针对具体业务表的特殊转换代码。
+- 不生成规范化中间 JSON，不建立通用 Definition/DTO 映射层。
+- 查询封装只负责：按 ID/类型查找、必填字段与引用校验、返回只读深拷贝。
+- 业务公式、效果解释和状态修改留在对应 Domain/Application。
+- UI 不直接打开 JSON 或调用 FileAccess。
 
-完成后 `GameState` 只剩兼容转发；调用方迁完再删除，而不是同时改几十个 UI。
+### 5.2 禁止修改的 Excel
 
-### `config_manager.gd` 与 `json_loader.gd`
+以下文件的工作表、列名和数据值均视为不可修改外部输入：
 
-`JsonLoader` 缩为通用 `JsonReader`：读取文件、解析 JSON、去注释、报告路径和错误。物品、战斗、地图、历练等 load/normalize/cache 分别迁到功能 catalog。`ConfigManager` 暂时转发旧查询，所有新代码直接依赖对应 catalog。
+- `effects效果介绍.xlsx`
+- `道具.xlsx`
+- `怪物.xlsx`
+- `技能表_战斗被动buff配置.xlsx`
+- `境界.xlsx`
+- `新建角色.xlsx`
 
-### `lilian_state.gd`
+这六张表只能原样导出并由代码按原字段查询。其他 Excel 允许为了结构一致性进行拆表、合表、字段命名和引用规范化，但不得借重构修改玩法数值。
 
-拆为三部分：
+### 5.3 配置验收
 
-- `LilianSession`：只保存局内数据并负责序列化。
-- `LilianApplication`：start/advance/choose/finish 用例。
-- 现有 event/map/reward/log service：保留纯规则，清除 autoload 查找。
+- 每张运行时表必须有 schema/reference validator。
+- 缺文件、重复 ID、必填字段缺失、类型错误、失效引用必须失败。
+- Validator 读取与游戏相同的导出 JSON，不复制整份生产数据为 fixture。
+- 功法 validator 保护现有玩法数据；大道 validator 保留以保护未来设计数据，通过不代表本轮实现大道玩法。
 
-历练与战斗只通过 `BattleInit`、`ZhandouSummary` 交换数据。
+## 6. 状态、存档与设置
 
-### 战斗大文件
+### 6.1 状态分类
 
-战斗已有合理子模块，不做全面重写。优先把 `zhandou_domain_service.gd` 的“时序推进”“行动执行”“效果应用”拆成三个内部协作者；`zhandou_obj.gd` 只保留单位状态和不变量；`zhandou_init_data.gd` 删除运行时 fallback builder，要求 catalog 在进入战斗前完成校验。
+| 类型 | 所有者 | 是否持久化 |
+| --- | --- | --- |
+| 静态配置 | `ConfigCatalog` | 随构建发布，不进存档 |
+| 玩家长期状态 | `DataStore` | 是 |
+| 历练/战斗 session | 对应 Application 提交到 `DataStore` 的可恢复值 | 按恢复需求 |
+| Scene payload | `SceneManager` | 消费即删，默认不持久化 |
+| UI 临时状态 | 所属 View/Page | 否 |
+| 设置 | `SettingsRepository` | 独立 `settings.json` |
 
-### UI
+`DataStore` 不公开内部可变 Dictionary。Query 返回深拷贝快照；Command 通过 Application 校验后一次提交新状态。
 
-`bag_base.gd` 保留虚拟列表和交互，把库存/装备到行数据的转换迁到 `InventoryViewModelBuilder`。以下固定 UI 创建迁回 `.tscn`：
+### 6.2 唯一自动存档
 
-- `gm_battle_panel.gd`
-- `dao_tree_panel.gd`
-- `weituo_board_panel.gd`
-- `bag_base.gd`
-- `peizhi_xuanze_tanchuang.gd`
+- 不提供存档/读档页面和手动存档槽。
+- 主菜单只提供“新游戏”和“继续游戏”。
+- 每次关键业务结算成功后，由 Application 统一请求自动存档；失败的操作不得落盘半成品。
+- `continue` 自动读取唯一存档；主文件损坏时尝试备份，仍失败则明确提示并只允许新游戏。
+- 新游戏覆盖已有存档前必须明确确认。
 
-`dao_tree_graph_view.gd` 的图节点和连线数量由数据决定，可继续动态生成。
+存档路径：
 
-## 10. 公共 API 迁移影响
+```text
+user://saves/
+├── autosave.json
+├── autosave.bak
+└── autosave.tmp
+```
 
-第一至第三阶段禁止直接删除或改名以下入口：
+写入顺序：状态深拷贝与校验 → 写临时文件 → 关闭并重读校验 → 保留备份 → 原子替换。任一步失败必须保留旧存档。
 
-- `GameState.*`
-- `LilianState.*`
-- `ConfigManager.*`
-- `SceneManager.SCENE_PATHS`、`SceneManager.go_to()` 及现有 helper
-- `DataEvents` 现有 signals
-- 存档字段、scene payload 字段、战斗/历练 summary 字段
+全新 schema 不提供旧版本 migration；但必须保留 `schema_version`，未来出现第二版时再增加连续 migration。
 
-迁移规则：旧入口调用新实现并输出一次开发期 deprecation warning；当 `rg` 确认仓库内调用为 0、存档迁移和 contract tests 均通过后，才在独立提交中删除。存档字段变更必须提升 schema version 并提供单向 migration，不能用散落的 `.get(default)` 模拟迁移。
+### 6.3 设置
+
+`user://settings.json` 独立保存音量、分辨率和显示模式。新游戏、删除存档或存档损坏不得清除设置。
+
+## 7. 导航、UI 与输入
+
+### 7.1 导航
+
+- 所有 Page/Game Scene 使用唯一 route 表登记。
+- SceneManager 只做导航，不执行历练开始、结算、奖励、教程或战斗数据装配。
+- 导航前校验 route/payload；新场景成功实例化并加入 `SceneHost` 后才释放旧场景。
+- 失败时旧场景保持可用；空闲时 `SceneHost` 只有一个活动可导航场景。
+- 战斗叠层、背包和 Dialog 的生命周期由明确 Host 管理，不在 SceneManager 混入业务判断。
+
+### 7.2 UI
+
+- 保留现有视觉和主要交互结果。
+- 固定 UI、布局、Theme 和静态资源写在 `.tscn`；脚本仅做绑定、局部状态、信号和动画。
+- 动态数量列表项使用独立子场景实例化；地图连线、战斗浮字等天然动态节点可以代码创建。
+- UI 只调用 Application command/query；禁止引用 `DataStore`、FileAccess 或原始 JSON。
+- UI 不计算伤害、价格、奖励、成功率或配置归一化。
+- 固定节点使用 `unique_name_in_owner = true` 和 `%NodeName`。
+
+### 7.3 输入与显示
+
+- GUI 使用 Control signal；快捷键使用 InputMap。
+- 本轮只验收键盘鼠标，不建设手柄抽象层。
+- 设计分辨率与显示模式由独立设置用例管理，不由各页面自行修改窗口。
+
+## 8. Contract 与结果模型
+
+只在以下边界建立 typed contract：
+
+- route payload；
+- 战斗输入与战斗总结；
+- 历练结算；
+- 自动存档 schema；
+- 跨功能奖励、库存扣除和时间推进；
+- UI 需要稳定只读结构的复杂快照。
+
+结果按用途保持最小：
+
+```text
+CommandResult: ok, error_code?, message?, changed_snapshot?
+QueryResult:   ok, error_code?, value?
+Navigation:    ok, error_code?, route_id?
+```
+
+只有真实需要时才增加 events 或 payload。禁止统一六字段万能 Result、万能基类和每函数一个 DTO。
+
+## 9. 测试与单一门禁
+
+### 9.1 测试分层
+
+| 测试 | 覆盖 | 复用原则 |
+| --- | --- | --- |
+| Unit | Domain 纯规则、边界、seed 确定性 | 通过公开函数，不绑定 Node 和 Autoload |
+| Contract | 原样 JSON、route payload、战斗/历练结果、存档 schema | fixture 只含最小行 |
+| Integration | Application + DataStore + 查询封装，成功提交与失败回滚 | 使用内存状态和测试 `user://` |
+| Smoke | AppRoot 启动、全部 route 实例化、关键主链路 | 统一 headless runner |
+
+- 新增或修改非平凡逻辑必须留下一个最小可运行检查。
+- 随机系统注入 seed，时间逻辑注入时间值。
+- 测试不得读写真实玩家存档。
+- UI 不做像素级单元测试；通过 scene smoke 和关键交互链验证。
+
+### 9.2 唯一命令
+
+最终本地和 CI 只运行：
+
+```text
+npm run validate
+```
+
+该命令必须依次覆盖：
+
+1. 全部配置 schema/reference validator。
+2. 架构依赖和 DataStore/UI 禁止项。
+3. 孤立 UID、缺失脚本、资源引用和 route 表。
+4. Godot unit/contract/integration tests。
+5. 全部 route scene smoke。
+6. Godot headless 启动，输出不得包含 ERROR。
+7. `git diff --check`。
+
+任一步失败返回非零退出码。Windows PowerShell 执行策略问题不能改变标准入口；需要用 Node/PowerShell 包装在 `npm run validate` 内解决。
+
+## 10. AI 执行协议
+
+每个阶段开始前，AI 必须：
+
+1. 重新读取 `AGENTS.md`、生产规范和本文。
+2. 检查工作区与最近提交，禁止覆盖用户未提交改动。
+3. 扫描本阶段真实调用链，列出 public API、状态写点、route、配置和资源引用。
+4. 输出本阶段计划文件、行为基线、迁移影响和最小验收命令。
+5. 先补能保护现有行为的最小测试，再改实现。
+
+每个阶段结束前，AI 必须：
+
+1. 删除本阶段已无调用的旧入口和 fallback。
+2. 运行本阶段测试以及当前完整 `npm run validate`。
+3. 汇总全部修改文件、行为是否等价、剩余风险和下一阶段入口条件。
+4. 保持提交单一目的；目录移动与业务逻辑修改不得混在同一提交。
+
+AI 只有在以下情况暂停询问用户：
+
+- 将改变玩法结果或玩家可见的主要交互结果；
+- 将删除当前已完成且可用的功能；
+- 将修改六个受保护 Excel 的结构或值；
+- 同一验收阻塞经根因修复仍无法解除；
+- 需要扩大到 Steamworks、性能专项或新功能。
+
+其他内部命名、目录、模块拆分和私有 API 调整由 AI 按生产规范自行决定。
 
 ## 11. 实施阶段
 
-### Phase 0：稳定基线
+### Phase 0：冻结并刻画真实产品
 
-- 修复三类 Node 配置校验失败和校验器类型异常。
-- 明确缺失历练 JSON 是删除、改名还是导出遗漏；loader 不再静默继续。
-- 删除 4 个孤立 `.uid` 或恢复对应脚本。
-- 增加单一验证入口，保证本地和 CI 同命令。
-- 记录当前可用场景的 smoke baseline。
+状态：2026-07-12 已完成，`npm run validate` 全绿，分类已确认。
 
-完成标准：配置校验退出码 0；Godot headless 启动无 ERROR；主菜单、洞府、地图、历练、战斗最小链路可打开。
+目标：得到可信的“已完成/仅设计”清单和绿色重构基线。
 
-### Phase 1：建立边界，不改行为
+- 自动扫描所有 route、场景入口、Autoload、配置表、状态写点和跨模块调用。
+- 运行并人工抽查关键链路，把功能分为：已完成必须保留、仅界面/设计、失效死代码。
+- 生成分类清单供用户一次确认；大道和自主研读/知识成长归入“仅设计”，技能与功法归入“必须保留”。
+- 删除 `character_creation.json` 运行时依赖，保留姓名 1–12 字符规则。
+- 对齐技能和道具效果注册表，修复当前 33 + 34 项验证失败，不修改受保护 Excel。
+- 删除确认无源的 4 个孤立 UID。
+- 扩充 `npm run validate` 到至少包含当前配置、UID/资源和 Godot 启动检查。
+- 为已完成主链建立 characterization tests。
 
-- 给 `core` 移除功能层 preload；先迁 feature-specific config loader。
-- 定义状态写入清单，阻止新增 `DataStore.savedata` 直接写入。
-- 补齐 `BattleInit`、`ZhandouSummary`、`LilianResult` 的边界校验。
-- 为现有门面添加委托点，不改调用方。
+退出条件：当前配置与资源检查全绿；Godot headless 无 ERROR；分类清单获确认；主要可玩链路有最小保护。
 
-完成标准：`core -> feature` 静态依赖为 0；新增代码符合依赖规则。
+### Phase 1：建立 AppRoot、导航和配置边界
 
-### Phase 2：拆 `GameState`
+- 建立 `AppRoot` 与静态 Host 组合，切换唯一 main scene。
+- SceneManager 只保留 route/payload/场景生命周期，迁出历练、战斗、教程和状态判断。
+- 把 13 个 Autoload 分批收敛到目标 3 个；本阶段先迁 UI Host 和剧情/教程生命周期。
+- 将 `JsonLoader` 缩为通用 reader，将 `ConfigManager` 缩为按模块原表查询入口；不创建中间数据层。
+- 建立 core 不依赖 feature、UI 不引用 DataStore/FileAccess 的静态门禁。
 
-按风险从低到高迁移：时间/库存查询 -> 修炼 -> 炼丹 -> 突破 -> 地图/委托 -> 历练结算。每次只迁一个用例组，公共方法保持不变。
+退出条件：AppRoot 启动；route 原子切换；core 反向依赖为 0；配置按需读取单个 JSON；行为测试保持通过。
 
-完成标准：`GameState` 不含业务算法，只保留兼容转发和必要状态查询；目标小于 300 行。
+### Phase 2：重建状态、单自动存档和设置
 
-### Phase 3：拆历练与战斗边界
+- 盘点所有 `savedata/rundata` 字段和写入点，为每个字段指定唯一 Application 所有者。
+- 建立全新 DataStore schema，不保留旧字段兼容。
+- 建立 command/query 提交边界，移除 UI 和 service 对可变字典的直接访问。
+- 实现唯一自动存档的临时文件、重读校验、备份和原子替换。
+- 实现独立 settings repository 和三种显示模式。
+- 重做主菜单为新游戏/继续游戏流程，不建设存档页面。
 
-- 将 `LilianState` 变为可序列化 session + application service。
-- 战斗入口不再读取 `GameState/LilianState`，只接受 validated init。
-- 战斗出口只返回 summary，由上层决定结算和导航。
-- 再拆战斗 domain 大文件，禁止同时动 VFX 表现。
+退出条件：状态写点只有 Application；新建、自动保存、继续、备份恢复和设置持久化测试全绿。
 
-完成标准：战斗 domain 可在无 SceneTree、无 autoload 环境执行一次确定性模拟。
+### Phase 3：迁移长期玩法垂直切片
 
-### Phase 4：清理 UI 和全局节点
+按真实依赖从低风险到高风险逐个迁移，每次只迁一个可验收用例组：
 
-- UI 改为读取 ViewModel、发送 command。
-- 固定 UI 回迁 `.tscn`。
-- 合并 overlay autoload，剧情/教程改由应用根持有。
-- 移除 UI 对可变 savedata/rundata 的直接引用。
+1. 角色创建与角色查询。
+2. 时间推进。
+3. 背包、物品、装备与负重。
+4. 修炼。
+5. 炼丹。
+6. 突破。
+7. 地图旅行与委托。
 
-完成标准：`scripts/ui` 中无 `DataStore.savedata` 写入；功能 UI 可用构造快照独立渲染。
+每个切片都必须完成：Catalog 薄查询 → Domain 纯规则 → Application command/query → UI 快照/意图 → 自动存档 → 测试 → 删除旧实现。
 
-### Phase 5：删除兼容层
+功法随修炼切片保留选择、装备、熟练度和现有效果；大道、自主研读和其他“仅设计”功能只整理界面边界与未来模块说明，不创建玩法实现。
 
-- 用 `rg` 确认旧 API、旧字段、fallback builder 调用为 0。
-- 删除门面转发、孤立脚本和过期 enum。
-- 最后再移动已稳定的目录；移动与逻辑变更分开提交。
+退出条件：`GameState` 不再承担业务和全局状态代理；完成模块无 UI 直写状态；所有切片行为检查通过。
 
-完成标准：13 个 autoload 收敛到 4 个；无失效资源引用；验证门禁全部通过。
+### Phase 4：历练、战斗与技能
 
-## 12. 生产级验证门禁
+- 把历练改为可序列化 session + Application，用明确 command 推进事件、地图、战斗衔接和结算。
+- 战斗只接受 validated BattleInit，只返回 BattleSummary；不得读取 GameState/LilianState。
+- 战斗 Domain 在无 SceneTree、无 Autoload 下完成一次确定性模拟。
+- 保留并重构主动技能、被动技能、Buff、目标选择、释放策略和物品战斗效果。
+- 删除运行时 fallback builder；配置无效时拒绝进入战斗并返回明确错误。
+- UI/VFX 只消费战斗快照和事件，不成为规则所有者。
 
-每个重构提交至少执行：
+退出条件：历练—战斗—返回/结算链行为等价；同 seed 结果确定；战斗和技能 unit/contract/integration tests 全绿。
 
-1. 配置：`node tools/validate-all.mjs`。
-2. 解析/启动：Godot headless 启动，输出不得包含 ERROR。
-3. Contract tests：存档迁移、奖励、时间推进、战斗 init/summary、历练结算。
-4. Scene smoke：遍历 `SceneManager.SCENE_PATHS`，逐场景实例化并运行一帧。
-5. 静态边界检查：禁止 core 依赖 feature、UI 写 DataStore、固定 UI 脚本动态创建控件。
-6. `git diff --check`。
+### Phase 5：UI、剧情、教程与全局清理
 
-测试优先覆盖业务边界，而不是为每个 getter 写测试。随机系统必须允许传入 seed，断言同 seed 结果一致。
+- 将固定 UI 迁回 `.tscn`，保留视觉和主要交互行为。
+- 页面统一使用 Application API；共享 View 禁止访问 Autoload。
+- 剧情、教程只通过公开事件/query/command 工作，不直接写 DataStore。
+- 合并 Overlay 生命周期到 AppRoot Host。
+- 删除 DataEvents 的无策略转发、旧 Host、旧门面、孤立脚本、兼容字段和失效 enum。
+- 完成 3 Autoload 目标和完整静态架构门禁。
 
-## 13. Ponytail 全仓复杂度审计
+退出条件：presentation 无 DataStore/FileAccess/业务计算；13 个 Autoload 收敛为 3 个；旧入口调用为 0。
 
-按可删除规模排序：
+### Phase 6：生产验收
 
-1. `shrink:` `JsonLoader` 与 `ConfigManager` 的逐表加载/归一化/缓存重复；保留通用 reader，归一化放各 feature catalog。`scripts/core/json_loader.gd`, `scripts/core/config_manager.gd`
-2. `delete:` `zhandou_init_data.gd` 的三套 runtime fallback builder；配置入口校验失败即拒绝开战。`scripts/zhandou/zhandou_init_data.gd`
-3. `shrink:` `GameState` 的 47 个状态代理和多功能算法；由功能命令拥有写入，门面迁完即删。`scripts/sim/game_state.gd`
-4. `native:` 6 个 UI 脚本动态创建固定 Godot 控件；改由 `.tscn` 声明，仅保留数据驱动节点。`scripts/ui`, `scenes/items/bag_base.gd`
-5. `yagni:` 4 个独立 overlay autoload 的重复启动和生命周期代码；用一个 `UiOverlayHost.tscn` 组合现有子场景。`project.godot`, `scripts/ui/*host.gd`
-6. `shrink:` `DataEvents` 的一行 signal 转发函数；无额外策略的事件直接 emit，保留真正需要校验/路由的入口。`scripts/events/data_events.gd`
-7. `delete:` 4 个没有源脚本的 `.gd.uid`；若确认脚本不会恢复则直接删除。`scripts/core/contracts`, `scripts/enum`, `scripts/ui/tips/presenter`
+- 执行全部 unit、contract、integration、route smoke 和 headless 启动。
+- 验收 Windows 键鼠下 `1920×1080`、`1280×720` 与三种显示模式。
+- 验收主链：启动 → 新建角色 → 洞府 → 修炼/炼丹/突破 → 背包/装备 → 地图/委托 → 历练 → 战斗/技能 → 结算 → 自动存档 → 重启继续。
+- 验收当前已完成的剧情、教程及 Phase 0 分类清单中的全部保留功能。
+- 确认功法玩法保持可用；大道、自主研读和其他未完成功能只保留界面与设计，没有伪实现。
+- 运行导出构建 smoke；Steamworks 集成不在本轮范围。
 
-`net: -700~-1200 lines, -0 dependencies possible.` 该估算只计算可删除的重复/降级/转发代码，不把“移动到新文件”算作减少。
+退出条件：`npm run validate` 全绿；Windows 导出可启动；无 ERROR、孤立资源、旧兼容或未登记状态写点。
 
-## 14. 第一批建议任务
+## 12. 最终完成定义
 
-第一批只做 Phase 0，控制在一个短分支内：
+只有同时满足以下条件才可宣告重构完成：
 
-1. 修复 `validate-xiulian-methods.mjs` 的输入结构判断，确保错误以校验结果输出而不是崩溃。
-2. 对齐当前导出 JSON 与三个 validator 的 schema。
-3. 处理 4 个缺失历练配置引用和 4 个孤立 UID。
-4. 增加最小 `tests/run_contract_tests.gd`，先覆盖 JSON loader 缺文件、存档 envelope、scene payload 和 battle summary。
-5. 增加场景实例化 smoke，建立重构前绿线。
-
-这批完成后再拆 `GameState`。在红色基线上直接拆模块，风险和返工都会显著增加。
+1. 已完成玩法与主要界面行为通过 Phase 0 基线和最终主链验收。
+2. 技能与功法系统完整保留；大道、自主研读和其他未完成系统仅保留界面和设计。
+3. 最终只有 `DataStore`、`ConfigCatalog`、`SceneManager` 三个 Autoload。
+4. UI 不直接访问状态、文件或原始配置；业务状态只有 Application 可提交。
+5. Domain 可脱离 SceneTree、Node 和 Autoload 测试。
+6. 运行时只读取 Excel 原样导出的单个 JSON；无第二套中间配置。
+7. 六个受保护 Excel 未被修改；其他表只有结构治理，没有数值平衡变更。
+8. 唯一自动存档、备份恢复和独立设置可用；没有旧存档兼容代码。
+9. 所有 route、payload、资源、UID、配置引用和架构边界由 `npm run validate` 自动检查。
+10. 没有迁移门面、静默 fallback、无调用 API、万能 DTO 或为未来预建的空抽象。
+11. Windows 键鼠和目标分辨率/显示模式验收通过。
+12. 修改记录、测试结果和剩余的“仅设计”功能边界清晰，可由后续 AI 继续执行。

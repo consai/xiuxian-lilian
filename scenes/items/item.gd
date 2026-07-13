@@ -287,7 +287,7 @@ func _on_press_clicked() -> void:
 	var should_show_info := show_info_on_click
 	clicked.emit()
 	if should_show_info and not _info_entry.is_empty():
-		ItemInfoPopupHost.show_entry(_info_entry)
+		get_tree().call_group("item_info_popup_host", "show_entry", _info_entry)
 
 
 func _on_gui_input(event: InputEvent) -> void:

@@ -147,7 +147,7 @@ func _bootstrap_savedata() -> void:
 func new_game(profile: Dictionary = {}) -> void:
 	DataStore.reset_all()
 	DataStore.start_tutorial()
-	var root := JsonLoader.load_moni_bundle()
+	var root := preload("res://scripts/sim/moni_catalog.gd").load_bundle()
 	var initial := root.get("initial_player", {}) as Dictionary
 	day = 1
 	realm_index = 0
@@ -1103,7 +1103,9 @@ func build_battle_init(event: Dictionary) -> Dictionary:
 	}
 
 
-func settle_lilian(result: Dictionary) -> Dictionary:
+func settle_lilian(result: Dictionary, tutorial_service: Node) -> Dictionary:
+	if tutorial_service == null:
+		return {"ok": false, "error": "缺少 TutorialService"}
 	if result.is_empty():
 		return {"ok": false, "error": "缺少历练结算数据"}
 	var result_errors := LilianResult.collect_errors(result)
@@ -1199,7 +1201,7 @@ func settle_lilian(result: Dictionary) -> Dictionary:
 	result["instability_reduced"] = instability_reduced
 	result["cultivation_instability"] = cultivation_instability
 	last_lilian_summary = result.duplicate(true)
-	TutorialService.game_event("tutorial.lilian_returned")
+	tutorial_service.game_event("tutorial.lilian_returned")
 	WeituoService.record_lilian_result(result, DataStore.savedata)
 	auto_save()
 	return {
@@ -1321,11 +1323,37 @@ func use_inventory_item(item_id: String) -> Dictionary:
 		result = _use_alchemy_mastery_notes(iid, def)
 	elif _has_attrs_effect(def):
 		result = _use_attrs_effect(iid, def)
+	elif def.get_use_effect_amount("hp") != 0.0 or def.get_use_effect_amount("mp") != 0.0:
+		result = _use_recovery_item(iid, def)
 	else:
 		return {"ok": false, "error": "该物品无法直接使用"}
 	if bool(result.get("ok", false)):
 		DataEvents.emit_inventory_changed()
 	return result
+
+
+func _use_recovery_item(item_id: String, def: ItemDef) -> Dictionary:
+	var recovery := InventoryService.recovery_result(
+		hp,
+		mp,
+		ZhandouAttr.get_attr(attrs, EnumPlayerAttr.HP_MAX, hp),
+		ZhandouAttr.get_attr(attrs, EnumPlayerAttr.MP_MAX, mp),
+		def.get_use_effect_amount("hp"),
+		def.get_use_effect_amount("mp")
+	)
+	var hp_gained := float(recovery["hp_gained"])
+	var mp_gained := float(recovery["mp_gained"])
+	if hp_gained <= 0.0 and mp_gained <= 0.0:
+		return {"ok": false, "error": "气血与法力已满"}
+	hp = float(recovery["hp"])
+	mp = float(recovery["mp"])
+	InventoryService.remove_item(inventory, item_id, 1)
+	return {
+		"ok": true,
+		"hp_gained": hp_gained,
+		"mp_gained": mp_gained,
+		"message": "恢复气血 %.0f、法力 %.0f" % [hp_gained, mp_gained],
+	}
 
 
 func _has_attrs_effect(def: ItemDef) -> bool:
@@ -1721,7 +1749,7 @@ func _activity_cfg(activity_id: String) -> Dictionary:
 
 
 func _simulation_root() -> Dictionary:
-	return JsonLoader.load_moni_bundle()
+	return preload("res://scripts/sim/moni_catalog.gd").load_bundle()
 
 
 func _config_manager() -> Node:

@@ -11,7 +11,6 @@ var _current_payload: Dictionary = {}
 
 
 func _ready() -> void:
-	layer = 1002
 	follow_viewport_enabled = true
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_popup = PopupScene.instantiate() as ItemInfoPopupView

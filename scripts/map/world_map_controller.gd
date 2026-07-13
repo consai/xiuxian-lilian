@@ -6,6 +6,7 @@ signal return_requested
 
 const WorldMapServiceScript := preload("res://scripts/map/world_map_service.gd")
 const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
+const LilianFlowServiceScript := preload("res://scripts/lilian/lilian_flow_service.gd")
 
 const _ROUTE_COLORS := {
 	"hidden": Color(0.48, 0.34, 0.2, 0.0),
@@ -101,7 +102,8 @@ func select_wilderness_location(location_id: String) -> void:
 			row,
 			bool(can_enter.get("ok", false)),
 			str(can_enter.get("error", "")),
-			0
+			0,
+			TutorialService.is_waiting_for_any(["tutorial.lilian_started"])
 		)
 	if location_id == "wild_wolf_valley":
 		TutorialService.game_event("tutorial.wolf_valley_selected")
@@ -147,7 +149,9 @@ func enter_wilderness(region_id: String, options: Dictionary = {}) -> void:
 	if not _apply_difficulty_override(location_id, options):
 		return
 	wilderness_entry_requested.emit(region_id)
-	var nav := SceneManager.start_lilian(location_id)
+	var nav := LilianFlowServiceScript.start_lilian(
+		location_id, -1, LilianState, GameState, SceneManager, TutorialService
+	)
 	if not bool(nav.get("ok", false)):
 		DataStore.lilian_runtime().erase("difficulty_override")
 
@@ -161,7 +165,9 @@ func enter_wilderness_location(location_id: String, options: Dictionary = {}) ->
 	if not _apply_difficulty_override(lilian_id, options):
 		return
 	wilderness_entry_requested.emit(location_id)
-	var nav := SceneManager.start_lilian(lilian_id)
+	var nav := LilianFlowServiceScript.start_lilian(
+		lilian_id, -1, LilianState, GameState, SceneManager, TutorialService
+	)
 	if not bool(nav.get("ok", false)):
 		DataStore.lilian_runtime().erase("difficulty_override")
 
@@ -198,7 +204,7 @@ func _on_return_pressed() -> void:
 	]):
 		return
 	return_requested.emit()
-	SceneManager.go_hub()
+	LilianFlowServiceScript.open_hub(LilianState, SceneManager)
 
 
 func _collect_map_nodes() -> void:

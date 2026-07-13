@@ -33,7 +33,9 @@ func _exit_tree() -> void:
 			_target.mouse_entered.disconnect(_on_mouse_entered)
 		if _target.mouse_exited.is_connected(_on_mouse_exited):
 			_target.mouse_exited.disconnect(_on_mouse_exited)
-	_get_host().hide_for(_target, 0)
+	var host := _get_host()
+	if host != null:
+		host.hide_for(_target, 0)
 
 
 func set_payload(next_payload: Dictionary) -> void:
@@ -44,7 +46,9 @@ func clear_payload() -> void:
 	payload = {}
 	_hover_depth = 0
 	if is_instance_valid(_target):
-		_get_host().hide_for(_target, 0)
+		var host := _get_host()
+		if host != null:
+			host.hide_for(_target, 0)
 
 
 func set_provider(provider: Callable) -> void:
@@ -101,5 +105,5 @@ func _request_hide() -> void:
 
 
 func _get_host() -> CanvasLayer:
-	var host := get_node_or_null("/root/HoverTipHost")
+	var host := get_tree().get_first_node_in_group("hover_tip_host")
 	return host as CanvasLayer if host is CanvasLayer else null

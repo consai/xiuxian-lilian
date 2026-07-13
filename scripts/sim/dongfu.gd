@@ -137,7 +137,7 @@ func _on_encounter() -> void:
 	if LilianState.active:
 		_refresh("当前仍在巡山中，请先完成或结算后再操作。")
 		return
-	var nav: Dictionary = SceneManager.go_world_map()
+	var nav: Dictionary = LilianFlowService.open_world_map(LilianState, SceneManager)
 	if not bool(nav.get("ok", false)):
 		_refresh(str(nav.get("error", "无法打开世界地图")))
 

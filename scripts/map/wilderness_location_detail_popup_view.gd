@@ -9,6 +9,7 @@ signal closed
 @onready var _close_button: TextureButton = %CloseButton
 
 var _location_id := ""
+var _close_blocked := false
 
 
 func _ready() -> void:
@@ -22,9 +23,11 @@ func show_location(
 	location_data: Dictionary,
 	can_enter: bool,
 	block_reason: String,
-	exploration: int
+	exploration: int,
+	close_blocked: bool
 ) -> void:
 	_location_id = location_id
+	_close_blocked = close_blocked
 	_title.text = str(location_data.get("name", location_id))
 	var env_tags := ", ".join((location_data.get("environment_tags", []) as Array).map(func(v): return str(v)))
 	var rewards := ", ".join((location_data.get("preview_rewards", []) as Array).map(func(v): return str(v)))
@@ -55,7 +58,7 @@ func _on_enter_pressed() -> void:
 
 
 func _on_close_pressed() -> void:
-	if TutorialService.is_waiting_for_any(["tutorial.lilian_started"]):
+	if _close_blocked:
 		return
 	hide_popup()
 	closed.emit()

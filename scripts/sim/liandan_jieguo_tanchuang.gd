@@ -25,7 +25,7 @@ func _ready() -> void:
 	if payload.is_empty() or not bool(payload.get("ok", false)):
 		var nav: Dictionary = SceneManager.go_liandan_mianban()
 		if not bool(nav.get("ok", false)):
-			SceneManager.go_hub()
+			LilianFlowService.open_hub(LilianState, SceneManager)
 		return
 	_apply_result(payload)
 
@@ -213,6 +213,6 @@ func _on_continue_pressed() -> void:
 
 func _on_return_pressed() -> void:
 	TutorialService.game_event("tutorial.alchemy_completed")
-	var nav: Dictionary = SceneManager.go_hub()
+	var nav: Dictionary = LilianFlowService.open_hub(LilianState, SceneManager)
 	if not bool(nav.get("ok", false)):
 		push_warning(str(nav.get("error", "无法返回观中")))

@@ -4,27 +4,20 @@ extends Node
 signal story_finished(story_id: String, result: String)
 
 const StoryPlayerScript := preload("res://scripts/story/story_player.gd")
-const StoryPlaybackPresenterScript := preload("res://scripts/story/story_playback_presenter.gd")
-const PresenterScene := preload("res://scenes/story/story_playback_ui.tscn")
 
 var _player = StoryPlayerScript.new()
-var _presenter
-var _layer: CanvasLayer
+var _presenter: StoryPlaybackPresenter
 var _story_id := ""
 var _waiting_event := ""
 
 
-func _ready() -> void:
-	_layer = CanvasLayer.new()
-	_layer.layer = 100
-	add_child(_layer)
-	_presenter = PresenterScene.instantiate()
-	_layer.add_child(_presenter)
+func bind_presenter(presenter: StoryPlaybackPresenter) -> void:
+	_presenter = presenter
 	_presenter.advance_requested.connect(_on_advance_requested)
 	_presenter.choice_requested.connect(_on_choice_requested)
 	_presenter.skip_requested.connect(skip_active)
 	_presenter.hide_all()
-	call_deferred("_restore_active")
+	_restore_active()
 
 
 func start_story(story_id: String, initial_state: Dictionary = {}) -> Dictionary:

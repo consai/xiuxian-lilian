@@ -3,7 +3,7 @@ extends RefCounted
 
 ## 数值配置门面：境界系数、属性公式、标杆敌人与平衡验收统一从 data/exportjson/yunxing_params/jingjie_balance*.json 读取。
 
-const PATH := "res://data/exportjson/yunxing_params/jingjie_balance.json"
+const PATH_LABEL := "data/exportjson/yunxing_params/jingjie_balance_*.json"
 
 const DEFAULT_ATTRIBUTE_FORMULA := {
 	EnumPlayerAttr.HP_MAX: {"base": 80.0, "scale": {"roushen": 10.0}},
@@ -222,7 +222,7 @@ static func collect_config_errors(simulation_realms: Array = []) -> PackedString
 	var errors: PackedStringArray = []
 	var root := bundle()
 	if root.is_empty():
-		errors.append("境界数值配置为空: %s" % PATH)
+		errors.append("境界数值配置为空: %s" % PATH_LABEL)
 		return errors
 	var major_ids := {}
 	for row_v in major_realms():

@@ -19,7 +19,6 @@ var _active_window: int = GmWindow.MAIN
 
 
 func _ready() -> void:
-	layer = 1003
 	follow_viewport_enabled = true
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_panel = PanelScene.instantiate() as Control

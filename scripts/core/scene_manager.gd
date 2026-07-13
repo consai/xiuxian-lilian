@@ -60,7 +60,15 @@ var _active_scene: Node = null
 
 func _ready() -> void:
 	_ensure_scene_root()
-	call_deferred("_adopt_boot_scene")
+
+
+func bind_scene_host(scene_host: Node) -> void:
+	if scene_host == null:
+		push_error("SceneManager: SceneHost 不可用")
+		return
+	if _scene_root != null and _scene_root != scene_host and _scene_root.get_parent() == self:
+		_scene_root.queue_free()
+	_scene_root = scene_host
 
 
 func _game_state() -> Node:
@@ -114,43 +122,16 @@ func _set_active_scene(scene: Node) -> void:
 	active_scene_changed.emit(scene)
 
 
-## 启动时把 project.godot 配置的 main_scene 从 root 收编到 SceneRoot。
-func _adopt_boot_scene() -> void:
-	var current := get_tree().current_scene
-	if current == null:
-		return
-	if current.get_parent() == get_tree().root:
-		current.get_parent().remove_child(current)
-		_scene_root.add_child(current)
-	_set_active_scene(current)
-
-
-func _load_main_scene(path: String) -> void:
-	_ensure_scene_root()
-	var packed := load(path) as PackedScene
-	if packed == null:
-		push_error("SceneManager: failed to load %s" % path)
-		_data_store().scene_runtime()["transitioning"] = false
-		return
-	var new_scene: Node = packed.instantiate()
-	if new_scene == null:
-		push_error("SceneManager: failed to instantiate %s" % path)
-		_data_store().scene_runtime()["transitioning"] = false
-		return
-	var old_scene := get_active_scene()
-	if old_scene != null and is_instance_valid(old_scene) and old_scene.get_parent() == _scene_root:
-		old_scene.queue_free()
-	_scene_root.add_child(new_scene)
-	_set_active_scene(new_scene)
-
-
 func go_to(scene_id: String, payload: Dictionary = {}, options: Dictionary = {}) -> Dictionary:
-	if bool(options.get("reset_history", false)):
-		_data_store().reset_scene_runtime()
 	var guard := _guard_enter(scene_id, options)
 	if not bool(guard.get("ok", false)):
 		return guard
-	return _perform_transition(scene_id, payload, true)
+	return _perform_transition(
+		scene_id,
+		payload,
+		true,
+		bool(options.get("reset_history", false))
+	)
 
 
 func go_hub(payload: Dictionary = {}, options: Dictionary = {}) -> Dictionary:
@@ -165,34 +146,12 @@ func go_world_map() -> Dictionary:
 	return go_to(WORLD_MAP)
 
 
-func start_lilian(location_id: String, seed_override: int = -1) -> Dictionary:
-	var lilian := _lilian_state()
-	var game_state := _game_state()
-	if lilian == null or game_state == null:
-		return {"ok": false, "error": "缺少 GameState 或 LilianState"}
-	var preflight := _preflight_transition()
-	if not bool(preflight.get("ok", false)):
-		return preflight
-	var started: Dictionary = lilian.start(location_id, game_state, seed_override)
-	if not bool(started.get("ok", false)):
-		return started
-	var tutorial := _autoload("TutorialService")
-	if tutorial != null and tutorial.has_method("game_event"):
-		tutorial.call("game_event", "tutorial.lilian_started")
-	var nav := go_lilian_xunhuan()
-	if not bool(nav.get("ok", false)):
-		lilian.reset()
-	return nav
-
-
 func go_lilian_xunhuan() -> Dictionary:
 	return go_to(LILIAN_XUNHUAN)
 
 
-func go_lilian_jiesuan(reason: String = "manual") -> Dictionary:
-	_discard_lilian_zhandou_stack()
-	var payload := ScenePayload.lilian_jiesuan(reason)
-	if payload.is_empty():
+func open_lilian_jiesuan(payload: Dictionary) -> Dictionary:
+	if not ScenePayload.validate(LILIAN_JIESUAN, payload):
 		return {"ok": false, "error": "invalid_lilian_jiesuan_payload"}
 	return go_to(LILIAN_JIESUAN, payload)
 
@@ -256,27 +215,22 @@ func go_mastered_arts_panel() -> Dictionary:
 	return go_to(MASTERED_ARTS_PANEL)
 
 
-func go_zhandou_peizhi_mianban() -> Dictionary:
-	if _can_overlay_panel_on_lilian_xunhuan():
+func go_zhandou_peizhi_mianban(prefer_overlay: bool = false) -> Dictionary:
+	if prefer_overlay and _can_overlay_panel_on_lilian_xunhuan():
 		return _push_panel_popup(ZHANDOU_PEIZHI_MIANBAN, {})
 	return go_to(ZHANDOU_PEIZHI_MIANBAN)
 
 
 func go_skill_release_strategy_panel() -> Dictionary:
-	if _can_overlay_panel_on_lilian_xunhuan():
-		return _push_panel_popup(SKILL_RELEASE_STRATEGY_PANEL, {})
 	return go_to(SKILL_RELEASE_STRATEGY_PANEL)
 
 
 ## 背包统一以弹窗叠在当前场景上打开，不切场景、不压栈。
 func go_beibao_panel(payload: Dictionary = {}) -> Dictionary:
-	var merged := payload.duplicate(true)
-	if _should_use_lilian_bag_context():
-		merged["context"] = "lilian"
 	var preflight := _preflight_panel_popup()
 	if not bool(preflight.get("ok", false)):
 		return preflight
-	return _push_panel_popup(BEIBAO_PANEL, merged)
+	return _push_panel_popup(BEIBAO_PANEL, payload.duplicate(true))
 
 
 func go_dao_tree_panel() -> Dictionary:
@@ -293,40 +247,34 @@ func go_back(fallback_scene_id: String = HUB, options: Dictionary = {}) -> Dicti
 	var scene_rt: Dictionary = _data_store().scene_runtime()
 	if bool(scene_rt.get("transitioning", false)):
 		return {"ok": false, "error": "transition_in_progress"}
-	var history_v: Variant = scene_rt.get("history", [])
-	var history: Array = history_v as Array if history_v is Array else []
-	var current_id := str(scene_rt.get("current_id", ""))
-	if not history.is_empty() and str(history.back()) == current_id:
-		history.pop_back()
-	var target_id := fallback_scene_id
-	if not history.is_empty():
-		target_id = str(history.back())
-	scene_rt["history"] = history
+	var target_id := peek_back_scene_id(fallback_scene_id)
 	if not SCENE_PATHS.has(target_id):
 		return {"ok": false, "error": "unknown_scene_id:%s" % target_id}
 	var guard := _guard_enter(target_id, options)
 	if not bool(guard.get("ok", false)):
 		return guard
-	return _perform_transition(target_id, {}, false)
+	return _perform_transition(target_id, {}, false, false, _back_history())
 
 
-func go_zhandou(battle_data: Dictionary, source: String = "scene_manager") -> Dictionary:
-	var merged := ZhandouInitData.merge_skill_cfg_from_tables(battle_data)
-	var errors := ZhandouInitData.collect_errors(merged)
-	if not errors.is_empty():
-		return {"ok": false, "error": errors[0]}
-	var preflight := _preflight_transition()
-	if not bool(preflight.get("ok", false)):
-		return preflight
-	ZhandouInitData.set_pending(get_tree(), merged, source)
-	var nav: Dictionary
-	if _can_overlay_zhandou_on_lilian_xunhuan(source):
-		nav = _push_zhandou_overlay()
-	else:
-		nav = _perform_transition(ZHANDOU_CHANGJING, {}, true)
-	if not bool(nav.get("ok", false)):
-		_data_store().zhandou_runtime()["pending_init"] = {}
-	return nav
+func peek_back_scene_id(fallback_scene_id: String = HUB) -> String:
+	var history := _back_history()
+	return str(history.back()) if not history.is_empty() else fallback_scene_id
+
+
+func _back_history() -> Array:
+	var scene_rt: Dictionary = _data_store().scene_runtime()
+	var history_v: Variant = scene_rt.get("history", [])
+	var history: Array = (history_v as Array).duplicate() if history_v is Array else []
+	var current_id := str(scene_rt.get("current_id", ""))
+	if not history.is_empty() and str(history.back()) == current_id:
+		history.pop_back()
+	return history
+
+
+func open_zhandou(prefer_overlay: bool) -> Dictionary:
+	if prefer_overlay and _can_overlay_zhandou_on_lilian_xunhuan():
+		return _push_zhandou_overlay()
+	return _perform_transition(ZHANDOU_CHANGJING, {}, true)
 
 
 ## 历练战斗胜利后：移除战斗叠层并恢复历练界面（不重新加载场景）。
@@ -338,12 +286,6 @@ func resume_lilian_after_zhandou() -> Dictionary:
 	if _scene_underlay.has_method("resume_after_battle"):
 		_scene_underlay.call("resume_after_battle")
 	return {"ok": true, "scene_id": LILIAN_XUNHUAN, "resumed": true}
-
-
-## 历练战斗战败/撤退结算：清掉叠层与历练界面后进入结算场景。
-func end_lilian_zhandou_and_go_jiesuan(reason: String = "defeated") -> Dictionary:
-	_discard_lilian_zhandou_stack()
-	return go_lilian_jiesuan(reason)
 
 
 ## 关闭面板弹窗并恢复底层场景。
@@ -384,21 +326,6 @@ func _guard_enter(scene_id: String, options: Dictionary) -> Dictionary:
 		return {"ok": false, "error": "unknown_scene_id:%s" % scene_id}
 	var lilian := _lilian_state()
 	match scene_id:
-		LILIAN_XUNHUAN:
-			if lilian == null or not lilian.active:
-				return {"ok": false, "error": "没有进行中的历练"}
-			if lilian.should_go_to_result():
-				return {"ok": false, "error": "历练已进入结算流程"}
-		LILIAN_JIESUAN:
-			if lilian == null:
-				return {"ok": false, "error": "缺少 LilianState"}
-			var game_state := _game_state()
-			var has_summary := game_state != null and not (game_state.last_lilian_summary as Dictionary).is_empty()
-			if not lilian.active and not has_summary:
-				return {"ok": false, "error": "没有可结算的历练"}
-		WORLD_MAP:
-			if lilian != null and lilian.active:
-				return {"ok": false, "error": _BLOCKED_LILIAN_ACTIVE}
 		ZHANDOU_CHANGJING:
 			return {"ok": false, "error": "战斗场景必须通过 go_zhandou() 进入"}
 		HUB:
@@ -407,15 +334,20 @@ func _guard_enter(scene_id: String, options: Dictionary) -> Dictionary:
 	return {"ok": true}
 
 
-func _preflight_transition() -> Dictionary:
+func preflight_transition() -> Dictionary:
 	var scene_rt: Dictionary = _data_store().scene_runtime()
 	if bool(scene_rt.get("transitioning", false)):
 		return {"ok": false, "error": "transition_in_progress"}
 	return {"ok": true}
 
 
-func _perform_transition(scene_id: String, payload: Dictionary, record_history: bool) -> Dictionary:
-	_discard_lilian_zhandou_stack()
+func _perform_transition(
+		scene_id: String,
+		payload: Dictionary,
+		record_history: bool,
+		reset_history: bool = false,
+		history_override: Variant = null
+) -> Dictionary:
 	var scene_rt: Dictionary = _data_store().scene_runtime()
 	if bool(scene_rt.get("transitioning", false)):
 		return {"ok": false, "error": "transition_in_progress"}
@@ -423,17 +355,41 @@ func _perform_transition(scene_id: String, payload: Dictionary, record_history: 
 	if path == "":
 		return {"ok": false, "error": "unknown_scene_id:%s" % scene_id}
 	scene_rt["transitioning"] = true
+	var packed := load(path) as PackedScene
+	if packed == null:
+		scene_rt["transitioning"] = false
+		return {"ok": false, "error": "scene_load_failed:%s" % scene_id}
+	var new_scene := packed.instantiate()
+	if new_scene == null:
+		scene_rt["transitioning"] = false
+		return {"ok": false, "error": "scene_instantiate_failed:%s" % scene_id}
+
+	var previous_id := str(scene_rt.get("current_id", ""))
+	var history: Array
+	if history_override is Array:
+		history = (history_override as Array).duplicate()
+	elif reset_history:
+		history = []
+	else:
+		var history_v: Variant = scene_rt.get("history", [])
+		history = (history_v as Array).duplicate() if history_v is Array else []
+	if record_history:
+		history.append(scene_id)
+
 	if not payload.is_empty():
 		_data_store().set_scene_payload(scene_id, payload)
-	scene_rt["previous_id"] = str(scene_rt.get("current_id", ""))
+	_ensure_scene_root()
+	var old_scene := get_active_scene()
+	_scene_root.add_child(new_scene)
+	_discard_lilian_zhandou_stack()
+	if old_scene != null and is_instance_valid(old_scene) \
+			and old_scene != new_scene and old_scene.get_parent() == _scene_root:
+		old_scene.queue_free()
+	_set_active_scene(new_scene)
+	scene_rt["previous_id"] = previous_id
 	scene_rt["current_id"] = scene_id
-	if record_history:
-		var history_v: Variant = scene_rt.get("history", [])
-		var history: Array = history_v as Array if history_v is Array else []
-		history.append(scene_id)
-		scene_rt["history"] = history
-	call_deferred("_load_main_scene", path)
-	call_deferred("_release_transition_lock")
+	scene_rt["history"] = history
+	scene_rt["transitioning"] = false
 	return {"ok": true, "scene_id": scene_id, "path": path}
 
 
@@ -442,23 +398,13 @@ func _release_transition_lock() -> void:
 	_data_store().scene_runtime()["transitioning"] = false
 
 
-func _can_overlay_zhandou_on_lilian_xunhuan(source: String) -> bool:
-	if not _is_lilian_zhandou_source(source):
-		return false
+func _can_overlay_zhandou_on_lilian_xunhuan() -> bool:
 	if _zhandou_overlay != null or _panel_overlay != null:
 		return false
 	var underlay := get_active_scene()
 	if underlay == null:
 		return false
 	return str(underlay.scene_file_path) == str(SCENE_PATHS.get(LILIAN_XUNHUAN, ""))
-
-
-## 与 LilianBattleFlow.is_lilian_source 保持一致，避免 SceneManager 与战斗出口脚本循环依赖。
-func _is_lilian_zhandou_source(source: String) -> bool:
-	var trimmed := source.strip_edges()
-	return trimmed == "lilian" or trimmed.begins_with("lilian_")
-
-
 func _push_zhandou_overlay() -> Dictionary:
 	var scene_rt: Dictionary = _data_store().scene_runtime()
 	if bool(scene_rt.get("transitioning", false)):
@@ -507,22 +453,14 @@ func _discard_scene_underlay() -> void:
 	_scene_underlay = null
 
 
-func _should_use_lilian_bag_context() -> bool:
-	var lilian := _lilian_state()
-	return lilian != null and lilian.active
-
-
 func _preflight_panel_popup() -> Dictionary:
 	if _zhandou_overlay != null or _panel_overlay != null:
 		return {"ok": false, "error": "panel_popup_already_open"}
-	return _preflight_transition()
+	return preflight_transition()
 
 
 func _can_overlay_panel_on_lilian_xunhuan() -> bool:
 	if not _preflight_panel_popup().get("ok", false):
-		return false
-	var lilian := _lilian_state()
-	if lilian == null or not lilian.active:
 		return false
 	var underlay := get_active_scene()
 	if underlay == null:

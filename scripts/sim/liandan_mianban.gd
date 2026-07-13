@@ -271,7 +271,7 @@ func _start_brew(batch_count: int, preview: Dictionary) -> void:
 func _on_close_pressed() -> void:
 	if _is_tutorial_alchemy_forced():
 		return
-	SceneManager.go_hub()
+	LilianFlowService.open_hub(LilianState, SceneManager)
 
 
 func _is_tutorial_alchemy_forced() -> bool:

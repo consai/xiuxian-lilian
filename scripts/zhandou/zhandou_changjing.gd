@@ -179,7 +179,7 @@ func _exit_tree() -> void:
 	ZhandouDebugLog.clear_domain()
 
 
-## 由 [ZhandouInitData.resolve] 消费进战数据；外部请 [SceneManager.go_zhandou] 写入 pending 并切场景。
+## 由 [ZhandouInitData.resolve] 消费进战数据；外部请 [ZhandouInitData.start_battle] 写入 pending 并导航。
 func initialize_battle(data: Dictionary) -> bool:
 	return ZhandouChangjingBootstrap.initialize_battle(_ctx, _hud, data)
 

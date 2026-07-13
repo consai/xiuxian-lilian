@@ -34,7 +34,12 @@ func _on_save_overlay_closed(message: String) -> void:
 
 
 func _enter_game() -> void:
-	var result: Dictionary = SceneManager.go_hub({}, {"reset_history": true})
+	var result: Dictionary = LilianFlowService.open_hub(
+		LilianState,
+		SceneManager,
+		{},
+		{"reset_history": true}
+	)
 	if not bool(result.get("ok", false)):
 		_set_message(str(result.get("error", "进入游戏失败")))
 

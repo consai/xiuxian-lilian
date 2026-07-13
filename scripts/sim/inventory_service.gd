@@ -31,6 +31,24 @@ static func remove_item(inventory: Dictionary, item_id: String, count: int) -> i
 	return removed
 
 
+static func recovery_result(
+		current_hp: float,
+		current_mp: float,
+		max_hp: float,
+		max_mp: float,
+		hp_amount: float,
+		mp_amount: float
+) -> Dictionary:
+	var next_hp := minf(current_hp + hp_amount, max_hp)
+	var next_mp := minf(current_mp + mp_amount, max_mp)
+	return {
+		"hp": next_hp,
+		"mp": next_mp,
+		"hp_gained": next_hp - current_hp,
+		"mp_gained": next_mp - current_mp,
+	}
+
+
 static func transfer_capacity(inventory: Dictionary, item_id: String) -> int:
 	var iid := item_id.strip_edges()
 	if iid == "":
@@ -156,14 +174,10 @@ static func sync_battle_item_counts(inventory: Dictionary, slots: Array, battle_
 
 static func _item_def(item_id: String) -> ItemDef:
 	var cm := _config_manager()
-	if cm != null and cm.has_method("item_def_by_id"):
-		var found: ItemDef = cm.call("item_def_by_id", item_id) as ItemDef
-		if found != null:
-			return found
-	for item_v in JsonLoader.load_items():
-		if item_v is ItemDef and (item_v as ItemDef).id == item_id:
-			return item_v as ItemDef
-	return null
+	if cm == null:
+		push_error("InventoryService: ConfigManager unavailable")
+		return null
+	return cm.call("item_def_by_id", item_id) as ItemDef
 
 
 static func _config_manager() -> Node:

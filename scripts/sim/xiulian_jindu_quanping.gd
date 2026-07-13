@@ -50,7 +50,7 @@ func _ready() -> void:
 	if not _apply_payload(payload):
 		var nav: Dictionary = SceneManager.go_xiulian_mianban()
 		if not bool(nav.get("ok", false)):
-			SceneManager.go_hub()
+			LilianFlowService.open_hub(LilianState, SceneManager)
 		return
 	_bind_header()
 	_start_progress()
@@ -164,6 +164,6 @@ func _finish_progress() -> void:
 
 func _on_result_confirmed() -> void:
 	TutorialService.game_event("tutorial.cultivation_completed")
-	var nav: Dictionary = SceneManager.go_hub()
+	var nav: Dictionary = LilianFlowService.open_hub(LilianState, SceneManager)
 	if not bool(nav.get("ok", false)):
 		push_warning(str(nav.get("error", "无法返回观中")))

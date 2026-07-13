@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="XiuXianLiLian"
-run/main_scene="res://scenes/ui/main_menu.tscn"
+run/main_scene="res://scenes/app/app_root.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -21,14 +21,9 @@ DataStore="*res://scripts/core/data_store.gd"
 DataEvents="*res://scripts/events/data_events.gd"
 ConfigManager="*res://scripts/core/config_manager.gd"
 SceneManager="*res://scripts/core/scene_manager.gd"
-TipsHost="*res://scripts/ui/tips_host.gd"
-HoverTipHost="*res://scripts/ui/hover/hover_tip_host.gd"
 SaveService="*res://scripts/sim/save_service.gd"
 GameState="*res://scripts/sim/game_state.gd"
 LilianState="*res://scripts/lilian/lilian_state.gd"
-ItemInfoPopupHost="*res://scripts/ui/item_info_popup_host.gd"
-GmPanelHost="*res://scripts/ui/gm_panel_host.gd"
-StoryDirector="*res://scripts/story/story_director.gd"
 TutorialService="*res://scripts/story/tutorial_service.gd"
 
 [display]

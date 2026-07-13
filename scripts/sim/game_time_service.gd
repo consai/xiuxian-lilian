@@ -113,4 +113,4 @@ static func _setting(key: String, default_value: Variant) -> Variant:
 
 
 static func _root() -> Dictionary:
-	return JsonLoader.load_shijian_rules_bundle()
+	return preload("res://scripts/sim/game_time_catalog.gd").settings()

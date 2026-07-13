@@ -45,7 +45,7 @@ func _ready() -> void:
 	if not _apply_payload(payload):
 		var nav: Dictionary = SceneManager.go_liandan_mianban()
 		if not bool(nav.get("ok", false)):
-			SceneManager.go_hub()
+			LilianFlowService.open_hub(LilianState, SceneManager)
 		return
 	_start_progress()
 
@@ -131,7 +131,7 @@ func _finish_progress() -> void:
 		push_warning(str(result.get("error", "炼制失败")))
 		var back_nav: Dictionary = SceneManager.go_liandan_mianban()
 		if not bool(back_nav.get("ok", false)):
-			SceneManager.go_hub()
+			LilianFlowService.open_hub(LilianState, SceneManager)
 		return
 	result["recipe_name"] = _recipe_name
 	result["start_day"] = _start_day

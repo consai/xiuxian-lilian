@@ -225,22 +225,21 @@ func _clear_injury() -> void:
 
 
 func _open_item_grant_panel() -> void:
-	if GmPanelHost != null and GmPanelHost.has_method("open_item_grant_panel"):
-		GmPanelHost.open_item_grant_panel()
-	else:
+	if get_tree().get_first_node_in_group("gm_panel_host") == null:
 		_flash("无法打开添加道具面板")
+		return
+	get_tree().call_group("gm_panel_host", "open_item_grant_panel")
 
 
 func _show_main_window() -> void:
-	if GmPanelHost != null and GmPanelHost.has_method("show_panel"):
-		GmPanelHost.show_panel()
+	get_tree().call_group("gm_panel_host", "show_panel")
 
 
 func _show_battle_window() -> void:
-	if GmPanelHost != null and GmPanelHost.has_method("show_battle_panel"):
-		GmPanelHost.show_battle_panel()
-	else:
+	if get_tree().get_first_node_in_group("gm_panel_host") == null:
 		_flash("无法打开战斗调试面板")
+		return
+	get_tree().call_group("gm_panel_host", "show_battle_panel")
 
 
 func _navigate(nav: Dictionary, fallback_error: String) -> bool:
@@ -258,7 +257,10 @@ func _go_hub() -> void:
 
 func _go_world_map() -> void:
 	visible = false
-	_navigate(SceneManager.go_world_map(), "无法打开世界地图")
+	_navigate(
+		LilianFlowService.open_world_map(LilianState, SceneManager),
+		"无法打开世界地图"
+	)
 
 
 func _go_attributes() -> void:
@@ -277,7 +279,9 @@ func _start_lilian() -> void:
 		return
 	var location_id := str(_location_option.get_item_metadata(_location_option.selected))
 	visible = false
-	_navigate(SceneManager.start_lilian(location_id), "无法开始历练")
+	_navigate(LilianFlowService.start_lilian(
+		location_id, -1, LilianState, GameState, SceneManager, TutorialService
+	), "无法开始历练")
 
 
 func _force_settle_lilian() -> void:
@@ -285,7 +289,9 @@ func _force_settle_lilian() -> void:
 		_flash("当前没有进行中的历练")
 		return
 	visible = false
-	_navigate(SceneManager.go_lilian_jiesuan("manual"), "无法进入历练结算")
+	_navigate(LilianFlowService.open_settlement(
+		"manual", LilianState, GameState, SceneManager
+	), "无法进入历练结算")
 
 
 func _reset_lilian() -> void:
@@ -314,7 +320,9 @@ func _start_gm_battle() -> void:
 		_flash("创建战斗失败：%s" % errors[0])
 		return
 	visible = false
-	_navigate(SceneManager.go_zhandou(battle_data, "gm_panel"), "无法进入 GM 战斗")
+	_navigate(ZhandouInitData.start_battle(
+		get_tree(), battle_data, "gm_panel", SceneManager, false
+	), "无法进入 GM 战斗")
 
 
 func _build_gm_battle_init(monster_id: String, count: int) -> Dictionary:
@@ -324,7 +332,10 @@ func _build_gm_battle_init(monster_id: String, count: int) -> Dictionary:
 func _new_game() -> void:
 	GameState.new_game()
 	visible = false
-	_navigate(SceneManager.go_hub(), "无法返回观中")
+	_navigate(
+		LilianFlowService.open_hub(LilianState, SceneManager),
+		"无法返回观中"
+	)
 
 
 func _grant_dao_knowledge() -> void:

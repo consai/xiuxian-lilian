@@ -113,7 +113,12 @@ var _rng := RandomNumberGenerator.new()
 var _game_state: Node = null
 
 
-func start(location_id_value: String, game_state: Node, seed_override: int = -1) -> Dictionary:
+func start(
+		location_id_value: String,
+		game_state: Node,
+		seed_override: int,
+		use_tutorial_map: bool
+) -> Dictionary:
 	if active:
 		return {"ok": false, "error": "已有进行中的历练"}
 	var location := DidianServiceScript.by_id(location_id_value)
@@ -155,7 +160,7 @@ func start(location_id_value: String, game_state: Node, seed_override: int = -1)
 	visited_once_events = []
 	var generated_map := (
 		LilianMapServiceScript.generate_tutorial(effective_location)
-		if TutorialService.should_use_tutorial_lilian_map()
+		if use_tutorial_map
 		else LilianMapServiceScript.generate(effective_location, seed)
 	)
 	map_nodes = generated_map.get("nodes", []) as Array
@@ -513,7 +518,7 @@ func receive_battle_summary(summary: Dictionary) -> void:
 	_save_rng()
 
 
-func settle_pending_battle() -> Dictionary:
+func settle_pending_battle(grant_first_battle_reward: bool) -> Dictionary:
 	if pending_battle_summary.is_empty() or pending_battle_event_id == "":
 		return {"ok": false, "error": "没有待结算的战斗"}
 	var summary := pending_battle_summary
@@ -525,7 +530,7 @@ func settle_pending_battle() -> Dictionary:
 	if won:
 		stats["wins"] = int(stats.get("wins", 0)) + 1
 		var battle_rewards := pending_battle_rewards.duplicate(true)
-		if TutorialService.is_active() and StoryDirector.is_waiting_for("tutorial.first_battle_won"):
+		if grant_first_battle_reward:
 			battle_rewards.append({"kind": "item", "id": "items_LingCao", "count": 2})
 		_apply_session_rewards(battle_rewards)
 		pending_battle_rewards = []
@@ -540,7 +545,6 @@ func settle_pending_battle() -> Dictionary:
 			phase = "resolving"
 		current_choices = []
 		pending_decision_event = {}
-		TutorialService.game_event("tutorial.first_battle_won")
 		return {"ok": true, "won": true, "mode": "auto_done", "event": event}
 	if fled:
 		if not event.is_empty():

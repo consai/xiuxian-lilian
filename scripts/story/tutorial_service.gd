@@ -3,27 +3,40 @@ extends Node
 const STORY_ID := "prologue_tutorial"
 const MAIN_MENU_SCENE := "res://scenes/ui/main_menu.tscn"
 const TUTORIAL_ENABLED := true
+const StoryDirectorScript := preload("res://scripts/story/story_director.gd")
+
+var _story_director: StoryDirectorScript
 
 
 func _ready() -> void:
-	StoryDirector.story_finished.connect(_on_story_finished)
 	get_tree().scene_changed.connect(_on_scene_changed)
 	SceneManager.active_scene_changed.connect(_on_scene_changed)
+
+
+func bind_story_director(story_director: StoryDirectorScript) -> void:
+	if story_director == null:
+		push_error("TutorialService: StoryDirector 未绑定")
+		return
+	_story_director = story_director
+	_story_director.story_finished.connect(_on_story_finished)
 	call_deferred("_ensure_started")
 
 
 func game_event(event_id: String) -> void:
 	if not is_active():
 		return
+	if _story_director == null:
+		push_error("TutorialService: StoryDirector 未绑定")
+		return
 	# 首战胜利标记决定历练是否仍用新手三节点图，须写入存档，不能仅依赖剧情层是否在等待。
 	if event_id == "tutorial.first_battle_won":
 		_set_step_for_event(event_id)
 		if LilianState != null:
 			LilianState.auto_advance = false
-	if not StoryDirector.is_waiting_for(event_id):
+	if not _story_director.is_waiting_for(event_id):
 		return
 	_set_step_for_event(event_id)
-	StoryDirector.notify_game_event(event_id)
+	_story_director.notify_game_event(event_id)
 
 
 func is_active() -> bool:
@@ -44,8 +57,11 @@ func should_use_tutorial_lilian_map() -> bool:
 func is_waiting_for_any(event_ids: Array) -> bool:
 	if not is_active():
 		return false
+	if _story_director == null:
+		push_error("TutorialService: StoryDirector 未绑定")
+		return false
 	for event_id_v in event_ids:
-		if StoryDirector.is_waiting_for(str(event_id_v)):
+		if _story_director.is_waiting_for(str(event_id_v)):
 			return true
 	return false
 
@@ -56,9 +72,12 @@ func _ensure_started() -> void:
 		return
 	if _is_main_menu_scene():
 		return
-	if not is_active() or StoryDirector.is_active():
+	if _story_director == null:
+		push_error("TutorialService: StoryDirector 未绑定")
 		return
-	var started: Dictionary = StoryDirector.start_story(STORY_ID)
+	if not is_active() or _story_director.is_active():
+		return
+	var started: Dictionary = _story_director.start_story(STORY_ID)
 	if not bool(started.get("ok", false)):
 		push_warning("TutorialService: failed to start %s: %s" % [STORY_ID, str(started.get("error", started.get("errors", "unknown")))])
 
@@ -69,11 +88,13 @@ func _is_main_menu_scene() -> bool:
 
 
 func _stop_active_tutorial() -> void:
-	if StoryDirector.has_method("get_active_story_id") and StoryDirector.get_active_story_id() == STORY_ID:
-		StoryDirector.skip_active()
+	if _story_director != null and _story_director.get_active_story_id() == STORY_ID:
+		_story_director.skip_active()
 
 
 func _on_scene_changed(_scene: Node = null) -> void:
+	if _story_director == null:
+		return
 	call_deferred("_ensure_started")
 
 
