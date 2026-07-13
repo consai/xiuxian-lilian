@@ -41,6 +41,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="TipsHost" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
 layer = 1010
 follow_viewport_enabled = true
 process_mode = 3

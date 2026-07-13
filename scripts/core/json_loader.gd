@@ -11,6 +11,7 @@ const ZHANDOU_FLOAT_STYLES_PATH := "%s/zhandou_float_styles.json" % EXPORT_DIR
 const ZHANDOU_FLOAT_STYLE_ROWS_PATH := "%s/zhandou_float_styles_styles.json" % EXPORT_DIR
 
 const ItemDefScript = preload("res://scripts/core/item_def.gd")
+const ExportTableReaderScript = preload("res://scripts/core/config/export_table_reader.gd")
 
 ## 配置文件中的文档用元数据键（加载后剔除）。
 const JSON_COMMENT_KEYS: Array[String] = ["_comment", "_说明", "_doc", "_备注"]
@@ -38,105 +39,6 @@ static func yunxing_params_path(file_name: String) -> String:
 	return "%s/%s" % [YUNXING_PARAMS_DIR, file_name]
 
 
-static func _export_keyed_rows(path: String) -> Dictionary:
-	var root := _read_json_root_object(path)
-	var out := {}
-	for key_v in root.keys():
-		var row_v: Variant = root[key_v]
-		if row_v is Dictionary:
-			out[str(key_v)] = _strip_null_fields(row_v)
-	return out
-
-
-static func _strip_null_fields(value: Variant) -> Variant:
-	if value is Dictionary:
-		var out := {}
-		for key_v in (value as Dictionary).keys():
-			var cell: Variant = value[key_v]
-			if cell != null:
-				out[key_v] = _strip_null_fields(cell)
-		return out
-	if value is Array:
-		var out: Array = []
-		for cell in value:
-			out.append(_strip_null_fields(cell))
-		return out
-	if value is String:
-		var text := str(value).strip_edges()
-		if text.begins_with("{") or text.begins_with("["):
-			var parser := JSON.new()
-			if parser.parse(text) == OK and (parser.data is Dictionary or parser.data is Array):
-				return _strip_null_fields(parser.data)
-	return value
-
-
-static func _export_row_array(path: String) -> Array:
-	var rows := _export_keyed_rows(path)
-	var keys: Array = rows.keys()
-	keys.sort_custom(_sort_config_keys)
-	var out: Array = []
-	for key_v in keys:
-		out.append((rows[key_v] as Dictionary).duplicate(true))
-	return out
-
-
-static func _export_settings(path: String) -> Dictionary:
-	var rows := _export_keyed_rows(path)
-	var out := {}
-	for key_v in rows.keys():
-		var row := rows[key_v] as Dictionary
-		var key := str(row.get("key", key_v)).strip_edges()
-		if key == "":
-			continue
-		out[key] = _export_setting_payload(row)
-	return out
-
-
-static func _export_setting_payload(row: Dictionary) -> Variant:
-	if row.has("value") and row["value"] != null:
-		return _coerce_export_scalar(row["value"])
-	var out := {}
-	for key_v in row.keys():
-		var key := str(key_v)
-		if key == "key" or key == "value":
-			continue
-		var value: Variant = row[key_v]
-		if value == null:
-			continue
-		out[key] = _coerce_export_scalar(value)
-	return out
-
-
-static func _coerce_export_scalar(value: Variant) -> Variant:
-	if not value is String:
-		return value
-	var s := str(value).strip_edges()
-	var comment_at := s.find(" #")
-	if comment_at >= 0:
-		var before_comment := s.substr(0, comment_at).strip_edges()
-		if before_comment.is_valid_int() or before_comment.is_valid_float() \
-				or before_comment.to_lower() in ["true", "false"]:
-			s = before_comment
-	var lower := s.to_lower()
-	if lower == "true":
-		return true
-	if lower == "false":
-		return false
-	if s.is_valid_int():
-		return int(s)
-	if s.is_valid_float():
-		return float(s)
-	return s
-
-
-static func _sort_config_keys(a: Variant, b: Variant) -> bool:
-	var sa := str(a)
-	var sb := str(b)
-	if sa.is_valid_int() and sb.is_valid_int():
-		return int(sa) < int(sb)
-	return sa.naturalnocasecmp_to(sb) < 0
-
-
 static func _read_json_root_object(path: String) -> Dictionary:
 	return JsonReader.read_object(path)
 
@@ -151,8 +53,8 @@ static func _read_config_variant(path: String) -> Variant:
 static func load_items() -> Array:
 	var out: Array = []
 	var raw := _expand_learning_book_items({
-		"generated_learning_books": _export_row_array(ITEM_GENERATED_BOOKS_PATH),
-	}, _export_row_array(ITEMS_PATH))
+		"generated_learning_books": ExportTableReaderScript.read_row_array(ITEM_GENERATED_BOOKS_PATH),
+	}, ExportTableReaderScript.read_row_array(ITEMS_PATH))
 	for item in raw:
 		if not item is Dictionary:
 			continue
@@ -357,20 +259,20 @@ static func zhandou_vfx_preset_path(preset_id: String) -> String:
 
 static func zhandou_vfx_preset_ids() -> Array:
 	var out: Array = ZHANDOU_VFX_PRESET_FILES.keys()
-	out.sort_custom(_sort_config_keys)
+	out.sort_custom(ExportTableReaderScript.compare_keys)
 	return out
 
 
 static func load_zhandou_float_styles() -> Dictionary:
-	var raw := _export_settings(ZHANDOU_FLOAT_STYLES_PATH)
+	var raw := ExportTableReaderScript.read_settings(ZHANDOU_FLOAT_STYLES_PATH)
 	if raw.is_empty():
 		return {"version": 1, "jitter_x": 18.0, "max_per_unit_per_frame": 6, "styles": {}}
-	raw["styles"] = _export_keyed_rows(ZHANDOU_FLOAT_STYLE_ROWS_PATH)
+	raw["styles"] = ExportTableReaderScript.read_keyed_rows(ZHANDOU_FLOAT_STYLE_ROWS_PATH)
 	return strip_json_comments(raw) as Dictionary
 
 
 static func load_zhandou_vfx_index() -> Dictionary:
-	var raw := _export_settings(ZHANDOU_VFX_INDEX_PATH)
+	var raw := ExportTableReaderScript.read_settings(ZHANDOU_VFX_INDEX_PATH)
 	if raw.is_empty():
 		return {"version": 1, "default": "melee_default", "impact_preset": "hit_default", "preset_dir": "presets"}
 	return strip_json_comments(raw) as Dictionary
@@ -381,30 +283,30 @@ static func load_zhandou_vfx_preset_file(preset_ref: String) -> Dictionary:
 	if path == "" or not FileAccess.file_exists(path):
 		push_warning("JsonLoader: zhandou vfx preset not found: %s" % path)
 		return {}
-	var sequence := _export_row_array(path)
+	var sequence := ExportTableReaderScript.read_row_array(path)
 	if sequence.is_empty():
 		return {}
 	return strip_json_comments({"sequence": sequence}) as Dictionary
 
 
 static func load_dao_tree() -> Dictionary:
-	var root := _export_settings(export_path("dao_tree.json"))
-	root["metadata"] = _export_settings(export_path("dao_tree_metadata.json"))
-	root["training"] = _export_settings(export_path("dao_tree_training.json"))
-	root["attributes"] = _export_settings(export_path("dao_tree_attributes.json"))
-	root["realms"] = _export_row_array(export_path("dao_tree_realms.json"))
-	root["domainGroups"] = _export_row_array(export_path("dao_tree_domainGroups.json"))
-	root["domains"] = _export_row_array(export_path("dao_tree_domains.json"))
-	root["skills"] = _export_row_array(export_path("dao_tree_skills.json"))
+	var root := ExportTableReaderScript.read_settings(export_path("dao_tree.json"))
+	root["metadata"] = ExportTableReaderScript.read_settings(export_path("dao_tree_metadata.json"))
+	root["training"] = ExportTableReaderScript.read_settings(export_path("dao_tree_training.json"))
+	root["attributes"] = ExportTableReaderScript.read_settings(export_path("dao_tree_attributes.json"))
+	root["realms"] = ExportTableReaderScript.read_row_array(export_path("dao_tree_realms.json"))
+	root["domainGroups"] = ExportTableReaderScript.read_row_array(export_path("dao_tree_domainGroups.json"))
+	root["domains"] = ExportTableReaderScript.read_row_array(export_path("dao_tree_domains.json"))
+	root["skills"] = ExportTableReaderScript.read_row_array(export_path("dao_tree_skills.json"))
 	return root
 
 
 static func load_xiulian_methods_bundle() -> Dictionary:
-	var root := _export_settings(export_path("xiulian_methods.json"))
-	root["metadata"] = _export_settings(export_path("xiulian_methods_metadata.json"))
-	root["families"] = _export_row_array(export_path("xiulian_methods_families.json"))
-	root["methods"] = _export_row_array(export_path("xiulian_methods_methods.json"))
-	root["effectCatalog"] = _export_keyed_rows(export_path("xiulian_methods_effectCatalog.json"))
+	var root := ExportTableReaderScript.read_settings(export_path("xiulian_methods.json"))
+	root["metadata"] = ExportTableReaderScript.read_settings(export_path("xiulian_methods_metadata.json"))
+	root["families"] = ExportTableReaderScript.read_row_array(export_path("xiulian_methods_families.json"))
+	root["methods"] = ExportTableReaderScript.read_row_array(export_path("xiulian_methods_methods.json"))
+	root["effectCatalog"] = ExportTableReaderScript.read_keyed_rows(export_path("xiulian_methods_effectCatalog.json"))
 	return root
 
 
@@ -463,96 +365,82 @@ static func _ability_table_path(table_key: String) -> String:
 
 
 static func load_effect_catalog() -> Dictionary:
-	var root := _export_settings(export_path("xiaoguo_catalog.json"))
-	root["metadata"] = _export_settings(export_path("xiaoguo_catalog_metadata.json"))
-	root["effects"] = _export_keyed_rows(export_path("xiaoguo_catalog_effects.json"))
-	root["stackPolicies"] = _export_settings(export_path("xiaoguo_catalog_stackPolicies.json"))
+	var root := ExportTableReaderScript.read_settings(export_path("xiaoguo_catalog.json"))
+	root["metadata"] = ExportTableReaderScript.read_settings(export_path("xiaoguo_catalog_metadata.json"))
+	root["effects"] = ExportTableReaderScript.read_keyed_rows(export_path("xiaoguo_catalog_effects.json"))
+	root["stackPolicies"] = ExportTableReaderScript.read_settings(export_path("xiaoguo_catalog_stackPolicies.json"))
 	return root
 
 
 static func load_locations_bundle() -> Dictionary:
-	var root := _export_settings(export_path("didian.json"))
-	root["locations"] = _export_keyed_rows(export_path("didian_locations.json"))
+	var root := ExportTableReaderScript.read_settings(export_path("didian.json"))
+	root["locations"] = ExportTableReaderScript.read_keyed_rows(export_path("didian_locations.json"))
 	return root
 
 
 static func load_world_map_bundle() -> Dictionary:
-	var root := _export_settings(export_path("shijie_map.json"))
-	root["cities"] = _export_keyed_rows(export_path("shijie_map_cities.json"))
-	root["routes"] = _export_row_array(export_path("shijie_map_routes.json"))
-	root["wilderness_regions"] = _export_keyed_rows(export_path("shijie_map_wilderness_regions.json"))
-	root["wilderness_locations"] = _export_keyed_rows(export_path("shijie_map_wilderness_locatio.json"))
+	var root := ExportTableReaderScript.read_settings(export_path("shijie_map.json"))
+	root["cities"] = ExportTableReaderScript.read_keyed_rows(export_path("shijie_map_cities.json"))
+	root["routes"] = ExportTableReaderScript.read_row_array(export_path("shijie_map_routes.json"))
+	root["wilderness_regions"] = ExportTableReaderScript.read_keyed_rows(export_path("shijie_map_wilderness_regions.json"))
+	root["wilderness_locations"] = ExportTableReaderScript.read_keyed_rows(export_path("shijie_map_wilderness_locatio.json"))
 	return root
 
 
 static func load_lilian_common_events_bundle() -> Dictionary:
-	var root := _export_settings(export_path("lilian_common_events.json"))
-	root["events"] = _export_keyed_rows(export_path("lilian_common_events_events.json"))
+	var root := ExportTableReaderScript.read_settings(export_path("lilian_common_events.json"))
+	root["events"] = ExportTableReaderScript.read_keyed_rows(export_path("lilian_common_events_events.json"))
 	return root
 
 
 static func load_lilian_events_bundle() -> Dictionary:
-	var root := _export_settings(export_path("lilian_events.json"))
-	root["events"] = _export_keyed_rows(export_path("lilian_events_events.json"))
+	var root := ExportTableReaderScript.read_settings(export_path("lilian_events.json"))
+	root["events"] = ExportTableReaderScript.read_keyed_rows(export_path("lilian_events_events.json"))
 	return root
 
 
 static func load_lilian_rules_bundle() -> Dictionary:
-	var root := _export_settings(yunxing_params_path("lilian_rules.json"))
-	root["reward_budget"] = _export_settings(yunxing_params_path("lilian_rules_reward_budget.json"))
+	var root := ExportTableReaderScript.read_settings(yunxing_params_path("lilian_rules.json"))
+	root["reward_budget"] = ExportTableReaderScript.read_settings(yunxing_params_path("lilian_rules_reward_budget.json"))
 	return root
 
 
 static func load_moni_bundle() -> Dictionary:
-	var root := _export_settings(yunxing_params_path("moni.json"))
-	root["activities"] = _export_keyed_rows(yunxing_params_path("moni_activities.json"))
-	root["initial_player"] = _export_settings(yunxing_params_path("moni_initial_player.json"))
+	var root := ExportTableReaderScript.read_settings(yunxing_params_path("moni.json"))
+	root["activities"] = ExportTableReaderScript.read_keyed_rows(yunxing_params_path("moni_activities.json"))
+	root["initial_player"] = ExportTableReaderScript.read_settings(yunxing_params_path("moni_initial_player.json"))
 	return root
 
 
 static func load_jingjie_balance_bundle() -> Dictionary:
 	var root := {}
-	root["acceptance"] = _export_settings(yunxing_params_path("jingjie_balance_acceptance.json"))
-	root["benchmark_enemies"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_benchmark_ene.json"))
-	root["budgets"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_budgets.json"))
-	root["combat_attribute_formula"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_combat_attrib.json"))
-	root["cultivation_progression"] = _export_settings(yunxing_params_path("jingjie_balance_cultivation_p.json"))
-	root["encounter_bands"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_encounter_ban.json"))
-	root["major_realms"] = _export_row_array(yunxing_params_path("jingjie_balance_major_realms.json"))
-	root["standard_players"] = _export_keyed_rows(yunxing_params_path("jingjie_balance_standard_play.json"))
+	root["acceptance"] = ExportTableReaderScript.read_settings(yunxing_params_path("jingjie_balance_acceptance.json"))
+	root["benchmark_enemies"] = ExportTableReaderScript.read_keyed_rows(yunxing_params_path("jingjie_balance_benchmark_ene.json"))
+	root["budgets"] = ExportTableReaderScript.read_keyed_rows(yunxing_params_path("jingjie_balance_budgets.json"))
+	root["combat_attribute_formula"] = ExportTableReaderScript.read_keyed_rows(yunxing_params_path("jingjie_balance_combat_attrib.json"))
+	root["cultivation_progression"] = ExportTableReaderScript.read_settings(yunxing_params_path("jingjie_balance_cultivation_p.json"))
+	root["encounter_bands"] = ExportTableReaderScript.read_keyed_rows(yunxing_params_path("jingjie_balance_encounter_ban.json"))
+	root["major_realms"] = ExportTableReaderScript.read_row_array(yunxing_params_path("jingjie_balance_major_realms.json"))
+	root["standard_players"] = ExportTableReaderScript.read_keyed_rows(yunxing_params_path("jingjie_balance_standard_play.json"))
 	return root
 
 
 static func load_liandan_bundle() -> Dictionary:
-	var root := _export_settings(export_path("liandan.json"))
-	root["furnaces"] = _export_row_array(export_path("liandan_furnaces.json"))
-	root["recipes"] = _export_row_array(export_path("liandan_recipes.json"))
-	root["strategies"] = _export_row_array(export_path("liandan_strategies.json"))
-	return root
-
-
-static func load_tupo_rules_bundle() -> Dictionary:
-	var root := _export_settings(yunxing_params_path("tupo_rules.json"))
-	root["component_caps"] = _export_settings(yunxing_params_path("tupo_rules_component_caps.json"))
-	root["major_breakthroughs"] = _export_keyed_rows(yunxing_params_path("tupo_rules_major_breakthrough.json"))
+	var root := ExportTableReaderScript.read_settings(export_path("liandan.json"))
+	root["furnaces"] = ExportTableReaderScript.read_row_array(export_path("liandan_furnaces.json"))
+	root["recipes"] = ExportTableReaderScript.read_row_array(export_path("liandan_recipes.json"))
+	root["strategies"] = ExportTableReaderScript.read_row_array(export_path("liandan_strategies.json"))
 	return root
 
 
 static func load_weituo_bundle() -> Dictionary:
-	var root := _export_settings(export_path("weituo.json"))
-	root["rules"] = _export_settings(export_path("weituo_rules.json"))
-	root["weituo"] = _export_keyed_rows(export_path("weituo_weituo.json"))
+	var root := ExportTableReaderScript.read_settings(export_path("weituo.json"))
+	root["rules"] = ExportTableReaderScript.read_settings(export_path("weituo_rules.json"))
+	root["weituo"] = ExportTableReaderScript.read_keyed_rows(export_path("weituo_weituo.json"))
 	return root
 
 
 static func load_tip_policy_bundle() -> Dictionary:
-	var root := _export_settings(yunxing_params_path("ui_tip_policy.json"))
-	root["channels"] = _export_keyed_rows(yunxing_params_path("ui_tip_policy_channels.json"))
-	return root
-
-
-static func load_story_bundle(story_id: String) -> Dictionary:
-	var name := story_id.replace(".", "_").replace("/", "_").replace("\\", "_")
-	var root := _export_settings(export_path("gushi_%s.json" % name))
-	root["nodes"] = _export_keyed_rows(export_path("gushi_%s_nodes.json" % name))
+	var root := ExportTableReaderScript.read_settings(yunxing_params_path("ui_tip_policy.json"))
+	root["channels"] = ExportTableReaderScript.read_keyed_rows(yunxing_params_path("ui_tip_policy_channels.json"))
 	return root

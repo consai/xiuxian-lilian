@@ -17,6 +17,7 @@ class FakeSceneManager:
 	var open_calls := 0
 	var back_calls := 0
 	var back_target := "hub"
+	var panel_active := false
 	var open_result := {"ok": true}
 
 	func go_lilian_xunhuan() -> Dictionary:
@@ -25,6 +26,9 @@ class FakeSceneManager:
 
 	func peek_back_scene_id(_fallback: String = "hub") -> String:
 		return back_target
+
+	func is_panel_popup_active() -> bool:
+		return panel_active
 
 	func go_back(_fallback: String = "hub") -> Dictionary:
 		back_calls += 1
@@ -75,6 +79,27 @@ func _run() -> void:
 	var unrelated_back: Dictionary = flow_script.call("go_back", lilian, scene_manager, "hub")
 	assert(bool(unrelated_back.get("ok", false)))
 	assert(scene_manager.back_calls == 2)
+
+	scene_manager.back_target = "hub"
+	lilian.active = true
+	var blocked_hub_back: Dictionary = flow_script.call("go_back", lilian, scene_manager, "hub")
+	assert(blocked_hub_back == {
+		"ok": false,
+		"error": "当前仍在历练中，请先完成或结算后再操作。",
+		"blocked": true,
+	})
+	assert(scene_manager.back_calls == 2)
+
+	lilian.active = false
+	var allowed_hub_back: Dictionary = flow_script.call("go_back", lilian, scene_manager, "hub")
+	assert(bool(allowed_hub_back.get("ok", false)))
+	assert(scene_manager.back_calls == 3)
+
+	scene_manager.panel_active = true
+	lilian.active = true
+	var dismissed_panel: Dictionary = flow_script.call("go_back", lilian, scene_manager, "hub")
+	assert(bool(dismissed_panel.get("ok", false)))
+	assert(scene_manager.back_calls == 4)
 
 	lilian.free()
 	scene_manager.free()

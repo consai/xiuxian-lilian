@@ -46,8 +46,6 @@ const SCENE_PATHS := {
 	DAO_TREE_PANEL: "res://scenes/ui/dao_tree_panel.tscn",
 }
 
-const _BLOCKED_LILIAN_ACTIVE := "当前仍在历练中，请先完成或结算后再操作。"
-
 ## 叠在当前场景上的战斗/面板浮层，避免切场景销毁底层界面。
 var _zhandou_overlay: Node = null
 var _panel_overlay: Node = null
@@ -69,14 +67,6 @@ func bind_scene_host(scene_host: Node) -> void:
 	if _scene_root != null and _scene_root != scene_host and _scene_root.get_parent() == self:
 		_scene_root.queue_free()
 	_scene_root = scene_host
-
-
-func _game_state() -> Node:
-	return _autoload("GameState")
-
-
-func _lilian_state() -> Node:
-	return _autoload("LilianState")
 
 
 func _data_store() -> Node:
@@ -123,7 +113,7 @@ func _set_active_scene(scene: Node) -> void:
 
 
 func go_to(scene_id: String, payload: Dictionary = {}, options: Dictionary = {}) -> Dictionary:
-	var guard := _guard_enter(scene_id, options)
+	var guard := _guard_enter(scene_id)
 	if not bool(guard.get("ok", false)):
 		return guard
 	return _perform_transition(
@@ -234,7 +224,7 @@ func go_beibao_panel(payload: Dictionary = {}) -> Dictionary:
 
 
 func go_dao_tree_panel() -> Dictionary:
-	var guard := _guard_enter(DAO_TREE_PANEL, {})
+	var guard := _guard_enter(DAO_TREE_PANEL)
 	if not bool(guard.get("ok", false)):
 		return guard
 	# 大道树是人物配置中的同级视图，不额外占用返回栈层级。
@@ -250,7 +240,7 @@ func go_back(fallback_scene_id: String = HUB, options: Dictionary = {}) -> Dicti
 	var target_id := peek_back_scene_id(fallback_scene_id)
 	if not SCENE_PATHS.has(target_id):
 		return {"ok": false, "error": "unknown_scene_id:%s" % target_id}
-	var guard := _guard_enter(target_id, options)
+	var guard := _guard_enter(target_id)
 	if not bool(guard.get("ok", false)):
 		return guard
 	return _perform_transition(target_id, {}, false, false, _back_history())
@@ -321,16 +311,12 @@ func peek_payload(scene_id: String) -> Dictionary:
 	return _data_store().peek_scene_payload(scene_id)
 
 
-func _guard_enter(scene_id: String, options: Dictionary) -> Dictionary:
+func _guard_enter(scene_id: String) -> Dictionary:
 	if not SCENE_PATHS.has(scene_id):
 		return {"ok": false, "error": "unknown_scene_id:%s" % scene_id}
-	var lilian := _lilian_state()
 	match scene_id:
 		ZHANDOU_CHANGJING:
 			return {"ok": false, "error": "战斗场景必须通过 go_zhandou() 进入"}
-		HUB:
-			if lilian != null and lilian.active and not bool(options.get("allow_active_lilian", false)):
-				return {"ok": false, "error": _BLOCKED_LILIAN_ACTIVE, "blocked": true}
 	return {"ok": true}
 
 

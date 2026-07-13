@@ -259,12 +259,6 @@
   },
   {
     "rule": "presentation_hardcoded_nodepath",
-    "path": "scripts/story/story_playback_presenter.gd",
-    "source": "var scene_manager := tree.root.get_node_or_null(\"SceneManager\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
     "path": "scripts/ui/character_attributes_panel.gd",
     "source": "@onready var _attributes_heading: Label = $Panel/AttributesCard/Heading",
     "count": 1
@@ -273,24 +267,6 @@
     "rule": "presentation_hardcoded_nodepath",
     "path": "scripts/ui/character_attributes_panel.gd",
     "source": "var label := panel.get_node(\"Label\") as Label",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
-    "path": "scripts/ui/components/tupo_value_row.gd",
-    "source": "@onready var _hover_tip: HoverTipSource = $Help/HoverTipSource",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
-    "path": "scripts/ui/components/tupo_value_row.gd",
-    "source": "@onready var _name_label: Label = $Name",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
-    "path": "scripts/ui/components/tupo_value_row.gd",
-    "source": "@onready var _value_label: Label = $Value",
     "count": 1
   },
   {
@@ -481,12 +457,6 @@
   },
   {
     "rule": "presentation_hardcoded_nodepath",
-    "path": "scripts/ui/tips_host.gd",
-    "source": "var de: Node = get_node_or_null(\"/root/DataEvents\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
     "path": "scripts/ui/tips/core/reward_tip_builder.gd",
     "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
     "count": 1
@@ -501,18 +471,6 @@
     "rule": "presentation_hardcoded_nodepath",
     "path": "scripts/zhandou/zhandou_float_presenter.gd",
     "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_raw_json",
-    "path": "scripts/ui/tips_host.gd",
-    "source": "return JsonLoader.load_tip_policy_bundle()",
-    "count": 1
-  },
-  {
-    "rule": "presentation_root_lookup",
-    "path": "scripts/story/story_playback_presenter.gd",
-    "source": "var scene_manager := tree.root.get_node_or_null(\"SceneManager\")",
     "count": 1
   },
   {
@@ -549,12 +507,6 @@
     "rule": "presentation_root_lookup",
     "path": "scripts/ui/gm_item_grant_panel.gd",
     "source": "return (loop as SceneTree).root.get_node_or_null(\"GameState\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_root_lookup",
-    "path": "scripts/ui/tips_host.gd",
-    "source": "var de: Node = get_node_or_null(\"/root/DataEvents\")",
     "count": 1
   },
   {

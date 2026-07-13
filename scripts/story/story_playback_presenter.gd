@@ -3,6 +3,7 @@ extends Control
 
 const GuideMaskScript := preload("res://scripts/story/story_guide_mask.gd")
 const EnumCharacterPortraitScript := preload("res://scripts/enum/enum_character_portrait.gd")
+const SceneManagerScript := preload("res://scripts/core/scene_manager.gd")
 const TYPEWRITER_CHARS_PER_SEC := 32.0
 const ADVANCE_DELAY_AFTER_COMPLETE := 0.3
 const FOCUS_PROMPT_MARGIN := 12.0
@@ -46,6 +47,7 @@ var _line_text := ""
 var _typewriter_progress := 0.0
 var _typewriter_done := true
 var _advance_block_timer := 0.0
+var _scene_manager: SceneManagerScript
 
 
 func _ready() -> void:
@@ -63,6 +65,18 @@ func _ready() -> void:
 	_choice_template_b.visible = false
 	_continue_indicator.visible = false
 	hide_all()
+
+
+func bind_scene_manager(scene_manager: SceneManagerScript) -> void:
+	if scene_manager == null:
+		push_error("StoryPlaybackPresenter: SceneManager 未绑定")
+		return
+	if _scene_manager != null:
+		if _scene_manager == scene_manager:
+			return
+		push_error("StoryPlaybackPresenter: 禁止更换已绑定的 SceneManager")
+		return
+	_scene_manager = scene_manager
 
 
 func show_frame(frame: Dictionary) -> void:
@@ -234,7 +248,8 @@ func _clear_choice_buttons() -> void:
 
 
 func _update_focus() -> void:
-	var target := _find_target(SceneManager.get_active_scene(), _focus_target)
+	var active_scene: Node = _scene_manager.get_active_scene() if _scene_manager != null else null
+	var target := _find_target(active_scene, _focus_target)
 	if target == null:
 		_focus_prompt.visible = false
 		_guide_mask.set_active(false)
@@ -363,14 +378,11 @@ func _find_target(root: Node, target: String) -> Control:
 	var found := _find_target_recursive(root, target)
 	if found != null:
 		return found
-	var tree := get_tree()
-	if tree == null:
+	if _scene_manager == null:
 		return null
-	var scene_manager := tree.root.get_node_or_null("SceneManager")
-	if scene_manager != null and scene_manager.has_method("get_scene_root"):
-		found = _find_target_recursive(scene_manager.call("get_scene_root"), target)
-		if found != null:
-			return found
+	found = _find_target_recursive(_scene_manager.get_scene_root(), target)
+	if found != null:
+		return found
 	return null
 
 

@@ -4,6 +4,7 @@ extends Node
 signal story_finished(story_id: String, result: String)
 
 const StoryPlayerScript := preload("res://scripts/story/story_player.gd")
+const StoryCatalogScript := preload("res://scripts/story/story_catalog.gd")
 
 var _player = StoryPlayerScript.new()
 var _presenter: StoryPlaybackPresenter
@@ -161,4 +162,4 @@ func _restore_active() -> void:
 
 
 func _load_story(story_id: String) -> Dictionary:
-	return JsonLoader.load_story_bundle(story_id)
+	return StoryCatalogScript.load_story(story_id)

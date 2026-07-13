@@ -280,4 +280,4 @@ func _on_reset_zoom() -> void:
 
 
 func _on_close() -> void:
-	SceneManager.go_back()
+	LilianFlowService.go_back(LilianState, SceneManager)

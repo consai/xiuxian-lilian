@@ -55,7 +55,7 @@ func _run() -> void:
 	)
 	assert(bool(allowed.get("ok", false)))
 	assert(scene_manager.calls == 2)
-	assert(scene_manager.options == {"allow_active_lilian": true})
+	assert(scene_manager.options == {})
 
 	lilian.active = false
 	scene_manager.result = {"ok": false, "error": "navigation_failed"}

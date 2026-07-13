@@ -3,10 +3,10 @@ extends HBoxContainer
 const TupoServiceScript := preload("res://scripts/sim/tupo_service.gd")
 const HoverTipPayloadScript := preload("res://scripts/ui/hover/hover_tip_payload.gd")
 
-@onready var _name_label: Label = $Name
-@onready var _value_label: Label = $Value
+@onready var _name_label: Label = %Name
+@onready var _value_label: Label = %Value
 @onready var _help: BaseButton = %Help
-@onready var _hover_tip: HoverTipSource = $Help/HoverTipSource
+@onready var _hover_tip: HoverTipSource = %HoverTipSource
 
 var _sources: Array = []
 

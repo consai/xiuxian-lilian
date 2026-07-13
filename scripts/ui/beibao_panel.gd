@@ -58,4 +58,4 @@ func _go_back() -> void:
 		SceneManager.dismiss_panel_popup()
 	if popup_active:
 		return
-	SceneManager.go_back()
+	LilianFlowService.go_back(LilianState, SceneManager)

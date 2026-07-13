@@ -13,12 +13,12 @@ const RewardTipPresenterScript := preload("res://scripts/ui/tips/presenter/rewar
 const TipBarScene := preload("res://scenes/ui/tip_bar.tscn")
 const RewardTipLayerScene := preload("res://scenes/ui/reward_tip_layer.tscn")
 
-const POLICY_CFG_PATH := "res://data/exportjson/yunxing_params/ui_tip_policy.json"
-
 var _metrics: TipMetrics
 var _policy: TipPolicyEngine
 var _router: TipRouter
 var _bus: TipBus
+var _data_events: Node
+var _policy_snapshot: Dictionary = {}
 
 @export var debug_print_metrics: bool = false
 
@@ -26,16 +26,24 @@ var _bus: TipBus
 func _ready() -> void:
 	follow_viewport_enabled = true
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	_setup_tip_runtime()
-	if Engine.is_editor_hint():
+
+
+func bind_dependencies(data_events: Node, policy_snapshot: Dictionary) -> void:
+	if data_events == null or policy_snapshot.is_empty():
+		push_error("TipsHost: DataEvents 或提示策略未绑定")
 		return
-	var de: Node = get_node_or_null("/root/DataEvents")
-	if de == null:
+	if _data_events != null:
+		if _data_events == data_events and _policy_snapshot == policy_snapshot:
+			return
+		push_error("TipsHost: 禁止更换已绑定的依赖")
 		return
-	if de.has_signal("tip_intent") and not de.tip_intent.is_connected(_on_tip_intent):
-		de.tip_intent.connect(_on_tip_intent)
-	if de.has_signal("tip_intents") and not de.tip_intents.is_connected(_on_tip_intents):
-		de.tip_intents.connect(_on_tip_intents)
+	_data_events = data_events
+	_policy_snapshot = policy_snapshot.duplicate(true)
+	_setup_tip_runtime(_policy_snapshot)
+	if not data_events.tip_intent.is_connected(_on_tip_intent):
+		data_events.tip_intent.connect(_on_tip_intent)
+	if not data_events.tip_intents.is_connected(_on_tip_intents):
+		data_events.tip_intents.connect(_on_tip_intents)
 
 
 func _on_tip_intent(intent: Dictionary) -> void:
@@ -48,12 +56,12 @@ func _on_tip_intents(intents: Array) -> void:
 	_bus.publish_many(intents)
 
 
-func _setup_tip_runtime() -> void:
+func _setup_tip_runtime(policy_snapshot: Dictionary) -> void:
 	_metrics = TipMetricsScript.new()
 	_policy = TipPolicyEngineScript.new()
 	_router = TipRouterScript.new()
 	_bus = TipBusScript.new()
-	_policy.setup(_load_policy_config())
+	_policy.setup(policy_snapshot)
 	var bar_root := TipBarScene.instantiate() as Control
 	add_child(bar_root)
 	var bar_presenter := BarTipPresenterScript.new()
@@ -76,7 +84,3 @@ func _publish_intent(intent: Dictionary) -> void:
 	var result := _bus.publish(intent)
 	if debug_print_metrics and not bool(result.get("ok", false)):
 		push_warning("TipsHost publish rejected: %s" % str(result.get("reason_code", "")))
-
-
-func _load_policy_config() -> Dictionary:
-	return JsonLoader.load_tip_policy_bundle()

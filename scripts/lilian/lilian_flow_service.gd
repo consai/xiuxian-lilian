@@ -51,8 +51,15 @@ static func go_back(
 		scene_manager: Node,
 		fallback_scene_id: String = "hub"
 ) -> Dictionary:
-	if scene_manager.peek_back_scene_id(fallback_scene_id) == "lilian_xunhuan":
+	if scene_manager.is_panel_popup_active():
+		return scene_manager.go_back(fallback_scene_id)
+	var target_scene_id: String = scene_manager.peek_back_scene_id(fallback_scene_id)
+	if target_scene_id == "lilian_xunhuan":
 		var admission := _active_lilian_admission(lilian_state)
+		if not bool(admission.get("ok", false)):
+			return admission
+	elif target_scene_id == "hub":
+		var admission := _hub_admission(lilian_state, false)
 		if not bool(admission.get("ok", false)):
 			return admission
 	return scene_manager.go_back(fallback_scene_id)
@@ -91,16 +98,10 @@ static func open_hub(
 		options: Dictionary = {},
 		allow_active: bool = false
 ) -> Dictionary:
-	if lilian_state != null and lilian_state.active and not allow_active:
-		return {
-			"ok": false,
-			"error": _BLOCKED_LILIAN_ACTIVE,
-			"blocked": true,
-		}
-	var nav_options := options.duplicate(true)
-	if allow_active:
-		nav_options["allow_active_lilian"] = true
-	return scene_manager.go_hub(payload.duplicate(true), nav_options)
+	var admission := _hub_admission(lilian_state, allow_active)
+	if not bool(admission.get("ok", false)):
+		return admission
+	return scene_manager.go_hub(payload.duplicate(true), options.duplicate(true))
 
 
 static func close_settlement(
@@ -120,6 +121,16 @@ static func _active_lilian_admission(lilian_state: Node) -> Dictionary:
 		return {"ok": false, "error": "没有进行中的历练"}
 	if lilian_state.should_go_to_result():
 		return {"ok": false, "error": "历练已进入结算流程"}
+	return {"ok": true}
+
+
+static func _hub_admission(lilian_state: Node, allow_active: bool) -> Dictionary:
+	if lilian_state != null and lilian_state.active and not allow_active:
+		return {
+			"ok": false,
+			"error": _BLOCKED_LILIAN_ACTIVE,
+			"blocked": true,
+		}
 	return {"ok": true}
 
 

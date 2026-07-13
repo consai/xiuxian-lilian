@@ -1,11 +1,23 @@
 extends SceneTree
 
+const StoryCatalogScript := preload("res://scripts/story/story_catalog.gd")
+
 
 func _init() -> void:
 	call_deferred("_run")
 
 
 func _run() -> void:
+	var story := StoryCatalogScript.load_story("prologue_tutorial")
+	assert(story["schema_version"] is int)
+	assert(story["schema_version"] == 1)
+	assert(story["id"] == "prologue_tutorial")
+	assert(story["entry"] == "empty_cave")
+	assert(story["nodes"] is Dictionary)
+	var nodes := story["nodes"] as Dictionary
+	assert(not (nodes["empty_cave"] as Dictionary).has("speaker"))
+	assert((nodes["open_pill_cultivation"] as Dictionary)["commands"] is Array)
+
 	var data_store := root.get_node("DataStore")
 	var scene_manager := root.get_node("SceneManager")
 	var tutorial_service := root.get_node("TutorialService")

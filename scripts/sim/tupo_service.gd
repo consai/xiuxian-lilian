@@ -1,9 +1,9 @@
 ﻿class_name TupoService
 extends RefCounted
 
-const RULES_PATH := "res://data/exportjson/yunxing_params/tupo_rules.json"
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
+const TupoCatalogScript := preload("res://scripts/sim/tupo_catalog.gd")
 
 const COMPONENT_KEYS := [
 	"cultivation", "pills", "mind", "aptitude", "fortune", "special_method", "other"
@@ -23,7 +23,7 @@ const TRANSITION_BY_MAJOR := EnumMajorRealm.TRANSITION_BY_MAJOR
 
 
 static func rules() -> Dictionary:
-	return JsonLoader.load_tupo_rules_bundle()
+	return TupoCatalogScript.load_rules()
 
 
 static func compute_breakdown(savedata: Dictionary, realms: Array, realm_index: int) -> Dictionary:

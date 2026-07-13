@@ -252,7 +252,10 @@ func _navigate(nav: Dictionary, fallback_error: String) -> bool:
 
 func _go_hub() -> void:
 	visible = false
-	_navigate(SceneManager.go_hub({"allow_active_lilian": true}), "无法返回观中")
+	_navigate(
+		LilianFlowService.open_hub(LilianState, SceneManager, {}, {}, true),
+		"无法返回观中"
+	)
 
 
 func _go_world_map() -> void:

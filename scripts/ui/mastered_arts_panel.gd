@@ -321,4 +321,4 @@ func _clear(container: Node) -> void:
 
 
 func _go_back() -> void:
-	SceneManager.go_back()
+	LilianFlowService.go_back(LilianState, SceneManager)

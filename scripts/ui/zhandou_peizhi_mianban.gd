@@ -377,4 +377,4 @@ func _apply_quality_tier_badges(row: Control, entry: Dictionary) -> void:
 
 
 func _go_back() -> void:
-	SceneManager.go_back()
+	LilianFlowService.go_back(LilianState, SceneManager)

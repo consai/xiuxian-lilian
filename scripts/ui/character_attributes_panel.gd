@@ -197,4 +197,4 @@ func _statistics_text() -> String:
 
 func _on_close_pressed() -> void:
 	TutorialService.game_event("tutorial.attributes_closed")
-	SceneManager.go_back()
+	LilianFlowService.go_back(LilianState, SceneManager)
