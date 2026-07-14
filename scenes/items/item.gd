@@ -1,6 +1,10 @@
 class_name ItemView
 extends Control
 
+const ItemIconResolverScript := preload(
+	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
+)
+
 ## 道具展示块，场景 [code]item.tscn[/code]。
 ## [member click_enabled] 为 [code]false[/code] 时仅展示（如详情弹窗）；为 [code]true[/code] 时可点击并带缩放反馈（如背包）。
 ## [member show_info_on_click] 为 [code]true[/code] 且已 [method set_info_entry] 时，左键打开全局道具详情。
@@ -115,7 +119,7 @@ static func apply_item_id(view: ItemView, item_id: String, count: int = 0, optio
 	if iid != "" and ConfigManager != null:
 		var def := ConfigManager.item_def_by_id(iid)
 		if def != null:
-			icon = ItemDef.resolve_icon_texture(def.icon_path, null)
+			icon = ItemIconResolverScript.resolve(def.icon_path, null)
 			if item_name == "":
 				item_name = def.name
 			quality = EnumQuality.display_label(def.quality)
@@ -165,7 +169,7 @@ static func apply_reward_row(view: ItemView, row: Dictionary, options: Dictionar
 		if ConfigManager != null:
 			var def := ConfigManager.item_def_by_id(item_id)
 			if def != null:
-				icon = ItemDef.resolve_icon_texture(def.icon_path, null)
+				icon = ItemIconResolverScript.resolve(def.icon_path, null)
 				if quality == "":
 					quality = EnumQuality.display_label(def.quality)
 				tier = def.tier
@@ -174,7 +178,7 @@ static func apply_reward_row(view: ItemView, row: Dictionary, options: Dictionar
 			item_name = str(row.get("id", "奖励"))
 		var path := str(row.get("icon_path", row.get("icon", ""))).strip_edges()
 		if path != "":
-			icon = ItemDef.resolve_icon_texture(path, null)
+			icon = ItemIconResolverScript.resolve(path, null)
 	view.apply_display(icon, item_name, count, Color.WHITE, quality, false, tier)
 	view.set_info_entry(entry_from_reward_row(row))
 

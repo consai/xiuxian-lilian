@@ -377,4 +377,5 @@ func _apply_quality_tier_badges(row: Control, entry: Dictionary) -> void:
 
 
 func _go_back() -> void:
-	LilianFlowService.go_back(LilianState, SceneManager)
+	var popup_mode := SceneManager.is_panel_popup_active()
+	LilianFlowService.close_lilian_utility_panel(popup_mode, LilianState, SceneManager)

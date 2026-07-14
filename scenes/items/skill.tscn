@@ -135,6 +135,7 @@ texture_progress = ExtResource("2_sg1g1")
 tint_progress = Color(0, 0, 0, 0.55)
 
 [node name="skill_num" type="TextureRect" parent="." unique_id=436472769]
+unique_name_in_owner = true
 layout_mode = 0
 offset_right = 20.0
 offset_bottom = 21.0
@@ -195,6 +196,7 @@ horizontal_alignment = 2
 vertical_alignment = 1
 
 [node name="Control" type="Control" parent="." unique_id=1869731696]
+unique_name_in_owner = true
 anchors_preset = 0
 mouse_filter = 2
 script = ExtResource("7_ypyvn")

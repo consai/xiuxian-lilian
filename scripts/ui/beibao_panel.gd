@@ -53,9 +53,4 @@ func _on_lilian_entry_right_clicked(entry: Dictionary) -> void:
 
 
 func _go_back() -> void:
-	var popup_active := SceneManager.is_panel_popup_active()
-	if popup_active:
-		SceneManager.dismiss_panel_popup()
-	if popup_active:
-		return
-	LilianFlowService.go_back(LilianState, SceneManager)
+	LilianFlowService.close_lilian_utility_panel(_lilian_mode, LilianState, SceneManager)

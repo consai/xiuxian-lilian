@@ -2,6 +2,19 @@
 
 const SIM_PATH := "res://data/exportjson/yunxing_params/moni.json"
 const HUB_SCENE := "res://scenes/sim/dongfu.tscn"
+const CharacterSavedataStateScript := preload(
+	"res://scripts/features/character/domain/character_savedata_state.gd"
+)
+const LiandanStateScript := preload("res://scripts/features/alchemy/domain/liandan_state.gd")
+const WeituoStateScript := preload(
+	"res://scripts/features/commission/domain/weituo_state.gd"
+)
+const InventoryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_application.gd"
+)
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
 
 const INSTABILITY_REDUCTION_PER_WIN := 10
 const PASSIVE_METHOD_PRACTICE_RATIO := 0.25
@@ -95,8 +108,11 @@ var inventory: Dictionary:
 	get: return DataStore.savedata.get("inventory", {}) as Dictionary
 	set(value): DataStore.savedata["inventory"] = value
 var liandan: Dictionary:
-	get: return DataStore.savedata.get("liandan", DataStore.savedata.get("alchemy", LiandanService.default_state())) as Dictionary
-	set(value): DataStore.savedata["liandan"] = LiandanService.normalize_state(value)
+	get: return DataStore.savedata.get("liandan", {}) as Dictionary
+	set(value):
+		var prepared := LiandanStateScript.prepare(value)
+		if not prepared.is_empty():
+			DataStore.savedata["liandan"] = prepared
 var storage: Dictionary:
 	get: return DataStore.savedata.get("storage", {}) as Dictionary
 	set(value): DataStore.savedata["storage"] = value
@@ -141,14 +157,22 @@ func _ready() -> void:
 
 func _bootstrap_savedata() -> void:
 	# 主界面负责新局与读档，启动时不自动加载存档。
-	pass
+	var initial_snapshot := CharacterSavedataStateScript.apply_to_snapshot(DataStore.savedata)
+	if not initial_snapshot.has("liandan"):
+		initial_snapshot["liandan"] = LiandanStateScript.default_state()
+	if not initial_snapshot.has("weituo"):
+		initial_snapshot["weituo"] = WeituoStateScript.default_state()
+	DataStore.savedata = initial_snapshot
 
 
 func new_game(profile: Dictionary = {}) -> void:
-	DataStore.reset_all()
+	var initial := preload("res://scripts/sim/moni_catalog.gd").initial_player()
+	if initial.is_empty():
+		push_error("[game_state:invalid_initial_player] MoniCatalog returned no initial player")
+		return
+	DataStore.reset_all(CharacterSavedataStateScript.default_slice())
+	DataStore.savedata["weituo"] = WeituoStateScript.default_state()
 	DataStore.start_tutorial()
-	var root := preload("res://scripts/sim/moni_catalog.gd").load_bundle()
-	var initial := root.get("initial_player", {}) as Dictionary
 	day = 1
 	realm_index = 0
 	cultivation = 0
@@ -180,7 +204,7 @@ func new_game(profile: Dictionary = {}) -> void:
 	treasure_item_slots = (initial.get("treasure_item_slots", ["", "", ""]) as Array).duplicate(true)
 	item_slots = (initial.get("item_slots", ["", "", ""]) as Array).duplicate(true)
 	inventory = (initial.get("items", initial.get("inventory", {})) as Dictionary).duplicate(true)
-	liandan = LiandanService.default_state()
+	liandan = LiandanStateScript.default_state()
 	storage = (initial.get("storage", {}) as Dictionary).duplicate(true)
 	storage_equips = (initial.get("storage_equips", []) as Array).duplicate(true)
 	activity_log = []
@@ -413,14 +437,14 @@ func _apply_liandan_brew_result(
 ) -> Dictionary:
 	for ingredient_v in result.get("ingredients", []) as Array:
 		var ingredient := ingredient_v as Dictionary
-		InventoryService.remove_item(
+		InventoryApplicationScript.remove_item(
 			inventory,
 			str(ingredient.get("id", "")),
 			int(ingredient.get("count", 0))
 		)
 	var product_id := str(result.get("product_id", ""))
 	if product_id != "":
-		result["added"] = InventoryService.add_item(inventory, product_id, int(result.get("count", 0)))
+		result["added"] = InventoryApplicationScript.add_item(inventory, product_id, int(result.get("count", 0)))
 	else:
 		result["added"] = 0
 	var next_liandan := LiandanService.apply_xp(liandan, int(result.get("xp", 0)))
@@ -690,7 +714,7 @@ func cultivate_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, days: int 
 		if EnumXiulianMode.is_pill_mode(mode_id):
 			var active_pill_id := str(pill_ids[int(day_index / GameTimeService.days_per_month())])
 			if day_index % GameTimeService.days_per_month() == 0:
-				InventoryService.remove_item(inventory, active_pill_id, 1)
+				InventoryApplicationScript.remove_item(inventory, active_pill_id, 1)
 			raw_gain = cultivation_pill_daily_gain(active_pill_id) + method_base_gain
 		else:
 			var multiplier := float(mode["cultivation_multiplier"])
@@ -771,13 +795,13 @@ func best_owned_cultivation_pill_id() -> String:
 
 
 func is_cultivation_pill(item_id: String) -> bool:
-	var def := ConfigManager.item_def_by_id(item_id)
+	var def := InventoryQueryApplicationScript.definition_by_id(item_id)
 	return def != null and def.is_cultivation_pill()
 
 
 ## 修炼丹药配置的月修为（来自物品 use_effect.pill_cultivation）。
 func cultivation_pill_gain(item_id: String) -> int:
-	var def := ConfigManager.item_def_by_id(item_id)
+	var def := InventoryQueryApplicationScript.definition_by_id(item_id)
 	if def == null:
 		return 0
 	return maxi(0, int(round(def.get_use_effect_amount("pill_cultivation"))))
@@ -789,7 +813,7 @@ func cultivation_pill_daily_gain(item_id: String) -> int:
 
 
 func cultivation_pill_rank(item_id: String) -> int:
-	var def := ConfigManager.item_def_by_id(item_id)
+	var def := InventoryQueryApplicationScript.definition_by_id(item_id)
 	if def == null:
 		return 0
 	return def.quality * 1000 + cultivation_pill_gain(item_id)
@@ -801,9 +825,13 @@ func _cultivation_pill_count(days: int) -> int:
 
 
 func rest() -> void:
+	var cfg := _activity_cfg("rest")
+	if cfg.is_empty():
+		push_error("[game_state:missing_activity] rest")
+		return
 	hp = float(attrs.get(EnumPlayerAttr.HP_MAX, 100.0))
 	mp = float(attrs.get(EnumPlayerAttr.MP_MAX, 100.0))
-	injury_days = maxi(0, injury_days - maxi(0, int(_activity_cfg("rest").get("injury_recovery", 2))))
+	injury_days = maxi(0, injury_days - int(cfg["injury_recovery"]))
 	_finish_activity("休息：恢复气血与法力", false)
 
 
@@ -1064,7 +1092,7 @@ func apply_battle_player_runtime(summary: Dictionary) -> void:
 		mp = float(runtime_summary.get("mp", mp))
 	var battle_items_v: Variant = runtime_summary.get("items", [])
 	if battle_items_v is Array:
-		InventoryService.sync_battle_item_counts(
+		InventoryApplicationScript.sync_battle_item_counts(
 			inventory, item_slots, battle_items_v as Array
 		)
 
@@ -1125,11 +1153,11 @@ func settle_lilian(result: Dictionary, tutorial_service: Node) -> Dictionary:
 	mp = float(result.get("mp", mp))
 	if exit_reason == "defeated":
 		var rules := LilianRulesService.rules()
-		hp = maxf(hp, float(attrs.get(EnumPlayerAttr.HP_MAX, 100.0)) * float(rules.get("defeat_hp_floor_ratio", 0.25)))
-		injury_days = maxi(injury_days, int(rules.get("defeat_injury_days", 3)))
+		hp = maxf(hp, float(attrs.get(EnumPlayerAttr.HP_MAX, 100.0)) * float(rules["defeat_hp_floor_ratio"]))
+		injury_days = maxi(injury_days, int(rules["defeat_injury_days"]))
 	elif exit_reason == "fled":
 		var fled_rules := LilianRulesService.rules()
-		injury_days = maxi(injury_days, int(fled_rules.get("fled_injury_days", 1)))
+		injury_days = maxi(injury_days, int(fled_rules["fled_injury_days"]))
 	for item_row_v in result.get("items", []) as Array:
 		if not item_row_v is Dictionary:
 			continue
@@ -1150,7 +1178,7 @@ func settle_lilian(result: Dictionary, tutorial_service: Node) -> Dictionary:
 		var lost := lost_v as Dictionary
 		if str(lost.get("source", "inventory")) == "session_loot":
 			continue
-		InventoryService.remove_item(
+		InventoryApplicationScript.remove_item(
 			inventory,
 			str(lost.get("id", "")),
 			int(lost.get("count", 0))
@@ -1218,7 +1246,22 @@ func to_dict() -> Dictionary:
 
 
 func apply_dict(data: Dictionary) -> bool:
-	if not DataStore.import_savedata(data):
+	if not data.has("liandan"):
+		push_error("[game_state:missing_state_slice] field=liandan")
+		return false
+	if not LiandanStateScript.validate(data.get("liandan")):
+		return false
+	if not data.has("weituo"):
+		push_error("[game_state:missing_state_slice] field=weituo")
+		return false
+	var prepared_weituo := WeituoService.prepare_state_for_commit(
+		data.get("weituo"), "game_state.apply_dict"
+	)
+	if prepared_weituo.is_empty():
+		return false
+	var normalized_data := CharacterSavedataStateScript.apply_to_snapshot(data)
+	normalized_data["weituo"] = prepared_weituo
+	if not DataStore.import_savedata(normalized_data):
 		return false
 	refresh_derived_attrs(true)
 	var attrs_dict := attrs
@@ -1313,7 +1356,7 @@ func use_inventory_item(item_id: String) -> Dictionary:
 	var iid := item_id.strip_edges()
 	if iid == "":
 		return {"ok": false, "error": "无效物品"}
-	var def := ConfigManager.item_def_by_id(iid)
+	var def := InventoryQueryApplicationScript.definition_by_id(iid)
 	if def == null or int(inventory.get(iid, 0)) <= 0:
 		return {"ok": false, "error": "背包中没有该物品"}
 	var result: Dictionary
@@ -1333,7 +1376,7 @@ func use_inventory_item(item_id: String) -> Dictionary:
 
 
 func _use_recovery_item(item_id: String, def: ItemDef) -> Dictionary:
-	var recovery := InventoryService.recovery_result(
+	var recovery := InventoryApplicationScript.recovery_result(
 		hp,
 		mp,
 		ZhandouAttr.get_attr(attrs, EnumPlayerAttr.HP_MAX, hp),
@@ -1347,7 +1390,7 @@ func _use_recovery_item(item_id: String, def: ItemDef) -> Dictionary:
 		return {"ok": false, "error": "气血与法力已满"}
 	hp = float(recovery["hp"])
 	mp = float(recovery["mp"])
-	InventoryService.remove_item(inventory, item_id, 1)
+	InventoryApplicationScript.remove_item(inventory, item_id, 1)
 	return {
 		"ok": true,
 		"hp_gained": hp_gained,
@@ -1385,12 +1428,12 @@ func _use_attrs_effect(item_id: String, def: ItemDef) -> Dictionary:
 		applied.append({"attr": attr_key, "delta": delta})
 	if applied.is_empty():
 		return {"ok": false, "error": "无有效的属性修改"}
-	InventoryService.remove_item(inventory, item_id, 1)
+	InventoryApplicationScript.remove_item(inventory, item_id, 1)
 	return {"ok": true, "attrs": applied, "feedback": "属性已变化"}
 
 
 func use_learning_book(item_id: String) -> Dictionary:
-	var def := ConfigManager.item_def_by_id(item_id)
+	var def := InventoryQueryApplicationScript.definition_by_id(item_id)
 	if def == null or int(inventory.get(item_id, 0)) <= 0:
 		return {"ok": false, "error": "背包中没有该典籍"}
 	var result: Dictionary
@@ -1401,7 +1444,7 @@ func use_learning_book(item_id: String) -> Dictionary:
 	else:
 		return {"ok": false, "error": "该物品不是可学习典籍"}
 	if bool(result.get("ok", false)):
-		InventoryService.remove_item(inventory, item_id, 1)
+		InventoryApplicationScript.remove_item(inventory, item_id, 1)
 	return result
 
 
@@ -1437,7 +1480,7 @@ func _use_alchemy_mastery_notes(item_id: String, def: ItemDef) -> Dictionary:
 	var gained := LiandanService.mastery_for(liandan, recipe_id) - before
 	var recipe := LiandanService.recipe_by_id(recipe_id)
 	var recipe_name := str(recipe.get("pill_name", recipe.get("name", "丹方")))
-	InventoryService.remove_item(inventory, item_id, 1)
+	InventoryApplicationScript.remove_item(inventory, item_id, 1)
 	return {
 		"ok": true,
 		"message": "研读心得，%s熟练度 +%d" % [recipe_name, gained],
@@ -1514,7 +1557,7 @@ func assign_treasure_item_slot(slot_index: int, item_id: String) -> Dictionary:
 		return {"ok": true}
 	if int(inventory.get(iid, 0)) <= 0:
 		return {"ok": false, "error": "背包中没有该法宝"}
-	var def := ConfigManager.item_def_by_id(iid)
+	var def := InventoryQueryApplicationScript.definition_by_id(iid)
 	if def == null or not def.is_treasure():
 		return {"ok": false, "error": "该物品不是法宝"}
 	for i in treasure_slots.size():
@@ -1546,7 +1589,7 @@ func assign_item_slot(slot_index: int, item_id: String) -> Dictionary:
 		return {"ok": true}
 	if int(inventory.get(iid, 0)) <= 0:
 		return {"ok": false, "error": "背包中没有该道具"}
-	var def := ConfigManager.item_def_by_id(iid)
+	var def := InventoryQueryApplicationScript.definition_by_id(iid)
 	if def == null or not def.has_fight_config():
 		return {"ok": false, "error": "该物品不可带入战斗"}
 	for i in slots.size():
@@ -1743,13 +1786,7 @@ func _sync_realm() -> void:
 
 
 func _activity_cfg(activity_id: String) -> Dictionary:
-	var activities := _simulation_root().get("activities", {}) as Dictionary
-	var cfg_v: Variant = activities.get(activity_id, {})
-	return cfg_v as Dictionary if cfg_v is Dictionary else {}
-
-
-func _simulation_root() -> Dictionary:
-	return preload("res://scripts/sim/moni_catalog.gd").load_bundle()
+	return preload("res://scripts/sim/moni_catalog.gd").activity_by_id(activity_id)
 
 
 func _config_manager() -> Node:

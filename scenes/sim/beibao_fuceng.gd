@@ -1,6 +1,6 @@
 extends TextureRect
 
-const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
+const InventoryApplicationScript := preload("res://scripts/features/inventory/application/inventory_application.gd")
 
 @onready var _bag_left: BagBaseView = %BagLeft
 @onready var _bag_right: BagBaseView = %BagRight
@@ -61,7 +61,7 @@ func _deposit_entry(entry: Dictionary) -> void:
 		var count := maxi(1, int(entry.get("count", 1)))
 		if item_id == "":
 			return
-		var moved := InventoryServiceScript.transfer_item(GameState.inventory, GameState.storage, item_id, count)
+		var moved := InventoryApplicationScript.transfer_item(GameState.inventory, GameState.storage, item_id, count)
 		if moved > 0:
 			_clear_item_slots_if_empty(item_id)
 			_show_status("已存入 %s × %d" % [_entry_name(entry), moved])
@@ -76,7 +76,7 @@ func _withdraw_entry(entry: Dictionary) -> void:
 		var count := maxi(1, int(entry.get("count", 1)))
 		if item_id == "":
 			return
-		var moved := InventoryServiceScript.transfer_item(GameState.storage, GameState.inventory, item_id, count)
+		var moved := InventoryApplicationScript.transfer_item(GameState.storage, GameState.inventory, item_id, count)
 		if moved > 0:
 			_show_status("已取出 %s × %d" % [_entry_name(entry), moved])
 	refresh()
@@ -85,7 +85,7 @@ func _withdraw_entry(entry: Dictionary) -> void:
 func _deposit_equip(equip_id: int) -> void:
 	if equip_id <= 0:
 		return
-	if not InventoryServiceScript.transfer_equip(GameState.owned_equips, GameState.storage_equips, equip_id):
+	if not InventoryApplicationScript.transfer_equip(GameState.owned_equips, GameState.storage_equips, equip_id):
 		return
 	_clear_equip_slots(equip_id)
 	_show_status("已将法宝存入仓库")
@@ -95,28 +95,28 @@ func _deposit_equip(equip_id: int) -> void:
 func _withdraw_equip(equip_id: int) -> void:
 	if equip_id <= 0:
 		return
-	if InventoryServiceScript.transfer_equip(GameState.storage_equips, GameState.owned_equips, equip_id):
+	if InventoryApplicationScript.transfer_equip(GameState.storage_equips, GameState.owned_equips, equip_id):
 		_show_status("已从仓库取出法宝")
 	refresh()
 
 
 func _deposit_all() -> void:
-	InventoryServiceScript.transfer_all_items(GameState.inventory, GameState.storage)
+	InventoryApplicationScript.transfer_all_items(GameState.inventory, GameState.storage)
 	for i in GameState.item_slots.size():
 		GameState.item_slots[i] = ""
 	for equip_id_v in GameState.owned_equips.duplicate():
 		var equip_id := int(equip_id_v)
 		if equip_id <= 0:
 			continue
-		if InventoryServiceScript.transfer_equip(GameState.owned_equips, GameState.storage_equips, equip_id):
+		if InventoryApplicationScript.transfer_equip(GameState.owned_equips, GameState.storage_equips, equip_id):
 			_clear_equip_slots(equip_id)
 	_show_status("背包物品已全部存入仓库")
 	refresh()
 
 
 func _withdraw_all() -> void:
-	InventoryServiceScript.transfer_all_items(GameState.storage, GameState.inventory)
-	InventoryServiceScript.transfer_all_equips(GameState.storage_equips, GameState.owned_equips)
+	InventoryApplicationScript.transfer_all_items(GameState.storage, GameState.inventory)
+	InventoryApplicationScript.transfer_all_equips(GameState.storage_equips, GameState.owned_equips)
 	_show_status("仓库物品已全部取出")
 	refresh()
 

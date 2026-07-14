@@ -8,6 +8,9 @@ signal abandon_requested(instance_id: String)
 const CARD_SCENE_PATH := "res://scenes/ui/components/weituo_card.tscn"
 const REQUIREMENT_ROW_SCENE_PATH := "res://scenes/ui/components/weituo_requirement_row.tscn"
 const ITEM_SCENE_PATH := "res://scenes/items/item.tscn"
+const ItemIconResolverScript := preload(
+	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
+)
 
 const FILTER_ALL := "all"
 const FILTER_AVAILABLE := "available"
@@ -248,7 +251,7 @@ func _rebuild_reward_rows(rewards: Array) -> void:
 			item_row["name"] = str(item_row.get("display_name", ""))
 		var icon_path: String = str(item_row.get("icon_path", "")).strip_edges()
 		if icon_path != "" and not item_row.get("icon") is Texture2D:
-			item_row["icon"] = ItemDef.resolve_icon_texture(icon_path, null)
+			item_row["icon"] = ItemIconResolverScript.resolve(icon_path, null)
 		var item_slot: ItemView = load(ITEM_SCENE_PATH).instantiate() as ItemView
 		_reward_list.add_child(item_slot)
 		ItemView.apply_reward_row(item_slot, item_row, {"click_enabled": true, "show_info_on_click": true})

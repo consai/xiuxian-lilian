@@ -4,6 +4,9 @@ const ORIGIN_TYPE := "origin"
 const ROOT_TYPE := "root"
 const TALENT_TYPE := "talent"
 const ChoiceCardScene := preload("res://scenes/ui/components/juese_choice_card.tscn")
+const CharacterCreationApplicationScript := preload(
+	"res://scripts/features/character/application/character_creation_application.gd"
+)
 
 var _step := 0
 var _selected: Dictionary = {"origin_id": "", "root_id": "", "talent_id": ""}
@@ -37,7 +40,15 @@ func _show_step() -> void:
 	%Step1.theme_type_variation = &"" if _step == 0 else &"TabIdle"
 	%Step2.theme_type_variation = &"" if _step == 1 else &"TabIdle"
 	%Step3.theme_type_variation = &"" if _step == 2 else &"TabIdle"
-	var rows: Array = ConfigManager.character_creation_choices(str(meta["choice_type"]))
+	var query: Dictionary = CharacterCreationApplicationScript.query_choices(
+		str(meta["choice_type"])
+	)
+	if not bool(query.get("ok", false)):
+		for card_v in _cards:
+			(card_v as Button).visible = false
+		_message_label.text = str(query.get("message", "角色创建配置无效"))
+		return
+	var rows: Array = (query.get("value", []) as Array).duplicate(true)
 	while _cards.size() < rows.size():
 		var card := ChoiceCardScene.instantiate()
 		%ChoiceCards.add_child(card)

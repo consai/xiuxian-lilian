@@ -3,6 +3,7 @@ extends SceneTree
 const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
 const DataStoreScript := preload("res://scripts/core/data_store.gd")
 const LiandanServiceScript := preload("res://scripts/sim/liandan_service.gd")
+const LiandanStateScript := preload("res://scripts/features/alchemy/domain/liandan_state.gd")
 const RealmServiceScript := preload("res://scripts/sim/realm_service.gd")
 const RealmBalanceServiceScript := preload("res://scripts/sim/realm_balance_service.gd")
 const TupoServiceScript := preload("res://scripts/sim/tupo_service.gd")
@@ -63,7 +64,7 @@ func _character_and_cultivation() -> void:
 
 
 func _liandan() -> void:
-	var state := LiandanServiceScript.default_state()
+	var state := LiandanStateScript.default_state()
 	var inventory := {"items_LingCao": 4}
 	var preview := LiandanServiceScript.preview(
 		"recipe.huiqi", "steady", "lowest", state, inventory,

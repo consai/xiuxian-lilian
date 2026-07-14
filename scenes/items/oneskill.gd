@@ -17,12 +17,12 @@ var _hot_key: String = "1"
 @onready var _back: Panel = %Back
 @onready var _icon: TextureRect = %Icon
 @onready var _cd_overlay: TextureProgressBar = %CdOverlay
-@onready var _skill_num: TextureRect = $skill_num
+@onready var _skill_num: TextureRect = %skill_num
 @onready var _slot_label: Label = %SlotLabel
 @onready var _name_label: Label = %NameLabel
 @onready var _count_label: Label = %CountLabel
 @onready var _hover_tip: HoverTipSource = %HoverTipSource
-@onready var _press: Control = $Control
+@onready var _press: Control = %Control
 
 var _cd_total: float = 0.0
 var _icon_tint: Color = Color.WHITE

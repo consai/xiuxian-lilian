@@ -2,20 +2,20 @@ class_name GmBattleBuilder
 extends RefCounted
 
 const LilianEventServiceScript := preload("res://scripts/lilian/lilian_event_service.gd")
+const BattleConfigQueryApplicationScript := preload(
+	"res://scripts/features/battle/application/battle_config_query_application.gd"
+)
 
 
 static func build(
 		monster_id: String,
 		count: int,
-		game_state: Node,
-		config_manager: Node
+		game_state: Node
 ) -> Dictionary:
 	var mid := monster_id.strip_edges()
-	if mid == "" or game_state == null or config_manager == null:
+	if mid == "" or game_state == null:
 		return {}
-	if not config_manager.has_method("monster_by_id"):
-		return {}
-	var monster := config_manager.call("monster_by_id", mid) as Dictionary
+	var monster := BattleConfigQueryApplicationScript.monster_by_id(mid)
 	if monster.is_empty():
 		return {}
 	var safe_count := clampi(count, 1, 8)

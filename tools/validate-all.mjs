@@ -44,7 +44,15 @@ const godotEnv = {
   APPDATA: path.join(root, ".godot_test_appdata_cultivation"),
   LOCALAPPDATA: path.join(root, ".godot_test_local_cultivation"),
 };
-for (const name of fs.readdirSync(path.join(root, "tests")).filter((name) => /^test_.*\.gd$/.test(name)).sort()) {
+const godotTests = fs.readdirSync(path.join(root, "tests")).filter((name) => /^test_.*\.gd$/.test(name)).sort();
+const requiredGodotTests = ["test_weituo_catalog.gd"];
+for (const name of requiredGodotTests) {
+  if (!godotTests.includes(name)) {
+    console.error(`Missing required Godot test: ${name}`);
+    failed = true;
+  }
+}
+for (const name of godotTests) {
   failed = runGodot(name, ["--script", `res://tests/${name}`]) || failed;
 }
 failed = runGodot("route smoke", ["--script", "res://tests/run_route_smoke.gd"]) || failed;

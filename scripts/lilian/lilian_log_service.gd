@@ -222,9 +222,7 @@ static func _reward_label(reward: Dictionary) -> String:
 	var count := maxi(1, int(reward.get("count", reward.get("amount", 1))))
 	if kind == "equip":
 		var equip_name := "法宝"
-		var cm := _config_manager()
-		if cm != null:
-			equip_name = str(cm.equip_by_id(int(reward.get("id", -1))).get("name", equip_name))
+		equip_name = str(reward.get("name", equip_name))
 		return equip_name if count <= 1 else "%s×%d" % [equip_name, count]
 	if kind == "currency":
 		var amount := int(reward.get("count", reward.get("amount", 0)))
@@ -233,14 +231,4 @@ static func _reward_label(reward: Dictionary) -> String:
 		return "货币×%d" % amount
 	var item_id := str(reward.get("id", ""))
 	var item_name := str(reward.get("name", reward.get("item_name", item_id)))
-	var cm_item := _config_manager()
-	if cm_item != null and cm_item.has_method("get_item_display_name"):
-		item_name = str(cm_item.call("get_item_display_name", item_id))
 	return "%s×%d" % [item_name, count] if count > 1 else item_name
-
-
-static func _config_manager() -> Node:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("ConfigManager")

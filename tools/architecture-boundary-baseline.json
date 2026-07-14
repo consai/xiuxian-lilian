@@ -85,18 +85,6 @@
   },
   {
     "rule": "presentation_hardcoded_nodepath",
-    "path": "scenes/items/oneskill.gd",
-    "source": "@onready var _press: Control = $Control",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
-    "path": "scenes/items/oneskill.gd",
-    "source": "@onready var _skill_num: TextureRect = $skill_num",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
     "path": "scripts/sim/liandan_jieguo_tanchuang.gd",
     "source": "@onready var _days_label: Label = $Dialog/Content/Stats/Days/Text",
     "count": 1
@@ -283,18 +271,6 @@
   },
   {
     "rule": "presentation_hardcoded_nodepath",
-    "path": "scripts/ui/dao_tree_node_view.gd",
-    "source": "@onready var _rank: Label = $VBox/Rank",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
-    "path": "scripts/ui/dao_tree_node_view.gd",
-    "source": "@onready var _title: Label = $VBox/Title",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
     "path": "scripts/ui/dao_tree_panel.gd",
     "source": "@onready var _back: TextureButton = $BottomActions/Back",
     "count": 1
@@ -403,12 +379,6 @@
   },
   {
     "rule": "presentation_hardcoded_nodepath",
-    "path": "scripts/ui/gm_battle_panel.gd",
-    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
     "path": "scripts/ui/gm_item_grant_panel.gd",
     "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
     "count": 1
@@ -423,12 +393,6 @@
     "rule": "presentation_hardcoded_nodepath",
     "path": "scripts/ui/gm_item_grant_panel.gd",
     "source": "return (loop as SceneTree).root.get_node_or_null(\"GameState\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
-    "path": "scripts/ui/item_info_popup_view.gd",
-    "source": "@onready var _use_button_label: Label = %UseButton.get_node(\"Label\") as Label",
     "count": 1
   },
   {
@@ -468,12 +432,6 @@
     "count": 1
   },
   {
-    "rule": "presentation_hardcoded_nodepath",
-    "path": "scripts/zhandou/zhandou_float_presenter.gd",
-    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
-    "count": 1
-  },
-  {
     "rule": "presentation_root_lookup",
     "path": "scripts/ui/gm_battle_access.gd",
     "source": "return (loop as SceneTree).root.get_node_or_null(\"GameState\")",
@@ -483,12 +441,6 @@
     "rule": "presentation_root_lookup",
     "path": "scripts/ui/gm_battle_access.gd",
     "source": "return (loop as SceneTree).root.get_node_or_null(\"SceneManager\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_root_lookup",
-    "path": "scripts/ui/gm_battle_panel.gd",
-    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
     "count": 1
   },
   {
@@ -512,12 +464,6 @@
   {
     "rule": "presentation_root_lookup",
     "path": "scripts/ui/tips/core/reward_tip_builder.gd",
-    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_root_lookup",
-    "path": "scripts/zhandou/zhandou_float_presenter.gd",
     "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
     "count": 1
   }

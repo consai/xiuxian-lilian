@@ -3,53 +3,47 @@ extends RefCounted
 
 const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
 const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
+const WorldMapCatalogScript := preload("res://scripts/map/world_map_catalog.gd")
 
 const ROUTE_KEY_SEP := "|"
 
+static var _catalog := WorldMapCatalogScript.new()
+
 
 static func starter_city_id() -> String:
-	var meta := _world_map_meta()
-	return str(meta.get("starter_city_id", "qingshi_market"))
+	var meta := _catalog.meta()
+	if meta.is_empty():
+		push_error("WorldMapService: world map catalog is unavailable")
+		return ""
+	return str(meta["starter_city_id"])
 
 
 static func all_city_ids() -> Array:
-	return _config_manager().all_city_ids() if _config_manager() != null else []
+	return _catalog.all_city_ids()
 
 
 static func city_by_id(city_id: String) -> Dictionary:
-	var cm := _config_manager()
-	if cm == null:
-		return {}
-	return cm.city_by_id(city_id)
+	return _catalog.city_by_id(city_id)
 
 
 static func all_routes() -> Array:
-	var cm := _config_manager()
-	if cm == null:
-		return []
-	return cm.all_routes()
+	return _catalog.all_routes()
 
 
 static func wilderness_region_by_id(region_id: String) -> Dictionary:
-	var cm := _config_manager()
-	if cm == null:
-		return {}
-	return cm.wilderness_region_by_id(region_id)
+	return _catalog.wilderness_region_by_id(region_id)
 
 
 static func all_wilderness_region_ids() -> Array:
-	return _config_manager().all_wilderness_region_ids() if _config_manager() != null else []
+	return _catalog.all_wilderness_region_ids()
 
 
 static func wilderness_location_by_id(location_id: String) -> Dictionary:
-	var cm := _config_manager()
-	if cm == null:
-		return {}
-	return cm.wilderness_location_by_id(location_id)
+	return _catalog.wilderness_location_by_id(location_id)
 
 
 static func all_wilderness_location_ids() -> Array:
-	return _config_manager().all_wilderness_location_ids() if _config_manager() != null else []
+	return _catalog.all_wilderness_location_ids()
 
 
 static func route_key(from_id: String, to_id: String) -> String:
@@ -482,17 +476,3 @@ static func _default_route_state(from_id: String, to_id: String) -> String:
 		if (a == from_id and b == to_id) or (a == to_id and b == from_id):
 			return str(row.get("default_state", "open"))
 	return "open"
-
-
-static func _world_map_meta() -> Dictionary:
-	var cm := _config_manager()
-	if cm == null or not cm.has_method("world_map_meta"):
-		return {}
-	return cm.world_map_meta()
-
-
-static func _config_manager() -> Node:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("ConfigManager")

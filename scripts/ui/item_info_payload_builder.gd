@@ -5,7 +5,10 @@ const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 const LiandanServiceScript := preload("res://scripts/sim/liandan_service.gd")
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
-const ItemDefScript := preload("res://scripts/core/item_def.gd")
+const ItemDefScript := preload("res://scripts/features/inventory/domain/item_def.gd")
+const ItemIconResolverScript := preload(
+	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
+)
 const ZhandouAttrScript := preload("res://scripts/zhandou/zhandou_attr.gd")
 
 
@@ -26,7 +29,7 @@ static func from_item_id(item_id: String, count: int = 1) -> Dictionary:
 	var def := _item_def(iid)
 	if def == null:
 		return {}
-	var icon := ItemDefScript.resolve_icon_texture(def.icon_path, null)
+	var icon := ItemIconResolverScript.resolve(def.icon_path, null)
 	var detail_lines := _item_detail_lines(def)
 	var footer_lines: PackedStringArray = []
 	if count > 0:

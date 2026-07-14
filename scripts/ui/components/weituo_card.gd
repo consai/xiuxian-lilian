@@ -2,6 +2,10 @@ extends Button
 
 signal selected(entry_key: String)
 
+const ItemIconResolverScript := preload(
+	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
+)
+
 @onready var _portrait: TextureRect = %Portrait
 @onready var _title_label: Label = %TitleLabel
 @onready var _state_badge: Label = %StateBadge
@@ -73,7 +77,7 @@ func _bind_reward_preview(rewards: Array) -> void:
 		if icon_node != null:
 			var icon_path := str(reward.get("icon_path", "")).strip_edges()
 			if icon_path != "":
-				icon_node.texture = ItemDef.resolve_icon_texture(icon_path, icon_node.texture)
+				icon_node.texture = ItemIconResolverScript.resolve(icon_path, icon_node.texture)
 
 
 func _on_pressed() -> void:

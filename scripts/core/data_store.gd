@@ -1,8 +1,5 @@
 extends Node
 
-const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
-const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
-const LiandanServiceScript := preload("res://scripts/sim/liandan_service.gd")
 const SAVEDATA_SCHEMA_VERSION := 2
 const RUNDATA_SCHEMA_VERSION := 1
 
@@ -21,24 +18,17 @@ func ensure_initialized() -> void:
 		reset_rundata()
 
 
-func reset_savedata() -> void:
-	savedata = _default_savedata()
+func reset_savedata(extra_defaults: Dictionary = {}) -> void:
+	savedata = _default_savedata(extra_defaults)
 
 
 func start_tutorial() -> void:
 	savedata["tutorial"] = _default_tutorial_savedata()
 
 
-func coalesce_savedata(data: Dictionary) -> Dictionary:
-	var out := _default_savedata()
-	for key in data.keys():
-		var value: Variant = data[key]
-		if value is Dictionary:
-			out[key] = (value as Dictionary).duplicate(true)
-		elif value is Array:
-			out[key] = (value as Array).duplicate(true)
-		else:
-			out[key] = value
+func coalesce_savedata(data: Dictionary, extra_defaults: Dictionary = {}) -> Dictionary:
+	var out := _default_savedata(extra_defaults)
+	_overlay_snapshot(out, data)
 	# 所有读档兼容和下限修正集中在这里，业务脚本只处理当前 schema。
 	out["day"] = maxi(1, int(out.get("day", 1)))
 	out["realm_index"] = maxi(0, int(out.get("realm_index", 0)))
@@ -86,8 +76,6 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 			totals.erase("expedition_steps")
 		out["totals"] = totals
 	out["map"] = _coalesce_map_savedata(out.get("map", {}))
-	out["foundations"] = CharacterStatsScript.normalize_foundations(out.get("foundations", {}))
-	out["aptitudes"] = CharacterStatsScript.normalize_aptitudes(out.get("aptitudes", {}))
 	var bonuses_v: Variant = out.get("breakthrough_bonuses", {})
 	var bonuses := bonuses_v as Dictionary if bonuses_v is Dictionary else {}
 	out["breakthrough_bonuses"] = {
@@ -103,14 +91,6 @@ func coalesce_savedata(data: Dictionary) -> Dictionary:
 		"yuanying": maxi(0, int(quality.get("yuanying", quality.get("yuanying", 0)))),
 	}
 	out["breakthrough_attempt_cooldown_days"] = maxi(0, int(out.get("breakthrough_attempt_cooldown_days", 0)))
-	var liandan_raw: Variant = out.get("liandan", out.get("alchemy", {}))
-	out["liandan"] = LiandanServiceScript.normalize_state(liandan_raw)
-	if out.has("alchemy"):
-		out.erase("alchemy")
-	var weituo_raw: Variant = out.get("weituo", out.get("commissions", {}))
-	out["weituo"] = WeituoService.coalesce_savedata(weituo_raw)
-	if out.has("commissions"):
-		out.erase("commissions")
 	out["story"] = _coalesce_story_savedata(out.get("story", {}))
 	if data.has("tutorial"):
 		out["tutorial"] = _coalesce_tutorial_savedata(data.get("tutorial", {}))
@@ -145,8 +125,8 @@ func reset_rundata() -> void:
 	}
 
 
-func reset_all() -> void:
-	reset_savedata()
+func reset_all(extra_defaults: Dictionary = {}) -> void:
+	reset_savedata(extra_defaults)
 	reset_rundata()
 
 
@@ -155,10 +135,10 @@ func export_savedata() -> Dictionary:
 	return savedata.duplicate(true)
 
 
-func import_savedata(data: Dictionary) -> bool:
+func import_savedata(data: Dictionary, extra_defaults: Dictionary = {}) -> bool:
 	if not validate_savedata(data):
 		return false
-	savedata = coalesce_savedata(data)
+	savedata = coalesce_savedata(data, extra_defaults)
 	reset_rundata()
 	return true
 
@@ -339,8 +319,8 @@ func take_ui_tupo_zongjie() -> Dictionary:
 	return {}
 
 
-func _default_savedata() -> Dictionary:
-	return {
+func _default_savedata(extra_defaults: Dictionary = {}) -> Dictionary:
+	var out := {
 		"day": 1,
 		"realm_index": 0,
 		"realm_name": "",
@@ -354,8 +334,6 @@ func _default_savedata() -> Dictionary:
 		"character_origin_id": "",
 		"character_root_id": "",
 		"character_talent_id": "",
-		"foundations": CharacterStatsScript.default_foundations(),
-		"aptitudes": CharacterStatsScript.default_aptitudes(),
 		"attrs": {},
 		"hp": 1000.0,
 		"mp": 1000.0,
@@ -402,8 +380,6 @@ func _default_savedata() -> Dictionary:
 			"yuanying": 0,
 		},
 		"breakthrough_attempt_cooldown_days": 0,
-		"liandan": LiandanServiceScript.default_state(),
-		"weituo": WeituoService.default_savedata(),
 		"story": {
 			"completed": [],
 			"flags": {},
@@ -412,6 +388,19 @@ func _default_savedata() -> Dictionary:
 		},
 		"tutorial": _completed_tutorial_savedata(),
 	}
+	_overlay_snapshot(out, extra_defaults)
+	return out
+
+
+func _overlay_snapshot(target: Dictionary, overlay: Dictionary) -> void:
+	for key in overlay.keys():
+		var value: Variant = overlay[key]
+		if value is Dictionary:
+			target[key] = (value as Dictionary).duplicate(true)
+		elif value is Array:
+			target[key] = (value as Array).duplicate(true)
+		else:
+			target[key] = value
 
 
 func _default_map_savedata() -> Dictionary:
@@ -557,8 +546,6 @@ func _coalesce_dao_savedata(out: Dictionary) -> Dictionary:
 		out["equipped_abilities"] = _normalize_ability_slots(equipped_abilities_v)
 	else:
 		out["equipped_abilities"] = _normalize_ability_slots(equipped_abilities_v)
-	if (out.get("knowledge", {}) as Dictionary).is_empty():
-		KnowledgeServiceScript.grant_level(out, "zhuji.breathing", 1)
 	return out
 
 

@@ -4,6 +4,9 @@
 
 signal closed
 
+const BattleConfigQueryApplicationScript := preload(
+	"res://scripts/features/battle/application/battle_config_query_application.gd"
+)
 const ATTR_LABELS: Dictionary = {
 	EnumPlayerAttr.HP_MAX: "气血上限",
 	EnumPlayerAttr.MP_MAX: "法力上限",
@@ -112,16 +115,14 @@ func _build_catalogs() -> void:
 		return str(a.get("name", "")) < str(b.get("name", ""))
 	)
 	_buff_catalog.clear()
-	var cm: Node = _config_manager()
-	if cm != null and cm.has_method("all_buff_ids"):
-		for bid_v in cm.call("all_buff_ids") as Array:
-			var bid: String = str(bid_v).strip_edges()
-			if bid == "":
-				continue
-			var row: Dictionary = cm.call("buff_by_id", bid) as Dictionary
-			if row.is_empty():
-				continue
-			_buff_catalog.append(row)
+	for bid_v in BattleConfigQueryApplicationScript.all_buff_ids():
+		var bid: String = str(bid_v).strip_edges()
+		if bid == "":
+			continue
+		var row := BattleConfigQueryApplicationScript.buff_by_id(bid)
+		if row.is_empty():
+			continue
+		_buff_catalog.append(row)
 	_buff_catalog.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return str(a.get("name", a.get("id", ""))) < str(b.get("name", b.get("id", "")))
 	)
@@ -258,10 +259,7 @@ func _rebuild_buff_list(entry: Dictionary) -> void:
 		var inst: Dictionary = inst_v as Dictionary
 		var stacks: int = int(inst.get("stacks", 0))
 		var duration_left: float = float(inst.get("duration_left", 0.0))
-		var cm: Node = _config_manager()
-		var def: Dictionary = {}
-		if cm != null and cm.has_method("buff_by_id"):
-			def = cm.call("buff_by_id", bid) as Dictionary
+		var def := BattleConfigQueryApplicationScript.buff_by_id(bid)
 		var name_text: String = str(def.get("name", bid))
 		var label: String = "%s · 层数 %d · 剩余 %.1fs" % [name_text, stacks, duration_left]
 		var index: int = _buff_list.add_item(label)
@@ -404,10 +402,3 @@ func _on_close_pressed() -> void:
 	set_process(false)
 	closed.emit()
 	get_tree().call_group("gm_panel_host", "show_panel")
-
-
-func _config_manager() -> Node:
-	var loop: MainLoop = Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("ConfigManager")

@@ -4,10 +4,13 @@ class_name SkillHoverTipBuilder
 ## 根据技能配置构建 Hover Tip 载荷。
 
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
+const AbilityQueryApplicationScript := preload(
+	"res://scripts/features/ability/application/ability_query_application.gd"
+)
 
 
 static func build(skill_id: int, icon: Texture2D = null) -> Dictionary:
-	var cfg := ConfigManager.skill_by_id(skill_id)
+	var cfg := AbilityQueryApplicationScript.runtime_by_combat_id(skill_id)
 	if cfg.is_empty():
 		return {}
 	return build_from_runtime(cfg, icon)
@@ -67,13 +70,13 @@ static func build_from_runtime(cfg: Dictionary, icon: Texture2D = null) -> Dicti
 
 
 static func build_ability(ability_id: String, savedata: Dictionary, icon: Texture2D = null) -> Dictionary:
-	var ability := AbilityService.by_id(ability_id)
+	var ability := AbilityQueryApplicationScript.definition_by_id(ability_id)
 	if ability.is_empty():
 		return {}
-	var runtime := AbilityService.to_runtime_dict(ability_id, savedata)
+	var runtime := AbilityQueryApplicationScript.runtime_by_ability_id(ability_id, savedata)
 	var title := str(ability.get("name", ability_id)).strip_edges()
 	var quality := clampi(int(ability.get("quality", 1)), EnumQuality.Type.LOW, EnumQuality.Type.SUPREME)
-	var tier := AbilityService.ability_tier(ability)
+	var tier := AbilityQueryApplicationScript.tier_for(ability_id)
 	var lines: Array[String] = []
 	var desc := str(ability.get("description", "")).strip_edges()
 	if desc != "":
@@ -82,7 +85,7 @@ static func build_ability(ability_id: String, savedata: Dictionary, icon: Textur
 	lines.append("类型：%s" % ability_type_label(ability_type))
 	for policy_line in _ability_policy_lines(ability_type):
 		lines.append(policy_line)
-	var realm_id := AbilityService.ability_realm_id(ability)
+	var realm_id := AbilityQueryApplicationScript.realm_id_for(ability_id)
 	lines.append("境界：%s" % DaoTreeServiceScript.realm_display_name(realm_id))
 	lines.append("阶位：%s" % EnumItemTier.label(tier))
 	lines.append("品质：%s" % EnumQuality.display_label(quality))

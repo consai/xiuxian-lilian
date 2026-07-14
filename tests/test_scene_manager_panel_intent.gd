@@ -64,6 +64,35 @@ func _run() -> void:
 	var overlay := overlay_manager.go_zhandou_peizhi_mianban(true)
 	assert(bool(overlay.get("ok", false)))
 	assert(bool(overlay.get("popup", false)))
+	var dismissed_routes: Array[String] = []
+	overlay_manager.overlay_dismissed.connect(func(route_id: String) -> void:
+		dismissed_routes.append(route_id)
+	)
+	var dismissed_panel := overlay_manager.dismiss_panel_popup()
+	assert(bool(dismissed_panel.get("ok", false)))
+	assert(dismissed_routes == [SceneManagerScript.ZHANDOU_PEIZHI_MIANBAN])
+	assert(lilian_scene.visible)
+
+	var no_battle_overlay := overlay_manager.dismiss_zhandou_overlay()
+	assert(no_battle_overlay == {"ok": false, "error": "no_zhandou_overlay"})
+	assert(overlay_manager.get_active_scene() == lilian_scene)
+
+	var battle_underlay := Control.new()
+	overlay_host.add_child(battle_underlay)
+	battle_underlay.visible = false
+	battle_underlay.process_mode = Node.PROCESS_MODE_DISABLED
+	var battle_overlay := Node.new()
+	overlay_host.add_child(battle_overlay)
+	overlay_manager.set("_scene_underlay", battle_underlay)
+	overlay_manager.set("_zhandou_overlay", battle_overlay)
+	var dismissed_battle := overlay_manager.dismiss_zhandou_overlay()
+	assert(bool(dismissed_battle.get("ok", false)))
+	assert(dismissed_routes == [
+		SceneManagerScript.ZHANDOU_PEIZHI_MIANBAN,
+		SceneManagerScript.ZHANDOU_CHANGJING,
+	])
+	assert(battle_underlay.visible)
+	assert(battle_underlay.process_mode == Node.PROCESS_MODE_INHERIT)
 
 	overlay_manager.free()
 	overlay_host.free()

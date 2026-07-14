@@ -4,13 +4,15 @@ extends RefCounted
 const BATTLE_TYPES := ["battle", "elite", "boss"]
 const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
 const EnumActivityTimeScript := preload("res://scripts/enum/enum_activity_time.gd")
+const LilianRulesCatalogScript := preload("res://scripts/lilian/lilian_rules_catalog.gd")
 
 
 static func rules() -> Dictionary:
-	var cm := _config_manager()
-	if cm != null and cm.has_method("lilian_rules"):
-		return cm.call("lilian_rules") as Dictionary
-	return {}
+	return LilianRulesCatalogScript.rules()
+
+
+static func reward_budget_rules() -> Dictionary:
+	return LilianRulesCatalogScript.reward_budget()
 
 
 static func elapsed_days(days_elapsed: int, major_realm_id: String) -> int:
@@ -23,10 +25,10 @@ static func elapsed_days(days_elapsed: int, major_realm_id: String) -> int:
 
 static func should_trigger_event_today(idle_days: int, rng: RandomNumberGenerator) -> bool:
 	var cfg := rules()
-	var max_idle := maxi(1, int(cfg.get("max_idle_days", 4)))
+	var max_idle := int(cfg["max_idle_days"])
 	if idle_days >= max_idle:
 		return true
-	var chance := clampf(float(cfg.get("event_day_chance", 0.55)), 0.0, 1.0)
+	var chance := float(cfg["event_day_chance"])
 	if chance >= 1.0:
 		return true
 	if chance <= 0.0:
@@ -36,10 +38,3 @@ static func should_trigger_event_today(idle_days: int, rng: RandomNumberGenerato
 
 static func is_battle_type(event_type: String) -> bool:
 	return event_type in BATTLE_TYPES
-
-
-static func _config_manager() -> Node:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("ConfigManager")

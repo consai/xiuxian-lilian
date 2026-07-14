@@ -5,7 +5,10 @@ extends Control
 
 const ItemScene := preload("res://scenes/items/item.tscn")
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
-const ItemDefScript := preload("res://scripts/core/item_def.gd")
+const ItemDefScript := preload("res://scripts/features/inventory/domain/item_def.gd")
+const ItemIconResolverScript := preload(
+	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
+)
 const ItemInfoPayloadBuilderScript := preload("res://scripts/ui/item_info_payload_builder.gd")
 const HoverTipSourceScript := preload("res://scripts/ui/hover/hover_tip_source.gd")
 const HoverTipPayloadScript := preload("res://scripts/ui/hover/hover_tip_payload.gd")
@@ -590,7 +593,7 @@ func _entry_view_data(entry: Dictionary, cache_key: String = "") -> Dictionary:
 		if ConfigManager != null:
 			var def := ConfigManager.item_def_by_id(item_id)
 			if def != null:
-				icon = ItemDefScript.resolve_icon_texture(def.icon_path, null)
+				icon = ItemIconResolverScript.resolve(def.icon_path, null)
 				if quality == "":
 					quality = EnumQuality.display_label(def.quality)
 				tier = def.tier

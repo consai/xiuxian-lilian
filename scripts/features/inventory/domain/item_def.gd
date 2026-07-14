@@ -30,15 +30,6 @@ var learn_ability_id: String = ""
 var learn_method_id: String = ""
 
 
-static func resolve_icon_texture(icon_path: String, fallback: Texture2D) -> Texture2D:
-	var p := icon_path.strip_edges()
-	if p != "" and ResourceLoader.exists(p):
-		var res := load(p)
-		if res is Texture2D:
-			return res as Texture2D
-	return fallback
-
-
 func has_use_effect() -> bool:
 	return not use_effect.is_empty()
 
@@ -94,6 +85,55 @@ func to_fight_runtime_dict() -> Dictionary:
 	return out
 
 
+func clone() -> ItemDef:
+	var out := ItemDef.new()
+	out.id = id
+	out.name = name
+	out.item_type = item_type
+	out.primary_type = primary_type
+	out.secondary_type = secondary_type
+	out.quality = quality
+	out.tier = tier
+	out.desc = desc
+	out.stackable = stackable
+	out.max_stack = max_stack
+	out.base_ling_shi = base_ling_shi
+	out.icon_path = icon_path
+	out.use_effect = use_effect.duplicate(true)
+	out.fight_effect = fight_effect.duplicate(true)
+	out.fight_id = fight_id
+	out.fight_cd = fight_cd
+	out.fight_mp_cost = fight_mp_cost
+	out.learn_ability_id = learn_ability_id
+	out.learn_method_id = learn_method_id
+	return out
+
+
+## 可序列化的运行时定义快照；不包含 Resource、Texture 或其他运行时对象。
+func to_dict() -> Dictionary:
+	return {
+		"id": id,
+		"name": name,
+		"item_type": item_type,
+		"primary_type": primary_type,
+		"secondary_type": secondary_type,
+		"quality": quality,
+		"tier": tier,
+		"desc": desc,
+		"stackable": stackable,
+		"max_stack": max_stack,
+		"base_ling_shi": base_ling_shi,
+		"icon_path": icon_path,
+		"use_effect": use_effect.duplicate(true),
+		"fight_effect": fight_effect.duplicate(true),
+		"fight_id": fight_id,
+		"fight_cd": fight_cd,
+		"fight_mp_cost": fight_mp_cost,
+		"learn_ability_id": learn_ability_id,
+		"learn_method_id": learn_method_id,
+	}
+
+
 static func from_dict(data: Dictionary) -> ItemDef:
 	## 参数说明：
 	## - data: 单条道具配置字典
@@ -133,7 +173,8 @@ static func from_dict(data: Dictionary) -> ItemDef:
 		push_error("ItemDef.from_dict: invalid tier %s in %s" % [str(data.get("tier")), item.id])
 		return null
 	item.desc = str(data.get("desc", ""))
-	item.stackable = int(data.get("stackable", 1))
+	var stackable_v: Variant = data.get("stackable", 1)
+	item.stackable = (1 if stackable_v else 0) if stackable_v is bool else int(stackable_v)
 	item.max_stack = maxi(1, int(data.get("max_stack", 999)))
 	item.base_ling_shi = maxi(0, int(data.get("ling_shi", data.get("base_ling_shi", 0))))
 	item.icon_path = str(data.get("icon", data.get("icon_path", data.get("tuBiao", "")))).strip_edges()
@@ -147,9 +188,12 @@ static func from_dict(data: Dictionary) -> ItemDef:
 		item.fight_effect = (fe as Array).duplicate(true)
 	else:
 		item.fight_effect = []
-	item.fight_id = maxi(0, int(data.get("fight_id", 0)))
-	item.fight_cd = maxf(0.0, float(data.get("fight_cd", data.get("cd", 0.0))))
-	item.fight_mp_cost = maxf(0.0, float(data.get("fight_mp_cost", data.get("mp_cost", 0.0))))
+	var fight_id_v: Variant = data.get("fight_id", 0)
+	item.fight_id = maxi(0, int(fight_id_v)) if fight_id_v != null else 0
+	var fight_cd_v: Variant = data.get("fight_cd", data.get("cd", 0.0))
+	item.fight_cd = maxf(0.0, float(fight_cd_v)) if fight_cd_v != null else 0.0
+	var fight_mp_cost_v: Variant = data.get("fight_mp_cost", data.get("mp_cost", 0.0))
+	item.fight_mp_cost = maxf(0.0, float(fight_mp_cost_v)) if fight_mp_cost_v != null else 0.0
 	item.learn_ability_id = str(data.get("learn_ability_id", "")).strip_edges()
 	item.learn_method_id = str(data.get("learn_method_id", "")).strip_edges()
 	if item.stackable == 0:

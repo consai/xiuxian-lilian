@@ -7,20 +7,15 @@ const LilianLogServiceScript := preload("res://scripts/lilian/lilian_log_service
 const EnumLilianNodeTypeScript := preload("res://scripts/enum/enum_lilian_node_type.gd")
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const ConditionServiceScript := preload("res://scripts/sim/condition_service.gd")
+const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
+const LilianEventCatalogScript := preload("res://scripts/lilian/lilian_event_catalog.gd")
 
 
 static func by_id(event_id: String) -> Dictionary:
 	var generated := _generated_event_by_id(event_id)
 	if not generated.is_empty():
 		return generated
-	var cm := _config_manager()
-	if cm != null and cm.has_method("lilian_event_by_id"):
-		var event := cm.call("lilian_event_by_id", event_id) as Dictionary
-		if not event.is_empty():
-			return event
-	if cm != null and cm.has_method("lilian_common_event_by_id"):
-		return cm.call("lilian_common_event_by_id", event_id) as Dictionary
-	return {}
+	return LilianEventCatalogScript.static_by_id(event_id)
 
 
 static func event_pool_for_location(location: Dictionary) -> Array:
@@ -467,13 +462,10 @@ static func resolve_non_battle_event(
 static func build_battle_enemy(event: Dictionary) -> Dictionary:
 	var enemy := (event.get("enemy", {}) as Dictionary).duplicate(true)
 	if enemy.is_empty():
-		var cm := _config_manager()
-		if cm != null and cm.has_method("location_enemy_pool"):
-			enemy = cm.call(
-				"location_enemy_pool",
-				str(event.get("location_id", "")),
-				str(event.get("enemy_pool", ""))
-			) as Dictionary
+		enemy = DidianServiceScript.enemy_for_location(
+			str(event.get("location_id", "")),
+			str(event.get("enemy_pool", ""))
+		)
 	return _normalize_battle_enemy(enemy)
 
 
@@ -767,13 +759,6 @@ static func _weighted_pick(pool: Array, rng: RandomNumberGenerator) -> Dictionar
 	return {}
 
 
-static func _config_manager() -> Node:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
-
-
 static func _generated_event_by_id(event_id: String) -> Dictionary:
 	var loop := Engine.get_main_loop()
 	if not loop is SceneTree:
@@ -811,14 +796,8 @@ static func _store_generated_event(event: Dictionary) -> void:
 
 
 static func _location_monsters(location_id: String) -> Array:
-	var cm := _config_manager()
-	if cm != null and cm.has_method("location_monsters"):
-		return cm.call("location_monsters", location_id) as Array
-	return []
+	return DidianServiceScript.monsters_for_location(location_id)
 
 
 static func _location_by_id(location_id: String) -> Dictionary:
-	var cm := _config_manager()
-	if cm != null and cm.has_method("location_by_id"):
-		return cm.call("location_by_id", location_id) as Dictionary
-	return {}
+	return DidianServiceScript.by_id(location_id)

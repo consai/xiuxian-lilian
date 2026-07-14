@@ -3,12 +3,21 @@ extends RefCounted
 
 const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
 const LilianEventServiceScript := preload("res://scripts/lilian/lilian_event_service.gd")
+const LilianEventCatalogScript := preload("res://scripts/lilian/lilian_event_catalog.gd")
+const LilianLocationCatalogScript := preload("res://scripts/lilian/lilian_location_catalog.gd")
 const LilianRulesServiceScript := preload("res://scripts/lilian/lilian_rules_service.gd")
 const EnumLilianNodeTypeScript := preload("res://scripts/enum/enum_lilian_node_type.gd")
+const BattleConfigQueryApplicationScript := preload(
+	"res://scripts/features/battle/application/battle_config_query_application.gd"
+)
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
 
 
 static func collect_errors(game_state: Node = null) -> PackedStringArray:
-	var errors: PackedStringArray = []
+	var errors: PackedStringArray = LilianEventCatalogScript.collect_errors()
+	errors.append_array(LilianLocationCatalogScript.new().collect_errors())
 	for location_v in DidianServiceScript.all_locations():
 		var location := location_v as Dictionary
 		var location_id := str(location.get("id", ""))
@@ -121,9 +130,8 @@ static func _validate_location_materials(location: Dictionary, location_id: Stri
 		if drop_pool == "" or not drop_pools.has(drop_pool):
 			errors.append("地点 %s 材料 %s 引用了未知 drop_pool %s" % [location_id, material_id, drop_pool])
 		for item_id_v in row.get("item_ids", []) as Array:
-			var cm := _config_manager()
 			var item_id := str(item_id_v)
-			if cm != null and cm.has_method("item_def_by_id") and cm.call("item_def_by_id", item_id) == null:
+			if InventoryQueryApplicationScript.definition_by_id(item_id) == null:
 				errors.append("地点 %s 材料 %s 引用了未知物品 %s" % [location_id, material_id, item_id])
 	return errors
 
@@ -155,8 +163,8 @@ static func _validate_monster(monster: Dictionary, monster_id: String) -> Packed
 				continue
 			if sid == 0:
 				continue
-			var cm := _config_manager()
-			if cm != null and cm.has_method("skill_by_id") and (cm.call("skill_by_id", sid) as Dictionary).is_empty():
+			var config_manager := _config_manager()
+			if config_manager != null and config_manager.has_method("skill_by_id") and (config_manager.call("skill_by_id", sid) as Dictionary).is_empty():
 				errors.append("怪物 %s 引用了未知技能 %d" % [monster_id, sid])
 	var attrs := (LilianEventServiceScript.build_battle_enemy({"enemy": monster}).get("attrs", {}) as Dictionary)
 	for key in [
@@ -305,14 +313,13 @@ static func _validate_reward(reward: Dictionary, label: String) -> PackedStringA
 	var errors: PackedStringArray = []
 	var kind := str(reward.get("kind", "item"))
 	if kind == "equip":
-		var eid := int(reward.get("id", -1))
-		var cm := _config_manager()
-		if cm != null and cm.has_method("equip_by_id") and (cm.call("equip_by_id", eid) as Dictionary).is_empty():
-			errors.append("%s 引用了未知法宝 %d" % [label, eid])
+		var equip_id := int(reward.get("id", -1))
+		var config_manager := _config_manager()
+		if config_manager != null and config_manager.has_method("equip_by_id") and (config_manager.call("equip_by_id", equip_id) as Dictionary).is_empty():
+			errors.append("%s 引用了未知法宝 %d" % [label, equip_id])
 	elif kind == "item":
 		var iid := str(reward.get("id", ""))
-		var cm := _config_manager()
-		if cm != null and cm.has_method("item_def_by_id") and cm.call("item_def_by_id", iid) == null:
+		if InventoryQueryApplicationScript.definition_by_id(iid) == null:
 			errors.append("%s 引用了未知物品 %s" % [label, iid])
 	elif kind == "currency":
 		var currency_id := str(reward.get("id", "ling_stones"))
@@ -362,36 +369,16 @@ static func _config_manager() -> Node:
 
 
 static func _static_event_by_id(event_id: String) -> Dictionary:
-	var cm := _config_manager()
-	if cm == null:
-		return LilianEventServiceScript.by_id(event_id)
-	if cm.has_method("lilian_event_by_id"):
-		var event := cm.call("lilian_event_by_id", event_id) as Dictionary
-		if not event.is_empty():
-			return event
-	if cm.has_method("lilian_common_event_by_id"):
-		var common := cm.call("lilian_common_event_by_id", event_id) as Dictionary
-		if not common.is_empty():
-			return common
-	return LilianEventServiceScript.by_id(event_id)
+	return LilianEventCatalogScript.static_by_id(event_id)
 
 
 static func _monster_by_id(monster_id: String) -> Dictionary:
-	var cm := _config_manager()
-	if cm != null and cm.has_method("monster_by_id"):
-		return cm.call("monster_by_id", monster_id) as Dictionary
-	return {}
+	return BattleConfigQueryApplicationScript.monster_by_id(monster_id)
 
 
 static func _monster_drop_entries(monster: Dictionary) -> Array:
-	var cm := _config_manager()
-	if cm != null and cm.has_method("monster_drop_entries"):
-		return cm.call("monster_drop_entries", monster) as Array
-	return []
+	return BattleConfigQueryApplicationScript.monster_drop_entries(monster)
 
 
 static func _location_enemy(location_id: String, monster_ref: String) -> Dictionary:
-	var cm := _config_manager()
-	if cm != null and cm.has_method("location_enemy_pool"):
-		return cm.call("location_enemy_pool", location_id, monster_ref) as Dictionary
-	return {}
+	return DidianServiceScript.enemy_for_location(location_id, monster_ref)

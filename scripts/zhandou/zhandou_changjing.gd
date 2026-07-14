@@ -290,9 +290,7 @@ func _on_battle_finished(summary: Dictionary) -> void:
 func _schedule_lilian_auto_result_close() -> void:
 	if not _ctx.auto_battle_player:
 		return
-	var wait := maxf(0.1, float(
-		LilianRulesServiceScript.rules().get("auto_event_advance_seconds", 1.0)
-	))
+	var wait := float(LilianRulesServiceScript.rules()["auto_event_advance_seconds"])
 	get_tree().create_timer(wait).timeout.connect(
 		_on_battle_result_close_requested,
 		CONNECT_ONE_SHOT

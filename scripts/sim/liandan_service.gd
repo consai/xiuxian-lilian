@@ -11,70 +11,7 @@ const FAILURE_MASTERY_MULTIPLIER := 1.5
 const DEFAULT_BASE_YIELD := 2
 const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
 const EnumActivityTimeScript := preload("res://scripts/enum/enum_activity_time.gd")
-
-
-static func default_state() -> Dictionary:
-	return {
-		"level": 1,
-		"xp": 0,
-		"known_recipes": [
-			"recipe.huiqi",
-			"recipe.huiling",
-			"recipe.liaoshang",
-			"recipe.juqi",
-			"recipe.qingmai",
-			"recipe.guben",
-		],
-		"owned_furnaces": {"furnace.old_copper": {"durability": 30}},
-		"equipped_furnace": "furnace.old_copper",
-		"last_recipe": "recipe.huiqi",
-		"last_strategy": "steady",
-		"total_batches": 0,
-		"recipe_mastery": {},
-	}
-
-
-static func normalize_state(raw: Variant) -> Dictionary:
-	var out := default_state()
-	if raw is Dictionary:
-		var src := raw as Dictionary
-		out["level"] = clampi(int(src.get("level", 1)), 1, 10)
-		out["xp"] = maxi(0, int(src.get("xp", 0)))
-		if src.get("known_recipes") is Array:
-			out["known_recipes"] = _merge_known_recipes(
-				out.get("known_recipes", []) as Array,
-				src.get("known_recipes") as Array
-			)
-		if src.get("owned_furnaces") is Dictionary:
-			out["owned_furnaces"] = (src.get("owned_furnaces") as Dictionary).duplicate(true)
-		out["equipped_furnace"] = str(src.get("equipped_furnace", out["equipped_furnace"]))
-		out["last_recipe"] = str(src.get("last_recipe", out["last_recipe"]))
-		var last_strategy := str(src.get("last_strategy", out["last_strategy"]))
-		# 循方炼制已移除，旧存档回落到稳守炉火
-		if last_strategy == "standard":
-			last_strategy = "steady"
-		out["last_strategy"] = last_strategy
-		out["total_batches"] = maxi(0, int(src.get("total_batches", 0)))
-		if src.get("recipe_mastery") is Dictionary:
-			var mastery: Dictionary = {}
-			for recipe_id_v in (src.get("recipe_mastery") as Dictionary).keys():
-				var recipe_id := str(recipe_id_v)
-				mastery[recipe_id] = clampi(
-					int((src.get("recipe_mastery") as Dictionary).get(recipe_id_v, 0)),
-					0,
-					MAX_RECIPE_MASTERY
-				)
-			out["recipe_mastery"] = mastery
-	return out
-
-
-static func _merge_known_recipes(defaults: Array, saved: Array) -> Array:
-	var out := defaults.duplicate()
-	for recipe_id_v in saved:
-		var recipe_id := str(recipe_id_v)
-		if recipe_id != "" and recipe_id not in out:
-			out.append(recipe_id)
-	return out
+const LiandanStateScript := preload("res://scripts/features/alchemy/domain/liandan_state.gd")
 
 
 static func all_recipes() -> Array:
@@ -122,7 +59,9 @@ static func preview(
 	var strategy := strategy_by_id(strategy_id)
 	if recipe.is_empty() or strategy.is_empty():
 		return {"ok": false, "error": "未知丹方或炼制策略"}
-	var state := normalize_state(liandan_state)
+	var state := LiandanStateScript.prepare(liandan_state)
+	if state.is_empty():
+		return {"ok": false, "error": "炼丹状态不符合当前 schema"}
 	if not (state.get("known_recipes", []) as Array).has(recipe_id):
 		return {"ok": false, "error": "尚未掌握该丹方", "recipe": recipe}
 	var selection := _select_ingredients(recipe, inventory, selection_mode)
@@ -227,7 +166,9 @@ static func max_batch_count(preview_data: Dictionary, inventory: Dictionary, lia
 		var required := maxi(1, int(ingredient.get("count", 1)))
 		var owned := int(inventory.get(str(ingredient.get("id", "")), 0))
 		max_batches = mini(max_batches, owned / required)
-	var state := normalize_state(liandan_state)
+	var state := LiandanStateScript.prepare(liandan_state)
+	if state.is_empty():
+		return 0
 	var furnace_id := str(state.get("equipped_furnace", ""))
 	var owned_furnaces := state.get("owned_furnaces", {}) as Dictionary
 	var furnace_state_v: Variant = owned_furnaces.get(furnace_id, {})
@@ -376,7 +317,9 @@ static func roll(preview_data: Dictionary, rng: RandomNumberGenerator) -> Dictio
 
 
 static func apply_xp(liandan_state: Dictionary, gained: int) -> Dictionary:
-	var state := normalize_state(liandan_state)
+	var state := LiandanStateScript.prepare(liandan_state)
+	if state.is_empty():
+		return {}
 	state["xp"] = int(state.get("xp", 0)) + maxi(0, gained)
 	while int(state.get("level", 1)) < 10:
 		var needed := int(state.get("level", 1)) * 100
@@ -388,7 +331,9 @@ static func apply_xp(liandan_state: Dictionary, gained: int) -> Dictionary:
 
 
 static func mastery_for(liandan_state: Dictionary, recipe_id: String) -> int:
-	var state := normalize_state(liandan_state)
+	var state := LiandanStateScript.prepare(liandan_state)
+	if state.is_empty():
+		return 0
 	return clampi(
 		int((state.get("recipe_mastery", {}) as Dictionary).get(recipe_id, 0)),
 		0,
@@ -397,7 +342,9 @@ static func mastery_for(liandan_state: Dictionary, recipe_id: String) -> int:
 
 
 static func apply_recipe_mastery(liandan_state: Dictionary, recipe_id: String, gained: int) -> Dictionary:
-	var state := normalize_state(liandan_state)
+	var state := LiandanStateScript.prepare(liandan_state)
+	if state.is_empty():
+		return {}
 	var mastery := state.get("recipe_mastery", {}) as Dictionary
 	mastery[recipe_id] = clampi(
 		int(mastery.get(recipe_id, 0)) + maxi(0, gained),

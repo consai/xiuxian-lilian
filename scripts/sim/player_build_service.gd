@@ -3,7 +3,9 @@ extends RefCounted
 
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
-const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
+const InventoryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_application.gd"
+)
 const TagServiceScript := preload("res://scripts/sim/tag_service.gd")
 
 
@@ -62,7 +64,7 @@ static func build_battle_snapshot(savedata: Dictionary, runtime: Dictionary = {}
 		"attrs": build.get("attrs", {}),
 		"skills": skills,
 		"equips": equips,
-		"items": InventoryServiceScript.build_battle_item_slots(
+		"items": InventoryApplicationScript.build_battle_item_slots(
 			runtime.get("inventory", savedata.get("inventory", {})) as Dictionary,
 			runtime.get("item_slots", savedata.get("item_slots", [])) as Array
 		),

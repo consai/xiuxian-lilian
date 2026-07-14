@@ -17,6 +17,10 @@ extends Control
 
 const SIM_PATH := "res://data/exportjson/yunxing_params/moni.json"
 const GmBattleBuilderScript := preload("res://scripts/ui/gm_battle_builder.gd")
+const BattleConfigQueryApplicationScript := preload(
+	"res://scripts/features/battle/application/battle_config_query_application.gd"
+)
+const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
 
 @onready var _status_label: Label = %StatusLabel
 @onready var _message_label: Label = %MessageLabel
@@ -69,11 +73,11 @@ func _connect_buttons() -> void:
 
 func _build_location_options() -> void:
 	_location_option.clear()
-	var ids: Array = ConfigManager.all_location_ids()
+	var ids: Array = DidianServiceScript.all_location_ids()
 	ids.sort()
 	for location_id_v in ids:
 		var location_id := str(location_id_v)
-		var row := ConfigManager.location_by_id(location_id)
+		var row := DidianServiceScript.by_id(location_id)
 		var label := str(row.get("name", location_id))
 		_location_option.add_item(label, _location_option.item_count)
 		_location_option.set_item_metadata(_location_option.item_count - 1, location_id)
@@ -84,9 +88,9 @@ func _build_location_options() -> void:
 func _build_monster_options() -> void:
 	_monster_option.clear()
 	var rows: Array = []
-	for monster_id_v in ConfigManager.all_monster_ids():
+	for monster_id_v in BattleConfigQueryApplicationScript.all_monster_ids():
 		var monster_id := str(monster_id_v)
-		var monster := ConfigManager.monster_by_id(monster_id)
+		var monster := BattleConfigQueryApplicationScript.monster_by_id(monster_id)
 		if monster.is_empty():
 			continue
 		rows.append({
@@ -329,7 +333,7 @@ func _start_gm_battle() -> void:
 
 
 func _build_gm_battle_init(monster_id: String, count: int) -> Dictionary:
-	return GmBattleBuilderScript.build(monster_id, count, GameState, ConfigManager)
+	return GmBattleBuilderScript.build(monster_id, count, GameState)
 
 
 func _new_game() -> void:

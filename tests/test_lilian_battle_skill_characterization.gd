@@ -1,5 +1,9 @@
 extends SceneTree
 
+const BattleConfigQueryApplicationScript := preload(
+	"res://scripts/features/battle/application/battle_config_query_application.gd"
+)
+
 var _failures: PackedStringArray = []
 
 
@@ -12,6 +16,7 @@ func _run() -> void:
 	_characterize_battle_init()
 	_characterize_active_skill_and_summary()
 	_characterize_runtime_buff()
+	_characterize_configured_buff_snapshot()
 	if not _failures.is_empty():
 		for failure in _failures:
 			push_error(failure)
@@ -89,6 +94,28 @@ func _buff_trace() -> Array:
 	var during := actor.get_attr(EnumPlayerAttr.PHYSICAL_ATK)
 	actor.tick_buffs(2.1)
 	return [before, during, actor.get_attr(EnumPlayerAttr.PHYSICAL_ATK)]
+
+
+func _characterize_configured_buff_snapshot() -> void:
+	var definitions := BattleConfigQueryApplicationScript.all_buffs_snapshot()
+	var actor := ZhandouObj.new({
+		"hp": 100.0,
+		"mp": 20.0,
+		"attrs": ZhandouAttr.from_stat_block({EnumPlayerAttr.SPD: 100.0}),
+		"skills": [],
+	}, definitions)
+	var applied := actor.add_buff("buff_0001")
+	_check(applied == 1, "configured buff must be resolved from the injected snapshot")
+	_check(actor.get_attr(EnumPlayerAttr.SPD) == 120.0, "configured buff modifier behavior changed")
+	_check(not actor.to_dict().has("buff_definitions"), "static buff definitions must not enter runtime state")
+	var projected := ZhandouObj.duplicate_with_advancing_projection(actor, 0.1)
+	_check(projected != null, "buffed combatant projection must be created")
+	if projected != null:
+		_check(projected.add_buff("buff_0002") == 1, "projection must retain injected buff definitions")
+	actor.tick_buffs(4.1)
+	_check(actor.get_attr(EnumPlayerAttr.SPD) == 100.0, "configured buff expiry must restore modifiers")
+
+
 func _check(condition: bool, message: String) -> void:
 	if not condition:
 		_failures.append(message)

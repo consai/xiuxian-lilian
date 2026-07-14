@@ -32,9 +32,12 @@ var passives: Dictionary = {}
 var next_action_time: float = 0.0
 ## 运行时事件队列，由 Domain 层拉取并转发到表现层。
 var _runtime_events: Array = []
+## 由战斗应用层注入的本场 Buff 静态定义；不属于运行时状态，不进入 to_dict/存档。
+var _buff_definitions: Dictionary = {}
 
 # 初始化
-func _init(data: Dictionary = {}) -> void:
+func _init(data: Dictionary = {}, buff_definitions: Dictionary = {}) -> void:
+	_buff_definitions = buff_definitions.duplicate(true)
 	apply_dict(data)
 
 # 应用数据
@@ -60,12 +63,6 @@ func apply_dict(data: Dictionary) -> void:
 	if buffs_in is Dictionary:
 		buffs = _duplicate_nested_dict(buffs_in as Dictionary)
 	_apply_passives_from_row(data)
-
-static func _get_config_manager() -> Node:
-	var loop: MainLoop = Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
 
 # 转换为字典
 func to_dict() -> Dictionary:
@@ -192,11 +189,9 @@ func _lookup_buff_def(buff_id: String) -> Dictionary:
 	var bid := buff_id.strip_edges()
 	if bid == "":
 		return {}
-	var cm := _get_config_manager()
-	if cm != null and cm.has_method("buff_by_id"):
-		var cfg: Dictionary = cm.call("buff_by_id", bid) as Dictionary
-		if not cfg.is_empty():
-			return cfg
+	var cfg_v: Variant = _buff_definitions.get(bid)
+	if cfg_v is Dictionary:
+		return (cfg_v as Dictionary).duplicate(true)
 	return {}
 
 
@@ -559,7 +554,7 @@ static func duplicate_with_advancing_projection(source: ZhandouObj, advancing_se
 		return null
 	if advancing_seconds <= 0.0:
 		return source
-	var projected := ZhandouObj.new(source.to_dict())
+	var projected := ZhandouObj.new(source.to_dict(), source._buff_definitions)
 	projected.apply_advancing_projection(advancing_seconds)
 	return projected
 

@@ -4,41 +4,31 @@ extends RefCounted
 
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
+const AbilityCatalogScript := preload(
+	"res://scripts/features/ability/infrastructure/ability_catalog.gd"
+)
 
 const TIAOXI_ID := "ability.combat.tiaoxi"
 
-static var _bundle: Dictionary = {}
-static var _abilities_by_id: Dictionary = {}
-static var _abilities_by_table: Dictionary = {}
-static var _table_by_ability_id: Dictionary = {}
+static var _combat_index_loaded := false
 static var _combat_id_by_ability: Dictionary = {}
-static var _ability_by_combat_id: Dictionary = {}
+static var _ability_id_by_combat_id: Dictionary = {}
+static var _catalog := AbilityCatalogScript.new()
 
 
 static func reload() -> void:
-	_bundle = JsonLoader.load_abilities_bundle()
-	_abilities_by_id.clear()
-	_abilities_by_table.clear()
-	_table_by_ability_id.clear()
+	_catalog.reload()
+	_rebuild_combat_index()
+
+
+static func _rebuild_combat_index() -> void:
 	_combat_id_by_ability.clear()
-	_ability_by_combat_id.clear()
-	_ability_by_combat_id[0] = _tiaoxi_row()
+	_ability_id_by_combat_id.clear()
+	_ability_id_by_combat_id[0] = TIAOXI_ID
 	_combat_id_by_ability[TIAOXI_ID] = 0
-	# 新导出按 tables 分表；旧导出只有 abilities，下面保留双路径读取。
-	for table_key in EnumSkill.LOAD_ORDER:
-		_abilities_by_table[table_key] = {}
-	var tables_v: Variant = _bundle.get("tables", {})
-	if tables_v is Dictionary and not (tables_v as Dictionary).is_empty():
-		for table_key_v in (tables_v as Dictionary).keys():
-			var table_key := str(table_key_v)
-			if not _abilities_by_table.has(table_key):
-				_abilities_by_table[table_key] = {}
-			_index_table_rows(table_key, (tables_v as Dictionary).get(table_key_v, []) as Array)
-	else:
-		_index_table_rows_from_merged(_bundle.get("abilities", []) as Array)
 	var next_id := 1
 	# 战斗层历史上使用数字 skill_id；这里集中生成映射，避免配置表泄漏数字 id。
-	for ability_v in _bundle.get("abilities", []) as Array:
+	for ability_v in _catalog.all_definitions():
 		if not ability_v is Dictionary:
 			continue
 		var ability := ability_v as Dictionary
@@ -48,79 +38,26 @@ static func reload() -> void:
 		var atype := str(ability.get("type", ""))
 		if uses_combat_skill_slot(atype):
 			_combat_id_by_ability[aid] = next_id
-			_ability_by_combat_id[next_id] = ability
+			_ability_id_by_combat_id[next_id] = aid
 			next_id += 1
+	_combat_index_loaded = true
 
 
-static func _index_table_rows(table_key: String, rows: Array) -> void:
-	for ability_v in rows:
-		if not ability_v is Dictionary:
-			continue
-		var ability := ability_v as Dictionary
-		var aid := str(ability.get("id", ""))
-		if aid == "":
-			continue
-		_abilities_by_id[aid] = ability
-		(_abilities_by_table[table_key] as Dictionary)[aid] = ability
-		_table_by_ability_id[aid] = table_key
-
-
-static func _index_table_rows_from_merged(rows: Array) -> void:
-	for ability_v in rows:
-		if not ability_v is Dictionary:
-			continue
-		var ability := ability_v as Dictionary
-		var aid := str(ability.get("id", ""))
-		if aid == "":
-			continue
-		var table_key := _infer_table_key(str(ability.get("type", "")))
-		if table_key == "":
-			continue
-		if not _abilities_by_table.has(table_key):
-			_abilities_by_table[table_key] = {}
-		_abilities_by_id[aid] = ability
-		(_abilities_by_table[table_key] as Dictionary)[aid] = ability
-		_table_by_ability_id[aid] = table_key
-
-
-static func _infer_table_key(ability_type: String) -> String:
-	match ability_type:
-		"combat_active", "combat_upkeep":
-			return EnumSkill.LABEL_ZHANDOU_ACTIVE
-		"combat_passive":
-			return EnumSkill.LABEL_PASSIVE
-		_:
-			return ""
+static func _ensure_combat_index() -> void:
+	if not _combat_index_loaded:
+		_rebuild_combat_index()
 
 
 static func table_keys() -> Array[String]:
-	bundle()
-	var out: Array[String] = []
-	for table_key in EnumSkill.LOAD_ORDER:
-		if (_abilities_by_table.get(table_key, {}) as Dictionary).size() > 0:
-			out.append(table_key)
-	for table_key in _abilities_by_table.keys():
-		var key := str(table_key)
-		if key not in out and (_abilities_by_table.get(key, {}) as Dictionary).size() > 0:
-			out.append(key)
-	return out
+	return _catalog.table_keys()
 
 
 static func abilities_in_table(table_key: String) -> Array:
-	bundle()
-	var out: Array = []
-	var table_map: Variant = _abilities_by_table.get(table_key.strip_edges(), {})
-	if not table_map is Dictionary:
-		return out
-	for ability_v in (table_map as Dictionary).values():
-		if ability_v is Dictionary:
-			out.append((ability_v as Dictionary).duplicate(true))
-	return out
+	return _catalog.definitions_in_table(table_key)
 
 
 static func table_key_for(ability_id: String) -> String:
-	bundle()
-	return str(_table_by_ability_id.get(ability_id.strip_edges(), ""))
+	return _catalog.table_key_for(ability_id)
 
 
 static func zhandou_active_abilities() -> Array:
@@ -141,45 +78,28 @@ static func is_always_active_passive(ability_type: String) -> bool:
 	return ability_type == "combat_passive"
 
 
-static func bundle() -> Dictionary:
-	if _bundle.is_empty():
-		reload()
-	return _bundle
-
-
 static func all_abilities() -> Array:
-	bundle()
-	var out: Array = []
-	for key in _abilities_by_id.keys():
-		out.append(by_id(str(key)))
-	return out
+	return _catalog.all_definitions()
 
 
 static func by_id(ability_id: String) -> Dictionary:
-	bundle()
-	var row: Variant = _abilities_by_id.get(ability_id.strip_edges())
-	if row is Dictionary:
-		return (row as Dictionary).duplicate(true)
 	if ability_id == TIAOXI_ID:
 		return _tiaoxi_row()
-	return {}
+	return _catalog.by_id(ability_id)
 
 
 static func combat_id_for(ability_id: String) -> int:
-	bundle()
+	_ensure_combat_index()
 	if ability_id == "" or ability_id == "-1":
 		return -1
 	return int(_combat_id_by_ability.get(ability_id.strip_edges(), -1))
 
 
 static func ability_id_for_combat_id(combat_id: int) -> String:
-	bundle()
+	_ensure_combat_index()
 	if combat_id == 0:
 		return TIAOXI_ID
-	var row: Variant = _ability_by_combat_id.get(combat_id)
-	if row is Dictionary:
-		return str((row as Dictionary).get("id", ""))
-	return ""
+	return str(_ability_id_by_combat_id.get(combat_id, ""))
 
 
 static func ability_tier(ability: Dictionary) -> int:
@@ -306,14 +226,13 @@ static func to_runtime_dict(ability_id: String, _savedata: Dictionary) -> Dictio
 
 
 static func build_skill_cfg(savedata: Dictionary) -> Dictionary:
-	bundle()
+	_ensure_combat_index()
 	var skills: Dictionary = {}
 	skills["0"] = _tiaoxi_runtime()
-	for combat_id in _ability_by_combat_id.keys():
+	for combat_id in _ability_id_by_combat_id.keys():
 		if int(combat_id) <= 0:
 			continue
-		var ability := _ability_by_combat_id[combat_id] as Dictionary
-		var aid := str(ability.get("id", ""))
+		var aid := str(_ability_id_by_combat_id[combat_id])
 		skills[str(combat_id)] = to_runtime_dict(aid, savedata)
 	return {"battle_time_limit": 200.0, "skills": skills}
 

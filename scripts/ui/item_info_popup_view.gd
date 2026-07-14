@@ -16,7 +16,7 @@ const _FOOTER_COLOR := Color(0.5372549, 0.42745098, 0.3882353, 1.0)
 @onready var _detail_label: Label = %DetailLabel
 @onready var _footer_label: Label = %FooterLabel
 @onready var _use_button: TextureButton = %UseButton
-@onready var _use_button_label: Label = %UseButton.get_node("Label") as Label
+@onready var _use_button_label: Label = %UseButtonLabel
 @onready var _close_button: TextureButton = %CloseButton
 
 

@@ -1,7 +1,5 @@
 extends Control
 
-const ItemDefScript := preload("res://scripts/core/item_def.gd")
-
 const MILESTONE_LABELS := ["投药", "控火", "凝丹", "开炉"]
 const STATUS_TEXTS := [
 	"药材入炉，药香初起",

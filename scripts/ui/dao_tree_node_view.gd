@@ -4,8 +4,8 @@ extends PanelContainer
 signal pressed(skill_id: String)
 signal double_pressed(skill_id: String)
 
-@onready var _title: Label = $VBox/Title
-@onready var _rank: Label = $VBox/Rank
+@onready var _title: Label = %Title
+@onready var _rank: Label = %Rank
 
 var skill_id: String = ""
 

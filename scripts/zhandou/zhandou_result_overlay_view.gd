@@ -5,7 +5,9 @@ signal close_requested
 
 const ZhandouRecordTypesScript := preload("res://scripts/zhandou/zhandou_record_types.gd")
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
-const ItemDefScript := preload("res://scripts/core/item_def.gd")
+const ItemIconResolverScript := preload(
+	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
+)
 
 @onready var _body: RichTextLabel = %BattleResultBody
 @onready var _btn_close: Button = %BattleResultClose
@@ -238,7 +240,7 @@ func _apply_reward_row(view: ItemView, row: Dictionary) -> void:
 		if ConfigManager != null:
 			var def := ConfigManager.item_def_by_id(item_id)
 			if def != null:
-				icon = ItemDefScript.resolve_icon_texture(def.icon_path, null)
+				icon = ItemIconResolverScript.resolve(def.icon_path, null)
 				if quality == "":
 					quality = EnumQuality.display_label(def.quality)
 				tier = def.tier
@@ -247,7 +249,7 @@ func _apply_reward_row(view: ItemView, row: Dictionary) -> void:
 			item_name = str(row.get("id", "奖励"))
 		var path := str(row.get("icon_path", row.get("icon", ""))).strip_edges()
 		if path != "":
-			icon = ItemDefScript.resolve_icon_texture(path, null)
+			icon = ItemIconResolverScript.resolve(path, null)
 	view.apply_display(icon, item_name, count, Color.WHITE, quality, false, tier)
 	view.show_name_label = true
 	view.set_info_entry(ItemView.entry_from_reward_row(row))

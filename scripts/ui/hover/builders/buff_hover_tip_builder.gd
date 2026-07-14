@@ -3,12 +3,16 @@ class_name BuffHoverTipBuilder
 
 ## 根据 Buff 配置构建 Hover Tip 载荷（仅静态配置，不含运行时层数/剩余时间）。
 
+const BattleConfigQueryApplicationScript := preload(
+	"res://scripts/features/battle/application/battle_config_query_application.gd"
+)
+
 const _COLOR_BUFF := Color(0.29803923, 0.4862745, 0.34509805, 1.0)
 const _COLOR_DEBUFF := Color(0.76862746, 0.34901962, 0.31764707, 1.0)
 
 
 static func build(buff_id: String, icon: Texture2D = null) -> Dictionary:
-	var cfg := ConfigManager.buff_by_id(buff_id)
+	var cfg := BattleConfigQueryApplicationScript.buff_by_id(buff_id)
 	if cfg.is_empty():
 		return {}
 	var title := str(cfg.get("name", buff_id)).strip_edges()

@@ -29,6 +29,6 @@ static func handle_result_close() -> void:
 			reason = "defeated"
 		LilianFlowService.open_settlement(reason, LilianState, GameState, SceneManager)
 	elif SceneManager.is_lilian_zhandou_overlay_active():
-		SceneManager.resume_lilian_after_zhandou()
+		SceneManager.dismiss_zhandou_overlay()
 	else:
 		LilianFlowService.open_active_lilian(LilianState, SceneManager)

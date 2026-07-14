@@ -2,78 +2,55 @@ class_name WeituoService
 extends RefCounted
 ## 委托领域服务：配置读取、榜单刷新、接取/提交和历练进度回填。
 
-const WEITUO_CONFIG_PATH := "res://data/exportjson/weituo.json"
-
-static var _cached_config: Dictionary = {}
-
-
-static func load_config() -> Dictionary:
-	if _cached_config.is_empty():
-		var raw := JsonLoader.load_weituo_bundle()
-		if raw.is_empty():
-			return {}
-		_cached_config = raw.duplicate(true)
-	return _cached_config.duplicate(true)
+const WeituoCatalogScript := preload(
+	"res://scripts/features/commission/infrastructure/weituo_catalog.gd"
+)
+const WeituoStateScript := preload(
+	"res://scripts/features/commission/domain/weituo_state.gd"
+)
+const InventoryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_application.gd"
+)
 
 
 static func rules() -> Dictionary:
-	return load_config().get("rules", {}) as Dictionary
+	return WeituoCatalogScript.rules()
 
 
 static func weituo_dict() -> Dictionary:
-	var config := load_config()
-	var entries_v: Variant = config.get("weituo", config.get("commissions", {}))
-	return entries_v as Dictionary
+	return WeituoCatalogScript.commissions()
 
 
 static func active_limit() -> int:
-	return maxi(1, int(rules().get("active_limit", 3)))
+	return int(rules()["active_limit"])
 
 
 ## 委托榜单次刷新展示的可接受委托数量（默认每月 3 个）。
 static func board_offer_count() -> int:
-	return maxi(1, int(rules().get("board_offer_count", 3)))
+	return int(rules()["board_offer_count"])
 
 
 static func weituo_by_id(weituo_id: String) -> Dictionary:
-	var wid := weituo_id.strip_edges()
-	if wid == "":
+	return WeituoCatalogScript.commission_by_id(weituo_id)
+
+
+static func prepare_state_for_commit(raw: Variant, action: String) -> Dictionary:
+	var prepared := WeituoStateScript.prepare(raw)
+	if prepared.is_empty():
+		push_error("[weituo_service:invalid_state] action=%s" % action)
 		return {}
-	return (weituo_dict().get(wid, {}) as Dictionary).duplicate(true)
-
-
-static func default_savedata() -> Dictionary:
-	return {
-		"active": {},
-		"completed_once": [],
-		"completed_count": {},
-		"board": {"refresh_day": 1, "offer_ids": []},
-	}
-
-
-static func coalesce_savedata(data: Variant) -> Dictionary:
-	var out := default_savedata()
-	if data is Dictionary:
-		var src := data as Dictionary
-		if src.get("active") is Dictionary:
-			out["active"] = (src.get("active") as Dictionary).duplicate(true)
-		if src.get("completed_once") is Array:
-			out["completed_once"] = (src.get("completed_once") as Array).duplicate()
-		if src.get("completed_count") is Dictionary:
-			out["completed_count"] = (src.get("completed_count") as Dictionary).duplicate(true)
-		if src.get("board") is Dictionary:
-			var board := (src.get("board") as Dictionary).duplicate(true)
-			out["board"] = {
-				"refresh_day": maxi(1, int(board.get("refresh_day", out["board"]["refresh_day"]))),
-				"offer_ids": (board.get("offer_ids", []) as Array).duplicate(),
-			}
-	out["active"] = _sanitize_active(out["active"] as Dictionary)
-	return out
+	if not _validate_catalog_references(prepared, action):
+		return {}
+	return prepared
 
 
 static func visible_entries(savedata: Dictionary, game_state: Node = null) -> Array:
-	refresh_board_if_needed(savedata, game_state)
-	var weituo_data := weituo_block(savedata)
+	var refresh_result := refresh_board_if_needed(savedata, game_state)
+	if not bool(refresh_result.get("ok", false)):
+		return []
+	var weituo_data := _prepare_weituo_data(savedata, "visible_entries")
+	if weituo_data.is_empty():
+		return []
 	var entries: Array = []
 	var active_map := weituo_data.get("active", {}) as Dictionary
 	var active_weituo_ids: Dictionary = {}
@@ -82,11 +59,7 @@ static func visible_entries(savedata: Dictionary, game_state: Node = null) -> Ar
 		var instance_id := str(instance_id_v)
 		var rec := active_map[instance_id] as Dictionary
 		var weituo_id := _record_weituo_id(rec)
-		if weituo_id == "":
-			continue
 		var weituo_def := weituo_by_id(weituo_id)
-		if weituo_def.is_empty():
-			continue
 		active_weituo_ids[weituo_id] = instance_id
 		# 已接取委托优先以 active 记录展示，避免同一委托在榜单重复出现。
 		entries.append(
@@ -107,7 +80,7 @@ static func visible_entries(savedata: Dictionary, game_state: Node = null) -> Ar
 		if active_weituo_ids.has(weituo_id):
 			continue
 		var weituo_def := weituo_by_id(weituo_id)
-		if weituo_def.is_empty() or not is_unlocked(weituo_def, savedata, game_state):
+		if not is_unlocked(weituo_def, savedata, game_state):
 			continue
 		var state := _offer_state(weituo_data, weituo_id, weituo_def)
 		if state == EnumWeituoState.State.LOCKED:
@@ -131,7 +104,9 @@ static func visible_entries(savedata: Dictionary, game_state: Node = null) -> Ar
 
 
 static func board_badge(savedata: Dictionary, game_state: Node = null) -> Dictionary:
-	var weituo_data := weituo_block(savedata)
+	var weituo_data := _prepare_weituo_data(savedata, "board_badge")
+	if weituo_data.is_empty():
+		return {"has_ready": false, "has_new": false, "active_count": 0, "active_limit": active_limit()}
 	var active_map := weituo_data.get("active", {}) as Dictionary
 	var has_ready := false
 	for instance_id_v in active_map.keys():
@@ -148,13 +123,15 @@ static func board_badge(savedata: Dictionary, game_state: Node = null) -> Dictio
 
 
 static func accept(weituo_id: String, savedata: Dictionary, game_state: Node = null) -> Dictionary:
+	var weituo_data := _prepare_weituo_data(savedata, "accept")
+	if weituo_data.is_empty():
+		return {"ok": false, "error": "委托状态无效"}
 	var cid := weituo_id.strip_edges()
 	var weituo_def := weituo_by_id(cid)
 	if weituo_def.is_empty():
 		return {"ok": false, "error": "委托不存在"}
 	if not is_unlocked(weituo_def, savedata, game_state):
 		return {"ok": false, "error": "委托尚未解锁"}
-	var weituo_data := weituo_block(savedata)
 	var active := weituo_data.get("active", {}) as Dictionary
 	if _active_instance_for_weituo(active, cid) != "":
 		return {"ok": false, "error": "该委托已在进行中"}
@@ -172,19 +149,20 @@ static func accept(weituo_id: String, savedata: Dictionary, game_state: Node = n
 		"progress": {},
 	}
 	weituo_data["active"] = active
-	savedata["weituo"] = weituo_data
+	if not _commit_weituo_data(savedata, weituo_data, "accept"):
+		return {"ok": false, "error": "委托状态提交失败"}
 	return {"ok": true, "instance_id": instance_id}
 
 
 static func can_submit(instance_id: String, savedata: Dictionary, game_state: Node = null) -> Dictionary:
-	var weituo_data := weituo_block(savedata)
+	var weituo_data := _prepare_weituo_data(savedata, "can_submit")
+	if weituo_data.is_empty():
+		return {"ok": false, "missing": [], "requirements": []}
 	var active := weituo_data.get("active", {}) as Dictionary
 	if not active.has(instance_id):
 		return {"ok": false, "missing": [], "requirements": []}
 	var rec := active[instance_id] as Dictionary
 	var weituo_def := weituo_by_id(str(_record_weituo_id(rec)))
-	if weituo_def.is_empty():
-		return {"ok": false, "missing": [], "requirements": []}
 	var requirements := _evaluate_requirements(weituo_def, rec, savedata, game_state, true)
 	var missing: Array = []
 	for req_v in requirements:
@@ -200,7 +178,9 @@ static func submit(instance_id: String, savedata: Dictionary, game_state: Node) 
 		return {"ok": false, "error": "条件未满足", "missing": check.get("missing", [])}
 	if game_state == null:
 		return {"ok": false, "error": "缺少 GameState"}
-	var weituo_data := weituo_block(savedata)
+	var weituo_data := _prepare_weituo_data(savedata, "submit")
+	if weituo_data.is_empty():
+		return {"ok": false, "error": "委托状态无效", "missing": []}
 	var active := weituo_data.get("active", {}) as Dictionary
 	var rec := active[instance_id] as Dictionary
 	var weituo_def := weituo_by_id(str(_record_weituo_id(rec)))
@@ -229,25 +209,31 @@ static func submit(instance_id: String, savedata: Dictionary, game_state: Node) 
 	weituo_data["completed_count"] = completed_count
 	active.erase(instance_id)
 	weituo_data["active"] = active
-	savedata["weituo"] = weituo_data
+	if not _commit_weituo_data(savedata, weituo_data, "submit"):
+		return {"ok": false, "error": "委托状态提交失败", "missing": []}
 	if game_state.has_method("auto_save"):
 		game_state.call("auto_save")
 	return {"ok": true, "rewards": applied}
 
 
 static func abandon(instance_id: String, savedata: Dictionary) -> Dictionary:
-	var weituo_data := weituo_block(savedata)
+	var weituo_data := _prepare_weituo_data(savedata, "abandon")
+	if weituo_data.is_empty():
+		return {"ok": false, "error": "委托状态无效"}
 	var active := weituo_data.get("active", {}) as Dictionary
 	if not active.has(instance_id):
 		return {"ok": false, "error": "委托不存在"}
 	active.erase(instance_id)
 	weituo_data["active"] = active
-	savedata["weituo"] = weituo_data
+	if not _commit_weituo_data(savedata, weituo_data, "abandon"):
+		return {"ok": false, "error": "委托状态提交失败"}
 	return {"ok": true}
 
 
 static func record_lilian_result(result: Dictionary, savedata: Dictionary) -> Dictionary:
-	var weituo_data := weituo_block(savedata)
+	var weituo_data := _prepare_weituo_data(savedata, "record_lilian_result")
+	if weituo_data.is_empty():
+		return {"ok": false, "error": "委托状态无效", "updated": []}
 	var active := weituo_data.get("active", {}) as Dictionary
 	if active.is_empty():
 		return {"ok": true, "updated": []}
@@ -264,8 +250,6 @@ static func record_lilian_result(result: Dictionary, savedata: Dictionary) -> Di
 		var instance_id := str(instance_id_v)
 		var rec := (active[instance_id] as Dictionary).duplicate(true)
 		var weituo_def := weituo_by_id(str(_record_weituo_id(rec)))
-		if weituo_def.is_empty():
-			continue
 		var progress := rec.get("progress", {}) as Dictionary
 		var applied_ids: Array = progress.get("settlement_ids", []) as Array
 		if settlement_id != "" and settlement_id in applied_ids:
@@ -297,14 +281,17 @@ static func record_lilian_result(result: Dictionary, savedata: Dictionary) -> Di
 		updated.append(instance_id)
 
 	weituo_data["active"] = active
-	savedata["weituo"] = weituo_data
+	if not _commit_weituo_data(savedata, weituo_data, "record_lilian_result"):
+		return {"ok": false, "error": "委托状态提交失败", "updated": []}
 	return {"ok": true, "updated": updated}
 
 
 static func refresh_board_if_needed(savedata: Dictionary, _game_state: Node = null) -> Dictionary:
-	var weituo_data := weituo_block(savedata)
+	var weituo_data := _prepare_weituo_data(savedata, "refresh_board_if_needed")
+	if weituo_data.is_empty():
+		return {"ok": false, "error": "委托状态无效", "refreshed": false}
 	var board := weituo_data.get("board", {}) as Dictionary
-	var refresh_days := maxi(1, int(rules().get("refresh_days", 30)))
+	var refresh_days := int(rules()["refresh_days"])
 	var day := int(savedata.get("day", 1))
 	var refresh_day := int(board.get("refresh_day", 1))
 	var offer_ids: Array = board.get("offer_ids", []) as Array
@@ -318,12 +305,13 @@ static func refresh_board_if_needed(savedata: Dictionary, _game_state: Node = nu
 		board["offer_ids"] = _pick_board_offer_ids(savedata, _game_state)
 		refreshed = true
 	weituo_data["board"] = board
-	savedata["weituo"] = weituo_data
+	if not _commit_weituo_data(savedata, weituo_data, "refresh_board_if_needed"):
+		return {"ok": false, "error": "委托状态提交失败", "refreshed": false}
 	return {"ok": true, "refreshed": refreshed}
 
 
 static func weituo_block(savedata: Dictionary) -> Dictionary:
-	return coalesce_savedata(savedata.get("weituo", savedata.get("commissions", {})))
+	return _prepare_weituo_data(savedata, "weituo_block")
 
 
 static func is_unlocked(weituo_def: Dictionary, savedata: Dictionary, _game_state: Node = null) -> bool:
@@ -384,9 +372,11 @@ static func build_reward_row(reward: Dictionary) -> Dictionary:
 
 
 static func refresh_header(savedata: Dictionary) -> Dictionary:
-	var weituo_data := weituo_block(savedata)
+	var weituo_data := _prepare_weituo_data(savedata, "refresh_header")
+	if weituo_data.is_empty():
+		return {}
 	var board := weituo_data.get("board", {}) as Dictionary
-	var refresh_days := maxi(1, int(rules().get("refresh_days", 30)))
+	var refresh_days := int(rules()["refresh_days"])
 	var refresh_day := int(board.get("refresh_day", 1))
 	var next_day := refresh_day + refresh_days
 	var active_count := int((weituo_data.get("active", {}) as Dictionary).size())
@@ -572,30 +562,46 @@ static func _sort_entries(a: Dictionary, b: Dictionary) -> bool:
 	return str(a.get("weituo_id", "")) < str(b.get("weituo_id", ""))
 
 
-static func _sanitize_active(active: Dictionary) -> Dictionary:
-	var out: Dictionary = {}
-	for instance_id_v in active.keys():
-		var instance_id := str(instance_id_v)
-		var rec_v: Variant = active[instance_id_v]
-		if not rec_v is Dictionary:
-			continue
-		var rec := rec_v as Dictionary
-		var weituo_id := _record_weituo_id(rec)
-		if weituo_id == "" or weituo_by_id(weituo_id).is_empty():
-			continue
-		out[instance_id] = {
-			"weituo_id": weituo_id,
-			"accepted_day": maxi(1, int(rec.get("accepted_day", 1))),
-			"progress": (rec.get("progress", {}) as Dictionary).duplicate(true),
-		}
-	return out
+static func _prepare_weituo_data(savedata: Dictionary, action: String) -> Dictionary:
+	if not savedata.has("weituo"):
+		push_error("[weituo_service:missing_state] action=%s field=weituo" % action)
+		return {}
+	return prepare_state_for_commit(savedata["weituo"], action)
+
+
+static func _commit_weituo_data(savedata: Dictionary, candidate: Dictionary, action: String) -> bool:
+	var prepared := prepare_state_for_commit(candidate, action)
+	if prepared.is_empty():
+		push_error("[weituo_service:invalid_commit] action=%s" % action)
+		return false
+	savedata["weituo"] = prepared
+	return true
+
+
+static func _validate_catalog_references(state: Dictionary, action: String) -> bool:
+	var referenced_ids: Dictionary = {}
+	for record_v in (state["active"] as Dictionary).values():
+		var record := record_v as Dictionary
+		referenced_ids[str(record["weituo_id"])] = "active"
+	for weituo_id_v in state["completed_once"] as Array:
+		referenced_ids[str(weituo_id_v)] = "completed_once"
+	for weituo_id_v in (state["completed_count"] as Dictionary).keys():
+		referenced_ids[str(weituo_id_v)] = "completed_count"
+	for weituo_id_v in (state["board"] as Dictionary)["offer_ids"] as Array:
+		referenced_ids[str(weituo_id_v)] = "board.offer_ids"
+	for weituo_id_v in referenced_ids.keys():
+		var weituo_id := str(weituo_id_v)
+		if weituo_by_id(weituo_id).is_empty():
+			push_error(
+				"[weituo_service:unknown_reference] action=%s field=%s weituo_id=%s"
+				% [action, str(referenced_ids[weituo_id_v]), weituo_id]
+			)
+			return false
+	return true
 
 
 static func _record_weituo_id(rec: Dictionary) -> String:
-	var weituo_id := str(rec.get("weituo_id", "")).strip_edges()
-	if weituo_id != "":
-		return weituo_id
-	return str(rec.get("commission_id", "")).strip_edges()
+	return str(rec["weituo_id"])
 
 
 static func _active_instance_for_weituo(active: Dictionary, weituo_id: String) -> String:
@@ -608,13 +614,15 @@ static func _active_instance_for_weituo(active: Dictionary, weituo_id: String) -
 
 ## 从已解锁委托池中按 weight 抽取本周期榜单位（ponytail: 无种子随机，读档后空榜重抽可能变化）。
 static func _pick_board_offer_ids(savedata: Dictionary, game_state: Node = null) -> Array:
-	var weituo_data := weituo_block(savedata)
+	var weituo_data := _prepare_weituo_data(savedata, "pick_board_offer_ids")
+	if weituo_data.is_empty():
+		return []
 	var completed_once: Array = weituo_data.get("completed_once", []) as Array
 	var candidates: Array = []
 	for weituo_id_v in weituo_dict().keys():
 		var weituo_id := str(weituo_id_v)
 		var weituo_def := weituo_by_id(weituo_id)
-		if weituo_def.is_empty() or not is_unlocked(weituo_def, savedata, game_state):
+		if not is_unlocked(weituo_def, savedata, game_state):
 			continue
 		if not bool(weituo_def.get("repeatable", true)) and weituo_id in completed_once:
 			continue
@@ -723,7 +731,7 @@ static func _consume_item_requirements(inventory: Dictionary, weituo_def: Dictio
 		var need := maxi(1, int(req.get("count", 1)))
 		if item_id == "":
 			continue
-		var removed := InventoryService.remove_item(inventory, item_id, need)
+		var removed := InventoryApplicationScript.remove_item(inventory, item_id, need)
 		if removed < need:
 			push_error("WeituoService: item consume mismatch for %s (%d/%d)" % [item_id, removed, need])
 			return {"ok": false, "error": "扣除物品失败", "missing": []}

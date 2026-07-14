@@ -12,26 +12,24 @@ static func roll_event_rewards(event: Dictionary, rng: RandomNumberGenerator) ->
 
 
 static func reward_budget_value_for_event(event: Dictionary) -> float:
-	var rules := LilianRulesServiceScript.rules()
-	var budget := _reward_budget_rules(rules)
-	if not bool(budget.get("enabled", true)):
+	var budget := LilianRulesServiceScript.reward_budget_rules()
+	if not bool(budget["enabled"]):
 		return 0.0
-	var base_per_day := maxf(0.0, float(budget.get("daily_base_value", 10.0)))
+	var base_per_day := float(budget["daily_base_value"])
 	var difficulty := maxi(1, int(event.get("difficulty", 1)))
 	var duration_days := maxi(1, int(event.get("duration_days", 1)))
-	var growth := maxf(0.0, float(budget.get("difficulty_growth", 0.18)))
-	var type_multipliers := budget.get("event_type_multipliers", {}) as Dictionary
+	var growth := float(budget["difficulty_growth"])
+	var type_multipliers := budget["event_type_multipliers"] as Dictionary
 	var event_type := str(event.get("type", "travel"))
-	var type_multiplier := maxf(0.0, float(type_multipliers.get(event_type, 1.0)))
+	var type_multiplier := float(type_multipliers.get(event_type, 1.0))
 	return base_per_day * float(duration_days) * (1.0 + float(difficulty - 1) * growth) * type_multiplier
 
 
 static func apply_reward_budget(event: Dictionary, rewards: Array) -> Array:
 	if rewards.is_empty():
 		return rewards
-	var rules := LilianRulesServiceScript.rules()
-	var budget := _reward_budget_rules(rules)
-	if not bool(budget.get("enabled", true)):
+	var budget := LilianRulesServiceScript.reward_budget_rules()
+	if not bool(budget["enabled"]):
 		return rewards
 	var target_value := reward_budget_value_for_event(event)
 	if target_value <= 0.0:
@@ -39,8 +37,8 @@ static func apply_reward_budget(event: Dictionary, rewards: Array) -> Array:
 	var current_value := reward_value(rewards)
 	if current_value <= 0.0:
 		return rewards
-	var min_scale := maxf(0.01, float(budget.get("min_scale", 0.5)))
-	var max_scale := maxf(min_scale, float(budget.get("max_scale", 3.0)))
+	var min_scale := float(budget["min_scale"])
+	var max_scale := float(budget["max_scale"])
 	var scale := clampf(target_value / current_value, min_scale, max_scale)
 	var out: Array = []
 	for reward_v in rewards:
@@ -79,7 +77,7 @@ static func grant_to_player(game_state: Node, session_loot: Array, rewards: Arra
 
 static func apply_loot_loss_on_defeat(loot: Array) -> Dictionary:
 	var rules := LilianRulesServiceScript.rules()
-	var drop_ratio := clampf(float(rules.get("defeat_loot_drop_ratio", 0.3)), 0.0, 1.0)
+	var drop_ratio := float(rules["defeat_loot_drop_ratio"])
 	if drop_ratio <= 0.0:
 		return {"lost": []}
 	var candidates: Array = []
@@ -213,24 +211,17 @@ static func _reward_context_for_event(event: Dictionary) -> Dictionary:
 	}
 
 
-static func _reward_budget_rules(rules: Dictionary) -> Dictionary:
-	var budget_v: Variant = rules.get("reward_budget", {})
-	if budget_v is Dictionary:
-		return (budget_v as Dictionary).duplicate(true)
-	return {}
-
-
 static func _unit_value(reward: Dictionary) -> float:
-	var budget := _reward_budget_rules(LilianRulesServiceScript.rules())
-	var unit_values := budget.get("unit_values", {}) as Dictionary
+	var budget := LilianRulesServiceScript.reward_budget_rules()
+	var unit_values := budget["unit_values"] as Dictionary
 	var kind := str(reward.get("kind", "item"))
 	match kind:
 		"currency":
-			return maxf(0.01, float(unit_values.get("currency", 1.0)))
+			return float(unit_values["currency"])
 		"equip":
-			return maxf(0.01, float(unit_values.get("equip", 120.0)))
+			return float(unit_values["equip"])
 		_:
-			var base := maxf(0.01, float(unit_values.get("item", 10.0)))
+			var base := float(unit_values["item"])
 			var grade := maxi(1, int(reward.get("material_grade", 1)))
-			var grade_multipliers := budget.get("material_grade_multipliers", {}) as Dictionary
-			return base * maxf(0.01, float(grade_multipliers.get(str(grade), grade)))
+			var grade_multipliers := budget["material_grade_multipliers"] as Dictionary
+			return base * float(grade_multipliers.get(str(grade), grade))

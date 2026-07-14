@@ -1,7 +1,9 @@
 class_name RewardService
 extends RefCounted
 
-const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
+const InventoryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_application.gd"
+)
 const RewardTipBuilderScript := preload("res://scripts/ui/tips/core/reward_tip_builder.gd")
 
 
@@ -42,7 +44,7 @@ static func apply_rewards(game_state: Node, rewards: Array, source: String = "re
 		var count := maxi(1, int(reward.get("count", 1)))
 		if kind == EnumRewardKind.LABEL_EQUIP:
 			var eid := int(reward.get("id", -1))
-			if InventoryServiceScript.add_equip(game_state.owned_equips, eid):
+			if InventoryApplicationScript.add_equip(game_state.owned_equips, eid):
 				applied.append({"kind": kind, "id": eid, "count": 1})
 			else:
 				var compensation := count * 30
@@ -59,7 +61,7 @@ static func apply_rewards(game_state: Node, rewards: Array, source: String = "re
 				applied.append({"kind": kind, "id": currency_id, "count": count})
 		else:
 			var iid := str(reward.get("id", ""))
-			var added := InventoryServiceScript.add_item(game_state.inventory, iid, count)
+			var added := InventoryApplicationScript.add_item(game_state.inventory, iid, count)
 			if added > 0:
 				applied.append({
 					"kind": EnumRewardKind.LABEL_ITEM,

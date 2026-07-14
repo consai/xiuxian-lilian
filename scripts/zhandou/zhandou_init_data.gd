@@ -4,6 +4,9 @@ extends RefCounted
 ## 进战前经 [method start_battle] 写入 DataStore，由 [ZhandouChangjing] 在 _ready 消费。
 const ZhandouSetupScript = preload("res://scripts/zhandou/zhandou_setup.gd")
 const ZhandouRecordTypesScript = preload("res://scripts/zhandou/zhandou_record_types.gd")
+const BattleConfigQueryApplicationScript := preload(
+	"res://scripts/features/battle/application/battle_config_query_application.gd"
+)
 
 const META_SCHEMA_VERSION := 2
 
@@ -147,11 +150,11 @@ static func merge_skill_cfg_from_tables(data: Dictionary) -> Dictionary:
 	var existing: Variant = out.get("skill_cfg")
 	if existing is Dictionary and not (existing as Dictionary).is_empty():
 		partial = (existing as Dictionary).duplicate(true)
+	var ability_bundle := _build_skill_cfg_from_abilities(partial)
+	if ability_bundle.is_empty():
+		return {}
+	out["skill_cfg"] = ability_bundle["skills"]
 	var cm := _get_config_manager()
-	if cm != null and cm.has_method("build_skill_cfg"):
-		out["skill_cfg"] = cm.call("build_skill_cfg", partial)
-	else:
-		out["skill_cfg"] = _build_skill_cfg_fallback(partial)
 	var item_partial: Dictionary = {}
 	var existing_item: Variant = out.get("item_cfg")
 	if existing_item is Dictionary and not (existing_item as Dictionary).is_empty():
@@ -165,10 +168,7 @@ static func merge_skill_cfg_from_tables(data: Dictionary) -> Dictionary:
 	if cm != null and cm.has_method("build_equip_cfg"):
 		out["equip_cfg"] = cm.call("build_equip_cfg", equip_partial)
 	if not out.has("battle_time_limit"):
-		if cm != null and cm.has_method("battle_time_limit_default"):
-			out["battle_time_limit"] = cm.call("battle_time_limit_default")
-		else:
-			out["battle_time_limit"] = 200.0
+		out["battle_time_limit"] = float(ability_bundle["battle_time_limit"])
 	return out
 
 
@@ -588,6 +588,10 @@ static func _collect_enemy_skill_ids(slots_v: Variant) -> Dictionary:
 
 static func _build_setup(merged: Dictionary) -> ZhandouSetupScript:
 	var setup := ZhandouSetupScript.new()
+	var buff_definitions := BattleConfigQueryApplicationScript.all_buffs_snapshot()
+	if buff_definitions.is_empty():
+		push_error("ZhandouInitData._build_setup: Buff definition snapshot is empty")
+		return null
 	var player_row: Dictionary = (merged["player"] as Dictionary).duplicate(true)
 	var enemy_rows := _extract_enemy_rows(merged)
 	if enemy_rows.is_empty():
@@ -596,10 +600,12 @@ static func _build_setup(merged: Dictionary) -> ZhandouSetupScript:
 	setup.player_row = player_row
 	setup.enemy_rows = _duplicate_enemy_rows(enemy_rows)
 	setup.enemy_row = (setup.enemy_rows[0] as Dictionary).duplicate(true)
-	setup.player = create_fight_obj("player", player_row)
+	setup.player = create_fight_obj("player", player_row, buff_definitions)
 	setup.enemies = []
 	for i in enemy_rows.size():
-		var enemy_obj := create_fight_obj("enemy%d" % i, enemy_rows[i] as Dictionary)
+		var enemy_obj := create_fight_obj(
+			"enemy%d" % i, enemy_rows[i] as Dictionary, buff_definitions
+		)
 		if enemy_obj == null:
 			push_error("ZhandouInitData._build_setup: 无法创建第 %d 个敌方 ZhandouObj" % (i + 1))
 			return null
@@ -663,7 +669,11 @@ static func _apply_spd_jitter_from_setup(
 			(row_v as Dictionary)["spd_jitter_ratio"] = ratio
 
 
-static func create_fight_obj(side: String, row: Dictionary) -> ZhandouObj:
+static func create_fight_obj(
+		side: String,
+		row: Dictionary,
+		buff_definitions: Dictionary = {}
+) -> ZhandouObj:
 	var errors := PackedStringArray()
 	_append_combatant_errors(errors, side, row)
 	if not errors.is_empty():
@@ -673,7 +683,7 @@ static func create_fight_obj(side: String, row: Dictionary) -> ZhandouObj:
 	var jitter_ratio := _resolve_spd_jitter_ratio(row)
 	var fight_dict := _combatant_to_fight_dict(row)
 	_apply_spd_jitter(fight_dict, jitter_ratio)
-	var unit := ZhandouObj.new(fight_dict)
+	var unit := ZhandouObj.new(fight_dict, buff_definitions)
 	unit.clamp_vitals()
 	return unit
 
@@ -1006,34 +1016,42 @@ static func _get_config_manager() -> Node:
 	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
 
 
-static func _build_skill_cfg_fallback(partial: Dictionary) -> Dictionary:
+static func _build_skill_cfg_from_abilities(partial: Dictionary) -> Dictionary:
 	const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 	var bundle: Dictionary = AbilityServiceScript.build_skill_cfg({})
-	var out: Dictionary = {}
-	var skills_v: Variant = bundle.get("skills", {})
-	if skills_v is Dictionary:
-		for key in (skills_v as Dictionary).keys():
-			var row_v: Variant = (skills_v as Dictionary)[key]
-			if not row_v is Dictionary:
-				continue
-			var row := (row_v as Dictionary).duplicate(true)
-			var sid := int(key)
-			out[sid] = row
-			out[str(sid)] = row
+	if not bundle.has("battle_time_limit"):
+		push_error("ZhandouInitData: AbilityService skill config missing battle_time_limit")
+		return {}
+	var skills_v: Variant = bundle.get("skills")
+	if not skills_v is Dictionary:
+		push_error("ZhandouInitData: AbilityService skill config missing skills Dictionary")
+		return {}
+	var skills: Dictionary = {}
+	for key in (skills_v as Dictionary).keys():
+		var row_v: Variant = (skills_v as Dictionary)[key]
+		if not row_v is Dictionary:
+			continue
+		var row := (row_v as Dictionary).duplicate(true)
+		var sid := int(key)
+		skills[sid] = row
+		skills[str(sid)] = row
 	if partial.is_empty():
-		return out
+		return {
+			"battle_time_limit": float(bundle["battle_time_limit"]),
+			"skills": skills,
+		}
 	for k in partial.keys():
 		var key_str := str(k)
 		if key_str == "basic_attack" or key_str == "tiaoxi_cfg":
 			var ba_v: Variant = partial[k]
 			if ba_v is Dictionary:
-				var merged := out.get(0, out.get("0", {})) as Dictionary
+				var merged := skills.get(0, skills.get("0", {})) as Dictionary
 				if not merged is Dictionary:
 					merged = {}
 				for bk in (ba_v as Dictionary).keys():
 					merged[bk] = (ba_v as Dictionary)[bk]
-				out[0] = merged
-				out["0"] = merged
+				skills[0] = merged
+				skills["0"] = merged
 			continue
 		var ev: Variant = partial[k]
 		if not ev is Dictionary:
@@ -1041,11 +1059,14 @@ static func _build_skill_cfg_fallback(partial: Dictionary) -> Dictionary:
 		var entry := (ev as Dictionary).duplicate(true)
 		if key_str.is_valid_int():
 			var iid := int(key_str)
-			out[iid] = entry
-			out[str(iid)] = entry
+			skills[iid] = entry
+			skills[str(iid)] = entry
 		else:
-			out[key_str] = entry
-	return out
+			skills[key_str] = entry
+	return {
+		"battle_time_limit": float(bundle["battle_time_limit"]),
+		"skills": skills,
+	}
 
 
 static func _resolve_icon_texture(cfg: Dictionary) -> Texture2D:

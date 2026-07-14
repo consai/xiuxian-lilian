@@ -1,6 +1,6 @@
 ﻿extends Node
 
-const InventoryServiceScript := preload("res://scripts/sim/inventory_service.gd")
+const InventoryApplicationScript := preload("res://scripts/features/inventory/application/inventory_application.gd")
 const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
 const LilianEventServiceScript := preload("res://scripts/lilian/lilian_event_service.gd")
 const LilianRewardServiceScript := preload("res://scripts/lilian/lilian_reward_service.gd")
@@ -477,6 +477,11 @@ func build_battle_init() -> Dictionary:
 	var player: Dictionary = {}
 	if _game_state != null:
 		player = _game_state.build_player_battle_snapshot(runtime)
+	player["items"] = InventoryApplicationScript.build_battle_item_slots_from_snapshots(
+		runtime.get("inventory", {}) as Dictionary,
+		runtime.get("item_slots", []) as Array,
+		runtime.get("item_definitions", {}) as Dictionary
+	)
 	if not PlayerBattleSnapshot.collect_errors(player).is_empty():
 		return {}
 	var enemy := LilianEventServiceScript.build_battle_enemy(event)
@@ -639,7 +644,7 @@ func finish(exit_reason: String) -> Dictionary:
 		loot_lost.append_array(loot_loss.get("lost", []) as Array)
 		var rules: Dictionary = LilianRulesServiceScript.rules()
 		var hp_max := float((player_snapshot.get("attrs", {}) as Dictionary).get(EnumPlayerAttr.HP_MAX, 100.0))
-		runtime["hp"] = maxf(float(runtime.get("hp", 0.0)), hp_max * float(rules.get("defeat_hp_floor_ratio", 0.25)))
+		runtime["hp"] = maxf(float(runtime.get("hp", 0.0)), hp_max * float(rules["defeat_hp_floor_ratio"]))
 	var result := LilianResult.to_dict({
 		"ok": true,
 		"settlement_id": lilian_id,
@@ -775,7 +780,7 @@ func _sync_runtime_from_summary(summary: Dictionary) -> void:
 	runtime["mp"] = float(runtime_summary.get("mp", runtime.get("mp", 0.0)))
 	var inv := runtime.get("inventory", {}) as Dictionary
 	var slots := runtime.get("item_slots", ["", "", ""]) as Array
-	InventoryServiceScript.sync_battle_item_counts(inv, slots, runtime_summary.get("items", []) as Array)
+	InventoryApplicationScript.sync_battle_item_counts(inv, slots, runtime_summary.get("items", []) as Array)
 	runtime["inventory"] = inv
 
 
@@ -805,11 +810,10 @@ func use_runtime_inventory_item(item_id: String) -> Dictionary:
 	var inv := (runtime.get("inventory", {}) as Dictionary).duplicate(true)
 	if int(inv.get(iid, 0)) <= 0:
 		return {"ok": false, "error": "背包中没有该物品"}
-	var def: ItemDef = null
-	if ConfigManager != null:
-		def = ConfigManager.item_def_by_id(iid)
+	var def := _runtime_item_definition(iid)
 	if def == null:
-		return {"ok": false, "error": "未知物品"}
+		push_error("use_runtime_inventory_item: missing runtime definition %s" % iid)
+		return {"ok": false, "error": "历练物品定义缺失"}
 	var mp_cost := maxf(0.0, float(def.fight_mp_cost))
 	if mp_cost > 0.0 and float(runtime.get("mp", 0.0)) < mp_cost:
 		return {"ok": false, "error": "法力不足，无法催动丹药"}
@@ -832,9 +836,7 @@ func use_runtime_inventory_item(item_id: String) -> Dictionary:
 			slots[slot_index] = ""
 	runtime["inventory"] = inv
 	runtime["item_slots"] = slots
-	var item_name := iid
-	if ConfigManager != null:
-		item_name = ConfigManager.get_item_display_name(iid)
+	var item_name := def.name
 	var feedback_text := "使用 %s，%s" % [item_name, "，".join(feedback_parts)]
 	runtime_vitals_changed.emit(feedback_text)
 	return {
@@ -909,6 +911,14 @@ func _apply_runtime_item_effects(def: ItemDef, player_attrs: Dictionary) -> Pack
 	return feedback_parts
 
 
+func _runtime_item_definition(item_id: String) -> ItemDef:
+	var snapshots := runtime.get("item_definitions", {}) as Dictionary
+	var snapshot_v: Variant = snapshots.get(item_id)
+	if not snapshot_v is Dictionary:
+		return null
+	return InventoryApplicationScript.definition_from_snapshot(snapshot_v as Dictionary)
+
+
 func _apply_session_rewards(rewards: Array) -> void:
 	if rewards.is_empty():
 		return
@@ -931,11 +941,13 @@ func _runtime_items_for_settlement() -> Array:
 
 
 func _copy_runtime_from_game(game_state: Node) -> Dictionary:
+	var inventory := (game_state.inventory as Dictionary).duplicate(true)
 	return {
 		"hp": float(game_state.hp),
 		"mp": float(game_state.mp),
 		"item_slots": (game_state.item_slots as Array).duplicate(true),
-		"inventory": (game_state.inventory as Dictionary).duplicate(true),
+		"inventory": inventory,
+		"item_definitions": InventoryApplicationScript.definition_snapshots_for_item_ids(inventory.keys()),
 		"owned_equips": (game_state.owned_equips as Array).duplicate(true),
 	}
 

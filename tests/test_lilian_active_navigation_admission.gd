@@ -6,9 +6,13 @@ class FakeLilianState:
 
 	var active := false
 	var result_pending := false
+	var peizhi_sync_calls := 0
 
 	func should_go_to_result() -> bool:
 		return result_pending
+
+	func sync_runtime_peizhi_from_game() -> void:
+		peizhi_sync_calls += 1
 
 
 class FakeSceneManager:
@@ -19,6 +23,7 @@ class FakeSceneManager:
 	var back_target := "hub"
 	var panel_active := false
 	var open_result := {"ok": true}
+	var dismiss_calls := 0
 
 	func go_lilian_xunhuan() -> Dictionary:
 		open_calls += 1
@@ -33,6 +38,10 @@ class FakeSceneManager:
 	func go_back(_fallback: String = "hub") -> Dictionary:
 		back_calls += 1
 		return {"ok": true}
+
+	func dismiss_panel_popup() -> Dictionary:
+		dismiss_calls += 1
+		return {"ok": true, "resumed": true}
 
 
 func _init() -> void:
@@ -100,6 +109,37 @@ func _run() -> void:
 	var dismissed_panel: Dictionary = flow_script.call("go_back", lilian, scene_manager, "hub")
 	assert(bool(dismissed_panel.get("ok", false)))
 	assert(scene_manager.back_calls == 4)
+
+	var dongfu_bag_close: Dictionary = flow_script.call(
+		"close_lilian_utility_panel", false, lilian, scene_manager, "hub"
+	)
+	assert(bool(dongfu_bag_close.get("ok", false)))
+	assert(lilian.peizhi_sync_calls == 0)
+	assert(scene_manager.dismiss_calls == 1)
+
+	var lilian_bag_close: Dictionary = flow_script.call(
+		"close_lilian_utility_panel", true, lilian, scene_manager, "hub"
+	)
+	assert(bool(lilian_bag_close.get("ok", false)))
+	assert(lilian.peizhi_sync_calls == 1)
+	assert(scene_manager.dismiss_calls == 2)
+
+	var popup_configuration_close: Dictionary = flow_script.call(
+		"close_lilian_utility_panel", true, lilian, scene_manager, "hub"
+	)
+	assert(bool(popup_configuration_close.get("ok", false)))
+	assert(lilian.peizhi_sync_calls == 2)
+	assert(scene_manager.dismiss_calls == 3)
+
+	scene_manager.panel_active = false
+	lilian.active = false
+	var route_configuration_close: Dictionary = flow_script.call(
+		"close_lilian_utility_panel", false, lilian, scene_manager, "hub"
+	)
+	assert(bool(route_configuration_close.get("ok", false)))
+	assert(lilian.peizhi_sync_calls == 2)
+	assert(scene_manager.dismiss_calls == 3)
+	assert(scene_manager.back_calls == 5)
 
 	lilian.free()
 	scene_manager.free()

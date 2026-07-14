@@ -3,6 +3,7 @@ extends RefCounted
 
 const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
 const ConditionServiceScript := preload("res://scripts/sim/condition_service.gd")
+const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
 
 
 static func roll_event_rewards(event: Dictionary, rng: RandomNumberGenerator, context: Dictionary = {}) -> Array:
@@ -45,10 +46,7 @@ static func _drop_pool_for_event(event: Dictionary, pool_id: String) -> Dictiona
 	var location_id := str(event.get("location_id", "")).strip_edges()
 	if location_id == "" or pool_id.strip_edges() == "":
 		return {}
-	var cm := _config_manager()
-	if cm != null and cm.has_method("location_drop_pool"):
-		return cm.call("location_drop_pool", location_id, pool_id) as Dictionary
-	return {}
+	return DidianServiceScript.drop_pool_for_location(location_id, pool_id)
 
 
 static func _roll_entries(entries: Array, rng: RandomNumberGenerator, rolls: int, context: Dictionary = {}) -> Array:
@@ -110,10 +108,3 @@ static func _weighted_pick(entries: Array, rng: RandomNumberGenerator, context: 
 		if roll <= 0.0:
 			return (entry.get("row", {}) as Dictionary).duplicate(true)
 	return ((weighted.back() as Dictionary).get("row", {}) as Dictionary).duplicate(true)
-
-
-static func _config_manager() -> Node:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("ConfigManager")

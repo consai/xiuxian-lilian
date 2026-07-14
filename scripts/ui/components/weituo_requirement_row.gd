@@ -2,6 +2,9 @@ extends PanelContainer
 
 const COLOR_OK := Color(0.35, 0.48, 0.24, 1.0)
 const COLOR_MISSING := Color(0.62, 0.32, 0.2, 1.0)
+const ItemIconResolverScript := preload(
+	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
+)
 
 @onready var _icon: TextureRect = %Icon
 @onready var _name_label: Label = %NameLabel
@@ -23,7 +26,7 @@ func bind(row: Dictionary) -> void:
 		_count_label.text = "%d/%d" % [current, required]
 	var icon_path := str(row.get("icon_path", "")).strip_edges()
 	if icon_path != "":
-		_icon.texture = ItemDef.resolve_icon_texture(icon_path, _icon.texture)
+		_icon.texture = ItemIconResolverScript.resolve(icon_path, _icon.texture)
 	set_satisfied(satisfied)
 
 

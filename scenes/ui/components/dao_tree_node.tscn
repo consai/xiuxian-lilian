@@ -47,12 +47,14 @@ expand_mode = 3
 stretch_mode = 5
 
 [node name="Title" type="Label" parent="VBox"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "剑阵基础"
 label_settings = ExtResource("2_text")
 horizontal_alignment = 1
 
 [node name="Rank" type="Label" parent="VBox"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "I"
 label_settings = ExtResource("2_text")

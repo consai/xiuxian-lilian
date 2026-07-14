@@ -3,8 +3,10 @@ extends RefCounted
 
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
+const CultivationMethodQueryApplicationScript := preload(
+	"res://scripts/features/cultivation/application/cultivation_method_query_application.gd"
+)
 
-const PATH := "res://data/exportjson/xiulian_methods.json"
 const SLOT_MAIN := "main"
 const SLOT_SUPPORT := "support"
 const SLOT_SUPPORT_3 := "support_3"
@@ -18,53 +20,16 @@ const SLOT_WEIGHTS := {
 const MASTERY_MAX_LEVEL := 5
 const MASTERY_VALUE_RATIOS := [0.0, 0.25, 0.5, 0.75, 1.0]
 
-static var _bundle: Dictionary = {}
-static var _methods_by_id: Dictionary = {}
-static var _families_by_id: Dictionary = {}
-
-
-static func reload() -> void:
-	_bundle = JsonLoader.load_xiulian_methods_bundle()
-	_methods_by_id.clear()
-	_families_by_id.clear()
-	for family_v in _bundle.get("families", []) as Array:
-		if family_v is Dictionary:
-			var family := family_v as Dictionary
-			_families_by_id[str(family.get("id", ""))] = family
-	for method_v in _bundle.get("methods", []) as Array:
-		if method_v is Dictionary:
-			var method := method_v as Dictionary
-			_methods_by_id[str(method.get("id", ""))] = method
-
-
-static func bundle() -> Dictionary:
-	if _bundle.is_empty():
-		reload()
-	return _bundle
-
-
 static func all_methods() -> Array:
-	bundle()
-	var out: Array = []
-	for key in _methods_by_id.keys():
-		out.append(by_id(str(key)))
-	return out
+	return CultivationMethodQueryApplicationScript.all_definitions()
 
 
 static func by_id(method_id: String) -> Dictionary:
-	bundle()
-	var row: Variant = _methods_by_id.get(method_id.strip_edges())
-	if row is Dictionary:
-		return (row as Dictionary).duplicate(true)
-	return {}
+	return CultivationMethodQueryApplicationScript.definition_by_id(method_id)
 
 
 static func family_by_id(family_id: String) -> Dictionary:
-	bundle()
-	var row: Variant = _families_by_id.get(family_id.strip_edges())
-	if row is Dictionary:
-		return (row as Dictionary).duplicate(true)
-	return {}
+	return CultivationMethodQueryApplicationScript.family_by_id(family_id)
 
 
 static func equipped_rows(slots: Dictionary) -> Array:

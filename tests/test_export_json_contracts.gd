@@ -6,7 +6,20 @@ const EquipCatalogScript := preload("res://scripts/zhandou/equip_catalog.gd")
 const BuffCatalogScript := preload("res://scripts/zhandou/buff_catalog.gd")
 const StringsZhScript := preload("res://scripts/core/strings_zh.gd")
 const ExportTableReaderScript := preload("res://scripts/core/config/export_table_reader.gd")
+const LilianLocationCatalogScript := preload("res://scripts/lilian/lilian_location_catalog.gd")
 const TupoCatalogScript := preload("res://scripts/sim/tupo_catalog.gd")
+const WeituoCatalogScript := preload(
+	"res://scripts/features/commission/infrastructure/weituo_catalog.gd"
+)
+const MonsterCatalogScript := preload(
+	"res://scripts/features/battle/infrastructure/monster_catalog.gd"
+)
+const BattleConfigQueryApplicationScript := preload(
+	"res://scripts/features/battle/application/battle_config_query_application.gd"
+)
+const CultivationMethodQueryApplicationScript := preload(
+	"res://scripts/features/cultivation/application/cultivation_method_query_application.gd"
+)
 
 
 func _init() -> void:
@@ -46,16 +59,31 @@ func _init() -> void:
 	var equips := EquipCatalogScript.load_bundle().get("equips", []) as Array
 	if equips.is_empty() or not equips[0] is EquipDef or (equips[0] as EquipDef).id <= 0:
 		errors.append("EquipCatalog must load typed exported equips")
-	var buffs := BuffCatalogScript.load_all()
-	if buffs.is_empty() or not buffs[0] is BuffDef or (buffs[0] as BuffDef).id == "":
-		errors.append("BuffCatalog must load typed exported buffs")
-	var weituo := JsonLoaderScript.load_weituo_bundle()
-	var commission := (weituo.get("weituo", {}) as Dictionary).get("qingxin_herb_delivery_001", {}) as Dictionary
+	var buff_ids := BuffCatalogScript.all_buff_ids()
+	var first_buff := BuffCatalogScript.buff_by_id(str(buff_ids[0])) if not buff_ids.is_empty() else {}
+	if buff_ids.size() != 14 or str(first_buff.get("id", "")) == "":
+		errors.append("BuffCatalog must load all validated exported buffs")
+	_check_type(errors, first_buff.get("modifiers"), TYPE_DICTIONARY, "buff.modifiers")
+	_check_type(errors, first_buff.get("tick_effects"), TYPE_ARRAY, "buff.tick_effects")
+	var commissions := WeituoCatalogScript.commissions()
+	var commission := commissions.get("qingxin_herb_delivery_001", {}) as Dictionary
 	_check_type(errors, commission.get("requirements"), TYPE_ARRAY, "weituo.requirements")
 	_check_type(errors, commission.get("rewards"), TYPE_ARRAY, "weituo.rewards")
 	_check_type(errors, commission.get("ui"), TYPE_DICTIONARY, "weituo.ui")
+	_validate_weituo_references(errors, commissions)
+	var raw_monsters := MonsterCatalogScript.all_monsters_snapshot()
+	if raw_monsters.size() != 10:
+		errors.append("MonsterCatalog must load all 10 validated exported monsters")
+	var raw_wolf := raw_monsters.get("qinglan_wolf", {}) as Dictionary
+	_check_type(errors, raw_wolf.get("dropitem"), TYPE_ARRAY, "monster.dropitem")
+	_check_type(errors, raw_wolf.get("skills"), TYPE_ARRAY, "monster.skills")
+	var runtime_wolf := BattleConfigQueryApplicationScript.monster_by_id("qinglan_wolf")
+	_check_type(errors, runtime_wolf.get("attrs"), TYPE_DICTIONARY, "monster.attrs")
+	if str(runtime_wolf.get("species", "")) != "beast" \
+			or (runtime_wolf.get("skills", []) as Array) != [1, 0]:
+		errors.append("battle monster query must preserve normalized runtime shape")
 
-	var methods := JsonLoaderScript.load_xiulian_methods_bundle().get("methods", []) as Array
+	var methods := CultivationMethodQueryApplicationScript.all_definitions()
 	var method := methods.front() as Dictionary
 	_check_type(errors, method.get("practice"), TYPE_DICTIONARY, "xiulian_method.practice")
 	_check_type(errors, method.get("effects"), TYPE_ARRAY, "xiulian_method.effects")
@@ -87,3 +115,40 @@ func _init() -> void:
 func _check_type(errors: PackedStringArray, value: Variant, expected: Variant.Type, label: String) -> void:
 	if typeof(value) != expected:
 		errors.append("%s expected %s, got %s" % [label, type_string(expected), type_string(typeof(value))])
+
+
+func _validate_weituo_references(errors: PackedStringArray, commissions: Dictionary) -> void:
+	var item_ids: Dictionary = {}
+	for item_v in JsonLoaderScript.load_items():
+		if item_v is ItemDef:
+			item_ids[(item_v as ItemDef).id] = true
+	var equip_ids: Dictionary = {}
+	for equip_v in EquipCatalogScript.load_bundle().get("equips", []) as Array:
+		if equip_v is EquipDef:
+			equip_ids[(equip_v as EquipDef).id] = true
+	var location_ids := LilianLocationCatalogScript.new().all_location_ids()
+	for commission_id_v in commissions.keys():
+		var commission_id := str(commission_id_v)
+		var row := commissions[commission_id_v] as Dictionary
+		for index in (row.get("requirements", []) as Array).size():
+			var requirement := (row["requirements"] as Array)[index] as Dictionary
+			var kind := str(requirement.get("kind", ""))
+			if kind == "item":
+				var item_id := str(requirement.get("id", ""))
+				if not item_ids.has(item_id):
+					errors.append("weituo.%s.requirements[%d].id unknown item %s" % [commission_id, index, item_id])
+			elif kind == "lilian":
+				var location_id := str(requirement.get("location_id", ""))
+				if not location_ids.has(location_id):
+					errors.append("weituo.%s.requirements[%d].location_id unknown location %s" % [commission_id, index, location_id])
+		for index in (row.get("rewards", []) as Array).size():
+			var reward := (row["rewards"] as Array)[index] as Dictionary
+			var kind := str(reward.get("kind", ""))
+			if kind == "item":
+				var item_id := str(reward.get("id", ""))
+				if not item_ids.has(item_id):
+					errors.append("weituo.%s.rewards[%d].id unknown item %s" % [commission_id, index, item_id])
+			elif kind == "equip":
+				var equip_id := int(reward.get("id", -1))
+				if not equip_ids.has(equip_id):
+					errors.append("weituo.%s.rewards[%d].id unknown equip %d" % [commission_id, index, equip_id])

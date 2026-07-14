@@ -3,6 +3,10 @@ class_name BuffStatusItem
 
 ## 单个 Buff/被动图标展示。被动平时不显示倒计时，触发冷却后才显示剩余秒数。
 
+const BattleConfigQueryApplicationScript := preload(
+	"res://scripts/features/battle/application/battle_config_query_application.gd"
+)
+
 @onready var _icon: TextureRect = %Icon
 @onready var _time_label: Label = %TimeLabel
 @onready var _stacks_label: Label = %StacksLabel
@@ -59,7 +63,7 @@ func clear_item() -> void:
 func _apply_buff_display(buff_id: String, duration_left: float, stacks: int, show_time: bool) -> void:
 	_entry_id = buff_id.strip_edges()
 	_entry_kind = "buff"
-	var cfg := ConfigManager.buff_by_id(_entry_id)
+	var cfg := BattleConfigQueryApplicationScript.buff_by_id(_entry_id)
 	var icon := ZhandouInitData._resolve_icon_texture(cfg)
 	if _icon != null:
 		_icon.texture = icon

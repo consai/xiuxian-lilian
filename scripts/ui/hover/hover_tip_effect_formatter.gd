@@ -3,6 +3,10 @@ class_name HoverTipEffectFormatter
 
 ## 战斗效果行文案格式化，供技能/道具/法宝 hover tip 共用。
 
+const BattleConfigQueryApplicationScript := preload(
+	"res://scripts/features/battle/application/battle_config_query_application.gd"
+)
+
 
 static func format_lines(effects_v: Variant, skill_target: String = "", skill_target_arg: String = "") -> Array[String]:
 	var out: Array[String] = []
@@ -69,7 +73,7 @@ static func _format_buff_effect(effect: Dictionary, target_label: String) -> Str
 			var buff_id := str(buff_key).strip_edges()
 			if buff_id == "":
 				continue
-			var buff_cfg := ConfigManager.buff_by_id(buff_id)
+			var buff_cfg := BattleConfigQueryApplicationScript.buff_by_id(buff_id)
 			var buff_name := str(buff_cfg.get("name", buff_id)).strip_edges()
 			return StringsZh.format_template(
 				StringsZh.getp("hover.skill.effect_buff", "对{target}施加 {name}"),

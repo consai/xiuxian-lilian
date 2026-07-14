@@ -2,6 +2,9 @@ extends Control
 
 const PlayerAutoBattleServiceScript := preload("res://scripts/sim/player_auto_battle_service.gd")
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
+const AbilityQueryApplicationScript := preload(
+	"res://scripts/features/ability/application/ability_query_application.gd"
+)
 const ROW_SCENE := preload("res://scenes/ui/components/strategy_skill_row.tscn")
 
 const MODE_ROWS := [
@@ -151,15 +154,14 @@ func _cycle_setting(setting_key: String) -> void:
 
 
 func _on_add_pressed() -> void:
-	const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 	for aid_v in GameState.equipped_abilities:
 		var aid := str(aid_v).strip_edges()
 		if aid == "":
 			continue
-		var sid := AbilityServiceScript.combat_id_for(aid)
+		var sid := AbilityQueryApplicationScript.combat_id_for(aid)
 		if sid <= 0 or _has_skill_strategy(sid):
 			continue
-		var skill := AbilityServiceScript.to_runtime_dict(aid, GameState.to_dict())
+		var skill := AbilityQueryApplicationScript.runtime_by_ability_id(aid, GameState.to_dict())
 		var template := PlayerAutoBattleServiceScript.skill_strategy_template(
 			sid,
 			str(skill.get("name", ""))
@@ -237,7 +239,11 @@ func _strategy_icon(strategy: Dictionary) -> Texture2D:
 	var action := strategy.get("action", {}) as Dictionary
 	match str(action.get("type", "")):
 		"skill":
-			return _entry_icon(ConfigManager.skill_by_id(int(action.get("skill_id", -1))))
+			return _entry_icon(
+				AbilityQueryApplicationScript.runtime_by_combat_id(
+					int(action.get("skill_id", -1))
+				)
+			)
 		"item":
 			var slot_index := int(action.get("slot_index", 0))
 			var iid := str(GameState.item_slots[slot_index]) if slot_index < GameState.item_slots.size() else ""

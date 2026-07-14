@@ -1,6 +1,7 @@
 extends Node
 
 signal active_scene_changed(scene: Node)
+signal overlay_dismissed(route_id: String)
 
 const MAIN_MENU := "main_menu"
 const CHARACTER_CREATION := "character_creation"
@@ -49,6 +50,7 @@ const SCENE_PATHS := {
 ## 叠在当前场景上的战斗/面板浮层，避免切场景销毁底层界面。
 var _zhandou_overlay: Node = null
 var _panel_overlay: Node = null
+var _panel_overlay_id := ""
 var _scene_underlay: Node = null
 ## 无专属 Host 的可导航场景与浮层统一挂在此节点下，不直接挂 root。
 var _scene_root: Node = null
@@ -267,15 +269,18 @@ func open_zhandou(prefer_overlay: bool) -> Dictionary:
 	return _perform_transition(ZHANDOU_CHANGJING, {}, true)
 
 
-## 历练战斗胜利后：移除战斗叠层并恢复历练界面（不重新加载场景）。
-func resume_lilian_after_zhandou() -> Dictionary:
-	if _zhandou_overlay == null or _scene_underlay == null:
-		return go_lilian_xunhuan()
+## 关闭战斗叠层并恢复底层场景；业务恢复由底层页面订阅事实信号处理。
+func dismiss_zhandou_overlay() -> Dictionary:
+	if _zhandou_overlay == null or not is_instance_valid(_zhandou_overlay):
+		return {"ok": false, "error": "no_zhandou_overlay"}
+	if _scene_underlay == null or not is_instance_valid(_scene_underlay):
+		return {"ok": false, "error": "no_scene_underlay"}
 	_remove_zhandou_overlay()
 	_restore_scene_underlay()
-	if _scene_underlay.has_method("resume_after_battle"):
-		_scene_underlay.call("resume_after_battle")
-	return {"ok": true, "scene_id": LILIAN_XUNHUAN, "resumed": true}
+	if _panel_overlay == null:
+		_scene_underlay = null
+	overlay_dismissed.emit(ZHANDOU_CHANGJING)
+	return {"ok": true, "route_id": ZHANDOU_CHANGJING, "resumed": true}
 
 
 ## 关闭面板弹窗并恢复底层场景。
@@ -283,16 +288,16 @@ func dismiss_panel_popup() -> Dictionary:
 	if _panel_overlay == null:
 		return {"ok": false, "error": "no_panel_overlay"}
 	var underlay := _scene_underlay
+	var dismissed_route_id := _panel_overlay_id
 	_remove_panel_overlay()
 	if underlay != null and is_instance_valid(underlay):
 		if not underlay.visible:
 			underlay.visible = true
 			underlay.process_mode = Node.PROCESS_MODE_INHERIT
-		if underlay.has_method("resume_after_panel"):
-			underlay.call("resume_after_panel")
 	if _zhandou_overlay == null:
 		_scene_underlay = null
-	return {"ok": true, "resumed": true}
+	overlay_dismissed.emit(dismissed_route_id)
+	return {"ok": true, "route_id": dismissed_route_id, "resumed": true}
 
 
 func is_panel_popup_active() -> bool:
@@ -480,6 +485,7 @@ func _push_panel_popup(scene_id: String, payload: Dictionary) -> Dictionary:
 		_scene_underlay.visible = false
 		_scene_underlay.process_mode = Node.PROCESS_MODE_DISABLED
 	_panel_overlay = overlay
+	_panel_overlay_id = scene_id
 	if keep_underlay_visible:
 		# 背包弹窗：底层场景保持可见，仅在上层叠半透明遮罩与背包面板。
 		_panel_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -495,6 +501,7 @@ func _remove_panel_overlay() -> void:
 	if _panel_overlay != null and is_instance_valid(_panel_overlay):
 		_panel_overlay.queue_free()
 	_panel_overlay = null
+	_panel_overlay_id = ""
 	if _zhandou_overlay == null:
 		_data_store().scene_runtime()["overlay_id"] = ""
 

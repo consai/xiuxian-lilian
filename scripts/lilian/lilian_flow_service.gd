@@ -65,6 +65,22 @@ static func go_back(
 	return scene_manager.go_back(fallback_scene_id)
 
 
+## 关闭历练工具浮层。仅调用方明确声明历练上下文时同步局内战斗配置。
+static func close_lilian_utility_panel(
+		sync_runtime_peizhi: bool,
+		lilian_state: Node,
+		scene_manager: Node,
+		fallback_scene_id: String = "hub"
+) -> Dictionary:
+	if not scene_manager.is_panel_popup_active():
+		return go_back(lilian_state, scene_manager, fallback_scene_id)
+	if sync_runtime_peizhi:
+		if lilian_state == null or not lilian_state.active:
+			return {"ok": false, "error": "历练配置同步缺少进行中的历练"}
+		lilian_state.sync_runtime_peizhi_from_game()
+	return scene_manager.dismiss_panel_popup()
+
+
 static func open_settlement(
 		reason: String,
 		lilian_state: Node,

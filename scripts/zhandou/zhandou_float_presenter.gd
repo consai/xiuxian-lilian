@@ -1,5 +1,9 @@
 class_name ZhandouFloatPresenter
 extends RefCounted
+
+const BattleConfigQueryApplicationScript := preload(
+	"res://scripts/features/battle/application/battle_config_query_application.gd"
+)
 const ZhandouReportScript = preload("res://scripts/zhandou/zhandou_report.gd")
 const ZhandouRecordTypesScript := preload("res://scripts/zhandou/zhandou_record_types.gd")
 
@@ -95,11 +99,9 @@ static func build_buff_tick_spawns(
 
 static func build_buff_expire_spawn(buff_id: String, unit_id: String) -> Dictionary:
 	var bname := buff_id.strip_edges()
-	var cm := _get_config_manager()
-	if cm != null and cm.has_method("buff_by_id"):
-		var row: Dictionary = cm.call("buff_by_id", bname) as Dictionary
-		if not row.is_empty():
-			bname = str(row.get("name", bname)).strip_edges()
+	var row := BattleConfigQueryApplicationScript.buff_by_id(bname)
+	if not row.is_empty():
+		bname = str(row.get("name", bname)).strip_edges()
 	var text := StringsZh.format_template(
 		StringsZh.getp("combat.float.buff_expire", "%s 消散"),
 		{"name": bname}
@@ -162,10 +164,3 @@ static func _display_name(unit_id: String, names: Dictionary) -> String:
 			return "敌方"
 		_:
 			return uid
-
-
-static func _get_config_manager() -> Node:
-	var loop: MainLoop = Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("ConfigManager")

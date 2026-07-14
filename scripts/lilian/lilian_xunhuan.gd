@@ -29,6 +29,8 @@ func _ready() -> void:
 	if LilianState.should_go_to_result():
 		call_deferred("_go_completed_result")
 		return
+	if not SceneManager.overlay_dismissed.is_connected(_on_overlay_dismissed):
+		SceneManager.overlay_dismissed.connect(_on_overlay_dismissed)
 	_prepare_loot_template()
 	_prepare_battle_popup()
 	_auto_advance_timer.timeout.connect(_on_auto_advance_timeout)
@@ -278,9 +280,7 @@ func _handle_step_result(result: Dictionary) -> void:
 
 
 func _auto_advance_seconds() -> float:
-	return maxf(0.1, float(
-		LilianRulesServiceScript.rules().get("auto_event_advance_seconds", 1.0)
-	))
+	return float(LilianRulesServiceScript.rules()["auto_event_advance_seconds"])
 
 
 func _schedule_auto_advance(continue_after: bool = true) -> void:
@@ -504,23 +504,24 @@ func _on_battle_fight_requested() -> void:
 		popup.visible = false
 
 
-## 历练叠层战斗结束后由 SceneManager 回调：解锁 UI 并刷新状态，不重建场景。
-func resume_after_battle() -> void:
-	_locked = false
-	var popup := %BattlePopup as LilianZhandouTanchuangView
-	if popup != null:
-		popup.visible = false
-	_refresh_all()
-
-
-## 历练浮层面板（背包/战斗设置）关闭后刷新界面。
-func resume_after_panel() -> void:
-	var ui_rt: Dictionary = DataStore.ui_runtime()
-	var feedback := str(ui_rt.get("lilian_bag_feedback", "")).strip_edges()
-	ui_rt["lilian_bag_feedback"] = ""
-	if feedback != "":
-		(%Feedback as Label).text = feedback
-	LilianState.sync_runtime_peizhi_from_game()
+## SceneManager 只发布叠层关闭事实；页面自行恢复局部展示状态。
+func _on_overlay_dismissed(route_id: String) -> void:
+	match route_id:
+		SceneManager.ZHANDOU_CHANGJING:
+			_locked = false
+			var popup := %BattlePopup as LilianZhandouTanchuangView
+			if popup != null:
+				popup.visible = false
+		SceneManager.BEIBAO_PANEL:
+			var ui_rt: Dictionary = DataStore.ui_runtime()
+			var feedback := str(ui_rt.get("lilian_bag_feedback", "")).strip_edges()
+			ui_rt["lilian_bag_feedback"] = ""
+			if feedback != "":
+				(%Feedback as Label).text = feedback
+		SceneManager.ZHANDOU_PEIZHI_MIANBAN:
+			pass
+		_:
+			return
 	_refresh_all()
 
 
