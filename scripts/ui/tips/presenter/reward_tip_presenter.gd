@@ -3,6 +3,9 @@ class_name RewardTipPresenter
 
 const TipIntentScript := preload("res://scripts/ui/tips/core/tip_intent.gd")
 const RewardTipLineScene := preload("res://scenes/ui/components/reward_tip_line.tscn")
+const ItemIconResolverScript := preload(
+	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
+)
 
 const DEFAULT_TTL_MS := 1600
 
@@ -82,10 +85,7 @@ func _apply_intent(row: Control, intent: Dictionary, text: String) -> void:
 	var icon := row.get_node_or_null("%Icon") as TextureRect
 	if icon != null:
 		var icon_path := str(_context(intent).get("icon_path", "")).strip_edges()
-		if icon_path != "" and ResourceLoader.exists(icon_path):
-			var res := load(icon_path)
-			if res is Texture2D:
-				icon.texture = res as Texture2D
+		icon.texture = ItemIconResolverScript.resolve(icon_path, icon.texture)
 		icon.visible = icon.texture != null
 
 

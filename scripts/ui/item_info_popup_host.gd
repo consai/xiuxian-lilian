@@ -20,11 +20,15 @@ func _ready() -> void:
 
 
 func show_entry(entry: Dictionary) -> void:
-	show_payload(BuilderScript.from_entry(entry))
+	show_payload(BuilderScript.from_entry(
+		entry, GameState.to_dict(), GameState.major_realm_id()
+	))
 
 
 func show_item(item_id: String, count: int = 1) -> void:
-	show_payload(BuilderScript.from_item_id(item_id, count))
+	show_payload(BuilderScript.from_item_id(
+		item_id, count, GameState.to_dict(), GameState.major_realm_id()
+	))
 
 
 func show_equip(equip_id: int) -> void:

@@ -8,6 +8,9 @@ const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.
 const ItemIconResolverScript := preload(
 	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
 )
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
 
 @onready var _body: RichTextLabel = %BattleResultBody
 @onready var _btn_close: Button = %BattleResultClose
@@ -235,15 +238,14 @@ func _apply_reward_row(view: ItemView, row: Dictionary) -> void:
 		tier = maxi(1, int(equip_cfg.get("tier", tier)))
 	elif kind == "item":
 		var item_id := str(row.get("id", ""))
-		if item_name == "" and ConfigManager != null:
-			item_name = str(ConfigManager.get_item_display_name(item_id))
-		if ConfigManager != null:
-			var def := ConfigManager.item_def_by_id(item_id)
-			if def != null:
-				icon = ItemIconResolverScript.resolve(def.icon_path, null)
-				if quality == "":
-					quality = EnumQuality.display_label(def.quality)
-				tier = def.tier
+		if item_name == "":
+			item_name = InventoryQueryApplicationScript.display_name(item_id)
+		var def := InventoryQueryApplicationScript.definition_by_id(item_id)
+		if def != null:
+			icon = ItemIconResolverScript.resolve(def.icon_path, null)
+			if quality == "":
+				quality = EnumQuality.display_label(def.quality)
+			tier = def.tier
 	else:
 		if item_name == "":
 			item_name = str(row.get("id", "奖励"))

@@ -3,7 +3,7 @@ extends RefCounted
 
 const _CTX := preload("res://scripts/zhandou/vfx/zhandou_vfx_context.gd")
 const _LIB := preload("res://scripts/zhandou/vfx/zhandou_vfx_preset_library.gd")
-const _DEFS := preload("res://scripts/zhandou/vfx/zhandou_vfx_step_defs.gd")
+const _DEFS := preload("res://scripts/features/battle/domain/zhandou_vfx_step_defs.gd")
 
 
 func play_sequence(ctx: ZhandouVfxContext, steps: Array) -> void:
@@ -63,7 +63,7 @@ func _run_step(ctx: ZhandouVfxContext, step: Dictionary) -> void:
 
 
 func _op_tween(ctx: ZhandouVfxContext, step: Dictionary) -> void:
-	var role := str(step.get("actor", ZhandouVfxStepDefs.ACTOR_CASTER)).strip_edges()
+	var role := str(step.get("actor", _DEFS.ACTOR_CASTER)).strip_edges()
 	var vfx := ctx.resolve_step_actor(step)
 	if vfx == null:
 		_log_tween_skip(role, "角色 VFX 未注册", step)

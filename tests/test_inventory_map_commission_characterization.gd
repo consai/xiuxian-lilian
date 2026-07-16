@@ -8,7 +8,9 @@ const WeituoStateScript := preload(
 	"res://scripts/features/commission/domain/weituo_state.gd"
 )
 const WorldMapServiceScript := preload("res://scripts/map/world_map_service.gd")
-const ItemAliasCatalogScript := preload("res://scripts/sim/item_alias_catalog.gd")
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
 
 const COMMISSION_ID := "qingxin_herb_delivery_001"
 const INSTANCE_ID := "fixed_commission_instance"
@@ -50,12 +52,8 @@ func _run() -> void:
 
 
 func _test_inventory(errors: PackedStringArray) -> void:
-	var aliases := ItemAliasCatalogScript.load_all()
-	_expect(errors, aliases.size() == 3, "item alias count")
-	_expect(errors, aliases.get("book_method_hunyuan") == "book_method_hunyuan_1", "known item alias")
-	var config := root.get_node("ConfigManager")
-	var alias_def: ItemDef = config.item_def_by_id("book_method_hunyuan")
-	var canonical_def: ItemDef = config.item_def_by_id("book_method_hunyuan_1")
+	var alias_def: ItemDef = InventoryQueryApplicationScript.definition_by_id("book_method_hunyuan")
+	var canonical_def: ItemDef = InventoryQueryApplicationScript.definition_by_id("book_method_hunyuan_1")
 	_expect(
 		errors,
 		alias_def != null and canonical_def != null \

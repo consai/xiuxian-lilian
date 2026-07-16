@@ -88,7 +88,10 @@ func _ready() -> void:
 			vfx.event_finished.connect(_on_vfx_event_finished)
 		if not vfx.queue_finished.is_connected(_on_vfx_queue_finished):
 			vfx.queue_finished.connect(_on_vfx_queue_finished)
-	_ctx.init_ok = ZhandouChangjingBootstrap.try_initialize(_ctx, _hud, editor_battle_init, editor_auto_sample, get_tree())
+	var battle_envelope := SceneManager.take_payload(SceneManager.ZHANDOU_CHANGJING)
+	_ctx.init_ok = ZhandouChangjingBootstrap.try_initialize(
+		_ctx, _hud, editor_battle_init, editor_auto_sample, battle_envelope
+	)
 	if not _ctx.init_ok:
 		set_process(false)
 		return
@@ -179,7 +182,7 @@ func _exit_tree() -> void:
 	ZhandouDebugLog.clear_domain()
 
 
-## 由 [ZhandouInitData.resolve] 消费进战数据；外部请 [ZhandouInitData.start_battle] 写入 pending 并导航。
+## 由 [ZhandouInitData.resolve] 消费进战数据；外部通过 BattleStartApplication 导航并提交 payload。
 func initialize_battle(data: Dictionary) -> bool:
 	return ZhandouChangjingBootstrap.initialize_battle(_ctx, _hud, data)
 

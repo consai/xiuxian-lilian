@@ -2,6 +2,12 @@ extends RefCounted
 class_name RewardTipBuilder
 
 const TipIntentScript := preload("res://scripts/ui/tips/core/tip_intent.gd")
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
+const DaoTreeQueryApplicationScript := preload(
+	"res://scripts/features/dao/application/dao_tree_query_application.gd"
+)
 
 const LARGE_LING_STONE_THRESHOLD := 500
 const RARE_QUALITY_THRESHOLD := 3
@@ -61,7 +67,7 @@ static func cultivation_result(result: Dictionary, source: String = "cultivation
 		var skill_id := str(row.get("skill_id", ""))
 		var skill_name := ""
 		if skill_id != "":
-			var skill_def := DaoTreeService.skill_by_id(skill_id)
+			var skill_def := DaoTreeQueryApplicationScript.skill_by_id(skill_id)
 			skill_name = str(skill_def.get("name", skill_id))
 		if skill_name.strip_edges() == "":
 			skill_name = "知识"
@@ -189,10 +195,7 @@ static func currency_label(currency_id: String) -> String:
 
 
 static func _item_def_by_id(item_id: String) -> ItemDef:
-	var cm := _config_manager()
-	if cm == null or not cm.has_method("item_def_by_id"):
-		return null
-	return cm.call("item_def_by_id", item_id) as ItemDef
+	return InventoryQueryApplicationScript.definition_by_id(item_id)
 
 
 static func _equip_by_id(equip_id: int) -> Dictionary:

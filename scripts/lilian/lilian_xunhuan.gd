@@ -1,15 +1,18 @@
 ﻿extends Control
 
 const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
-const LilianEventServiceScript := preload("res://scripts/lilian/lilian_event_service.gd")
 const LilianRulesServiceScript := preload("res://scripts/lilian/lilian_rules_service.gd")
 const LilianZhandouTanchuangView := preload("res://scripts/lilian/lilian_zhandou_tanchuang_view.gd")
 const LilianLogServiceScript := preload("res://scripts/lilian/lilian_log_service.gd")
 const LilianMapServiceScript := preload("res://scripts/lilian/lilian_map_service.gd")
+const BattleStartApplicationScript := preload(
+	"res://scripts/features/battle/application/battle_start_application.gd"
+)
 var _locked := false
 var _auto_chain_after_timer := false
 var _map_node_template: Button = null
 var _map_refresh_pending := false
+var _pending_bag_feedback := ""
 
 @onready var _auto_advance_timer: Timer = %AutoAdvanceTimer
 @onready var _map_scroll: ScrollContainer = %MapScroll
@@ -38,6 +41,8 @@ func _ready() -> void:
 		LilianState.log_updated.connect(_refresh_log_display)
 	if not LilianState.runtime_vitals_changed.is_connected(_on_runtime_vitals_changed):
 		LilianState.runtime_vitals_changed.connect(_on_runtime_vitals_changed)
+	if not LilianState.runtime_item_feedback.is_connected(_on_runtime_item_feedback):
+		LilianState.runtime_item_feedback.connect(_on_runtime_item_feedback)
 	(%ExitButton as Button).pressed.connect(_on_exit_pressed)
 	(%StatusToggleButton as Button).pressed.connect(_on_info_toggle_pressed)
 	(%bag as Button).pressed.connect(_on_bag_pressed)
@@ -59,7 +64,7 @@ func _ready() -> void:
 	_refresh_all()
 	_queue_map_refresh_after_layout()
 	if LilianState.phase == "battle" and LilianState.pending_battle_event_id != "":
-		var pending_event := LilianEventServiceScript.by_id(LilianState.pending_battle_event_id)
+		var pending_event := LilianState.event_by_id(LilianState.pending_battle_event_id)
 		if not pending_event.is_empty():
 			_show_pending_battle_popup(pending_event)
 	if get_tree().root.has_meta("smoke_auto_exit") and bool(get_tree().root.get_meta("smoke_auto_exit")):
@@ -114,13 +119,19 @@ func _refresh_event_presentation() -> void:
 			card.disabled = _locked
 
 
-## 背包用药等局内状态变化：立即刷新左上角气血/法力，并展示用药反馈。
-func _on_runtime_vitals_changed(feedback: String = "") -> void:
+## 背包用药等局内状态变化：只刷新左上角气血/法力。
+func _on_runtime_vitals_changed(_feedback: String = "") -> void:
 	_refresh_status_panel()
+
+
+func _on_runtime_item_feedback(feedback: String) -> void:
+	if str(SceneManager.navigation_snapshot().get("overlay_id", "")) != SceneManager.BEIBAO_PANEL:
+		return
 	var text := feedback.strip_edges()
-	if text != "":
-		(%Feedback as Label).text = text
-		DataStore.ui_runtime()["lilian_bag_feedback"] = ""
+	if text == "":
+		return
+	_pending_bag_feedback = text
+	(%Feedback as Label).text = text
 
 
 func _refresh_status_panel() -> void:
@@ -190,7 +201,7 @@ func _on_step_gui_input(event: InputEvent) -> void:
 
 
 func _reopen_pending_battle_popup() -> void:
-	var pending_event := LilianEventServiceScript.by_id(LilianState.pending_battle_event_id)
+	var pending_event := LilianState.event_by_id(LilianState.pending_battle_event_id)
 	if pending_event.is_empty():
 		return
 	_show_pending_battle_popup(pending_event)
@@ -338,6 +349,7 @@ func _on_exit_pressed() -> void:
 func _on_bag_pressed() -> void:
 	if not _can_open_utility_panels():
 		return
+	_pending_bag_feedback = ""
 	var nav: Dictionary = SceneManager.go_beibao_panel({"context": "lilian"})
 	if not bool(nav.get("ok", false)):
 		var err := str(nav.get("error", "无法打开储物袋")).strip_edges()
@@ -490,8 +502,8 @@ func _on_battle_fight_requested() -> void:
 		return
 	var popup := %BattlePopup as LilianZhandouTanchuangView
 	var battle_data := LilianState.build_battle_init()
-	var nav: Dictionary = ZhandouInitData.start_battle(
-		get_tree(), battle_data, "lilian", SceneManager, true
+	var nav: Dictionary = BattleStartApplicationScript.start_battle(
+		battle_data, "lilian", SceneManager, true
 	)
 	if not bool(nav.get("ok", false)):
 		LilianState.clear_pending_battle()
@@ -513,11 +525,9 @@ func _on_overlay_dismissed(route_id: String) -> void:
 			if popup != null:
 				popup.visible = false
 		SceneManager.BEIBAO_PANEL:
-			var ui_rt: Dictionary = DataStore.ui_runtime()
-			var feedback := str(ui_rt.get("lilian_bag_feedback", "")).strip_edges()
-			ui_rt["lilian_bag_feedback"] = ""
-			if feedback != "":
-				(%Feedback as Label).text = feedback
+			if _pending_bag_feedback != "":
+				(%Feedback as Label).text = _pending_bag_feedback
+			_pending_bag_feedback = ""
 		SceneManager.ZHANDOU_PEIZHI_MIANBAN:
 			pass
 		_:

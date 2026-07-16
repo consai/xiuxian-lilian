@@ -17,7 +17,9 @@ func _ready() -> void:
 		return
 	_tips_host.bind_dependencies(DataEvents, tip_policy)
 	_story_playback_ui.bind_scene_manager(SceneManager)
+	_story_director.bind_store(DataStore)
 	_story_director.bind_presenter(_story_playback_ui)
+	TutorialService.bind_store(DataStore)
 	TutorialService.bind_story_director(_story_director)
 	SceneManager.bind_scene_host(_scene_host)
 	var result: Dictionary = SceneManager.go_to(

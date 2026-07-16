@@ -11,14 +11,14 @@ const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
 const LilianEventCatalogScript := preload("res://scripts/lilian/lilian_event_catalog.gd")
 
 
-static func by_id(event_id: String) -> Dictionary:
-	var generated := _generated_event_by_id(event_id)
-	if not generated.is_empty():
-		return generated
+static func by_id(event_id: String, generated_events: Dictionary) -> Dictionary:
+	var generated_v: Variant = generated_events.get(event_id)
+	if generated_v is Dictionary:
+		return (generated_v as Dictionary).duplicate(true)
 	return LilianEventCatalogScript.static_by_id(event_id)
 
 
-static func event_pool_for_location(location: Dictionary) -> Array:
+static func event_pool_for_location(location: Dictionary, generated_events: Dictionary) -> Array:
 	var pool: Array = []
 	for event_id_v in location.get("event_pool", []) as Array:
 		var event_id := ""
@@ -28,7 +28,7 @@ static func event_pool_for_location(location: Dictionary) -> Array:
 			event_id = str(event_id_v)
 		if event_id == "":
 			continue
-		var event := by_id(event_id)
+		var event := by_id(event_id, generated_events)
 		if not event.is_empty():
 			pool.append(event)
 	return pool
@@ -50,9 +50,10 @@ static func materialize_event_for_context(
 static func roll_next_event(
 		location: Dictionary,
 		visited_once: Array,
-		rng: RandomNumberGenerator
+		rng: RandomNumberGenerator,
+		generated_events: Dictionary
 ) -> Dictionary:
-	var candidates := _filter_candidates(location, visited_once)
+	var candidates := _filter_candidates(location, visited_once, generated_events)
 	var pick := _weighted_pick(candidates, rng)
 	if pick.is_empty():
 		return {}
@@ -63,26 +64,32 @@ static func roll_event_for_node(
 		location: Dictionary,
 		node: Dictionary,
 		visited_once: Array,
-		rng: RandomNumberGenerator
+		rng: RandomNumberGenerator,
+		generated_events: Dictionary
 ) -> Dictionary:
 	var fixed_event_id := str(node.get("fixed_event_id", "")).strip_edges()
 	if fixed_event_id != "":
-		var fixed_event := by_id(fixed_event_id)
+		var fixed_event := by_id(fixed_event_id, generated_events)
 		if not fixed_event.is_empty():
 			return _materialize_event_for_context(location, node, fixed_event, rng)
-	var candidates := candidates_for_node(location, node, visited_once)
+	var candidates := candidates_for_node(location, node, visited_once, generated_events)
 	var pick := _weighted_pick(candidates, rng)
 	if not pick.is_empty():
 		return _materialize_event_for_context(location, node, pick, rng)
 	var generated := _generated_battle_event_for_node(location, node, rng)
-	if not generated.is_empty():
-		_store_generated_event(generated)
 	return generated
 
 
-static func candidates_for_node(location: Dictionary, node: Dictionary, visited_once: Array) -> Array:
+static func candidates_for_node(
+		location: Dictionary,
+		node: Dictionary,
+		visited_once: Array,
+		generated_events: Dictionary
+) -> Array:
 	var type_id := str(node.get("type", EnumLilianNodeTypeScript.ID_TRAVEL))
-	var candidates := _filter_candidates(location, visited_once, _event_context(location, node))
+	var candidates := _filter_candidates(
+		location, visited_once, generated_events, _event_context(location, node)
+	)
 	var typed: Array = []
 	for fallback_type in _node_type_fallbacks(type_id):
 		typed = _candidates_matching_node_type(candidates, fallback_type)
@@ -199,8 +206,6 @@ static func _materialize_event_for_context(
 	current["node_type"] = str(context.get("node_type", current.get("node_type", "")))
 	if LilianRulesServiceScript.is_battle_type(str(current.get("type", ""))):
 		current = _materialize_battle_event(location, node, current, rng)
-	if not current.is_empty() and str(current.get("id", "")).strip_edges() != "":
-		_store_generated_event(current)
 	return current
 
 
@@ -340,11 +345,12 @@ static func resolve_decision_option(
 		option: Dictionary,
 		runtime: Dictionary,
 		player_attrs: Dictionary,
-		rng: RandomNumberGenerator
+		rng: RandomNumberGenerator,
+		generated_events: Dictionary
 ) -> Dictionary:
 	var trigger_id := str(option.get("trigger_event", "")).strip_edges()
 	if trigger_id != "":
-		var triggered := by_id(trigger_id)
+		var triggered := by_id(trigger_id, generated_events)
 		if triggered.is_empty():
 			return {"ok": false, "error": "抉择引用了未知事件"}
 		var event_type := str(triggered.get("type", ""))
@@ -680,11 +686,16 @@ static func _join_feedback(prefix: String, body: String) -> String:
 	return "%s：%s" % [lead, tail]
 
 
-static func _filter_candidates(location: Dictionary, visited_once: Array, context: Dictionary = {}) -> Array:
+static func _filter_candidates(
+		location: Dictionary,
+		visited_once: Array,
+		generated_events: Dictionary,
+		context: Dictionary = {}
+) -> Array:
 	if context.is_empty():
 		context = _event_context(location, {})
 	var out: Array = []
-	for event_v in event_pool_for_location(location):
+	for event_v in event_pool_for_location(location, generated_events):
 		var event := event_v as Dictionary
 		var event_id := str(event.get("id", ""))
 		if bool(event.get("once_per_lilian", false)) and visited_once.has(event_id):
@@ -757,42 +768,6 @@ static func _weighted_pick(pool: Array, rng: RandomNumberGenerator) -> Dictionar
 		if roll <= 0:
 			return row.duplicate(true)
 	return {}
-
-
-static func _generated_event_by_id(event_id: String) -> Dictionary:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return {}
-	var data_store := (loop as SceneTree).root.get_node_or_null("DataStore")
-	if data_store == null or not data_store.has_method("lilian_runtime"):
-		return {}
-	var runtime := data_store.call("lilian_runtime") as Dictionary
-	var generated_v: Variant = runtime.get("generated_events", {})
-	if not generated_v is Dictionary:
-		return {}
-	var event_v: Variant = (generated_v as Dictionary).get(event_id, {})
-	if event_v is Dictionary:
-		return (event_v as Dictionary).duplicate(true)
-	return {}
-
-
-static func _store_generated_event(event: Dictionary) -> void:
-	var event_id := str(event.get("id", "")).strip_edges()
-	if event_id == "":
-		return
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return
-	var data_store := (loop as SceneTree).root.get_node_or_null("DataStore")
-	if data_store == null or not data_store.has_method("lilian_runtime"):
-		return
-	var runtime := data_store.call("lilian_runtime") as Dictionary
-	if not bool(runtime.get("active", false)):
-		return
-	var generated_v: Variant = runtime.get("generated_events", {})
-	var generated := generated_v as Dictionary if generated_v is Dictionary else {}
-	generated[event_id] = event.duplicate(true)
-	runtime["generated_events"] = generated
 
 
 static func _location_monsters(location_id: String) -> Array:

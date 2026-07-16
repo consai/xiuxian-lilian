@@ -3,6 +3,9 @@ extends Control
 ## GM 奖励发放面板：模糊搜索配置表道具 / 法宝并经 GameState.grant_rewards 发放。
 
 const GmItemSearchScript := preload("res://scripts/ui/gm_item_search.gd")
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
 
 signal closed
 
@@ -38,9 +41,7 @@ func refresh() -> void:
 func _build_catalog() -> void:
 	_catalog.clear()
 	var cm := _config_manager()
-	if cm == null:
-		return
-	var item_rows := cm.call("items") as Array
+	var item_rows := InventoryQueryApplicationScript.all_definitions()
 	for def_v in item_rows:
 		if not def_v is ItemDef:
 			continue
@@ -55,6 +56,8 @@ func _build_catalog() -> void:
 			"quality": EnumQuality.display_label(def.quality),
 			"tier": EnumItemTier.label(def.tier),
 		})
+	if cm == null:
+		return
 	var equip_ids := cm.call("all_equip_ids") as Array
 	for equip_id_v in equip_ids:
 		var equip_id := int(equip_id_v)
@@ -184,9 +187,7 @@ func _grant_entry(entry: Dictionary, count: int, announce_single: bool = true) -
 		elif str(row.get("kind", kind)) == EnumRewardKind.LABEL_CURRENCY:
 			_flash("已获得灵石 x%d" % int(row.get("count", 0)))
 		else:
-			var display_name := str(row.get("id", reward_id))
-			if cm != null and cm.has_method("get_item_display_name"):
-				display_name = str(cm.call("get_item_display_name", display_name))
+			var display_name := InventoryQueryApplicationScript.display_name(str(row.get("id", reward_id)))
 			_flash("已获得 %s x%d" % [display_name, int(row.get("count", 0))])
 	return true
 

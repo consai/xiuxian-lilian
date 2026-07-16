@@ -4,6 +4,12 @@ const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_se
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
+const ItemIconResolverScript := preload(
+	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
+)
 
 const TREASURE_SLOT_LABELS := ["主动法宝", "被动法宝一", "被动法宝二"]
 const PAGE_METHODS := "methods"
@@ -207,14 +213,13 @@ func _equip_entry(index: int) -> Dictionary:
 	if index < GameState.treasure_item_slots.size():
 		item_id = str(GameState.treasure_item_slots[index]).strip_edges()
 	if item_id != "":
-		var def := ConfigManager.item_def_by_id(item_id)
+		var def := InventoryQueryApplicationScript.definition_by_id(item_id)
 		if def != null:
-			var runtime := def.to_fight_runtime_dict()
 			return {
 				"label": def.name,
-				"icon": _entry_icon(runtime),
+				"icon": ItemIconResolverScript.resolve(def.icon_path, null),
 			}
-		return {"label": ConfigManager.get_item_display_name(item_id)}
+		return {"label": InventoryQueryApplicationScript.display_name(item_id)}
 	var eid := int(GameState.equip_slots[index]) if index < GameState.equip_slots.size() else -1
 	if eid <= 0:
 		return {"label": _treasure_slot_label(index)}
@@ -233,13 +238,13 @@ func _item_entry(index: int) -> Dictionary:
 	var iid := str(GameState.item_slots[index]) if index < GameState.item_slots.size() else ""
 	if iid == "":
 		return {"label": "空"}
-	var item_name := ConfigManager.get_item_display_name(iid)
+	var item_name := InventoryQueryApplicationScript.display_name(iid)
 	var count := int(GameState.inventory.get(iid, 0))
 	var label := "%s x%d" % [item_name, count] if count > 1 else item_name
 	var icon: Texture2D = null
-	var def := ConfigManager.item_def_by_id(iid)
+	var def := InventoryQueryApplicationScript.definition_by_id(iid)
 	if def != null:
-		icon = _entry_icon(def.to_fight_runtime_dict())
+		icon = ItemIconResolverScript.resolve(def.icon_path, null)
 	return {
 		"label": label,
 		"icon": icon,
@@ -259,10 +264,8 @@ func _on_popup_selected(entry_id: Variant) -> void:
 		return
 	var aid := str(entry_id).strip_edges()
 	if aid == "" or aid == "-1":
-		var slots := DataStore._normalize_ability_slots(GameState.equipped_abilities)
-		slots[int(_selection_target)] = ""
-		GameState.equipped_abilities = slots
-		_refresh("技能槽已清空。")
+		var clear_result: Dictionary = GameState.equip_ability(int(_selection_target), "")
+		_refresh(str(clear_result.get("error", "技能槽已清空。")))
 		return
 	var skill_result: Dictionary = GameState.equip_ability(int(_selection_target), aid)
 	_refresh(str(skill_result.get("error", "技能配置已更新。")))

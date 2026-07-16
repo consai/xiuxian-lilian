@@ -4,6 +4,9 @@ extends Control
 const ItemIconResolverScript := preload(
 	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
 )
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
 
 ## 道具展示块，场景 [code]item.tscn[/code]。
 ## [member click_enabled] 为 [code]false[/code] 时仅展示（如详情弹窗）；为 [code]true[/code] 时可点击并带缩放反馈（如背包）。
@@ -116,8 +119,8 @@ static func apply_item_id(view: ItemView, item_id: String, count: int = 0, optio
 	var item_name := name_override
 	var quality := ""
 	var tier := 1
-	if iid != "" and ConfigManager != null:
-		var def := ConfigManager.item_def_by_id(iid)
+	if iid != "":
+		var def := InventoryQueryApplicationScript.definition_by_id(iid)
 		if def != null:
 			icon = ItemIconResolverScript.resolve(def.icon_path, null)
 			if item_name == "":
@@ -164,15 +167,14 @@ static func apply_reward_row(view: ItemView, row: Dictionary, options: Dictionar
 		tier = maxi(1, int(equip_cfg.get("tier", tier)))
 	elif kind == EnumRewardKind.LABEL_ITEM:
 		var item_id := str(row.get("id", ""))
-		if item_name == "" and ConfigManager != null:
-			item_name = str(ConfigManager.get_item_display_name(item_id))
-		if ConfigManager != null:
-			var def := ConfigManager.item_def_by_id(item_id)
-			if def != null:
-				icon = ItemIconResolverScript.resolve(def.icon_path, null)
-				if quality == "":
-					quality = EnumQuality.display_label(def.quality)
-				tier = def.tier
+		if item_name == "":
+			item_name = InventoryQueryApplicationScript.display_name(item_id)
+		var def := InventoryQueryApplicationScript.definition_by_id(item_id)
+		if def != null:
+			icon = ItemIconResolverScript.resolve(def.icon_path, null)
+			if quality == "":
+				quality = EnumQuality.display_label(def.quality)
+			tier = def.tier
 	else:
 		if item_name == "":
 			item_name = str(row.get("id", "奖励"))

@@ -4,6 +4,7 @@ extends RefCounted
 ## 数值配置门面：境界系数、属性公式、标杆敌人与平衡验收统一从 data/exportjson/yunxing_params/jingjie_balance*.json 读取。
 
 const PATH_LABEL := "data/exportjson/yunxing_params/jingjie_balance_*.json"
+const RealmBalanceQueryApplicationScript := preload("res://scripts/features/cultivation/application/realm_balance_query_application.gd")
 
 const DEFAULT_ATTRIBUTE_FORMULA := {
 	EnumPlayerAttr.HP_MAX: {"base": 80.0, "scale": {"roushen": 10.0}},
@@ -35,17 +36,12 @@ const EXPORT_FOUNDATION_KEYS := {
 	"agility": "shenfa",
 }
 
-static var _bundle: Dictionary = {}
-
-
 static func reload() -> void:
-	_bundle = JsonLoader.load_jingjie_balance_bundle()
+	RealmBalanceQueryApplicationScript.reload()
 
 
 static func bundle() -> Dictionary:
-	if _bundle.is_empty():
-		reload()
-	return _bundle
+	return RealmBalanceQueryApplicationScript.bundle()
 
 
 static func build_base_combat_attrs(foundations: Dictionary) -> Dictionary:

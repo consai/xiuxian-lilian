@@ -2,18 +2,42 @@
 
 const SIM_PATH := "res://data/exportjson/yunxing_params/moni.json"
 const HUB_SCENE := "res://scenes/sim/dongfu.tscn"
+const DaoTreeQueryApplicationScript := preload(
+	"res://scripts/features/dao/application/dao_tree_query_application.gd"
+)
+const KnowledgeApplicationScript := preload(
+	"res://scripts/features/dao/application/knowledge_application.gd"
+)
 const CharacterSavedataStateScript := preload(
 	"res://scripts/features/character/domain/character_savedata_state.gd"
+)
+const CharacterCreationApplicationScript := preload(
+	"res://scripts/features/character/application/character_creation_application.gd"
 )
 const LiandanStateScript := preload("res://scripts/features/alchemy/domain/liandan_state.gd")
 const WeituoStateScript := preload(
 	"res://scripts/features/commission/domain/weituo_state.gd"
+)
+const WorldMapStateScript := preload(
+	"res://scripts/features/map/domain/world_map_state.gd"
+)
+const WorldMapApplicationScript := preload(
+	"res://scripts/features/map/application/world_map_application.gd"
+)
+const StoryApplicationScript := preload(
+	"res://scripts/features/story/application/story_application.gd"
+)
+const TutorialApplicationScript := preload(
+	"res://scripts/features/tutorial/application/tutorial_application.gd"
 )
 const InventoryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_application.gd"
 )
 const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
+const LilianResultContract := preload(
+	"res://scripts/features/lilian/contracts/lilian_result.gd"
 )
 
 const INSTABILITY_REDUCTION_PER_WIN := 10
@@ -65,9 +89,6 @@ var hp: float:
 var mp: float:
 	get: return float(DataStore.savedata.get("mp", 100.0))
 	set(value): DataStore.savedata["mp"] = value
-var knowledge: Dictionary:
-	get: return DataStore.savedata.get("knowledge", {}) as Dictionary
-	set(value): DataStore.savedata["knowledge"] = value
 var unlocked_abilities: Array:
 	get: return DataStore.savedata.get("unlocked_abilities", []) as Array
 	set(value): DataStore.savedata["unlocked_abilities"] = value
@@ -137,20 +158,6 @@ var last_settled_lilian_id: String:
 var active_save_slot: int:
 	get: return int(DataStore.game_runtime().get("active_save_slot", 0))
 	set(value): DataStore.game_runtime()["active_save_slot"] = value
-var current_city_id: String:
-	get: return str(DataStore.map_savedata().get("current_city_id", ""))
-	set(value): _map_savedata()["current_city_id"] = value
-var map_discovered_cities: Array:
-	get: return DataStore.map_savedata().get("discovered_cities", []) as Array
-	set(value): _map_savedata()["discovered_cities"] = value
-var map_discovered_regions: Array:
-	get: return DataStore.map_savedata().get("discovered_regions", []) as Array
-	set(value): _map_savedata()["discovered_regions"] = value
-var map_discovered_locations: Array:
-	get: return DataStore.map_savedata().get("discovered_locations", []) as Array
-	set(value): _map_savedata()["discovered_locations"] = value
-
-
 func _ready() -> void:
 	_bootstrap_savedata()
 
@@ -158,11 +165,27 @@ func _ready() -> void:
 func _bootstrap_savedata() -> void:
 	# 主界面负责新局与读档，启动时不自动加载存档。
 	var initial_snapshot := CharacterSavedataStateScript.apply_to_snapshot(DataStore.savedata)
+	if initial_snapshot.is_empty():
+		push_error("[game_state:invalid_character_savedata] action=bootstrap")
+		return
+	var knowledge_result := KnowledgeApplicationScript.initialize_default(initial_snapshot)
+	if not bool(knowledge_result.get("ok", false)):
+		push_error("[game_state:invalid_knowledge_state] action=bootstrap")
+		return
 	if not initial_snapshot.has("liandan"):
 		initial_snapshot["liandan"] = LiandanStateScript.default_state()
 	if not initial_snapshot.has("weituo"):
 		initial_snapshot["weituo"] = WeituoStateScript.default_state()
+	if not initial_snapshot.has("map"):
+		WorldMapApplicationScript.initialize_default(initial_snapshot)
 	DataStore.savedata = initial_snapshot
+	var story_application := StoryApplicationScript.new()
+	story_application.bind_store(DataStore)
+	story_application.initialize_missing()
+	var tutorial_application := TutorialApplicationScript.new()
+	tutorial_application.bind_store(DataStore)
+	tutorial_application.initialize_missing()
+	TutorialService.bind_store(DataStore)
 
 
 func new_game(profile: Dictionary = {}) -> void:
@@ -171,8 +194,19 @@ func new_game(profile: Dictionary = {}) -> void:
 		push_error("[game_state:invalid_initial_player] MoniCatalog returned no initial player")
 		return
 	DataStore.reset_all(CharacterSavedataStateScript.default_slice())
+	var knowledge_result := KnowledgeApplicationScript.initialize_default(DataStore.savedata)
+	if not bool(knowledge_result.get("ok", false)):
+		push_error("[game_state:invalid_knowledge_state] action=new_game")
+		return
+	var story_application := StoryApplicationScript.new()
+	story_application.bind_store(DataStore)
+	story_application.initialize_missing()
+	SceneManager.reset_navigation_runtime()
 	DataStore.savedata["weituo"] = WeituoStateScript.default_state()
-	DataStore.start_tutorial()
+	WorldMapApplicationScript.initialize_default(DataStore.savedata)
+	var tutorial_application := TutorialApplicationScript.new()
+	tutorial_application.bind_store(DataStore)
+	tutorial_application.start_new_game()
 	day = 1
 	realm_index = 0
 	cultivation = 0
@@ -230,14 +264,20 @@ func _apply_character_profile(profile: Dictionary) -> void:
 	var name := str(profile.get("player_name", "")).strip_edges()
 	if name != "":
 		player_name = name
-	DataStore.savedata["character_origin_id"] = str(profile.get("origin_id", ""))
-	DataStore.savedata["character_root_id"] = str(profile.get("root_id", ""))
-	DataStore.savedata["character_talent_id"] = str(profile.get("talent_id", ""))
+	var profile_result := CharacterCreationApplicationScript.apply_profile(
+		DataStore.savedata, profile
+	)
+	if not bool(profile_result.get("ok", false)):
+		push_error(
+			"[game_state:character_profile_failed] error_code=%s message=%s"
+			% [
+				str(profile_result.get("error_code", "unknown")),
+				str(profile_result.get("message", "角色档案提交失败")),
+			]
+		)
+		return
 	var root_id := str(profile.get("root_id", "")).strip_edges()
 	if root_id != "":
-		var next_aptitudes := aptitudes.duplicate(true)
-		next_aptitudes[EnumPlayerAttr.ROOTS] = {root_id: 80.0}
-		aptitudes = next_aptitudes
 		refresh_derived_attrs(false)
 		hp = float(attrs.get(EnumPlayerAttr.HP_MAX, 100.0))
 		mp = float(attrs.get(EnumPlayerAttr.MP_MAX, 100.0))
@@ -508,7 +548,7 @@ func max_knowledge_study_days(skill_id: String = "") -> int:
 	var sid := skill_id.strip_edges()
 	var rank := 1.0
 	if sid != "":
-		var skill := DaoTreeService.skill_by_id(sid)
+		var skill := DaoTreeQueryApplicationScript.skill_by_id(sid)
 		rank = maxf(1.0, float(skill.get("rank", 1)))
 	var suggested := GameTimeService.suggested_activity_days(
 		EnumActivityTime.LABEL_SELF_STUDY,
@@ -523,7 +563,7 @@ func max_knowledge_study_days(skill_id: String = "") -> int:
 	var entry := KnowledgeService.get_entry(DataStore.savedata, sid)
 	var current_level := int(entry.get("level", 0))
 	var policy := gate.get("policy", {}) as Dictionary
-	var skill := DaoTreeService.skill_by_id(sid)
+	var skill := DaoTreeQueryApplicationScript.skill_by_id(sid)
 	var target_level := mini(current_level + 1, int(skill.get("maxLevel", 5)))
 	if target_level <= current_level:
 		return suggested
@@ -611,7 +651,7 @@ func preview_cultivation_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, 
 			return {
 				"ok": false,
 				"error": "丹药炼化每月需要一枚%s，当前仅有 %d 枚。" % [
-					ConfigManager.get_item_display_name(resolved_pill_id),
+					InventoryQueryApplicationScript.display_name(resolved_pill_id),
 					owned_pills,
 				],
 			}
@@ -1033,11 +1073,11 @@ func begin_lilian(location_id: String) -> Dictionary:
 
 
 func map_data() -> Dictionary:
-	return DataStore.map_savedata()
+	return WorldMapApplicationScript.snapshot(DataStore.savedata)
 
 
 func set_map_data(data: Dictionary) -> void:
-	DataStore.savedata["map"] = data.duplicate(true)
+	WorldMapApplicationScript.commit(DataStore.savedata, data)
 
 
 func discover_map_node(node_id: String, category: String) -> void:
@@ -1047,7 +1087,10 @@ func discover_map_node(node_id: String, category: String) -> void:
 func travel_to_city(target_city_id: String, path: Array, total_days: int) -> Dictionary:
 	if target_city_id == "":
 		return {"ok": false, "error": "缺少目标城市"}
-	var preview := WorldMapService.build_travel_preview(current_city_id, target_city_id, map_data())
+	var current_map := map_data()
+	var preview := WorldMapService.build_travel_preview(
+		str(current_map.get("current_city_id", "")), target_city_id, current_map
+	)
 	if not bool(preview.get("ok", false)):
 		return preview
 	var expected_path: Array = preview.get("path", []) as Array
@@ -1136,7 +1179,7 @@ func settle_lilian(result: Dictionary, tutorial_service: Node) -> Dictionary:
 		return {"ok": false, "error": "缺少 TutorialService"}
 	if result.is_empty():
 		return {"ok": false, "error": "缺少历练结算数据"}
-	var result_errors := LilianResult.collect_errors(result)
+	var result_errors := LilianResultContract.collect_errors(result)
 	if not result_errors.is_empty():
 		return {"ok": false, "error": result_errors[0]}
 	var settlement_id := str(result.get("settlement_id", "")).strip_edges()
@@ -1246,6 +1289,33 @@ func to_dict() -> Dictionary:
 
 
 func apply_dict(data: Dictionary) -> bool:
+	if not data.has("knowledge"):
+		push_error("[game_state:missing_state_slice] field=knowledge")
+		return false
+	var prepared_knowledge := KnowledgeApplicationScript.prepare_candidate(data.get("knowledge"))
+	if not bool(prepared_knowledge.get("ok", false)):
+		return false
+	if not data.has("story"):
+		push_error("[game_state:missing_state_slice] field=story")
+		return false
+	var story_application := StoryApplicationScript.new()
+	story_application.bind_store(DataStore)
+	if not story_application.validate_savedata(data.get("story")):
+		return false
+	if not data.has("tutorial"):
+		push_error("[game_state:missing_state_slice] field=tutorial")
+		return false
+	var tutorial_application := TutorialApplicationScript.new()
+	tutorial_application.bind_store(DataStore)
+	var prepared_tutorial := tutorial_application.prepare_import(data.get("tutorial"))
+	if prepared_tutorial.is_empty():
+		return false
+	if not data.has("map"):
+		push_error("[game_state:missing_state_slice] field=map")
+		return false
+	var prepared_map := WorldMapStateScript.prepare(data.get("map"))
+	if prepared_map.is_empty():
+		return false
 	if not data.has("liandan"):
 		push_error("[game_state:missing_state_slice] field=liandan")
 		return false
@@ -1260,9 +1330,18 @@ func apply_dict(data: Dictionary) -> bool:
 	if prepared_weituo.is_empty():
 		return false
 	var normalized_data := CharacterSavedataStateScript.apply_to_snapshot(data)
+	if normalized_data.is_empty():
+		push_error("[game_state:invalid_character_savedata] action=apply_dict")
+		return false
+	normalized_data["tutorial"] = prepared_tutorial
+	normalized_data["map"] = prepared_map
 	normalized_data["weituo"] = prepared_weituo
+	normalized_data["knowledge"] = (
+		prepared_knowledge.get("value", {}) as Dictionary
+	).duplicate(true)
 	if not DataStore.import_savedata(normalized_data):
 		return false
+	SceneManager.reset_navigation_runtime()
 	refresh_derived_attrs(true)
 	var attrs_dict := attrs
 	hp = clampf(hp, 0.0, float(attrs_dict.get(EnumPlayerAttr.HP_MAX, 100.0)))
@@ -1271,7 +1350,6 @@ func apply_dict(data: Dictionary) -> bool:
 		var lilian := (Engine.get_main_loop() as SceneTree).root.get_node_or_null("LilianState")
 		if lilian != null and lilian.has_method("reset"):
 			lilian.reset()
-	_initialize_map_state()
 	_sync_realm()
 	return true
 
@@ -1633,10 +1711,8 @@ func reward_label(reward: Dictionary) -> String:
 		return "%s x1" % str(ConfigManager.equip_by_id(int(reward.get("id", -1))).get("name", "法宝"))
 	if kind == "currency":
 		return "灵石 x%d" % int(reward.get("count", 0))
-	var cm := _config_manager()
 	var name := str(reward.get("id", ""))
-	if cm != null and cm.has_method("get_item_display_name"):
-		name = str(cm.call("get_item_display_name", name))
+	name = InventoryQueryApplicationScript.display_name(name)
 	return "%s x%d" % [name, int(reward.get("count", 0))]
 
 
@@ -1802,12 +1878,5 @@ func _emit_tip_intents(intents: Array) -> void:
 	DataEvents.emit_tip_intents(intents)
 
 
-func _map_savedata() -> Dictionary:
-	return DataStore.map_savedata()
-
-
 func _initialize_map_state() -> void:
-	var map_state := map_data()
-	if str(map_state.get("current_city_id", "")) == "":
-		map_state["current_city_id"] = WorldMapService.starter_city_id()
 	set_map_data(WorldMapService.apply_starter_discovery(map_data()))

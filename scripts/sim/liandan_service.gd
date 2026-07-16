@@ -1,7 +1,6 @@
 class_name LiandanService
 extends RefCounted
 
-const DATA_PATH := "res://data/exportjson/liandan.json"
 const MAX_RECIPE_MASTERY := 1000
 const MASTERY_SCORE_MAX := 20.0
 const MASTERY_EXTRA_PILL_CHANCE_MAX := 0.75
@@ -12,14 +11,15 @@ const DEFAULT_BASE_YIELD := 2
 const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
 const EnumActivityTimeScript := preload("res://scripts/enum/enum_activity_time.gd")
 const LiandanStateScript := preload("res://scripts/features/alchemy/domain/liandan_state.gd")
+const LiandanQueryApplicationScript := preload("res://scripts/features/alchemy/application/liandan_query_application.gd")
 
 
 static func all_recipes() -> Array:
-	return (_root().get("recipes", []) as Array).duplicate(true)
+	return LiandanQueryApplicationScript.all_recipes()
 
 
 static func all_strategies() -> Array:
-	return (_root().get("strategies", []) as Array).duplicate(true)
+	return LiandanQueryApplicationScript.all_strategies()
 
 
 static func recipe_by_id(recipe_id: String) -> Dictionary:
@@ -31,7 +31,7 @@ static func strategy_by_id(strategy_id: String) -> Dictionary:
 
 
 static func furnace_by_id(furnace_id: String) -> Dictionary:
-	return _by_id((_root().get("furnaces", []) as Array), furnace_id)
+	return LiandanQueryApplicationScript.furnace_by_id(furnace_id)
 
 
 static func recipe_preview_product_id(recipe: Dictionary) -> String:
@@ -487,7 +487,3 @@ static func _by_id(rows: Array, target_id: String) -> Dictionary:
 		if row_v is Dictionary and str((row_v as Dictionary).get("id", "")) == target_id:
 			return (row_v as Dictionary).duplicate(true)
 	return {}
-
-
-static func _root() -> Dictionary:
-	return JsonLoader.load_liandan_bundle()

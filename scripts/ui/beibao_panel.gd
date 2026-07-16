@@ -45,10 +45,7 @@ func _refresh() -> void:
 func _on_lilian_entry_right_clicked(entry: Dictionary) -> void:
 	if str(entry.get("kind", "item")) != "item":
 		return
-	var result: Dictionary = LilianState.use_runtime_inventory_item(str(entry.get("id", "")))
-	var feedback := str(result.get("feedback", result.get("error", ""))).strip_edges()
-	if feedback != "":
-		DataStore.ui_runtime()["lilian_bag_feedback"] = feedback
+	LilianState.use_runtime_inventory_item(str(entry.get("id", "")))
 	_refresh()
 
 

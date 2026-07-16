@@ -17,11 +17,14 @@ static func handle_battle_finished(summary: Dictionary) -> void:
 static func handle_result_close() -> void:
 	if LilianState == null:
 		return
+	var tutorial_was_active := TutorialService.is_active()
 	var grant_first_battle_reward := TutorialService.is_waiting_for_any([
 		"tutorial.first_battle_won",
 	])
 	var settled: Dictionary = LilianState.settle_pending_battle(grant_first_battle_reward)
 	if bool(settled.get("ok", false)) and bool(settled.get("won", false)):
+		if tutorial_was_active:
+			LilianState.auto_advance = false
 		TutorialService.game_event("tutorial.first_battle_won")
 	if LilianState.should_go_to_result():
 		var reason := LilianState.pending_exit_reason

@@ -2,6 +2,7 @@ class_name ZhandouFloatLayer
 extends CanvasLayer
 
 const _FLOAT_LABEL_SCENE := preload("res://scenes/zhandou/float/float_label.tscn")
+const _VFX_QUERY := preload("res://scripts/features/battle/application/battle_vfx_query_application.gd")
 
 const _TONE_PRIORITY := {
 	"buff_expire": 0,
@@ -26,7 +27,7 @@ func _ready() -> void:
 
 
 func _reload_styles() -> void:
-	_styles_bundle = JsonLoader.load_zhandou_float_styles()
+	_styles_bundle = _VFX_QUERY.float_styles()
 
 
 func clear_all() -> void:

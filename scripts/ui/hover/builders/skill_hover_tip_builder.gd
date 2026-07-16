@@ -3,7 +3,9 @@ class_name SkillHoverTipBuilder
 
 ## 根据技能配置构建 Hover Tip 载荷。
 
-const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
+const DaoTreeQueryApplicationScript := preload(
+	"res://scripts/features/dao/application/dao_tree_query_application.gd"
+)
 const AbilityQueryApplicationScript := preload(
 	"res://scripts/features/ability/application/ability_query_application.gd"
 )
@@ -86,7 +88,7 @@ static func build_ability(ability_id: String, savedata: Dictionary, icon: Textur
 	for policy_line in _ability_policy_lines(ability_type):
 		lines.append(policy_line)
 	var realm_id := AbilityQueryApplicationScript.realm_id_for(ability_id)
-	lines.append("境界：%s" % DaoTreeServiceScript.realm_display_name(realm_id))
+	lines.append("境界：%s" % DaoTreeQueryApplicationScript.realm_display_name(realm_id))
 	lines.append("阶位：%s" % EnumItemTier.label(tier))
 	lines.append("品质：%s" % EnumQuality.display_label(quality))
 	var combat_v: Variant = ability.get("combat", {})

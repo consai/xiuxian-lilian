@@ -1,6 +1,9 @@
 extends Control
 
 const LiandanServiceScript := preload("res://scripts/sim/liandan_service.gd")
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
 const SELECTION_MODES := ["lowest", "highest"]
 const TUTORIAL_RECIPE_INDEX := 0
 const TUTORIAL_STRATEGY_ID := "steady"
@@ -170,7 +173,7 @@ func _format_ingredients(rows: Array) -> String:
 	for row_v in rows:
 		var row := row_v as Dictionary
 		lines.append("· %s x%d  品质 %d（持有 %d）" % [
-			ConfigManager.get_item_display_name(str(row.get("id", ""))),
+			InventoryQueryApplicationScript.display_name(str(row.get("id", ""))),
 			int(row.get("count", 0)),
 			int(row.get("quality", 1)),
 			int(GameState.inventory.get(str(row.get("id", "")), 0)),
@@ -277,10 +280,9 @@ func _on_close_pressed() -> void:
 func _is_tutorial_alchemy_forced() -> bool:
 	if not TutorialService.is_active():
 		return false
-	var flags := (DataStore.savedata.get("tutorial", {}) as Dictionary).get("flags", {}) as Dictionary
 	return (
-		not bool(flags.get("tutorial.alchemy_completed", false))
-		and bool(flags.get("tutorial.alchemy_opened", false))
+		not TutorialService.has_event_flag("tutorial.alchemy_completed")
+		and TutorialService.has_event_flag("tutorial.alchemy_opened")
 	)
 
 
@@ -311,9 +313,8 @@ func _tutorial_brew_locked() -> bool:
 	)
 	if not _is_tutorial_alchemy_forced() and not TutorialService.is_waiting_for_any(TUTORIAL_BREW_LOCK_EVENTS):
 		return false
-	var flags := (DataStore.savedata.get("tutorial", {}) as Dictionary).get("flags", {}) as Dictionary
 	for event_id in TUTORIAL_BREW_LOCK_EVENTS:
-		if not bool(flags.get(event_id, false)):
+		if not TutorialService.has_event_flag(event_id):
 			return true
 	return false
 

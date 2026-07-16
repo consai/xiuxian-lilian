@@ -9,6 +9,9 @@ const ItemDefScript := preload("res://scripts/features/inventory/domain/item_def
 const ItemIconResolverScript := preload(
 	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
 )
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
 const ZhandouAttrScript := preload("res://scripts/zhandou/zhandou_attr.gd")
 
 
@@ -16,21 +19,38 @@ static func is_empty(payload: Dictionary) -> bool:
 	return str(payload.get("title", "")).strip_edges() == ""
 
 
-static func from_entry(entry: Dictionary) -> Dictionary:
+static func from_entry(
+		entry: Dictionary,
+		savedata_snapshot: Dictionary,
+		major_realm_id: String
+) -> Dictionary:
 	if str(entry.get("kind", "item")) == "equip":
 		return from_equip_id(int(entry.get("id", -1)))
-	return from_item_id(str(entry.get("id", "")), maxi(1, int(entry.get("count", 1))))
+	return from_item_id(
+		str(entry.get("id", "")),
+		maxi(1, int(entry.get("count", 1))),
+		savedata_snapshot,
+		major_realm_id
+	)
 
 
-static func from_item_id(item_id: String, count: int = 1) -> Dictionary:
+static func from_item_id(
+		item_id: String,
+		count: int,
+		savedata_snapshot: Dictionary,
+		major_realm_id: String
+) -> Dictionary:
 	var iid := item_id.strip_edges()
 	if iid == "":
 		return {}
 	var def := _item_def(iid)
 	if def == null:
 		return {}
+	if def.is_learning_book() and major_realm_id.strip_edges() == "":
+		push_error("[item_info_payload_builder:missing_major_realm] item_id=%s" % iid)
+		return {}
 	var icon := ItemIconResolverScript.resolve(def.icon_path, null)
-	var detail_lines := _item_detail_lines(def)
+	var detail_lines := _item_detail_lines(def, savedata_snapshot, major_realm_id)
 	var footer_lines: PackedStringArray = []
 	if count > 0:
 		footer_lines.append(StringsZh.format_template(
@@ -43,7 +63,9 @@ static func from_item_id(item_id: String, count: int = 1) -> Dictionary:
 			{"value": str(def.base_ling_shi)}
 		))
 	var use_action := _use_action_for_def(def)
-	var learn_blocked := learning_book_condition_unmet(def)
+	var learn_blocked := learning_book_condition_unmet(
+		def, savedata_snapshot, major_realm_id
+	)
 	return {
 		"item_id": iid,
 		"count": count,
@@ -145,9 +167,13 @@ static func _item_meta(def: ItemDef) -> String:
 	return " · ".join(parts)
 
 
-static func _item_detail_lines(def: ItemDef) -> Array[String]:
+static func _item_detail_lines(
+		def: ItemDef,
+		savedata_snapshot: Dictionary,
+		major_realm_id: String
+) -> Array[String]:
 	var lines: Array[String] = []
-	for learn_line in _format_learning_lines(def):
+	for learn_line in _format_learning_lines(def, savedata_snapshot, major_realm_id):
 		lines.append(learn_line)
 	for use_line in format_use_effect_lines(def.use_effect):
 		lines.append(use_line)
@@ -165,7 +191,8 @@ static func _item_detail_lines(def: ItemDef) -> Array[String]:
 		for effect_line in HoverTipEffectFormatter.format_lines(def.fight_effect):
 			lines.append(effect_line)
 	elif def.fight_id > 0:
-		var fight_cfg := ConfigManager.item_by_fight_id(def.fight_id)
+		var fight_def := InventoryQueryApplicationScript.definition_by_fight_id(def.fight_id)
+		var fight_cfg := fight_def.to_fight_runtime_dict() if fight_def != null else {}
 		if not fight_cfg.is_empty():
 			var cost_text := str(fight_cfg.get("cost_text", "")).strip_edges()
 			if cost_text != "":
@@ -185,11 +212,12 @@ static func _item_detail_lines(def: ItemDef) -> Array[String]:
 	return lines
 
 
-static func _format_learning_lines(def: ItemDef) -> Array[String]:
+static func _format_learning_lines(
+		def: ItemDef,
+		savedata_snapshot: Dictionary,
+		major_realm_id: String
+) -> Array[String]:
 	var lines: Array[String] = []
-	var ctx := _learning_context()
-	var savedata: Dictionary = ctx.get("savedata", {})
-	var major_realm := str(ctx.get("major_realm", "lianqi"))
 	if def.learn_ability_id != "":
 		var ability := AbilityServiceScript.by_id(def.learn_ability_id)
 		var name := str(ability.get("name", def.learn_ability_id))
@@ -199,7 +227,9 @@ static func _format_learning_lines(def: ItemDef) -> Array[String]:
 		))
 		_append_unmet_learning_req_lines(
 			lines,
-			AbilityServiceScript.unmet_learning_requirement_lines(ability, savedata, major_realm)
+			AbilityServiceScript.unmet_learning_requirement_lines(
+				ability, savedata_snapshot, major_realm_id
+			)
 		)
 	elif def.learn_method_id != "":
 		var method := XiulianMethodServiceScript.by_id(def.learn_method_id)
@@ -210,7 +240,9 @@ static func _format_learning_lines(def: ItemDef) -> Array[String]:
 		))
 		_append_unmet_learning_req_lines(
 			lines,
-			XiulianMethodServiceScript.unmet_learning_requirement_lines(method, savedata, major_realm)
+			XiulianMethodServiceScript.unmet_learning_requirement_lines(
+				method, savedata_snapshot, major_realm_id
+			)
 		)
 	if not lines.is_empty():
 		lines.append(StringsZh.getp("item_info.learn_hub_hint", "在洞府底部「研读」使用"))
@@ -223,14 +255,6 @@ static func _append_unmet_learning_req_lines(lines: Array[String], req_lines: Ar
 	lines.append(StringsZh.getp("item_info.learn_req_header", "学习条件："))
 	for req_line in req_lines:
 		lines.append("· %s" % req_line)
-
-
-static func _learning_context() -> Dictionary:
-	var savedata: Dictionary = DataStore.savedata if DataStore != null else {}
-	var major_realm := str(savedata.get("major_realm", "lianqi"))
-	if GameState != null:
-		major_realm = GameState.major_realm_id()
-	return {"savedata": savedata, "major_realm": major_realm}
 
 
 static func _use_action_for_def(def: ItemDef) -> Dictionary:
@@ -360,27 +384,32 @@ static func _fmt_signed_num(value: float) -> String:
 	return "0"
 
 
-static func learning_book_condition_unmet(def: ItemDef) -> bool:
+static func learning_book_condition_unmet(
+		def: ItemDef,
+		savedata_snapshot: Dictionary,
+		major_realm_id: String
+) -> bool:
 	if def == null or not def.is_learning_book():
 		return false
-	var ctx := _learning_context()
-	var savedata: Dictionary = ctx.get("savedata", {})
-	var major_realm := str(ctx.get("major_realm", "lianqi"))
+	var realm_id := major_realm_id.strip_edges()
+	if realm_id == "":
+		push_error("[item_info_payload_builder:missing_major_realm] item_id=%s" % def.id)
+		return true
 	if def.learn_method_id != "":
 		var method_id := def.learn_method_id.strip_edges()
 		if method_id == "":
 			return false
-		if (savedata.get("unlocked_methods", []) as Array).has(method_id):
+		if (savedata_snapshot.get("unlocked_methods", []) as Array).has(method_id):
 			return false
-		return XiulianMethodServiceScript.learning_condition_unmet(method_id, savedata, major_realm)
+		return XiulianMethodServiceScript.learning_condition_unmet(
+			method_id, savedata_snapshot, realm_id
+		)
 	var ability_id := def.learn_ability_id.strip_edges()
 	if ability_id == "" or AbilityServiceScript.by_id(ability_id).is_empty():
 		return false
-	# 与 GameState.learn_ability 的「尚未满足学习条件」判断一致（含初始已入栏但未达研读门槛的技能）
-	return not AbilityServiceScript.can_learn(ability_id, savedata, major_realm)
+	# 与实际研读流程的「尚未满足学习条件」判断一致（含初始已入栏但未达门槛的技能）
+	return not AbilityServiceScript.can_learn(ability_id, savedata_snapshot, realm_id)
 
 
 static func _item_def(item_id: String) -> ItemDef:
-	if ConfigManager != null:
-		return ConfigManager.item_def_by_id(item_id)
-	return null
+	return InventoryQueryApplicationScript.definition_by_id(item_id)

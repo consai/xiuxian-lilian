@@ -7,106 +7,115 @@ const LilianRewardServiceScript := preload("res://scripts/lilian/lilian_reward_s
 const LilianRulesServiceScript := preload("res://scripts/lilian/lilian_rules_service.gd")
 const LilianLogServiceScript := preload("res://scripts/lilian/lilian_log_service.gd")
 const LilianMapServiceScript := preload("res://scripts/lilian/lilian_map_service.gd")
+const LilianSessionStateScript := preload(
+	"res://scripts/features/lilian/domain/lilian_session_state.gd"
+)
 const EnumLilianNodeTypeScript := preload("res://scripts/enum/enum_lilian_node_type.gd")
 const GameTimeServiceScript := preload("res://scripts/sim/game_time_service.gd")
+const LilianResultContract := preload(
+	"res://scripts/features/lilian/contracts/lilian_result.gd"
+)
 
 signal log_updated
 ## 历练局内气血/法力等即时状态变化（如背包用药），供底层 HUD 同步刷新。
 signal runtime_vitals_changed(feedback: String)
+## 历练局内物品使用已完成；成功与失败都携带最终用户反馈。
+signal runtime_item_feedback(feedback: String)
 
 var _pending_log_index := -1
 var _pending_step_event: Dictionary = {}
+var _session := LilianSessionStateScript.new()
 
 var active: bool:
-	get: return bool(DataStore.lilian_runtime().get("active", false))
-	set(value): DataStore.lilian_runtime()["active"] = value
+	get: return bool(_session.value_ref("active"))
+	set(value): _session.set_value("active", value)
 var phase: String:
-	get: return str(DataStore.lilian_runtime().get("phase", "idle"))
-	set(value): DataStore.lilian_runtime()["phase"] = value
+	get: return str(_session.value_ref("phase"))
+	set(value): _session.set_value("phase", value)
 var location_id: String:
-	get: return str(DataStore.lilian_runtime().get("location_id", ""))
-	set(value): DataStore.lilian_runtime()["location_id"] = value
+	get: return str(_session.value_ref("location_id"))
+	set(value): _session.set_value("location_id", value)
 var auto_advance: bool:
-	get: return bool(DataStore.lilian_runtime().get("auto_advance", true))
-	set(value): DataStore.lilian_runtime()["auto_advance"] = value
+	get: return bool(_session.value_ref("auto_advance"))
+	set(value): _session.set_value("auto_advance", value)
 var steps: int:
-	get: return int(DataStore.lilian_runtime().get("steps", 0))
-	set(value): DataStore.lilian_runtime()["steps"] = value
+	get: return int(_session.value_ref("steps"))
+	set(value): _session.set_value("steps", value)
 var days: int:
-	get: return int(DataStore.lilian_runtime().get("days", 0))
-	set(value): DataStore.lilian_runtime()["days"] = value
+	get: return int(_session.value_ref("days"))
+	set(value): _session.set_value("days", value)
 var days_without_event: int:
-	get: return int(DataStore.lilian_runtime().get("days_without_event", 0))
-	set(value): DataStore.lilian_runtime()["days_without_event"] = value
+	get: return int(_session.value_ref("days_without_event"))
+	set(value): _session.set_value("days_without_event", value)
 var seed: int:
-	get: return int(DataStore.lilian_runtime().get("seed", 0))
-	set(value): DataStore.lilian_runtime()["seed"] = value
+	get: return int(_session.value_ref("seed"))
+	set(value): _session.set_value("seed", value)
 var rng_state: int:
-	get: return int(DataStore.lilian_runtime().get("rng_state", 0))
-	set(value): DataStore.lilian_runtime()["rng_state"] = value
+	get: return int(_session.value_ref("rng_state"))
+	set(value): _session.set_value("rng_state", value)
 var runtime: Dictionary:
-	get: return DataStore.lilian_runtime().get("runtime", {}) as Dictionary
-	set(value): DataStore.lilian_runtime()["runtime"] = value
+	get: return _session.value_ref("runtime") as Dictionary
+	set(value): _session.set_value("runtime", value)
 var loot: Array:
-	get: return DataStore.lilian_runtime().get("loot", []) as Array
-	set(value): DataStore.lilian_runtime()["loot"] = value
+	get: return _session.value_ref("loot") as Array
+	set(value): _session.set_value("loot", value)
 var current_choices: Array:
-	get: return DataStore.lilian_runtime().get("current_choices", []) as Array
-	set(value): DataStore.lilian_runtime()["current_choices"] = value
+	get: return _session.value_ref("current_choices") as Array
+	set(value): _session.set_value("current_choices", value)
 var pending_decision_event: Dictionary:
-	get: return DataStore.lilian_runtime().get("pending_decision_event", {}) as Dictionary
-	set(value): DataStore.lilian_runtime()["pending_decision_event"] = value
+	get: return _session.value_ref("pending_decision_event") as Dictionary
+	set(value): _session.set_value("pending_decision_event", value)
 var current_event_id: String:
-	get: return str(DataStore.lilian_runtime().get("current_event_id", ""))
-	set(value): DataStore.lilian_runtime()["current_event_id"] = value
+	get: return str(_session.value_ref("current_event_id"))
+	set(value): _session.set_value("current_event_id", value)
 var pending_battle_event_id: String:
-	get: return str(DataStore.lilian_runtime().get("pending_battle_event_id", ""))
-	set(value): DataStore.lilian_runtime()["pending_battle_event_id"] = value
+	get: return str(_session.value_ref("pending_battle_event_id"))
+	set(value): _session.set_value("pending_battle_event_id", value)
 var pending_battle_summary: Dictionary:
-	get: return DataStore.lilian_runtime().get("pending_battle_summary", {}) as Dictionary
-	set(value): DataStore.lilian_runtime()["pending_battle_summary"] = value
+	get: return _session.value_ref("pending_battle_summary") as Dictionary
+	set(value): _session.set_value("pending_battle_summary", value)
 var pending_battle_rewards: Array:
-	get: return DataStore.lilian_runtime().get("pending_battle_rewards", []) as Array
-	set(value): DataStore.lilian_runtime()["pending_battle_rewards"] = value
+	get: return _session.value_ref("pending_battle_rewards") as Array
+	set(value): _session.set_value("pending_battle_rewards", value)
 var visited_once_events: Array:
-	get: return DataStore.lilian_runtime().get("visited_once_events", []) as Array
-	set(value): DataStore.lilian_runtime()["visited_once_events"] = value
+	get: return _session.value_ref("visited_once_events") as Array
+	set(value): _session.set_value("visited_once_events", value)
 var map_nodes: Array:
-	get: return DataStore.lilian_runtime().get("map_nodes", []) as Array
-	set(value): DataStore.lilian_runtime()["map_nodes"] = value
+	get: return _session.value_ref("map_nodes") as Array
+	set(value): _session.set_value("map_nodes", value)
 var map_edges: Array:
-	get: return DataStore.lilian_runtime().get("map_edges", []) as Array
-	set(value): DataStore.lilian_runtime()["map_edges"] = value
+	get: return _session.value_ref("map_edges") as Array
+	set(value): _session.set_value("map_edges", value)
 var current_node_id: String:
-	get: return str(DataStore.lilian_runtime().get("current_node_id", ""))
-	set(value): DataStore.lilian_runtime()["current_node_id"] = value
+	get: return str(_session.value_ref("current_node_id"))
+	set(value): _session.set_value("current_node_id", value)
 var available_node_ids: Array:
-	get: return DataStore.lilian_runtime().get("available_node_ids", []) as Array
-	set(value): DataStore.lilian_runtime()["available_node_ids"] = value
+	get: return _session.value_ref("available_node_ids") as Array
+	set(value): _session.set_value("available_node_ids", value)
 var visited_node_ids: Array:
-	get: return DataStore.lilian_runtime().get("visited_node_ids", []) as Array
-	set(value): DataStore.lilian_runtime()["visited_node_ids"] = value
+	get: return _session.value_ref("visited_node_ids") as Array
+	set(value): _session.set_value("visited_node_ids", value)
 var resolved_node_events: Dictionary:
-	get: return DataStore.lilian_runtime().get("resolved_node_events", {}) as Dictionary
-	set(value): DataStore.lilian_runtime()["resolved_node_events"] = value
+	get: return _session.value_ref("resolved_node_events") as Dictionary
+	set(value): _session.set_value("resolved_node_events", value)
 var stats: Dictionary:
-	get: return DataStore.lilian_runtime().get("stats", {}) as Dictionary
-	set(value): DataStore.lilian_runtime()["stats"] = value
+	get: return _session.value_ref("stats") as Dictionary
+	set(value): _session.set_value("stats", value)
 var event_log: Array:
-	get: return DataStore.lilian_runtime().get("event_log", []) as Array
-	set(value): DataStore.lilian_runtime()["event_log"] = value
+	get: return _session.value_ref("event_log") as Array
+	set(value): _session.set_value("event_log", value)
 var player_snapshot: Dictionary:
-	get: return DataStore.lilian_runtime().get("player_snapshot", {}) as Dictionary
-	set(value): DataStore.lilian_runtime()["player_snapshot"] = value
+	get: return _session.value_ref("player_snapshot") as Dictionary
+	set(value): _session.set_value("player_snapshot", value)
 var pending_exit_reason: String:
-	get: return str(DataStore.lilian_runtime().get("pending_exit_reason", ""))
-	set(value): DataStore.lilian_runtime()["pending_exit_reason"] = value
+	get: return str(_session.value_ref("pending_exit_reason"))
+	set(value): _session.set_value("pending_exit_reason", value)
 var lilian_id: String:
-	get: return str(DataStore.lilian_runtime().get("lilian_id", ""))
-	set(value): DataStore.lilian_runtime()["lilian_id"] = value
+	get: return str(_session.value_ref("lilian_id"))
+	set(value): _session.set_value("lilian_id", value)
 var start_day: int:
-	get: return int(DataStore.lilian_runtime().get("start_day", 0))
-	set(value): DataStore.lilian_runtime()["start_day"] = value
+	get: return int(_session.value_ref("start_day"))
+	set(value): _session.set_value("start_day", value)
 const _MAX_QUIET_DAY_CHAIN := 32
 
 var _rng := RandomNumberGenerator.new()
@@ -126,7 +135,7 @@ func start(
 		return {"ok": false, "error": "未知地点"}
 	var effective_location := location.duplicate(true)
 	effective_location["id"] = location_id_value
-	var override_v: Variant = DataStore.lilian_runtime().get("difficulty_override", {})
+	var override_v: Variant = _session.value_ref("difficulty_override")
 	if override_v is Dictionary:
 		var override := override_v as Dictionary
 		if not override.is_empty():
@@ -185,8 +194,8 @@ func start(
 	}
 	player_snapshot = _copy_player_snapshot(game_state)
 	runtime = _copy_runtime_from_game(game_state)
-	DataStore.lilian_runtime()["effective_location"] = effective_location
-	DataStore.lilian_runtime().erase("difficulty_override")
+	_session.set_value("effective_location", effective_location)
+	clear_difficulty_override()
 	event_log.append(LilianLogServiceScript.build_departure_entry(effective_location))
 	return {"ok": true, "location": effective_location}
 
@@ -229,8 +238,10 @@ func _advance_single_day() -> Dictionary:
 	var event := LilianEventServiceScript.roll_next_event(
 		effective_location(),
 		visited_once_events,
-		_rng
+		_rng,
+		_generated_events_ref()
 	)
+	remember_generated_event(event)
 	if event.is_empty():
 		days_without_event += 1
 		_save_rng()
@@ -267,8 +278,10 @@ func choose_map_node(node_id: String) -> Dictionary:
 		effective_location(),
 		node,
 		visited_once_events,
-		_rng
+		_rng,
+		_generated_events_ref()
 	)
+	remember_generated_event(event)
 	_save_rng()
 	if event.is_empty():
 		_complete_current_node()
@@ -399,8 +412,10 @@ func _resolve_decision_choice(choice_id: String) -> Dictionary:
 		option,
 		runtime,
 		player_snapshot.get("attrs", {}) as Dictionary,
-		_rng
+		_rng,
+		_generated_events_ref()
 	)
+	remember_generated_event(result.get("event", {}) as Dictionary)
 	_save_rng()
 	if not bool(result.get("ok", false)):
 		phase = "choosing"
@@ -437,7 +452,7 @@ func _resolve_manual_event_choice(event_id: String) -> Dictionary:
 			chosen = choice
 			break
 	if chosen.is_empty():
-		chosen = LilianEventServiceScript.by_id(event_id)
+		chosen = event_by_id(event_id)
 	if chosen.is_empty():
 		return {"ok": false, "error": "无效的事件选择"}
 	current_choices = []
@@ -446,6 +461,7 @@ func _resolve_manual_event_choice(event_id: String) -> Dictionary:
 	if str(node.get("type", "")) == EnumLilianNodeTypeScript.ID_START:
 		node = {}
 	chosen = LilianEventServiceScript.materialize_event_for_context(effective_location(), node, chosen, _rng)
+	remember_generated_event(chosen)
 	_save_rng()
 	_begin_log_event(chosen)
 	var event_type := str(chosen.get("type", ""))
@@ -471,7 +487,7 @@ func _resolve_manual_event_choice(event_id: String) -> Dictionary:
 func build_battle_init() -> Dictionary:
 	if pending_battle_event_id == "":
 		return {}
-	var event := LilianEventServiceScript.by_id(pending_battle_event_id)
+	var event := event_by_id(pending_battle_event_id)
 	if event.is_empty():
 		return {}
 	var player: Dictionary = {}
@@ -515,7 +531,7 @@ func receive_battle_summary(summary: Dictionary) -> void:
 	pending_battle_rewards = []
 	if str(summary.get("outcome", "")) != "win" or pending_battle_event_id == "":
 		return
-	var event := LilianEventServiceScript.by_id(pending_battle_event_id)
+	var event := event_by_id(pending_battle_event_id)
 	if event.is_empty():
 		return
 	_restore_rng()
@@ -527,7 +543,7 @@ func settle_pending_battle(grant_first_battle_reward: bool) -> Dictionary:
 	if pending_battle_summary.is_empty() or pending_battle_event_id == "":
 		return {"ok": false, "error": "没有待结算的战斗"}
 	var summary := pending_battle_summary
-	var event := LilianEventServiceScript.by_id(pending_battle_event_id)
+	var event := event_by_id(pending_battle_event_id)
 	_sync_runtime_from_summary(summary)
 	var won := str(summary.get("outcome", "")) == "win"
 	var fled := str(summary.get("outcome", "")) == ZhandouSummary.OUTCOME_ESCAPED
@@ -622,7 +638,7 @@ func clear_pending_battle() -> void:
 func retreat_from_pending_battle() -> Dictionary:
 	if pending_battle_event_id == "" or phase != "battle":
 		return {"ok": false, "error": "没有待处理的战斗"}
-	var event := LilianEventServiceScript.by_id(pending_battle_event_id)
+	var event := event_by_id(pending_battle_event_id)
 	clear_pending_battle()
 	if not event.is_empty():
 		var enemy_name := str((event.get("enemy", {}) as Dictionary).get("name", event.get("name", "强敌")))
@@ -645,7 +661,7 @@ func finish(exit_reason: String) -> Dictionary:
 		var rules: Dictionary = LilianRulesServiceScript.rules()
 		var hp_max := float((player_snapshot.get("attrs", {}) as Dictionary).get(EnumPlayerAttr.HP_MAX, 100.0))
 		runtime["hp"] = maxf(float(runtime.get("hp", 0.0)), hp_max * float(rules["defeat_hp_floor_ratio"]))
-	var result := LilianResult.to_dict({
+	var result := LilianResultContract.to_dict({
 		"ok": true,
 		"settlement_id": lilian_id,
 		"exit_reason": reason,
@@ -663,7 +679,7 @@ func finish(exit_reason: String) -> Dictionary:
 		"event_log": _duplicate_event_log(),
 		"chronicle": _build_chronicle(),
 	})
-	var result_errors := LilianResult.collect_errors(result)
+	var result_errors := LilianResultContract.collect_errors(result)
 	if not result_errors.is_empty():
 		return {"ok": false, "error": result_errors[0]}
 	reset()
@@ -673,7 +689,7 @@ func finish(exit_reason: String) -> Dictionary:
 func reset() -> void:
 	_pending_log_index = -1
 	_pending_step_event = {}
-	DataStore.reset_lilian_runtime()
+	_session.reset()
 	_game_state = null
 
 
@@ -801,26 +817,26 @@ func use_runtime_item_slot(slot_index: int) -> Dictionary:
 ## 历练背包中右键/使用消耗品：扣减 runtime 库存并恢复气血法力。
 func use_runtime_inventory_item(item_id: String) -> Dictionary:
 	if not active:
-		return {"ok": false, "error": "历练未进行"}
+		return _runtime_item_use_result(false, "历练未进行")
 	if _blocks_runtime_item_use():
-		return {"ok": false, "error": "战斗中无法使用丹药"}
+		return _runtime_item_use_result(false, "战斗中无法使用丹药")
 	var iid := item_id.strip_edges()
 	if iid == "":
-		return {"ok": false, "error": "无效物品"}
+		return _runtime_item_use_result(false, "无效物品")
 	var inv := (runtime.get("inventory", {}) as Dictionary).duplicate(true)
 	if int(inv.get(iid, 0)) <= 0:
-		return {"ok": false, "error": "背包中没有该物品"}
+		return _runtime_item_use_result(false, "背包中没有该物品")
 	var def := _runtime_item_definition(iid)
 	if def == null:
 		push_error("use_runtime_inventory_item: missing runtime definition %s" % iid)
-		return {"ok": false, "error": "历练物品定义缺失"}
+		return _runtime_item_use_result(false, "历练物品定义缺失")
 	var mp_cost := maxf(0.0, float(def.fight_mp_cost))
 	if mp_cost > 0.0 and float(runtime.get("mp", 0.0)) < mp_cost:
-		return {"ok": false, "error": "法力不足，无法催动丹药"}
+		return _runtime_item_use_result(false, "法力不足，无法催动丹药")
 	var attrs := player_snapshot.get("attrs", {}) as Dictionary
 	var feedback_parts := _apply_runtime_item_effects(def, attrs)
 	if feedback_parts.is_empty():
-		return {"ok": false, "error": "该物品无法在此使用"}
+		return _runtime_item_use_result(false, "该物品无法在此使用")
 	if mp_cost > 0.0:
 		runtime["mp"] = maxf(0.0, float(runtime.get("mp", 0.0)) - mp_cost)
 	var remaining := maxi(0, int(inv.get(iid, 0)) - 1)
@@ -838,12 +854,19 @@ func use_runtime_inventory_item(item_id: String) -> Dictionary:
 	runtime["item_slots"] = slots
 	var item_name := def.name
 	var feedback_text := "使用 %s，%s" % [item_name, "，".join(feedback_parts)]
-	runtime_vitals_changed.emit(feedback_text)
-	return {
-		"ok": true,
-		"feedback": feedback_text,
-		"item_id": iid,
-	}
+	return _runtime_item_use_result(true, feedback_text, iid)
+
+
+func _runtime_item_use_result(ok: bool, feedback: String, item_id: String = "") -> Dictionary:
+	var result := {"ok": ok}
+	if ok:
+		result["feedback"] = feedback
+		result["item_id"] = item_id
+		runtime_vitals_changed.emit(feedback)
+	else:
+		result["error"] = feedback
+	runtime_item_feedback.emit(feedback)
+	return result
 
 
 func _blocks_runtime_item_use() -> bool:
@@ -993,10 +1016,48 @@ func _event_difficulty(event: Dictionary) -> int:
 
 
 func effective_location() -> Dictionary:
-	var stored_v: Variant = DataStore.lilian_runtime().get("effective_location", {})
+	var stored_v: Variant = _session.value_ref("effective_location")
 	if stored_v is Dictionary and not (stored_v as Dictionary).is_empty():
 		return (stored_v as Dictionary).duplicate(true)
 	return DidianServiceScript.by_id(location_id)
+
+
+func event_by_id(event_id: String) -> Dictionary:
+	return LilianEventServiceScript.by_id(event_id, _generated_events_ref())
+
+
+func set_difficulty_override(min_difficulty: int, max_difficulty: int) -> void:
+	_session.set_value("difficulty_override", {
+		"min_difficulty": min_difficulty,
+		"max_difficulty": max_difficulty,
+	})
+
+
+func clear_difficulty_override() -> void:
+	_session.set_value("difficulty_override", {})
+
+
+func difficulty_override_snapshot() -> Dictionary:
+	return (_session.value_ref("difficulty_override") as Dictionary).duplicate(true)
+
+
+func generated_events_snapshot() -> Dictionary:
+	return _generated_events_ref().duplicate(true)
+
+
+func session_snapshot() -> Dictionary:
+	return _session.snapshot()
+
+
+func _generated_events_ref() -> Dictionary:
+	return _session.value_ref("generated_events") as Dictionary
+
+
+func remember_generated_event(event: Dictionary) -> void:
+	var event_id := str(event.get("id", "")).strip_edges()
+	if event_id == "":
+		return
+	_generated_events_ref()[event_id] = event.duplicate(true)
 
 
 func _duplicate_event_log() -> Array:

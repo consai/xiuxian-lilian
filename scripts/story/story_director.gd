@@ -1,22 +1,36 @@
 extends Node
-## 剧情编排层：连接 StoryPlayer、剧情 UI、DataStore 快照和外部游戏事件。
+## 剧情编排层：连接 StoryPlayer、剧情 UI、状态应用边界和外部游戏事件。
 
 signal story_finished(story_id: String, result: String)
 
 const StoryPlayerScript := preload("res://scripts/story/story_player.gd")
 const StoryCatalogScript := preload("res://scripts/story/story_catalog.gd")
+const StoryApplicationScript := preload(
+	"res://scripts/features/story/application/story_application.gd"
+)
 
 var _player = StoryPlayerScript.new()
+var _application := StoryApplicationScript.new()
 var _presenter: StoryPlaybackPresenter
 var _story_id := ""
 var _waiting_event := ""
 
 
+func bind_store(store: Node) -> void:
+	_application.bind_store(store)
+	_application.initialize_missing()
+	if not store.state_replaced.is_connected(_on_state_replaced):
+		store.state_replaced.connect(_on_state_replaced)
+
+
 func bind_presenter(presenter: StoryPlaybackPresenter) -> void:
 	_presenter = presenter
-	_presenter.advance_requested.connect(_on_advance_requested)
-	_presenter.choice_requested.connect(_on_choice_requested)
-	_presenter.skip_requested.connect(skip_active)
+	if not _presenter.advance_requested.is_connected(_on_advance_requested):
+		_presenter.advance_requested.connect(_on_advance_requested)
+	if not _presenter.choice_requested.is_connected(_on_choice_requested):
+		_presenter.choice_requested.connect(_on_choice_requested)
+	if not _presenter.skip_requested.is_connected(skip_active):
+		_presenter.skip_requested.connect(skip_active)
 	_presenter.hide_all()
 	_restore_active()
 
@@ -30,7 +44,6 @@ func start_story(story_id: String, initial_state: Dictionary = {}) -> Dictionary
 		return loaded
 	_story_id = story_id
 	_waiting_event = ""
-	DataStore.story_runtime()["pending_event"] = ""
 	return _consume(_player.start())
 
 
@@ -38,7 +51,6 @@ func notify_game_event(event_id: String) -> void:
 	if event_id == "" or event_id != _waiting_event:
 		return
 	_waiting_event = ""
-	DataStore.story_runtime()["pending_event"] = ""
 	_consume(_player.advance())
 
 
@@ -104,7 +116,6 @@ func _consume_commands(commands: Array) -> void:
 	elif _waiting_event != "":
 		_presenter.clear_guide()
 	if _waiting_event != "":
-		DataStore.story_runtime()["pending_event"] = _waiting_event
 		_save_snapshot()
 	else:
 		_consume(_player.advance())
@@ -112,17 +123,11 @@ func _consume_commands(commands: Array) -> void:
 
 func _finish(result: String) -> void:
 	var finished_id := _story_id
-	var story_savedata := DataStore.savedata.get("story", {}) as Dictionary
-	var completed := story_savedata.get("completed", []) as Array
-	if result == "completed" and not completed.has(finished_id):
-		completed.append(finished_id)
-	story_savedata["completed"] = completed
-	story_savedata["history"] = _player.snapshot().get("history", [])
-	DataStore.savedata["story"] = story_savedata
-	DataStore.story_runtime()["active_snapshot"] = {}
-	story_savedata["active_snapshot"] = {}
-	DataStore.savedata["story"] = story_savedata
-	DataStore.story_runtime()["pending_event"] = ""
+	if not _application.finish(
+		finished_id, result, _player.snapshot().get("history", []) as Array
+	):
+		push_error("[story_director:finish_commit_failed] story_id=%s" % finished_id)
+		return
 	_story_id = ""
 	_waiting_event = ""
 	_presenter.hide_all()
@@ -134,27 +139,23 @@ func _save_snapshot() -> void:
 		return
 	var snapshot: Dictionary = _player.snapshot()
 	snapshot["story_file_id"] = _story_id
-	DataStore.story_runtime()["active_snapshot"] = snapshot
-	var story_savedata := DataStore.savedata.get("story", {}) as Dictionary
-	story_savedata["active_snapshot"] = snapshot.duplicate(true)
-	DataStore.savedata["story"] = story_savedata
+	if not _application.commit_active(snapshot, _waiting_event):
+		push_error("[story_director:snapshot_commit_failed] story_id=%s" % _story_id)
 
 
 func _restore_active() -> void:
-	var snapshot_v: Variant = DataStore.story_runtime().get("active_snapshot", {})
-	if not snapshot_v is Dictionary or (snapshot_v as Dictionary).is_empty():
-		# 切场景优先读 rundata，读档/重启时再回退到 savedata。
-		snapshot_v = (DataStore.savedata.get("story", {}) as Dictionary).get("active_snapshot", {})
+	var session := _application.session_snapshot()
+	var snapshot_v: Variant = session.get("active_snapshot", {})
 	if not snapshot_v is Dictionary or (snapshot_v as Dictionary).is_empty():
 		return
 	var snapshot := snapshot_v as Dictionary
 	var file_id := str(snapshot.get("story_file_id", ""))
 	var story := _load_story(file_id)
 	if story.is_empty() or not bool(_player.restore(story, snapshot).get("ok", false)):
-		DataStore.story_runtime()["active_snapshot"] = {}
+		_application.clear_active()
 		return
 	_story_id = file_id
-	_waiting_event = str(DataStore.story_runtime().get("pending_event", ""))
+	_waiting_event = str(session.get("pending_event", ""))
 	if _waiting_event != "":
 		_consume_commands((_player.current_frame().get("commands", []) as Array))
 	else:
@@ -163,3 +164,15 @@ func _restore_active() -> void:
 
 func _load_story(story_id: String) -> Dictionary:
 	return StoryCatalogScript.load_story(story_id)
+
+
+func _on_state_replaced() -> void:
+	_story_id = ""
+	_waiting_event = ""
+	_player = StoryPlayerScript.new()
+	if _presenter != null:
+		_presenter.hide_all()
+	if not _application.initialize_missing():
+		return
+	if _presenter != null:
+		_restore_active()

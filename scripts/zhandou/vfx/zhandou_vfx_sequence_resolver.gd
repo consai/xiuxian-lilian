@@ -1,11 +1,13 @@
 class_name ZhandouVfxSequenceResolver
 extends RefCounted
 
+const _VFX_QUERY := preload("res://scripts/features/battle/application/battle_vfx_query_application.gd")
+
 
 ## 从技能配置 / 事件载荷解析 vfx 绑定（支持文件名、preset 对象、内联 sequence）。
 static func normalize_vfx_binding(vfx_v: Variant) -> Dictionary:
 	if vfx_v is String:
-		var id := JsonLoader.normalize_zhandou_vfx_preset_id(str(vfx_v))
+		var id := _VFX_QUERY.normalize_preset_id(str(vfx_v))
 		if id != "":
 			return {"preset": id}
 		return {}
@@ -13,10 +15,10 @@ static func normalize_vfx_binding(vfx_v: Variant) -> Dictionary:
 		return {}
 	var d := (vfx_v as Dictionary).duplicate(true)
 	if d.has("file"):
-		d["preset"] = JsonLoader.normalize_zhandou_vfx_preset_id(str(d["file"]))
+		d["preset"] = _VFX_QUERY.normalize_preset_id(str(d["file"]))
 		d.erase("file")
 	elif d.has("preset"):
-		d["preset"] = JsonLoader.normalize_zhandou_vfx_preset_id(str(d["preset"]))
+		d["preset"] = _VFX_QUERY.normalize_preset_id(str(d["preset"]))
 	return d
 
 
@@ -27,7 +29,7 @@ static func vfx_binding_from_skill_cfg(cfg: Dictionary) -> Dictionary:
 		return normalize_vfx_binding(cfg["vfx"])
 	for alias_key in ["vfx_file", "vfx_preset"]:
 		if cfg.has(alias_key):
-			var id := JsonLoader.normalize_zhandou_vfx_preset_id(str(cfg[alias_key]))
+			var id := _VFX_QUERY.normalize_preset_id(str(cfg[alias_key]))
 			if id != "":
 				return {"preset": id}
 	return {}

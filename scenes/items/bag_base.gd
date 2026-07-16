@@ -9,6 +9,9 @@ const ItemDefScript := preload("res://scripts/features/inventory/domain/item_def
 const ItemIconResolverScript := preload(
 	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
 )
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
 const ItemInfoPayloadBuilderScript := preload("res://scripts/ui/item_info_payload_builder.gd")
 const HoverTipSourceScript := preload("res://scripts/ui/hover/hover_tip_source.gd")
 const HoverTipPayloadScript := preload("res://scripts/ui/hover/hover_tip_payload.gd")
@@ -547,7 +550,9 @@ func _build_hover_payload_for_entry(entry: Dictionary) -> Dictionary:
 		return ItemHoverTipBuilderScript.build(
 			def.fight_id, null, maxi(1, int(entry.get("count", 1)))
 		)
-	var info := ItemInfoPayloadBuilderScript.from_entry(entry)
+	var info := ItemInfoPayloadBuilderScript.from_entry(
+		entry, GameState.to_dict(), GameState.major_realm_id()
+	)
 	if info.is_empty():
 		return {}
 	var lines: PackedStringArray = PackedStringArray()
@@ -588,16 +593,17 @@ func _entry_view_data(entry: Dictionary, cache_key: String = "") -> Dictionary:
 		tier = maxi(1, int(equip_cfg.get("tier", tier)))
 	else:
 		var item_id := str(entry.get("id", ""))
-		if item_name == "" and ConfigManager != null:
-			item_name = str(ConfigManager.get_item_display_name(item_id))
-		if ConfigManager != null:
-			var def := ConfigManager.item_def_by_id(item_id)
-			if def != null:
-				icon = ItemIconResolverScript.resolve(def.icon_path, null)
-				if quality == "":
-					quality = EnumQuality.display_label(def.quality)
-				tier = def.tier
-				learn_blocked = ItemInfoPayloadBuilderScript.learning_book_condition_unmet(def)
+		if item_name == "":
+			item_name = InventoryQueryApplicationScript.display_name(item_id)
+		var def := InventoryQueryApplicationScript.definition_by_id(item_id)
+		if def != null:
+			icon = ItemIconResolverScript.resolve(def.icon_path, null)
+			if quality == "":
+				quality = EnumQuality.display_label(def.quality)
+			tier = def.tier
+			learn_blocked = ItemInfoPayloadBuilderScript.learning_book_condition_unmet(
+				def, GameState.to_dict(), GameState.major_realm_id()
+			)
 	var data := {
 		"icon": icon,
 		"name": item_name,
@@ -791,6 +797,4 @@ static func _entry_sort_order(entry: Dictionary) -> int:
 
 
 static func _item_def(item_id: String) -> ItemDef:
-	if ConfigManager != null:
-		return ConfigManager.item_def_by_id(item_id)
-	return null
+	return InventoryQueryApplicationScript.definition_by_id(item_id)

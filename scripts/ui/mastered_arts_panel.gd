@@ -3,7 +3,9 @@ extends Control
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
-const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
+const DaoTreeQueryApplicationScript := preload(
+	"res://scripts/features/dao/application/dao_tree_query_application.gd"
+)
 const MethodRowScene := preload("res://scenes/ui/components/peizhi_gongfa_hang.tscn")
 const SkillRowScene := preload("res://scenes/ui/components/mastered_skill_row.tscn")
 
@@ -138,7 +140,7 @@ func _refresh_filter_buttons() -> void:
 func _skill_meta(ability: Dictionary, _runtime: Dictionary, _ability_id: String) -> String:
 	var parts: PackedStringArray = []
 	var realm_id := AbilityService.ability_realm_id(ability)
-	parts.append("境界 %s" % DaoTreeServiceScript.realm_display_name(realm_id))
+	parts.append("境界 %s" % DaoTreeQueryApplicationScript.realm_display_name(realm_id))
 	parts.append(EnumItemTier.label(_entry_tier(ability)))
 	parts.append(EnumQuality.display_label(_entry_quality(ability)))
 	var combat_v: Variant = ability.get("combat", {})
@@ -206,7 +208,7 @@ func _method_meta(method: Dictionary, method_id: String) -> String:
 	var parts: PackedStringArray = []
 	var realm := str(method.get("realm", "")).strip_edges()
 	if realm != "":
-		parts.append("境界 %s" % DaoTreeServiceScript.realm_display_name(realm))
+		parts.append("境界 %s" % DaoTreeQueryApplicationScript.realm_display_name(realm))
 	var family := XiulianMethodServiceScript.family_by_id(str(method.get("familyId", "")))
 	parts.append(EnumItemTier.label(_entry_tier(method)))
 	parts.append(EnumQuality.display_label(_entry_quality(method, family)))

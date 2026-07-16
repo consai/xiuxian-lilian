@@ -2,6 +2,9 @@ class_name KnowledgeStudyService
 extends RefCounted
 
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
+const DaoTreeQueryApplicationScript := preload(
+	"res://scripts/features/dao/application/dao_tree_query_application.gd"
+)
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
 
 
@@ -22,7 +25,7 @@ static func can_study(
 	player_major_realm: String
 ) -> Dictionary:
 	var sid := skill_id.strip_edges()
-	var skill := DaoTreeServiceScript.skill_by_id(sid)
+	var skill := DaoTreeQueryApplicationScript.skill_by_id(sid)
 	if skill.is_empty():
 		return {"ok": false, "error": "未知知识"}
 	var policy := study_policy(skill)
@@ -31,7 +34,7 @@ static func can_study(
 	if not DaoTreeServiceScript.meets_realm_gate(str(skill.get("realm", "")), player_major_realm):
 		return {
 			"ok": false,
-			"error": "境界不足，需要%s" % DaoTreeServiceScript.realm_display_name(str(skill.get("realm", ""))),
+			"error": "境界不足，需要%s" % DaoTreeQueryApplicationScript.realm_display_name(str(skill.get("realm", ""))),
 		}
 	if not DaoTreeServiceScript.prereqs_met(sid, KnowledgeServiceScript.effective_levels_map(savedata)):
 		return {"ok": false, "error": "前置知识不足"}
@@ -52,7 +55,7 @@ static func preview(
 		return gate
 	var safe_days := maxi(1, days)
 	var sid := skill_id.strip_edges()
-	var skill := DaoTreeServiceScript.skill_by_id(sid)
+	var skill := DaoTreeQueryApplicationScript.skill_by_id(sid)
 	var policy := gate.get("policy", {}) as Dictionary
 	var speed := DaoTreeServiceScript.training_speed(
 		sid,
@@ -101,7 +104,7 @@ static func apply_study(savedata: Dictionary, skill_id: String, days: int, playe
 
 static func studyable_skills(savedata: Dictionary, player_major_realm: String) -> Array:
 	var rows: Array = []
-	for skill_v in DaoTreeServiceScript.config().get("skills", []) as Array:
+	for skill_v in DaoTreeQueryApplicationScript.all_skills():
 		if not skill_v is Dictionary:
 			continue
 		var skill := skill_v as Dictionary

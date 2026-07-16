@@ -4,7 +4,9 @@ class_name MethodHoverTipBuilder
 ## 根据功法配置构建 Hover Tip 载荷。
 
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
-const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
+const DaoTreeQueryApplicationScript := preload(
+	"res://scripts/features/dao/application/dao_tree_query_application.gd"
+)
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 
 
@@ -21,7 +23,7 @@ static func build(method_id: String, savedata: Dictionary, icon: Texture2D = nul
 	if desc != "":
 		lines.append(_localize_config_text(desc))
 	lines.append("类型：%s" % method_type_label(method))
-	var realm := DaoTreeServiceScript.realm_display_name(str(method.get("realm", "")))
+	var realm := DaoTreeQueryApplicationScript.realm_display_name(str(method.get("realm", "")))
 	if realm != "":
 		lines.append("境界：%s" % realm)
 	lines.append("阶位：%s" % EnumItemTier.label(tier))
@@ -69,7 +71,7 @@ static func method_type_label(method: Dictionary) -> String:
 
 static func _localize_config_text(text: String) -> String:
 	var out := text
-	for row_v in DaoTreeServiceScript.config().get("skills", []) as Array:
+	for row_v in DaoTreeQueryApplicationScript.all_skills():
 		if not row_v is Dictionary:
 			continue
 		var row := row_v as Dictionary

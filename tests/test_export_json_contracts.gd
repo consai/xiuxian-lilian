@@ -1,6 +1,9 @@
 extends SceneTree
 
-const JsonLoaderScript := preload("res://scripts/core/json_loader.gd")
+const LiandanQueryApplicationScript := preload("res://scripts/features/alchemy/application/liandan_query_application.gd")
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
 const JsonReaderScript := preload("res://scripts/core/config/json_reader.gd")
 const EquipCatalogScript := preload("res://scripts/zhandou/equip_catalog.gd")
 const BuffCatalogScript := preload("res://scripts/zhandou/buff_catalog.gd")
@@ -88,13 +91,13 @@ func _init() -> void:
 	_check_type(errors, method.get("practice"), TYPE_DICTIONARY, "xiulian_method.practice")
 	_check_type(errors, method.get("effects"), TYPE_ARRAY, "xiulian_method.effects")
 
-	var recipes := JsonLoaderScript.load_liandan_bundle().get("recipes", []) as Array
+	var recipes := LiandanQueryApplicationScript.all_recipes()
 	var recipe := recipes.front() as Dictionary
 	_check_type(errors, recipe.get("ingredients"), TYPE_ARRAY, "liandan.ingredients")
 	_check_type(errors, recipe.get("products"), TYPE_DICTIONARY, "liandan.products")
 
 	var lingguo: ItemDef = null
-	for item_v in JsonLoaderScript.load_items():
+	for item_v in InventoryQueryApplicationScript.all_definitions():
 		if item_v is ItemDef and (item_v as ItemDef).id == "items_LingGuo":
 			lingguo = item_v as ItemDef
 			break
@@ -119,7 +122,7 @@ func _check_type(errors: PackedStringArray, value: Variant, expected: Variant.Ty
 
 func _validate_weituo_references(errors: PackedStringArray, commissions: Dictionary) -> void:
 	var item_ids: Dictionary = {}
-	for item_v in JsonLoaderScript.load_items():
+	for item_v in InventoryQueryApplicationScript.all_definitions():
 		if item_v is ItemDef:
 			item_ids[(item_v as ItemDef).id] = true
 	var equip_ids: Dictionary = {}

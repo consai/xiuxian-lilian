@@ -4,15 +4,6 @@ const Catalog := preload("res://scripts/lilian/lilian_event_catalog.gd")
 const EventService := preload("res://scripts/lilian/lilian_event_service.gd")
 const ExportTableReaderScript := preload("res://scripts/core/config/export_table_reader.gd")
 
-class FakeDataStore:
-	extends Node
-
-	var runtime := {"active": true, "generated_events": {}}
-
-	func lilian_runtime() -> Dictionary:
-		return runtime
-
-
 var _failures: PackedStringArray = []
 
 
@@ -72,7 +63,7 @@ func _test_deep_copy_and_query_contract() -> void:
 		"explicit nested rows are deep copies"
 	)
 	_check(Catalog.static_by_id("missing_event").is_empty(), "unknown catalog id is query-safe")
-	_check(EventService.by_id("missing_event").is_empty(), "unknown application id remains query-safe")
+	_check(EventService.by_id("missing_event", {}).is_empty(), "unknown application id remains query-safe")
 
 
 func _test_complex_cells_and_runtime_shape() -> void:
@@ -93,35 +84,56 @@ func _test_complex_cells_and_runtime_shape() -> void:
 	})
 	_check(enemies.size() == 2, "runtime still converts enemy_count String to two enemies")
 	var location := {"event_pool": [common_id, {"id": explicit_id}, "missing_event"]}
-	var pool := EventService.event_pool_for_location(location)
+	var pool := EventService.event_pool_for_location(location, {})
 	_check(pool.size() == 2, "event pool still skips unknown ids")
 	_check(str((pool[0] as Dictionary).get("id", "")) == common_id, "event pool keeps source order")
 	_check(str((pool[1] as Dictionary).get("id", "")) == explicit_id, "event pool resolves dictionary ids")
 
 
 func _test_generated_event_precedence() -> void:
-	var existing := root.get_node_or_null("DataStore")
-	var data_store: Node = existing
-	var owns_fixture := false
-	if data_store == null:
-		data_store = FakeDataStore.new()
-		data_store.name = "DataStore"
-		root.add_child(data_store)
-		owns_fixture = true
-	var runtime := data_store.call("lilian_runtime") as Dictionary
-	var previous_active: Variant = runtime.get("active")
-	var previous_generated: Variant = runtime.get("generated_events", {}).duplicate(true)
-	runtime["active"] = true
-	runtime["generated_events"] = {
+	var generated := {
 		"qinglan_wolf": {"id": "qinglan_wolf", "source": "generated"},
 	}
-	var event := EventService.by_id("qinglan_wolf")
+	var event := EventService.by_id("qinglan_wolf", generated)
 	_check(str(event.get("source", "")) == "generated", "generated event still overrides explicit config")
-	runtime["active"] = previous_active
-	runtime["generated_events"] = previous_generated
-	if owns_fixture:
-		root.remove_child(data_store)
-		data_store.free()
+	event["source"] = "mutated"
+	_check(
+		str((generated["qinglan_wolf"] as Dictionary).get("source", "")) == "generated",
+		"generated query returns a deep clone"
+	)
+	var before := generated.duplicate(true)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 17
+	var location := {
+		"id": "qinglan_mountain",
+		"event_pool": [],
+		"min_difficulty": 1,
+		"max_difficulty": 3,
+	}
+	var node := {"id": "generated_node", "type": "battle", "difficulty": 2}
+	var dynamic := EventService.roll_event_for_node(location, node, [], rng, generated)
+	_check(str(dynamic.get("id", "")).begins_with("generated::"), "node fallback creates dynamic event")
+	_check(generated == before, "node roll does not implicitly mutate generated events")
+	var materialized := EventService.materialize_event_for_context(
+		location,
+		node,
+		Catalog.explicit_by_id("qinglan_wolf"),
+		rng
+	)
+	_check(not materialized.is_empty(), "materialization returns an event")
+	_check(generated == before, "materialization does not implicitly mutate generated events")
+	var lilian_state: Node = root.get_node("LilianState")
+	lilian_state.reset()
+	lilian_state.remember_generated_event(dynamic)
+	var persisted: Dictionary = lilian_state.event_by_id(str(dynamic.get("id", "")))
+	_check(persisted == dynamic, "dynamic node event remains queryable through LilianState")
+	persisted["name"] = "mutated"
+	_check(
+		str(lilian_state.event_by_id(str(dynamic.get("id", ""))).get("name", ""))
+			!= "mutated",
+		"LilianState event query returns a deep clone"
+	)
+	lilian_state.reset()
 
 
 func _test_intrinsic_validation() -> void:

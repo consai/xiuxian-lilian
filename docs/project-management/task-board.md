@@ -24,7 +24,7 @@
 
 ### [x] PM-002：补齐历练背包验收
 
-描述：确认历练运行时背包只改 `DataStore.lilian_runtime()`，结算后再投影回存档。
+描述：确认历练运行时背包只改 `LilianState` session，结算后再投影回存档。
 
 验收：
 

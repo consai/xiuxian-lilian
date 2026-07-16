@@ -1,4 +1,3 @@
-class_name LilianResult
 extends RefCounted
 
 const EXIT_MANUAL := "manual"

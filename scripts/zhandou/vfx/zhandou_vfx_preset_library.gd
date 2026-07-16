@@ -1,6 +1,8 @@
 class_name ZhandouVfxPresetLibrary
 extends RefCounted
 
+const _VFX_QUERY := preload("res://scripts/features/battle/application/battle_vfx_query_application.gd")
+
 var _default_preset_id: String = "melee_default"
 var _impact_preset_id: String = "hit_default"
 var _sequence_cache: Dictionary = {} # preset_id -> Array
@@ -8,7 +10,7 @@ var _sequence_cache: Dictionary = {} # preset_id -> Array
 
 static func load_default() -> ZhandouVfxPresetLibrary:
 	var lib := ZhandouVfxPresetLibrary.new()
-	lib.load_from_index(JsonLoader.load_zhandou_vfx_index())
+	lib.load_from_index(_VFX_QUERY.index_snapshot())
 	return lib
 
 
@@ -27,21 +29,20 @@ func get_impact_preset_id() -> String:
 
 
 func has_preset(preset_id: String) -> bool:
-	var id := JsonLoader.normalize_zhandou_vfx_preset_id(preset_id)
+	var id := _VFX_QUERY.normalize_preset_id(preset_id)
 	if id == "":
 		return false
 	if _sequence_cache.has(id):
 		return true
-	var path := JsonLoader.zhandou_vfx_preset_path(id)
-	return path != "" and FileAccess.file_exists(path)
+	return _VFX_QUERY.has_preset(id)
 
 
 func get_preset_ids() -> Array:
-	return JsonLoader.zhandou_vfx_preset_ids()
+	return _VFX_QUERY.preset_ids()
 
 
 func get_sequence(preset_ref: String) -> Array:
-	var id := JsonLoader.normalize_zhandou_vfx_preset_id(preset_ref)
+	var id := _VFX_QUERY.normalize_preset_id(preset_ref)
 	if id == "":
 		id = _default_preset_id
 	if _sequence_cache.has(id):
@@ -52,8 +53,7 @@ func get_sequence(preset_ref: String) -> Array:
 			return get_sequence(_default_preset_id)
 		push_warning("ZhandouVfxPresetLibrary: 无法加载 preset '%s'" % id)
 		return []
-	var data := JsonLoader.load_zhandou_vfx_preset_file(id)
-	var seq: Variant = data.get("sequence", [])
+	var seq: Variant = _VFX_QUERY.sequence(id)
 	if seq is Array:
 		var steps := duplicate_steps(seq as Array)
 		_sequence_cache[id] = steps
@@ -63,7 +63,7 @@ func get_sequence(preset_ref: String) -> Array:
 
 
 func reload_preset(preset_ref: String) -> void:
-	var id := JsonLoader.normalize_zhandou_vfx_preset_id(preset_ref)
+	var id := _VFX_QUERY.normalize_preset_id(preset_ref)
 	_sequence_cache.erase(id)
 
 

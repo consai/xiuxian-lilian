@@ -162,7 +162,7 @@ static func _make_node(
 
 static func _available_node_types(location: Dictionary) -> Array:
 	var out: Array = []
-	for event_v in LilianEventServiceScript.event_pool_for_location(location):
+	for event_v in LilianEventServiceScript.event_pool_for_location(location, {}):
 		if not event_v is Dictionary:
 			continue
 		var type_id := EnumLilianNodeTypeScript.from_event(event_v as Dictionary)

@@ -132,7 +132,7 @@ flowchart LR
 
 ### 场景流改造
 
-1. `dongfu`：`can_breakthrough()` 为真时，点击突破 → `SceneManager.go_tupo_mianban()`（不再直接 `GameState.breakthrough()`）。
+1. `dongfu`：`can_breakthrough()` 为真时，构造 `BreakthroughPagePayload.panel()` 并调用 `SceneManager.go_to(SceneManager.TUPO_ZONGJIE, payload)`（不再直接 `GameState.breakthrough()`）。
 2. 面板确认后调用 `GameState.attempt_major_breakthrough()` → 内部 `TupoService.resolve()`。
 3. 成功 → 现有 `tupo_zongjie`；失败 → 回洞府并刷新 debuff 文案。
 

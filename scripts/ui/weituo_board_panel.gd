@@ -11,6 +11,9 @@ const ITEM_SCENE_PATH := "res://scenes/items/item.tscn"
 const ItemIconResolverScript := preload(
 	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
 )
+const WeituoApplicationScript := preload(
+	"res://scripts/features/commission/application/weituo_application.gd"
+)
 
 const FILTER_ALL := "all"
 const FILTER_AVAILABLE := "available"
@@ -46,9 +49,11 @@ var _card_nodes: Dictionary = {}
 var _filter_buttons: Dictionary = {}
 var _cancel_abandon_button: Button
 var _confirm_abandon_button: Button
+var _application: Variant
 
 
 func _ready() -> void:
+	_application = WeituoApplicationScript.production()
 	_confirm_abandon_popup.visible = false
 	_cancel_abandon_button = _confirm_abandon_popup.find_child("CancelAbandonButton", true, false) as Button
 	_confirm_abandon_button = _confirm_abandon_popup.find_child("ConfirmAbandonButton", true, false) as Button
@@ -87,9 +92,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func refresh(entries: Array = []) -> void:
-	WeituoService.refresh_board_if_needed(DataStore.savedata, GameState)
-	_entries = entries if not entries.is_empty() else WeituoService.visible_entries(DataStore.savedata, GameState)
-	var header := WeituoService.refresh_header(DataStore.savedata)
+	var snapshot: Dictionary = _application.refresh_board_snapshot(entries)
+	if not bool(snapshot.get("ok", false)):
+		show_empty_state(str(snapshot.get("error", "委托榜单刷新失败")))
+		return
+	_entries = (snapshot.get("entries", []) as Array).duplicate(true)
+	var header := snapshot.get("header", {}) as Dictionary
 	_active_limit_label.text = str(header.get("active_text", ""))
 	_refresh_label.text = str(header.get("refresh_text", ""))
 	_rebuild_cards()

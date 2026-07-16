@@ -11,6 +11,9 @@ const WeituoStateScript := preload(
 const InventoryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_application.gd"
 )
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
 
 
 static func rules() -> Dictionary:
@@ -45,9 +48,6 @@ static func prepare_state_for_commit(raw: Variant, action: String) -> Dictionary
 
 
 static func visible_entries(savedata: Dictionary, game_state: Node = null) -> Array:
-	var refresh_result := refresh_board_if_needed(savedata, game_state)
-	if not bool(refresh_result.get("ok", false)):
-		return []
 	var weituo_data := _prepare_weituo_data(savedata, "visible_entries")
 	if weituo_data.is_empty():
 		return []
@@ -360,8 +360,8 @@ static func build_reward_row(reward: Dictionary) -> Dictionary:
 	if def != null:
 		display_name = def.name
 		icon_path = def.icon_path
-	elif _config_manager() != null:
-		display_name = _config_manager().get_item_display_name(item_id)
+	else:
+		display_name = InventoryQueryApplicationScript.display_name(item_id)
 	return {
 		"kind": kind,
 		"id": item_id,
@@ -652,9 +652,7 @@ static func _item_label(req: Dictionary, item_id: String) -> String:
 	var label := str(req.get("label", "")).strip_edges()
 	if label != "":
 		return label
-	if _config_manager() != null:
-		return _config_manager().get_item_display_name(item_id)
-	return item_id
+	return InventoryQueryApplicationScript.display_name(item_id)
 
 
 static func _item_icon_path(item_id: String) -> String:
@@ -665,9 +663,7 @@ static func _item_icon_path(item_id: String) -> String:
 
 
 static func _item_def(item_id: String) -> ItemDef:
-	if _config_manager() == null:
-		return null
-	return _config_manager().item_def_by_id(item_id)
+	return InventoryQueryApplicationScript.definition_by_id(item_id)
 
 
 static func _config_manager() -> Node:

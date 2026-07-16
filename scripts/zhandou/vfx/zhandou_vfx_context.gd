@@ -1,6 +1,8 @@
 class_name ZhandouVfxContext
 extends RefCounted
 
+const _DEFS := preload("res://scripts/features/battle/domain/zhandou_vfx_step_defs.gd")
+
 ## 单次战斗表现事件的运行时上下文：角色、锚点、可调参数。
 
 var host: Node
@@ -31,14 +33,14 @@ func get_actor_for_role(role: String) -> Node2D:
 
 func _role_to_unit_id(role: String) -> String:
 	match str(role).strip_edges().to_lower():
-		ZhandouVfxStepDefs.ACTOR_TARGET, "target_id":
+		_DEFS.ACTOR_TARGET, "target_id":
 			return target_id
 		_:
 			return source_id
 
 
 func resolve_step_actor(step: Dictionary) -> ZhandouActorVfx:
-	var role := str(step.get("actor", ZhandouVfxStepDefs.ACTOR_CASTER)).strip_edges().to_lower()
+	var role := str(step.get("actor", _DEFS.ACTOR_CASTER)).strip_edges().to_lower()
 	return get_vfx_for_role(role)
 
 
@@ -51,8 +53,8 @@ func prepare_caster_action() -> void:
 
 
 func compute_hit_direction() -> Vector2:
-	var source := get_actor_for_role(ZhandouVfxStepDefs.ACTOR_CASTER)
-	var target := get_actor_for_role(ZhandouVfxStepDefs.ACTOR_TARGET)
+	var source := get_actor_for_role(_DEFS.ACTOR_CASTER)
+	var target := get_actor_for_role(_DEFS.ACTOR_TARGET)
 	_hit_direction = ZhandouVfxManager.melee_hit_direction_local(source, target)
 	return _hit_direction
 
@@ -62,7 +64,7 @@ func resolve_anchor(actor_vfx: ZhandouActorVfx, anchor_name: String) -> Variant:
 		return null
 	var key := anchor_name.strip_edges().to_lower()
 	var target_actor := get_actor_for_role(
-		ZhandouVfxStepDefs.ACTOR_CASTER if actor_vfx == get_vfx(target_id) else ZhandouVfxStepDefs.ACTOR_TARGET
+		_DEFS.ACTOR_CASTER if actor_vfx == get_vfx(target_id) else _DEFS.ACTOR_TARGET
 	)
 	var other_vfx := get_vfx(target_id) if actor_vfx == get_vfx(source_id) else get_vfx(source_id)
 	match key:

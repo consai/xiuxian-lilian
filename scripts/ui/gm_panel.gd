@@ -20,6 +20,9 @@ const GmBattleBuilderScript := preload("res://scripts/ui/gm_battle_builder.gd")
 const BattleConfigQueryApplicationScript := preload(
 	"res://scripts/features/battle/application/battle_config_query_application.gd"
 )
+const BattleStartApplicationScript := preload(
+	"res://scripts/features/battle/application/battle_start_application.gd"
+)
 const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
 
 @onready var _status_label: Label = %StatusLabel
@@ -118,7 +121,7 @@ func _build_monster_options() -> void:
 
 
 func _bind_status() -> void:
-	var scene_id := str(DataStore.scene_runtime().get("current_id", "unknown"))
+	var scene_id := str(SceneManager.navigation_snapshot().get("current_id", "unknown"))
 	var lilian_text := "无"
 	if LilianState.active:
 		lilian_text = "%s · %s · 第 %d 步" % [
@@ -327,8 +330,8 @@ func _start_gm_battle() -> void:
 		_flash("创建战斗失败：%s" % errors[0])
 		return
 	visible = false
-	_navigate(ZhandouInitData.start_battle(
-		get_tree(), battle_data, "gm_panel", SceneManager, false
+	_navigate(BattleStartApplicationScript.start_battle(
+		battle_data, "gm_panel", SceneManager, false
 	), "无法进入 GM 战斗")
 
 

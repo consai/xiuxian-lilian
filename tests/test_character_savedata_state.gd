@@ -11,6 +11,9 @@ func _init() -> void:
 
 func _run() -> void:
 	var defaults := CharacterSavedataStateScript.default_slice()
+	assert(defaults["character_origin_id"] == "")
+	assert(defaults["character_root_id"] == "")
+	assert(defaults["character_talent_id"] == "")
 	assert(defaults["foundations"] == {
 		"roushen": 10.0, "lingli": 10.0, "shenshi": 10.0, "shenfa": 10.0,
 	})
@@ -22,6 +25,9 @@ func _run() -> void:
 	assert(float((CharacterSavedataStateScript.default_slice()["foundations"] as Dictionary)["roushen"]) == 10.0)
 
 	var missing := CharacterSavedataStateScript.apply_to_snapshot({"day": 3})
+	assert(missing["character_origin_id"] == "")
+	assert(missing["character_root_id"] == "")
+	assert(missing["character_talent_id"] == "")
 	assert((missing["aptitudes"] as Dictionary)["roots"] == {"fire": 80.0})
 	var explicit_empty := CharacterSavedataStateScript.apply_to_snapshot({"aptitudes": {}})
 	assert((explicit_empty["aptitudes"] as Dictionary)["roots"] == {})
@@ -52,6 +58,19 @@ func _run() -> void:
 	})
 	(normalized["aptitudes"] as Dictionary)["fortune"] = 999.0
 	assert((raw["aptitudes"] as Dictionary)["fortune"] == 22)
+
+	Engine.print_error_messages = false
+	var invalid_id := CharacterSavedataStateScript.apply_to_snapshot({
+		"character_origin_id": 12,
+	})
+	Engine.print_error_messages = true
+	assert(invalid_id.is_empty())
+	var errors := CharacterSavedataStateScript.collect_errors({
+		"character_origin_id": 12,
+	})
+	assert(errors == PackedStringArray([
+		"[character_savedata_state:invalid_field_type] field=character_origin_id expected=String actual=int",
+	]))
 
 	print("PASS: character savedata state ownership")
 	quit(0)

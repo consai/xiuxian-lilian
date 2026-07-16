@@ -4,8 +4,13 @@ const STORY_ID := "prologue_tutorial"
 const MAIN_MENU_SCENE := "res://scenes/ui/main_menu.tscn"
 const TUTORIAL_ENABLED := true
 const StoryDirectorScript := preload("res://scripts/story/story_director.gd")
+const TutorialApplicationScript := preload(
+	"res://scripts/features/tutorial/application/tutorial_application.gd"
+)
 
 var _story_director: StoryDirectorScript
+var _application := TutorialApplicationScript.new()
+var _store: Node
 
 
 func _ready() -> void:
@@ -13,12 +18,26 @@ func _ready() -> void:
 	SceneManager.active_scene_changed.connect(_on_scene_changed)
 
 
+func bind_store(store: Node) -> void:
+	if store == null:
+		push_error("TutorialService: Data Store 未绑定")
+		return
+	if _store != null and _store != store and _store.state_replaced.is_connected(_on_state_replaced):
+		_store.state_replaced.disconnect(_on_state_replaced)
+	_store = store
+	_application.bind_store(_store)
+	_application.initialize_missing()
+	if not _store.state_replaced.is_connected(_on_state_replaced):
+		_store.state_replaced.connect(_on_state_replaced)
+
+
 func bind_story_director(story_director: StoryDirectorScript) -> void:
 	if story_director == null:
 		push_error("TutorialService: StoryDirector 未绑定")
 		return
 	_story_director = story_director
-	_story_director.story_finished.connect(_on_story_finished)
+	if not _story_director.story_finished.is_connected(_on_story_finished):
+		_story_director.story_finished.connect(_on_story_finished)
 	call_deferred("_ensure_started")
 
 
@@ -28,30 +47,30 @@ func game_event(event_id: String) -> void:
 	if _story_director == null:
 		push_error("TutorialService: StoryDirector 未绑定")
 		return
-	# 首战胜利标记决定历练是否仍用新手三节点图，须写入存档，不能仅依赖剧情层是否在等待。
 	if event_id == "tutorial.first_battle_won":
-		_set_step_for_event(event_id)
-		if LilianState != null:
-			LilianState.auto_advance = false
+		_application.record_game_event(event_id)
+	elif not _story_director.is_waiting_for(event_id):
+		return
+	else:
+		_application.record_game_event(event_id)
 	if not _story_director.is_waiting_for(event_id):
 		return
-	_set_step_for_event(event_id)
 	_story_director.notify_game_event(event_id)
 
 
 func is_active() -> bool:
 	if not TUTORIAL_ENABLED:
 		return false
-	var tutorial := DataStore.savedata.get("tutorial", {}) as Dictionary
-	return not bool(tutorial.get("completed", false)) and not bool(tutorial.get("skipped", false))
+	return _application.is_active()
+
+
+func has_event_flag(event_id: String) -> bool:
+	return _application.has_event_flag(event_id)
 
 
 ## 首次历练路线图：教程未完成且尚未赢下引导战斗时使用固定三节点地图。
 func should_use_tutorial_lilian_map() -> bool:
-	if not is_active():
-		return false
-	var flags := (DataStore.savedata.get("tutorial", {}) as Dictionary).get("flags", {}) as Dictionary
-	return not bool(flags.get("tutorial.first_battle_won", false))
+	return _application.should_use_tutorial_lilian_map()
 
 
 func is_waiting_for_any(event_ids: Array) -> bool:
@@ -101,40 +120,8 @@ func _on_scene_changed(_scene: Node = null) -> void:
 func _on_story_finished(story_id: String, result: String) -> void:
 	if story_id != STORY_ID:
 		return
-	var tutorial := DataStore.savedata.get("tutorial", {}) as Dictionary
-	tutorial["step"] = "T10"
-	tutorial["completed"] = result == "completed"
-	tutorial["skipped"] = result == "skipped"
-	DataStore.savedata["tutorial"] = tutorial
+	_application.finish(result == "completed", result == "skipped")
 
 
-func _set_step_for_event(event_id: String) -> void:
-	var steps := {
-		"tutorial.xiulian_mianban_opened": "T01",
-		"tutorial.cultivation_started": "T01",
-		"tutorial.cultivation_result_shown": "T02",
-		"tutorial.cultivation_completed": "T02",
-		"tutorial.pill_mode_selected": "T02",
-		"tutorial.alchemy_opened": "T09",
-		"tutorial.alchemy_recipe_selected": "T09",
-		"tutorial.alchemy_preview_acknowledged": "T09",
-		"tutorial.alchemy_started": "T09",
-		"tutorial.alchemy_result_shown": "T09",
-		"tutorial.alchemy_completed": "T10",
-		"tutorial.attributes_opened": "T03",
-		"tutorial.attributes_closed": "T03",
-		"tutorial.world_map_opened": "T03",
-		"tutorial.wolf_valley_selected": "T04",
-		"tutorial.lilian_started": "T04",
-		"tutorial.first_battle_won": "T05",
-		"tutorial.lilian_returned": "T06",
-		"tutorial.result_closed": "T07",
-	}
-	if not steps.has(event_id):
-		return
-	var tutorial := DataStore.savedata.get("tutorial", {}) as Dictionary
-	tutorial["step"] = steps[event_id]
-	var flags := tutorial.get("flags", {}) as Dictionary
-	flags[event_id] = true
-	tutorial["flags"] = flags
-	DataStore.savedata["tutorial"] = tutorial
+func _on_state_replaced() -> void:
+	_application.initialize_missing()

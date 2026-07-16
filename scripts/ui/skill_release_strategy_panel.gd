@@ -2,6 +2,12 @@ extends Control
 
 const PlayerAutoBattleServiceScript := preload("res://scripts/sim/player_auto_battle_service.gd")
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
+const ItemIconResolverScript := preload(
+	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
+)
 const AbilityQueryApplicationScript := preload(
 	"res://scripts/features/ability/application/ability_query_application.gd"
 )
@@ -247,9 +253,9 @@ func _strategy_icon(strategy: Dictionary) -> Texture2D:
 		"item":
 			var slot_index := int(action.get("slot_index", 0))
 			var iid := str(GameState.item_slots[slot_index]) if slot_index < GameState.item_slots.size() else ""
-			var def := ConfigManager.item_def_by_id(iid)
+			var def := InventoryQueryApplicationScript.definition_by_id(iid)
 			if def != null:
-				return _entry_icon(def.to_fight_runtime_dict())
+				return ItemIconResolverScript.resolve(def.icon_path, null)
 		"equip":
 			var equip_slot := int(action.get("slot_index", 0))
 			var eid := int(GameState.equip_slots[equip_slot]) if equip_slot < GameState.equip_slots.size() else -1

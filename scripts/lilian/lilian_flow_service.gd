@@ -4,6 +4,9 @@ extends RefCounted
 ## 历练结算编排：finish → settle，避免场景与 autoload 散落重复调用。
 
 const _BLOCKED_LILIAN_ACTIVE := "当前仍在历练中，请先完成或结算后再操作。"
+const LilianSettlementPayloadContract := preload(
+	"res://scripts/features/lilian/contracts/lilian_settlement_payload.gd"
+)
 
 
 static func start_lilian(
@@ -95,10 +98,10 @@ static func open_settlement(
 	)
 	if not lilian_state.active and not has_summary:
 		return {"ok": false, "error": "没有可结算的历练"}
-	var payload := ScenePayload.lilian_jiesuan(reason)
+	var payload := LilianSettlementPayloadContract.create(reason)
 	if payload.is_empty():
 		return {"ok": false, "error": "invalid_lilian_jiesuan_payload"}
-	return scene_manager.open_lilian_jiesuan(payload)
+	return scene_manager.go_to(scene_manager.LILIAN_JIESUAN, payload)
 
 
 static func open_world_map(lilian_state: Node, scene_manager: Node) -> Dictionary:

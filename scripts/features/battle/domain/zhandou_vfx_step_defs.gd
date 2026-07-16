@@ -1,4 +1,3 @@
-class_name ZhandouVfxStepDefs
 extends RefCounted
 
 const OP_STOP_IDLE := "stop_idle"

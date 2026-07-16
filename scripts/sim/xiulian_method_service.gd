@@ -2,6 +2,9 @@
 extends RefCounted
 
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
+const DaoTreeQueryApplicationScript := preload(
+	"res://scripts/features/dao/application/dao_tree_query_application.gd"
+)
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 const CultivationMethodQueryApplicationScript := preload(
 	"res://scripts/features/cultivation/application/cultivation_method_query_application.gd"
@@ -76,11 +79,11 @@ static func unmet_learning_requirement_lines(
 	if not DaoTreeServiceScript.meets_realm_gate(realm, player_major_realm):
 		var current_realm := str(savedata.get("realm_name", "")).strip_edges()
 		if current_realm == "":
-			current_realm = DaoTreeServiceScript.realm_display_name(player_major_realm)
+			current_realm = DaoTreeQueryApplicationScript.realm_display_name(player_major_realm)
 		lines.append(StringsZh.format_template(
 			StringsZh.getp("item_info.learn_req_realm", "境界要求：{need}（当前：{current}）"),
 			{
-				"need": DaoTreeServiceScript.realm_display_name(realm),
+				"need": DaoTreeQueryApplicationScript.realm_display_name(realm),
 				"current": current_realm,
 			}
 		))

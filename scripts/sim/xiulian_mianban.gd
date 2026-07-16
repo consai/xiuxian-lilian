@@ -2,6 +2,9 @@ extends Control
 
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const ItemViewScript := preload("res://scenes/items/item.gd")
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
 
 const MODE_IDS := EnumXiulianMode.MODE_IDS
 
@@ -94,7 +97,7 @@ func _refresh() -> void:
 	]
 	if int(preview.get("instability_gain", 0)) > 0:
 		var pill_id := str(preview.get("pill_id", ""))
-		var pill_name = ConfigManager.get_item_display_name(pill_id)
+		var pill_name := InventoryQueryApplicationScript.display_name(pill_id)
 		meta_text += "\n消耗%s x%d · 灵力驳杂 +%d" % [
 			pill_name,
 			int(preview.get("pill_count", 0)),
@@ -163,7 +166,7 @@ func _format_mode_description(mode: Dictionary, preview: Dictionary) -> String:
 	if pill_id == "":
 		return "点击选择修炼丹药后打坐炼化，修为增长极快，但会使灵力驳杂。"
 	var gain: int = GameState.cultivation_pill_gain(pill_id)
-	var pill_name = ConfigManager.get_item_display_name(pill_id)
+	var pill_name := InventoryQueryApplicationScript.display_name(pill_id)
 	return "炼化【%s】，每月药力约 %d 点月修为（逐日折算），但会使灵力驳杂。" % [
 		pill_name,
 		gain,
@@ -181,7 +184,7 @@ func _refresh_pill_slot(preview: Dictionary) -> void:
 	var owned := int(GameState.inventory.get(pill_id, 0))
 	ItemViewScript.apply_item_id(_pill_slot, pill_id, owned, {
 		"show_name": true,
-		"name_override": "%s %d" % [ConfigManager.get_item_display_name(pill_id), owned],
+		"name_override": "%s %d" % [InventoryQueryApplicationScript.display_name(pill_id), owned],
 		"show_info_on_click": false,
 		"click_enabled": true,
 	})

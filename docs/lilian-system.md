@@ -8,7 +8,7 @@
 
 历练是洞府主循环中的**外出探索玩法**：玩家经世界地图选野外区域或地点 → 生成随机网状路线图 → 玩家自由选择相邻节点 → 节点解析为采集、休整、抉择或战斗事件 → 可随时返程或战败结算 → 回写存档（天数、气血法力、背包、世界状态、统计）。
 
-核心设计：**局内状态走 `DataStore.lilian_runtime()`**，结算结果经 `LilianResult` 契约交给 `GameState.settle_lilian()` 持久化。
+核心设计：**局内状态由 `LilianState` 独占持有**，结算结果经 `LilianResult` 契约交给 `GameState.settle_lilian()` 持久化。
 
 ```mermaid
 flowchart LR
@@ -83,7 +83,7 @@ flowchart LR
 | `LilianBattleFlow` | `scripts/lilian/lilian_battle_flow.gd` | 战斗场景出口回调 |
 | `DidianService` | `scripts/lilian/didian_service.gd` | 地点配置读取 |
 | `SceneManager` | `scripts/core/scene_manager.gd` | `start_lilian` / 场景跳转与互斥 |
-| `LilianResult` | `scripts/core/contracts/lilian_result.gd` | 结算数据结构校验 |
+| `LilianResult` | `scripts/features/lilian/contracts/lilian_result.gd` | 结算数据结构校验 |
 
 ### 3.3 配置表
 
@@ -117,7 +117,7 @@ flowchart LR
 | `manual` | 主循环点返程；战前弹窗关闭后的主动返程（战前撤退） |
 | `defeated` | 战斗失败 |
 
-### 4.3 `DataStore.lilian_runtime()` 主要字段
+### 4.3 `LilianState` session 主要字段
 
 ```
 active, phase, location_id, lilian_id, start_day
@@ -286,7 +286,7 @@ choose_map_node(node_id)
 
 ## 10. 架构约束
 
-1. **数据规范**：所有跨场景历练状态必须经 `DataStore.lilian_runtime()`，禁止平行静态全局。  
+1. **数据规范**：所有跨场景历练状态必须由 `LilianState` session 持有，禁止平行静态全局。
 2. **RNG 可复现**：每步 `_restore_rng` / `_save_rng` 持久化 `rng_state`，支持 `seed_override`（测试用）。  
 3. **重复结算防护**：`GameState.last_settled_lilian_id` 与 `settlement_id` 去重。  
 4. **战斗来源解耦**：战斗场景只认 `source`，历练逻辑集中在 `LilianBattleFlow`。

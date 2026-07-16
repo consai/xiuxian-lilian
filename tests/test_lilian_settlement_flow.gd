@@ -23,10 +23,11 @@ class FakeSceneManager:
 	var log: Array[String] = []
 	var navigation_result := {"ok": true}
 
-	func open_lilian_jiesuan(value: Dictionary) -> Dictionary:
+	func go_to(scene_id: String, value: Dictionary = {}) -> Dictionary:
+		assert(scene_id == LILIAN_JIESUAN)
 		calls += 1
 		payload = value.duplicate(true)
-		return {"ok": true}
+		return navigation_result
 
 	func take_payload(_scene_id: String) -> Dictionary:
 		log.append("take_payload")
@@ -102,12 +103,6 @@ func _run() -> void:
 	assert(not bool(closed.get("ok", false)))
 	assert(scene_manager.log == ["game_event", "take_payload", "go_hub"])
 
-	var manager_script := load("res://scripts/core/scene_manager.gd")
-	var manager: Node = manager_script.new()
-	var rejected: Dictionary = manager.open_lilian_jiesuan({"reason": "invalid_reason"})
-	assert(not bool(rejected.get("ok", false)))
-
-	manager.free()
 	lilian.free()
 	game_state.free()
 	scene_manager.free()

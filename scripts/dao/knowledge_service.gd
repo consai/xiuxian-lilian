@@ -2,6 +2,9 @@ class_name KnowledgeService
 extends RefCounted
 
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
+const DaoTreeQueryApplicationScript := preload(
+	"res://scripts/features/dao/application/dao_tree_query_application.gd"
+)
 
 const KNOWLEDGE_KEY := "knowledge"
 const METHOD_MASTERY_KEY := "method_mastery"
@@ -34,7 +37,7 @@ static func set_entry(savedata: Dictionary, skill_id: String, entry: Dictionary)
 
 static func level_progress_percent(savedata: Dictionary, skill_id: String) -> float:
 	var effective := effective_level(savedata, skill_id)
-	var skill := DaoTreeServiceScript.skill_by_id(skill_id)
+	var skill := DaoTreeQueryApplicationScript.skill_by_id(skill_id)
 	var max_level := int(skill.get("maxLevel", 5))
 	var level := int(floor(effective))
 	if level >= max_level:
@@ -99,7 +102,7 @@ static func gain_progress_snapshot(
 static func effective_level(savedata: Dictionary, skill_id: String) -> float:
 	var entry := get_entry(savedata, skill_id)
 	var level := int(entry.get("level", 0))
-	if level >= int(DaoTreeServiceScript.skill_by_id(skill_id).get("maxLevel", 5)):
+	if level >= int(DaoTreeQueryApplicationScript.skill_by_id(skill_id).get("maxLevel", 5)):
 		return float(level)
 	var req := DaoTreeServiceScript.required_xp_for_level(skill_id, level + 1)
 	if req <= 0.0:
@@ -109,7 +112,7 @@ static func effective_level(savedata: Dictionary, skill_id: String) -> float:
 
 static func effective_levels_map(savedata: Dictionary) -> Dictionary:
 	var out := {}
-	for skill_v in DaoTreeServiceScript.config().get("skills", []) as Array:
+	for skill_v in DaoTreeQueryApplicationScript.all_skills():
 		if not skill_v is Dictionary:
 			continue
 		var sid := str((skill_v as Dictionary).get("id", ""))
@@ -122,7 +125,7 @@ static func apply_xp(savedata: Dictionary, skill_id: String, amount: float, sour
 	var sid := skill_id.strip_edges()
 	if sid == "" or amount <= 0.0:
 		return {"applied": 0.0, "levels_gained": 0}
-	var skill := DaoTreeServiceScript.skill_by_id(sid)
+	var skill := DaoTreeQueryApplicationScript.skill_by_id(sid)
 	if skill.is_empty():
 		return {"applied": 0.0, "levels_gained": 0}
 	var max_level := int(skill.get("maxLevel", 5))
@@ -156,7 +159,7 @@ static func apply_xp(savedata: Dictionary, skill_id: String, amount: float, sour
 
 static func grant_level(savedata: Dictionary, skill_id: String, level: int, marked: bool = false) -> void:
 	var sid := skill_id.strip_edges()
-	var skill := DaoTreeServiceScript.skill_by_id(sid)
+	var skill := DaoTreeQueryApplicationScript.skill_by_id(sid)
 	if skill.is_empty():
 		return
 	var entry := get_entry(savedata, sid)
@@ -177,7 +180,7 @@ static func toggle_mark(savedata: Dictionary, skill_id: String) -> bool:
 
 static func total_learned_points(savedata: Dictionary) -> int:
 	var total := 0
-	for skill_v in DaoTreeServiceScript.config().get("skills", []) as Array:
+	for skill_v in DaoTreeQueryApplicationScript.all_skills():
 		if not skill_v is Dictionary:
 			continue
 		var sid := str((skill_v as Dictionary).get("id", ""))

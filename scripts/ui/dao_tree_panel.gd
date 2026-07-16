@@ -3,6 +3,9 @@ extends Control
 const DaoTreeGraphViewScript := preload("res://scripts/ui/dao_tree_graph_view.gd")
 const DaoTreeNodeViewScript := preload("res://scripts/ui/dao_tree_node_view.gd")
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
+const DaoTreeQueryApplicationScript := preload(
+	"res://scripts/features/dao/application/dao_tree_query_application.gd"
+)
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
 
 @onready var _player_card: Label = $PlayerCard/Text
@@ -77,7 +80,7 @@ func _build_categories() -> void:
 	for child in _categories.get_children():
 		child.queue_free()
 	_category_buttons.clear()
-	for domain_v in DaoTreeServiceScript.domains():
+	for domain_v in DaoTreeQueryApplicationScript.domains():
 		if domain_v is Dictionary:
 			_add_category_button(domain_v as Dictionary)
 
@@ -201,7 +204,7 @@ func _sync_tree_data() -> void:
 	_graph.setup(GameState.to_dict(), GameState.major_realm_id())
 	if not _tree_initialized:
 		_tree_initialized = true
-		_current_domain = str((DaoTreeServiceScript.domains().front() as Dictionary).get("id", "zhuji"))
+		_current_domain = str((DaoTreeQueryApplicationScript.domains().front() as Dictionary).get("id", "zhuji"))
 		_highlight_category(_current_domain)
 	_focus_view()
 
@@ -226,7 +229,7 @@ func _on_node_double_pressed(skill_id: String) -> void:
 
 
 func _bind_details(skill_id: String) -> void:
-	var skill := DaoTreeServiceScript.skill_by_id(skill_id)
+	var skill := DaoTreeQueryApplicationScript.skill_by_id(skill_id)
 	if skill.is_empty():
 		return
 	var effective := KnowledgeServiceScript.effective_level(GameState.to_dict(), skill_id)
@@ -248,7 +251,7 @@ func _bind_details(skill_id: String) -> void:
 		if not req_v is Dictionary:
 			continue
 		var req := req_v as Dictionary
-		var parent := DaoTreeServiceScript.skill_by_id(str(req.get("id", "")))
+		var parent := DaoTreeQueryApplicationScript.skill_by_id(str(req.get("id", "")))
 		var have := KnowledgeServiceScript.effective_level(GameState.to_dict(), str(req.get("id", "")))
 		var ok := have >= float(req.get("level", 1))
 		prereq_lines.append(
@@ -269,7 +272,7 @@ func _show_routes() -> void:
 		return
 	_route_panel.visible = true
 	_route_heading.text = "提升途径 · %s" % str(
-		DaoTreeServiceScript.skill_by_id(_selected_skill_id).get("name", "")
+		DaoTreeQueryApplicationScript.skill_by_id(_selected_skill_id).get("name", "")
 	)
 
 

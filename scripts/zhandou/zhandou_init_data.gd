@@ -1,14 +1,14 @@
 ﻿class_name ZhandouInitData
 extends RefCounted
-## 进战唯一入口：外部只提交 combatant 字典，由 [method resolve] 生成 [ZhandouSetup]（[ZhandouObj] + UI 快照）。
-## 进战前经 [method start_battle] 写入 DataStore，由 [ZhandouChangjing] 在 _ready 消费。
+## 战斗初始化解析器：接收已验证的 combatant payload，生成 [ZhandouSetup]（[ZhandouObj] + UI 快照）。
 const ZhandouSetupScript = preload("res://scripts/zhandou/zhandou_setup.gd")
 const ZhandouRecordTypesScript = preload("res://scripts/zhandou/zhandou_record_types.gd")
 const BattleConfigQueryApplicationScript := preload(
 	"res://scripts/features/battle/application/battle_config_query_application.gd"
 )
-
-const META_SCHEMA_VERSION := 2
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
 
 const SETUP_KEYS := ["player", "battle_time_limit"]
 const COMBATANT_KEYS := ["hp", "mp", "attrs", "skills"]
@@ -16,79 +16,6 @@ const ATTR_KEYS := EnumPlayerAttr.COMBAT_CORE_KEYS
 
 ## 进战时出手速度 [member ZhandouObj.ATTR_SPD] 相对基础值的随机浮动比例（±5% → 0.95~1.05）。
 const DEFAULT_SPD_JITTER_RATIO := 0.05
-
-
-static func set_pending(
-		tree: SceneTree,
-		data: Dictionary,
-		source: String = "unknown",
-		session_id: String = ""
-) -> String:
-	var sid := session_id.strip_edges()
-	if sid == "":
-		sid = _new_battle_session_id()
-	var payload := data.duplicate(true)
-	payload["battle_session_id"] = sid
-	var envelope := {
-		"schema": META_SCHEMA_VERSION,
-		"battle_session_id": sid,
-		"source": source,
-		"created_unix": int(Time.get_unix_time_from_system()),
-		"payload": payload,
-	}
-	var store := tree.root.get_node_or_null("DataStore")
-	if store != null:
-		store.set_zhandou_pending_init(envelope)
-	return sid
-
-
-static func start_battle(
-		tree: SceneTree,
-		data: Dictionary,
-		source: String,
-		scene_manager: Node,
-		prefer_overlay: bool
-) -> Dictionary:
-	var merged := merge_skill_cfg_from_tables(data)
-	var errors := collect_errors(merged)
-	if not errors.is_empty():
-		return {"ok": false, "error": errors[0]}
-	var preflight: Dictionary = scene_manager.preflight_transition()
-	if not bool(preflight.get("ok", false)):
-		return preflight
-	set_pending(tree, merged, source)
-	var nav: Dictionary = scene_manager.open_zhandou(prefer_overlay)
-	if not bool(nav.get("ok", false)):
-		take_pending_envelope(tree)
-	return nav
-
-
-static func take_pending_envelope(tree: SceneTree = null) -> Dictionary:
-	var active_tree := tree if tree != null else Engine.get_main_loop() as SceneTree
-	var store := active_tree.root.get_node_or_null("DataStore") if active_tree != null else null
-	if store == null:
-		return {}
-	var envelope: Dictionary = store.take_zhandou_pending_init()
-	if envelope.is_empty():
-		return {}
-	return envelope
-
-
-static func take_pending(tree: SceneTree = null, required_session_id: String = "") -> Dictionary:
-	var envelope := take_pending_envelope(tree)
-	if envelope.is_empty():
-		return {}
-	if envelope.has("payload"):
-		var sid := str(envelope.get("battle_session_id", "")).strip_edges()
-		var required := required_session_id.strip_edges()
-		if required != "" and sid != "" and sid != required:
-			push_error(
-				"ZhandouInitData.take_pending: session mismatch required=%s actual=%s" % [required, sid]
-			)
-			return {}
-		var payload_v: Variant = envelope.get("payload", {})
-		return payload_v as Dictionary if payload_v is Dictionary else {}
-	return envelope
 
 
 ## 合并表、校验并构建 [ZhandouSetup]；失败返回 [code]null[/code]（默认 [method push_error]）。
@@ -159,8 +86,7 @@ static func merge_skill_cfg_from_tables(data: Dictionary) -> Dictionary:
 	var existing_item: Variant = out.get("item_cfg")
 	if existing_item is Dictionary and not (existing_item as Dictionary).is_empty():
 		item_partial = (existing_item as Dictionary).duplicate(true)
-	if cm != null and cm.has_method("build_item_cfg"):
-		out["item_cfg"] = cm.call("build_item_cfg", item_partial)
+	out["item_cfg"] = InventoryQueryApplicationScript.build_item_cfg(item_partial)
 	var equip_partial: Dictionary = {}
 	var existing_equip: Variant = out.get("equip_cfg")
 	if existing_equip is Dictionary and not (existing_equip as Dictionary).is_empty():
@@ -1097,10 +1023,6 @@ static func _resolve_avatar_texture(row: Dictionary) -> Texture2D:
 	if icon_tex != null:
 		return icon_tex
 	return null
-
-
-static func _new_battle_session_id() -> String:
-	return "battle_%d_%d" % [int(Time.get_unix_time_from_system() * 1000.0), randi()]
 
 
 static func _quality_back_color(quality: int) -> Color:

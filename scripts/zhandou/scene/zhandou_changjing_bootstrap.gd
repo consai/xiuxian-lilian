@@ -4,6 +4,9 @@ extends RefCounted
 ## 战斗场景进战初始化与开战启动。
 
 const EnemyAiRuntimeStateScript = preload("res://scripts/zhandou/ai/enemy_ai_runtime_state.gd")
+const BattlePendingSessionScript := preload(
+	"res://scripts/features/battle/contracts/battle_pending_session.gd"
+)
 
 
 static func try_initialize(
@@ -11,25 +14,32 @@ static func try_initialize(
 		hud: ZhandouChangjingHud,
 		editor_battle_init: Dictionary,
 		editor_auto_sample: bool,
-		tree: SceneTree
+		envelope: Dictionary
 ) -> bool:
-	var envelope := ZhandouInitData.take_pending_envelope(tree)
 	var data: Dictionary = {}
-	if envelope.has("payload"):
-		var payload_v: Variant = envelope.get("payload", {})
-		data = payload_v as Dictionary if payload_v is Dictionary else {}
-	ctx.battle_source = str(envelope.get("source", ""))
+	if not envelope.is_empty():
+		var envelope_errors := BattlePendingSessionScript.collect_errors(envelope)
+		if not envelope_errors.is_empty():
+			for message in envelope_errors:
+				push_error("ZhandouChangjing: invalid BattlePendingSession: %s" % message)
+			return false
+		var pending: Dictionary = BattlePendingSessionScript.from_dict(envelope)
+		if pending.is_empty():
+			push_error("ZhandouChangjing: BattlePendingSession.from_dict 失败")
+			return false
+		data = BattlePendingSessionScript.payload_snapshot(pending)
+		ctx.battle_source = str(pending["source"])
 	if data.is_empty() and not editor_battle_init.is_empty():
 		data = editor_battle_init.duplicate(true)
 	if data.is_empty() and editor_auto_sample and OS.has_feature("editor"):
 		data = ZhandouInitData.sample_for_editor()
 		push_warning(
 			"ZhandouChangjing: 编辑器直开，已使用 sample_for_editor()。"
-			+ "正式进战请 ZhandouInitData.set_pending(tree, data)（写入 DataStore）。"
+			+ "正式进战请通过 BattleStartApplication 与 SceneManager payload 进入。"
 		)
 	if data.is_empty():
 		push_error(
-			"ZhandouChangjing: 缺少战斗初始化数据。请 ZhandouInitData.set_pending(tree, data) 写入 DataStore 后切场景，"
+			"ZhandouChangjing: 缺少战斗初始化数据。请通过 BattleStartApplication 与 SceneManager payload 进入，"
 			+ "或在编辑器填写 editor_battle_init（或开启 editor_auto_sample）。"
 		)
 		return false

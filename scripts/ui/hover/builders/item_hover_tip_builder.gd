@@ -3,12 +3,19 @@ class_name ItemHoverTipBuilder
 
 ## 根据战斗道具配置（fight_id）构建 Hover Tip 载荷。
 
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
+const ItemIconResolverScript := preload(
+	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
+)
+
 
 static func build(fight_item_id: int, icon: Texture2D = null, count: int = -1) -> Dictionary:
-	var cfg := ConfigManager.item_by_fight_id(fight_item_id)
-	if cfg.is_empty():
+	var def := InventoryQueryApplicationScript.definition_by_fight_id(fight_item_id)
+	if def == null:
 		return {}
-	var def := ConfigManager.item_def_by_fight_id(fight_item_id)
+	var cfg := def.to_fight_runtime_dict()
 	var title := str(cfg.get("name", "")).strip_edges()
 	if title == "" and def != null:
 		title = def.name
@@ -49,7 +56,7 @@ static func build(fight_item_id: int, icon: Texture2D = null, count: int = -1) -
 	if icon != null:
 		payload_fields["icon"] = icon
 	else:
-		var tex := ZhandouInitData._resolve_icon_texture(cfg)
+		var tex := ItemIconResolverScript.resolve(def.icon_path, null)
 		if tex != null:
 			payload_fields["icon"] = tex
 	return HoverTipPayload.make(payload_fields)

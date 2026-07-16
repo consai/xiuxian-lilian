@@ -1,6 +1,9 @@
 extends Control
 
 const LiandanServiceScript := preload("res://scripts/sim/liandan_service.gd")
+const InventoryQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
 
 @onready var _quality_label: Label = $Dialog/Content/RewardRow/RewardInfo/Quality/Text
 @onready var _name_label: Label = $Dialog/Content/RewardRow/RewardInfo/Name
@@ -68,7 +71,7 @@ func _apply_result(result: Dictionary) -> void:
 	elif added > 0 and product_id != "":
 		_name_label.text = "%s%s ×%d" % [
 			quality_name,
-			ConfigManager.get_item_display_name(product_id),
+			InventoryQueryApplicationScript.display_name(product_id),
 			added,
 		]
 		_description_label.text = _product_description(result)
@@ -132,7 +135,7 @@ func _format_batch_products(product_totals: Dictionary, recipe_id: String) -> St
 	for row_v in rows:
 		var row := row_v as Dictionary
 		parts.append("%s ×%d" % [
-			ConfigManager.get_item_display_name(str(row.get("product_id", ""))),
+			InventoryQueryApplicationScript.display_name(str(row.get("product_id", ""))),
 			int(row.get("amount", 0)),
 		])
 	return " · ".join(parts)
@@ -162,7 +165,7 @@ func _product_description(result: Dictionary) -> String:
 	var product_id := str(result.get("product_id", ""))
 	if product_id == "":
 		return EnumLiandanQuality.failure_flavor(str(result.get("quality", EnumLiandanQuality.LABEL_NONE)))
-	var def := ConfigManager.item_def_by_id(product_id)
+	var def := InventoryQueryApplicationScript.definition_by_id(product_id)
 	if def != null:
 		var text := ItemInfoPayloadBuilder.describe_item(def).strip_edges()
 		if text != "":

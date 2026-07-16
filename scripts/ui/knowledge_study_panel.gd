@@ -1,6 +1,8 @@
 extends Control
 
-const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
+const DaoTreeQueryApplicationScript := preload(
+	"res://scripts/features/dao/application/dao_tree_query_application.gd"
+)
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
 
 @onready var _player_label: Label = %PlayerLabel
@@ -56,8 +58,8 @@ func _bind_list() -> void:
 	for row_v in _rows:
 		var row := row_v as Dictionary
 		var skill_id := str(row.get("id", ""))
-		var skill := DaoTreeServiceScript.skill_by_id(skill_id)
-		var domain := DaoTreeServiceScript.domain_by_id(str(skill.get("domain", "")))
+		var skill := DaoTreeQueryApplicationScript.skill_by_id(skill_id)
+		var domain := DaoTreeQueryApplicationScript.domain_by_id(str(skill.get("domain", "")))
 		var level := int(row.get("level", 0))
 		var quality := _entry_quality(skill)
 		var label := "%s  %s  · %s · %s · %s" % [
@@ -81,7 +83,7 @@ func _bind_details() -> void:
 		_day_count_label.text = "研读 1日"
 		_start_button.disabled = true
 		return
-	var skill := DaoTreeServiceScript.skill_by_id(_selected_skill_id)
+	var skill := DaoTreeQueryApplicationScript.skill_by_id(_selected_skill_id)
 	var entry := KnowledgeServiceScript.get_entry(GameState.to_dict(), _selected_skill_id)
 	var level := int(entry.get("level", 0))
 	var max_days := maxi(1, GameState.max_knowledge_study_days(_selected_skill_id))
@@ -95,7 +97,7 @@ func _bind_details() -> void:
 	var preview := GameState.preview_knowledge_study(_selected_skill_id, _days)
 	_progress.max_value = 100.0
 	_progress.value = KnowledgeServiceScript.level_progress_percent(GameState.to_dict(), _selected_skill_id)
-	var domain := DaoTreeServiceScript.domain_by_id(str(skill.get("domain", "")))
+	var domain := DaoTreeQueryApplicationScript.domain_by_id(str(skill.get("domain", "")))
 	_state_label.text = "%s · %s · %s · 当前 %.0f%%" % [
 		str(domain.get("name", "")),
 		EnumItemTier.label(_entry_tier(skill)),

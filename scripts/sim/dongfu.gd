@@ -1,5 +1,12 @@
 ﻿extends Control
 
+const BreakthroughPagePayloadContract := preload(
+	"res://scripts/features/cultivation/contracts/breakthrough_page_payload.gd"
+)
+const WeituoApplicationScript := preload(
+	"res://scripts/features/commission/application/weituo_application.gd"
+)
+
 @onready var _realm_label: Label = %RealmLabel
 @onready var _status_label: Label = %StatusLabel
 @onready var _message_label: Label = %MessageLabel
@@ -19,8 +26,11 @@
 @onready var _skills_button: TextureButton = %Skills
 @onready var _save_button: Button = %SaveButton
 
+var _weituo_application: Variant
+
 
 func _ready() -> void:
+	_weituo_application = WeituoApplicationScript.production()
 	_inventory_overlay.visible = false
 	_save_slots_overlay.visible = false
 	_weituo_board.visible = false
@@ -146,7 +156,8 @@ func _on_breakthrough() -> void:
 	if not GameState.can_breakthrough():
 		_refresh("修为尚未达到大境界突破门槛。")
 		return
-	var nav: Dictionary = SceneManager.go_tupo_mianban()
+	var payload := BreakthroughPagePayloadContract.panel()
+	var nav: Dictionary = SceneManager.go_to(SceneManager.TUPO_ZONGJIE, payload)
 	if not bool(nav.get("ok", false)):
 		_refresh(str(nav.get("error", "无法打开突破界面")))
 
@@ -176,18 +187,17 @@ func _close_weituo_board() -> void:
 
 
 func _on_weituo_accept(weituo_id: String) -> void:
-	var result: Dictionary = WeituoService.accept(weituo_id, DataStore.savedata, GameState)
+	var result: Dictionary = _weituo_application.accept(weituo_id)
 	if not bool(result.get("ok", false)):
 		if _weituo_board.has_method("show_state_hint"):
 			_weituo_board.show_state_hint(str(result.get("error", "无法接受委托")))
 		return
-	GameState.auto_save()
 	if _weituo_board.has_method("refresh"):
 		_weituo_board.refresh()
 
 
 func _on_weituo_submit(instance_id: String) -> void:
-	var result: Dictionary = WeituoService.submit(instance_id, DataStore.savedata, GameState)
+	var result: Dictionary = _weituo_application.submit(instance_id)
 	if not bool(result.get("ok", false)):
 		if _weituo_board.has_method("show_state_hint"):
 			_weituo_board.show_state_hint(str(result.get("error", "无法提交委托")))
@@ -200,12 +210,11 @@ func _on_weituo_submit(instance_id: String) -> void:
 
 
 func _on_weituo_abandon(instance_id: String) -> void:
-	var result: Dictionary = WeituoService.abandon(instance_id, DataStore.savedata)
+	var result: Dictionary = _weituo_application.abandon(instance_id)
 	if not bool(result.get("ok", false)):
 		if _weituo_board.has_method("show_state_hint"):
 			_weituo_board.show_state_hint(str(result.get("error", "无法放弃委托")))
 		return
-	GameState.auto_save()
 	if _weituo_board.has_method("refresh"):
 		_weituo_board.refresh()
 

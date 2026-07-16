@@ -4,6 +4,9 @@ extends Control
 const NODE_SCENE := preload("res://scenes/ui/components/dao_tree_node.tscn")
 const DaoTreeNodeViewScript := preload("res://scripts/ui/dao_tree_node_view.gd")
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
+const DaoTreeQueryApplicationScript := preload(
+	"res://scripts/features/dao/application/dao_tree_query_application.gd"
+)
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
 
 signal node_pressed(skill_id: String)
@@ -238,12 +241,12 @@ func _compute_full_layout() -> Dictionary:
 	var positions := {}
 	_domain_regions.clear()
 	_realm_regions.clear()
-	var realms := DaoTreeServiceScript.realms()
+	var realms := DaoTreeQueryApplicationScript.realms()
 	var column_widths := _compute_domain_column_widths()
 	var realm_tops := _compute_realm_row_tops()
 	var realm_bounds: Dictionary = {}
 	var x_cursor := TREE_PADDING.x
-	var groups := DaoTreeServiceScript.domain_groups()
+	var groups := DaoTreeQueryApplicationScript.domain_groups()
 
 	for group_index in groups.size():
 		var group_v: Variant = groups[group_index]
@@ -253,7 +256,7 @@ func _compute_full_layout() -> Dictionary:
 		var domain_ids: Array = []
 		for domain_id_v in group.get("domains", []) as Array:
 			var domain_id := str(domain_id_v)
-			if domain_id != "" and not DaoTreeServiceScript.domain_by_id(domain_id).is_empty():
+			if domain_id != "" and not DaoTreeQueryApplicationScript.domain_by_id(domain_id).is_empty():
 				domain_ids.append(domain_id)
 		if domain_ids.is_empty():
 			continue
@@ -318,7 +321,7 @@ func _compute_full_layout() -> Dictionary:
 
 func _ordered_domain_ids() -> Array:
 	var out: Array = []
-	for group_v in DaoTreeServiceScript.domain_groups():
+	for group_v in DaoTreeQueryApplicationScript.domain_groups():
 		if not group_v is Dictionary:
 			continue
 		for domain_id_v in (group_v as Dictionary).get("domains", []) as Array:
@@ -328,7 +331,7 @@ func _ordered_domain_ids() -> Array:
 
 func _compute_domain_column_widths() -> Dictionary:
 	var widths := {}
-	var realms := DaoTreeServiceScript.realms()
+	var realms := DaoTreeQueryApplicationScript.realms()
 	for domain_id_v in _ordered_domain_ids():
 		var domain_id := str(domain_id_v)
 		var max_layers := 1
@@ -361,7 +364,7 @@ func _realm_band_layer_count(skills: Array) -> int:
 
 func _compute_realm_row_tops() -> Dictionary:
 	var tops := {}
-	var realms := DaoTreeServiceScript.realms()
+	var realms := DaoTreeQueryApplicationScript.realms()
 	var domain_ids := _ordered_domain_ids()
 	var y_cursor := TREE_PADDING.y
 
@@ -433,7 +436,7 @@ func _expand_bounds(store: Dictionary, realm_id: String, rect: Rect2) -> void:
 
 func _skills_for_domain_realm(domain_id: String, realm_id: String) -> Array:
 	var out: Array = []
-	for skill_v in DaoTreeServiceScript.skills_in_domain(domain_id):
+	for skill_v in DaoTreeQueryApplicationScript.skills_in_domain(domain_id):
 		if skill_v is Dictionary and str((skill_v as Dictionary).get("realm", "")) == realm_id:
 			out.append(skill_v)
 	out.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
@@ -481,7 +484,7 @@ func _band_depth(skill_id: String, ids: Dictionary, memo: Dictionary) -> int:
 
 func _spawn_nodes() -> void:
 	_nodes_by_id.clear()
-	for skill_v in DaoTreeServiceScript.config().get("skills", []) as Array:
+	for skill_v in DaoTreeQueryApplicationScript.all_skills():
 		if not skill_v is Dictionary:
 			continue
 		var skill := skill_v as Dictionary
@@ -501,7 +504,7 @@ func _spawn_lines() -> void:
 	for child in _lines_layer.get_children():
 		child.queue_free()
 	var line_color := Color(0.42, 0.32, 0.21, 0.72)
-	for skill_v in DaoTreeServiceScript.config().get("skills", []) as Array:
+	for skill_v in DaoTreeQueryApplicationScript.all_skills():
 		if not skill_v is Dictionary:
 			continue
 		var skill := skill_v as Dictionary
@@ -516,7 +519,7 @@ func _spawn_lines() -> void:
 			var parent_id := str((req_v as Dictionary).get("id", ""))
 			if parent_id == "" or not _positions.has(parent_id):
 				continue
-			var parent_skill := DaoTreeServiceScript.skill_by_id(parent_id)
+			var parent_skill := DaoTreeQueryApplicationScript.skill_by_id(parent_id)
 			if parent_skill.is_empty():
 				continue
 			if str(parent_skill.get("domain", "")) != child_domain:
@@ -534,7 +537,7 @@ func _refresh_node_states() -> void:
 	var levels_map := KnowledgeServiceScript.effective_levels_map(_savedata)
 	for sid in _nodes_by_id.keys():
 		var node: DaoTreeNodeViewScript = _nodes_by_id[sid]
-		var skill := DaoTreeServiceScript.skill_by_id(str(sid))
+		var skill := DaoTreeQueryApplicationScript.skill_by_id(str(sid))
 		if skill.is_empty():
 			continue
 		var entry := KnowledgeServiceScript.get_entry(_savedata, str(sid))

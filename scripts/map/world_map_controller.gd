@@ -28,6 +28,10 @@ var _city_nodes: Dictionary = {}
 var _region_nodes: Dictionary = {}
 var _location_nodes: Dictionary = {}
 var _route_lines: Dictionary = {}
+var _selected_city_id: String = ""
+var _selected_region_id: String = ""
+var _selected_location_id: String = ""
+var _pending_travel: Dictionary = {}
 
 
 func _ready() -> void:
@@ -61,7 +65,7 @@ func select_city(city_id: String) -> void:
 		city_id,
 		map_data
 	)
-	DataStore.map_runtime()["selected_city_id"] = city_id
+	_selected_city_id = city_id
 	_update_selection_for_city(city, preview)
 	if _city_popup.has_method("show_city"):
 		_city_popup.call("show_city", city_id, city, preview)
@@ -73,7 +77,7 @@ func select_wilderness(region_id: String) -> void:
 	if region.is_empty():
 		return
 	var can_enter := WorldMapServiceScript.can_enter_wilderness(region_id, map_data)
-	DataStore.map_runtime()["selected_region_id"] = region_id
+	_selected_region_id = region_id
 	_update_selection_for_region(region, map_data)
 	if _wilderness_popup.has_method("show_region"):
 		_wilderness_popup.call(
@@ -94,7 +98,7 @@ func select_wilderness_location(location_id: String) -> void:
 	if row.is_empty():
 		return
 	var can_enter := WorldMapServiceScript.can_enter_wilderness_location(location_id, map_data)
-	DataStore.map_runtime()["selected_location_id"] = location_id
+	_selected_location_id = location_id
 	if _location_popup.has_method("show_location"):
 		_location_popup.call(
 			"show_location",
@@ -115,12 +119,12 @@ func request_travel(target_city_id: String) -> void:
 	var preview := WorldMapServiceScript.build_travel_preview(from_id, target_city_id, map_data)
 	if not bool(preview.get("ok", false)):
 		return
-	DataStore.map_runtime()["pending_travel"] = preview.duplicate(true)
+	_pending_travel = preview.duplicate(true)
 	confirm_travel()
 
 
 func confirm_travel() -> void:
-	var pending_v: Variant = DataStore.map_runtime().get("pending_travel", {})
+	var pending_v: Variant = _pending_travel
 	if not pending_v is Dictionary:
 		return
 	var pending := pending_v as Dictionary
@@ -153,7 +157,7 @@ func enter_wilderness(region_id: String, options: Dictionary = {}) -> void:
 		location_id, -1, LilianState, GameState, SceneManager, TutorialService
 	)
 	if not bool(nav.get("ok", false)):
-		DataStore.lilian_runtime().erase("difficulty_override")
+		LilianState.clear_difficulty_override()
 
 
 func enter_wilderness_location(location_id: String, options: Dictionary = {}) -> void:
@@ -169,12 +173,12 @@ func enter_wilderness_location(location_id: String, options: Dictionary = {}) ->
 		lilian_id, -1, LilianState, GameState, SceneManager, TutorialService
 	)
 	if not bool(nav.get("ok", false)):
-		DataStore.lilian_runtime().erase("difficulty_override")
+		LilianState.clear_difficulty_override()
 
 
 func _apply_difficulty_override(location_id: String, options: Dictionary) -> bool:
 	if not options.has("min_difficulty") and not options.has("max_difficulty"):
-		DataStore.lilian_runtime().erase("difficulty_override")
+		LilianState.clear_difficulty_override()
 		return true
 	var clamped := WorldMapServiceScript.clamp_difficulty_options(
 		location_id,
@@ -183,10 +187,10 @@ func _apply_difficulty_override(location_id: String, options: Dictionary) -> boo
 	)
 	if not bool(clamped.get("ok", false)):
 		return false
-	DataStore.lilian_runtime()["difficulty_override"] = {
-		"min_difficulty": int(clamped.get("min_difficulty", 1)),
-		"max_difficulty": int(clamped.get("max_difficulty", 1)),
-	}
+	LilianState.set_difficulty_override(
+		int(clamped.get("min_difficulty", 1)),
+		int(clamped.get("max_difficulty", 1))
+	)
 	return true
 
 
@@ -194,7 +198,7 @@ func close_popups() -> void:
 	for popup in [_city_popup, _wilderness_popup, _location_popup, _travel_popup]:
 		if popup != null and popup.has_method("hide_popup"):
 			popup.call("hide_popup")
-	DataStore.map_runtime()["pending_travel"] = {}
+	_pending_travel = {}
 
 
 func _on_return_pressed() -> void:
@@ -231,15 +235,15 @@ func _connect_popups() -> void:
 	if _city_popup.has_signal("travel_requested"):
 		_city_popup.travel_requested.connect(request_travel)
 	if _city_popup.has_signal("closed"):
-		_city_popup.closed.connect(func(): DataStore.map_runtime()["selected_city_id"] = "")
+		_city_popup.closed.connect(func(): _selected_city_id = "")
 	if _wilderness_popup.has_signal("enter_requested"):
 		_wilderness_popup.enter_requested.connect(enter_wilderness)
 	if _wilderness_popup.has_signal("closed"):
-		_wilderness_popup.closed.connect(func(): DataStore.map_runtime()["selected_region_id"] = "")
+		_wilderness_popup.closed.connect(func(): _selected_region_id = "")
 	if _location_popup.has_signal("enter_requested"):
 		_location_popup.enter_requested.connect(enter_wilderness_location)
 	if _location_popup.has_signal("closed"):
-		_location_popup.closed.connect(func(): DataStore.map_runtime()["selected_location_id"] = "")
+		_location_popup.closed.connect(func(): _selected_location_id = "")
 	if _travel_popup.has_signal("confirmed"):
 		_travel_popup.confirmed.connect(confirm_travel)
 	if _travel_popup.has_signal("cancelled"):
