@@ -8,6 +8,23 @@ const TipIntentScript := preload("res://scripts/ui/tips/core/tip_intent.gd")
 
 var _popup: ItemInfoPopupView
 var _current_payload: Dictionary = {}
+var _game_session_host: Node
+var _tips_host: Node
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func bind_tips_host(host: Node) -> void:
+	_tips_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("ItemInfoPopupHost: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
 
 
 func _ready() -> void:
@@ -21,13 +38,13 @@ func _ready() -> void:
 
 func show_entry(entry: Dictionary) -> void:
 	show_payload(BuilderScript.from_entry(
-		entry, GameState.to_dict(), GameState.major_realm_id()
+		entry, _game_session().to_dict(), _game_session().major_realm_id()
 	))
 
 
 func show_item(item_id: String, count: int = 1) -> void:
 	show_payload(BuilderScript.from_item_id(
-		item_id, count, GameState.to_dict(), GameState.major_realm_id()
+		item_id, count, _game_session().to_dict(), _game_session().major_realm_id()
 	))
 
 
@@ -50,12 +67,12 @@ func hide_popup() -> void:
 
 
 func _on_use_requested() -> void:
-	if _current_payload.is_empty() or GameState == null:
+	if _current_payload.is_empty() or _game_session() == null:
 		return
 	var item_id := str(_current_payload.get("item_id", "")).strip_edges()
 	if item_id == "":
 		return
-	var result := GameState.use_inventory_item(item_id)
+	var result: Dictionary = _game_session().use_inventory_item(item_id)
 	if bool(result.get("ok", false)):
 		var message := str(result.get("message", "")).strip_edges()
 		if message != "":
@@ -78,7 +95,9 @@ func _emit_use_tip(text: String, tone: String) -> void:
 	var message := text.strip_edges()
 	if message == "":
 		return
-	DataEvents.emit_tip_intent(TipIntentScript.make({
+	if _tips_host == null:
+		return
+	_tips_host.publish_intent(TipIntentScript.make({
 		"type": EnumTipIntentType.LABEL_TOAST,
 		"text": message,
 		"tone": tone,

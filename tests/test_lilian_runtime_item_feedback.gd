@@ -3,6 +3,10 @@ extends SceneTree
 const InventoryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_application.gd"
 )
+const LilianSessionScript := preload("res://scripts/lilian/lilian_state.gd")
+const LilianSessionHostScript := preload("res://scripts/app/lilian_session_host.gd")
+const GameSessionHostScript := preload("res://scripts/app/game_session_host.gd")
+const GameSessionScript := preload("res://scripts/sim/game_state.gd")
 
 var _failures: PackedStringArray = []
 var _feedback_count := 0
@@ -17,8 +21,10 @@ func _init() -> void:
 
 
 func _run() -> void:
-	_lilian_state = root.get_node("LilianState")
+	_lilian_state = LilianSessionScript.new()
+	root.add_child(_lilian_state)
 	_scene_manager = root.get_node("SceneManager")
+	_lilian_state.bind_scene_manager(_scene_manager)
 	_lilian_state.runtime_item_feedback.connect(_on_runtime_item_feedback)
 	_lilian_state.runtime_vitals_changed.connect(_on_runtime_vitals_changed)
 	_test_success()
@@ -120,6 +126,15 @@ func _test_page_pending_feedback() -> void:
 	_seed_active_session("items_LingGuo", 1, 40.0, 30.0)
 	_lilian_state.location_id = "qinglan_mountain"
 	var page := (load("res://scenes/lilian/lilian_xunhuan.tscn") as PackedScene).instantiate()
+	var session_host := LilianSessionHostScript.new()
+	session_host.bind_session(_lilian_state)
+	var game_session_host := GameSessionHostScript.new()
+	var game_session := GameSessionScript.new()
+	game_session.bind_store(root.get_node("DataStore"))
+	game_session.bind_scene_manager(root.get_node("SceneManager"))
+	game_session_host.bind_session(game_session)
+	page.bind_lilian_session_host(session_host)
+	page.bind_game_session_host(game_session_host)
 	root.add_child(page)
 	await process_frame
 	page.set("_pending_bag_feedback", "最新背包反馈")
@@ -129,6 +144,9 @@ func _test_page_pending_feedback() -> void:
 	_check(str(page.get("_pending_bag_feedback")) == "", "bag dismissal consumes pending feedback")
 	_check(str((page.get_node("%Feedback") as Label).text) == "最新背包反馈", "bag dismissal presents latest feedback")
 	page.queue_free()
+	session_host.queue_free()
+	game_session_host.queue_free()
+	game_session.queue_free()
 	await process_frame
 
 

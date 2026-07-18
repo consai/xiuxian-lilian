@@ -1,9 +1,37 @@
 extends Control
 
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("SkillReleaseStrategyPanel: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("SkillReleaseStrategyPanel: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
 const PlayerAutoBattleServiceScript := preload("res://scripts/sim/player_auto_battle_service.gd")
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
+const InventoryEquipQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_query_application.gd"
 )
 const ItemIconResolverScript := preload(
 	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
@@ -44,12 +72,18 @@ var _wired := false
 
 
 func _ready() -> void:
-	_load_draft()
 	_close_button.pressed.connect(_go_back)
 	_cancel_button.pressed.connect(_go_back)
 	_confirm_button.pressed.connect(_on_confirm_pressed)
 	_add_button.pressed.connect(_on_add_pressed)
 	_wire_static_interactions()
+	call_deferred("_initialize_after_session")
+
+
+func _initialize_after_session() -> void:
+	if _game_session() == null:
+		return
+	_load_draft()
 	_refresh()
 
 
@@ -60,8 +94,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _load_draft() -> void:
-	_draft_preset = GameState.auto_battle_preset
-	var rules := GameState.resolved_auto_battle_rules()
+	var game_session := _game_session()
+	_draft_preset = game_session.auto_battle_preset
+	var rules: Dictionary = game_session.resolved_auto_battle_rules()
 	_draft_strategies = (rules.get("strategies", []) as Array).duplicate(true)
 	_draft_settings = PlayerAutoBattleServiceScript.normalize_settings(rules.get("settings", {}))
 
@@ -160,14 +195,15 @@ func _cycle_setting(setting_key: String) -> void:
 
 
 func _on_add_pressed() -> void:
-	for aid_v in GameState.equipped_abilities:
+	var game_session := _game_session()
+	for aid_v in game_session.equipped_abilities:
 		var aid := str(aid_v).strip_edges()
 		if aid == "":
 			continue
 		var sid := AbilityQueryApplicationScript.combat_id_for(aid)
 		if sid <= 0 or _has_skill_strategy(sid):
 			continue
-		var skill := AbilityQueryApplicationScript.runtime_by_ability_id(aid, GameState.to_dict())
+		var skill := AbilityQueryApplicationScript.runtime_by_ability_id(aid, game_session.to_dict())
 		var template := PlayerAutoBattleServiceScript.skill_strategy_template(
 			sid,
 			str(skill.get("name", ""))
@@ -209,13 +245,14 @@ func _edit_strategy(index: int) -> void:
 
 
 func _on_confirm_pressed() -> void:
-	GameState.auto_battle_preset = _draft_preset
-	GameState.auto_battle_rules = PlayerAutoBattleServiceScript.with_config(
+	var game_session := _game_session()
+	game_session.auto_battle_preset = _draft_preset
+	game_session.auto_battle_rules = PlayerAutoBattleServiceScript.with_config(
 		_draft_preset,
 		_draft_strategies,
 		_draft_settings
 	)
-	GameState.auto_battle_enabled = true
+	game_session.auto_battle_enabled = true
 	_refresh("策略已保存。")
 	await get_tree().process_frame
 	_go_back()
@@ -252,15 +289,17 @@ func _strategy_icon(strategy: Dictionary) -> Texture2D:
 			)
 		"item":
 			var slot_index := int(action.get("slot_index", 0))
-			var iid := str(GameState.item_slots[slot_index]) if slot_index < GameState.item_slots.size() else ""
+			var game_session := _game_session()
+			var iid := str(game_session.item_slots[slot_index]) if slot_index < game_session.item_slots.size() else ""
 			var def := InventoryQueryApplicationScript.definition_by_id(iid)
 			if def != null:
 				return ItemIconResolverScript.resolve(def.icon_path, null)
 		"equip":
 			var equip_slot := int(action.get("slot_index", 0))
-			var eid := int(GameState.equip_slots[equip_slot]) if equip_slot < GameState.equip_slots.size() else -1
+			var game_session := _game_session()
+			var eid := int(game_session.equip_slots[equip_slot]) if equip_slot < game_session.equip_slots.size() else -1
 			if eid > 0:
-				return _entry_icon(ConfigManager.equip_by_id(eid))
+				return _entry_icon(InventoryEquipQueryApplicationScript.equip_by_id(eid))
 	return null
 
 
@@ -279,4 +318,6 @@ func _preset_name(preset: String) -> String:
 
 
 func _go_back() -> void:
-	LilianFlowService.go_back(LilianState, SceneManager)
+	var lilian := _lilian_session()
+	if lilian != null:
+		LilianFlowService.go_back(lilian, SceneManager)

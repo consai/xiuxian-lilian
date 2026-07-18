@@ -61,6 +61,10 @@ var _previous_id := ""
 var _history: Array = []
 var _transitioning := false
 var _payloads: Dictionary = {}
+var _game_session_host: Node
+var _lilian_session_host: Node
+var _tips_host: Node
+var _tutorial_coordinator: Node
 
 
 func _ready() -> void:
@@ -74,6 +78,26 @@ func bind_scene_host(scene_host: Node) -> void:
 	if _scene_root != null and _scene_root != scene_host and _scene_root.get_parent() == self:
 		_scene_root.queue_free()
 	_scene_root = scene_host
+
+
+func bind_page_dependencies(game_session_host: Node, lilian_session_host: Node, tips_host: Node, tutorial_coordinator: Node) -> void:
+	_game_session_host = game_session_host
+	_lilian_session_host = lilian_session_host
+	_tips_host = tips_host
+	_tutorial_coordinator = tutorial_coordinator
+
+
+func _inject_page_dependencies(scene: Node) -> void:
+	if scene == null:
+		return
+	if scene.has_method("bind_game_session_host"):
+		scene.call("bind_game_session_host", _game_session_host)
+	if scene.has_method("bind_lilian_session_host"):
+		scene.call("bind_lilian_session_host", _lilian_session_host)
+	if scene.has_method("bind_tips_host"):
+		scene.call("bind_tips_host", _tips_host)
+	if scene.has_method("bind_tutorial_coordinator"):
+		scene.call("bind_tutorial_coordinator", _tutorial_coordinator)
 
 
 ## 返回 SceneManager 下的场景容器，供剧情引导等跨层查找节点。
@@ -358,6 +382,7 @@ func _perform_transition(
 	if new_scene == null:
 		_transitioning = false
 		return {"ok": false, "error": "scene_instantiate_failed:%s" % scene_id}
+	_inject_page_dependencies(new_scene)
 
 	var payload_copy := payload.duplicate(true)
 	var previous_id := _current_id
@@ -417,6 +442,7 @@ func _push_zhandou_overlay(payload: Dictionary) -> Dictionary:
 	if overlay == null:
 		_transitioning = false
 		return {"ok": false, "error": "zhandou_changjing_instantiate_failed"}
+	_inject_page_dependencies(overlay)
 	# 战斗场景会在同步 _ready 中 take；仅实例化成功后提交，失败不得覆盖旧 payload。
 	_payloads[ZHANDOU_CHANGJING] = payload.duplicate(true)
 	_scene_underlay = underlay
@@ -481,6 +507,7 @@ func _push_panel_popup(scene_id: String, payload: Dictionary) -> Dictionary:
 	if overlay == null:
 		_transitioning = false
 		return {"ok": false, "error": "panel_scene_instantiate_failed"}
+	_inject_page_dependencies(overlay)
 	_payloads[scene_id] = payload.duplicate(true)
 	_scene_underlay = underlay
 	var keep_underlay_visible := scene_id == BEIBAO_PANEL

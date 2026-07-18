@@ -11,6 +11,18 @@ signal closed
 
 var _slot_index := -1
 var _pick_kind := ""
+var _game_session_host: Node
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("PeizhiBeibaoTanchuang: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
 
 
 func _ready() -> void:
@@ -62,7 +74,10 @@ func _open(slot_index: int, kind: String, title: String, hint: String) -> void:
 			_bag.set_picker_mode(BagBaseView.PickerFilter.CULTIVATION_PILL)
 		_:
 			_bag.set_picker_mode(BagBaseView.PickerFilter.BATTLE_ITEM)
-	_bag.bind_inventory(GameState.inventory, GameState.owned_equips)
+	var game_session := _game_session()
+	if game_session == null:
+		return
+	_bag.bind_inventory(game_session.inventory, game_session.owned_equips, game_session)
 	visible = true
 
 

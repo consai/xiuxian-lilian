@@ -1,5 +1,31 @@
 extends Control
 
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("MasteredArtsPanel: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("MasteredArtsPanel: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
+
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
@@ -35,6 +61,12 @@ func _ready() -> void:
 	_filter_active.pressed.connect(_set_skill_filter.bind(FILTER_ACTIVE))
 	_filter_upkeep.pressed.connect(_set_skill_filter.bind(FILTER_UPKEEP))
 	_filter_passive.pressed.connect(_set_skill_filter.bind(FILTER_PASSIVE))
+	call_deferred("_initialize_after_session")
+
+
+func _initialize_after_session() -> void:
+	if _game_session() == null:
+		return
 	refresh()
 
 
@@ -53,7 +85,8 @@ func refresh() -> void:
 func _bind_methods() -> void:
 	_clear(_methods)
 	var count := 0
-	for method_id_v in GameState.unlocked_methods:
+	var game_session := _game_session()
+	for method_id_v in game_session.unlocked_methods:
 		var method_id := str(method_id_v).strip_edges()
 		if method_id == "":
 			continue
@@ -75,7 +108,7 @@ func _bind_methods() -> void:
 		row.get_node("%EffectLabel").text = _method_brief_effect(method, method_id)
 		_apply_quality_tier_badges(row, method, family)
 		var hover := row.get_node("%HoverTipSource") as HoverTipSource
-		hover.set_payload(MethodHoverTipBuilder.build(method_id, GameState.to_dict(), icon))
+		hover.set_payload(MethodHoverTipBuilder.build(method_id, game_session.to_dict(), icon))
 		_set_icon(row.get_node("%Icon") as TextureRect, icon)
 		_methods.add_child(row)
 	_method_count.text = "已掌握 %d 门" % count
@@ -87,7 +120,8 @@ func _bind_skills() -> void:
 	_clear(_skills)
 	var count := 0
 	var visible_count := 0
-	for ability_id_v in GameState.unlocked_abilities:
+	var game_session := _game_session()
+	for ability_id_v in game_session.unlocked_abilities:
 		var ability_id := str(ability_id_v).strip_edges()
 		if ability_id == "" or ability_id == "-1":
 			continue
@@ -98,7 +132,7 @@ func _bind_skills() -> void:
 		var ability_type := str(ability.get("type", ""))
 		if _skill_filter != FILTER_ALL and ability_type != _skill_filter:
 			continue
-		var skill := AbilityServiceScript.to_runtime_dict(ability_id, GameState.to_dict())
+		var skill := AbilityServiceScript.to_runtime_dict(ability_id, game_session.to_dict())
 		var display := skill if not skill.is_empty() else ability
 		visible_count += 1
 		var row := SkillRowScene.instantiate() as Control
@@ -113,7 +147,7 @@ func _bind_skills() -> void:
 		_apply_quality_tier_badges(row, ability)
 		_set_icon(row.get_node("%Icon") as TextureRect, icon)
 		var hover := row.get_node("%HoverTipSource") as HoverTipSource
-		hover.set_payload(SkillHoverTipBuilder.build_ability(ability_id, GameState.to_dict(), icon))
+		hover.set_payload(SkillHoverTipBuilder.build_ability(ability_id, game_session.to_dict(), icon))
 		_skills.add_child(row)
 	_skill_count.text = "已掌握 %d 个    当前显示 %d 个" % [count, visible_count]
 	if visible_count == 0:
@@ -212,7 +246,7 @@ func _method_meta(method: Dictionary, method_id: String) -> String:
 	var family := XiulianMethodServiceScript.family_by_id(str(method.get("familyId", "")))
 	parts.append(EnumItemTier.label(_entry_tier(method)))
 	parts.append(EnumQuality.display_label(_entry_quality(method, family)))
-	var mastery := XiulianMethodServiceScript.method_mastery(GameState.to_dict(), method_id)
+	var mastery := XiulianMethodServiceScript.method_mastery(_game_session().to_dict(), method_id)
 	parts.append("熟练 %.0f%%" % (mastery * 100.0))
 	var practice: Dictionary = method.get("practice", {}) as Dictionary
 	if not practice.is_empty():
@@ -223,7 +257,7 @@ func _method_meta(method: Dictionary, method_id: String) -> String:
 func _method_brief_effect(method: Dictionary, method_id: String) -> String:
 	var lines := HoverTipEffectFormatter.format_raw_ability_lines(
 		method.get("effects", []),
-		XiulianMethodServiceScript.method_mastery_value_ratio(GameState.to_dict(), method_id)
+		XiulianMethodServiceScript.method_mastery_value_ratio(_game_session().to_dict(), method_id)
 	)
 	if not lines.is_empty():
 		return str(lines[0])
@@ -323,4 +357,5 @@ func _clear(container: Node) -> void:
 
 
 func _go_back() -> void:
-	LilianFlowService.go_back(LilianState, SceneManager)
+	var lilian := _lilian_session()
+	if lilian != null: LilianFlowService.go_back(lilian, SceneManager)

@@ -7,6 +7,9 @@ const ItemIconResolverScript := preload(
 const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
 )
+const InventoryEquipQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_query_application.gd"
+)
 
 ## 道具展示块，场景 [code]item.tscn[/code]。
 ## [member click_enabled] 为 [code]false[/code] 时仅展示（如详情弹窗）；为 [code]true[/code] 时可点击并带缩放反馈（如背包）。
@@ -158,7 +161,7 @@ static func apply_reward_row(view: ItemView, row: Dictionary, options: Dictionar
 		if item_name == "":
 			item_name = "灵石" if str(row.get("id", "")) == "ling_stones" else str(row.get("id", "货币"))
 	elif kind == EnumRewardKind.LABEL_EQUIP:
-		var equip_cfg := ConfigManager.equip_by_id(int(row.get("id", -1)))
+		var equip_cfg := InventoryEquipQueryApplicationScript.equip_by_id(int(row.get("id", -1)))
 		if item_name == "":
 			item_name = str(equip_cfg.get("name", "法宝"))
 		icon = ZhandouInitDataScript._resolve_icon_texture(equip_cfg)

@@ -13,6 +13,18 @@ signal cancelled
 
 var _days_per_batch := 1
 var _duration_per_batch := "1日"
+var _game_session_host: Node
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("LiandanPiliangTanchuang: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
 
 
 func _ready() -> void:
@@ -35,7 +47,7 @@ func open(preview: Dictionary, max_batch: int) -> void:
 	var recipe := preview.get("recipe", {}) as Dictionary
 	var recipe_name := str(recipe.get("name", "丹方"))
 	_days_per_batch = maxi(1, int(preview.get("days", 1)))
-	_duration_per_batch = str(preview.get("duration_label", GameState.time_duration_label(_days_per_batch)))
+	_duration_per_batch = str(preview.get("duration_label", _game_session().time_duration_label(_days_per_batch)))
 	var safe_max := maxi(1, max_batch)
 	_count_slider.min_value = 1.0
 	_count_slider.max_value = float(safe_max)
@@ -55,7 +67,7 @@ func close_popup() -> void:
 
 func _update_count_display(count: int) -> void:
 	var total_days := count * _days_per_batch
-	_count_label.text = "%d 炉（共 %s）" % [count, GameState.time_duration_label(total_days)]
+	_count_label.text = "%d 炉（共 %s）" % [count, _game_session().time_duration_label(total_days)]
 
 
 func _on_slider_value_changed(value: float) -> void:

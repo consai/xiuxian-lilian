@@ -38,7 +38,7 @@ class FakeSceneManager:
 		return navigation_result
 
 
-class FakeTutorialService:
+class FakeTutorialCoordinator:
 	extends Node
 
 	var log: Array[String]
@@ -60,7 +60,7 @@ func _run() -> void:
 	var lilian := FakeLilianState.new()
 	var game_state := FakeGameState.new()
 	var scene_manager := FakeSceneManager.new()
-	var tutorial := FakeTutorialService.new(scene_manager.log)
+	var tutorial := FakeTutorialCoordinator.new(scene_manager.log)
 
 	var blocked: Dictionary = flow_script.call(
 		"open_settlement", "manual", lilian, game_state, scene_manager

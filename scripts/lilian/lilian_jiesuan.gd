@@ -1,9 +1,38 @@
 extends Control
 
+var _lilian_session_host: Node
+var _game_session_host: Node
+var LilianState: Node:
+	get:
+		if _lilian_session_host == null:
+			push_error("LilianJiesuan: LilianSessionHost 未注入")
+			return null
+		return _lilian_session_host.session()
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+	_initialize_settlement()
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+	_initialize_settlement()
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("LilianJiesuan: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
 const LilianFlowService := preload("res://scripts/lilian/lilian_flow_service.gd")
 const RewardServiceScript := preload("res://scripts/sim/reward_service.gd")
 
 var _result: Dictionary = {}
+var _tutorial_coordinator: Node
+var _settlement_initialized := false
 
 @onready var _loot_items: GridContainer = %LootItems
 @onready var _loot_item_template: ItemView = (
@@ -18,24 +47,43 @@ var _result: Dictionary = {}
 
 
 func _ready() -> void:
+	(%ReturnButton as Button).pressed.connect(_on_return_pressed)
+	(%LogButton as Button).pressed.connect(_on_log_pressed)
+	_prepare_loot_template(_loot_item_template)
+	_prepare_loot_template(_loot_lost_item_template)
+	_initialize_settlement()
+
+
+func bind_tutorial_coordinator(tutorial_coordinator: Node) -> void:
+	if tutorial_coordinator == null:
+		push_error("LilianJiesuan: TutorialCoordinator 不可用")
+		return
+	_tutorial_coordinator = tutorial_coordinator
+	_initialize_settlement()
+
+
+func tutorial_coordinator() -> Node:
+	return _tutorial_coordinator
+
+
+func _initialize_settlement() -> void:
+	if _settlement_initialized or _tutorial_coordinator == null or _lilian_session_host == null or _game_session_host == null:
+		return
+	_settlement_initialized = true
 	var payload: Dictionary = SceneManager.peek_payload(SceneManager.LILIAN_JIESUAN)
 	var reason: String = str(payload.get("reason", "manual"))
 	if LilianState.active:
 		_result = LilianFlowService.settle_active_lilian(
 			reason,
 			LilianState,
-			GameState,
-			TutorialService
+			_game_session(),
+			_tutorial_coordinator
 		)
-	elif not GameState.last_lilian_summary.is_empty():
-		_result = GameState.last_lilian_summary.duplicate(true)
+	elif not _game_session().last_lilian_summary.is_empty():
+		_result = _game_session().last_lilian_summary.duplicate(true)
 	else:
 		LilianFlowService.open_hub(LilianState, SceneManager)
 		return
-	(%ReturnButton as Button).pressed.connect(_on_return_pressed)
-	(%LogButton as Button).pressed.connect(_on_log_pressed)
-	_prepare_loot_template(_loot_item_template)
-	_prepare_loot_template(_loot_lost_item_template)
 	_render()
 
 
@@ -51,19 +99,19 @@ func _render() -> void:
 	var title := %Title as Label
 	var body := %Body as RichTextLabel
 	var log_button := %LogButton as Button
-	var reason := str(_result.get("exit_reason", "manual"))
+	var reason: String = str(_result.get("exit_reason", "manual"))
 	var reason_text := "主动返程"
 	if reason == "defeated":
 		reason_text = "战败撤退"
 	elif reason == "fled":
 		reason_text = "战中遁走"
 	title.text = "历练结算 · %s" % reason_text
-	var stats := _result.get("stats", {}) as Dictionary
+	var stats: Dictionary = _result.get("stats", {}) as Dictionary
 	var lines: PackedStringArray = [
 		"最高难度 %d，事件 %d 个，耗时 %s" % [
 			maxi(int(stats.get("max_difficulty", 0)), int(stats.get("max_depth", 0))),
 			int(stats.get("steps", 0)),
-			str(_result.get("duration_label", GameState.time_duration_label(int(_result.get("elapsed_days", 1))))),
+			str(_result.get("duration_label", _game_session().time_duration_label(int(_result.get("elapsed_days", 1))))),
 		],
 		"战斗 %d 场，胜 %d，负 %d" % [
 			int(stats.get("battles", 0)),
@@ -238,4 +286,7 @@ func _on_log_pressed() -> void:
 
 
 func _on_return_pressed() -> void:
-	LilianFlowService.close_settlement(LilianState, SceneManager, TutorialService)
+	if _tutorial_coordinator == null:
+		push_error("LilianJiesuan: TutorialCoordinator 未绑定 action=return")
+		return
+	LilianFlowService.close_settlement(LilianState, SceneManager, _tutorial_coordinator)

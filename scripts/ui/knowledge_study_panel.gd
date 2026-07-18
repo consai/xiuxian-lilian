@@ -1,5 +1,31 @@
 extends Control
 
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("KnowledgeStudyPanel: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("KnowledgeStudyPanel: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
+
 const DaoTreeQueryApplicationScript := preload(
 	"res://scripts/features/dao/application/dao_tree_query_application.gd"
 )
@@ -32,6 +58,12 @@ func _ready() -> void:
 	_day_slider.value_changed.connect(_on_day_changed)
 	_max_button.pressed.connect(_on_max_pressed)
 	_start_button.pressed.connect(_on_start_pressed)
+	call_deferred("_initialize_after_session")
+
+
+func _initialize_after_session() -> void:
+	if _game_session() == null:
+		return
 	_refresh()
 
 
@@ -42,9 +74,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _refresh() -> void:
-	_player_label.text = "%s · %s" % [GameState.player_name, GameState.realm_name]
-	_day_label.text = GameState.time_date_label(GameState.day)
-	_rows = GameState.studyable_knowledge()
+	var game_session := _game_session()
+	_player_label.text = "%s · %s" % [game_session.player_name, game_session.realm_name]
+	_day_label.text = game_session.time_date_label(game_session.day)
+	_rows = game_session.studyable_knowledge()
 	_bind_list()
 	if _selected_skill_id == "" and not _rows.is_empty():
 		_selected_skill_id = str((_rows.front() as Dictionary).get("id", ""))
@@ -84,9 +117,10 @@ func _bind_details() -> void:
 		_start_button.disabled = true
 		return
 	var skill := DaoTreeQueryApplicationScript.skill_by_id(_selected_skill_id)
-	var entry := KnowledgeServiceScript.get_entry(GameState.to_dict(), _selected_skill_id)
+	var game_session := _game_session()
+	var entry := KnowledgeServiceScript.get_entry(game_session.to_dict(), _selected_skill_id)
 	var level := int(entry.get("level", 0))
-	var max_days := maxi(1, GameState.max_knowledge_study_days(_selected_skill_id))
+	var max_days := maxi(1, game_session.max_knowledge_study_days(_selected_skill_id))
 	_days = clampi(_days, 1, max_days)
 	_day_slider.max_value = float(max_days)
 	_day_slider.set_value_no_signal(float(_days))
@@ -94,9 +128,9 @@ func _bind_details() -> void:
 	_name_label.text = "%s  %s" % [str(skill.get("name", "")), _roman(level) if level > 0 else "未入门"]
 	_name_label.add_theme_color_override("font_color", EnumQuality.get_color(_entry_quality(skill)))
 	_description_label.text = str(skill.get("description", ""))
-	var preview := GameState.preview_knowledge_study(_selected_skill_id, _days)
+	var preview: Dictionary = game_session.preview_knowledge_study(_selected_skill_id, _days)
 	_progress.max_value = 100.0
-	_progress.value = KnowledgeServiceScript.level_progress_percent(GameState.to_dict(), _selected_skill_id)
+	_progress.value = KnowledgeServiceScript.level_progress_percent(game_session.to_dict(), _selected_skill_id)
 	var domain := DaoTreeQueryApplicationScript.domain_by_id(str(skill.get("domain", "")))
 	_state_label.text = "%s · %s · %s · 当前 %.0f%%" % [
 		str(domain.get("name", "")),
@@ -104,7 +138,7 @@ func _bind_details() -> void:
 		EnumQuality.display_label(_entry_quality(skill)),
 		_progress.value,
 	]
-	_day_count_label.text = "研读 %s" % GameState.time_duration_label(_days)
+	_day_count_label.text = "研读 %s" % game_session.time_duration_label(_days)
 	if not bool(preview.get("ok", false)):
 		_preview_label.text = str(preview.get("error", "当前无法研读"))
 		_start_button.disabled = true
@@ -125,7 +159,7 @@ func _bind_details() -> void:
 		float(preview.get("training_speed", 0.0)),
 		int(preview.get("rank", 1)),
 		float(preview.get("points_to_next", 0.0)),
-		GameState.time_duration_label(int(preview.get("estimated_days_to_next", 0))),
+		game_session.time_duration_label(int(preview.get("estimated_days_to_next", 0))),
 	]
 	_start_button.disabled = false
 
@@ -152,7 +186,7 @@ func _on_max_pressed() -> void:
 func _on_start_pressed() -> void:
 	if _selected_skill_id == "":
 		return
-	var result := GameState.study_knowledge(_selected_skill_id, _days)
+	var result: Dictionary = _game_session().study_knowledge(_selected_skill_id, _days)
 	if not bool(result.get("ok", false)):
 		_result_label.text = str(result.get("error", "研读失败"))
 		return
@@ -168,7 +202,9 @@ func _on_start_pressed() -> void:
 
 
 func _on_close_pressed() -> void:
-	var nav: Dictionary = LilianFlowService.open_hub(LilianState, SceneManager)
+	var lilian := _lilian_session()
+	if lilian == null: return
+	var nav: Dictionary = LilianFlowService.open_hub(lilian, SceneManager)
 	if not bool(nav.get("ok", false)):
 		push_warning(str(nav.get("error", "无法返回观中")))
 

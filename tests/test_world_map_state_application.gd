@@ -6,6 +6,8 @@ const WorldMapStateScript := preload(
 const WorldMapApplicationScript := preload(
 	"res://scripts/features/map/application/world_map_application.gd"
 )
+const GameSessionScript := preload("res://scripts/sim/game_state.gd")
+const LilianSessionScript := preload("res://scripts/lilian/lilian_state.gd")
 
 
 func _init() -> void:
@@ -82,7 +84,13 @@ func _run() -> void:
 	assert((initialized["map"]["vanished_nodes"] as Array).is_empty())
 
 	var store := root.get_node("DataStore")
-	var game_state := root.get_node("GameState")
+	var game_state := GameSessionScript.new()
+	var lilian_session := LilianSessionScript.new()
+	root.add_child(game_state)
+	root.add_child(lilian_session)
+	game_state.bind_store(store)
+	game_state.bind_scene_manager(root.get_node("SceneManager"))
+	game_state.bind_lilian_session(lilian_session)
 	game_state.new_game({"player_name": "地图状态测试"})
 	var new_game_map: Dictionary = game_state.map_data()
 	assert(str(new_game_map.get("current_city_id", "")) == "qingshi_market")
@@ -101,6 +109,8 @@ func _run() -> void:
 	roundtrip_save["map"] = roundtrip_map
 	assert(game_state.apply_dict(roundtrip_save))
 	assert(game_state.map_data() == roundtrip_map)
+	game_state.queue_free()
+	lilian_session.queue_free()
 
 	print("PASS: world map state and application ownership")
 	quit(0)

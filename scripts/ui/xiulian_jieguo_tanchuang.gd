@@ -11,6 +11,18 @@ signal confirmed
 @onready var _completed_days_label: Label = %CompletedDaysLabel
 @onready var _confirm_button: Button = %ConfirmButton
 @onready var _plan_title: Label = %PlanTitle
+var _game_session_host: Node
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("XiulianJieguoTanchuang: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
 
 
 func _ready() -> void:
@@ -29,7 +41,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func show_result(result: Dictionary) -> void:
 	var days := int(result.get("days", 1))
-	_completed_days_label.text = "闭关 %s" % str(result.get("duration_label", GameState.time_duration_label(days)))
+	_completed_days_label.text = "闭关 %s" % str(result.get("duration_label", _game_session().time_duration_label(days)))
 	_status_label.text = "周天运转完毕"
 	_flavor_label.text = _result_flavor(str(result.get("mode_id", "cycle")))
 	_result_label.text = _format_summary(result)

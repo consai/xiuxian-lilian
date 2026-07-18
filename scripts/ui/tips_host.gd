@@ -1,6 +1,6 @@
 extends CanvasLayer
 
-## 全局提示入口：接收 DataEvents 的 tip_intent 并交给 TipBus 策略化处理。
+## AppRoot-owned提示入口：接收显式 tip intent 并交给 TipBus 策略化处理。
 
 const TipIntentScript := preload("res://scripts/ui/tips/core/tip_intent.gd")
 const TipMetricsScript := preload("res://scripts/ui/tips/core/tip_metrics.gd")
@@ -17,7 +17,6 @@ var _metrics: TipMetrics
 var _policy: TipPolicyEngine
 var _router: TipRouter
 var _bus: TipBus
-var _data_events: Node
 var _policy_snapshot: Dictionary = {}
 
 @export var debug_print_metrics: bool = false
@@ -28,22 +27,25 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 
-func bind_dependencies(data_events: Node, policy_snapshot: Dictionary) -> void:
-	if data_events == null or policy_snapshot.is_empty():
-		push_error("TipsHost: DataEvents 或提示策略未绑定")
+func bind_dependencies(policy_snapshot: Dictionary) -> void:
+	if policy_snapshot.is_empty():
+		push_error("TipsHost: 提示策略未绑定")
 		return
-	if _data_events != null:
-		if _data_events == data_events and _policy_snapshot == policy_snapshot:
+	if not _policy_snapshot.is_empty():
+		if _policy_snapshot == policy_snapshot:
 			return
-		push_error("TipsHost: 禁止更换已绑定的依赖")
+		push_error("TipsHost: 禁止更换已绑定的策略")
 		return
-	_data_events = data_events
 	_policy_snapshot = policy_snapshot.duplicate(true)
 	_setup_tip_runtime(_policy_snapshot)
-	if not data_events.tip_intent.is_connected(_on_tip_intent):
-		data_events.tip_intent.connect(_on_tip_intent)
-	if not data_events.tip_intents.is_connected(_on_tip_intents):
-		data_events.tip_intents.connect(_on_tip_intents)
+
+
+func publish_intent(intent: Dictionary) -> void:
+	_publish_intent(intent)
+
+
+func publish_intents(intents: Array) -> void:
+	_on_tip_intents(intents)
 
 
 func _on_tip_intent(intent: Dictionary) -> void:

@@ -1,6 +1,16 @@
 extends SceneTree
 
 const WORLD_MAP_SCENE_PATH := "res://scenes/map/map.tscn"
+const GameSessionScript := preload("res://scripts/sim/game_state.gd")
+const GameSessionHostScript := preload("res://scripts/app/game_session_host.gd")
+
+
+class TutorialFixture extends Node:
+	func is_waiting_for_any(_event_ids: Array) -> bool:
+		return false
+
+	func game_event(_event_id: String) -> void:
+		pass
 
 
 func _init() -> void:
@@ -9,7 +19,13 @@ func _init() -> void:
 
 func _run() -> void:
 	var store := root.get_node("DataStore")
-	var game_state := root.get_node("GameState")
+	var game_state := GameSessionScript.new()
+	root.add_child(game_state)
+	game_state.bind_store(store)
+	game_state.bind_scene_manager(root.get_node("SceneManager"))
+	var game_host := GameSessionHostScript.new()
+	game_host.bind_session(game_state)
+	var tutorial := TutorialFixture.new()
 	var original_savedata: Dictionary = store.savedata.duplicate(true)
 	var original_rundata: Dictionary = store.rundata.duplicate(true)
 	store.reset_rundata()
@@ -23,6 +39,8 @@ func _run() -> void:
 	var world_map_scene: PackedScene = load(WORLD_MAP_SCENE_PATH)
 	assert(world_map_scene != null)
 	var controller := world_map_scene.instantiate()
+	controller.bind_game_session_host(game_host)
+	controller.bind_tutorial_coordinator(tutorial)
 	root.add_child(controller)
 	await process_frame
 	assert(not store.rundata.has("map"))
@@ -53,5 +71,8 @@ func _run() -> void:
 	await process_frame
 	store.savedata = original_savedata
 	store.rundata = original_rundata
+	game_state.queue_free()
+	game_host.free()
+	tutorial.free()
 	print("PASS: world map runtime is owned by the controller")
 	quit(0)

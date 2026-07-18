@@ -9,6 +9,9 @@ const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 const CultivationMethodQueryApplicationScript := preload(
 	"res://scripts/features/cultivation/application/cultivation_method_query_application.gd"
 )
+const CultivationMethodSavedataApplicationScript := preload(
+	"res://scripts/features/cultivation/application/cultivation_method_savedata_application.gd"
+)
 
 const SLOT_MAIN := "main"
 const SLOT_SUPPORT := "support"
@@ -180,10 +183,18 @@ static func method_mastery_value_ratio(savedata: Dictionary, method_id: String) 
 
 
 static func add_method_mastery(savedata: Dictionary, method_id: String, amount: float) -> void:
-	if not savedata.get("method_mastery") is Dictionary:
-		savedata["method_mastery"] = {}
+	var state_result := CultivationMethodSavedataApplicationScript.snapshot(savedata)
+	if not bool(state_result.get("ok", false)):
+		push_error("[xiulian_method_service:invalid_cultivation_method_state] action=add_mastery")
+		return
+	var state := state_result.get("value", {}) as Dictionary
+	var mastery := state.get("method_mastery", {}) as Dictionary
 	var current := method_mastery(savedata, method_id)
-	(savedata["method_mastery"] as Dictionary)[method_id.strip_edges()] = clampf(current + amount, 0.0, 1.0)
+	mastery[method_id.strip_edges()] = clampf(current + amount, 0.0, 1.0)
+	state["method_mastery"] = mastery
+	var commit_result := CultivationMethodSavedataApplicationScript.commit(savedata, state)
+	if not bool(commit_result.get("ok", false)):
+		push_error("[xiulian_method_service:invalid_cultivation_method_state] action=commit_mastery")
 
 
 static func apply_cultivation_cycle(

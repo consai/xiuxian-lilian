@@ -519,13 +519,13 @@ static func emit_block_reason_intent(
 ) -> void:
 	if text == "" or ctx.scene == null:
 		return
-	var de: Node = ctx.scene.get_node_or_null("/root/DataEvents")
-	if de == null or not de.has_method("emit_tip_intent"):
+	var tip_host := ctx.tip_host
+	if tip_host == null or not tip_host.has_method("publish_intent"):
 		return
 	var tone := EnumTipTone.LABEL_LOSS \
 			if reason_code in [BLOCK_INSUFFICIENT_MP, BLOCK_NO_COUNT] \
 			else EnumTipTone.LABEL_NEUTRAL
-	de.emit_tip_intent({
+	tip_host.publish_intent({
 		"id": "fight_block_%d" % Time.get_ticks_msec(),
 		"schema_version": 1,
 		"type": EnumTipIntentType.LABEL_BLOCK_REASON,

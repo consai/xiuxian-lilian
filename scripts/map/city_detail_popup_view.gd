@@ -17,7 +17,7 @@ func _ready() -> void:
 	%Dimmer.gui_input.connect(_on_dimmer_input)
 
 
-func show_city(city_id: String, city_data: Dictionary, preview: Dictionary) -> void:
+func show_city(city_id: String, city_data: Dictionary, preview: Dictionary, duration_label: String) -> void:
 	_city_id = city_id
 	_title.text = str(city_data.get("name", city_id))
 	var type_label := "坊市" if str(city_data.get("type", "")) == "market" else "修真城市"
@@ -30,7 +30,7 @@ func show_city(city_id: String, city_data: Dictionary, preview: Dictionary) -> v
 		"城市功能：%s" % services,
 	]
 	if bool(preview.get("ok", false)):
-		lines.append("路程：预计 %s" % str(preview.get("duration_label", GameState.time_duration_label(int(preview.get("total_days", 0))))))
+		lines.append("路程：预计 %s" % str(preview.get("duration_label", duration_label)))
 		lines.append("路线状态：可前往")
 	elif str(preview.get("error", "")) != "":
 		lines.append("路程：%s" % str(preview.get("error", "")))

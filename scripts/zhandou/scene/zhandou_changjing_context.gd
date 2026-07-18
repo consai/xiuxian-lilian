@@ -8,6 +8,8 @@ const UNIT_PLAYER := "player"
 const UNIT_ENEMY := "enemy"
 
 var scene: Control
+var lilian_session: Node
+var tip_host: Node
 
 var domain: ZhandouDomainService
 var battle_player: ZhandouObj

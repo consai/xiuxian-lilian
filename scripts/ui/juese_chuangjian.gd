@@ -1,5 +1,30 @@
 extends Control
 
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("JueseChuangjian: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("JueseChuangjian: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
 const ORIGIN_TYPE := "origin"
 const ROOT_TYPE := "root"
 const TALENT_TYPE := "talent"
@@ -101,14 +126,19 @@ func _finish() -> void:
 	if name.length() < 1 or name.length() > 12:
 		_message_label.text = "角色名称须为 1–12 个字符。"
 		return
-	GameState.new_game({
+	var game_session := _game_session()
+	if game_session == null:
+		return
+	game_session.new_game({
 		"player_name": name,
 		"origin_id": _selected["origin_id"],
 		"root_id": _selected["root_id"],
 		"talent_id": _selected["talent_id"],
 	})
+	var lilian := _lilian_session()
+	if lilian == null: return
 	var nav: Dictionary = LilianFlowService.open_hub(
-		LilianState,
+		lilian,
 		SceneManager,
 		{},
 		{"reset_history": true}

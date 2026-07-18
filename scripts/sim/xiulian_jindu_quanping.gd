@@ -1,5 +1,44 @@
 extends Control
 
+var _tutorial_coordinator: Node
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+	if _result_popup != null and _result_popup.has_method("bind_game_session_host"):
+		_result_popup.bind_game_session_host(host)
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("XiulianJinduQuanping: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("XiulianJinduQuanping: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
+
+func bind_tutorial_coordinator(coordinator: Node) -> void:
+	_tutorial_coordinator = coordinator
+
+
+func _tutorial_event(event_id: String) -> void:
+	if _tutorial_coordinator == null:
+		push_error("XiulianJinduQuanping: TutorialCoordinator 未注入")
+		return
+	_tutorial_coordinator.game_event(event_id)
+
 const STAGE_TEXTS := [
 	"第一周天 · 引气入体",
 	"第二周天 · 气息渐稳",
@@ -46,11 +85,18 @@ func _ready() -> void:
 	_setup_qi_ring_pivots()
 	_skip_button.pressed.connect(_on_skip_pressed)
 	_result_popup.confirmed.connect(_on_result_confirmed)
+	call_deferred("_initialize_after_session")
+
+
+func _initialize_after_session() -> void:
+	if _game_session() == null:
+		return
 	var payload: Dictionary = SceneManager.take_payload(SceneManager.XIULIAN_JINDU_QUANPING)
 	if not _apply_payload(payload):
 		var nav: Dictionary = SceneManager.go_xiulian_mianban()
 		if not bool(nav.get("ok", false)):
-			LilianFlowService.open_hub(LilianState, SceneManager)
+			var lilian := _lilian_session()
+			if lilian != null: LilianFlowService.open_hub(lilian, SceneManager)
 		return
 	_bind_header()
 	_start_progress()
@@ -61,7 +107,7 @@ func _apply_payload(payload: Dictionary) -> bool:
 	_days = int(payload.get("days", 0))
 	if _mode_id == "" or _days <= 0:
 		return false
-	_start_day = int(payload.get("start_day", GameState.day))
+	_start_day = int(payload.get("start_day", _game_session().day))
 	_method_name = str(payload.get("method_name", "主功法"))
 	_mode_name = str(payload.get("mode_name", "运转周天"))
 	_pill_id = str(payload.get("pill_id", ""))
@@ -121,9 +167,9 @@ func _update_visuals(ratio: float) -> void:
 	_progress_label.text = "%d%%" % int(round(percent))
 	if is_equal_approx(ratio, 1.0):
 		_day_label.text = "闭关 %s / %s\n%s" % [
-			GameState.time_duration_label(_days),
-			GameState.time_duration_label(_days),
-			GameState.time_date_label(_start_day + _days - 1),
+		_game_session().time_duration_label(_days),
+		_game_session().time_duration_label(_days),
+		_game_session().time_date_label(_start_day + _days - 1),
 		]
 		_status_label.text = "周天圆满 · 功行已成"
 		return
@@ -132,9 +178,9 @@ func _update_visuals(ratio: float) -> void:
 	var within_day: float = day_progress - floor(day_progress)
 	var cycle_index := clampi(int(within_day * float(STAGE_TEXTS.size())), 0, STAGE_TEXTS.size() - 1)
 	_day_label.text = "闭关 %s / %s\n%s" % [
-		GameState.time_duration_label(current_day),
-		GameState.time_duration_label(_days),
-		GameState.time_date_label(_start_day + current_day - 1),
+		_game_session().time_duration_label(current_day),
+		_game_session().time_duration_label(_days),
+		_game_session().time_date_label(_start_day + current_day - 1),
 	]
 	_status_label.text = STAGE_TEXTS[cycle_index]
 
@@ -153,17 +199,19 @@ func _finish_progress() -> void:
 		return
 	_finishing = true
 	_skip_button.disabled = true
-	var result: Dictionary = GameState.cultivate_session(_mode_id, _days, _pill_id)
+	var result: Dictionary = _game_session().cultivate_session(_mode_id, _days, _pill_id)
 	if not bool(result.get("ok", false)):
 		push_warning(str(result.get("error", "修炼失败")))
 		SceneManager.go_xiulian_mianban()
 		return
 	_result_popup.show_result(result)
-	TutorialService.game_event("tutorial.cultivation_result_shown")
+	_tutorial_event("tutorial.cultivation_result_shown")
 
 
 func _on_result_confirmed() -> void:
-	TutorialService.game_event("tutorial.cultivation_completed")
-	var nav: Dictionary = LilianFlowService.open_hub(LilianState, SceneManager)
+	_tutorial_event("tutorial.cultivation_completed")
+	var lilian := _lilian_session()
+	if lilian == null: return
+	var nav: Dictionary = LilianFlowService.open_hub(lilian, SceneManager)
 	if not bool(nav.get("ok", false)):
 		push_warning(str(nav.get("error", "无法返回观中")))

@@ -1,6 +1,10 @@
 extends SceneTree
 
 const SceneManagerScript := preload("res://scripts/core/scene_manager.gd")
+const GameSessionScript := preload("res://scripts/sim/game_state.gd")
+const GameSessionHostScript := preload("res://scripts/app/game_session_host.gd")
+const LilianSessionScript := preload("res://scripts/lilian/lilian_state.gd")
+const LilianSessionHostScript := preload("res://scripts/app/lilian_session_host.gd")
 
 
 func _init() -> void:
@@ -13,6 +17,19 @@ func _run() -> void:
 	var host := Node.new()
 	root.add_child(host)
 	manager.bind_scene_host(host)
+	var game_session := GameSessionScript.new()
+	root.add_child(game_session)
+	game_session.bind_store(root.get_node("DataStore"))
+	game_session.bind_scene_manager(manager)
+	var game_host := GameSessionHostScript.new()
+	game_host.bind_session(game_session)
+	var lilian_session := LilianSessionScript.new()
+	root.add_child(lilian_session)
+	lilian_session.active = true
+	var lilian_host := LilianSessionHostScript.new()
+	lilian_host.bind_session(lilian_session)
+	var tutorial_coordinator := Node.new()
+	manager.bind_page_dependencies(game_host, lilian_host, null, tutorial_coordinator)
 
 	var normal := manager.go_zhandou_peizhi_mianban()
 	assert(bool(normal.get("ok", false)))
@@ -28,9 +45,11 @@ func _run() -> void:
 	var overlay_host := Node.new()
 	root.add_child(overlay_host)
 	overlay_manager.bind_scene_host(overlay_host)
+	overlay_manager.bind_page_dependencies(game_host, lilian_host, null, tutorial_coordinator)
 	var lilian_scene := (
 		load(SceneManagerScript.SCENE_PATHS[SceneManagerScript.LILIAN_XUNHUAN]) as PackedScene
 	).instantiate()
+	overlay_manager.call("_inject_page_dependencies", lilian_scene)
 	overlay_host.add_child(lilian_scene)
 	overlay_manager.call("_set_active_scene", lilian_scene)
 	var overlay := overlay_manager.go_zhandou_peizhi_mianban(true)
@@ -88,5 +107,10 @@ func _run() -> void:
 
 	overlay_manager.free()
 	overlay_host.free()
+	game_host.free()
+	lilian_host.free()
+	tutorial_coordinator.free()
+	game_session.free()
+	lilian_session.free()
 	print("PASS: panel navigation requires explicit overlay intent")
 	quit(0)

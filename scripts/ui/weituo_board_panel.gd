@@ -50,10 +50,19 @@ var _filter_buttons: Dictionary = {}
 var _cancel_abandon_button: Button
 var _confirm_abandon_button: Button
 var _application: Variant
+var _game_session_host: Node
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+	if _game_session_host != null:
+		var game_session: Node = _game_session_host.session()
+		_application = WeituoApplicationScript.new(game_session.data_store(), game_session)
+		if is_node_ready():
+			refresh()
 
 
 func _ready() -> void:
-	_application = WeituoApplicationScript.production()
 	_confirm_abandon_popup.visible = false
 	_cancel_abandon_button = _confirm_abandon_popup.find_child("CancelAbandonButton", true, false) as Button
 	_confirm_abandon_button = _confirm_abandon_popup.find_child("ConfirmAbandonButton", true, false) as Button
@@ -77,7 +86,8 @@ func _ready() -> void:
 		FILTER_READY: _ready_filter_button,
 		FILTER_COMPLETED: _completed_filter_button,
 	}
-	refresh()
+	if _application != null:
+		refresh()
 
 
 func _unhandled_input(event: InputEvent) -> void:

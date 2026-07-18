@@ -1,5 +1,42 @@
 extends Control
 
+var _tutorial_coordinator: Node
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("LiandanJieguoTanchuang: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("LiandanJieguoTanchuang: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
+
+func bind_tutorial_coordinator(coordinator: Node) -> void:
+	_tutorial_coordinator = coordinator
+
+
+func _tutorial_event(event_id: String) -> void:
+	if _tutorial_coordinator == null:
+		push_error("LiandanJieguoTanchuang: TutorialCoordinator 未注入")
+		return
+	_tutorial_coordinator.game_event(event_id)
+
 const LiandanServiceScript := preload("res://scripts/sim/liandan_service.gd")
 const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
@@ -24,11 +61,18 @@ func _ready() -> void:
 	_material_template.set_click_enabled(false)
 	%ContinueButton.pressed.connect(_on_continue_pressed)
 	%ReturnButton.pressed.connect(_on_return_pressed)
+	call_deferred("_initialize_after_session")
+
+
+func _initialize_after_session() -> void:
+	if _game_session() == null:
+		return
 	var payload: Dictionary = SceneManager.take_payload(SceneManager.LIANDAN_JIEGUO_TANCHUANG)
 	if payload.is_empty() or not bool(payload.get("ok", false)):
 		var nav: Dictionary = SceneManager.go_liandan_mianban()
 		if not bool(nav.get("ok", false)):
-			LilianFlowService.open_hub(LilianState, SceneManager)
+			var lilian := _lilian_session()
+			if lilian != null: LilianFlowService.open_hub(lilian, SceneManager)
 		return
 	_apply_result(payload)
 
@@ -92,14 +136,14 @@ func _apply_result(result: Dictionary) -> void:
 
 	_score_label.text = "成丹分\n%d" % int(round(float(result.get("score", 0.0))))
 	_experience_label.text = "炼丹经验\n+%d" % int(result.get("xp", 0))
-	var furnace_id := str(GameState.liandan.get("equipped_furnace", ""))
+	var furnace_id := str(_game_session().liandan.get("equipped_furnace", ""))
 	var furnace := LiandanServiceScript.furnace_by_id(furnace_id)
 	var max_durability := int(furnace.get("max_durability", 30))
 	_durability_label.text = "丹炉耐久\n%d/%d" % [
 		int(result.get("furnace_durability", 0)),
 		max_durability,
 	]
-	_days_label.text = "耗时\n%s" % str(result.get("duration_label", GameState.time_duration_label(int(result.get("days", 1)))))
+	_days_label.text = "耗时\n%s" % str(result.get("duration_label", _game_session().time_duration_label(int(result.get("days", 1)))))
 	_mastery_label.text = "%s熟练度 +%d  ·  当前 %d/1000%s" % [
 		pill_name,
 		int(result.get("mastery_gain", 0)),
@@ -215,7 +259,9 @@ func _on_continue_pressed() -> void:
 
 
 func _on_return_pressed() -> void:
-	TutorialService.game_event("tutorial.alchemy_completed")
-	var nav: Dictionary = LilianFlowService.open_hub(LilianState, SceneManager)
+	_tutorial_event("tutorial.alchemy_completed")
+	var lilian := _lilian_session()
+	if lilian == null: return
+	var nav: Dictionary = LilianFlowService.open_hub(lilian, SceneManager)
 	if not bool(nav.get("ok", false)):
 		push_warning(str(nav.get("error", "无法返回观中")))

@@ -1,90 +1,40 @@
 class_name PlayerAutoBattleService
 extends RefCounted
 
-const POLICY := "player_auto"
-const VERSION := 2
+const AutoBattleRulesScript := preload("res://scripts/features/battle/domain/auto_battle_rules.gd")
+const DaoTreeQueryApplicationScript := preload(
+	"res://scripts/features/dao/application/dao_tree_query_application.gd"
+)
+const POLICY := AutoBattleRulesScript.POLICY
+const VERSION := AutoBattleRulesScript.VERSION
 
 
 static func default_settings() -> Dictionary:
-	return {
-		"global_cooldown_sec": 1.0,
-		"duplicate_skill_policy": "highest_priority",
-		"cast_range": "in_range",
-		"auto_pill": true,
-		"opening_buff": true,
-	}
+	return AutoBattleRulesScript.default_settings()
 
 
 static func default_rules() -> Dictionary:
-	return {
-		"version": VERSION,
-		"policy": POLICY,
-		"strategies": [],
-		"settings": default_settings(),
-	}
+	return AutoBattleRulesScript.default_rules()
 
 
 static func normalize_rules(raw: Variant) -> Dictionary:
-	if not raw is Dictionary:
-		return default_rules()
-	var source := raw as Dictionary
-	if source.is_empty():
-		return default_rules()
-	var policy := str(source.get("policy", "")).strip_edges().to_lower()
-	if policy == POLICY:
-		return {
-			"version": VERSION,
-			"policy": POLICY,
-			"strategies": normalize_strategies(source.get("strategies", [])),
-			"settings": normalize_settings(source.get("settings", {})),
-		}
-	return default_rules()
+	return AutoBattleRulesScript.normalize_rules(raw)
 
 
 static func normalize_strategies(raw: Variant) -> Array:
-	if not raw is Array:
-		return []
-	var out: Array = []
-	for entry_v in raw as Array:
-		if not entry_v is Dictionary:
-			continue
-		var entry := (entry_v as Dictionary).duplicate(true)
-		if not entry.get("action", {}) is Dictionary:
-			continue
-		out.append(entry)
-	return out
+	return AutoBattleRulesScript.normalize_strategies(raw)
 
 
 static func normalize_settings(raw: Variant) -> Dictionary:
-	var out := default_settings()
-	if not raw is Dictionary:
-		return out
-	var source := raw as Dictionary
-	if source.has("global_cooldown_sec"):
-		out["global_cooldown_sec"] = maxf(0.0, float(source["global_cooldown_sec"]))
-	if source.has("duplicate_skill_policy"):
-		out["duplicate_skill_policy"] = str(source["duplicate_skill_policy"])
-	if source.has("cast_range"):
-		out["cast_range"] = str(source["cast_range"])
-	if source.has("auto_pill"):
-		out["auto_pill"] = bool(source["auto_pill"])
-	if source.has("opening_buff"):
-		out["opening_buff"] = bool(source["opening_buff"])
-	return out
+	return AutoBattleRulesScript.normalize_settings(raw)
 
 
 static func with_strategies(strategies: Array, settings: Dictionary = {}) -> Dictionary:
-	return with_config("balanced", strategies, settings)
+	return AutoBattleRulesScript.with_strategies(strategies, settings)
 
 
 static func with_config(preset: String, strategies: Array, settings: Dictionary = {}) -> Dictionary:
-	return {
-		"version": VERSION,
-		"policy": POLICY,
-		"preset": preset.strip_edges().to_lower(),
-		"strategies": normalize_strategies(strategies),
-		"settings": normalize_settings(settings),
-	}
+	return AutoBattleRulesScript.with_config(preset, strategies, settings)
 
 
 static func strategy_templates() -> Array:
@@ -263,17 +213,7 @@ static func _skill_ready_strategies(equipped_skills: Array) -> Array:
 
 
 static func _skill_row(skill_id: int) -> Dictionary:
-	var cm := _config_manager()
-	if cm != null and cm.has_method("skill_by_id"):
-		return cm.call("skill_by_id", skill_id) as Dictionary
-	return {}
-
-
-static func _config_manager() -> Node:
-	var loop := Engine.get_main_loop()
-	if loop is SceneTree:
-		return (loop as SceneTree).root.get_node_or_null("ConfigManager")
-	return null
+	return DaoTreeQueryApplicationScript.skill_by_id(str(skill_id))
 
 
 static func _skill_category_label(skill: Dictionary) -> String:

@@ -24,6 +24,11 @@ signal runtime_item_feedback(feedback: String)
 
 var _pending_log_index := -1
 var _pending_step_event: Dictionary = {}
+var SceneManager: Node
+
+
+func bind_scene_manager(scene_manager: Node) -> void:
+	SceneManager = scene_manager
 var _session := LilianSessionStateScript.new()
 
 var active: bool:

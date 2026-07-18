@@ -44,7 +44,9 @@ static func apply_rewards(game_state: Node, rewards: Array, source: String = "re
 		var count := maxi(1, int(reward.get("count", 1)))
 		if kind == EnumRewardKind.LABEL_EQUIP:
 			var eid := int(reward.get("id", -1))
-			if InventoryApplicationScript.add_equip(game_state.owned_equips, eid):
+			var owned_equips: Array = game_state.owned_equips as Array
+			if InventoryApplicationScript.add_equip(owned_equips, eid):
+				game_state.owned_equips = owned_equips
 				applied.append({"kind": kind, "id": eid, "count": 1})
 			else:
 				var compensation := count * 30
@@ -68,24 +70,19 @@ static func apply_rewards(game_state: Node, rewards: Array, source: String = "re
 					"id": iid,
 					"count": added,
 				})
-	_emit_reward_tips(applied, source)
+	_emit_reward_tips(applied, source, game_state)
 	return applied
 
 
-static func _emit_reward_tips(applied: Array, source: String) -> void:
+static func _emit_reward_tips(applied: Array, source: String, game_state: Node) -> void:
 	if applied.is_empty():
 		return
-	var bus := _data_events()
-	if bus == null or not bus.has_method("emit_tip_intents"):
+	if game_state == null or not game_state.has_method("tip_host"):
 		return
-	bus.call("emit_tip_intents", RewardTipBuilderScript.from_rewards(applied, source))
-
-
-static func _data_events() -> Node:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("DataEvents")
+	var tip_host := game_state.call("tip_host") as Node
+	if tip_host == null:
+		return
+	tip_host.publish_intents(RewardTipBuilderScript.from_rewards(applied, source))
 
 
 static func _weighted_pick(pool: Array, rng: RandomNumberGenerator) -> Dictionary:

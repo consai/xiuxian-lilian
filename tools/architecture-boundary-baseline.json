@@ -290,31 +290,7 @@
   {
     "rule": "presentation_hardcoded_nodepath",
     "path": "scripts/ui/gm_battle_access.gd",
-    "source": "return (loop as SceneTree).root.get_node_or_null(\"GameState\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
-    "path": "scripts/ui/gm_battle_access.gd",
     "source": "return (loop as SceneTree).root.get_node_or_null(\"SceneManager\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
-    "path": "scripts/ui/gm_item_grant_panel.gd",
-    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
-    "path": "scripts/ui/gm_item_grant_panel.gd",
-    "source": "return (loop as SceneTree).root.get_node_or_null(\"DataEvents\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
-    "path": "scripts/ui/gm_item_grant_panel.gd",
-    "source": "return (loop as SceneTree).root.get_node_or_null(\"GameState\")",
     "count": 1
   },
   {
@@ -343,12 +319,6 @@
   },
   {
     "rule": "presentation_hardcoded_nodepath",
-    "path": "scripts/ui/tips/core/reward_tip_builder.gd",
-    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_hardcoded_nodepath",
     "path": "scripts/zhandou/scene/zhandou_changjing_hud.gd",
     "source": "var press := slot.get_node_or_null(\"Control\")",
     "count": 1
@@ -356,37 +326,7 @@
   {
     "rule": "presentation_root_lookup",
     "path": "scripts/ui/gm_battle_access.gd",
-    "source": "return (loop as SceneTree).root.get_node_or_null(\"GameState\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_root_lookup",
-    "path": "scripts/ui/gm_battle_access.gd",
     "source": "return (loop as SceneTree).root.get_node_or_null(\"SceneManager\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_root_lookup",
-    "path": "scripts/ui/gm_item_grant_panel.gd",
-    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_root_lookup",
-    "path": "scripts/ui/gm_item_grant_panel.gd",
-    "source": "return (loop as SceneTree).root.get_node_or_null(\"DataEvents\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_root_lookup",
-    "path": "scripts/ui/gm_item_grant_panel.gd",
-    "source": "return (loop as SceneTree).root.get_node_or_null(\"GameState\")",
-    "count": 1
-  },
-  {
-    "rule": "presentation_root_lookup",
-    "path": "scripts/ui/tips/core/reward_tip_builder.gd",
-    "source": "return (loop as SceneTree).root.get_node_or_null(\"ConfigManager\")",
     "count": 1
   }
 ]

@@ -12,6 +12,44 @@ const TUTORIAL_BREW_LOCK_EVENTS := [
 	"tutorial.alchemy_preview_acknowledged",
 ]
 
+var _tutorial_coordinator: Node
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_tutorial_coordinator(coordinator: Node) -> void:
+	_tutorial_coordinator = coordinator
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+	if _batch_popup != null and _batch_popup.has_method("bind_game_session_host"):
+		_batch_popup.bind_game_session_host(host)
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("LiandanMianban: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("LiandanMianban: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
+
+func _tutorial() -> Node:
+	if _tutorial_coordinator == null:
+		push_error("LiandanMianban: TutorialCoordinator 未注入")
+	return _tutorial_coordinator
+
 @onready var _recipe_option: OptionButton = %RecipeOption
 @onready var _strategy_option: OptionButton = %StrategyOption
 @onready var _selection_option: OptionButton = %SelectionOption
@@ -32,8 +70,15 @@ var _strategies: Array = []
 
 
 func _ready() -> void:
-	_recipes = GameState.liandan_recipes()
-	_strategies = GameState.liandan_strategies()
+	call_deferred("_initialize_after_session")
+
+
+func _initialize_after_session() -> void:
+	var game_session := _game_session()
+	if game_session == null:
+		return
+	_recipes = game_session.liandan_recipes()
+	_strategies = game_session.liandan_strategies()
 	for recipe_v in _recipes:
 		_recipe_option.add_item(str((recipe_v as Dictionary).get("name", "丹方")))
 	for strategy_v in _strategies:
@@ -71,8 +116,9 @@ func _bind_option_menus(options: Array) -> void:
 
 
 func _select_saved_defaults() -> void:
-	var last_recipe := str(GameState.liandan.get("last_recipe", "recipe.huiqi"))
-	var last_strategy := str(GameState.liandan.get("last_strategy", "steady"))
+	var game_session := _game_session()
+	var last_recipe := str(game_session.liandan.get("last_recipe", "recipe.huiqi"))
+	var last_strategy := str(game_session.liandan.get("last_strategy", "steady"))
 	_select_option_by_id(_recipes, "id", last_recipe, _recipe_option)
 	_select_option_by_id(_strategies, "id", last_strategy, _strategy_option)
 
@@ -85,16 +131,17 @@ func _select_option_by_id(rows: Array, key: String, target_id: String, option: O
 
 
 func _refresh() -> void:
-	_player_label.text = "%s\n%s" % [GameState.player_name, GameState.realm_name]
+	var game_session := _game_session()
+	_player_label.text = "%s\n%s" % [game_session.player_name, game_session.realm_name]
 	var preview := _preview()
-	var furnace_id := str(GameState.liandan.get("equipped_furnace", ""))
-	var owned := GameState.liandan.get("owned_furnaces", {}) as Dictionary
+	var furnace_id := str(game_session.liandan.get("equipped_furnace", ""))
+	var owned := game_session.liandan.get("owned_furnaces", {}) as Dictionary
 	var furnace_state := owned.get(furnace_id, {}) as Dictionary
 	_status_label.text = "%s  |  炼丹术 Lv.%d（%d/%d）  |  丹炉耐久 %d" % [
-		GameState.time_date_label(GameState.day),
-		int(GameState.liandan.get("level", 1)),
-		int(GameState.liandan.get("xp", 0)),
-		int(GameState.liandan.get("level", 1)) * 100,
+		game_session.time_date_label(game_session.day),
+		int(game_session.liandan.get("level", 1)),
+		int(game_session.liandan.get("xp", 0)),
+		int(game_session.liandan.get("level", 1)) * 100,
 		int(furnace_state.get("durability", 0)),
 	]
 	if not bool(preview.get("ok", false)):
@@ -127,10 +174,10 @@ func _refresh() -> void:
 		float(preview.get("extra_pill_chance", 0.0)) * 100.0,
 		int(preview.get("max_extra_pills", 0)),
 		float(preview.get("cost_save_chance", 0.0)) * 100.0,
-		str(preview.get("duration_label", GameState.time_duration_label(int(preview.get("days", 1))))),
+		str(preview.get("duration_label", game_session.time_duration_label(int(preview.get("days", 1))))),
 		str(strategy.get("description", "")),
 	]
-	_brew_button.text = "开炉炼制（%s）" % str(preview.get("duration_label", GameState.time_duration_label(int(preview.get("days", 1)))))
+	_brew_button.text = "开炉炼制（%s）" % str(preview.get("duration_label", game_session.time_duration_label(int(preview.get("days", 1)))))
 	_brew_button.disabled = _tutorial_brew_locked()
 
 
@@ -150,7 +197,7 @@ func _preview() -> Dictionary:
 		recipe_id = str(recipe.get("id", ""))
 		strategy_id = str(strategy.get("id", ""))
 		selection_mode = str(SELECTION_MODES[clampi(_selection_option.selected, 0, SELECTION_MODES.size() - 1)])
-	return GameState.preview_liandan(recipe_id, strategy_id, selection_mode)
+	return _game_session().preview_liandan(recipe_id, strategy_id, selection_mode)
 
 
 func _selected_recipe() -> Dictionary:
@@ -176,7 +223,7 @@ func _format_ingredients(rows: Array) -> String:
 			InventoryQueryApplicationScript.display_name(str(row.get("id", ""))),
 			int(row.get("count", 0)),
 			int(row.get("quality", 1)),
-			int(GameState.inventory.get(str(row.get("id", "")), 0)),
+			int(_game_session().inventory.get(str(row.get("id", "")), 0)),
 		])
 	return "\n".join(lines)
 
@@ -235,7 +282,7 @@ func _on_brew_pressed() -> void:
 	if _is_tutorial_alchemy_forced():
 		_start_brew(1, preview)
 		return
-	var max_batch := GameState.max_liandan_batch_count(preview)
+	var max_batch: int = _game_session().max_liandan_batch_count(preview)
 	if max_batch <= 1:
 		_start_brew(1, preview)
 		return
@@ -263,26 +310,30 @@ func _start_brew(batch_count: int, preview: Dictionary) -> void:
 		"batch_count": batch_count,
 		"recipe_name": str(recipe.get("name", "丹方")),
 		"strategy_name": str(strategy.get("name", "策略")),
-		"start_day": GameState.day,
+		"start_day": _game_session().day,
 	})
 	if not bool(nav.get("ok", false)):
 		_result_label.text = str(nav.get("error", "无法开始炼制"))
 		return
-	TutorialService.game_event("tutorial.alchemy_started")
+	var tutorial := _tutorial()
+	if tutorial != null: tutorial.game_event("tutorial.alchemy_started")
 
 
 func _on_close_pressed() -> void:
 	if _is_tutorial_alchemy_forced():
 		return
-	LilianFlowService.open_hub(LilianState, SceneManager)
+	var lilian := _lilian_session()
+	if lilian != null:
+		LilianFlowService.open_hub(lilian, SceneManager)
 
 
 func _is_tutorial_alchemy_forced() -> bool:
-	if not TutorialService.is_active():
+	var tutorial := _tutorial()
+	if tutorial == null or not tutorial.is_active():
 		return false
 	return (
-		not TutorialService.has_event_flag("tutorial.alchemy_completed")
-		and TutorialService.has_event_flag("tutorial.alchemy_opened")
+		not tutorial.has_event_flag("tutorial.alchemy_completed")
+		and tutorial.has_event_flag("tutorial.alchemy_opened")
 	)
 
 
@@ -298,8 +349,9 @@ func _setup_tutorial_alchemy() -> void:
 func _on_recipe_selected(index: int) -> void:
 	if index < 0 or index >= _recipes.size():
 		return
-	if TutorialService.is_waiting_for_any(["tutorial.alchemy_recipe_selected"]) and index == TUTORIAL_RECIPE_INDEX:
-		TutorialService.game_event("tutorial.alchemy_recipe_selected")
+	var tutorial := _tutorial()
+	if tutorial != null and tutorial.is_waiting_for_any(["tutorial.alchemy_recipe_selected"]) and index == TUTORIAL_RECIPE_INDEX:
+		tutorial.game_event("tutorial.alchemy_recipe_selected")
 		call_deferred("_refresh")
 		return
 	_refresh()
@@ -308,13 +360,14 @@ func _on_recipe_selected(index: int) -> void:
 func _tutorial_brew_locked() -> bool:
 	_tutorial_preview_click_area.mouse_filter = (
 		Control.MOUSE_FILTER_STOP
-		if TutorialService.is_waiting_for_any(["tutorial.alchemy_preview_acknowledged"])
+		if _tutorial() != null and _tutorial().is_waiting_for_any(["tutorial.alchemy_preview_acknowledged"])
 		else Control.MOUSE_FILTER_IGNORE
 	)
-	if not _is_tutorial_alchemy_forced() and not TutorialService.is_waiting_for_any(TUTORIAL_BREW_LOCK_EVENTS):
+	var tutorial := _tutorial()
+	if tutorial == null or (not _is_tutorial_alchemy_forced() and not tutorial.is_waiting_for_any(TUTORIAL_BREW_LOCK_EVENTS)):
 		return false
 	for event_id in TUTORIAL_BREW_LOCK_EVENTS:
-		if not TutorialService.has_event_flag(event_id):
+		if not tutorial.has_event_flag(event_id):
 			return true
 	return false
 
@@ -325,6 +378,7 @@ func _on_preview_area_gui_input(event: InputEvent) -> void:
 	var mouse := event as InputEventMouseButton
 	if not mouse.pressed or mouse.button_index != MOUSE_BUTTON_LEFT:
 		return
-	TutorialService.game_event("tutorial.alchemy_preview_acknowledged")
+	var tutorial := _tutorial()
+	if tutorial != null: tutorial.game_event("tutorial.alchemy_preview_acknowledged")
 	# Story advances synchronously; refresh so brew lock reflects the new step.
 	call_deferred("_refresh")

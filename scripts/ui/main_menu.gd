@@ -1,5 +1,18 @@
 extends Control
 
+var _lilian_session_host: Node
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("MainMenu: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
 @onready var _save_overlay: Control = %SaveSlotsOverlay
 @onready var _message_label: Label = %MessageLabel
 
@@ -34,8 +47,10 @@ func _on_save_overlay_closed(message: String) -> void:
 
 
 func _enter_game() -> void:
+	var lilian := _lilian_session()
+	if lilian == null: return
 	var result: Dictionary = LilianFlowService.open_hub(
-		LilianState,
+		lilian,
 		SceneManager,
 		{},
 		{"reset_history": true}

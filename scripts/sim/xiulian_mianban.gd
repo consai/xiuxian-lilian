@@ -8,6 +8,46 @@ const InventoryQueryApplicationScript := preload(
 
 const MODE_IDS := EnumXiulianMode.MODE_IDS
 
+var _tutorial_coordinator: Node
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_tutorial_coordinator(coordinator: Node) -> void:
+	_tutorial_coordinator = coordinator
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+	if _pill_picker != null and _pill_picker.has_method("bind_game_session_host"):
+		_pill_picker.bind_game_session_host(host)
+	if _method_picker != null and _method_picker.has_method("bind_game_session_host"):
+		_method_picker.bind_game_session_host(host)
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("XiulianMianban: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("XiulianMianban: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
+
+func _tutorial() -> Node:
+	if _tutorial_coordinator == null:
+		push_error("XiulianMianban: TutorialCoordinator 未注入")
+	return _tutorial_coordinator
+
 @onready var _player_label: Label = %PlayerLabel
 @onready var _day_label: Label = %DayLabel
 @onready var _method_label: Label = %MethodLabel
@@ -50,20 +90,27 @@ func _ready() -> void:
 	_pill_picker.entry_picked.connect(_on_pill_picked)
 	_method_picker.selected.connect(_on_method_picked)
 	_knowledge_label.visible = false
+	call_deferred("_initialize_after_session")
+
+
+func _initialize_after_session() -> void:
+	if _game_session() == null:
+		return
 	_refresh()
 
 
 func _refresh() -> void:
 	if EnumXiulianMode.is_pill_mode(_mode_id):
-		_selected_pill_id = GameState.resolve_cultivation_pill_id(_selected_pill_id)
+		_selected_pill_id = _game_session().resolve_cultivation_pill_id(_selected_pill_id)
 	_sync_day_slider()
 	var preview: Dictionary = _build_preview()
-	_player_label.text = "%s · %s" % [GameState.player_name, GameState.realm_name]
-	_day_label.text = GameState.time_date_label(GameState.day)
+	var game_session := _game_session()
+	_player_label.text = "%s · %s" % [game_session.player_name, game_session.realm_name]
+	_day_label.text = game_session.time_date_label(game_session.day)
 	_pill_select_row.visible = EnumXiulianMode.is_pill_mode(_mode_id)
 	_refresh_pill_slot(preview)
 	if not bool(preview.get("ok", false)):
-		var method_preview: Dictionary = GameState.preview_cultivation_session(EnumXiulianMode.LABEL_CYCLE, _cultivation_days())
+		var method_preview: Dictionary = game_session.preview_cultivation_session(EnumXiulianMode.LABEL_CYCLE, _cultivation_days())
 		if bool(method_preview.get("ok", false)):
 			_bind_method_preview(method_preview)
 		else:
@@ -88,7 +135,7 @@ func _refresh() -> void:
 	_mode_description.text = _format_mode_description(mode, preview)
 	var formula_text := _format_cultivation_formula(preview)
 	_preview_label.text = "闭关 %s\n预计修为 +%d" % [
-		str(preview.get("duration_label", GameState.time_duration_label(_cultivation_days()))),
+		str(preview.get("duration_label", game_session.time_duration_label(_cultivation_days()))),
 		int(preview.get("estimated_cultivation", 0)),
 	]
 	var meta_text := "%s → %s" % [
@@ -109,14 +156,15 @@ func _refresh() -> void:
 	_preview_meta_label.text = meta_text
 	_preview_meta_label.visible = true
 	_start_button.disabled = false
-	_start_button.text = "开始闭关（%s）" % str(preview.get("duration_label", GameState.time_duration_label(_cultivation_days())))
+	_start_button.text = "开始闭关（%s）" % str(preview.get("duration_label", game_session.time_duration_label(_cultivation_days())))
 	_result_label.text = ""
 	_update_button_states()
 
 
 func _sync_day_slider() -> void:
-	var min_days := GameState.min_cultivation_days()
-	var max_days := maxi(min_days, GameState.max_cultivation_days(_mode_id, _selected_pill_id))
+	var game_session := _game_session()
+	var min_days: int = game_session.min_cultivation_days()
+	var max_days := maxi(min_days, game_session.max_cultivation_days(_mode_id, _selected_pill_id))
 	_day_slider.min_value = float(min_days)
 	_day_slider.max_value = float(max_days)
 	# 未选择或越界时回落到最短可选天数（1 月）
@@ -126,7 +174,7 @@ func _sync_day_slider() -> void:
 	if int(round(_day_slider.value)) != _days:
 		_day_slider.set_value_no_signal(float(_days))
 	_day_max_button.disabled = max_days <= min_days
-	_day_count_label.text = "闭关 %s" % GameState.time_duration_label(_cultivation_days())
+	_day_count_label.text = "闭关 %s" % game_session.time_duration_label(_cultivation_days())
 
 
 func _cultivation_days() -> int:
@@ -138,7 +186,7 @@ func _on_day_slider_changed(value: float) -> void:
 	if new_days == _days:
 		return
 	_days = new_days
-	_day_count_label.text = "闭关 %s" % GameState.time_duration_label(_cultivation_days())
+	_day_count_label.text = "闭关 %s" % _game_session().time_duration_label(_cultivation_days())
 	_refresh()
 
 
@@ -155,8 +203,8 @@ func _bind_method_preview(preview: Dictionary) -> void:
 
 func _build_preview() -> Dictionary:
 	if EnumXiulianMode.is_pill_mode(_mode_id):
-		return GameState.preview_cultivation_session(_mode_id, _cultivation_days(), _selected_pill_id)
-	return GameState.preview_cultivation_session(_mode_id, _cultivation_days())
+		return _game_session().preview_cultivation_session(_mode_id, _cultivation_days(), _selected_pill_id)
+	return _game_session().preview_cultivation_session(_mode_id, _cultivation_days())
 
 
 func _format_mode_description(mode: Dictionary, preview: Dictionary) -> String:
@@ -165,7 +213,7 @@ func _format_mode_description(mode: Dictionary, preview: Dictionary) -> String:
 	var pill_id := str(preview.get("pill_id", ""))
 	if pill_id == "":
 		return "点击选择修炼丹药后打坐炼化，修为增长极快，但会使灵力驳杂。"
-	var gain: int = GameState.cultivation_pill_gain(pill_id)
+	var gain: int = _game_session().cultivation_pill_gain(pill_id)
 	var pill_name := InventoryQueryApplicationScript.display_name(pill_id)
 	return "炼化【%s】，每月药力约 %d 点月修为（逐日折算），但会使灵力驳杂。" % [
 		pill_name,
@@ -181,7 +229,7 @@ func _refresh_pill_slot(preview: Dictionary) -> void:
 		_pill_slot.apply_empty(null)
 		_pill_hint.text = "点击选择修炼丹药"
 		return
-	var owned := int(GameState.inventory.get(pill_id, 0))
+	var owned := int(_game_session().inventory.get(pill_id, 0))
 	ItemViewScript.apply_item_id(_pill_slot, pill_id, owned, {
 		"show_name": true,
 		"name_override": "%s %d" % [InventoryQueryApplicationScript.display_name(pill_id), owned],
@@ -224,10 +272,11 @@ func _format_cultivation_formula(preview: Dictionary) -> String:
 func _select_mode(mode_id: String) -> void:
 	_mode_id = mode_id
 	if EnumXiulianMode.is_pill_mode(mode_id):
-		_selected_pill_id = GameState.resolve_cultivation_pill_id(_selected_pill_id)
+		_selected_pill_id = _game_session().resolve_cultivation_pill_id(_selected_pill_id)
 	_refresh()
 	if EnumXiulianMode.is_pill_mode(mode_id):
-		TutorialService.game_event("tutorial.pill_mode_selected")
+		var tutorial := _tutorial()
+		if tutorial != null: tutorial.game_event("tutorial.pill_mode_selected")
 
 
 func _on_pill_slot_clicked() -> void:
@@ -246,7 +295,7 @@ func _on_method_change_pressed() -> void:
 
 
 func _on_method_picked(entry_id: Variant) -> void:
-	var result: Dictionary = GameState.equip_method("main", str(entry_id))
+	var result: Dictionary = _game_session().equip_method("main", str(entry_id))
 	if not bool(result.get("ok", false)):
 		_result_label.text = str(result.get("error", "无法替换主修功法"))
 		return
@@ -272,7 +321,7 @@ func _on_start_pressed() -> void:
 		"days": _cultivation_days(),
 		"method_name": str(preview.get("method_name", "主功法")),
 		"mode_name": str(mode.get("name", "运转周天")),
-		"start_day": int(preview.get("start_day", GameState.day)),
+		"start_day": int(preview.get("start_day", _game_session().day)),
 	}
 	if EnumXiulianMode.is_pill_mode(_mode_id):
 		session["pill_id"] = str(preview.get("pill_id", ""))
@@ -280,15 +329,20 @@ func _on_start_pressed() -> void:
 	if not bool(nav.get("ok", false)):
 		_result_label.text = str(nav.get("error", "无法开始闭关"))
 		return
-	TutorialService.game_event("tutorial.cultivation_started")
+	var tutorial := _tutorial()
+	if tutorial != null: tutorial.game_event("tutorial.cultivation_started")
 
 
 func _on_close_pressed() -> void:
-	if TutorialService.is_waiting_for_any([
+	var tutorial := _tutorial()
+	if tutorial != null and tutorial.is_waiting_for_any([
 		"tutorial.pill_mode_selected",
 		"tutorial.cultivation_result_shown",
 	]):
 		return
-	var nav: Dictionary = LilianFlowService.open_hub(LilianState, SceneManager)
+	var lilian := _lilian_session()
+	if lilian == null:
+		return
+	var nav: Dictionary = LilianFlowService.open_hub(lilian, SceneManager)
 	if not bool(nav.get("ok", false)):
 		push_warning(str(nav.get("error", "无法返回观中")))

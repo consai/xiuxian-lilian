@@ -5,7 +5,9 @@ const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
 )
 const JsonReaderScript := preload("res://scripts/core/config/json_reader.gd")
-const EquipCatalogScript := preload("res://scripts/zhandou/equip_catalog.gd")
+const InventoryEquipQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_query_application.gd"
+)
 const BuffCatalogScript := preload("res://scripts/zhandou/buff_catalog.gd")
 const StringsZhScript := preload("res://scripts/core/strings_zh.gd")
 const ExportTableReaderScript := preload("res://scripts/core/config/export_table_reader.gd")
@@ -59,9 +61,10 @@ func _init() -> void:
 		errors.append("null object fields must be removed")
 	if StringsZhScript.getp("hover.target.self") != "自身":
 		errors.append("StringsZh must load exported key/value rows and normalize dotted paths")
-	var equips := EquipCatalogScript.load_bundle().get("equips", []) as Array
-	if equips.is_empty() or not equips[0] is EquipDef or (equips[0] as EquipDef).id <= 0:
-		errors.append("EquipCatalog must load typed exported equips")
+	var equip_ids := InventoryEquipQueryApplicationScript.all_equip_ids()
+	var first_equip := InventoryEquipQueryApplicationScript.equip_by_id(int(equip_ids[0])) if not equip_ids.is_empty() else {}
+	if equip_ids.is_empty() or int(first_equip.get("id", -1)) <= 0:
+		errors.append("Inventory equip query must load typed exported equips")
 	var buff_ids := BuffCatalogScript.all_buff_ids()
 	var first_buff := BuffCatalogScript.buff_by_id(str(buff_ids[0])) if not buff_ids.is_empty() else {}
 	if buff_ids.size() != 14 or str(first_buff.get("id", "")) == "":
@@ -126,9 +129,8 @@ func _validate_weituo_references(errors: PackedStringArray, commissions: Diction
 		if item_v is ItemDef:
 			item_ids[(item_v as ItemDef).id] = true
 	var equip_ids: Dictionary = {}
-	for equip_v in EquipCatalogScript.load_bundle().get("equips", []) as Array:
-		if equip_v is EquipDef:
-			equip_ids[(equip_v as EquipDef).id] = true
+	for equip_id_v in InventoryEquipQueryApplicationScript.all_equip_ids():
+		equip_ids[int(equip_id_v)] = true
 	var location_ids := LilianLocationCatalogScript.new().all_location_ids()
 	for commission_id_v in commissions.keys():
 		var commission_id := str(commission_id_v)

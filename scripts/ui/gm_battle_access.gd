@@ -3,6 +3,15 @@ extends RefCounted
 
 ## GM 战斗调试：定位当前战斗场景并读写 [ZhandouObj] / 战斗行数据。
 
+static var _game_session: Node
+
+
+static func bind_game_session(game_session: Node) -> void:
+	if game_session == null:
+		push_error("GmBattleAccess: GameSession 未注入")
+		return
+	_game_session = game_session
+
 
 static func is_in_battle() -> bool:
 	return battle_scene() != null
@@ -147,7 +156,4 @@ static func _scene_manager() -> Node:
 
 
 static func _game_state() -> Node:
-	var loop: MainLoop = Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("GameState")
+	return _game_session

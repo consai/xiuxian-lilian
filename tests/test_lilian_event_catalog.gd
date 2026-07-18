@@ -3,6 +3,7 @@ extends SceneTree
 const Catalog := preload("res://scripts/lilian/lilian_event_catalog.gd")
 const EventService := preload("res://scripts/lilian/lilian_event_service.gd")
 const ExportTableReaderScript := preload("res://scripts/core/config/export_table_reader.gd")
+const LilianSessionScript := preload("res://scripts/lilian/lilian_state.gd")
 
 var _failures: PackedStringArray = []
 
@@ -122,8 +123,10 @@ func _test_generated_event_precedence() -> void:
 	)
 	_check(not materialized.is_empty(), "materialization returns an event")
 	_check(generated == before, "materialization does not implicitly mutate generated events")
-	var lilian_state: Node = root.get_node("LilianState")
+	var lilian_state: Node = LilianSessionScript.new()
+	root.add_child(lilian_state)
 	lilian_state.reset()
+	lilian_state.queue_free()
 	lilian_state.remember_generated_event(dynamic)
 	var persisted: Dictionary = lilian_state.event_by_id(str(dynamic.get("id", "")))
 	_check(persisted == dynamic, "dynamic node event remains queryable through LilianState")

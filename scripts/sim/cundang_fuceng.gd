@@ -3,7 +3,21 @@ extends Control
 signal closed(message: String)
 signal loaded(slot: int)
 
+const SaveRepositoryScript := preload("res://scripts/core/save_repository.gd")
+
 @export var load_only := false
+var _game_session_host: Node
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("CundangFuceng: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
 
 
 func _ready() -> void:
@@ -27,7 +41,7 @@ func _apply_mode() -> void:
 
 
 func refresh() -> void:
-	var active := GameState.active_save_slot
+	var active: int = int(_game_session().active_save_slot)
 	%Slot1SaveButton.disabled = true
 	_refresh_slot(1, %Slot1Label, %Slot1LoadButton, active, true)
 	_refresh_slot(2, %Slot2Label, %Slot2LoadButton, active)
@@ -42,11 +56,11 @@ func _refresh_slot(
 	auto_save: bool = false,
 ) -> void:
 	var prefix := "自动存档" if auto_save else "槽位 %d" % slot
-	var info: Dictionary = SaveService.slot_info(slot)
+	var info: Dictionary = SaveRepositoryScript.slot_info(slot)
 	if bool(info.get("ok", false)):
 		label.text = "%s：%s · %s · 修为 %d" % [
 			prefix,
-			GameState.time_date_label(int(info.get("day", 1))),
+			_game_session().time_date_label(int(info.get("day", 1))),
 			str(info.get("realm_name", "未知")),
 			int(info.get("cultivation", 0)),
 		]
@@ -59,10 +73,10 @@ func _refresh_slot(
 
 
 func _on_save_pressed(slot: int) -> void:
-	if slot == SaveService.AUTO_SAVE_SLOT:
+	if slot == SaveRepositoryScript.AUTO_SAVE_SLOT:
 		closed.emit("槽位 1 为自动存档，历练完成后会自动写入。")
 		return
-	var result: Dictionary = GameState.save_game(slot)
+	var result: Dictionary = _game_session().save_game(slot)
 	if bool(result.get("ok", false)):
 		refresh()
 		closed.emit("已存入槽位 %d。" % slot)
@@ -71,7 +85,7 @@ func _on_save_pressed(slot: int) -> void:
 
 
 func _on_load_pressed(slot: int) -> void:
-	var result: Dictionary = GameState.load_game(slot)
+	var result: Dictionary = _game_session().load_game(slot)
 	if bool(result.get("ok", false)):
 		refresh()
 		loaded.emit(slot)

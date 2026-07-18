@@ -1,5 +1,30 @@
 extends Control
 
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("TupoZongjie: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("TupoZongjie: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
 const TupoServiceScript := preload("res://scripts/sim/tupo_service.gd")
 
 const COMPONENT_ROWS := {
@@ -47,11 +72,17 @@ var _finished := false
 func _ready() -> void:
 	%CloseButton.pressed.connect(_on_close_pressed)
 	_start_button.pressed.connect(_on_start_pressed)
+	call_deferred("_initialize_after_session")
+
+
+func _initialize_after_session() -> void:
+	if _game_session() == null:
+		return
 	var payload: Dictionary = SceneManager.take_payload(SceneManager.TUPO_ZONGJIE)
 	if str(payload.get("mode", "")) == "result" and bool(payload.get("success", false)):
 		_show_success(payload)
 		return
-	if not GameState.can_breakthrough():
+	if not _game_session().can_breakthrough():
 		_on_close_pressed()
 		return
 	_refresh_panel()
@@ -59,12 +90,13 @@ func _ready() -> void:
 
 func _refresh_panel() -> void:
 	_finished = false
-	_player_info.text = "%s\n%s" % [GameState.player_name, GameState.realm_name]
-	_ling_stones.text = "灵石  %d" % GameState.ling_stones
+	var game_session := _game_session()
+	_player_info.text = "%s\n%s" % [game_session.player_name, game_session.realm_name]
+	_ling_stones.text = "灵石  %d" % game_session.ling_stones
 	_paths_panel.visible = true
 	_left_panel.visible = true
 	_start_label.text = "开始突破"
-	var preview: Dictionary = GameState.preview_breakthrough()
+	var preview: Dictionary = game_session.preview_breakthrough()
 	if not bool(preview.get("ok", false)):
 		_apply_preview_error(str(preview.get("error", "当前无法突破")))
 		return
@@ -75,7 +107,7 @@ func _apply_preview_error(error: String) -> void:
 	for key in COMPONENT_ROWS.keys():
 		_bind_row(str(COMPONENT_ROWS[key]), 0, [])
 	_total_label.text = "突破值总计       —"
-	_realm_label.text = "%s   →   %s" % [GameState.realm_name, GameState.next_realm_name()]
+	_realm_label.text = "%s   →   %s" % [_game_session().realm_name, _game_session().next_realm_name()]
 	_value_label.text = "突破值     —"
 	_progress.max_value = 1.0
 	_progress.value = 0.0
@@ -97,7 +129,7 @@ func _apply_breakdown(preview: Dictionary) -> void:
 	var min_total := maxi(1, int(preview.get("min_total", 1)))
 	_total_label.text = "突破值总计       %d" % total
 	_realm_label.text = "%s   →   %s" % [
-		str(preview.get("current_realm_name", GameState.realm_name)),
+		str(preview.get("current_realm_name", _game_session().realm_name)),
 		str(preview.get("target_realm_name", "")),
 	]
 	_value_label.text = "突破值     %d / %d" % [total, min_total]
@@ -125,18 +157,19 @@ func _apply_breakdown(preview: Dictionary) -> void:
 
 func _show_success(result: Dictionary) -> void:
 	_finished = true
-	_player_info.text = "%s\n%s" % [GameState.player_name, GameState.realm_name]
-	_ling_stones.text = "灵石  %d" % GameState.ling_stones
+	var game_session := _game_session()
+	_player_info.text = "%s\n%s" % [game_session.player_name, game_session.realm_name]
+	_ling_stones.text = "灵石  %d" % game_session.ling_stones
 	_paths_panel.visible = false
 	_left_panel.visible = false
 	_realm_label.text = "%s   →   %s" % [
 		str(result.get("old_realm", "")),
-		str(result.get("new_realm", GameState.realm_name)),
+		str(result.get("new_realm", game_session.realm_name)),
 	]
 	var tier_label := str(result.get("tier_label", ""))
 	_value_label.text = "突破成功"
 	_progress.value = _progress.max_value
-	_warning.text = "历时%s" % GameState.time_date_label(int(result.get("day", GameState.day)))
+	_warning.text = "历时%s" % game_session.time_date_label(int(result.get("day", game_session.day)))
 	_warning.add_theme_color_override("font_color", Color(0.22, 0.42, 0.12, 1))
 	_tier_result.text = "突破成功" if tier_label == "" else tier_label
 	_tier_effect.text = _format_success_effect(result, tier_label)
@@ -203,7 +236,7 @@ func _on_start_pressed() -> void:
 	if _finished:
 		_on_close_pressed()
 		return
-	var result: Dictionary = GameState.attempt_breakthrough()
+	var result: Dictionary = _game_session().attempt_breakthrough()
 	if not bool(result.get("ok", false)):
 		_warning.text = str(result.get("error", "无法突破"))
 		_warning.add_theme_color_override("font_color", Color(0.64, 0.14, 0.08, 1))
@@ -217,6 +250,8 @@ func _on_start_pressed() -> void:
 
 
 func _on_close_pressed() -> void:
-	var nav: Dictionary = LilianFlowService.open_hub(LilianState, SceneManager)
+	var lilian := _lilian_session()
+	if lilian == null: return
+	var nav: Dictionary = LilianFlowService.open_hub(lilian, SceneManager)
 	if not bool(nav.get("ok", false)):
 		push_warning(str(nav.get("error", "无法返回观中")))

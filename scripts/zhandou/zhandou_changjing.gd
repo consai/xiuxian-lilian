@@ -57,6 +57,47 @@ signal battle_finished(summary: Dictionary)
 @onready var _escape_button: TextureButton = %EscapeButton
 
 var _ctx := ZhandouChangjingContext.new()
+var _tutorial_coordinator: Node
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_tutorial_coordinator(tutorial_coordinator: Node) -> void:
+	if tutorial_coordinator == null:
+		push_error("ZhandouChangjing: TutorialCoordinator 不可用")
+		return
+	_tutorial_coordinator = tutorial_coordinator
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+	_ctx.lilian_session = _lilian_session()
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func bind_tips_host(host: Node) -> void:
+	_ctx.tip_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("ZhandouChangjing: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("ZhandouChangjing: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
+
+func tutorial_coordinator() -> Node:
+	return _tutorial_coordinator
 var _hud := ZhandouChangjingHud.new()
 var _input := ZhandouChangjingInput.new()
 var _presentation := ZhandouChangjingPresentation.new()
@@ -277,17 +318,19 @@ func _on_vfx_queue_finished() -> void:
 
 func _on_battle_result_close_requested() -> void:
 	if LilianBattleFlow.is_lilian_source(_ctx.battle_source):
-		LilianBattleFlow.handle_result_close()
+		LilianBattleFlow.handle_result_close(_lilian_session(), _game_session(), _tutorial_coordinator)
 		return
 	_hud.hide_battle_result()
 
 
 func _on_battle_finished(summary: Dictionary) -> void:
 	if LilianBattleFlow.is_lilian_source(_ctx.battle_source):
-		LilianBattleFlow.handle_battle_finished(summary)
+		LilianBattleFlow.handle_battle_finished(_lilian_session(), summary)
 		_schedule_lilian_auto_result_close()
 		return
-	GameState.apply_battle_player_runtime(summary)
+	var game_session := _game_session()
+	if game_session != null:
+		game_session.apply_battle_player_runtime(summary)
 
 
 func _schedule_lilian_auto_result_close() -> void:

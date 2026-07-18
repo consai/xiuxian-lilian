@@ -1,16 +1,9 @@
 extends RefCounted
-## 委托应用边界：组装长期状态与 GameState，并统一编排榜单和存档副作用。
-
-const SELF_PATH := "res://scripts/features/commission/application/weituo_application.gd"
+## 委托应用边界：组装长期状态与游戏会话，并统一编排榜单和存档副作用。
 const WeituoServiceScript := preload("res://scripts/sim/weituo_service.gd")
 
 var _store: Node
 var _game_state: Node
-
-
-static func production() -> RefCounted:
-	var application_script := load(SELF_PATH) as GDScript
-	return application_script.new(DataStore, GameState) as RefCounted
 
 
 func _init(store: Node, game_state: Node) -> void:

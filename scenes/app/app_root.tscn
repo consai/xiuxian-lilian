@@ -54,12 +54,14 @@ process_mode = 3
 script = ExtResource("3_hover_tip_host")
 
 [node name="ItemInfoPopupHost" type="CanvasLayer" parent="." groups=["item_info_popup_host"]]
+unique_name_in_owner = true
 layer = 1002
 follow_viewport_enabled = true
 process_mode = 3
 script = ExtResource("4_item_info_host")
 
 [node name="GmPanelHost" type="CanvasLayer" parent="." groups=["gm_panel_host"]]
+unique_name_in_owner = true
 layer = 1003
 follow_viewport_enabled = true
 process_mode = 3

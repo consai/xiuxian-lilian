@@ -278,8 +278,8 @@ func return_battle_end(ctx: ZhandouChangjingContext, hud: ZhandouChangjingHud, r
 		if ctx.scene.has_signal("battle_finished"):
 			ctx.scene.emit_signal("battle_finished", summary)
 		var display_summary := summary.duplicate(true)
-		if LilianState != null and LilianState.active and LilianState.phase == "battle":
-			display_summary["rewards"] = LilianState.pending_battle_rewards.duplicate(true)
+		if ctx.lilian_session != null and ctx.lilian_session.active and ctx.lilian_session.phase == "battle":
+			display_summary["rewards"] = ctx.lilian_session.pending_battle_rewards.duplicate(true)
 		hud.show_battle_result(ctx, display_summary)
 	var player_hp := ctx.domain.player.hp if ctx.domain.player != null else -1.0
 	var enemy_hp := ctx.domain.enemy.hp if ctx.domain.enemy != null else 0.0

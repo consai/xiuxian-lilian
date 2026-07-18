@@ -16,6 +16,37 @@ var _panel: Control
 var _battle_panel: Control
 var _item_grant_panel: Control
 var _active_window: int = GmWindow.MAIN
+var _tutorial_coordinator: Node
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+	if _panel != null:
+		_panel.call("bind_game_session_host", _game_session_host)
+	if _item_grant_panel != null and _item_grant_panel.has_method("bind_game_session_host"):
+		_item_grant_panel.call("bind_game_session_host", _game_session_host)
+	GmBattleAccess.bind_game_session(_game_session_host.session())
+
+
+func bind_tutorial_coordinator(tutorial_coordinator: Node) -> void:
+	if tutorial_coordinator == null:
+		push_error("GmPanelHost: TutorialCoordinator 不可用")
+		return
+	_tutorial_coordinator = tutorial_coordinator
+	if _panel != null:
+		_panel.call("bind_tutorial_coordinator", _tutorial_coordinator)
+
+
+func tutorial_coordinator() -> Node:
+	return _tutorial_coordinator
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+	if _panel != null:
+		_panel.call("bind_lilian_session_host", _lilian_session_host)
 
 
 func _ready() -> void:
@@ -23,6 +54,12 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_panel = PanelScene.instantiate() as Control
 	add_child(_panel)
+	if _tutorial_coordinator != null:
+		_panel.call("bind_tutorial_coordinator", _tutorial_coordinator)
+	if _lilian_session_host != null:
+		_panel.call("bind_lilian_session_host", _lilian_session_host)
+	if _game_session_host != null:
+		_panel.call("bind_game_session_host", _game_session_host)
 	_panel.visible = false
 	_battle_panel = BattlePanelScene.instantiate() as Control
 	add_child(_battle_panel)
@@ -31,6 +68,8 @@ func _ready() -> void:
 		_battle_panel.connect("closed", _on_battle_panel_closed)
 	_item_grant_panel = ItemGrantPanelScene.instantiate() as Control
 	add_child(_item_grant_panel)
+	if _game_session_host != null and _item_grant_panel.has_method("bind_game_session_host"):
+		_item_grant_panel.call("bind_game_session_host", _game_session_host)
 	_item_grant_panel.visible = false
 	if _item_grant_panel.has_signal("closed"):
 		_item_grant_panel.connect("closed", _on_item_grant_panel_closed)

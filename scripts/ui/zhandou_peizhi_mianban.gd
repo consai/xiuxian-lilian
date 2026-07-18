@@ -1,11 +1,44 @@
 extends Control
 
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+	if _selection_popup != null and _selection_popup.has_method("bind_game_session_host"):
+		_selection_popup.bind_game_session_host(host)
+	if _bag_popup != null and _bag_popup.has_method("bind_game_session_host"):
+		_bag_popup.bind_game_session_host(host)
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("ZhandouPeizhiMianban: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("ZhandouPeizhiMianban: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
+
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const AbilityServiceScript := preload("res://scripts/dao/ability_service.gd")
 const EffectResolverScript := preload("res://scripts/dao/effect_resolver.gd")
 const ZhandouInitDataScript := preload("res://scripts/zhandou/zhandou_init_data.gd")
 const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
+const InventoryEquipQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_query_application.gd"
 )
 const ItemIconResolverScript := preload(
 	"res://scripts/features/inventory/presentation/item_icon_resolver.gd"
@@ -129,7 +162,7 @@ func _page_status_text() -> String:
 func _bind_methods() -> void:
 	for spec in METHOD_ROWS:
 		var slot_key := str(spec["key"])
-		var method_id := str(GameState.cultivation_method_slots.get(slot_key, ""))
+		var method_id := str(_game_session().cultivation_method_slots.get(slot_key, ""))
 		var method := XiulianMethodServiceScript.by_id(method_id)
 		_bind_method_row(
 			_methods.get_node(str(spec["node"])) as Control,
@@ -153,25 +186,27 @@ func _bind_method_row(row: Control, type_label: String, method: Dictionary) -> v
 
 
 func _bind_method_summary() -> void:
-	var main := XiulianMethodServiceScript.by_id(str(GameState.cultivation_method_slots.get("main", "")))
+	var game_session := _game_session()
+	var main := XiulianMethodServiceScript.by_id(str(game_session.cultivation_method_slots.get("main", "")))
 	var mastery := XiulianMethodServiceScript.method_mastery_value_ratio(
-		GameState.to_dict(), str(main.get("id", ""))
+		game_session.to_dict(), str(main.get("id", ""))
 	)
 	var mp_restore := EffectResolverScript.combat_mp_restore_from_method(
 		main.get("effects", []) as Array, mastery
 	)
 	_method_summary.text = "当前主修：%s\n修炼速度 ×%.2f\n战斗每 2 秒恢复 %.0f 法力" % [
 		str(main.get("name", "未配置")),
-		XiulianMethodServiceScript.cultivation_speed(GameState.cultivation_method_slots),
+		XiulianMethodServiceScript.cultivation_speed(game_session.cultivation_method_slots),
 		mp_restore,
 	]
 
 
 func _bind_skills() -> void:
 	for i in _skills.get_child_count():
-		var aid := str(GameState.equipped_abilities[i]) if i < GameState.equipped_abilities.size() else ""
+		var game_session := _game_session()
+		var aid := str(game_session.equipped_abilities[i]) if i < game_session.equipped_abilities.size() else ""
 		var sid := AbilityServiceScript.combat_id_for(aid)
-		var skill := AbilityServiceScript.to_runtime_dict(aid, GameState.to_dict()) if aid != "" else {}
+		var skill := AbilityServiceScript.to_runtime_dict(aid, game_session.to_dict()) if aid != "" else {}
 		var row := _skills.get_child(i) as Control
 		row.get_node("%PriorityLabel").text = str(i + 1)
 		var name_label := row.get_node("%NameLabel") as Label
@@ -210,8 +245,9 @@ func _bind_equipment_slot(slot: Control, entry: Dictionary) -> void:
 
 func _equip_entry(index: int) -> Dictionary:
 	var item_id := ""
-	if index < GameState.treasure_item_slots.size():
-		item_id = str(GameState.treasure_item_slots[index]).strip_edges()
+	var game_session := _game_session()
+	if index < game_session.treasure_item_slots.size():
+		item_id = str(game_session.treasure_item_slots[index]).strip_edges()
 	if item_id != "":
 		var def := InventoryQueryApplicationScript.definition_by_id(item_id)
 		if def != null:
@@ -220,10 +256,10 @@ func _equip_entry(index: int) -> Dictionary:
 				"icon": ItemIconResolverScript.resolve(def.icon_path, null),
 			}
 		return {"label": InventoryQueryApplicationScript.display_name(item_id)}
-	var eid := int(GameState.equip_slots[index]) if index < GameState.equip_slots.size() else -1
+	var eid := int(game_session.equip_slots[index]) if index < game_session.equip_slots.size() else -1
 	if eid <= 0:
 		return {"label": _treasure_slot_label(index)}
-	var equip := ConfigManager.equip_by_id(eid)
+	var equip := InventoryEquipQueryApplicationScript.equip_by_id(eid)
 	return {
 		"label": str(equip.get("name", "空")),
 		"icon": _entry_icon(equip),
@@ -235,11 +271,12 @@ func _treasure_slot_label(index: int) -> String:
 
 
 func _item_entry(index: int) -> Dictionary:
-	var iid := str(GameState.item_slots[index]) if index < GameState.item_slots.size() else ""
+	var game_session := _game_session()
+	var iid := str(game_session.item_slots[index]) if index < game_session.item_slots.size() else ""
 	if iid == "":
 		return {"label": "空"}
 	var item_name := InventoryQueryApplicationScript.display_name(iid)
-	var count := int(GameState.inventory.get(iid, 0))
+	var count := int(game_session.inventory.get(iid, 0))
 	var label := "%s x%d" % [item_name, count] if count > 1 else item_name
 	var icon: Texture2D = null
 	var def := InventoryQueryApplicationScript.definition_by_id(iid)
@@ -259,15 +296,15 @@ func _open_selection(mode: String, target: Variant) -> void:
 
 func _on_popup_selected(entry_id: Variant) -> void:
 	if _selection_mode == "method":
-		var method_result: Dictionary = GameState.equip_method(str(_selection_target), str(entry_id))
+		var method_result: Dictionary = _game_session().equip_method(str(_selection_target), str(entry_id))
 		_refresh(str(method_result.get("error", "功法配置已更新。")))
 		return
 	var aid := str(entry_id).strip_edges()
 	if aid == "" or aid == "-1":
-		var clear_result: Dictionary = GameState.equip_ability(int(_selection_target), "")
+		var clear_result: Dictionary = _game_session().equip_ability(int(_selection_target), "")
 		_refresh(str(clear_result.get("error", "技能槽已清空。")))
 		return
-	var skill_result: Dictionary = GameState.equip_ability(int(_selection_target), aid)
+	var skill_result: Dictionary = _game_session().equip_ability(int(_selection_target), aid)
 	_refresh(str(skill_result.get("error", "技能配置已更新。")))
 
 
@@ -285,13 +322,13 @@ func _on_bag_entry_picked(entry: Dictionary) -> void:
 	if kind == "equip":
 		var result: Dictionary
 		if str(entry.get("kind", "item")) == "item":
-			result = GameState.assign_treasure_item_slot(slot_index, str(entry.get("id", "")))
+			result = _game_session().assign_treasure_item_slot(slot_index, str(entry.get("id", "")))
 		else:
-			result = GameState.assign_equip_slot(slot_index, int(entry.get("id", -1)))
+			result = _game_session().assign_equip_slot(slot_index, int(entry.get("id", -1)))
 		_refresh(_peizhi_message(result, "法宝配置已更新。"))
 		return
 	if kind == "item":
-		var result: Dictionary = GameState.assign_item_slot(slot_index, str(entry.get("id", "")))
+		var result: Dictionary = _game_session().assign_item_slot(slot_index, str(entry.get("id", "")))
 		_refresh(_peizhi_message(result, "道具配置已更新。"))
 		return
 	_refresh("配置失败。")
@@ -381,4 +418,6 @@ func _apply_quality_tier_badges(row: Control, entry: Dictionary) -> void:
 
 func _go_back() -> void:
 	var popup_mode := SceneManager.is_panel_popup_active()
-	LilianFlowService.close_lilian_utility_panel(popup_mode, LilianState, SceneManager)
+	var lilian := _lilian_session()
+	if lilian != null:
+		LilianFlowService.close_lilian_utility_panel(popup_mode, lilian, SceneManager)

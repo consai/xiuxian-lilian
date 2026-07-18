@@ -1,5 +1,42 @@
 extends Control
 
+var _tutorial_coordinator: Node
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_tutorial_coordinator(coordinator: Node) -> void:
+	_tutorial_coordinator = coordinator
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("LiandanJinduQuanping: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("LiandanJinduQuanping: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
+
+func _tutorial_event(event_id: String) -> void:
+	if _tutorial_coordinator == null:
+		push_error("LiandanJinduQuanping: TutorialCoordinator 未注入")
+		return
+	_tutorial_coordinator.game_event(event_id)
+
 const MILESTONE_LABELS := ["投药", "控火", "凝丹", "开炉"]
 const STATUS_TEXTS := [
 	"药材入炉，药香初起",
@@ -39,11 +76,19 @@ var _speed_multiplier := 1.0
 func _ready() -> void:
 	_cancel_button.pressed.connect(_on_cancel_pressed)
 	_speed_button.pressed.connect(_on_speed_pressed)
+	call_deferred("_initialize_after_session")
+
+
+func _initialize_after_session() -> void:
+	if _game_session() == null:
+		return
 	var payload: Dictionary = SceneManager.take_payload(SceneManager.LIANDAN_JINDU_QUANPING)
 	if not _apply_payload(payload):
 		var nav: Dictionary = SceneManager.go_liandan_mianban()
 		if not bool(nav.get("ok", false)):
-			LilianFlowService.open_hub(LilianState, SceneManager)
+			var lilian := _lilian_session()
+			if lilian != null:
+				LilianFlowService.open_hub(lilian, SceneManager)
 		return
 	_start_progress()
 
@@ -57,7 +102,7 @@ func _apply_payload(payload: Dictionary) -> bool:
 	_days_per_batch = maxi(1, int(payload.get("days_per_batch", _days)))
 	if _recipe_id == "" or _strategy_id == "" or _days <= 0:
 		return false
-	_start_day = int(payload.get("start_day", GameState.day))
+	_start_day = int(payload.get("start_day", _game_session().day))
 	_recipe_name = str(payload.get("recipe_name", "丹方"))
 	return true
 
@@ -88,8 +133,8 @@ func _update_visuals(ratio: float) -> void:
 	var day_progress := ratio * float(_days)
 	var current_day := clampi(int(day_progress) + 1, 1, _days)
 	_day_label.text = "%s / 共 %s" % [
-		GameState.time_duration_label(current_day),
-		GameState.time_duration_label(_days),
+		_game_session().time_duration_label(current_day),
+		_game_session().time_duration_label(_days),
 	]
 	var status_index := clampi(int(ratio * float(STATUS_TEXTS.size())), 0, STATUS_TEXTS.size() - 1)
 	_status_label.text = STATUS_TEXTS[status_index]
@@ -119,7 +164,7 @@ func _finish_progress() -> void:
 	_finishing = true
 	_cancel_button.disabled = true
 	_speed_button.disabled = true
-	var result: Dictionary = GameState.brew_liandan_batches(
+	var result: Dictionary = _game_session().brew_liandan_batches(
 		_recipe_id,
 		_strategy_id,
 		_selection_mode,
@@ -129,7 +174,9 @@ func _finish_progress() -> void:
 		push_warning(str(result.get("error", "炼制失败")))
 		var back_nav: Dictionary = SceneManager.go_liandan_mianban()
 		if not bool(back_nav.get("ok", false)):
-			LilianFlowService.open_hub(LilianState, SceneManager)
+			var lilian := _lilian_session()
+			if lilian != null:
+				LilianFlowService.open_hub(lilian, SceneManager)
 		return
 	result["recipe_name"] = _recipe_name
 	result["start_day"] = _start_day
@@ -138,4 +185,4 @@ func _finish_progress() -> void:
 		push_warning(str(result.get("error", "无法展示炼丹结果")))
 		SceneManager.go_liandan_mianban()
 		return
-	TutorialService.game_event("tutorial.alchemy_result_shown")
+	_tutorial_event("tutorial.alchemy_result_shown")

@@ -14,6 +14,9 @@ const InventoryApplicationScript := preload(
 const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
 )
+const InventoryEquipQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_query_application.gd"
+)
 
 
 static func rules() -> Dictionary:
@@ -195,9 +198,11 @@ static func submit(instance_id: String, savedata: Dictionary, game_state: Node) 
 	_persist_inventory(savedata, game_state, inventory)
 	var rewards := weituo_def.get("rewards", []) as Array
 	var applied := RewardService.apply_rewards(game_state, rewards, "weituo")
-	_emit_inventory_changed()
+	if game_state.has_method("notify_inventory_changed"):
+		game_state.call("notify_inventory_changed")
 	var title := str(weituo_def.get("title", "委托"))
-	_append_activity(game_state, "提交委托「%s」，获得预定奖励" % title)
+	var day := int(savedata["day"])
+	_append_activity(savedata, day, "提交委托「%s」，获得预定奖励" % title)
 	var weituo_id := _record_weituo_id(rec)
 	if not bool(weituo_def.get("repeatable", true)):
 		var completed_once: Array = weituo_data.get("completed_once", []) as Array
@@ -345,7 +350,7 @@ static func build_reward_row(reward: Dictionary) -> Dictionary:
 		}
 	if kind == EnumRewardKind.LABEL_EQUIP:
 		var equip_id := int(reward.get("id", -1))
-		var equip: Dictionary = _config_manager().equip_by_id(equip_id) if _config_manager() != null else {}
+		var equip: Dictionary = InventoryEquipQueryApplicationScript.equip_by_id(equip_id)
 		return {
 			"kind": kind,
 			"id": str(equip_id),
@@ -666,13 +671,6 @@ static func _item_def(item_id: String) -> ItemDef:
 	return InventoryQueryApplicationScript.definition_by_id(item_id)
 
 
-static func _config_manager() -> Node:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
-
-
 static func _requirement_item_id(req: Dictionary) -> String:
 	var item_id := str(req.get("id", "")).strip_edges()
 	if item_id != "":
@@ -734,21 +732,7 @@ static func _consume_item_requirements(inventory: Dictionary, weituo_def: Dictio
 	return {"ok": true}
 
 
-static func _emit_inventory_changed() -> void:
-	var bus := Engine.get_main_loop()
-	if not bus is SceneTree:
-		return
-	var data_events := (bus as SceneTree).root.get_node_or_null("DataEvents")
-	if data_events != null and data_events.has_method("emit_inventory_changed"):
-		data_events.call("emit_inventory_changed")
-
-
-static func _append_activity(game_state: Node, text: String) -> void:
-	if game_state == null:
-		return
-	var day := int(game_state.day) if "day" in game_state else 1
-	var activity_log_rows: Array = game_state.activity_log if "activity_log" in game_state else []
-	activity_log_rows.append({"day": day, "text": text})
-	if activity_log_rows.size() > 30:
-		activity_log_rows = activity_log_rows.slice(activity_log_rows.size() - 30)
-	game_state.activity_log = activity_log_rows
+static func _append_activity(savedata: Dictionary, day: int, text: String) -> void:
+	var journal_application := preload("res://scripts/features/character/application/player_journal_application.gd")
+	if not bool(journal_application.append(savedata, day, text).get("ok", false)):
+		push_error("[weituo_service:invalid_player_journal] action=append_activity")

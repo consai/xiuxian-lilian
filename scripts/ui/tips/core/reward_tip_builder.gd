@@ -5,6 +5,9 @@ const TipIntentScript := preload("res://scripts/ui/tips/core/tip_intent.gd")
 const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
 )
+const InventoryEquipQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_query_application.gd"
+)
 const DaoTreeQueryApplicationScript := preload(
 	"res://scripts/features/dao/application/dao_tree_query_application.gd"
 )
@@ -199,15 +202,4 @@ static func _item_def_by_id(item_id: String) -> ItemDef:
 
 
 static func _equip_by_id(equip_id: int) -> Dictionary:
-	var cm := _config_manager()
-	if cm == null or not cm.has_method("equip_by_id"):
-		return {}
-	var found: Variant = cm.call("equip_by_id", equip_id)
-	return found as Dictionary if found is Dictionary else {}
-
-
-static func _config_manager() -> Node:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
+	return InventoryEquipQueryApplicationScript.equip_by_id(equip_id)

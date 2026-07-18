@@ -6,6 +6,9 @@ const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_se
 const InventoryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_application.gd"
 )
+const InventoryEquipQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_query_application.gd"
+)
 const TagServiceScript := preload("res://scripts/sim/tag_service.gd")
 
 
@@ -127,14 +130,4 @@ static func _skills_include_id(skills: Array, skill_id: int) -> bool:
 
 
 static func _equip_by_id(equip_id: int) -> Dictionary:
-	var cm := _config_manager()
-	if cm != null and cm.has_method("equip_by_id"):
-		return cm.call("equip_by_id", equip_id) as Dictionary
-	return {}
-
-
-static func _config_manager() -> Node:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
+	return InventoryEquipQueryApplicationScript.equip_by_id(equip_id)

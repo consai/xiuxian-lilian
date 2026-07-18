@@ -1,10 +1,13 @@
 extends Control
 
-## GM 奖励发放面板：模糊搜索配置表道具 / 法宝并经 GameState.grant_rewards 发放。
+## GM 奖励发放面板：模糊搜索配置表道具 / 法宝并经游戏会话 grant_rewards 发放。
 
 const GmItemSearchScript := preload("res://scripts/ui/gm_item_search.gd")
 const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
+const InventoryEquipQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_query_application.gd"
 )
 
 signal closed
@@ -17,6 +20,11 @@ signal closed
 
 var _catalog: Array = []
 var _filtered: Array = []
+var _game_session_host: Node
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
 
 
 func _ready() -> void:
@@ -40,7 +48,6 @@ func refresh() -> void:
 
 func _build_catalog() -> void:
 	_catalog.clear()
-	var cm := _config_manager()
 	var item_rows := InventoryQueryApplicationScript.all_definitions()
 	for def_v in item_rows:
 		if not def_v is ItemDef:
@@ -56,12 +63,10 @@ func _build_catalog() -> void:
 			"quality": EnumQuality.display_label(def.quality),
 			"tier": EnumItemTier.label(def.tier),
 		})
-	if cm == null:
-		return
-	var equip_ids := cm.call("all_equip_ids") as Array
+	var equip_ids := InventoryEquipQueryApplicationScript.all_equip_ids()
 	for equip_id_v in equip_ids:
 		var equip_id := int(equip_id_v)
-		var equip := cm.call("equip_by_id", equip_id) as Dictionary
+		var equip := InventoryEquipQueryApplicationScript.equip_by_id(equip_id)
 		if equip.is_empty():
 			continue
 		_catalog.append({
@@ -161,7 +166,7 @@ func _grant_entry(entry: Dictionary, count: int, announce_single: bool = true) -
 	var game_state := _game_state()
 	if game_state == null:
 		if announce_single:
-			_flash("发放失败：GameState 未初始化")
+			_flash("发放失败：游戏会话未初始化")
 		return false
 	var kind := str(entry.get("kind", EnumRewardKind.LABEL_ITEM))
 	var reward_id: Variant = int(entry.get("id", -1)) if kind == EnumRewardKind.LABEL_EQUIP else str(entry.get("id", ""))
@@ -173,16 +178,11 @@ func _grant_entry(entry: Dictionary, count: int, announce_single: bool = true) -
 		if announce_single:
 			_flash("发放失败：未知奖励或已达上限（%s）" % str(reward_id))
 		return false
-	var data_events := _data_events()
-	if data_events != null and data_events.has_method("emit_inventory_changed"):
-		data_events.call("emit_inventory_changed")
+	game_state.notify_inventory_changed()
 	if announce_single:
-		var cm := _config_manager()
 		var row := applied[0] as Dictionary
 		if str(row.get("kind", kind)) == EnumRewardKind.LABEL_EQUIP:
-			var equip := {}
-			if cm != null:
-				equip = cm.call("equip_by_id", int(row.get("id", -1))) as Dictionary
+			var equip := InventoryEquipQueryApplicationScript.equip_by_id(int(row.get("id", -1)))
 			_flash("已获得法宝 %s" % str(equip.get("name", "法宝")))
 		elif str(row.get("kind", kind)) == EnumRewardKind.LABEL_CURRENCY:
 			_flash("已获得灵石 x%d" % int(row.get("count", 0)))
@@ -201,22 +201,8 @@ func _on_close_pressed() -> void:
 	closed.emit()
 
 
-func _config_manager() -> Node:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
-
-
 func _game_state() -> Node:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
+	if _game_session_host == null:
+		push_error("GmItemGrantPanel: GameSessionHost 未注入")
 		return null
-	return (loop as SceneTree).root.get_node_or_null("GameState")
-
-
-func _data_events() -> Node:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("DataEvents")
+	return _game_session_host.session()

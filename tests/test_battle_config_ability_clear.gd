@@ -2,6 +2,8 @@ extends SceneTree
 
 const PANEL_SCENE_PATH := "res://scenes/ui/zhandou_peizhi_mianban.tscn"
 const AUTO_SAVE_PATH := "user://save_slot_0.json"
+const GameSessionHostScript := preload("res://scripts/app/game_session_host.gd")
+const GameSessionScript := preload("res://scripts/sim/game_state.gd")
 
 var _failures: PackedStringArray = []
 var _game_state: Node
@@ -12,12 +14,18 @@ func _init() -> void:
 
 
 func _run() -> void:
-	_game_state = root.get_node("GameState")
+	_game_state = GameSessionScript.new()
+	root.add_child(_game_state)
+	_game_state.bind_store(root.get_node("DataStore"))
+	_game_state.bind_scene_manager(root.get_node("SceneManager"))
+	var game_session_host := GameSessionHostScript.new()
+	game_session_host.bind_session(_game_state)
 	var save_before := _file_snapshot(AUTO_SAVE_PATH)
 	_game_state.unlocked_abilities = ["skill_lq_001", "skill_lq_002"]
-	_game_state.equipped_abilities = ["skill_lq_001", "skill_lq_002", "", "skill_lq_001", ""]
+	_game_state.equipped_abilities = ["skill_lq_001", "skill_lq_002", "", "", ""]
 
 	var panel := (load(PANEL_SCENE_PATH) as PackedScene).instantiate()
+	panel.bind_game_session_host(game_session_host)
 	root.add_child(panel)
 	await process_frame
 
@@ -41,6 +49,8 @@ func _run() -> void:
 	_check(_file_snapshot(AUTO_SAVE_PATH) == save_before, "skill clearing does not write the autosave file")
 
 	panel.queue_free()
+	_game_state.queue_free()
+	game_session_host.queue_free()
 	await process_frame
 	if not _failures.is_empty():
 		for failure in _failures:

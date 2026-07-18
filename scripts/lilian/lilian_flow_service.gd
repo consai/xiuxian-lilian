@@ -15,7 +15,7 @@ static func start_lilian(
 		lilian_state: Node,
 		game_state: Node,
 		scene_manager: Node,
-		tutorial_service: Node
+		tutorial_coordinator: Node
 ) -> Dictionary:
 	if lilian_state == null or game_state == null:
 		return {"ok": false, "error": "缺少 GameState 或 LilianState"}
@@ -23,8 +23,8 @@ static func start_lilian(
 	if not bool(preflight.get("ok", false)):
 		return preflight
 	var use_tutorial_map: bool = (
-		tutorial_service != null
-		and tutorial_service.should_use_tutorial_lilian_map()
+		tutorial_coordinator != null
+		and tutorial_coordinator.should_use_tutorial_lilian_map()
 	)
 	var started: Dictionary = lilian_state.start(
 		location_id,
@@ -34,8 +34,8 @@ static func start_lilian(
 	)
 	if not bool(started.get("ok", false)):
 		return started
-	if tutorial_service != null:
-		tutorial_service.game_event("tutorial.lilian_started")
+	if tutorial_coordinator != null:
+		tutorial_coordinator.game_event("tutorial.lilian_started")
 	var nav: Dictionary = open_active_lilian(lilian_state, scene_manager)
 	if not bool(nav.get("ok", false)):
 		lilian_state.reset()
@@ -126,11 +126,11 @@ static func open_hub(
 static func close_settlement(
 		lilian_state: Node,
 		scene_manager: Node,
-		tutorial_service: Node
+		tutorial_coordinator: Node
 ) -> Dictionary:
-	if lilian_state == null or scene_manager == null or tutorial_service == null:
-		return {"ok": false, "error": "缺少 LilianState、SceneManager 或 TutorialService"}
-	tutorial_service.game_event("tutorial.result_closed")
+	if lilian_state == null or scene_manager == null or tutorial_coordinator == null:
+		return {"ok": false, "error": "缺少 LilianState、SceneManager 或 TutorialCoordinator"}
+	tutorial_coordinator.game_event("tutorial.result_closed")
 	scene_manager.take_payload(scene_manager.LILIAN_JIESUAN)
 	return open_hub(lilian_state, scene_manager)
 
@@ -157,16 +157,16 @@ static func settle_active_lilian(
 		reason: String,
 		lilian_state: Node,
 		game_state: Node,
-		tutorial_service: Node
+		tutorial_coordinator: Node
 ) -> Dictionary:
-	if lilian_state == null or game_state == null or tutorial_service == null:
-		return {"ok": false, "error": "缺少 LilianState、GameState 或 TutorialService"}
+	if lilian_state == null or game_state == null or tutorial_coordinator == null:
+		return {"ok": false, "error": "缺少 LilianState、GameState 或 TutorialCoordinator"}
 	if not lilian_state.active:
 		return {"ok": false, "error": "没有可结算的历练"}
 	var result: Dictionary = lilian_state.finish(reason)
 	if not bool(result.get("ok", false)):
 		return result
-	var settled: Dictionary = game_state.settle_lilian(result, tutorial_service)
+	var settled: Dictionary = game_state.settle_lilian(result, tutorial_coordinator)
 	if not bool(settled.get("ok", false)):
 		return settled
 	return result

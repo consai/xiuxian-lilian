@@ -27,15 +27,71 @@ const WeituoApplicationScript := preload(
 @onready var _save_button: Button = %SaveButton
 
 var _weituo_application: Variant
+var _tutorial_coordinator: Node
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_tutorial_coordinator(coordinator: Node) -> void:
+	_tutorial_coordinator = coordinator
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+	_bind_game_session_children()
+
+
+func _bind_game_session_children() -> void:
+	if _game_session_host == null:
+		return
+	if _save_slots_overlay != null and _save_slots_overlay.has_method("bind_game_session_host"):
+		_save_slots_overlay.call("bind_game_session_host", _game_session_host)
+	if _inventory_overlay != null and _inventory_overlay.has_method("bind_game_session_host"):
+		_inventory_overlay.call("bind_game_session_host", _game_session_host)
+	if _weituo_board != null and _weituo_board.has_method("bind_game_session_host"):
+		_weituo_board.call("bind_game_session_host", _game_session_host)
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("Dongfu: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("Dongfu: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
+
+func _tutorial_event(event_id: String) -> void:
+	if _tutorial_coordinator == null:
+		push_error("Dongfu: TutorialCoordinator 未注入")
+		return
+	_tutorial_coordinator.game_event(event_id)
 
 
 func _ready() -> void:
-	_weituo_application = WeituoApplicationScript.production()
+	_bind_game_session_children()
 	_inventory_overlay.visible = false
 	_save_slots_overlay.visible = false
 	_weituo_board.visible = false
 	_connect_actions()
-	GameState.refresh_derived_attrs(true)
+	call_deferred("_initialize_after_session")
+
+
+func _initialize_after_session() -> void:
+	var game_session := _game_session()
+	if game_session == null:
+		return
+		_weituo_application = WeituoApplicationScript.new(game_session.data_store(), game_session)
+	game_session.refresh_derived_attrs(true)
 	_refresh()
 
 
@@ -60,35 +116,37 @@ func _connect_actions() -> void:
 
 
 func _refresh(message: String = "") -> void:
-	var hp_max := float(GameState.attrs.get(EnumPlayerAttr.HP_MAX, 100.0))
-	var mp_max := float(GameState.attrs.get(EnumPlayerAttr.MP_MAX, 100.0))
+	var game_session := _game_session()
+	var hp_max := float(game_session.attrs.get(EnumPlayerAttr.HP_MAX, 100.0))
+	var mp_max := float(game_session.attrs.get(EnumPlayerAttr.MP_MAX, 100.0))
 	_realm_label.text = "%s · 修为 %d/%d" % [
-		GameState.realm_name, GameState.cultivation, GameState.breakthrough_at
+		game_session.realm_name, game_session.cultivation, game_session.breakthrough_at
 	]
 	var status := "%s  |  灵石 %d  |  气血 %.0f/%.0f  |  法力 %.0f/%.0f  |  伤势 %s  |  灵力驳杂 %d" % [
-		GameState.time_date_label(GameState.day), GameState.ling_stones, GameState.hp, hp_max,
-		GameState.mp, mp_max, GameState.time_duration_label(GameState.injury_days), GameState.cultivation_instability
+		game_session.time_date_label(game_session.day), game_session.ling_stones, game_session.hp, hp_max,
+		game_session.mp, mp_max, game_session.time_duration_label(game_session.injury_days), game_session.cultivation_instability
 	]
-	if GameState.active_save_slot > 0:
-		status += "  |  存档槽 %d" % GameState.active_save_slot
+	if game_session.active_save_slot > 0:
+		status += "  |  存档槽 %d" % game_session.active_save_slot
 	_status_label.text = status
 	# 仅在大境界可突破时展示入口，避免平时占位干扰洞府布局
-	_breakthrough_button.visible = GameState.can_breakthrough()
+	_breakthrough_button.visible = game_session.can_breakthrough()
 	_message_label.text = _resolve_message(message)
 
 
 func _resolve_message(message: String) -> String:
 	if message != "":
 		return message
-	if not GameState.last_lilian_summary.is_empty():
-		return _last_lilian_message(GameState.last_lilian_summary)
-	if not GameState.last_rewards.is_empty():
+	var game_session := _game_session()
+	if not game_session.last_lilian_summary.is_empty():
+		return _last_lilian_message(game_session.last_lilian_summary)
+	if not game_session.last_rewards.is_empty():
 		var rewards: PackedStringArray = []
-		for reward in GameState.last_rewards:
-			rewards.append(GameState.reward_label(reward))
+		for reward in game_session.last_rewards:
+			rewards.append(game_session.reward_label(reward))
 		return "上次所得：" + "、".join(rewards)
-	if not GameState.activity_log.is_empty():
-		return str((GameState.activity_log.back() as Dictionary).get("text", ""))
+	if not game_session.activity_log.is_empty():
+		return str((game_session.activity_log.back() as Dictionary).get("text", ""))
 	return "可随时出门巡山。"
 
 
@@ -98,7 +156,7 @@ func _last_lilian_message(summary: Dictionary) -> String:
 	var peak := maxi(int(stats.get("max_difficulty", 0)), int(stats.get("max_depth", 0)))
 	var duration := str(summary.get(
 		"duration_label",
-		GameState.time_duration_label(int(summary.get("elapsed_days", 1)))
+		_game_session().time_duration_label(int(summary.get("elapsed_days", 1)))
 	))
 	var exit_reason := str(summary.get("exit_reason", "manual"))
 	if exit_reason == "defeated":
@@ -113,14 +171,14 @@ func _last_lilian_message(summary: Dictionary) -> String:
 
 
 func _on_alchemy() -> void:
-	TutorialService.game_event("tutorial.alchemy_opened")
+	_tutorial_event("tutorial.alchemy_opened")
 	var nav: Dictionary = SceneManager.go_liandan_mianban()
 	if not bool(nav.get("ok", false)):
 		_refresh(str(nav.get("error", "无法打开炼丹界面")))
 
 
 func _on_cultivate() -> void:
-	TutorialService.game_event("tutorial.xiulian_mianban_opened")
+	_tutorial_event("tutorial.xiulian_mianban_opened")
 	var nav: Dictionary = SceneManager.go_xiulian_mianban()
 	if not bool(nav.get("ok", false)):
 		_refresh(str(nav.get("error", "无法打开修炼界面")))
@@ -139,21 +197,24 @@ func _on_skills() -> void:
 
 
 func _on_rest() -> void:
-	GameState.rest()
+	_game_session().rest()
 	_refresh("静养一日，气血与法力恢复，伤势减轻约 2 日。")
 
 
 func _on_encounter() -> void:
-	if LilianState.active:
+	var lilian := _lilian_session()
+	if lilian == null:
+		return
+	if lilian.active:
 		_refresh("当前仍在巡山中，请先完成或结算后再操作。")
 		return
-	var nav: Dictionary = LilianFlowService.open_world_map(LilianState, SceneManager)
+	var nav: Dictionary = LilianFlowService.open_world_map(lilian, SceneManager)
 	if not bool(nav.get("ok", false)):
 		_refresh(str(nav.get("error", "无法打开世界地图")))
 
 
 func _on_breakthrough() -> void:
-	if not GameState.can_breakthrough():
+	if not _game_session().can_breakthrough():
 		_refresh("修为尚未达到大境界突破门槛。")
 		return
 	var payload := BreakthroughPagePayloadContract.panel()
@@ -163,7 +224,7 @@ func _on_breakthrough() -> void:
 
 
 func _on_character_attributes() -> void:
-	TutorialService.game_event("tutorial.attributes_opened")
+	_tutorial_event("tutorial.attributes_opened")
 	var nav: Dictionary = SceneManager.go_character_attributes_panel()
 	if not bool(nav.get("ok", false)):
 		_refresh(str(nav.get("error", "无法打开人物属性")))

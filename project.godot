@@ -18,13 +18,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 DataStore="*res://scripts/core/data_store.gd"
-DataEvents="*res://scripts/events/data_events.gd"
-ConfigManager="*res://scripts/core/config_manager.gd"
+ConfigCatalog="*res://scripts/core/config/config_catalog.gd"
 SceneManager="*res://scripts/core/scene_manager.gd"
-SaveService="*res://scripts/sim/save_service.gd"
-GameState="*res://scripts/sim/game_state.gd"
-LilianState="*res://scripts/lilian/lilian_state.gd"
-TutorialService="*res://scripts/story/tutorial_service.gd"
 
 [display]
 

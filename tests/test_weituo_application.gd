@@ -194,6 +194,7 @@ func _savedata(day: int) -> Dictionary:
 		"day": day,
 		"realm_index": 0,
 		"inventory": {},
+		"activity_log": [],
 		"map": {"discovered_cities": ["qingshi_market"]},
 		"weituo": WeituoStateScript.default_state(),
 	}

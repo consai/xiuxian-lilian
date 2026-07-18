@@ -11,6 +11,18 @@ signal closed
 var _mode := "skill"
 var _target_key: Variant = -1
 var _filter := "all"
+var _game_session_host: Node
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("PeizhiXuanzeTanchuang: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
 
 @onready var _title: Label = %Title
 @onready var _filters: HBoxContainer = %Filters
@@ -57,7 +69,10 @@ func _build_entries() -> void:
 
 
 func _build_method_entries() -> void:
-	for method_id_v in GameState.unlocked_methods:
+	var game_session := _game_session()
+	if game_session == null:
+		return
+	for method_id_v in game_session.unlocked_methods:
 		var method_id := str(method_id_v)
 		var row := XiulianMethodServiceScript.by_id(method_id)
 		if not XiulianMethodServiceScript.can_equip(row, str(_target_key)):
@@ -65,20 +80,23 @@ func _build_method_entries() -> void:
 		var category := _method_category(row)
 		if _filter != "all" and category != _filter:
 			continue
-		var equipped := GameState.cultivation_method_slots.values().has(method_id)
+		var equipped: bool = game_session.cultivation_method_slots.values().has(method_id)
 		_add_entry(method_id, row, category, equipped)
 
 
 func _build_skill_entries() -> void:
-	for ability_id_v in GameState.unlocked_abilities:
+	var game_session := _game_session()
+	if game_session == null:
+		return
+	for ability_id_v in game_session.unlocked_abilities:
 		var ability_id := str(ability_id_v)
-		var row := AbilityServiceScript.to_runtime_dict(ability_id, GameState.to_dict())
+		var row := AbilityServiceScript.to_runtime_dict(ability_id, game_session.to_dict())
 		if row.is_empty():
 			continue
 		var category := _skill_category(row)
 		if _filter != "all" and category != _filter:
 			continue
-		var equipped := GameState.equipped_abilities.has(ability_id)
+		var equipped: bool = game_session.equipped_abilities.has(ability_id)
 		_add_entry(ability_id, row, category, equipped)
 	_add_empty_skill_entry()
 
@@ -137,12 +155,12 @@ func _close() -> void:
 
 func _is_equipped_at_target(entry_id: Variant) -> bool:
 	if _mode == "method":
-		return str(GameState.cultivation_method_slots.get(str(_target_key), "")) == str(entry_id)
+		return str(_game_session().cultivation_method_slots.get(str(_target_key), "")) == str(entry_id)
 	var index := int(_target_key)
 	return (
 		index >= 0
-		and index < GameState.equipped_abilities.size()
-		and str(GameState.equipped_abilities[index]) == str(entry_id)
+		and index < _game_session().equipped_abilities.size()
+		and str(_game_session().equipped_abilities[index]) == str(entry_id)
 	)
 
 

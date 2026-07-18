@@ -4,6 +4,9 @@ extends RefCounted
 const CharacterStatsScript := preload("res://scripts/sim/character_stats.gd")
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
 const TupoCatalogScript := preload("res://scripts/sim/tupo_catalog.gd")
+const BreakthroughApplicationScript := preload(
+	"res://scripts/features/cultivation/application/breakthrough_application.gd"
+)
 
 const COMPONENT_KEYS := [
 	"cultivation", "pills", "mind", "aptitude", "fortune", "special_method", "other"
@@ -27,12 +30,17 @@ static func rules() -> Dictionary:
 
 
 static func compute_breakdown(savedata: Dictionary, realms: Array, realm_index: int) -> Dictionary:
+	var breakthrough_state := BreakthroughApplicationScript.snapshot(savedata)
+	if not bool(breakthrough_state.get("ok", false)):
+		return {"ok": false, "error": str(breakthrough_state.get("error", "突破状态无效"))}
 	var preview := _transition_preview(savedata, realms, realm_index)
 	if not bool(preview.get("ok", false)):
 		return preview
 	var transition_id := str(preview.get("transition_id", ""))
 	var transition := _transition_cfg(transition_id)
-	var detail := _compute_component_detail(savedata, transition)
+	var detail := _compute_component_detail(
+		savedata, transition, breakthrough_state.get("value", {}) as Dictionary
+	)
 	var components: Dictionary = detail.get("components", {}) as Dictionary
 	var component_sources: Dictionary = detail.get("sources", {}) as Dictionary
 	var total := _sum_components(components)
@@ -126,9 +134,13 @@ static func resolve(savedata: Dictionary, realms: Array, realm_index: int, rng: 
 	var tier: Dictionary = breakdown.get("tier", {}) as Dictionary
 	var success_rate := clampf(float(tier.get("success_rate", 0.0)), 0.0, 1.0)
 	var success := success_rate >= 1.0 or rng.randf() < success_rate
+	var breakthrough_state := BreakthroughApplicationScript.snapshot(savedata)
+	if not bool(breakthrough_state.get("ok", false)):
+		return {"ok": false, "error": str(breakthrough_state.get("error", "突破状态无效"))}
+	var state := breakthrough_state.get("value", {}) as Dictionary
 	if not success:
-		return _fail_result(savedata, breakdown, tier)
-	return _success_result(savedata, realms, realm_index, breakdown, tier)
+		return _fail_result(savedata, state, breakdown, tier)
+	return _success_result(savedata, state, realms, realm_index, breakdown, tier)
 
 
 static func is_major_breakthrough(realms: Array, realm_index: int) -> bool:
@@ -140,6 +152,7 @@ static func is_major_breakthrough(realms: Array, realm_index: int) -> bool:
 
 static func _success_result(
 		savedata: Dictionary,
+		breakthrough_state: Dictionary,
 		realms: Array,
 		realm_index: int,
 		breakdown: Dictionary,
@@ -152,10 +165,12 @@ static func _success_result(
 	savedata["realm_index"] = next_index
 	savedata["realm_name"] = str(new_row.get("name", ""))
 	savedata["breakthrough_at"] = int(new_row.get("breakthrough_at", savedata.get("breakthrough_at", 100)))
-	var qualities: Dictionary = savedata.get("realm_quality", {}) as Dictionary
+	var qualities := breakthrough_state["realm_quality"] as Dictionary
 	if to_major in EnumMajorRealm.BREAKTHROUGH_QUALITY_REALMS:
 		qualities[to_major] = int(tier.get("quality", 0))
-		savedata["realm_quality"] = qualities
+	var committed := BreakthroughApplicationScript.commit(savedata, breakthrough_state)
+	if not bool(committed.get("ok", false)):
+		return {"ok": false, "error": str(committed.get("error", "突破状态提交失败"))}
 	return {
 		"ok": true,
 		"success": true,
@@ -168,15 +183,19 @@ static func _success_result(
 	}
 
 
-static func _fail_result(savedata: Dictionary, breakdown: Dictionary, tier: Dictionary) -> Dictionary:
+static func _fail_result(
+		savedata: Dictionary, breakthrough_state: Dictionary, breakdown: Dictionary, tier: Dictionary
+) -> Dictionary:
 	var cfg := rules()
 	var unstable_days := maxi(0, int(cfg.get("realm_unstable_days", 0)))
 	if unstable_days > 0:
-		savedata["breakthrough_attempt_cooldown_days"] = unstable_days
+		breakthrough_state["breakthrough_attempt_cooldown_days"] = unstable_days
 	if bool(cfg.get("consume_pills_on_fail", false)):
-		var bonuses: Dictionary = savedata.get("breakthrough_bonuses", {}) as Dictionary
+		var bonuses := breakthrough_state["breakthrough_bonuses"] as Dictionary
 		bonuses["pills"] = 0
-		savedata["breakthrough_bonuses"] = bonuses
+	var committed := BreakthroughApplicationScript.commit(savedata, breakthrough_state)
+	if not bool(committed.get("ok", false)):
+		return {"ok": false, "error": str(committed.get("error", "突破状态提交失败"))}
 	return {
 		"ok": true,
 		"success": false,
@@ -228,7 +247,9 @@ static func make_component_tip_payload(title: String, sources: Array) -> Diction
 	})
 
 
-static func _compute_component_detail(savedata: Dictionary, transition: Dictionary) -> Dictionary:
+static func _compute_component_detail(
+		savedata: Dictionary, transition: Dictionary, breakthrough_state: Dictionary
+) -> Dictionary:
 	var cfg := rules()
 	var caps: Dictionary = cfg.get("component_caps", {}) as Dictionary
 	var breakthrough_at := maxi(1, int(savedata.get("breakthrough_at", 100)))
@@ -237,7 +258,7 @@ static func _compute_component_detail(savedata: Dictionary, transition: Dictiona
 	var cultivation_points := int(
 		floor(float(mini(cultivation, breakthrough_at)) / float(breakthrough_at) * float(cultivation_cap))
 	)
-	var bonuses: Dictionary = savedata.get("breakthrough_bonuses", {}) as Dictionary
+	var bonuses := breakthrough_state["breakthrough_bonuses"] as Dictionary
 	var injury_days := maxi(0, int(savedata.get("injury_days", 0)))
 	var mind_base := int(cfg.get("mind_base", 80))
 	var mind_bonus := int(bonuses.get("mind", 0))

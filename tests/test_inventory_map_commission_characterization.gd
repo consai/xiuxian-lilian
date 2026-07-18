@@ -95,6 +95,7 @@ func _test_commission_submit(errors: PackedStringArray) -> void:
 	var savedata := {
 		"day": 42,
 		"inventory": game_state.inventory,
+		"activity_log": [],
 		"weituo": weituo,
 	}
 	var before_failed_submit := savedata.duplicate(true)
@@ -103,7 +104,9 @@ func _test_commission_submit(errors: PackedStringArray) -> void:
 	_expect(errors, savedata == before_failed_submit, "failed commission submit leaves savedata unchanged")
 	_expect(errors, game_state.inventory == {"items_LingCao": 2, "items_LingGuo": 2}, "failed commission submit consumes nothing")
 
-	game_state.inventory["items_LingCao"] = 3
+	var working_inventory := game_state.inventory
+	working_inventory["items_LingCao"] = 3
+	game_state.inventory = working_inventory
 	savedata["inventory"] = game_state.inventory
 	var submitted := WeituoServiceScript.submit(INSTANCE_ID, savedata, game_state)
 	var completed := savedata["weituo"] as Dictionary

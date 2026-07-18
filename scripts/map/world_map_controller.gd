@@ -32,17 +32,61 @@ var _selected_city_id: String = ""
 var _selected_region_id: String = ""
 var _selected_location_id: String = ""
 var _pending_travel: Dictionary = {}
+var _tutorial_coordinator: Node
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("WorldMapController: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("WorldMapController: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+var _tutorial_world_map_opened_notified := false
+
+
+func bind_tutorial_coordinator(tutorial_coordinator: Node) -> void:
+	if tutorial_coordinator == null:
+		push_error("WorldMapController: TutorialCoordinator 不可用")
+		return
+	_tutorial_coordinator = tutorial_coordinator
+	_notify_tutorial_world_map_opened()
+
+
+func tutorial_coordinator() -> Node:
+	return _tutorial_coordinator
 
 
 func _ready() -> void:
 	_collect_map_nodes()
 	_connect_popups()
+	call_deferred("_initialize_after_session")
+
+
+func _initialize_after_session() -> void:
+	if _game_session() == null:
+		return
 	refresh_map()
-	TutorialService.game_event("tutorial.world_map_opened")
+	_notify_tutorial_world_map_opened()
 
 
 func refresh_map() -> void:
-	var map_data := GameState.map_data()
+	var map_data: Dictionary = _game_session().map_data()
 	map_data = _sync_nearby_region_discovery(map_data)
 	_update_header(map_data)
 	_update_cities(map_data)
@@ -53,7 +97,7 @@ func refresh_map() -> void:
 
 
 func select_city(city_id: String) -> void:
-	var map_data := GameState.map_data()
+	var map_data: Dictionary = _game_session().map_data()
 	var state := WorldMapServiceScript.city_visual_state(city_id, map_data)
 	if state == "undiscovered" or state == "vanished":
 		return
@@ -68,11 +112,11 @@ func select_city(city_id: String) -> void:
 	_selected_city_id = city_id
 	_update_selection_for_city(city, preview)
 	if _city_popup.has_method("show_city"):
-		_city_popup.call("show_city", city_id, city, preview)
+		_city_popup.call("show_city", city_id, city, preview, _game_session().time_duration_label(int(preview.get("total_days", 0))))
 
 
 func select_wilderness(region_id: String) -> void:
-	var map_data := GameState.map_data()
+	var map_data: Dictionary = _game_session().map_data()
 	var region := WorldMapServiceScript.wilderness_region_by_id(region_id)
 	if region.is_empty():
 		return
@@ -89,7 +133,7 @@ func select_wilderness(region_id: String) -> void:
 			str(can_enter.get("error", ""))
 		)
 func select_wilderness_location(location_id: String) -> void:
-	var map_data := GameState.map_data()
+	var map_data: Dictionary = _game_session().map_data()
 	var current_city := str(map_data.get("current_city_id", ""))
 	var state := WorldMapServiceScript.location_visual_state(location_id, map_data, current_city)
 	if state != "discovered":
@@ -107,14 +151,14 @@ func select_wilderness_location(location_id: String) -> void:
 			bool(can_enter.get("ok", false)),
 			str(can_enter.get("error", "")),
 			0,
-			TutorialService.is_waiting_for_any(["tutorial.lilian_started"])
+			_is_tutorial_waiting_for_any(["tutorial.lilian_started"])
 		)
 	if location_id == "wild_wolf_valley":
-		TutorialService.game_event("tutorial.wolf_valley_selected")
+		_emit_tutorial_event("tutorial.wolf_valley_selected")
 
 
 func request_travel(target_city_id: String) -> void:
-	var map_data := GameState.map_data()
+	var map_data: Dictionary = _game_session().map_data()
 	var from_id := str(map_data.get("current_city_id", ""))
 	var preview := WorldMapServiceScript.build_travel_preview(from_id, target_city_id, map_data)
 	if not bool(preview.get("ok", false)):
@@ -132,7 +176,7 @@ func confirm_travel() -> void:
 	if path.is_empty():
 		return
 	var target_city_id := str(path.back())
-	var result := GameState.travel_to_city(
+	var result: Dictionary = _game_session().travel_to_city(
 		target_city_id,
 		path,
 		int(pending.get("total_days", 0))
@@ -145,7 +189,10 @@ func confirm_travel() -> void:
 
 
 func enter_wilderness(region_id: String, options: Dictionary = {}) -> void:
-	var map_data := GameState.map_data()
+	var lilian := _lilian_session()
+	if lilian == null:
+		return
+	var map_data: Dictionary = _game_session().map_data()
 	var can_enter := WorldMapServiceScript.can_enter_wilderness(region_id, map_data)
 	if not bool(can_enter.get("ok", false)):
 		return
@@ -154,14 +201,17 @@ func enter_wilderness(region_id: String, options: Dictionary = {}) -> void:
 		return
 	wilderness_entry_requested.emit(region_id)
 	var nav := LilianFlowServiceScript.start_lilian(
-		location_id, -1, LilianState, GameState, SceneManager, TutorialService
+		location_id, -1, lilian, _game_session(), SceneManager, _tutorial_coordinator
 	)
 	if not bool(nav.get("ok", false)):
-		LilianState.clear_difficulty_override()
+		lilian.clear_difficulty_override()
 
 
 func enter_wilderness_location(location_id: String, options: Dictionary = {}) -> void:
-	var map_data := GameState.map_data()
+	var lilian := _lilian_session()
+	if lilian == null:
+		return
+	var map_data: Dictionary = _game_session().map_data()
 	var can_enter := WorldMapServiceScript.can_enter_wilderness_location(location_id, map_data)
 	if not bool(can_enter.get("ok", false)):
 		return
@@ -170,15 +220,18 @@ func enter_wilderness_location(location_id: String, options: Dictionary = {}) ->
 		return
 	wilderness_entry_requested.emit(location_id)
 	var nav := LilianFlowServiceScript.start_lilian(
-		lilian_id, -1, LilianState, GameState, SceneManager, TutorialService
+		lilian_id, -1, lilian, _game_session(), SceneManager, _tutorial_coordinator
 	)
 	if not bool(nav.get("ok", false)):
-		LilianState.clear_difficulty_override()
+		lilian.clear_difficulty_override()
 
 
 func _apply_difficulty_override(location_id: String, options: Dictionary) -> bool:
+	var lilian := _lilian_session()
+	if lilian == null:
+		return false
 	if not options.has("min_difficulty") and not options.has("max_difficulty"):
-		LilianState.clear_difficulty_override()
+		lilian.clear_difficulty_override()
 		return true
 	var clamped := WorldMapServiceScript.clamp_difficulty_options(
 		location_id,
@@ -187,7 +240,7 @@ func _apply_difficulty_override(location_id: String, options: Dictionary) -> boo
 	)
 	if not bool(clamped.get("ok", false)):
 		return false
-	LilianState.set_difficulty_override(
+	lilian.set_difficulty_override(
 		int(clamped.get("min_difficulty", 1)),
 		int(clamped.get("max_difficulty", 1))
 	)
@@ -202,13 +255,36 @@ func close_popups() -> void:
 
 
 func _on_return_pressed() -> void:
-	if TutorialService.is_waiting_for_any([
+	if _is_tutorial_waiting_for_any([
 		"tutorial.wolf_valley_selected",
 		"tutorial.lilian_started",
 	]):
 		return
 	return_requested.emit()
-	LilianFlowServiceScript.open_hub(LilianState, SceneManager)
+	var lilian := _lilian_session()
+	if lilian != null:
+		LilianFlowServiceScript.open_hub(lilian, SceneManager)
+
+
+func _notify_tutorial_world_map_opened() -> void:
+	if _tutorial_world_map_opened_notified or _tutorial_coordinator == null:
+		return
+	_tutorial_world_map_opened_notified = true
+	_tutorial_coordinator.game_event("tutorial.world_map_opened")
+
+
+func _emit_tutorial_event(event_id: String) -> void:
+	if _tutorial_coordinator == null:
+		push_error("WorldMapController: TutorialCoordinator 未绑定 action=%s" % event_id)
+		return
+	_tutorial_coordinator.game_event(event_id)
+
+
+func _is_tutorial_waiting_for_any(event_ids: Array) -> bool:
+	if _tutorial_coordinator == null:
+		push_error("WorldMapController: TutorialCoordinator 未绑定 action=is_waiting_for_any")
+		return false
+	return _tutorial_coordinator.is_waiting_for_any(event_ids)
 
 
 func _collect_map_nodes() -> void:
@@ -255,8 +331,8 @@ func _update_header(map_data: Dictionary) -> void:
 	var city_name := str(WorldMapServiceScript.city_by_id(current_id).get("name", current_id))
 	_status_label.text = "当前位置：%s    %s    灵石 %d" % [
 		city_name,
-		GameState.time_date_label(GameState.day),
-		GameState.ling_stones,
+		_game_session().time_date_label(_game_session().day),
+		_game_session().ling_stones,
 	]
 
 
@@ -305,7 +381,7 @@ func _update_locations(map_data: Dictionary) -> void:
 			var state := WorldMapServiceScript.location_visual_state(location_id, map_data, current_city)
 			child.call("set_map_state", state)
 			if state == "discovered" and location_id not in (map_data.get("discovered_locations", []) as Array):
-				GameState.discover_map_node(location_id, "location")
+				_game_session().discover_map_node(location_id, "location")
 
 
 func _update_routes(map_data: Dictionary) -> void:
@@ -344,7 +420,7 @@ func _update_selection_panel(map_data: Dictionary) -> void:
 		if bool(preview.get("ok", false)):
 			preview_lines.append("%s %s" % [
 				str(WorldMapServiceScript.city_by_id(other).get("name", other)),
-				str(preview.get("duration_label", GameState.time_duration_label(int(preview.get("total_days", 0))))),
+				str(preview.get("duration_label", _game_session().time_duration_label(int(preview.get("total_days", 0))))),
 			])
 	_update_selection_for_city(city, {"ok": true, "total_days": 0})
 	_selection_summary.text = "%s\n\n%s\n\n%s" % [
@@ -360,7 +436,7 @@ func _update_selection_for_city(city: Dictionary, preview: Dictionary) -> void:
 		str(city.get("desc", "")),
 	]
 	if bool(preview.get("ok", false)) and int(preview.get("total_days", 0)) > 0:
-		_selection_summary.text += "\n\n预计路程：%s" % str(preview.get("duration_label", GameState.time_duration_label(int(preview.get("total_days", 0)))))
+		_selection_summary.text += "\n\n预计路程：%s" % str(preview.get("duration_label", _game_session().time_duration_label(int(preview.get("total_days", 0)))))
 
 
 func _update_selection_for_region(region: Dictionary, map_data: Dictionary) -> void:
@@ -410,6 +486,6 @@ func _sync_nearby_region_discovery(map_data: Dictionary) -> Dictionary:
 	var synced := WorldMapServiceScript.discover_regions_near_city(map_data, current_city)
 	var after: Array = synced.get("discovered_regions", []) as Array
 	if after.size() != before.size():
-		GameState.set_map_data(synced)
+		_game_session().set_map_data(synced)
 		return synced
 	return map_data

@@ -1,6 +1,10 @@
 extends RefCounted
 class_name EquipHoverTipBuilder
 
+const InventoryEquipQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_query_application.gd"
+)
+
 ## 根据法宝配置构建 Hover Tip 载荷。
 
 
@@ -9,7 +13,7 @@ static func build(
 	icon: Texture2D = null,
 	slot_effects: Variant = null
 ) -> Dictionary:
-	var cfg := ConfigManager.equip_by_id(equip_id)
+	var cfg := InventoryEquipQueryApplicationScript.equip_by_id(equip_id)
 	if cfg.is_empty():
 		return {}
 	var title := str(cfg.get("name", "")).strip_edges()

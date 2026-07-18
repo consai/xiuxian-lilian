@@ -1,5 +1,30 @@
 ﻿extends Control
 
+var _lilian_session_host: Node
+var _game_session_host: Node
+var LilianState: Node:
+	get:
+		if _lilian_session_host == null:
+			push_error("LilianXunhuan: LilianSessionHost 未注入")
+			return null
+		return _lilian_session_host.session()
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("LilianXunhuan: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
 const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
 const LilianRulesServiceScript := preload("res://scripts/lilian/lilian_rules_service.gd")
 const LilianZhandouTanchuangView := preload("res://scripts/lilian/lilian_zhandou_tanchuang_view.gd")
@@ -26,6 +51,13 @@ var _pending_bag_feedback := ""
 
 
 func _ready() -> void:
+	call_deferred("_initialize_after_session")
+
+
+func _initialize_after_session() -> void:
+	if _lilian_session_host == null or _game_session_host == null:
+		push_error("LilianXunhuan: SessionHost 未注入")
+		return
 	if not LilianState.active:
 		call_deferred("_fallback_hub")
 		return
@@ -64,7 +96,7 @@ func _ready() -> void:
 	_refresh_all()
 	_queue_map_refresh_after_layout()
 	if LilianState.phase == "battle" and LilianState.pending_battle_event_id != "":
-		var pending_event := LilianState.event_by_id(LilianState.pending_battle_event_id)
+		var pending_event: Dictionary = LilianState.event_by_id(LilianState.pending_battle_event_id)
 		if not pending_event.is_empty():
 			_show_pending_battle_popup(pending_event)
 	if get_tree().root.has_meta("smoke_auto_exit") and bool(get_tree().root.get_meta("smoke_auto_exit")):
@@ -79,8 +111,8 @@ func _refresh_all() -> void:
 	(%Header as Label).text = "%s · %s · 已行进 %s · 预计结算 %s" % [
 		str(location.get("name", "")),
 		diff_text,
-		GameState.time_duration_label(LilianState.estimated_elapsed_days()),
-		GameState.time_duration_label(LilianState.planned_elapsed_days()),
+		_game_session().time_duration_label(LilianState.estimated_elapsed_days()),
+		_game_session().time_duration_label(LilianState.planned_elapsed_days()),
 	]
 	_refresh_progress_dots()
 	_refresh_status_panel()
@@ -148,7 +180,7 @@ func _refresh_status_panel() -> void:
 	var hud_mp_bar := %HudMpBar as ProgressBar
 	hud_mp_bar.max_value = mp_max
 	hud_mp_bar.value = clampf(mp, 0.0, mp_max)
-	var stats := LilianState.stats
+	var stats: Dictionary = LilianState.stats
 	(%Runtime as RichTextLabel).text = "战斗 %d  胜 %d  负 %d" % [
 		int(stats.get("battles", 0)),
 		int(stats.get("wins", 0)),
@@ -201,7 +233,7 @@ func _on_step_gui_input(event: InputEvent) -> void:
 
 
 func _reopen_pending_battle_popup() -> void:
-	var pending_event := LilianState.event_by_id(LilianState.pending_battle_event_id)
+	var pending_event: Dictionary = LilianState.event_by_id(LilianState.pending_battle_event_id)
 	if pending_event.is_empty():
 		return
 	_show_pending_battle_popup(pending_event)
@@ -218,7 +250,7 @@ func _can_open_utility_panels() -> bool:
 
 func _refresh_progress_dots() -> void:
 	var total := maxi(1, LilianState.map_nodes.size())
-	var visited := LilianState.visited_node_ids.size()
+	var visited: int = LilianState.visited_node_ids.size()
 	var switches := _route_switch_summary()
 	(%ProgressDots as Label).visible = true
 	(%ProgressDots as Label).text = "路线 %d / %d · 改线 %d / %d" % [
@@ -339,11 +371,11 @@ func _on_event_chosen(event_id: String) -> void:
 func _on_exit_pressed() -> void:
 	if _is_pending_battle_dismissed():
 		LilianState.retreat_from_pending_battle()
-		LilianFlowService.open_settlement("manual", LilianState, GameState, SceneManager)
+		LilianFlowService.open_settlement("manual", LilianState, _game_session(), SceneManager)
 		return
 	if not LilianState.can_exit():
 		return
-	LilianFlowService.open_settlement("manual", LilianState, GameState, SceneManager)
+	LilianFlowService.open_settlement("manual", LilianState, _game_session(), SceneManager)
 
 
 func _on_bag_pressed() -> void:
@@ -470,10 +502,10 @@ func _fallback_hub() -> void:
 
 
 func _go_completed_result() -> void:
-	var reason := LilianState.pending_exit_reason
+	var reason: String = str(LilianState.pending_exit_reason)
 	if reason == "":
 		reason = "defeated"
-	LilianFlowService.open_settlement(reason, LilianState, GameState, SceneManager)
+	LilianFlowService.open_settlement(reason, LilianState, _game_session(), SceneManager)
 
 
 func _prepare_battle_popup() -> void:
@@ -501,7 +533,7 @@ func _on_battle_fight_requested() -> void:
 	if not _locked:
 		return
 	var popup := %BattlePopup as LilianZhandouTanchuangView
-	var battle_data := LilianState.build_battle_init()
+	var battle_data: Dictionary = LilianState.build_battle_init()
 	var nav: Dictionary = BattleStartApplicationScript.start_battle(
 		battle_data, "lilian", SceneManager, true
 	)
@@ -613,7 +645,7 @@ func _apply_loot_row(view: ItemView, row: Dictionary) -> void:
 func _refresh_map_display() -> void:
 	if _map_canvas == null or _map_nodes == null:
 		return
-	var snapshot := LilianState.map_snapshot()
+	var snapshot: Dictionary = LilianState.map_snapshot()
 	var nodes := snapshot.get("nodes", []) as Array
 	var edges := snapshot.get("edges", []) as Array
 	_map_canvas.setup(nodes, edges)

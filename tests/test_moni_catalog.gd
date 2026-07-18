@@ -4,6 +4,8 @@ const MoniCatalogScript := preload("res://scripts/sim/moni_catalog.gd")
 const CultivationMethodQueryApplicationScript := preload(
 	"res://scripts/features/cultivation/application/cultivation_method_query_application.gd"
 )
+const GameSessionScript := preload("res://scripts/sim/game_state.gd")
+const LilianSessionScript := preload("res://scripts/lilian/lilian_state.gd")
 
 
 func _init() -> void:
@@ -100,7 +102,14 @@ func _test_cross_table_references(errors: PackedStringArray) -> void:
 
 
 func _test_rest_characterization(errors: PackedStringArray) -> void:
-	var game_state := root.get_node("GameState")
+	var store := root.get_node("DataStore")
+	var game_state := GameSessionScript.new()
+	var lilian_session := LilianSessionScript.new()
+	root.add_child(game_state)
+	root.add_child(lilian_session)
+	game_state.bind_store(store)
+	game_state.bind_scene_manager(root.get_node("SceneManager"))
+	game_state.bind_lilian_session(lilian_session)
 	game_state.new_game()
 	game_state.injury_days = 5
 	game_state.hp = 1.0
@@ -111,6 +120,8 @@ func _test_rest_characterization(errors: PackedStringArray) -> void:
 	_expect(errors, is_equal_approx(float(game_state.hp), float(game_state.attrs.get("hp_max", 0.0))), "rest restores hp")
 	_expect(errors, is_equal_approx(float(game_state.mp), float(game_state.attrs.get("mp_max", 0.0))), "rest restores mp")
 	_expect(errors, int(game_state.day) == day_before + 1, "rest advances one day")
+	game_state.queue_free()
+	lilian_session.queue_free()
 
 
 func _has_code(errors: PackedStringArray, code: String) -> bool:

@@ -1,5 +1,31 @@
 extends Control
 
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("DaoTreePanel: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("DaoTreePanel: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
+
+
 const DaoTreeGraphViewScript := preload("res://scripts/ui/dao_tree_graph_view.gd")
 const DaoTreeNodeViewScript := preload("res://scripts/ui/dao_tree_node_view.gd")
 const DaoTreeServiceScript := preload("res://scripts/dao/dao_tree_service.gd")
@@ -45,6 +71,12 @@ func _ready() -> void:
 	_by_realm.pressed.connect(func() -> void: _set_mode(true))
 	_path_button.pressed.connect(_show_routes)
 	_route_panel.visible = false
+	call_deferred("_initialize_after_session")
+
+
+func _initialize_after_session() -> void:
+	if _game_session() == null:
+		return
 	_refresh()
 
 
@@ -59,7 +91,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _bind_header() -> void:
-	_player_card.text = "%s\n%s" % [GameState.player_name, GameState.realm_name]
+	var game_session := _game_session()
+	_player_card.text = "%s\n%s" % [game_session.player_name, game_session.realm_name]
 
 
 func _clear_demo_nodes() -> void:
@@ -201,7 +234,8 @@ func _refresh() -> void:
 func _sync_tree_data() -> void:
 	if _graph == null:
 		return
-	_graph.setup(GameState.to_dict(), GameState.major_realm_id())
+	var game_session := _game_session()
+	_graph.setup(game_session.to_dict(), game_session.major_realm_id())
 	if not _tree_initialized:
 		_tree_initialized = true
 		_current_domain = str((DaoTreeQueryApplicationScript.domains().front() as Dictionary).get("id", "zhuji"))
@@ -213,7 +247,7 @@ func _focus_view() -> void:
 	if _graph == null:
 		return
 	if _realm_mode:
-		_graph.focus_realm(GameState.major_realm_id())
+		_graph.focus_realm(_game_session().major_realm_id())
 	else:
 		_graph.focus_domain(_current_domain)
 
@@ -232,7 +266,7 @@ func _bind_details(skill_id: String) -> void:
 	var skill := DaoTreeQueryApplicationScript.skill_by_id(skill_id)
 	if skill.is_empty():
 		return
-	var effective := KnowledgeServiceScript.effective_level(GameState.to_dict(), skill_id)
+	var effective := KnowledgeServiceScript.effective_level(_game_session().to_dict(), skill_id)
 	var level := int(floor(effective))
 	_details_heading.text = "%s  %s" % [
 		str(skill.get("name", "")),
@@ -252,7 +286,7 @@ func _bind_details(skill_id: String) -> void:
 			continue
 		var req := req_v as Dictionary
 		var parent := DaoTreeQueryApplicationScript.skill_by_id(str(req.get("id", "")))
-		var have := KnowledgeServiceScript.effective_level(GameState.to_dict(), str(req.get("id", "")))
+		var have := KnowledgeServiceScript.effective_level(_game_session().to_dict(), str(req.get("id", "")))
 		var ok := have >= float(req.get("level", 1))
 		prereq_lines.append(
 			"%s%s %s" % [
@@ -283,4 +317,5 @@ func _on_reset_zoom() -> void:
 
 
 func _on_close() -> void:
-	LilianFlowService.go_back(LilianState, SceneManager)
+	var lilian := _lilian_session()
+	if lilian != null: LilianFlowService.go_back(lilian, SceneManager)

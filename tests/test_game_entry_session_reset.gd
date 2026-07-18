@@ -8,6 +8,8 @@ const WeituoStateScript := preload(
 const WorldMapStateScript := preload(
 	"res://scripts/features/map/domain/world_map_state.gd"
 )
+const LilianSessionScript := preload("res://scripts/lilian/lilian_state.gd")
+const GameSessionScript := preload("res://scripts/sim/game_state.gd")
 
 
 func _init() -> void:
@@ -24,9 +26,14 @@ func _run() -> void:
 	assert(initial.get("equip_slots") == [-1, -1, -1])
 
 	var store := root.get_node("DataStore")
-	var game_state := root.get_node("GameState")
-	var lilian_state := root.get_node("LilianState")
 	var navigation_manager := root.get_node("SceneManager")
+	var game_state := GameSessionScript.new()
+	root.add_child(game_state)
+	game_state.bind_store(store)
+	game_state.bind_scene_manager(navigation_manager)
+	var lilian_state := LilianSessionScript.new()
+	root.add_child(lilian_state)
+	game_state.bind_lilian_session(lilian_state)
 	navigation_manager.reset_navigation_runtime()
 	var coalesced: Dictionary = store.coalesce_savedata({"knowledge": {}})
 	assert((coalesced.get("knowledge", {}) as Dictionary).is_empty())
@@ -56,6 +63,9 @@ func _run() -> void:
 	assert(navigation_manager.peek_payload(SceneManager.MAIN_MENU).is_empty())
 	assert(str(game_state.player_name) == "新局测试")
 	assert(game_state.unlocked_abilities == initial["jineng"])
+	assert(game_state.equipped_abilities == [
+		"factive_lq_001", "factive_lq_002", "factive_lq_003", "", "",
+	])
 	assert(game_state.unlocked_methods == initial["gongfa"])
 	assert(game_state.liandan == LiandanStateScript.default_state())
 	assert(store.export_savedata().get("weituo") == WeituoStateScript.default_state())
@@ -144,6 +154,22 @@ func _run() -> void:
 	var payload_before_failed_load: Dictionary = navigation_manager.peek_payload(SceneManager.MAIN_MENU)
 	Engine.print_error_messages = false
 	var missing_knowledge := savedata.duplicate(true)
+	var missing_abilities := savedata.duplicate(true)
+	missing_abilities.erase("equipped_abilities")
+	assert(not game_state.apply_dict(missing_abilities))
+	assert(store.export_savedata() == before_failed_load)
+	assert(store.rundata == runtime_before_failed_load)
+	assert(lilian_state.session_snapshot() == lilian_before_failed_load)
+	assert(navigation_manager.navigation_snapshot() == navigation_before_failed_load)
+	assert(navigation_manager.peek_payload(SceneManager.MAIN_MENU) == payload_before_failed_load)
+	var invalid_abilities := savedata.duplicate(true)
+	invalid_abilities["equipped_abilities"] = ["factive_lq_001", "factive_lq_001", "", "", ""]
+	assert(not game_state.apply_dict(invalid_abilities))
+	assert(store.export_savedata() == before_failed_load)
+	assert(store.rundata == runtime_before_failed_load)
+	assert(lilian_state.session_snapshot() == lilian_before_failed_load)
+	assert(navigation_manager.navigation_snapshot() == navigation_before_failed_load)
+	assert(navigation_manager.peek_payload(SceneManager.MAIN_MENU) == payload_before_failed_load)
 	missing_knowledge.erase("knowledge")
 	assert(not game_state.apply_dict(missing_knowledge))
 	assert(store.export_savedata() == before_failed_load)
@@ -256,4 +282,6 @@ func _run() -> void:
 	assert(lilian_state.session_snapshot() == lilian_before_failed_load)
 
 	print("PASS: game entry config and current session reset protocol")
+	lilian_state.queue_free()
+	game_state.queue_free()
 	quit(0)

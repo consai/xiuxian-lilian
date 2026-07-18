@@ -16,7 +16,7 @@ func _ready() -> void:
 	%Dimmer.gui_input.connect(_on_dimmer_input)
 
 
-func show_preview(preview: Dictionary, from_name: String, to_name: String) -> void:
+func show_preview(preview: Dictionary, from_name: String, to_name: String, duration_label: String) -> void:
 	var path_names: PackedStringArray = []
 	for city_id_v in preview.get("path", []) as Array:
 		var city_id := str(city_id_v)
@@ -26,7 +26,7 @@ func show_preview(preview: Dictionary, from_name: String, to_name: String) -> vo
 		route_text = "%s → %s" % [from_name, to_name]
 	_route_summary.text = "%s\n\n预计耗时：%s\n可能遭遇：商队、路匪、随机事件\n\n启程后将立即离开当前城市。" % [
 		route_text,
-		str(preview.get("duration_label", GameState.time_duration_label(int(preview.get("total_days", 0))))),
+		str(preview.get("duration_label", duration_label)),
 	]
 	visible = true
 

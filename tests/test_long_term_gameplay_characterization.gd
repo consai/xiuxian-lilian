@@ -7,7 +7,17 @@ const LiandanStateScript := preload("res://scripts/features/alchemy/domain/liand
 const RealmServiceScript := preload("res://scripts/sim/realm_service.gd")
 const RealmBalanceServiceScript := preload("res://scripts/sim/realm_balance_service.gd")
 const TupoServiceScript := preload("res://scripts/sim/tupo_service.gd")
+const BreakthroughApplicationScript := preload(
+	"res://scripts/features/cultivation/application/breakthrough_application.gd"
+)
 const XiulianMethodServiceScript := preload("res://scripts/sim/xiulian_method_service.gd")
+const MoniCatalogScript := preload("res://scripts/sim/moni_catalog.gd")
+const CultivationMethodSavedataApplicationScript := preload(
+	"res://scripts/features/cultivation/application/cultivation_method_savedata_application.gd"
+)
+const CharacterProgressionApplicationScript := preload(
+	"res://scripts/features/character/application/character_progression_application.gd"
+)
 
 var _errors: PackedStringArray = []
 
@@ -33,12 +43,30 @@ func _character_and_cultivation() -> void:
 	var store := DataStoreScript.new()
 	store.reset_all()
 	var state := store.export_savedata()
+	_check(
+		bool(CharacterProgressionApplicationScript.initialize_default(state).get("ok", false)),
+		"character progression slice initializes through feature application"
+	)
 	_check(int(state.get("day", 0)) == 1 and int(state.get("realm_index", -1)) == 0 \
 		and int(state.get("cultivation", -1)) == 0,
 		"new game must reset day, realm and cultivation")
 	_check(str(state.get("player_name", "")) == "", "new game name must start empty before profile input")
 	_check((state.get("inventory", {}) as Dictionary).is_empty(), "new game inventory must start empty")
-	_check((state.get("equip_slots", []) as Array) == [-1, -1, -1], "new game equip slots changed")
+	_check(not state.has("equip_slots") and not state.has("item_slots"),
+		"raw DataStore defaults must not own inventory slot state")
+	var initial := MoniCatalogScript.initial_player()
+	var initial_methods := initial.get("gongfa", initial.get("methods", [])) as Array
+	var initial_method_id := str(initial_methods[0]) if not initial_methods.is_empty() else ""
+	_check(initial_method_id != "", "MoniCatalog must explicitly provide a starter method")
+	var initial_slots := {
+		"main": initial_method_id, "support_1": "", "support_2": "", "support_3": "",
+	}
+	var method_commit := CultivationMethodSavedataApplicationScript.commit(state, {
+		"method_mastery": {}, "unlocked_methods": initial_methods,
+		"current_cultivation_method_id": initial_method_id,
+		"cultivation_method_slots": initial_slots,
+	})
+	_check(bool(method_commit.get("ok", false)), "starter method slice commits through feature application")
 	var named := store.coalesce_savedata({"player_name": "测试修士"})
 	_check(str(named.get("player_name", "")) == "测试修士", "saved profile name must survive coalescing")
 
@@ -107,7 +135,12 @@ func _breakthrough() -> void:
 	base["cultivation"] = base["breakthrough_at"]
 	base["foundations"] = {"roushen": 100, "lingli": 100, "shenshi": 100, "shenfa": 100}
 	base["aptitudes"] = {"roots": {"fire": 100}, "fortune": 100, "comprehension": 100}
-	base["breakthrough_bonuses"] = {"pills": 300, "mind": 200, "other": 100}
+	var breakthrough_commit := BreakthroughApplicationScript.commit(base, {
+		"breakthrough_bonuses": {"pills": 300, "mind": 200, "other": 100},
+		"realm_quality": {"zhuji": 0, "jindan": 0, "yuanying": 0},
+		"breakthrough_attempt_cooldown_days": 0,
+	})
+	_check(bool(breakthrough_commit.get("ok", false)), "breakthrough slice commits through feature application")
 	base["cultivation_method_slots"] = {"main": "", "support_1": "", "support_2": "", "support_3": ""}
 
 	var preview := TupoServiceScript.compute_breakdown(base.duplicate(true), realms, 8)

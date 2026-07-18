@@ -13,6 +13,12 @@ const BattleConfigQueryApplicationScript := preload(
 const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
 )
+const InventoryEquipQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_query_application.gd"
+)
+const DaoTreeQueryApplicationScript := preload(
+	"res://scripts/features/dao/application/dao_tree_query_application.gd"
+)
 
 
 static func collect_errors(game_state: Node = null) -> PackedStringArray:
@@ -163,8 +169,7 @@ static func _validate_monster(monster: Dictionary, monster_id: String) -> Packed
 				continue
 			if sid == 0:
 				continue
-			var config_manager := _config_manager()
-			if config_manager != null and config_manager.has_method("skill_by_id") and (config_manager.call("skill_by_id", sid) as Dictionary).is_empty():
+			if DaoTreeQueryApplicationScript.skill_by_id(str(sid)).is_empty():
 				errors.append("怪物 %s 引用了未知技能 %d" % [monster_id, sid])
 	var attrs := (LilianEventServiceScript.build_battle_enemy({"enemy": monster}).get("attrs", {}) as Dictionary)
 	for key in [
@@ -314,8 +319,7 @@ static func _validate_reward(reward: Dictionary, label: String) -> PackedStringA
 	var kind := str(reward.get("kind", "item"))
 	if kind == "equip":
 		var equip_id := int(reward.get("id", -1))
-		var config_manager := _config_manager()
-		if config_manager != null and config_manager.has_method("equip_by_id") and (config_manager.call("equip_by_id", equip_id) as Dictionary).is_empty():
+		if InventoryEquipQueryApplicationScript.equip_by_id(equip_id).is_empty():
 			errors.append("%s 引用了未知法宝 %d" % [label, equip_id])
 	elif kind == "item":
 		var iid := str(reward.get("id", ""))
@@ -359,13 +363,6 @@ static func _extract_event_id(entry_v: Variant) -> String:
 	if entry_v is Dictionary:
 		return str((entry_v as Dictionary).get("id", ""))
 	return str(entry_v)
-
-
-static func _config_manager() -> Node:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
 
 
 static func _static_event_by_id(event_id: String) -> Dictionary:

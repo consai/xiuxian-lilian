@@ -9,6 +9,9 @@ const BattleConfigQueryApplicationScript := preload(
 const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
 )
+const InventoryEquipQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_query_application.gd"
+)
 
 const SETUP_KEYS := ["player", "battle_time_limit"]
 const COMBATANT_KEYS := ["hp", "mp", "attrs", "skills"]
@@ -81,7 +84,6 @@ static func merge_skill_cfg_from_tables(data: Dictionary) -> Dictionary:
 	if ability_bundle.is_empty():
 		return {}
 	out["skill_cfg"] = ability_bundle["skills"]
-	var cm := _get_config_manager()
 	var item_partial: Dictionary = {}
 	var existing_item: Variant = out.get("item_cfg")
 	if existing_item is Dictionary and not (existing_item as Dictionary).is_empty():
@@ -91,8 +93,7 @@ static func merge_skill_cfg_from_tables(data: Dictionary) -> Dictionary:
 	var existing_equip: Variant = out.get("equip_cfg")
 	if existing_equip is Dictionary and not (existing_equip as Dictionary).is_empty():
 		equip_partial = (existing_equip as Dictionary).duplicate(true)
-	if cm != null and cm.has_method("build_equip_cfg"):
-		out["equip_cfg"] = cm.call("build_equip_cfg", equip_partial)
+	out["equip_cfg"] = InventoryEquipQueryApplicationScript.build_equip_cfg(equip_partial)
 	if not out.has("battle_time_limit"):
 		out["battle_time_limit"] = float(ability_bundle["battle_time_limit"])
 	return out
@@ -933,13 +934,6 @@ static func sample_for_editor() -> Dictionary:
 		},
 	}
 	return merge_skill_cfg_from_tables(out)
-
-
-static func _get_config_manager() -> Node:
-	var loop: MainLoop = Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
 
 
 static func _build_skill_cfg_from_abilities(partial: Dictionary) -> Dictionary:

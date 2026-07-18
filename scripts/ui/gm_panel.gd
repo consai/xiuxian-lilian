@@ -2,17 +2,17 @@ extends Control
 
 ## GM 调试面板
 ##
-## 修改角色属性、境界、资源时，必须走与正常玩法相同的 GameState / RewardService 入口，
+## 修改角色属性、境界、资源时，必须走与正常玩法相同的游戏会话 / RewardService 入口，
 ## 以便触发小境界自动提升、大境界突破结算、根基成长、属性重算、经历记录等副作用。
-## 禁止在此直接写入 DataStore.savedata 或跳过 GameState 赋值器篡改 hp / realm_index 等字段。
+## 禁止在此直接写入 DataStore.savedata 或跳过游戏会话赋值器篡改 hp / realm_index 等字段。
 ##
 ## 正常途径对照：
-## - 修为：GameState.grant_cultivation / fill_cultivation_to_breakthrough（含 _auto_advance_layers）
-## - 境界：GameState.advance_realm_one_step / advance_realm_to_index（大境界走 breakthrough）
-## - 气血法力：GameState.rest（恢复满值并重算衍生属性后写入）
-## - 伤势：GameState.rest_until_injury_cleared（每次均走 rest 完整流程）
-## - 物品 / 灵石：GameState.grant_rewards → RewardService.apply_rewards
-## - 新局：GameState.new_game
+## - 修为：grant_cultivation / fill_cultivation_to_breakthrough（含 _auto_advance_layers）
+## - 境界：advance_realm_one_step / advance_realm_to_index（大境界走 breakthrough）
+## - 气血法力：rest（恢复满值并重算衍生属性后写入）
+## - 伤势：rest_until_injury_cleared（每次均走 rest 完整流程）
+## - 物品 / 灵石：grant_rewards → RewardService.apply_rewards
+## - 新局：new_game
 ## - 日数：无独立「跳日」玩法 API，GM 直接改 day 仅用于测试时间轴
 
 const SIM_PATH := "res://data/exportjson/yunxing_params/moni.json"
@@ -31,6 +31,42 @@ const DidianServiceScript := preload("res://scripts/lilian/didian_service.gd")
 @onready var _monster_option: OptionButton = %MonsterOption
 @onready var _enemy_count_input: SpinBox = %EnemyCountInput
 @onready var _close_button: TextureButton = %CloseButton
+var _tutorial_coordinator: Node
+var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_tutorial_coordinator(tutorial_coordinator: Node) -> void:
+	if tutorial_coordinator == null:
+		push_error("GmPanel: TutorialCoordinator 不可用")
+		return
+	_tutorial_coordinator = tutorial_coordinator
+
+
+func has_tutorial_coordinator() -> bool:
+	return _tutorial_coordinator != null
+
+
+func bind_lilian_session_host(host: Node) -> void:
+	_lilian_session_host = host
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
+
+
+func _game_session() -> Node:
+	if _game_session_host == null:
+		push_error("GmPanel: GameSessionHost 未注入")
+		return null
+	return _game_session_host.session()
+
+
+func _lilian_session() -> Node:
+	if _lilian_session_host == null:
+		push_error("GmPanel: LilianSessionHost 未注入")
+		return null
+	return _lilian_session_host.session()
 
 
 func _ready() -> void:
@@ -121,21 +157,22 @@ func _build_monster_options() -> void:
 
 
 func _bind_status() -> void:
+	var lilian := _lilian_session()
 	var scene_id := str(SceneManager.navigation_snapshot().get("current_id", "unknown"))
 	var lilian_text := "无"
-	if LilianState.active:
+	if lilian != null and lilian.active:
 		lilian_text = "%s · %s · 第 %d 步" % [
-			LilianState.location_id,
-			LilianState.phase,
-			LilianState.steps,
+			lilian.location_id,
+			lilian.phase,
+			lilian.steps,
 		]
 	_status_label.text = "场景 %s | %s %s | 修为 %d/%d | 灵石 %d | 历练 %s" % [
 		scene_id,
-		GameState.time_date_label(GameState.day),
-		GameState.realm_name,
-		GameState.cultivation,
-		GameState.breakthrough_at,
-		GameState.ling_stones,
+		_game_session().time_date_label(_game_session().day),
+		_game_session().realm_name,
+		_game_session().cultivation,
+		_game_session().breakthrough_at,
+		_game_session().ling_stones,
 		lilian_text,
 	]
 
@@ -151,55 +188,60 @@ func _on_close_pressed() -> void:
 
 ## 正常途径：grant_cultivation → _auto_advance_layers → refresh_derived_attrs
 func _add_cultivation(amount: int) -> void:
-	var result: Dictionary = GameState.grant_cultivation(amount)
+	var game_session := _game_session()
+	var result: Dictionary = game_session.grant_cultivation(amount)
 	if not bool(result.get("ok", false)):
 		_flash(str(result.get("error", "修为增加失败")))
 		return
 	var layer_advances := int(result.get("layer_advances", 0))
 	var extra := "，小境界提升 %d 层" % layer_advances if layer_advances > 0 else ""
 	_flash("修为 +%d%s，当前 %d/%d" % [
-		int(result.get("added", amount)), extra, GameState.cultivation, GameState.breakthrough_at,
+		int(result.get("added", amount)), extra, game_session.cultivation, game_session.breakthrough_at,
 	])
 
 
 ## 正常途径：fill_cultivation_to_breakthrough → _auto_advance_layers
 func _fill_cultivation() -> void:
-	var result: Dictionary = GameState.fill_cultivation_to_breakthrough()
+	var game_session := _game_session()
+	var result: Dictionary = game_session.fill_cultivation_to_breakthrough()
 	var layer_advances := int(result.get("layer_advances", 0))
-	var extra := "，已提升至 %s" % GameState.realm_name if layer_advances > 0 else ""
-	_flash("修为已补满至突破门槛 %d%s" % [GameState.breakthrough_at, extra])
+	var extra := "，已提升至 %s" % game_session.realm_name if layer_advances > 0 else ""
+	_flash("修为已补满至突破门槛 %d%s" % [game_session.breakthrough_at, extra])
 
 
 ## 正常途径：grant_rewards（currency / ling_stones）
 func _add_stones(amount: int) -> void:
-	var applied: Array = GameState.grant_rewards([
+	var game_session := _game_session()
+	var applied: Array = game_session.grant_rewards([
 		{"kind": "currency", "id": "ling_stones", "count": maxi(0, amount)},
 	])
 	if applied.is_empty():
 		_flash("灵石发放失败")
 		return
 	var row := applied[0] as Dictionary
-	_flash("灵石 +%d，当前 %d" % [int(row.get("count", 0)), GameState.ling_stones])
+	_flash("灵石 +%d，当前 %d" % [int(row.get("count", 0)), game_session.ling_stones])
 
 
 ## 无对应玩法 API：仅推进日数，不附带修炼 / 休息副作用
 func _add_days(amount: int) -> void:
-	GameState.day += maxi(0, amount)
-	_flash("日数 +%d，当前 %s" % [amount, GameState.time_date_label(GameState.day)])
+	var game_session := _game_session()
+	game_session.day += maxi(0, amount)
+	_flash("日数 +%d，当前 %s" % [amount, game_session.time_date_label(game_session.day)])
 
 
 ## 正常途径：advance_realm_one_step（大境界 → breakthrough，小层 → _auto_advance_layers）
 func _advance_realm() -> void:
-	var result: Dictionary = GameState.advance_realm_one_step()
+	var game_session := _game_session()
+	var result: Dictionary = game_session.advance_realm_one_step()
 	if not bool(result.get("ok", false)):
 		_flash(str(result.get("error", "无法继续提升境界")))
 		return
 	if str(result.get("mode", "")) == "layer":
-		_flash("境界提升至 %s（小层）" % GameState.realm_name)
+		_flash("境界提升至 %s（小层）" % game_session.realm_name)
 	else:
 		_flash("大境界突破成功：%s → %s" % [
 			str(result.get("old_realm", "")),
-			str(result.get("new_realm", GameState.realm_name)),
+			str(result.get("new_realm", game_session.realm_name)),
 		])
 
 
@@ -209,22 +251,23 @@ func _set_max_realm() -> void:
 	if realms.is_empty():
 		_flash("境界表为空")
 		return
-	var result: Dictionary = GameState.advance_realm_to_index(realms.size() - 1)
+	var game_session := _game_session()
+	var result: Dictionary = game_session.advance_realm_to_index(realms.size() - 1)
 	if not bool(result.get("ok", false)):
 		_flash(str(result.get("error", "无法提升至最高境界")))
 		return
-	_flash("境界设为 %s（共 %d 步）" % [GameState.realm_name, int(result.get("steps", 0))])
+	_flash("境界设为 %s（共 %d 步）" % [game_session.realm_name, int(result.get("steps", 0))])
 
 
 ## 正常途径：rest（恢复满气血法力、减轻伤势、推进 1 日、写入经历）
 func _full_heal() -> void:
-	GameState.rest()
+	_game_session().rest()
 	_flash("已休息：气血与法力恢复满值，伤势减轻")
 
 
 ## 正常途径：重复 rest 直至伤势清零（每次均推进 1 日）
 func _clear_injury() -> void:
-	var rests: int = GameState.rest_until_injury_cleared()
+	var rests: int = _game_session().rest_until_injury_cleared()
 	if rests <= 0:
 		_flash("当前无伤势")
 		return
@@ -258,17 +301,21 @@ func _navigate(nav: Dictionary, fallback_error: String) -> bool:
 
 
 func _go_hub() -> void:
+	var lilian := _lilian_session()
+	if lilian == null: return
 	visible = false
 	_navigate(
-		LilianFlowService.open_hub(LilianState, SceneManager, {}, {}, true),
+		LilianFlowService.open_hub(lilian, SceneManager, {}, {}, true),
 		"无法返回观中"
 	)
 
 
 func _go_world_map() -> void:
+	var lilian := _lilian_session()
+	if lilian == null: return
 	visible = false
 	_navigate(
-		LilianFlowService.open_world_map(LilianState, SceneManager),
+		LilianFlowService.open_world_map(lilian, SceneManager),
 		"无法打开世界地图"
 	)
 
@@ -284,36 +331,46 @@ func _go_beibao() -> void:
 
 
 func _start_lilian() -> void:
+	var lilian := _lilian_session()
+	if lilian == null: return
 	if _location_option.item_count <= 0:
 		_flash("没有可用历练地点")
+		return
+	if _tutorial_coordinator == null:
+		push_error("GmPanel: TutorialCoordinator 未绑定")
+		_flash("教程协调器不可用")
 		return
 	var location_id := str(_location_option.get_item_metadata(_location_option.selected))
 	visible = false
 	_navigate(LilianFlowService.start_lilian(
-		location_id, -1, LilianState, GameState, SceneManager, TutorialService
+		location_id, -1, lilian, _game_session(), SceneManager, _tutorial_coordinator
 	), "无法开始历练")
 
 
 func _force_settle_lilian() -> void:
-	if not LilianState.active:
+	var lilian := _lilian_session()
+	if lilian == null or not lilian.active:
 		_flash("当前没有进行中的历练")
 		return
 	visible = false
 	_navigate(LilianFlowService.open_settlement(
-		"manual", LilianState, GameState, SceneManager
+		"manual", lilian, _game_session(), SceneManager
 	), "无法进入历练结算")
 
 
 func _reset_lilian() -> void:
-	if not LilianState.active:
+	var lilian := _lilian_session()
+	if lilian == null or not lilian.active:
 		_flash("当前没有进行中的历练")
 		return
-	LilianState.reset()
+	lilian.reset()
 	_flash("历练状态已重置")
 
 
 func _start_gm_battle() -> void:
-	if LilianState.active:
+	var lilian := _lilian_session()
+	if lilian == null: return
+	if lilian.active:
 		_flash("历练中不能创建 GM 战斗，请先结算或重置历练")
 		return
 	if _monster_option.item_count <= 0:
@@ -321,7 +378,7 @@ func _start_gm_battle() -> void:
 		return
 	var monster_id := str(_monster_option.get_item_metadata(_monster_option.selected))
 	var count := int(_enemy_count_input.value)
-	var battle_data := _build_gm_battle_init(monster_id, count)
+	var battle_data: Dictionary = _build_gm_battle_init(monster_id, count)
 	if battle_data.is_empty():
 		_flash("创建战斗失败：敌人配置无效")
 		return
@@ -336,22 +393,25 @@ func _start_gm_battle() -> void:
 
 
 func _build_gm_battle_init(monster_id: String, count: int) -> Dictionary:
-	return GmBattleBuilderScript.build(monster_id, count, GameState)
+	return GmBattleBuilderScript.build(monster_id, count, _game_session())
 
 
 func _new_game() -> void:
-	GameState.new_game()
+	var lilian := _lilian_session()
+	if lilian == null: return
+	_game_session().new_game()
 	visible = false
 	_navigate(
-		LilianFlowService.open_hub(LilianState, SceneManager),
+		LilianFlowService.open_hub(lilian, SceneManager),
 		"无法返回观中"
 	)
 
 
 func _grant_dao_knowledge() -> void:
-	GameState.grant_knowledge("zhuji.breathing", 3)
-	GameState.grant_knowledge("cultivation.cycle", 2)
-	GameState.learn_ability("ability.combat.qi_bolt")
+	var game_session := _game_session()
+	game_session.grant_knowledge("zhuji.breathing", 3)
+	game_session.grant_knowledge("cultivation.cycle", 2)
+	game_session.learn_ability("ability.combat.qi_bolt")
 	_flash("已授予入门知识与御气弹")
 
 

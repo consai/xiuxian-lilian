@@ -11,6 +11,9 @@ const ItemIconResolverScript := preload(
 const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
 )
+const InventoryEquipQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_query_application.gd"
+)
 
 @onready var _body: RichTextLabel = %BattleResultBody
 @onready var _btn_close: Button = %BattleResultClose
@@ -229,7 +232,7 @@ func _apply_reward_row(view: ItemView, row: Dictionary) -> void:
 	if icon_v is Texture2D:
 		icon = icon_v
 	elif kind == "equip":
-		var equip_cfg := ConfigManager.equip_by_id(int(row.get("id", -1)))
+		var equip_cfg := InventoryEquipQueryApplicationScript.equip_by_id(int(row.get("id", -1)))
 		if item_name == "":
 			item_name = str(equip_cfg.get("name", "法宝"))
 		icon = ZhandouInitDataScript._resolve_icon_texture(equip_cfg)

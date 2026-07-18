@@ -12,6 +12,9 @@ const ItemIconResolverScript := preload(
 const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
 )
+const InventoryEquipQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_query_application.gd"
+)
 const ItemInfoPayloadBuilderScript := preload("res://scripts/ui/item_info_payload_builder.gd")
 const HoverTipSourceScript := preload("res://scripts/ui/hover/hover_tip_source.gd")
 const HoverTipPayloadScript := preload("res://scripts/ui/hover/hover_tip_payload.gd")
@@ -64,6 +67,14 @@ var _entry_view_cache: Dictionary = {}
 var _hover_payload_cache: Dictionary = {}
 var _sort_field: SortField = SortField.TYPE # 默认按类型排序
 var _sort_ascending: bool = true # 默认升序
+var _game_session: Node
+
+
+func bind_game_session(game_session: Node) -> void:
+	if game_session == null:
+		push_error("BagBaseView: GameSession 未注入")
+		return
+	_game_session = game_session
 
 
 func _ready() -> void:
@@ -109,7 +120,9 @@ func set_picker_mode(filter: PickerFilter) -> void:
 		_refresh()
 
 
-func bind_inventory(inventory: Dictionary, owned_equips: Array = []) -> void:
+func bind_inventory(inventory: Dictionary, owned_equips: Array = [], game_session: Node = null) -> void:
+	if game_session != null:
+		bind_game_session(game_session)
 	set_entries(build_entries_from_inventory(inventory, owned_equips))
 
 
@@ -551,7 +564,7 @@ func _build_hover_payload_for_entry(entry: Dictionary) -> Dictionary:
 			def.fight_id, null, maxi(1, int(entry.get("count", 1)))
 		)
 	var info := ItemInfoPayloadBuilderScript.from_entry(
-		entry, GameState.to_dict(), GameState.major_realm_id()
+		entry, _game_session.to_dict(), _game_session.major_realm_id()
 	)
 	if info.is_empty():
 		return {}
@@ -584,7 +597,7 @@ func _entry_view_data(entry: Dictionary, cache_key: String = "") -> Dictionary:
 	var kind := str(entry.get("kind", EnumRewardKind.LABEL_ITEM))
 	var learn_blocked := false
 	if kind == EnumRewardKind.LABEL_EQUIP:
-		var equip_cfg := ConfigManager.equip_by_id(int(entry.get("id", -1)))
+		var equip_cfg := InventoryEquipQueryApplicationScript.equip_by_id(int(entry.get("id", -1)))
 		if item_name == "":
 			item_name = str(equip_cfg.get("name", "法宝"))
 		icon = ZhandouInitDataScript._resolve_icon_texture(equip_cfg)
@@ -602,7 +615,7 @@ func _entry_view_data(entry: Dictionary, cache_key: String = "") -> Dictionary:
 				quality = EnumQuality.display_label(def.quality)
 			tier = def.tier
 			learn_blocked = ItemInfoPayloadBuilderScript.learning_book_condition_unmet(
-				def, GameState.to_dict(), GameState.major_realm_id()
+				def, _game_session.to_dict(), _game_session.major_realm_id()
 			)
 	var data := {
 		"icon": icon,
@@ -698,7 +711,7 @@ static func _normalize_entries(entries: Array) -> Array:
 			row["kind"] = EnumRewardKind.LABEL_EQUIP
 			row["count"] = 1
 			if not row.has("sort_name"):
-				row["sort_name"] = str(ConfigManager.equip_by_id(int(row.get("id", -1))).get("name", "法宝"))
+				row["sort_name"] = str(InventoryEquipQueryApplicationScript.equip_by_id(int(row.get("id", -1))).get("name", "法宝"))
 			if not row.has("item_type"):
 				row["item_type"] = EnumItemType.full_label(
 					EnumItemType.PRIMARY_TREASURE,
@@ -707,7 +720,7 @@ static func _normalize_entries(entries: Array) -> Array:
 			row["primary_type"] = EnumItemType.PRIMARY_TREASURE
 			row["secondary_type"] = EnumItemType.SECONDARY_ACTIVE_TREASURE
 			if not row.has("tier"):
-				var equip_cfg := ConfigManager.equip_by_id(int(row.get("id", -1)))
+				var equip_cfg := InventoryEquipQueryApplicationScript.equip_by_id(int(row.get("id", -1)))
 				row["tier"] = maxi(1, int(equip_cfg.get("tier", 1)))
 		else:
 			row["kind"] = EnumRewardKind.LABEL_ITEM
@@ -762,7 +775,7 @@ static func _entry_from_item(item_id: String, count: int) -> Dictionary:
 static func _entry_from_equip(equip_id: int) -> Dictionary:
 	if equip_id <= 0:
 		return {}
-	var cfg := ConfigManager.equip_by_id(equip_id)
+	var cfg := InventoryEquipQueryApplicationScript.equip_by_id(equip_id)
 	var equip_name := str(cfg.get("name", "法宝"))
 	return {
 		"kind": EnumRewardKind.LABEL_EQUIP,

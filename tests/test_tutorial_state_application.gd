@@ -20,8 +20,6 @@ func _init() -> void:
 func _run() -> void:
 	var active := TutorialStateScript.default_new_game()
 	var inactive := TutorialStateScript.default_inactive()
-	var production_store := root.get_node("DataStore")
-	assert(production_store.export_savedata().get("tutorial") == inactive)
 	assert(active["step"] == "T00" and not active["completed"])
 	assert(inactive["step"] == "T10" and inactive["completed"])
 	assert(TutorialStateScript.collect_errors(active).is_empty())

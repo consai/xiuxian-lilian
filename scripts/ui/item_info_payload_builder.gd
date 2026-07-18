@@ -12,6 +12,9 @@ const ItemIconResolverScript := preload(
 const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
 )
+const InventoryEquipQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_query_application.gd"
+)
 const ZhandouAttrScript := preload("res://scripts/zhandou/zhandou_attr.gd")
 
 
@@ -87,7 +90,7 @@ static func from_item_id(
 static func from_equip_id(equip_id: int) -> Dictionary:
 	if equip_id <= 0:
 		return {}
-	var cfg := ConfigManager.equip_by_id(equip_id)
+	var cfg := InventoryEquipQueryApplicationScript.equip_by_id(equip_id)
 	if cfg.is_empty():
 		return {}
 	var title := str(cfg.get("name", "法宝")).strip_edges()

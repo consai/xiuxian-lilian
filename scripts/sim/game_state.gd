@@ -8,6 +8,18 @@ const DaoTreeQueryApplicationScript := preload(
 const KnowledgeApplicationScript := preload(
 	"res://scripts/features/dao/application/knowledge_application.gd"
 )
+const AbilitySavedataApplicationScript := preload(
+	"res://scripts/features/ability/application/ability_savedata_application.gd"
+)
+const CultivationMethodSavedataApplicationScript := preload(
+	"res://scripts/features/cultivation/application/cultivation_method_savedata_application.gd"
+)
+const BreakthroughApplicationScript := preload(
+	"res://scripts/features/cultivation/application/breakthrough_application.gd"
+)
+const AutoBattleApplicationScript := preload(
+	"res://scripts/features/battle/application/auto_battle_application.gd"
+)
 const CharacterSavedataStateScript := preload(
 	"res://scripts/features/character/domain/character_savedata_state.gd"
 )
@@ -33,41 +45,115 @@ const TutorialApplicationScript := preload(
 const InventoryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_application.gd"
 )
+const InventoryQuantitiesApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_quantities_application.gd"
+)
+const InventoryItemSlotsApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_item_slots_application.gd"
+)
+const InventoryEquipApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_application.gd"
+)
 const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
+)
+const InventoryEquipQueryApplicationScript := preload(
+	"res://scripts/features/inventory/application/inventory_equip_query_application.gd"
 )
 const LilianResultContract := preload(
 	"res://scripts/features/lilian/contracts/lilian_result.gd"
 )
+const LilianTotalsApplicationScript := preload(
+	"res://scripts/features/lilian/application/lilian_totals_application.gd"
+)
+const PlayerJournalApplicationScript := preload(
+	"res://scripts/features/character/application/player_journal_application.gd"
+)
+const CharacterProgressionApplicationScript := preload(
+	"res://scripts/features/character/application/character_progression_application.gd"
+)
+const CharacterVitalsApplicationScript := preload(
+	"res://scripts/features/character/application/character_vitals_application.gd"
+)
+const SaveRepositoryScript := preload("res://scripts/core/save_repository.gd")
 
 const INSTABILITY_REDUCTION_PER_WIN := 10
 const PASSIVE_METHOD_PRACTICE_RATIO := 0.25
 
+var _lilian_session: Node
+var _tip_host: Node
+var DataStore: Node
+var SceneManager: Node
+
+signal inventory_changed
+
+
+func bind_store(store: Node) -> void:
+	if store == null:
+		push_error("GameState: DataStore 不可用")
+		return
+	DataStore = store
+	if is_node_ready():
+		_bootstrap_savedata()
+
+
+func data_store() -> Node:
+	return DataStore
+
+
+func bind_scene_manager(scene_manager: Node) -> void:
+	if scene_manager == null:
+		push_error("GameState: SceneManager 不可用")
+		return
+	SceneManager = scene_manager
+
+
+func bind_lilian_session(lilian_session: Node) -> void:
+	if lilian_session == null:
+		push_error("GameState: LilianSession 不可用")
+		return
+	_lilian_session = lilian_session
+
+
+func bind_tip_host(tip_host: Node) -> void:
+	if tip_host == null:
+		push_error("GameState: TipHost 不可用")
+		return
+	_tip_host = tip_host
+
+
+func tip_host() -> Node:
+	return _tip_host
+
+
+func notify_inventory_changed() -> void:
+	inventory_changed.emit()
+
 
 var day: int:
-	get: return int(DataStore.savedata.get("day", 1))
-	set(value): DataStore.savedata["day"] = value
+	get: return int(_progression_snapshot().get("day", 1))
+	set(value): _commit_progression_field("day", value)
 var realm_index: int:
-	get: return int(DataStore.savedata.get("realm_index", 0))
-	set(value): DataStore.savedata["realm_index"] = value
+	get: return int(_progression_snapshot().get("realm_index", 0))
+	set(value): _commit_progression_field("realm_index", value)
 var realm_name: String:
-	get: return str(DataStore.savedata.get("realm_name", ""))
-	set(value): DataStore.savedata["realm_name"] = value
+	get: return str(_progression_snapshot().get("realm_name", ""))
+	set(value): _commit_progression_field("realm_name", value)
 var cultivation: int:
-	get: return int(DataStore.savedata.get("cultivation", 0))
-	set(value): DataStore.savedata["cultivation"] = value
+	get: return int(_progression_snapshot().get("cultivation", 0))
+	set(value): _commit_progression_field("cultivation", value)
 var cultivation_instability: int:
-	get: return int(DataStore.savedata.get("cultivation_instability", 0))
-	set(value): DataStore.savedata["cultivation_instability"] = maxi(0, value)
+	get: return int(_progression_snapshot().get("cultivation_instability", 0))
+	set(value): _commit_progression_field("cultivation_instability", maxi(0, value))
 var breakthrough_at: int:
-	get: return int(DataStore.savedata.get("breakthrough_at", 100))
-	set(value): DataStore.savedata["breakthrough_at"] = value
+	get: return int(_progression_snapshot().get("breakthrough_at", 100))
+	set(value): _commit_progression_field("breakthrough_at", value)
 var injury_days: int:
-	get: return int(DataStore.savedata.get("injury_days", 0))
-	set(value): DataStore.savedata["injury_days"] = value
+	get: return int(_progression_snapshot().get("injury_days", 0))
+	set(value): _commit_progression_field("injury_days", value)
 var ling_stones: int:
-	get: return int(DataStore.savedata.get("ling_stones", 0))
-	set(value): DataStore.savedata["ling_stones"] = value
+	get: return int(_progression_snapshot().get("ling_stones", 0))
+	set(value): _commit_progression_field("ling_stones", value)
 var player_name: String:
 	get: return str(DataStore.savedata.get("player_name", ""))
 	set(value): DataStore.savedata["player_name"] = value
@@ -81,53 +167,53 @@ var aptitudes: Dictionary:
 	get: return DataStore.savedata.get("aptitudes", CharacterStats.default_aptitudes()) as Dictionary
 	set(value): DataStore.savedata["aptitudes"] = CharacterStats.normalize_aptitudes(value)
 var attrs: Dictionary:
-	get: return DataStore.savedata.get("attrs", {}) as Dictionary
-	set(value): DataStore.savedata["attrs"] = value
+	get: return _vitals_snapshot().get("attrs", {}) as Dictionary
+	set(value): _commit_vitals_state(value, hp, mp)
 var hp: float:
-	get: return float(DataStore.savedata.get("hp", 100.0))
-	set(value): DataStore.savedata["hp"] = value
+	get: return float(_vitals_snapshot().get("hp", 0.0))
+	set(value): _commit_vitals_state(attrs, value, mp)
 var mp: float:
-	get: return float(DataStore.savedata.get("mp", 100.0))
-	set(value): DataStore.savedata["mp"] = value
+	get: return float(_vitals_snapshot().get("mp", 0.0))
+	set(value): _commit_vitals_state(attrs, hp, value)
 var unlocked_abilities: Array:
-	get: return DataStore.savedata.get("unlocked_abilities", []) as Array
-	set(value): DataStore.savedata["unlocked_abilities"] = value
+	get: return _ability_snapshot().get("unlocked_abilities", []) as Array
+	set(value): _commit_ability_state(value, equipped_abilities)
 var equipped_abilities: Array:
-	get: return DataStore.savedata.get("equipped_abilities", []) as Array
-	set(value): DataStore.savedata["equipped_abilities"] = value
+	get: return _ability_snapshot().get("equipped_abilities", []) as Array
+	set(value): _commit_ability_state(unlocked_abilities, value)
 var unlocked_methods: Array:
-	get: return DataStore.savedata.get("unlocked_methods", ["method.hunyuan.1"]) as Array
-	set(value): DataStore.savedata["unlocked_methods"] = value
+	get: return _cultivation_method_snapshot().get("unlocked_methods", []) as Array
+	set(value): _commit_cultivation_method_state(value, current_cultivation_method_id, cultivation_method_slots, _method_mastery())
 var cultivation_method_slots: Dictionary:
-	get: return DataStore.savedata.get("cultivation_method_slots", {}) as Dictionary
-	set(value): DataStore.savedata["cultivation_method_slots"] = value
+	get: return _cultivation_method_snapshot().get("cultivation_method_slots", {}) as Dictionary
+	set(value): _commit_cultivation_method_state(unlocked_methods, current_cultivation_method_id, value, _method_mastery())
 var current_cultivation_method_id: String:
-	get: return str(DataStore.savedata.get("current_cultivation_method_id", ""))
-	set(value): DataStore.savedata["current_cultivation_method_id"] = value
+	get: return str(_cultivation_method_snapshot().get("current_cultivation_method_id", ""))
+	set(value): _commit_cultivation_method_state(unlocked_methods, value, cultivation_method_slots, _method_mastery())
 var auto_battle_enabled: bool:
-	get: return bool(DataStore.savedata.get("auto_battle_enabled", false))
-	set(value): DataStore.savedata["auto_battle_enabled"] = value
+	get: return bool(_auto_battle_snapshot().get("auto_battle_enabled", false))
+	set(value): _commit_auto_battle_state(value, auto_battle_preset, auto_battle_rules)
 var auto_battle_preset: String:
-	get: return str(DataStore.savedata.get("auto_battle_preset", "balanced"))
-	set(value): DataStore.savedata["auto_battle_preset"] = value
+	get: return str(_auto_battle_snapshot().get("auto_battle_preset", ""))
+	set(value): _commit_auto_battle_state(auto_battle_enabled, value, auto_battle_rules)
 var auto_battle_rules: Dictionary:
-	get: return DataStore.savedata.get("auto_battle_rules", {}) as Dictionary
-	set(value): DataStore.savedata["auto_battle_rules"] = value
+	get: return _auto_battle_snapshot().get("auto_battle_rules", {}) as Dictionary
+	set(value): _commit_auto_battle_state(auto_battle_enabled, auto_battle_preset, value)
 var owned_equips: Array:
-	get: return DataStore.savedata.get("owned_equips", []) as Array
-	set(value): DataStore.savedata["owned_equips"] = value
+	get: return _inventory_equip_snapshot().get("owned_equips", []) as Array
+	set(value): _commit_inventory_equip_state(value, equip_slots, treasure_item_slots, storage_equips)
 var equip_slots: Array:
-	get: return DataStore.savedata.get("equip_slots", [-1, -1, -1]) as Array
-	set(value): DataStore.savedata["equip_slots"] = value
+	get: return _inventory_equip_snapshot().get("equip_slots", []) as Array
+	set(value): _commit_inventory_equip_state(owned_equips, value, treasure_item_slots, storage_equips)
 var treasure_item_slots: Array:
-	get: return DataStore.savedata.get("treasure_item_slots", ["", "", ""]) as Array
-	set(value): DataStore.savedata["treasure_item_slots"] = value
+	get: return _inventory_equip_snapshot().get("treasure_item_slots", []) as Array
+	set(value): _commit_inventory_equip_state(owned_equips, equip_slots, value, storage_equips)
 var item_slots: Array:
-	get: return DataStore.savedata.get("item_slots", ["", "", ""]) as Array
-	set(value): DataStore.savedata["item_slots"] = value
+	get: return _item_slots_snapshot().get("item_slots", []) as Array
+	set(value): _commit_item_slots_state(value)
 var inventory: Dictionary:
-	get: return DataStore.savedata.get("inventory", {}) as Dictionary
-	set(value): DataStore.savedata["inventory"] = value
+	get: return _inventory_quantities_snapshot().get("inventory", {}) as Dictionary
+	set(value): _commit_inventory_quantities_state(value, storage)
 var liandan: Dictionary:
 	get: return DataStore.savedata.get("liandan", {}) as Dictionary
 	set(value):
@@ -135,17 +221,25 @@ var liandan: Dictionary:
 		if not prepared.is_empty():
 			DataStore.savedata["liandan"] = prepared
 var storage: Dictionary:
-	get: return DataStore.savedata.get("storage", {}) as Dictionary
-	set(value): DataStore.savedata["storage"] = value
+	get: return _inventory_quantities_snapshot().get("storage", {}) as Dictionary
+	set(value): _commit_inventory_quantities_state(inventory, value)
 var storage_equips: Array:
-	get: return DataStore.savedata.get("storage_equips", []) as Array
-	set(value): DataStore.savedata["storage_equips"] = value
+	get: return _inventory_equip_snapshot().get("storage_equips", []) as Array
+	set(value): _commit_inventory_equip_state(owned_equips, equip_slots, treasure_item_slots, value)
 var activity_log: Array:
-	get: return DataStore.savedata.get("activity_log", []) as Array
-	set(value): DataStore.savedata["activity_log"] = value
+	get:
+		var result := PlayerJournalApplicationScript.snapshot(DataStore.savedata)
+		return result.get("value", []) as Array
+	set(value):
+		if not bool(PlayerJournalApplicationScript.commit(DataStore.savedata, value).get("ok", false)):
+			push_error("[game_state:invalid_player_journal] action=set")
 var totals: Dictionary:
-	get: return DataStore.savedata.get("totals", {}) as Dictionary
-	set(value): DataStore.savedata["totals"] = value
+	get:
+		var result := LilianTotalsApplicationScript.snapshot(DataStore.savedata)
+		return result.get("value", {}) as Dictionary
+	set(value):
+		if not bool(LilianTotalsApplicationScript.commit(DataStore.savedata, value).get("ok", false)):
+			push_error("[game_state:invalid_lilian_totals] action=set")
 var last_rewards: Array:
 	get: return DataStore.game_runtime().get("last_rewards", []) as Array
 	set(value): DataStore.game_runtime()["last_rewards"] = value
@@ -159,6 +253,8 @@ var active_save_slot: int:
 	get: return int(DataStore.game_runtime().get("active_save_slot", 0))
 	set(value): DataStore.game_runtime()["active_save_slot"] = value
 func _ready() -> void:
+	if DataStore == null:
+		return
 	_bootstrap_savedata()
 
 
@@ -168,9 +264,52 @@ func _bootstrap_savedata() -> void:
 	if initial_snapshot.is_empty():
 		push_error("[game_state:invalid_character_savedata] action=bootstrap")
 		return
+	var progression_result := CharacterProgressionApplicationScript.initialize_default(initial_snapshot)
+	if not bool(progression_result.get("ok", false)):
+		push_error("[game_state:invalid_character_progression] action=bootstrap")
+		return
+	var vitals_result := CharacterVitalsApplicationScript.initialize_default(initial_snapshot)
+	if not bool(vitals_result.get("ok", false)):
+		push_error("[game_state:invalid_character_vitals] action=bootstrap")
+		return
+	var inventory_quantities_result := InventoryQuantitiesApplicationScript.initialize_default(initial_snapshot)
+	if not bool(inventory_quantities_result.get("ok", false)):
+		push_error("[game_state:invalid_inventory_quantities] action=bootstrap")
+		return
+	var inventory_equip_result := InventoryEquipApplicationScript.initialize_default(initial_snapshot)
+	if not bool(inventory_equip_result.get("ok", false)):
+		push_error("[game_state:invalid_inventory_equip_state] action=bootstrap")
+		return
 	var knowledge_result := KnowledgeApplicationScript.initialize_default(initial_snapshot)
 	if not bool(knowledge_result.get("ok", false)):
 		push_error("[game_state:invalid_knowledge_state] action=bootstrap")
+		return
+	var ability_result := AbilitySavedataApplicationScript.initialize_default(initial_snapshot)
+	if not bool(ability_result.get("ok", false)):
+		push_error("[game_state:invalid_ability_state] action=bootstrap")
+		return
+	var auto_battle_result := AutoBattleApplicationScript.initialize_default(initial_snapshot)
+	if not bool(auto_battle_result.get("ok", false)):
+		push_error("[game_state:invalid_auto_battle_state] action=bootstrap")
+		return
+	var breakthrough_result := BreakthroughApplicationScript.initialize_default(initial_snapshot)
+	if not bool(breakthrough_result.get("ok", false)):
+		push_error("[game_state:invalid_breakthrough_state] action=bootstrap")
+		return
+	var lilian_totals_result := LilianTotalsApplicationScript.initialize_default(initial_snapshot)
+	if not bool(lilian_totals_result.get("ok", false)):
+		push_error("[game_state:invalid_lilian_totals] action=bootstrap")
+		return
+	var journal_result := PlayerJournalApplicationScript.initialize_default(initial_snapshot)
+	if not bool(journal_result.get("ok", false)):
+		push_error("[game_state:invalid_player_journal] action=bootstrap")
+		return
+	var item_slots_result := InventoryItemSlotsApplicationScript.initialize_default(initial_snapshot)
+	if not bool(item_slots_result.get("ok", false)):
+		push_error("[game_state:invalid_inventory_item_slots] action=bootstrap")
+		return
+	if not _commit_initial_cultivation_method_state(preload("res://scripts/sim/moni_catalog.gd").initial_player(), initial_snapshot):
+		push_error("[game_state:invalid_cultivation_method_state] action=bootstrap")
 		return
 	if not initial_snapshot.has("liandan"):
 		initial_snapshot["liandan"] = LiandanStateScript.default_state()
@@ -185,18 +324,63 @@ func _bootstrap_savedata() -> void:
 	var tutorial_application := TutorialApplicationScript.new()
 	tutorial_application.bind_store(DataStore)
 	tutorial_application.initialize_missing()
-	TutorialService.bind_store(DataStore)
 
 
 func new_game(profile: Dictionary = {}) -> void:
+	if _lilian_session == null:
+		push_error("GameState: LilianSession 未注入 action=new_game")
+		return
 	var initial := preload("res://scripts/sim/moni_catalog.gd").initial_player()
 	if initial.is_empty():
 		push_error("[game_state:invalid_initial_player] MoniCatalog returned no initial player")
 		return
 	DataStore.reset_all(CharacterSavedataStateScript.default_slice())
+	var progression_result := CharacterProgressionApplicationScript.initialize_default(DataStore.savedata)
+	if not bool(progression_result.get("ok", false)):
+		push_error("[game_state:invalid_character_progression] action=new_game")
+		return
+	var vitals_result := CharacterVitalsApplicationScript.initialize_default(DataStore.savedata)
+	if not bool(vitals_result.get("ok", false)):
+		push_error("[game_state:invalid_character_vitals] action=new_game")
+		return
+	var inventory_quantities_result := InventoryQuantitiesApplicationScript.initialize_default(DataStore.savedata)
+	if not bool(inventory_quantities_result.get("ok", false)):
+		push_error("[game_state:invalid_inventory_quantities] action=new_game")
+		return
+	var inventory_equip_result := InventoryEquipApplicationScript.initialize_default(DataStore.savedata)
+	if not bool(inventory_equip_result.get("ok", false)):
+		push_error("[game_state:invalid_inventory_equip_state] action=new_game")
+		return
+	var item_slots_result := InventoryItemSlotsApplicationScript.initialize_default(DataStore.savedata)
+	if not bool(item_slots_result.get("ok", false)):
+		push_error("[game_state:invalid_inventory_item_slots] action=new_game")
+		return
 	var knowledge_result := KnowledgeApplicationScript.initialize_default(DataStore.savedata)
 	if not bool(knowledge_result.get("ok", false)):
 		push_error("[game_state:invalid_knowledge_state] action=new_game")
+		return
+	var ability_result := AbilitySavedataApplicationScript.initialize_default(DataStore.savedata)
+	if not bool(ability_result.get("ok", false)):
+		push_error("[game_state:invalid_ability_state] action=new_game")
+		return
+	var auto_battle_result := AutoBattleApplicationScript.initialize_default(DataStore.savedata)
+	if not bool(auto_battle_result.get("ok", false)):
+		push_error("[game_state:invalid_auto_battle_state] action=new_game")
+		return
+	var breakthrough_result := BreakthroughApplicationScript.initialize_default(DataStore.savedata)
+	if not bool(breakthrough_result.get("ok", false)):
+		push_error("[game_state:invalid_breakthrough_state] action=new_game")
+		return
+	var lilian_totals_result := LilianTotalsApplicationScript.initialize_default(DataStore.savedata)
+	if not bool(lilian_totals_result.get("ok", false)):
+		push_error("[game_state:invalid_lilian_totals] action=new_game")
+		return
+	var journal_result := PlayerJournalApplicationScript.initialize_default(DataStore.savedata)
+	if not bool(journal_result.get("ok", false)):
+		push_error("[game_state:invalid_player_journal] action=new_game")
+		return
+	if not _commit_initial_cultivation_method_state(initial):
+		push_error("[game_state:invalid_cultivation_method_state] action=new_game")
 		return
 	var story_application := StoryApplicationScript.new()
 	story_application.bind_store(DataStore)
@@ -221,39 +405,35 @@ func new_game(profile: Dictionary = {}) -> void:
 	refresh_derived_attrs(false)
 	hp = float(attrs.get(EnumPlayerAttr.HP_MAX, 100.0))
 	mp = float(attrs.get(EnumPlayerAttr.MP_MAX, 100.0))
-	unlocked_abilities = _initial_ability_ids(initial)
-	equipped_abilities = _initial_equipped_abilities(initial, unlocked_abilities)
-	unlocked_methods = _initial_method_ids(initial)
-	var default_method := str(unlocked_methods[0]) if not unlocked_methods.is_empty() else "method.hunyuan.1"
-	cultivation_method_slots = (initial.get("method_slots", {
-		"main": default_method, "support_1": "", "support_2": "", "support_3": "",
-	}) as Dictionary).duplicate(true)
-	current_cultivation_method_id = str(cultivation_method_slots.get("main", default_method))
+	var initial_unlocked := _initial_ability_ids(initial)
+	var initial_equipped := _initial_equipped_abilities(initial, initial_unlocked)
+	if not _commit_ability_state(initial_unlocked, initial_equipped):
+		push_error("[game_state:invalid_ability_state] action=new_game_initial")
+		return
 	_seed_starter_knowledge()
-	auto_battle_enabled = false
-	auto_battle_preset = "balanced"
-	auto_battle_rules = {}
+	if not _commit_auto_battle_state(false, "balanced", {}):
+		push_error("[game_state:invalid_auto_battle_state] action=new_game_initial")
+		return
 	owned_equips = (initial.get("equips", []) as Array).duplicate(true)
 	equip_slots = (initial.get("equip_slots", [-1, -1, -1]) as Array).duplicate(true)
 	treasure_item_slots = (initial.get("treasure_item_slots", ["", "", ""]) as Array).duplicate(true)
-	item_slots = (initial.get("item_slots", ["", "", ""]) as Array).duplicate(true)
+	if not _commit_item_slots_state(initial["item_slots"]):
+		push_error("[game_state:invalid_inventory_item_slots] action=new_game_initial")
+		return
 	inventory = (initial.get("items", initial.get("inventory", {})) as Dictionary).duplicate(true)
 	liandan = LiandanStateScript.default_state()
 	storage = (initial.get("storage", {}) as Dictionary).duplicate(true)
 	storage_equips = (initial.get("storage_equips", []) as Array).duplicate(true)
-	activity_log = []
-	totals = {
-		"battles": 0, "wins": 0, "losses": 0, "items_gained": 0,
-		"lilian_count": 0, "lilian_steps": 0, "max_difficulty": 0,
-	}
+	if not bool(PlayerJournalApplicationScript.commit(DataStore.savedata, []).get("ok", false)):
+		push_error("[game_state:invalid_player_journal] action=new_game_reset")
+		return
 	last_rewards = []
 	last_lilian_summary = {}
 	last_settled_lilian_id = ""
 	active_save_slot = 0
 	DataStore.savedata = DataStore.coalesce_savedata(DataStore.savedata)
 	_apply_character_profile(profile)
-	if LilianState != null and LilianState.has_method("reset"):
-		LilianState.reset()
+	_lilian_session.reset()
 	_initialize_map_state()
 	_sync_realm()
 
@@ -294,9 +474,9 @@ func _initial_ability_ids(initial: Dictionary) -> Array:
 
 func _initial_method_ids(initial: Dictionary) -> Array:
 	var out: Array = []
-	for method_id_v in initial.get("gongfa", initial.get("methods", ["method.hunyuan.1"])) as Array:
+	for method_id_v in initial.get("gongfa", initial.get("methods", [])) as Array:
 		var method_id := str(method_id_v).strip_edges()
-		if method_id != "":
+		if method_id != "" and not out.has(method_id):
 			out.append(method_id)
 	return out
 
@@ -304,13 +484,192 @@ func _initial_method_ids(initial: Dictionary) -> Array:
 func _initial_equipped_abilities(initial: Dictionary, unlocked: Array) -> Array:
 	var raw_v: Variant = initial.get("jineng_use", initial.get("equipped_abilities", []))
 	if raw_v is Array and not (raw_v as Array).is_empty():
-		return DataStore._normalize_ability_slots(raw_v)
+		return AbilitySavedataApplicationScript.normalize_slots(raw_v)
 	var slots: Array = ["", "", "", "", ""]
 	for i in unlocked.size():
 		if i >= 5:
 			break
 		slots[i] = str(unlocked[i])
-	return DataStore._normalize_ability_slots(slots)
+	return AbilitySavedataApplicationScript.normalize_slots(slots)
+
+
+func _ability_snapshot() -> Dictionary:
+	var result := AbilitySavedataApplicationScript.snapshot(DataStore.savedata)
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_ability_state] action=snapshot")
+		return {}
+	return (result.get("value", {}) as Dictionary).duplicate(true)
+
+
+func _commit_ability_state(unlocked: Variant, equipped: Variant) -> bool:
+	var result := AbilitySavedataApplicationScript.commit(DataStore.savedata, {
+		"unlocked_abilities": unlocked,
+		"equipped_abilities": equipped,
+	})
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_ability_state] action=commit")
+		return false
+	return true
+
+
+func _auto_battle_snapshot() -> Dictionary:
+	var result := AutoBattleApplicationScript.snapshot(DataStore.savedata)
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_auto_battle_state] action=snapshot")
+		return {}
+	return (result.get("value", {}) as Dictionary).duplicate(true)
+
+
+func _progression_snapshot() -> Dictionary:
+	var result := CharacterProgressionApplicationScript.snapshot(DataStore.savedata)
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_character_progression] action=snapshot")
+		return {}
+	return (result.get("value", {}) as Dictionary).duplicate(true)
+
+
+func _vitals_snapshot() -> Dictionary:
+	var result := CharacterVitalsApplicationScript.snapshot(DataStore.savedata)
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_character_vitals] action=snapshot")
+		return {}
+	return (result.get("value", {}) as Dictionary).duplicate(true)
+
+
+func _inventory_quantities_snapshot() -> Dictionary:
+	var result := InventoryQuantitiesApplicationScript.snapshot(DataStore.savedata)
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_inventory_quantities] action=snapshot")
+		return {}
+	return (result.get("value", {}) as Dictionary).duplicate(true)
+
+
+func _commit_inventory_quantities_state(next_inventory: Variant, next_storage: Variant) -> bool:
+	var result := InventoryQuantitiesApplicationScript.commit(DataStore.savedata, {
+		"inventory": next_inventory, "storage": next_storage,
+	})
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_inventory_quantities] action=commit")
+		return false
+	return true
+
+
+func _commit_inventory_working(working_inventory: Dictionary) -> bool:
+	return _commit_inventory_quantities_state(working_inventory, storage)
+
+
+func _inventory_equip_snapshot() -> Dictionary:
+	var result := InventoryEquipApplicationScript.snapshot(DataStore.savedata)
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_inventory_equip_state] action=snapshot")
+		return {}
+	return (result.get("value", {}) as Dictionary).duplicate(true)
+
+
+func _commit_inventory_equip_state(owned: Variant, slots: Variant, treasures: Variant, stored: Variant) -> bool:
+	var result := InventoryEquipApplicationScript.commit(DataStore.savedata, {
+		"owned_equips": owned, "equip_slots": slots,
+		"treasure_item_slots": treasures, "storage_equips": stored,
+	})
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_inventory_equip_state] action=commit")
+		return false
+	return true
+
+
+func _item_slots_snapshot() -> Dictionary:
+	var result := InventoryItemSlotsApplicationScript.snapshot(DataStore.savedata)
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_inventory_item_slots] action=snapshot")
+		return {}
+	return (result.get("value", {}) as Dictionary).duplicate(true)
+
+
+func _commit_item_slots_state(slots: Variant) -> bool:
+	var result := InventoryItemSlotsApplicationScript.commit(DataStore.savedata, {"item_slots": slots})
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_inventory_item_slots] action=commit")
+		return false
+	return true
+
+
+func _consume_inventory_item(item_id: String, count: int) -> bool:
+	var working_inventory := inventory
+	InventoryApplicationScript.remove_item(working_inventory, item_id, count)
+	return _commit_inventory_working(working_inventory)
+
+
+func _commit_vitals_state(next_attrs: Variant, next_hp: Variant, next_mp: Variant) -> bool:
+	var result := CharacterVitalsApplicationScript.commit(DataStore.savedata, {
+		"attrs": next_attrs,
+		"hp": next_hp,
+		"mp": next_mp,
+	})
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_character_vitals] action=commit")
+		return false
+	return true
+
+
+func _commit_progression_field(field: String, value: Variant) -> bool:
+	var next := _progression_snapshot()
+	if next.is_empty():
+		return false
+	next[field] = value
+	var result := CharacterProgressionApplicationScript.commit(DataStore.savedata, next)
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_character_progression] action=commit field=%s" % field)
+		return false
+	return true
+
+
+func _commit_auto_battle_state(enabled: Variant, preset: Variant, rules: Variant) -> bool:
+	var result := AutoBattleApplicationScript.commit(DataStore.savedata, {
+		"auto_battle_enabled": enabled,
+		"auto_battle_preset": preset,
+		"auto_battle_rules": rules,
+	})
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_auto_battle_state] action=commit")
+		return false
+	return true
+
+
+func _cultivation_method_snapshot() -> Dictionary:
+	var result := CultivationMethodSavedataApplicationScript.snapshot(DataStore.savedata)
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_cultivation_method_state] action=snapshot")
+		return {}
+	return (result.get("value", {}) as Dictionary).duplicate(true)
+
+
+func _method_mastery() -> Dictionary:
+	return _cultivation_method_snapshot().get("method_mastery", {}) as Dictionary
+
+
+func _commit_cultivation_method_state(unlocked: Variant, current: Variant, slots: Variant, mastery: Variant, target: Dictionary = DataStore.savedata) -> bool:
+	var result := CultivationMethodSavedataApplicationScript.commit(target, {
+		"method_mastery": mastery, "unlocked_methods": unlocked,
+		"current_cultivation_method_id": current, "cultivation_method_slots": slots,
+	})
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_cultivation_method_state] action=commit")
+		return false
+	return true
+
+
+func _commit_initial_cultivation_method_state(initial: Dictionary, target: Dictionary = DataStore.savedata) -> bool:
+	var unlocked := _initial_method_ids(initial)
+	if unlocked.is_empty():
+		push_error("[game_state:missing_initial_methods] MoniCatalog returned no starter method")
+		return false
+	var slots_v: Variant = initial.get("method_slots", {})
+	if not slots_v is Dictionary:
+		push_error("[game_state:invalid_initial_methods] field=method_slots")
+		return false
+	var slots := (slots_v as Dictionary).duplicate(true)
+	if slots.is_empty(): slots = {"main": str(unlocked[0]), "support_1": "", "support_2": "", "support_3": ""}
+	return _commit_cultivation_method_state(unlocked, str(slots.get("main", "")), slots, {}, target)
 
 
 func _seed_starter_knowledge() -> void:
@@ -318,19 +677,22 @@ func _seed_starter_knowledge() -> void:
 
 
 func can_persist() -> bool:
-	return LilianState == null or not LilianState.active
+	if _lilian_session == null:
+		push_error("GameState: LilianSession 未注入 action=can_persist")
+		return false
+	return not _lilian_session.active
 
 
 func save_game(slot: int) -> Dictionary:
-	if slot == SaveService.AUTO_SAVE_SLOT:
+	if slot == SaveRepositoryScript.AUTO_SAVE_SLOT:
 		return {"ok": false, "error": "槽位 1 为自动存档，无法手动存入"}
 	return _persist_slot(slot)
 
 
 func auto_save() -> Dictionary:
-	var result := _persist_slot(SaveService.AUTO_SAVE_SLOT)
+	var result := _persist_slot(SaveRepositoryScript.AUTO_SAVE_SLOT)
 	if bool(result.get("ok", false)):
-		DataEvents.emit_tip_intent({
+		_emit_tip_intent({
 			"type": EnumTipIntentType.LABEL_TOAST,
 			"text": "自动存档成功",
 			"tone": EnumTipTone.LABEL_GAIN,
@@ -346,7 +708,7 @@ func auto_save() -> Dictionary:
 func _persist_slot(slot: int) -> Dictionary:
 	if not can_persist():
 		return {"ok": false, "error": "历练中无法存档，请先完成或结算"}
-	var result: Dictionary = SaveService.save_slot(slot, to_dict())
+	var result: Dictionary = SaveRepositoryScript.save_slot(slot, to_dict())
 	if bool(result.get("ok", false)):
 		active_save_slot = slot
 	return result
@@ -355,7 +717,7 @@ func _persist_slot(slot: int) -> Dictionary:
 func load_game(slot: int) -> Dictionary:
 	if not can_persist():
 		return {"ok": false, "error": "历练中无法读档，请先完成或结算"}
-	var loaded: Dictionary = SaveService.load_slot(slot)
+	var loaded: Dictionary = SaveRepositoryScript.load_slot(slot)
 	if not bool(loaded.get("ok", false)):
 		return loaded
 	if not apply_dict(loaded.get("game", {}) as Dictionary):
@@ -475,18 +837,21 @@ func _apply_liandan_brew_result(
 	result: Dictionary,
 	defer_activity_log: bool = false
 ) -> Dictionary:
+	var working_inventory := inventory
 	for ingredient_v in result.get("ingredients", []) as Array:
 		var ingredient := ingredient_v as Dictionary
 		InventoryApplicationScript.remove_item(
-			inventory,
+			working_inventory,
 			str(ingredient.get("id", "")),
 			int(ingredient.get("count", 0))
 		)
 	var product_id := str(result.get("product_id", ""))
 	if product_id != "":
-		result["added"] = InventoryApplicationScript.add_item(inventory, product_id, int(result.get("count", 0)))
+		result["added"] = InventoryApplicationScript.add_item(working_inventory, product_id, int(result.get("count", 0)))
 	else:
 		result["added"] = 0
+	if not _commit_inventory_working(working_inventory):
+		return {"ok": false, "error": "背包状态无效"}
 	var next_liandan := LiandanService.apply_xp(liandan, int(result.get("xp", 0)))
 	next_liandan = LiandanService.apply_recipe_mastery(
 		next_liandan,
@@ -745,6 +1110,7 @@ func cultivate_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, days: int 
 	var realm_before := realm_name
 	var instability_before := cultivation_instability
 	var pill_ids := preview.get("pill_ids", []) as Array
+	var working_inventory := inventory
 	var layer_advances := 0
 	for day_index in safe_days:
 		var base_gain := RealmBalanceService.base_daily_cultivation_gain(_realm_row(realm_index))
@@ -754,7 +1120,7 @@ func cultivate_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, days: int 
 		if EnumXiulianMode.is_pill_mode(mode_id):
 			var active_pill_id := str(pill_ids[int(day_index / GameTimeService.days_per_month())])
 			if day_index % GameTimeService.days_per_month() == 0:
-				InventoryApplicationScript.remove_item(inventory, active_pill_id, 1)
+				InventoryApplicationScript.remove_item(working_inventory, active_pill_id, 1)
 			raw_gain = cultivation_pill_daily_gain(active_pill_id) + method_base_gain
 		else:
 			var multiplier := float(mode["cultivation_multiplier"])
@@ -769,6 +1135,8 @@ func cultivate_session(mode_id: String = EnumXiulianMode.LABEL_CYCLE, days: int 
 		)
 		injury_days = maxi(0, injury_days - 1)
 		layer_advances += _auto_advance_layers()
+	if EnumXiulianMode.is_pill_mode(mode_id) and not _commit_inventory_working(working_inventory):
+		return {"ok": false, "error": "背包状态无效"}
 	_advance_time(safe_days, false, false)
 	var gained := cultivation - cultivation_before
 	var activity_text := "闭关 %s：%s，修为 +%d" % [
@@ -1107,15 +1475,10 @@ func travel_to_city(target_city_id: String, path: Array, total_days: int) -> Dic
 	set_map_data(next_map)
 	if elapsed > 0:
 		_advance_time(elapsed, true, true)
-	activity_log.append({
-		"day": day,
-		"text": "旅行至%s，耗时 %s" % [
-			str(WorldMapService.city_by_id(target_city_id).get("name", target_city_id)),
-			GameTimeService.duration_label(elapsed),
-		],
-	})
-	if activity_log.size() > 30:
-		activity_log = activity_log.slice(activity_log.size() - 30)
+	_append_activity("旅行至%s，耗时 %s" % [
+		str(WorldMapService.city_by_id(target_city_id).get("name", target_city_id)),
+		GameTimeService.duration_label(elapsed),
+	])
 	return {
 		"ok": true,
 		"city_id": target_city_id,
@@ -1135,9 +1498,12 @@ func apply_battle_player_runtime(summary: Dictionary) -> void:
 		mp = float(runtime_summary.get("mp", mp))
 	var battle_items_v: Variant = runtime_summary.get("items", [])
 	if battle_items_v is Array:
+		var working_inventory := inventory
 		InventoryApplicationScript.sync_battle_item_counts(
-			inventory, item_slots, battle_items_v as Array
+			working_inventory, item_slots, battle_items_v as Array
 		)
+		if not _commit_inventory_working(working_inventory):
+			push_error("[game_state:invalid_inventory_quantities] action=apply_battle_runtime")
 
 
 func _skills_include_id(skills: Array, skill_id: int) -> bool:
@@ -1176,7 +1542,7 @@ func build_battle_init(event: Dictionary) -> Dictionary:
 
 func settle_lilian(result: Dictionary, tutorial_service: Node) -> Dictionary:
 	if tutorial_service == null:
-		return {"ok": false, "error": "缺少 TutorialService"}
+		return {"ok": false, "error": "缺少 TutorialCoordinator"}
 	if result.is_empty():
 		return {"ok": false, "error": "缺少历练结算数据"}
 	var result_errors := LilianResultContract.collect_errors(result)
@@ -1201,6 +1567,7 @@ func settle_lilian(result: Dictionary, tutorial_service: Node) -> Dictionary:
 	elif exit_reason == "fled":
 		var fled_rules := LilianRulesService.rules()
 		injury_days = maxi(injury_days, int(fled_rules["fled_injury_days"]))
+	var working_inventory := inventory
 	for item_row_v in result.get("items", []) as Array:
 		if not item_row_v is Dictionary:
 			continue
@@ -1210,10 +1577,26 @@ func settle_lilian(result: Dictionary, tutorial_service: Node) -> Dictionary:
 			continue
 		var remaining := maxi(0, int(item_row.get("count", 0)))
 		if remaining > 0:
-			inventory[iid] = remaining
+			working_inventory[iid] = remaining
 		else:
-			inventory.erase(iid)
-	var applied_loot := RewardService.apply_rewards(self, result.get("loot", []) as Array, "lilian_jiesuan")
+			working_inventory.erase(iid)
+	var item_rewards: Array = []
+	var non_item_rewards: Array = []
+	for reward_v in result.get("loot", []) as Array:
+		if reward_v is Dictionary and str((reward_v as Dictionary).get("kind", EnumRewardKind.LABEL_ITEM)) == EnumRewardKind.LABEL_ITEM:
+			item_rewards.append(reward_v)
+		else:
+			non_item_rewards.append(reward_v)
+	var applied_item_rewards: Array = []
+	for reward_v in item_rewards:
+		var reward := reward_v as Dictionary
+		var added := InventoryApplicationScript.add_item(working_inventory, str(reward.get("id", "")), maxi(1, int(reward.get("count", 1))))
+		if added > 0:
+			var applied_reward := reward.duplicate(true)
+			applied_reward["count"] = added
+			applied_item_rewards.append(applied_reward)
+	var applied_loot := RewardService.apply_rewards(self, non_item_rewards, "lilian_jiesuan")
+	applied_loot.append_array(applied_item_rewards)
 	last_rewards = applied_loot if not applied_loot.is_empty() else (result.get("loot", []) as Array).duplicate(true)
 	for lost_v in result.get("loot_lost", []) as Array:
 		if not lost_v is Dictionary:
@@ -1222,20 +1605,19 @@ func settle_lilian(result: Dictionary, tutorial_service: Node) -> Dictionary:
 		if str(lost.get("source", "inventory")) == "session_loot":
 			continue
 		InventoryApplicationScript.remove_item(
-			inventory,
+			working_inventory,
 			str(lost.get("id", "")),
 			int(lost.get("count", 0))
 		)
-	for reward in last_rewards:
-		totals["items_gained"] = int(totals.get("items_gained", 0)) + int((reward as Dictionary).get("count", 0))
+	if not _commit_inventory_working(working_inventory):
+		return {"ok": false, "error": "背包状态无效"}
 	var stats := result.get("stats", {}) as Dictionary
-	totals["lilian_count"] = int(totals.get("lilian_count", 0)) + 1
-	totals["lilian_steps"] = int(totals.get("lilian_steps", 0)) + int(stats.get("steps", 0))
-	var max_diff := maxi(int(stats.get("max_difficulty", 0)), int(stats.get("max_depth", 0)))
-	totals["max_difficulty"] = maxi(int(totals.get("max_difficulty", totals.get("max_depth", 0))), max_diff)
-	totals["battles"] = int(totals.get("battles", 0)) + int(stats.get("battles", 0))
-	totals["wins"] = int(totals.get("wins", 0)) + int(stats.get("wins", 0))
-	totals["losses"] = int(totals.get("losses", 0)) + int(stats.get("losses", 0))
+	var totals_result := LilianTotalsApplicationScript.apply_lilian_settlement(
+		DataStore.savedata, last_rewards, stats
+	)
+	if not bool(totals_result.get("ok", false)):
+		push_error("[game_state:invalid_lilian_totals] action=settle_lilian")
+		return {"ok": false, "error": "历练统计状态无效"}
 	var instability_reduced := mini(
 		cultivation_instability,
 		int(stats.get("wins", 0)) * INSTABILITY_REDUCTION_PER_WIN
@@ -1265,9 +1647,7 @@ func settle_lilian(result: Dictionary, tutorial_service: Node) -> Dictionary:
 		log_text += "（战中遁走）"
 	if instability_reduced > 0:
 		log_text += "，灵力驳杂 -%d" % instability_reduced
-	activity_log.append({"day": day, "text": log_text})
-	if activity_log.size() > 30:
-		activity_log = activity_log.slice(activity_log.size() - 30)
+	_append_activity(log_text)
 	last_settled_lilian_id = settlement_id
 	result["instability_reduced"] = instability_reduced
 	result["cultivation_instability"] = cultivation_instability
@@ -1289,6 +1669,105 @@ func to_dict() -> Dictionary:
 
 
 func apply_dict(data: Dictionary) -> bool:
+	if _lilian_session == null:
+		push_error("GameState: LilianSession 未注入 action=apply_dict")
+		return false
+	if not data.has("item_slots"):
+		push_error("[game_state:missing_state_slice] field=item_slots")
+		return false
+	var prepared_item_slots := InventoryItemSlotsApplicationScript.prepare_candidate({
+		"item_slots": data["item_slots"],
+	})
+	if not bool(prepared_item_slots.get("ok", false)):
+		return false
+	for key in ["inventory", "storage"]:
+		if not data.has(key):
+			push_error("[game_state:missing_state_slice] field=inventory_quantities")
+			return false
+	var prepared_inventory_quantities := InventoryQuantitiesApplicationScript.prepare_candidate({
+		"inventory": data["inventory"], "storage": data["storage"],
+	})
+	if not bool(prepared_inventory_quantities.get("ok", false)):
+		return false
+	var equip_candidate := {}
+	for key in ["owned_equips", "equip_slots", "treasure_item_slots", "storage_equips"]:
+		if not data.has(key):
+			push_error("[game_state:missing_state_slice] field=inventory_equip")
+			return false
+		equip_candidate[key] = data[key]
+	var prepared_inventory_equip := InventoryEquipApplicationScript.prepare_candidate(equip_candidate)
+	if not bool(prepared_inventory_equip.get("ok", false)):
+		return false
+	for key in ["attrs", "hp", "mp"]:
+		if not data.has(key):
+			push_error("[game_state:missing_state_slice] field=character_vitals")
+			return false
+	var prepared_vitals := CharacterVitalsApplicationScript.prepare_candidate({
+		"attrs": data["attrs"], "hp": data["hp"], "mp": data["mp"],
+	})
+	if not bool(prepared_vitals.get("ok", false)):
+		return false
+	var progression_candidate := {}
+	for key in ["day", "realm_index", "realm_name", "cultivation", "cultivation_instability", "breakthrough_at", "injury_days", "ling_stones"]:
+		if not data.has(key):
+			push_error("[game_state:missing_state_slice] field=character_progression")
+			return false
+		progression_candidate[key] = data[key]
+	var prepared_progression := CharacterProgressionApplicationScript.prepare_candidate(progression_candidate)
+	if not bool(prepared_progression.get("ok", false)):
+		return false
+	if not data.has("activity_log"):
+		push_error("[game_state:missing_state_slice] field=activity_log")
+		return false
+	var prepared_journal := PlayerJournalApplicationScript.prepare_candidate(data["activity_log"])
+	if not bool(prepared_journal.get("ok", false)):
+		return false
+	if not data.has("totals"):
+		push_error("[game_state:missing_state_slice] field=totals")
+		return false
+	var prepared_lilian_totals := LilianTotalsApplicationScript.prepare_candidate(data["totals"])
+	if not bool(prepared_lilian_totals.get("ok", false)):
+		return false
+	if not data.has("unlocked_abilities") or not data.has("equipped_abilities"):
+		push_error("[game_state:missing_state_slice] field=abilities")
+		return false
+	var prepared_abilities := AbilitySavedataApplicationScript.prepare_candidate({
+		"unlocked_abilities": data["unlocked_abilities"],
+		"equipped_abilities": data["equipped_abilities"],
+	})
+	if not bool(prepared_abilities.get("ok", false)):
+		return false
+	for key in ["auto_battle_enabled", "auto_battle_preset", "auto_battle_rules"]:
+		if not data.has(key):
+			push_error("[game_state:missing_state_slice] field=auto_battle")
+			return false
+	var prepared_auto_battle := AutoBattleApplicationScript.prepare_candidate({
+		"auto_battle_enabled": data["auto_battle_enabled"],
+		"auto_battle_preset": data["auto_battle_preset"],
+		"auto_battle_rules": data["auto_battle_rules"],
+	})
+	if not bool(prepared_auto_battle.get("ok", false)):
+		return false
+	for key in ["breakthrough_bonuses", "realm_quality", "breakthrough_attempt_cooldown_days"]:
+		if not data.has(key):
+			push_error("[game_state:missing_state_slice] field=breakthrough")
+			return false
+	var prepared_breakthrough := BreakthroughApplicationScript.prepare_candidate({
+		"breakthrough_bonuses": data["breakthrough_bonuses"],
+		"realm_quality": data["realm_quality"],
+		"breakthrough_attempt_cooldown_days": data["breakthrough_attempt_cooldown_days"],
+	})
+	if not bool(prepared_breakthrough.get("ok", false)):
+		return false
+	for key in ["method_mastery", "unlocked_methods", "current_cultivation_method_id", "cultivation_method_slots"]:
+		if not data.has(key):
+			push_error("[game_state:missing_state_slice] field=cultivation_methods")
+			return false
+	var prepared_methods := CultivationMethodSavedataApplicationScript.prepare_candidate({
+		"method_mastery": data["method_mastery"], "unlocked_methods": data["unlocked_methods"],
+		"current_cultivation_method_id": data["current_cultivation_method_id"], "cultivation_method_slots": data["cultivation_method_slots"],
+	})
+	if not bool(prepared_methods.get("ok", false)): return false
 	if not data.has("knowledge"):
 		push_error("[game_state:missing_state_slice] field=knowledge")
 		return false
@@ -1333,12 +1812,45 @@ func apply_dict(data: Dictionary) -> bool:
 	if normalized_data.is_empty():
 		push_error("[game_state:invalid_character_savedata] action=apply_dict")
 		return false
+	var prepared_progression_value := prepared_progression.get("value", {}) as Dictionary
+	for key in prepared_progression_value.keys():
+		normalized_data[key] = prepared_progression_value[key]
+	var prepared_inventory_quantities_value := prepared_inventory_quantities.get("value", {}) as Dictionary
+	for key in prepared_inventory_quantities_value.keys():
+		normalized_data[key] = (prepared_inventory_quantities_value[key] as Dictionary).duplicate(true)
+	var prepared_inventory_equip_value := prepared_inventory_equip.get("value", {}) as Dictionary
+	for key in prepared_inventory_equip_value.keys():
+		normalized_data[key] = (prepared_inventory_equip_value[key] as Array).duplicate(true)
+	var prepared_item_slots_value := prepared_item_slots.get("value", {}) as Dictionary
+	normalized_data["item_slots"] = (
+		prepared_item_slots_value.get("item_slots", []) as Array
+	).duplicate(true)
+	var prepared_vitals_value := prepared_vitals.get("value", {}) as Dictionary
+	for key in prepared_vitals_value.keys():
+		normalized_data[key] = prepared_vitals_value[key].duplicate(true) if prepared_vitals_value[key] is Dictionary else prepared_vitals_value[key]
+	normalized_data["totals"] = (prepared_lilian_totals.get("value", {}) as Dictionary).duplicate(true)
+	normalized_data["activity_log"] = (prepared_journal.get("value", []) as Array).duplicate(true)
 	normalized_data["tutorial"] = prepared_tutorial
 	normalized_data["map"] = prepared_map
 	normalized_data["weituo"] = prepared_weituo
 	normalized_data["knowledge"] = (
 		prepared_knowledge.get("value", {}) as Dictionary
 	).duplicate(true)
+	var prepared_ability_value := prepared_abilities.get("value", {}) as Dictionary
+	normalized_data["unlocked_abilities"] = (
+		prepared_ability_value.get("unlocked_abilities", []) as Array
+	).duplicate(true)
+	normalized_data["equipped_abilities"] = (
+		prepared_ability_value.get("equipped_abilities", []) as Array
+	).duplicate(true)
+	var prepared_auto_battle_value := prepared_auto_battle.get("value", {}) as Dictionary
+	for key in prepared_auto_battle_value.keys():
+		normalized_data[key] = prepared_auto_battle_value[key].duplicate(true) if prepared_auto_battle_value[key] is Dictionary or prepared_auto_battle_value[key] is Array else prepared_auto_battle_value[key]
+	var prepared_breakthrough_value := prepared_breakthrough.get("value", {}) as Dictionary
+	for key in prepared_breakthrough_value.keys():
+		normalized_data[key] = prepared_breakthrough_value[key].duplicate(true) if prepared_breakthrough_value[key] is Dictionary or prepared_breakthrough_value[key] is Array else prepared_breakthrough_value[key]
+	var prepared_method_value := prepared_methods.get("value", {}) as Dictionary
+	for key in prepared_method_value.keys(): normalized_data[key] = prepared_method_value[key].duplicate(true) if prepared_method_value[key] is Dictionary or prepared_method_value[key] is Array else prepared_method_value[key]
 	if not DataStore.import_savedata(normalized_data):
 		return false
 	SceneManager.reset_navigation_runtime()
@@ -1346,10 +1858,7 @@ func apply_dict(data: Dictionary) -> bool:
 	var attrs_dict := attrs
 	hp = clampf(hp, 0.0, float(attrs_dict.get(EnumPlayerAttr.HP_MAX, 100.0)))
 	mp = clampf(mp, 0.0, float(attrs_dict.get(EnumPlayerAttr.MP_MAX, 100.0)))
-	if Engine.get_main_loop() is SceneTree:
-		var lilian := (Engine.get_main_loop() as SceneTree).root.get_node_or_null("LilianState")
-		if lilian != null and lilian.has_method("reset"):
-			lilian.reset()
+	_lilian_session.reset()
 	_sync_realm()
 	return true
 
@@ -1393,18 +1902,21 @@ func learn_ability(ability_id: String) -> Dictionary:
 		return {"ok": false, "error": "未知技能"}
 	if not AbilityService.can_learn(aid, DataStore.savedata, major_realm_id()):
 		return {"ok": false, "error": "尚未满足学习条件"}
-	if unlocked_abilities.has(aid):
+	var ability_state := _ability_snapshot()
+	var unlocked := ability_state.get("unlocked_abilities", []) as Array
+	if unlocked.has(aid):
 		return {"ok": false, "error": "已经掌握该技能"}
-	unlocked_abilities.append(aid)
+	unlocked.append(aid)
+	var slots := ability_state.get("equipped_abilities", []) as Array
 	# 战斗被动/通用被动学会即生效，仅主动与持续技尝试填入战斗栏空槽
 	var ability_type := str(AbilityService.by_id(aid).get("type", ""))
 	if AbilityService.uses_combat_skill_slot(ability_type):
-		var slots := equipped_abilities.duplicate(true)
 		for i in slots.size():
 			if str(slots[i]).strip_edges() == "":
 				slots[i] = aid
-				equipped_abilities = DataStore._normalize_ability_slots(slots)
 				break
+	if not _commit_ability_state(unlocked, slots):
+		return {"ok": false, "error": "技能状态无效"}
 	return {"ok": true, "ability_id": aid}
 
 
@@ -1449,7 +1961,7 @@ func use_inventory_item(item_id: String) -> Dictionary:
 	else:
 		return {"ok": false, "error": "该物品无法直接使用"}
 	if bool(result.get("ok", false)):
-		DataEvents.emit_inventory_changed()
+		notify_inventory_changed()
 	return result
 
 
@@ -1468,7 +1980,8 @@ func _use_recovery_item(item_id: String, def: ItemDef) -> Dictionary:
 		return {"ok": false, "error": "气血与法力已满"}
 	hp = float(recovery["hp"])
 	mp = float(recovery["mp"])
-	InventoryApplicationScript.remove_item(inventory, item_id, 1)
+	if not _consume_inventory_item(item_id, 1):
+		return {"ok": false, "error": "背包状态无效"}
 	return {
 		"ok": true,
 		"hp_gained": hp_gained,
@@ -1506,7 +2019,8 @@ func _use_attrs_effect(item_id: String, def: ItemDef) -> Dictionary:
 		applied.append({"attr": attr_key, "delta": delta})
 	if applied.is_empty():
 		return {"ok": false, "error": "无有效的属性修改"}
-	InventoryApplicationScript.remove_item(inventory, item_id, 1)
+	if not _consume_inventory_item(item_id, 1):
+		return {"ok": false, "error": "背包状态无效"}
 	return {"ok": true, "attrs": applied, "feedback": "属性已变化"}
 
 
@@ -1522,7 +2036,8 @@ func use_learning_book(item_id: String) -> Dictionary:
 	else:
 		return {"ok": false, "error": "该物品不是可学习典籍"}
 	if bool(result.get("ok", false)):
-		InventoryApplicationScript.remove_item(inventory, item_id, 1)
+		if not _consume_inventory_item(item_id, 1):
+			return {"ok": false, "error": "背包状态无效"}
 	return result
 
 
@@ -1558,7 +2073,8 @@ func _use_alchemy_mastery_notes(item_id: String, def: ItemDef) -> Dictionary:
 	var gained := LiandanService.mastery_for(liandan, recipe_id) - before
 	var recipe := LiandanService.recipe_by_id(recipe_id)
 	var recipe_name := str(recipe.get("pill_name", recipe.get("name", "丹方")))
-	InventoryApplicationScript.remove_item(inventory, item_id, 1)
+	if not _consume_inventory_item(item_id, 1):
+		return {"ok": false, "error": "背包状态无效"}
 	return {
 		"ok": true,
 		"message": "研读心得，%s熟练度 +%d" % [recipe_name, gained],
@@ -1585,18 +2101,21 @@ func equip_ability(slot_index: int, ability_id: String) -> Dictionary:
 	var aid := ability_id.strip_edges()
 	if slot_index < 0 or slot_index >= 5:
 		return {"ok": false, "error": "无法配置该技能"}
-	if aid != "" and not unlocked_abilities.has(aid):
+	var ability_state := _ability_snapshot()
+	var unlocked := ability_state.get("unlocked_abilities", []) as Array
+	if aid != "" and not unlocked.has(aid):
 		return {"ok": false, "error": "无法配置该技能"}
 	if aid != "":
 		var ability_type := str(AbilityService.by_id(aid).get("type", ""))
 		if not AbilityService.uses_combat_skill_slot(ability_type):
 			return {"ok": false, "error": "该技能学会后自动生效，无需编入战斗栏"}
-	var slots := DataStore._normalize_ability_slots(equipped_abilities)
+	var slots := ability_state.get("equipped_abilities", []) as Array
 	var previous := slots.find(aid)
 	if previous >= 0:
 		slots[previous] = ""
 	slots[slot_index] = aid
-	equipped_abilities = slots
+	if not _commit_ability_state(unlocked, slots):
+		return {"ok": false, "error": "无法配置该技能"}
 	return {"ok": true}
 
 
@@ -1619,7 +2138,7 @@ func assign_equip_slot(slot_index: int, equip_id: int) -> Dictionary:
 	if slot_index < treasure_slots.size():
 		treasure_slots[slot_index] = ""
 		treasure_item_slots = treasure_slots
-	var cfg := ConfigManager.equip_by_id(equip_id)
+	var cfg := InventoryEquipQueryApplicationScript.equip_by_id(equip_id)
 	return {"ok": true, "message": "已装备 %s。" % str(cfg.get("name", "法宝"))}
 
 
@@ -1657,13 +2176,14 @@ func _owns_equip_id(equip_id: int) -> bool:
 
 
 func assign_item_slot(slot_index: int, item_id: String) -> Dictionary:
-	if slot_index < 0 or slot_index >= item_slots.size():
+	var slots := item_slots
+	if slot_index < 0 or slot_index >= slots.size():
 		return {"ok": false, "error": "无效道具槽位"}
 	var iid := item_id.strip_edges()
-	var slots := (item_slots as Array).duplicate(true)
 	if iid == "":
 		slots[slot_index] = ""
-		item_slots = slots
+		if not _commit_item_slots_state(slots):
+			return {"ok": false, "error": "道具槽位状态无效"}
 		return {"ok": true}
 	if int(inventory.get(iid, 0)) <= 0:
 		return {"ok": false, "error": "背包中没有该道具"}
@@ -1674,12 +2194,13 @@ func assign_item_slot(slot_index: int, item_id: String) -> Dictionary:
 		if i != slot_index and str(slots[i]) == iid:
 			slots[i] = ""
 	slots[slot_index] = iid
-	item_slots = slots
+	if not _commit_item_slots_state(slots):
+		return {"ok": false, "error": "道具槽位状态无效"}
 	return {"ok": true, "message": "已装备 %s。" % def.name}
 
 
 func resolved_auto_battle_rules() -> Dictionary:
-	return PlayerAutoBattleService.normalize_rules(auto_battle_rules)
+	return AutoBattleApplicationScript.normalized_rules(DataStore.savedata)
 
 
 func auto_battle_strategies() -> Array:
@@ -1688,7 +2209,9 @@ func auto_battle_strategies() -> Array:
 
 
 func set_auto_battle_strategies(strategies: Array) -> void:
-	auto_battle_rules = PlayerAutoBattleService.with_strategies(strategies)
+	var result := AutoBattleApplicationScript.with_strategies(DataStore.savedata, strategies)
+	if not bool(result.get("ok", false)):
+		push_error("[game_state:invalid_auto_battle_state] action=set_strategies")
 
 
 func append_auto_battle_strategy(strategy: Dictionary) -> void:
@@ -1708,7 +2231,7 @@ func remove_auto_battle_strategy(index: int) -> void:
 func reward_label(reward: Dictionary) -> String:
 	var kind := str(reward.get("kind", "item"))
 	if kind == "equip":
-		return "%s x1" % str(ConfigManager.equip_by_id(int(reward.get("id", -1))).get("name", "法宝"))
+		return "%s x1" % str(InventoryEquipQueryApplicationScript.equip_by_id(int(reward.get("id", -1))).get("name", "法宝"))
 	if kind == "currency":
 		return "灵石 x%d" % int(reward.get("count", 0))
 	var name := str(reward.get("id", ""))
@@ -1771,9 +2294,8 @@ func _apply_passive_method_practice(days_value: int) -> Dictionary:
 
 
 func _append_activity(text: String) -> void:
-	activity_log.append({"day": day, "text": text})
-	if activity_log.size() > 30:
-		activity_log = activity_log.slice(activity_log.size() - 30)
+	if not bool(PlayerJournalApplicationScript.append(DataStore.savedata, day, text).get("ok", false)):
+		push_error("[game_state:invalid_player_journal] action=append")
 
 
 func _roman_knowledge_level(level: int) -> String:
@@ -1865,17 +2387,16 @@ func _activity_cfg(activity_id: String) -> Dictionary:
 	return preload("res://scripts/sim/moni_catalog.gd").activity_by_id(activity_id)
 
 
-func _config_manager() -> Node:
-	var loop := Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("ConfigManager")
-
-
 func _emit_tip_intents(intents: Array) -> void:
-	if intents.is_empty() or DataEvents == null:
+	if intents.is_empty() or _tip_host == null:
 		return
-	DataEvents.emit_tip_intents(intents)
+	_tip_host.publish_intents(intents)
+
+
+func _emit_tip_intent(intent: Dictionary) -> void:
+	if _tip_host == null:
+		return
+	_tip_host.publish_intent(intent)
 
 
 func _initialize_map_state() -> void:
