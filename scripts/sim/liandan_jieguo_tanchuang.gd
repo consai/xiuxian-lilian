@@ -42,16 +42,16 @@ const InventoryQueryApplicationScript := preload(
 	"res://scripts/features/inventory/application/inventory_query_application.gd"
 )
 
-@onready var _quality_label: Label = $Dialog/Content/RewardRow/RewardInfo/Quality/Text
-@onready var _name_label: Label = $Dialog/Content/RewardRow/RewardInfo/Name
-@onready var _description_label: Label = $Dialog/Content/RewardRow/RewardInfo/Description
-@onready var _quality_panel: PanelContainer = $Dialog/Content/RewardRow/RewardInfo/Quality
-@onready var _score_label: Label = $Dialog/Content/Stats/Score/Text
-@onready var _experience_label: Label = $Dialog/Content/Stats/Experience/Text
-@onready var _durability_label: Label = $Dialog/Content/Stats/Durability/Text
-@onready var _days_label: Label = $Dialog/Content/Stats/Days/Text
+@onready var _quality_label: Label = find_child("Quality", true, false).find_child("Text", false, false) as Label
+@onready var _name_label: Label = find_child("Name", true, false) as Label
+@onready var _description_label: Label = find_child("Description", true, false) as Label
+@onready var _quality_panel: PanelContainer = find_child("Quality", true, false) as PanelContainer
+@onready var _score_label: Label = find_child("Score", true, false).find_child("Text", false, false) as Label
+@onready var _experience_label: Label = find_child("Experience", true, false).find_child("Text", false, false) as Label
+@onready var _durability_label: Label = find_child("Durability", true, false).find_child("Text", false, false) as Label
+@onready var _days_label: Label = find_child("Days", true, false).find_child("Text", false, false) as Label
 @onready var _mastery_label: Label = %MasteryLabel
-@onready var _materials_row: HBoxContainer = $Dialog/Content/Materials
+@onready var _materials_row: HBoxContainer = find_child("Materials", true, false) as HBoxContainer
 @onready var _reward_item: ItemView = %RewardItem
 @onready var _material_template: ItemView = %MaterialTemplate
 

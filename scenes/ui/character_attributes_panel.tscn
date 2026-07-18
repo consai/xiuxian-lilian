@@ -334,7 +334,8 @@ offset_right = 638.0
 offset_bottom = 564.0
 theme_override_styles/panel = SubResource("InsetPanel")
 
-[node name="Heading" type="Label" parent="Panel/AttributesCard" unique_id=1352032944]
+[node name="AttributesHeading" type="Label" parent="Panel/AttributesCard" unique_id=1352032944]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 10.0
 offset_top = 12.0

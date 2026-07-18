@@ -70,8 +70,8 @@ func _bind_reward_preview(rewards: Array) -> void:
 			continue
 		slot.visible = true
 		var reward := rewards[i] as Dictionary
-		var icon_node := slot.get_node_or_null("Icon") as TextureRect
-		var count_node := slot.get_node_or_null("Count") as Label
+		var icon_node := slot.find_child("Icon", true, false) as TextureRect
+		var count_node := slot.find_child("Count", true, false) as Label
 		if count_node != null:
 			count_node.text = str(maxi(1, int(reward.get("count", 1))))
 		if icon_node != null:

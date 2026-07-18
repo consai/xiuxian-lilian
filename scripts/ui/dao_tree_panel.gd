@@ -34,22 +34,22 @@ const DaoTreeQueryApplicationScript := preload(
 )
 const KnowledgeServiceScript := preload("res://scripts/dao/knowledge_service.gd")
 
-@onready var _player_card: Label = $PlayerCard/Text
-@onready var _by_dao: Button = $ModeTabs/Tabs/ByDao
-@onready var _by_realm: Button = $ModeTabs/Tabs/ByRealm
-@onready var _close: TextureButton = $Close
-@onready var _categories: VBoxContainer = $MainPanel/CategoryScroll/Categories
-@onready var _tree_area: Control = $MainPanel/TreeArea
-@onready var _details_heading: Label = $MainPanel/Details/VBox/Heading
-@onready var _details_desc: Label = $MainPanel/Details/VBox/Description
-@onready var _details_state: Label = $MainPanel/Details/VBox/State
-@onready var _details_progress: ProgressBar = $MainPanel/Details/VBox/Progress
-@onready var _details_impact: Label = $MainPanel/Details/VBox/Impact
-@onready var _path_button: Button = $MainPanel/Details/VBox/PathButton
-@onready var _route_panel: PanelContainer = $RoutePanel
-@onready var _route_heading: Label = $RoutePanel/VBox/Heading
-@onready var _back: TextureButton = $BottomActions/Back
-@onready var _zoom: TextureButton = $BottomActions/Zoom
+@onready var _player_card: Label = %PlayerCardText
+@onready var _by_dao: Button = %ByDao
+@onready var _by_realm: Button = %ByRealm
+@onready var _close: TextureButton = %Close
+@onready var _categories: VBoxContainer = %Categories
+@onready var _tree_area: Control = %TreeArea
+@onready var _details_heading: Label = %DetailsHeading
+@onready var _details_desc: Label = %DetailsDescription
+@onready var _details_state: Label = %DetailsState
+@onready var _details_progress: ProgressBar = %DetailsProgress
+@onready var _details_impact: Label = %DetailsImpact
+@onready var _path_button: Button = %PathButton
+@onready var _route_panel: PanelContainer = %RoutePanel
+@onready var _route_heading: Label = %RouteHeading
+@onready var _back: TextureButton = %Back
+@onready var _zoom: TextureButton = %Zoom
 
 var _graph: DaoTreeGraphViewScript
 var _selected_skill_id := ""

@@ -227,7 +227,7 @@ func _bind_row(row_path: String, value: int, sources: Array) -> void:
 	if row.has_method("bind"):
 		row.bind(value, sources)
 		return
-	var value_label := row.get_node_or_null("Value") as Label
+	var value_label := row.find_child("Value", true, false) as Label
 	if value_label != null:
 		value_label.text = str(value)
 

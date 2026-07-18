@@ -149,10 +149,7 @@ static func _is_battle_scene(node: Node) -> bool:
 
 
 static func _scene_manager() -> Node:
-	var loop: MainLoop = Engine.get_main_loop()
-	if not loop is SceneTree:
-		return null
-	return (loop as SceneTree).root.get_node_or_null("SceneManager")
+	return SceneManager
 
 
 static func _game_state() -> Node:

@@ -59,7 +59,11 @@ const QI_RING_BREATH := [
 
 @export var progress_duration := 3.0
 
-@onready var _qi_rings: Array[Panel] = [$OuterQiRing, $MiddleQiRing, $InnerQiRing]
+@onready var _qi_rings: Array[Panel] = [
+	find_child("OuterQiRing", true, false) as Panel,
+	find_child("MiddleQiRing", true, false) as Panel,
+	find_child("InnerQiRing", true, false) as Panel,
+]
 @onready var _method_label: Label = %MethodLabel
 @onready var _day_label: Label = %DayLabel
 @onready var _stage_title: Label = %StageTitle

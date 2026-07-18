@@ -14,6 +14,9 @@ func _run() -> void:
 		var candidate := defaults.duplicate(true)
 		candidate["display_mode"] = mode
 		_check(bool(SettingsRepositoryScript.validate(candidate).get("ok", false)), "display mode validates: " + mode)
+		for resolution in [{"width": 1920, "height": 1080}, {"width": 1280, "height": 720}]:
+			candidate["resolution"] = resolution
+			_check(bool(SettingsApplicationScript.apply(candidate).get("ok", false)), "display mode applies: %s %dx%d" % [mode, resolution["width"], resolution["height"]])
 	_check(not bool(SettingsRepositoryScript.validate({"display_mode": "invalid"}).get("ok", true)), "invalid mode rejected")
 	var saved := SettingsApplicationScript.save_settings(defaults)
 	_check(bool(saved.get("ok", false)), "settings save succeeds")

@@ -62,7 +62,7 @@ enum Tab { ATTRIBUTES, EXPERIENCE, STATISTICS }
 @onready var _magic_def: Panel = %MagicDef
 @onready var _action_spd: Panel = %ActionSpd
 @onready var _shield: Panel = %Shield
-@onready var _attributes_heading: Label = $Panel/AttributesCard/Heading
+@onready var _attributes_heading: Label = %AttributesHeading
 @onready var _attributes_card: Panel = %AttributesCard
 @onready var _other_attr: Panel = %OtherAttr
 @onready var _other_attr_heading: Label = %OtherAttrHeading
@@ -149,7 +149,7 @@ func _bind_combat_stats() -> void:
 
 
 func _set_stat_slot(panel: Panel, title: String, value_text: String) -> void:
-	var label := panel.get_node("Label") as Label
+	var label := panel.find_child("Label", false, false) as Label
 	label.text = "%s\n%s" % [title, value_text]
 
 

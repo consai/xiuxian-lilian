@@ -147,7 +147,8 @@ offset_right = 220.0
 offset_bottom = 92.0
 theme_override_styles/panel = SubResource("Panel")
 
-[node name="Text" type="Label" parent="PlayerCard" unique_id=430528202]
+[node name="PlayerCardText" type="Label" parent="PlayerCard" unique_id=430528202]
+unique_name_in_owner = true
 layout_mode = 2
 text = "云游散人
 炼气三层"
@@ -188,6 +189,7 @@ theme_override_styles/panel = SubResource("Inner")
 layout_mode = 2
 
 [node name="ByDao" type="Button" parent="ModeTabs/Tabs" unique_id=747636513]
+unique_name_in_owner = true
 script = ExtResource("18_auto")
 layout_mode = 2
 size_flags_horizontal = 3
@@ -198,6 +200,7 @@ text = "按大道"
 
 
 [node name="ByRealm" type="Button" parent="ModeTabs/Tabs" unique_id=1312592553]
+unique_name_in_owner = true
 script = ExtResource("18_auto")
 layout_mode = 2
 size_flags_horizontal = 3
@@ -208,6 +211,7 @@ text = "按境界"
 
 
 [node name="Close" type="TextureButton" parent="." unique_id=2138564248]
+unique_name_in_owner = true
 script = ExtResource("18_auto")
 layout_mode = 0
 offset_left = 1190.0
@@ -238,11 +242,13 @@ horizontal_scroll_mode = 0
 vertical_scroll_mode = 2
 
 [node name="Categories" type="VBoxContainer" parent="MainPanel/CategoryScroll" unique_id=373646180]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 16
 
 [node name="TreeArea" type="Control" parent="MainPanel" unique_id=1163789653]
+unique_name_in_owner = true
 clip_contents = true
 layout_mode = 0
 offset_left = 190.0
@@ -262,30 +268,35 @@ theme_override_styles/panel = SubResource("Inner")
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Heading" type="Label" parent="MainPanel/Details/VBox" unique_id=2116609757]
+[node name="DetailsHeading" type="Label" parent="MainPanel/Details/VBox" unique_id=2116609757]
+unique_name_in_owner = true
 layout_mode = 2
 text = "剑阵基础  I"
 label_settings = ExtResource("10_head")
 horizontal_alignment = 1
 
-[node name="Description" type="Label" parent="MainPanel/Details/VBox" unique_id=603788071]
+[node name="DetailsDescription" type="Label" parent="MainPanel/Details/VBox" unique_id=603788071]
+unique_name_in_owner = true
 layout_mode = 2
 text = "理解多柄飞剑的协同与阵势变化。"
 label_settings = ExtResource("12_small")
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="State" type="Label" parent="MainPanel/Details/VBox" unique_id=1435548466]
+[node name="DetailsState" type="Label" parent="MainPanel/Details/VBox" unique_id=1435548466]
+unique_name_in_owner = true
 layout_mode = 2
 text = "当前掌握                         I"
 label_settings = ExtResource("11_text")
 
-[node name="Progress" type="ProgressBar" parent="MainPanel/Details/VBox" unique_id=875511362]
+[node name="DetailsProgress" type="ProgressBar" parent="MainPanel/Details/VBox" unique_id=875511362]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 value = 42.0
 
-[node name="Impact" type="Label" parent="MainPanel/Details/VBox" unique_id=909100869]
+[node name="DetailsImpact" type="Label" parent="MainPanel/Details/VBox" unique_id=909100869]
+unique_name_in_owner = true
 layout_mode = 2
 text = "掌握度 42%
 
@@ -294,6 +305,7 @@ label_settings = ExtResource("12_small")
 autowrap_mode = 2
 
 [node name="PathButton" type="Button" parent="MainPanel/Details/VBox" unique_id=1993788657]
+unique_name_in_owner = true
 script = ExtResource("18_auto")
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
@@ -316,6 +328,7 @@ text = ""
 
 
 [node name="RoutePanel" type="PanelContainer" parent="." unique_id=2126428413]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 370.0
 offset_top = 590.0
@@ -326,7 +339,8 @@ theme_override_styles/panel = SubResource("Inner")
 [node name="VBox" type="VBoxContainer" parent="RoutePanel" unique_id=1012197089]
 layout_mode = 2
 
-[node name="Heading" type="Label" parent="RoutePanel/VBox" unique_id=1626114519]
+[node name="RouteHeading" type="Label" parent="RoutePanel/VBox" unique_id=1626114519]
+unique_name_in_owner = true
 layout_mode = 2
 text = "提升途径"
 label_settings = ExtResource("10_head")
@@ -374,6 +388,7 @@ offset_bottom = 792.0
 theme_override_constants/separation = 10
 
 [node name="Back" type="TextureButton" parent="BottomActions" unique_id=1247027947]
+unique_name_in_owner = true
 script = ExtResource("18_auto")
 custom_minimum_size = Vector2(100, 44)
 layout_mode = 2
@@ -395,6 +410,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Zoom" type="TextureButton" parent="BottomActions" unique_id=1904849399]
+unique_name_in_owner = true
 script = ExtResource("18_auto")
 custom_minimum_size = Vector2(100, 44)
 layout_mode = 2
@@ -429,4 +445,3 @@ text = "● 已掌握     ● 成长中     ○ 未掌握     印 条件不足"
 label_settings = ExtResource("12_small")
 horizontal_alignment = 1
 vertical_alignment = 1
-

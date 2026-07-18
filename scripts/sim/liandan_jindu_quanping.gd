@@ -53,10 +53,10 @@ const STATUS_TEXTS := [
 @onready var _cancel_button: TextureButton = %CancelButton
 @onready var _speed_button: TextureButton = %SpeedButton
 @onready var _milestone_labels: Array[Label] = [
-	$Milestones/AddHerb/Text,
-	$Milestones/ControlFire/Text,
-	$Milestones/FormPill/Text,
-	$Milestones/OpenFurnace/Text,
+	find_child("AddHerb", true, false).find_child("Text", false, false),
+	find_child("ControlFire", true, false).find_child("Text", false, false),
+	find_child("FormPill", true, false).find_child("Text", false, false),
+	find_child("OpenFurnace", true, false).find_child("Text", false, false),
 ]
 
 var _recipe_id := ""

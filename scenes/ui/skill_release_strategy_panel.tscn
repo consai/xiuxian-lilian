@@ -223,7 +223,8 @@ text = "激进"
 layout_mode = 2
 text = "保守"
 
-[node name="Description" type="Label" parent="Panel/ModeCard" unique_id=971675802]
+[node name="ModeDescription" type="Label" parent="Panel/ModeCard" unique_id=971675802]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 24.0
 offset_top = 114.0

@@ -730,7 +730,7 @@ static func _set_slot_input_enabled(slot: OneSkillView, tint: Color) -> void:
 	slot.mouse_filter = Control.MOUSE_FILTER_STOP
 	slot.modulate = Color.WHITE
 	slot.set_icon_tint(tint)
-	var press := slot.get_node_or_null("Control")
+	var press := slot.find_child("Control", true, false)
 	if press is Control:
 		press.mouse_filter = slot.mouse_filter
 		press.modulate = Color.WHITE

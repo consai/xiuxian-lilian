@@ -520,7 +520,7 @@ func _set_picker_chrome(show_chrome: bool) -> void:
 
 
 func _ensure_hover_tip(view: ItemView) -> HoverTipSource:
-	var tip := view.get_node_or_null("BagHoverTip") as HoverTipSource
+	var tip := view.find_child("BagHoverTip", true, false) as HoverTipSource
 	if tip == null:
 		tip = HoverTipSourceScript.new()
 		tip.name = "BagHoverTip"
@@ -539,7 +539,7 @@ func _bind_hover_tip(view: ItemView, payload: Dictionary) -> void:
 
 
 func _clear_hover_tip(view: ItemView) -> void:
-	var tip := view.get_node_or_null("BagHoverTip") as HoverTipSource
+	var tip := view.find_child("BagHoverTip", true, false) as HoverTipSource
 	if tip != null:
 		tip.clear_payload()
 		tip.enabled = false

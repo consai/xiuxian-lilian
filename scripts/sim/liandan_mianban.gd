@@ -59,7 +59,7 @@ func _tutorial() -> Node:
 @onready var _detail_label: Label = %DetailLabel
 @onready var _result_label: Label = %ResultLabel
 @onready var _brew_button: Button = %BrewButton
-@onready var _player_label: Label = $PlayerChip/Text
+@onready var _player_label: Label = find_child("PlayerChip", true, false).find_child("Text", false, false) as Label
 @onready var _tutorial_preview_click_area: Control = %TutorialPreviewClickArea
 @onready var _material_slots: Array[ItemView] = [%MaterialSlot0, %MaterialSlot1, %MaterialSlot2]
 @onready var _pill_preview: ItemView = %PillPreviewSlot

@@ -61,7 +61,7 @@ const SETTING_ROWS := [
 @onready var _cancel_button: TextureButton = %CancelButton
 @onready var _rows: VBoxContainer = %Rows
 @onready var _modes: HBoxContainer = %Modes
-@onready var _mode_description: Label = $Panel/ModeCard/Description
+@onready var _mode_description: Label = %ModeDescription
 @onready var _settings: VBoxContainer = %Settings
 @onready var _hint: Label = %Hint
 
@@ -106,10 +106,10 @@ func _wire_static_interactions() -> void:
 		return
 	_wired = true
 	for spec in MODE_ROWS:
-		var button := _modes.get_node(str(spec["node"])) as Button
+		var button := _modes.find_child(str(spec["node"]), false, false) as Button
 		button.pressed.connect(_select_preset.bind(str(spec["preset"])))
 	for spec in SETTING_ROWS:
-		var row := _settings.get_node(str(spec["node"])) as Control
+		var row := _settings.find_child(str(spec["node"]), false, false) as Control
 		_make_clickable(row, _cycle_setting.bind(str(spec["key"])))
 
 
@@ -149,9 +149,9 @@ func _sync_strategy_rows() -> void:
 
 
 func _wire_strategy_row(row: Control, index: int) -> void:
-	_make_clickable(row.get_node("Condition"), _edit_strategy.bind(index))
-	_make_clickable(row.get_node("Target"), _edit_strategy.bind(index))
-	_make_clickable(row.get_node("Drag") as Control, _move_strategy_up.bind(index))
+	_make_clickable(row.find_child("Condition", false, false) as Control, _edit_strategy.bind(index))
+	_make_clickable(row.find_child("Target", false, false) as Control, _edit_strategy.bind(index))
+	_make_clickable(row.find_child("Drag", false, false) as Control, _move_strategy_up.bind(index))
 	_make_clickable(row, _remove_strategy.bind(index))
 
 
@@ -169,14 +169,14 @@ func _bind_strategy_row(row: Control, strategy: Dictionary, index: int) -> void:
 func _bind_modes() -> void:
 	for spec in MODE_ROWS:
 		var preset := str(spec["preset"])
-		var button := _modes.get_node(str(spec["node"])) as Button
+		var button := _modes.find_child(str(spec["node"]), false, false) as Button
 		button.disabled = preset == _draft_preset
 
 
 func _bind_settings() -> void:
 	for spec in SETTING_ROWS:
 		var key := str(spec["key"])
-		var row := _settings.get_node(str(spec["node"])) as Control
+		var row := _settings.find_child(str(spec["node"]), false, false) as Control
 		row.get_node("%ValueLabel").text = PlayerAutoBattleServiceScript.setting_display(
 			key,
 			_draft_settings.get(key)
