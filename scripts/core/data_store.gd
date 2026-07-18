@@ -36,7 +36,6 @@ func reset_rundata() -> void:
 			"last_rewards": [],
 			"last_lilian_summary": {},
 			"last_settled_lilian_id": "",
-			"active_save_slot": 0,
 		},
 	}
 

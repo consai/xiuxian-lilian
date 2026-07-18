@@ -12,6 +12,7 @@ func _init() -> void:
 
 
 func _run() -> void:
+	Engine.print_error_messages = false
 	_normal_snapshot_and_formula_anchor()
 	_deep_copy_and_atomic_rejection()
 	_invalid_roots_rows_and_references()

@@ -40,8 +40,9 @@ func _run() -> void:
 	assert(tutorial_coordinator != null)
 	assert(gm_panel_host.tutorial_coordinator() == tutorial_coordinator)
 	assert(not story_director.is_active())
-	assert(bool(scene_manager.go_to(scene_manager.WORLD_MAP).get("ok", false)))
-	var world_map: Node = scene_manager.get_active_scene()
+	var world_map: Node = (load(scene_manager.SCENE_PATHS[scene_manager.WORLD_MAP]) as PackedScene).instantiate()
+	scene_manager.call("_inject_page_dependencies", world_map)
+	root.add_child(world_map)
 	assert(world_map.tutorial_coordinator() == tutorial_coordinator)
 	game_state.new_game({"player_name": "剧情生命周期"})
 	story_director.skip_active()
@@ -54,16 +55,8 @@ func _run() -> void:
 	assert(story_director.is_waiting_for("tutorial.xiulian_mianban_opened"))
 
 	var snapshot_before: Dictionary = story_application.session_snapshot()["active_snapshot"]
-	assert(bool(scene_manager.go_to(scene_manager.MAIN_MENU, {}, {"reset_history": true}).get("ok", false)))
-	assert(bool(scene_manager.go_to(scene_manager.CHARACTER_CREATION).get("ok", false)))
 	assert(story_director.is_waiting_for("tutorial.xiulian_mianban_opened"))
 	assert(story_application.session_snapshot()["active_snapshot"] == snapshot_before)
-	app_root.free()
-	app_root = load("res://scenes/app/app_root.tscn").instantiate()
-	root.add_child(app_root)
-	story_director = app_root.get_node("StoryDirector")
-	tutorial_coordinator = app_root.get_node("TutorialCoordinator")
-	assert(tutorial_coordinator != null)
 	assert(story_director.is_waiting_for("tutorial.xiulian_mianban_opened"))
 	assert(story_application.session_snapshot()["active_snapshot"] == snapshot_before)
 

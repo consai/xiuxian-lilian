@@ -11,7 +11,6 @@ const WeituoApplicationScript := preload(
 @onready var _status_label: Label = %StatusLabel
 @onready var _message_label: Label = %MessageLabel
 @onready var _inventory_overlay: Control = %InventoryOverlay
-@onready var _save_slots_overlay: Control = %SaveSlotsOverlay
 @onready var _breakthrough_button: TextureButton = %BreakthroughButton
 @onready var _furnace_button: TextureButton = %FurnaceButton
 @onready var _storage_button: TextureButton = %StorageButton
@@ -24,7 +23,6 @@ const WeituoApplicationScript := preload(
 @onready var _knowledge_study_button: TextureButton = %KnowledgeStudyButton
 @onready var _attributes_button: TextureButton = %btnattrs
 @onready var _skills_button: TextureButton = %Skills
-@onready var _save_button: Button = %SaveButton
 
 var _weituo_application: Variant
 var _tutorial_coordinator: Node
@@ -48,8 +46,6 @@ func bind_game_session_host(host: Node) -> void:
 func _bind_game_session_children() -> void:
 	if _game_session_host == null:
 		return
-	if _save_slots_overlay != null and _save_slots_overlay.has_method("bind_game_session_host"):
-		_save_slots_overlay.call("bind_game_session_host", _game_session_host)
 	if _inventory_overlay != null and _inventory_overlay.has_method("bind_game_session_host"):
 		_inventory_overlay.call("bind_game_session_host", _game_session_host)
 	if _weituo_board != null and _weituo_board.has_method("bind_game_session_host"):
@@ -80,7 +76,6 @@ func _tutorial_event(event_id: String) -> void:
 func _ready() -> void:
 	_bind_game_session_children()
 	_inventory_overlay.visible = false
-	_save_slots_overlay.visible = false
 	_weituo_board.visible = false
 	_connect_actions()
 	call_deferred("_initialize_after_session")
@@ -107,8 +102,6 @@ func _connect_actions() -> void:
 	_skills_button.pressed.connect(_on_skills)
 	_breakthrough_button.pressed.connect(_on_breakthrough)
 	_attributes_button.pressed.connect(_on_character_attributes)
-	_save_button.pressed.connect(_toggle_save_slots)
-	_save_slots_overlay.closed.connect(_on_save_slots_closed)
 	_weituo_board.close_requested.connect(_close_weituo_board)
 	_weituo_board.accept_requested.connect(_on_weituo_accept)
 	_weituo_board.submit_requested.connect(_on_weituo_submit)
@@ -126,8 +119,6 @@ func _refresh(message: String = "") -> void:
 		game_session.time_date_label(game_session.day), game_session.ling_stones, game_session.hp, hp_max,
 		game_session.mp, mp_max, game_session.time_duration_label(game_session.injury_days), game_session.cultivation_instability
 	]
-	if game_session.active_save_slot > 0:
-		status += "  |  存档槽 %d" % game_session.active_save_slot
 	_status_label.text = status
 	# 仅在大境界可突破时展示入口，避免平时占位干扰洞府布局
 	_breakthrough_button.visible = game_session.can_breakthrough()
@@ -282,17 +273,5 @@ func _on_weituo_abandon(instance_id: String) -> void:
 
 func _toggle_inventory() -> void:
 	_inventory_overlay.visible = not _inventory_overlay.visible
-	if _inventory_overlay.visible and _inventory_overlay.has_method("refresh"):
-		_inventory_overlay.refresh()
-
-
-func _toggle_save_slots() -> void:
-	_save_slots_overlay.visible = not _save_slots_overlay.visible
-	if _save_slots_overlay.visible and _save_slots_overlay.has_method("refresh"):
-		_save_slots_overlay.refresh()
-
-
-func _on_save_slots_closed(message: String) -> void:
-	_refresh(message)
 	if _inventory_overlay.visible and _inventory_overlay.has_method("refresh"):
 		_inventory_overlay.refresh()

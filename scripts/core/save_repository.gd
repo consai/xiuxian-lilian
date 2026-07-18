@@ -2,87 +2,87 @@ class_name SaveRepository
 extends RefCounted
 
 const SCHEMA_VERSION := 2
-const SLOT_COUNT := 3
-const AUTO_SAVE_SLOT := 1
+const AUTO_SAVE_PATH := "user://saves/autosave.json"
+const AUTO_SAVE_TEMP_PATH := "user://saves/autosave.tmp"
+const AUTO_SAVE_BACKUP_PATH := "user://saves/autosave.bak"
 
 
-static func save_slot(slot: int, data: Dictionary) -> Dictionary:
-	if slot < 1 or slot > SLOT_COUNT:
-		return {"ok": false, "error": "无效存档槽位"}
-	var file := FileAccess.open(_path(slot), FileAccess.WRITE)
-	if file == null:
-		return {"ok": false, "error": "无法写入存档"}
+static func save_auto(data: Dictionary) -> Dictionary:
+	var directory_result := DirAccess.make_dir_recursive_absolute("user://saves")
+	if directory_result != OK and directory_result != ERR_ALREADY_EXISTS:
+		return {"ok": false, "error": "无法创建自动存档目录"}
 	var envelope := {
 		"schema_version": SCHEMA_VERSION,
-		"saved_unix": int(Time.get_unix_time_from_system()),
-		"game": data.duplicate(true),
+		"app_version": "phase2",
+		"saved_at_unix": int(Time.get_unix_time_from_system()),
+		"slot_id": 1,
+		"payload": data.duplicate(true),
 	}
+	var file := FileAccess.open(AUTO_SAVE_TEMP_PATH, FileAccess.WRITE)
+	if file == null:
+		return {"ok": false, "error": "无法写入自动存档临时文件"}
 	file.store_string(JSON.stringify(envelope, "\t"))
-	return {"ok": true}
+	file.close()
+	var checked := _read_envelope(AUTO_SAVE_TEMP_PATH)
+	if not bool(checked.get("ok", false)):
+		DirAccess.remove_absolute(AUTO_SAVE_TEMP_PATH)
+		return {"ok": false, "error": "自动存档临时文件校验失败"}
+	if FileAccess.file_exists(AUTO_SAVE_PATH):
+		DirAccess.remove_absolute(AUTO_SAVE_BACKUP_PATH)
+		if DirAccess.rename_absolute(AUTO_SAVE_PATH, AUTO_SAVE_BACKUP_PATH) != OK:
+			DirAccess.remove_absolute(AUTO_SAVE_TEMP_PATH)
+			return {"ok": false, "error": "无法备份现有自动存档"}
+	if DirAccess.rename_absolute(AUTO_SAVE_TEMP_PATH, AUTO_SAVE_PATH) != OK:
+		if FileAccess.file_exists(AUTO_SAVE_BACKUP_PATH):
+			DirAccess.rename_absolute(AUTO_SAVE_BACKUP_PATH, AUTO_SAVE_PATH)
+		return {"ok": false, "error": "无法替换自动存档"}
+	var reread := _read_envelope(AUTO_SAVE_PATH)
+	if not bool(reread.get("ok", false)):
+		DirAccess.remove_absolute(AUTO_SAVE_PATH)
+		if FileAccess.file_exists(AUTO_SAVE_BACKUP_PATH):
+			DirAccess.rename_absolute(AUTO_SAVE_BACKUP_PATH, AUTO_SAVE_PATH)
+		return {"ok": false, "error": "自动存档重读校验失败"}
+	return {"ok": true, "saved_at_unix": int(envelope["saved_at_unix"])}
 
 
-static func load_slot(slot: int) -> Dictionary:
-	if slot < 1 or slot > SLOT_COUNT or not FileAccess.file_exists(_path(slot)):
-		return {"ok": false, "error": "该槽位为空"}
+static func load_auto() -> Dictionary:
+	return _read_envelope(AUTO_SAVE_PATH)
+
+
+static func restore_auto_backup() -> Dictionary:
+	if not FileAccess.file_exists(AUTO_SAVE_BACKUP_PATH):
+		return {"ok": false, "error": "没有自动存档备份"}
+	var checked := _read_envelope(AUTO_SAVE_BACKUP_PATH)
+	if not bool(checked.get("ok", false)):
+		return {"ok": false, "error": "自动存档备份损坏"}
+	if FileAccess.file_exists(AUTO_SAVE_PATH):
+		DirAccess.remove_absolute(AUTO_SAVE_PATH)
+	if DirAccess.rename_absolute(AUTO_SAVE_BACKUP_PATH, AUTO_SAVE_PATH) != OK:
+		return {"ok": false, "error": "无法恢复自动存档备份"}
+	return _read_envelope(AUTO_SAVE_PATH)
+
+
+static func _read_envelope(path: String) -> Dictionary:
+	if not FileAccess.file_exists(path):
+		return {"ok": false, "error": "自动存档不存在"}
 	var parser := JSON.new()
-	if parser.parse(FileAccess.get_file_as_string(_path(slot))) != OK:
-		return {"ok": false, "error": "存档损坏"}
+	if parser.parse(FileAccess.get_file_as_string(path)) != OK:
+		return {"ok": false, "error": "自动存档损坏"}
 	var parsed: Variant = parser.data
 	if not parsed is Dictionary:
-		return {"ok": false, "error": "存档损坏"}
+		return {"ok": false, "error": "自动存档根节点无效"}
 	var envelope := parsed as Dictionary
 	if int(envelope.get("schema_version", -1)) != SCHEMA_VERSION:
-		return {"ok": false, "error": "存档版本不兼容"}
-	var game_v: Variant = envelope.get("game")
-	if not game_v is Dictionary:
-		return {"ok": false, "error": "存档缺少游戏状态"}
-	return {"ok": true, "game": (game_v as Dictionary).duplicate(true)}
-
-
-static func slot_exists(slot: int) -> bool:
-	return slot >= 1 and slot <= SLOT_COUNT and FileAccess.file_exists(_path(slot))
-
-
-static func slot_info(slot: int) -> Dictionary:
-	var loaded := load_slot(slot)
-	if not bool(loaded.get("ok", false)):
-		return loaded
-	var game := loaded["game"] as Dictionary
+		return {"ok": false, "error": "自动存档版本不兼容"}
+	if str(envelope.get("app_version", "")).strip_edges() == "":
+		return {"ok": false, "error": "自动存档缺少应用版本"}
+	if int(envelope.get("slot_id", -1)) != 1:
+		return {"ok": false, "error": "自动存档槽位无效"}
+	var payload_v: Variant = envelope.get("payload")
+	if not payload_v is Dictionary:
+		return {"ok": false, "error": "自动存档缺少游戏状态"}
 	return {
 		"ok": true,
-		"day": int(game.get("day", 1)),
-		"realm_name": str(game.get("realm_name", "未知")),
-		"cultivation": int(game.get("cultivation", 0)),
+		"payload": (payload_v as Dictionary).duplicate(true),
+		"saved_at_unix": int(envelope.get("saved_at_unix", 0)),
 	}
-
-
-static func find_latest_slot() -> int:
-	var latest_slot := 0
-	var latest_time := -1
-	for slot in range(1, SLOT_COUNT + 1):
-		var saved_unix := _read_saved_unix(slot)
-		if saved_unix < 0:
-			continue
-		if saved_unix >= latest_time:
-			latest_time = saved_unix
-			latest_slot = slot
-	return latest_slot
-
-
-static func _read_saved_unix(slot: int) -> int:
-	if slot < 1 or slot > SLOT_COUNT or not FileAccess.file_exists(_path(slot)):
-		return -1
-	var parser := JSON.new()
-	if parser.parse(FileAccess.get_file_as_string(_path(slot))) != OK:
-		return -1
-	var parsed: Variant = parser.data
-	if not parsed is Dictionary:
-		return -1
-	var envelope := parsed as Dictionary
-	if int(envelope.get("schema_version", -1)) != SCHEMA_VERSION:
-		return -1
-	return int(envelope.get("saved_unix", 0))
-
-
-static func _path(slot: int) -> String:
-	return "user://save_slot_%d.json" % slot

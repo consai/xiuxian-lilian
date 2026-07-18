@@ -6,6 +6,7 @@ const ExportTableReaderScript := preload("res://scripts/core/config/export_table
 
 
 func _init() -> void:
+	Engine.print_error_messages = false
 	var roots := _roots()
 	var catalog = CatalogScript.new()
 	_check(catalog.reload(), "catalog must read all eight production tables")

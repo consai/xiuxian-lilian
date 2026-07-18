@@ -10,7 +10,6 @@
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/24.tres" id="17_label24"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="18_label28"]
 [ext_resource type="PackedScene" path="res://scenes/sim/beibao_fuceng.tscn" id="19_breup"]
-[ext_resource type="PackedScene" path="res://scenes/sim/cundang_fuceng.tscn" id="20_save"]
 [ext_resource type="PackedScene" path="res://scenes/ui/weituo_board_panel.tscn" id="21_weituo"]
 
 [sub_resource type="StyleBoxFlat" id="Style_panel"]
@@ -77,16 +76,6 @@ offset_bottom = 82.0
 text = "炼气一层 · 修为 0/100"
 label_settings = ExtResource("16_label20")
 horizontal_alignment = 1
-
-[node name="SaveButton" type="Button" parent="ProfilePanel" unique_id=1418512808]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 72.0
-offset_top = 84.0
-offset_right = 180.0
-offset_bottom = 108.0
-text = "存档"
-script = ExtResource("12_av2rb")
 
 [node name="StatusPanel" type="Panel" parent="." unique_id=144307130]
 layout_mode = 1
@@ -442,11 +431,6 @@ vertical_alignment = 1
 autowrap_mode = 2
 
 [node name="InventoryOverlay" parent="." unique_id=484445740 instance=ExtResource("19_breup")]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-
-[node name="SaveSlotsOverlay" parent="." unique_id=1076859842 instance=ExtResource("20_save")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1

@@ -1,6 +1,11 @@
 extends Control
 
 var _lilian_session_host: Node
+var _game_session_host: Node
+
+
+func bind_game_session_host(host: Node) -> void:
+	_game_session_host = host
 
 
 func bind_lilian_session_host(host: Node) -> void:
@@ -13,16 +18,12 @@ func _lilian_session() -> Node:
 		return null
 	return _lilian_session_host.session()
 
-@onready var _save_overlay: Control = %SaveSlotsOverlay
 @onready var _message_label: Label = %MessageLabel
 
 
 func _ready() -> void:
-	_save_overlay.visible = false
 	%StartButton.pressed.connect(_on_start_pressed)
 	%LoadButton.pressed.connect(_on_load_pressed)
-	_save_overlay.closed.connect(_on_save_overlay_closed)
-	_save_overlay.loaded.connect(_on_game_loaded)
 
 
 func _on_start_pressed() -> void:
@@ -32,18 +33,14 @@ func _on_start_pressed() -> void:
 
 
 func _on_load_pressed() -> void:
-	_save_overlay.refresh()
-	_save_overlay.visible = true
-	_set_message("选择要读取的存档槽位。")
-
-
-func _on_game_loaded(_slot: int) -> void:
+	if _game_session_host == null:
+		_set_message("游戏会话未注入")
+		return
+	var result: Dictionary = _game_session_host.continue_game()
+	if not bool(result.get("ok", false)):
+		_set_message(str(result.get("error", "没有可继续的自动存档")))
+		return
 	_enter_game()
-
-
-func _on_save_overlay_closed(message: String) -> void:
-	if message != "":
-		_set_message(message)
 
 
 func _enter_game() -> void:

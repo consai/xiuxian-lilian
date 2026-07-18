@@ -5,7 +5,6 @@
 [ext_resource type="Texture2D" uid="uid://v5owy5nnptxw" path="res://docs/concepts/cave_hub_background_only_v3.png" id="3_bg"]
 [ext_resource type="LabelSettings" uid="uid://c35q6evwb6fpr" path="res://ui/ziti_new/28.tres" id="4_label28"]
 [ext_resource type="LabelSettings" path="res://ui/ziti_new/20.tres" id="5_label20"]
-[ext_resource type="PackedScene" path="res://scenes/sim/cundang_fuceng.tscn" id="6_save"]
 [ext_resource type="PackedScene" path="res://scenes/ui/components/xiulian_primary_button.tscn" id="7_primary"]
 
 [ext_resource type="Script" uid="uid://cwd4djdi6atf6" path="res://scripts/ui/press_scale_feedback.gd" id="8_auto"]
@@ -145,7 +144,7 @@ theme_override_font_sizes/font_size = 28
 theme_override_styles/normal = SubResource("Style_secondary_normal")
 theme_override_styles/hover = SubResource("Style_secondary_hover")
 theme_override_styles/pressed = SubResource("Style_secondary_hover")
-text = "读取存档"
+text = "继续游戏"
 
 
 [node name="MessageLabel" type="Label" parent="MenuPanel"]
@@ -155,13 +154,7 @@ offset_left = 24.0
 offset_top = 328.0
 offset_right = 416.0
 offset_bottom = 396.0
-text = "请选择开始新游戏，或读取已有存档。"
+text = "请选择开始新游戏，或继续最近一次修行。"
 label_settings = ExtResource("5_label20")
 horizontal_alignment = 1
 autowrap_mode = 2
-
-[node name="SaveSlotsOverlay" parent="." instance=ExtResource("6_save")]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-load_only = true

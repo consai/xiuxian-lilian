@@ -6,6 +6,7 @@ const InventoryQueryApplicationScript := preload("res://scripts/features/invento
 
 
 func _init() -> void:
+	Engine.print_error_messages = false
 	var roots := _roots()
 	var item_ids := _known_item_ids()
 	var catalog = LiandanCatalogScript.new()

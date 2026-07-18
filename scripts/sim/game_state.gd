@@ -75,7 +75,7 @@ const CharacterProgressionApplicationScript := preload(
 const CharacterVitalsApplicationScript := preload(
 	"res://scripts/features/character/application/character_vitals_application.gd"
 )
-const SaveRepositoryScript := preload("res://scripts/core/save_repository.gd")
+const SaveApplicationScript := preload("res://scripts/core/save_application.gd")
 
 const INSTABILITY_REDUCTION_PER_WIN := 10
 const PASSIVE_METHOD_PRACTICE_RATIO := 0.25
@@ -249,9 +249,6 @@ var last_lilian_summary: Dictionary:
 var last_settled_lilian_id: String:
 	get: return str(DataStore.game_runtime().get("last_settled_lilian_id", ""))
 	set(value): DataStore.game_runtime()["last_settled_lilian_id"] = value
-var active_save_slot: int:
-	get: return int(DataStore.game_runtime().get("active_save_slot", 0))
-	set(value): DataStore.game_runtime()["active_save_slot"] = value
 func _ready() -> void:
 	if DataStore == null:
 		return
@@ -430,7 +427,6 @@ func new_game(profile: Dictionary = {}) -> void:
 	last_rewards = []
 	last_lilian_summary = {}
 	last_settled_lilian_id = ""
-	active_save_slot = 0
 	DataStore.savedata = DataStore.coalesce_savedata(DataStore.savedata)
 	_apply_character_profile(profile)
 	_lilian_session.reset()
@@ -683,14 +679,10 @@ func can_persist() -> bool:
 	return not _lilian_session.active
 
 
-func save_game(slot: int) -> Dictionary:
-	if slot == SaveRepositoryScript.AUTO_SAVE_SLOT:
-		return {"ok": false, "error": "槽位 1 为自动存档，无法手动存入"}
-	return _persist_slot(slot)
-
-
 func auto_save() -> Dictionary:
-	var result := _persist_slot(SaveRepositoryScript.AUTO_SAVE_SLOT)
+	if not can_persist():
+		return {"ok": false, "error": "历练中无法存档，请先完成或结算"}
+	var result: Dictionary = SaveApplicationScript.auto_save(to_dict())
 	if bool(result.get("ok", false)):
 		_emit_tip_intent({
 			"type": EnumTipIntentType.LABEL_TOAST,
@@ -703,27 +695,6 @@ func auto_save() -> Dictionary:
 			"dedupe_window_ms": 800,
 		})
 	return result
-
-
-func _persist_slot(slot: int) -> Dictionary:
-	if not can_persist():
-		return {"ok": false, "error": "历练中无法存档，请先完成或结算"}
-	var result: Dictionary = SaveRepositoryScript.save_slot(slot, to_dict())
-	if bool(result.get("ok", false)):
-		active_save_slot = slot
-	return result
-
-
-func load_game(slot: int) -> Dictionary:
-	if not can_persist():
-		return {"ok": false, "error": "历练中无法读档，请先完成或结算"}
-	var loaded: Dictionary = SaveRepositoryScript.load_slot(slot)
-	if not bool(loaded.get("ok", false)):
-		return loaded
-	if not apply_dict(loaded.get("game", {}) as Dictionary):
-		return {"ok": false, "error": "存档数据无效"}
-	active_save_slot = slot
-	return {"ok": true, "slot": slot}
 
 
 func cultivate() -> int:
